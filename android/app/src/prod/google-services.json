@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "555666777000",
+    "project_id": "playwithme-prod",
+    "storage_bucket": "playwithme-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555666777000:android:prod123456789abcdef",
+        "android_client_info": {
+          "package_name": "com.playwithme.play_with_me"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "555666777000-prod123456789abcdef.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyPROD-placeholder-key-for-production"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "555666777000-prod123456789abcdef.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
