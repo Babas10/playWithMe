@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "693417953144",
+    "project_id": "playwithme-stg",
+    "storage_bucket": "playwithme-stg.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:693417953144:android:871f2399bd70a091042a8d",
+        "android_client_info": {
+          "package_name": "com.playwithme.play_with_me.stg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAq80yO6uIB8BapyGEDsd1r5Johjbdf-pg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
