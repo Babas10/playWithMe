@@ -8,6 +8,14 @@ You can create a file named `CLAUDE.md` in the root of your repository and paste
 
 Welcome, Claude. You are the AI engineer for the "PlayWithMe" project. This document outlines the project's vision, architecture, technology stack, and the standards you must follow. Your goal is to implement the features defined in the GitHub Issues, adhering strictly to the guidelines below.
 
+## 📚 **Documentation**
+
+Comprehensive documentation is organized by Epic and Story in the [`docs/`](./docs/) directory. Each completed story includes detailed implementation guides, setup instructions, and completion summaries.
+
+**Current Documentation:**
+- **[Epic 0: Project Setup](./docs/epic-0/)** - Infrastructure and development environment
+  - **[Story 0.2.1: Firebase Multi-Environment Setup](./docs/epic-0/story-0.2.1/)** - Complete Firebase configuration guide
+
 ---
 ## 1. Project Vision 🏐
 

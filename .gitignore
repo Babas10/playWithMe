@@ -46,3 +46,12 @@ app.*.map.json
 
 # Firebase project configuration (contains sensitive project IDs)
 .firebase_projects.json
+
+# Firebase configuration files (contain sensitive API keys and project data)
+android/app/src/*/google-services.json
+ios/Runner/Firebase/*/GoogleService-Info.plist
+
+# Generated Firebase configuration files (generated from above config files)
+lib/core/config/firebase_config_dev.dart
+lib/core/config/firebase_config_stg.dart
+lib/core/config/firebase_config_prod.dart
