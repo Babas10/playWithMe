@@ -15,6 +15,8 @@ Comprehensive documentation is organized by Epic and Story in the [`docs/`](./do
 **Current Documentation:**
 - **[Epic 0: Project Setup](./docs/epic-0/)** - Infrastructure and development environment
   - **[Story 0.2.1: Firebase Multi-Environment Setup](./docs/epic-0/story-0.2.1/)** - Complete Firebase configuration guide
+- **[Security Documentation](./docs/security/)** - Critical security guidelines
+  - **[Firebase Config Security](./docs/security/FIREBASE_CONFIG_SECURITY.md)** - **MUST READ** before working with Firebase
 
 ---
 ## 1. Project Vision 🏐
@@ -64,6 +66,17 @@ Your primary directive is to produce **clean, high-quality, and maintainable cod
 * **DRY (Don't Repeat Yourself):** Abstract and reuse code where appropriate. Avoid duplicated logic.
 * **Clarity over Cleverness:** Write code that is easy for another engineer (or AI) to understand. Add comments only for complex or non-obvious logic.
 * **Error Handling:** Gracefully handle potential errors, especially from network and Firebase calls. The BLoC should emit specific `Error` states that the UI can respond to.
+
+### **🔒 Security (CRITICAL - NON-NEGOTIABLE):**
+* **NEVER commit Firebase configuration files** (`google-services.json`, `GoogleService-Info.plist`, `.firebase_projects.json`) to version control
+* **ALWAYS verify .gitignore** rules are in place before working with Firebase configs
+* **Use the provided tools** for secure Firebase configuration management:
+  - `dart run tools/generate_firebase_config.dart <env>` - Generate type-safe configs from downloaded files
+  - `dart run tools/validate_firebase_config.dart` - Validate configuration setup
+  - `dart run tools/replace_firebase_configs.dart` - Interactive replacement guide
+* **Follow the secure setup process** documented in `docs/security/FIREBASE_CONFIG_SECURITY.md`
+* **Never create template files** with placeholder Firebase configurations - use the generation scripts instead
+* **If secrets are accidentally committed**: Immediately stop, rotate API keys, remove from git history, and force push
 
 ### **Testing (Non-Negotiable):**
 Every feature must be accompanied by comprehensive tests. Follow the testing pyramid.
