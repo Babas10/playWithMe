@@ -55,3 +55,15 @@ ios/Runner/Firebase/*/GoogleService-Info.plist
 lib/core/config/firebase_config_dev.dart
 lib/core/config/firebase_config_stg.dart
 lib/core/config/firebase_config_prod.dart
+
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate*
+**/terraform-*.tfstate*
+**/.terraform.tfstate.lock.info
+**/terraform.plan
+**/terraform-*.plan
+
+# Node modules
+node_modules/
