@@ -26,7 +26,7 @@ class EnvironmentIndicator extends StatelessWidget {
         color: _getEnvironmentColor(),
         border: Border(
           bottom: BorderSide(
-            color: _getEnvironmentColor().withOpacity(0.3),
+            color: _getEnvironmentColor().withValues(alpha: 0.3),
             width: 1,
           ),
         ),
