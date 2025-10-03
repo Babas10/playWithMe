@@ -56,10 +56,11 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 Icon(
                   Icons.sports_volleyball,
                   size: 64,
@@ -164,6 +165,7 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );
