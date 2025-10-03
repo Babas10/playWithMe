@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
+import 'package:play_with_me/core/config/firebase_config_dev.dart';
+import 'package:play_with_me/core/config/firebase_config_stg.dart';
+import 'package:play_with_me/core/config/firebase_config_prod.dart';
 
 /// Provides Firebase options for different environments
 /// This class acts as a bridge between environment configuration and Firebase initialization
@@ -22,41 +25,47 @@ class FirebaseOptionsProvider {
   }
 
   /// Development environment Firebase options
-  /// These are placeholder values that should be replaced with real configuration
   static FirebaseOptions _getDevOptions() {
-    return const FirebaseOptions(
-      apiKey: 'dev-api-key-placeholder',
-      appId: 'dev-app-id-placeholder',
-      messagingSenderId: 'dev-sender-id-placeholder',
-      projectId: 'playwithme-dev',
-      storageBucket: 'playwithme-dev.appspot.com',
-      authDomain: 'playwithme-dev.firebaseapp.com',
+    final config = FirebaseConfigDev();
+    return FirebaseOptions(
+      apiKey: config.apiKey,
+      appId: defaultTargetPlatform == TargetPlatform.android
+          ? config.androidAppId
+          : config.iosAppId,
+      messagingSenderId: config.messagingSenderId,
+      projectId: config.projectId,
+      storageBucket: config.storageBucket,
+      authDomain: '${config.projectId}.firebaseapp.com',
     );
   }
 
   /// Staging environment Firebase options
-  /// These are placeholder values that should be replaced with real configuration
   static FirebaseOptions _getStagingOptions() {
-    return const FirebaseOptions(
-      apiKey: 'stg-api-key-placeholder',
-      appId: 'stg-app-id-placeholder',
-      messagingSenderId: 'stg-sender-id-placeholder',
-      projectId: 'playwithme-stg',
-      storageBucket: 'playwithme-stg.appspot.com',
-      authDomain: 'playwithme-stg.firebaseapp.com',
+    final config = FirebaseConfigStg();
+    return FirebaseOptions(
+      apiKey: config.apiKey,
+      appId: defaultTargetPlatform == TargetPlatform.android
+          ? config.androidAppId
+          : config.iosAppId,
+      messagingSenderId: config.messagingSenderId,
+      projectId: config.projectId,
+      storageBucket: config.storageBucket,
+      authDomain: '${config.projectId}.firebaseapp.com',
     );
   }
 
   /// Production environment Firebase options
-  /// These are placeholder values that should be replaced with real configuration
   static FirebaseOptions _getProdOptions() {
-    return const FirebaseOptions(
-      apiKey: 'prod-api-key-placeholder',
-      appId: 'prod-app-id-placeholder',
-      messagingSenderId: 'prod-sender-id-placeholder',
-      projectId: 'playwithme-prod',
-      storageBucket: 'playwithme-prod.appspot.com',
-      authDomain: 'playwithme-prod.firebaseapp.com',
+    final config = FirebaseConfigProd();
+    return FirebaseOptions(
+      apiKey: config.apiKey,
+      appId: defaultTargetPlatform == TargetPlatform.android
+          ? config.androidAppId
+          : config.iosAppId,
+      messagingSenderId: config.messagingSenderId,
+      projectId: config.projectId,
+      storageBucket: config.storageBucket,
+      authDomain: '${config.projectId}.firebaseapp.com',
     );
   }
 

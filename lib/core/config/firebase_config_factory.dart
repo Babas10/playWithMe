@@ -1,4 +1,4 @@
-import '../environment/environment_config.dart';
+import 'environment_config.dart';
 import 'firebase_config_base.dart';
 
 /// Factory for creating the appropriate Firebase configuration based on the environment
