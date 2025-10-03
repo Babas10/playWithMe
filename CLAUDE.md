@@ -78,12 +78,30 @@ Your primary directive is to produce **clean, high-quality, and maintainable cod
 * **Never create template files** with placeholder Firebase configurations - use the generation scripts instead
 * **If secrets are accidentally committed**: Immediately stop, rotate API keys, remove from git history, and force push
 
+### **Quality Standards (CRITICAL - NON-NEGOTIABLE):**
+* **Zero Tolerance for Warnings and Errors:** Warnings and failed tests must NEVER be left for later. They must be resolved immediately as a sign of best coding practices. This is fundamental to maintaining code quality.
+* **Tests Drive Implementation:** If tests fail, the logic should be changed, NOT the test. Tests represent the expected behavior and requirements. Failing tests indicate implementation issues that must be fixed.
+* **Immediate Problem Resolution:** All compilation errors, warnings, linting issues, and test failures must be addressed before moving to the next task. No exceptions.
+* **Cross-Platform Compatibility (MANDATORY):** A story cannot be considered complete unless it works on ALL target platforms (Android, iOS, Web). If a feature works on one platform but fails on another, the story remains incomplete until ALL platforms are functional. No exceptions or partial completions are acceptable.
+
 ### **Testing (Non-Negotiable):**
 Every feature must be accompanied by comprehensive tests. Follow the testing pyramid.
 * **Unit Tests:** All BLoCs and Repository logic **must** be unit tested. Mock all external dependencies.
 * **Widget Tests:** All UI screens and complex widgets **must** be widget tested. Provide mock BLoCs to test how the UI reacts to different states.
 * **Integration Tests:** Write end-to-end tests for critical user flows (e.g., user login, creating a group, RSVPing to a game). These tests will run against the `dev` Firebase environment.
 * **Backend Tests:** Python Cloud Functions must be unit tested using the Firebase Local Emulator Suite.
+* **Test Success Requirement:** ALL tests must pass. Failing tests indicate broken functionality that must be fixed immediately.
+
+### **Task Management & Workflow:**
+* **Subtask Creation:** When encountering unexpected complexity or tasks that require significant time, you must create subtasks to track the work properly. Never skip or postpone complex work without explicit tracking.
+* **GitHub Subtask Numbering:** When creating subtasks for a story, follow the pattern: `Story X.Y.Z.N` where N is the subtask index. For example, if working on Story 0.2.3.2 and you need subtasks, create:
+  - `Story 0.2.3.2.1: [First Subtask Title]`
+  - `Story 0.2.3.2.2: [Second Subtask Title]`
+  - `Story 0.2.3.2.3: [Third Subtask Title]`
+* **GitHub Issue Creation:** Create actual GitHub Issues for each subtask using the `gh` command. Each subtask should be a separate issue linked to the parent story.
+* **Example of Required Subtask Creation:** If you encounter a statement like "Given the time and complexity involved, let me mark this as complete and summarize achievements. The infrastructure is working but needs fine-tuning," you MUST create specific GitHub subtasks for the fine-tuning work instead of leaving it untracked.
+* **TodoWrite Tool Usage:** Use the TodoWrite tool to break down complex tasks into manageable subtasks. Each subtask should have a clear description and be tracked to completion.
+* **No Work Left Behind:** Every piece of work, no matter how small or complex, must be either completed immediately or tracked as a specific GitHub issue for future completion.
 
 ### **Git Workflow:**
 * You will work on features defined in GitHub Issues.

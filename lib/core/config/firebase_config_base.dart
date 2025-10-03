@@ -44,3 +44,4 @@ abstract class FirebaseConfigBase {
   String toString() {
     return 'FirebaseConfig($environment: $projectId)';
   }
+}
