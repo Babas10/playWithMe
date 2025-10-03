@@ -153,7 +153,7 @@ void main() {
       } catch (e) {
         print('Firebase test failed (expected with placeholder config): $e');
       }
-    }, skip: 'Manual test - requires real Firebase configuration');
+    }, skip: true); // Manual test - requires real Firebase configuration
 
     testWidgets('MANUAL: Test Firebase Auth integration', (tester) async {
       EnvironmentConfig.setEnvironment(Environment.dev);
@@ -180,7 +180,7 @@ void main() {
       } catch (e) {
         print('Firebase Auth test failed: $e');
       }
-    }, skip: 'Manual test - requires real Firebase configuration');
+    }, skip: true); // Manual test - requires real Firebase configuration
 
     testWidgets('MANUAL: Test Firestore operations', (tester) async {
       EnvironmentConfig.setEnvironment(Environment.dev);
@@ -208,6 +208,6 @@ void main() {
       } catch (e) {
         print('Firestore test failed: $e');
       }
-    }, skip: 'Manual test - requires real Firebase configuration');
+    }, skip: true); // Manual test - requires real Firebase configuration
   });
 }

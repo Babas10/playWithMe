@@ -1,20 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/widgets/environment_indicator.dart';
 import 'package:play_with_me/core/services/firebase_service.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
+import 'package:play_with_me/features/auth/presentation/pages/login_page.dart';
+import 'package:play_with_me/features/auth/presentation/pages/registration_page.dart';
+import 'package:play_with_me/features/auth/presentation/pages/password_reset_page.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
 
 class PlayWithMeApp extends StatelessWidget {
   const PlayWithMeApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PlayWithMe${EnvironmentConfig.appSuffix}',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthenticationBloc>(
+          create: (context) => sl<AuthenticationBloc>()..add(const AuthenticationStarted()),
+        ),
+        BlocProvider<LoginBloc>(
+          create: (context) => sl<LoginBloc>(),
+        ),
+        BlocProvider<RegistrationBloc>(
+          create: (context) => sl<RegistrationBloc>(),
+        ),
+        BlocProvider<PasswordResetBloc>(
+          create: (context) => sl<PasswordResetBloc>(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'PlayWithMe${EnvironmentConfig.appSuffix}',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
+        home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+          builder: (context, state) {
+            if (state is AuthenticationAuthenticated) {
+              return const HomePage();
+            } else if (state is AuthenticationUnauthenticated) {
+              return const LoginPage();
+            } else {
+              return const _SplashScreen();
+            }
+          },
+        ),
+        routes: {
+          '/login': (context) => const LoginPage(),
+          '/register': (context) => const RegistrationPage(),
+          '/forgot-password': (context) => const PasswordResetPage(),
+        },
       ),
-      home: const HomePage(),
     );
   }
 }
@@ -36,6 +78,16 @@ class HomePage extends StatelessWidget {
               AppBar(
                 backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                 title: Text('PlayWithMe${EnvironmentConfig.appSuffix}'),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.logout),
+                    onPressed: () {
+                      context.read<AuthenticationBloc>().add(
+                        const AuthenticationLogoutRequested(),
+                      );
+                    },
+                  ),
+                ],
               ),
 
               // Main content
@@ -115,6 +167,37 @@ class HomePage extends StatelessWidget {
           // Debug panel for development
           const FirebaseDebugPanel(),
         ],
+      ),
+    );
+  }
+}
+
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.sports_volleyball,
+              size: 64,
+              color: Theme.of(context).primaryColor,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'PlayWithMe${EnvironmentConfig.appSuffix}',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 32),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            const Text('Loading...'),
+          ],
+        ),
       ),
     );
   }
