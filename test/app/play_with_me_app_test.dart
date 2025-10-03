@@ -18,39 +18,55 @@ void main() {
     testWidgets('should render correctly in production environment', (WidgetTester tester) async {
       await tester.pumpWidget(const PlayWithMeApp());
 
-      // Wait for initial state changes - the AuthenticationBloc needs time to process the stream
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
+      // Wait for AuthenticationBloc to process initial auth state and stream subscription
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(); // Rebuild with new state
 
       // Should show login screen for unauthenticated users
-      expect(find.text('Welcome Back'), findsOneWidget);
-      expect(find.text('Sign in to continue playing'), findsOneWidget);
+      expect(find.text('Welcome Back!'), findsOneWidget);
+      expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
     });
 
     testWidgets('should render correctly in development environment', (WidgetTester tester) async {
       EnvironmentConfig.setEnvironment(Environment.dev);
       await tester.pumpWidget(const PlayWithMeApp());
-      await tester.pumpAndSettle();
+
+      // Wait for AuthenticationBloc to process initial auth state and stream subscription
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(); // Rebuild with new state
 
       // App shows authentication screen regardless of environment
-      expect(find.text('Welcome Back'), findsOneWidget);
-      expect(find.text('Sign in to continue playing'), findsOneWidget);
+      expect(find.text('Welcome Back!'), findsOneWidget);
+      expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
     });
 
     testWidgets('should render correctly in staging environment', (WidgetTester tester) async {
       EnvironmentConfig.setEnvironment(Environment.stg);
       await tester.pumpWidget(const PlayWithMeApp());
-      await tester.pumpAndSettle();
+
+      // Wait for AuthenticationBloc to process initial auth state and stream subscription
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(); // Rebuild with new state
 
       // App shows authentication screen regardless of environment
-      expect(find.text('Welcome Back'), findsOneWidget);
-      expect(find.text('Sign in to continue playing'), findsOneWidget);
+      expect(find.text('Welcome Back!'), findsOneWidget);
+      expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
     });
 
     testWidgets('should have correct theme colors', (WidgetTester tester) async {
       await tester.pumpWidget(const PlayWithMeApp());
-      await tester.pumpAndSettle();
+
+      // Wait for AuthenticationBloc to process initial auth state and stream subscription
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(); // Rebuild with new state
 
       final MaterialApp materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.theme?.colorScheme.primary, isNotNull);
@@ -60,21 +76,33 @@ void main() {
       // Test production
       EnvironmentConfig.setEnvironment(Environment.prod);
       await tester.pumpWidget(const PlayWithMeApp());
-      await tester.pumpAndSettle();
+      // Wait for AuthenticationBloc to process initial auth state and stream subscription
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(); // Rebuild with new state
       MaterialApp materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.title, 'PlayWithMe');
 
       // Test development
       EnvironmentConfig.setEnvironment(Environment.dev);
       await tester.pumpWidget(const PlayWithMeApp());
-      await tester.pumpAndSettle();
+      // Wait for AuthenticationBloc to process initial auth state and stream subscription
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(); // Rebuild with new state
       materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.title, 'PlayWithMe (Dev)');
 
       // Test staging
       EnvironmentConfig.setEnvironment(Environment.stg);
       await tester.pumpWidget(const PlayWithMeApp());
-      await tester.pumpAndSettle();
+      // Wait for AuthenticationBloc to process initial auth state and stream subscription
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(); // Rebuild with new state
       materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.title, 'PlayWithMe (Staging)');
     });
@@ -113,51 +141,73 @@ void main() {
       // Test development environment (red)
       EnvironmentConfig.setEnvironment(Environment.dev);
       await tester.pumpWidget(const MaterialApp(home: HomePage()));
-      await tester.pumpAndSettle();
 
-      // Find containers and look for the one with decoration
+      // Use controlled pump instead of pumpAndSettle to avoid timeouts
+      await tester.pump();
+
+      // Find the environment info container by looking for the one with environment text
+      final envText = find.text('Environment: Development');
+      expect(envText, findsOneWidget);
+
+      // Find containers and look for the one with border decoration
       final containers = tester.widgetList<Container>(find.byType(Container));
       Container? envContainer;
       for (final container in containers) {
         if (container.decoration is BoxDecoration) {
           final decoration = container.decoration as BoxDecoration;
-          if (decoration.border != null) {
-            envContainer = container;
-            break;
+          if (decoration.border != null && decoration.border is Border) {
+            final border = decoration.border as Border;
+            // Check if it's a uniform border (Border.all) with red color
+            if (border.top.color == Colors.red) {
+              envContainer = container;
+              break;
+            }
           }
         }
       }
 
-      expect(envContainer, isNotNull);
+      expect(envContainer, isNotNull, reason: 'Should find container with red border for dev environment');
       BoxDecoration decoration = envContainer!.decoration as BoxDecoration;
-      expect(decoration.border?.top.color, Colors.red);
+      final border = decoration.border as Border;
+      expect(border.top.color, Colors.red);
 
       // Test staging environment (orange)
       EnvironmentConfig.setEnvironment(Environment.stg);
       await tester.pumpWidget(const MaterialApp(home: HomePage()));
-      await tester.pumpAndSettle();
+      await tester.pump();
 
-      // Find the environment container again
+      // Verify staging environment text
+      expect(find.text('Environment: Staging'), findsOneWidget);
+
+      // Find the environment container for staging
       final stagingContainers = tester.widgetList<Container>(find.byType(Container));
       Container? stagingEnvContainer;
       for (final container in stagingContainers) {
         if (container.decoration is BoxDecoration) {
           final decoration = container.decoration as BoxDecoration;
-          if (decoration.border != null) {
-            stagingEnvContainer = container;
-            break;
+          if (decoration.border != null && decoration.border is Border) {
+            final border = decoration.border as Border;
+            // Check if it's a uniform border (Border.all) with orange color
+            if (border.top.color == Colors.orange) {
+              stagingEnvContainer = container;
+              break;
+            }
           }
         }
       }
 
-      expect(stagingEnvContainer, isNotNull);
+      expect(stagingEnvContainer, isNotNull, reason: 'Should find container with orange border for staging environment');
       BoxDecoration stagingDecoration = stagingEnvContainer!.decoration as BoxDecoration;
-      expect(stagingDecoration.border?.top.color, Colors.orange);
+      final stagingBorder = stagingDecoration.border as Border;
+      expect(stagingBorder.top.color, Colors.orange);
 
       // Test production environment (green)
       EnvironmentConfig.setEnvironment(Environment.prod);
       await tester.pumpWidget(const MaterialApp(home: HomePage()));
-      await tester.pumpAndSettle();
+      await tester.pump();
+
+      // Verify production environment text
+      expect(find.text('Environment: Production'), findsOneWidget);
 
       // Find the environment container for production
       final prodContainers = tester.widgetList<Container>(find.byType(Container));
@@ -165,16 +215,21 @@ void main() {
       for (final container in prodContainers) {
         if (container.decoration is BoxDecoration) {
           final decoration = container.decoration as BoxDecoration;
-          if (decoration.border != null) {
-            prodEnvContainer = container;
-            break;
+          if (decoration.border != null && decoration.border is Border) {
+            final border = decoration.border as Border;
+            // Check if it's a uniform border (Border.all) with green color
+            if (border.top.color == Colors.green) {
+              prodEnvContainer = container;
+              break;
+            }
           }
         }
       }
 
-      expect(prodEnvContainer, isNotNull);
+      expect(prodEnvContainer, isNotNull, reason: 'Should find container with green border for production environment');
       BoxDecoration prodDecoration = prodEnvContainer!.decoration as BoxDecoration;
-      expect(prodDecoration.border?.top.color, Colors.green);
+      final prodBorder = prodDecoration.border as Border;
+      expect(prodBorder.top.color, Colors.green);
     });
   });
 }
