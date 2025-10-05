@@ -195,7 +195,9 @@ void main() {
 
       // Act
       await tester.tap(find.text('Debug'));
-      await tester.pumpAndSettle();
+      // Wait for animation to complete
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Assert
       expect(find.text('Firebase Debug Panel'), findsOneWidget);
@@ -218,11 +220,15 @@ void main() {
 
       // Expand the panel
       await tester.tap(find.text('Debug'));
-      await tester.pumpAndSettle();
+      // Wait for expansion animation
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Act
       await tester.tap(find.byIcon(Icons.close));
-      await tester.pumpAndSettle();
+      // Wait for collapse animation
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Assert
       expect(find.text('Firebase Debug Panel'), findsNothing);
@@ -243,7 +249,9 @@ void main() {
 
       // Expand the panel
       await tester.tap(find.text('Debug'));
-      await tester.pumpAndSettle();
+      // Wait for expansion animation
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Assert
       expect(find.text('Development'), findsOneWidget);
