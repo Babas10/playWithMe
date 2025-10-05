@@ -41,7 +41,7 @@ void main() {
     );
 
     // Wait for the page to render
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     // The app should show login screen components
     expect(find.text('Welcome Back'), findsOneWidget);
