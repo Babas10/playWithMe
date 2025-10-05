@@ -1,8 +1,10 @@
+// Verifies that PlayWithMeApp correctly handles authentication state transitions and UI updates
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/app/play_with_me_app.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import '../helpers/test_helpers.dart';
+import '../features/auth/data/mock_auth_repository.dart';
 
 void main() {
   group('PlayWithMeApp', () {
@@ -105,6 +107,51 @@ void main() {
       await tester.pump(); // Rebuild with new state
       materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.title, 'PlayWithMe (Staging)');
+    });
+
+    testWidgets('should properly handle authentication state transitions (Unknown → Unauthenticated → UI update)', (WidgetTester tester) async {
+      // Set up initial environment
+      EnvironmentConfig.setEnvironment(Environment.dev);
+
+      // Build the app and capture the initial splash state
+      await tester.pumpWidget(const PlayWithMeApp());
+
+      // Initial state should show splash screen (Unknown state)
+      expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
+      expect(find.text('Loading...'), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      // Allow authentication process to start and emit initial state
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial null value
+      await tester.pump(); // Rebuild with new unauthenticated state
+
+      // Should transition to login screen (Unauthenticated state)
+      expect(find.text('Welcome Back!'), findsOneWidget);
+      expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
+
+      // Should no longer show splash screen elements
+      expect(find.text('Loading...'), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+
+      // Simulate user authentication by setting a user
+      final mockRepo = getTestAuthRepository()!;
+      const testUser = TestUserData.testUser;
+      mockRepo.setCurrentUser(testUser);
+
+      // Allow authentication bloc to process the state change
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream emission
+      await tester.pump(); // Rebuild with authenticated state
+
+      // Should transition to HomePage (Authenticated state)
+      expect(find.text('Welcome to PlayWithMe!'), findsOneWidget);
+      expect(find.text('Beach volleyball games organizer'), findsOneWidget);
+      expect(find.byIcon(Icons.logout), findsOneWidget);
+
+      // Should no longer show login screen elements
+      expect(find.text('Welcome Back!'), findsNothing);
+      expect(find.text('Sign in to continue organizing your volleyball games'), findsNothing);
     });
   });
 
