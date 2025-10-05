@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:io';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_options_provider.dart';
 
