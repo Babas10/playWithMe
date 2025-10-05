@@ -37,13 +37,19 @@ class MockAuthRepository extends Mock implements AuthRepository {
   void setCurrentUser(UserEntity? user) {
     debugPrint('🧪 MockAuthRepository: Setting current user to ${user?.email ?? 'null'}');
     _currentUser = user;
-    // Add immediately without any delay
-    _authStateController.add(user);
-    debugPrint('🧪 MockAuthRepository: Emitted user state to stream');
+    // Only add to stream if controller is not closed
+    if (!_authStateController.isClosed) {
+      _authStateController.add(user);
+      debugPrint('🧪 MockAuthRepository: Emitted user state to stream');
+    } else {
+      debugPrint('🧪 MockAuthRepository: Cannot emit - controller is closed');
+    }
   }
 
   void emitAuthStateChange(UserEntity? user) {
-    _authStateController.add(user);
+    if (!_authStateController.isClosed) {
+      _authStateController.add(user);
+    }
   }
 
   void dispose() {
