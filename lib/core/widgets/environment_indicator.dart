@@ -203,7 +203,7 @@ class _FirebaseDebugPanelState extends State<FirebaseDebugPanel> {
     final connectionInfo = FirebaseService.getConnectionInfo();
 
     return Container(
-      width: 250,
+      constraints: const BoxConstraints(maxWidth: 250),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,15 +213,18 @@ class _FirebaseDebugPanelState extends State<FirebaseDebugPanel> {
             children: [
               Icon(Icons.bug_report, color: Colors.white, size: 16),
               const SizedBox(width: 8),
-              Text(
-                'Firebase Debug Panel',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  'Firebase Debug Panel',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               GestureDetector(
                 onTap: () => setState(() => _isExpanded = false),
                 child: Icon(Icons.close, color: Colors.white, size: 16),
