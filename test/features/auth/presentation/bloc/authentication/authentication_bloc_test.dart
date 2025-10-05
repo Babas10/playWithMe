@@ -4,7 +4,6 @@ import 'package:mockito/mockito.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
-import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import '../../../data/mock_auth_repository.dart';
 
 void main() {
