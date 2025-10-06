@@ -5,6 +5,12 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/domain/repositories/group_repository.dart';
+import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_user_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_group_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_game_repository.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -15,6 +21,25 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<AuthRepository>()) {
     sl.registerLazySingleton<AuthRepository>(
       () => FirebaseAuthRepository(),
+    );
+  }
+
+  // Register core data repositories
+  if (!sl.isRegistered<UserRepository>()) {
+    sl.registerLazySingleton<UserRepository>(
+      () => FirestoreUserRepository(),
+    );
+  }
+
+  if (!sl.isRegistered<GroupRepository>()) {
+    sl.registerLazySingleton<GroupRepository>(
+      () => FirestoreGroupRepository(),
+    );
+  }
+
+  if (!sl.isRegistered<GameRepository>()) {
+    sl.registerLazySingleton<GameRepository>(
+      () => FirestoreGameRepository(),
     );
   }
 
