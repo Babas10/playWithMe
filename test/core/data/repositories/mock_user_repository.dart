@@ -24,6 +24,27 @@ class MockUserRepository implements UserRepository {
     }
   }
 
+  void setCurrentUserValue(UserModel? user) {
+    debugPrint('🧪 MockUserRepository: Setting current user value to ${user?.email ?? 'null'}');
+    _currentUserValue = user;
+    // Emit immediately in the next microtask to ensure listeners are set up
+    scheduleMicrotask(() {
+      if (!_currentUserController.isClosed) {
+        _currentUserController.add(user);
+      }
+    });
+  }
+
+  void setCurrentUserError(String error) {
+    debugPrint('🧪 MockUserRepository: Setting current user stream error: $error');
+    // Emit immediately in the next microtask to ensure listeners are set up
+    scheduleMicrotask(() {
+      if (!_currentUserController.isClosed) {
+        _currentUserController.addError(Exception(error));
+      }
+    });
+  }
+
   void addUser(UserModel user) {
     _users[user.uid] = user;
   }
