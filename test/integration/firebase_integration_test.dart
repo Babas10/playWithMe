@@ -1,3 +1,8 @@
+// DEPRECATED: Legacy Firebase integration tests - superseded by Story 0.2.4.1 improvements
+// These tests had platform channel compatibility issues with real Firebase configs
+// Use integration_test/firebase_integration_test.dart for device testing
+// Use test/integration/firebase_compatibility_test.dart for CI/CD unit testing
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
