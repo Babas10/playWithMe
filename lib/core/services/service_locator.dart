@@ -11,6 +11,9 @@ import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_user_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_group_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_game_repository.dart';
+import 'package:play_with_me/core/presentation/bloc/user/user_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/game/game_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -65,6 +68,25 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<PasswordResetBloc>()) {
     sl.registerFactory<PasswordResetBloc>(
       () => PasswordResetBloc(authRepository: sl()),
+    );
+  }
+
+  // Register core BLoCs only if not already registered
+  if (!sl.isRegistered<UserBloc>()) {
+    sl.registerFactory<UserBloc>(
+      () => UserBloc(userRepository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<GroupBloc>()) {
+    sl.registerFactory<GroupBloc>(
+      () => GroupBloc(groupRepository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<GameBloc>()) {
+    sl.registerFactory<GameBloc>(
+      () => GameBloc(gameRepository: sl()),
     );
   }
 }

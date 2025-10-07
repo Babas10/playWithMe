@@ -24,6 +24,21 @@ class MockUserRepository implements UserRepository {
     }
   }
 
+  void setCurrentUserValue(UserModel? user) {
+    debugPrint('🧪 MockUserRepository: Setting current user value to ${user?.email ?? 'null'}');
+    _currentUserValue = user;
+    if (!_currentUserController.isClosed) {
+      _currentUserController.add(user);
+    }
+  }
+
+  void setCurrentUserError(String error) {
+    debugPrint('🧪 MockUserRepository: Setting current user stream error: $error');
+    if (!_currentUserController.isClosed) {
+      _currentUserController.addError(Exception(error));
+    }
+  }
+
   void addUser(UserModel user) {
     _users[user.uid] = user;
   }
