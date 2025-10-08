@@ -174,8 +174,9 @@ class UserModel with _$UserModel {
 
   /// Add game participation
   UserModel addGame(String gameId, {bool won = false, int score = 0}) {
+    final newGameIds = gameIds.contains(gameId) ? gameIds : [...gameIds, gameId];
     return copyWith(
-      gameIds: [...gameIds, gameId],
+      gameIds: newGameIds,
       gamesPlayed: gamesPlayed + 1,
       gamesWon: won ? gamesWon + 1 : gamesWon,
       totalScore: totalScore + score,
