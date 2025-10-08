@@ -139,12 +139,9 @@ void main() {
         const validEmails = [
           'test@example.com',
           'user.name@example.com',
+          'user+tag@example.co.uk',
           'test123@example-domain.com',
         ];
-
-        // NOTE: 'user+tag@example.co.uk' is currently rejected by LoginBloc
-        // but accepted by other auth BLoCs (inconsistency in validation logic).
-        // This should be investigated and fixed in a separate issue.
 
         const invalidEmails = [
           'plainaddress',
@@ -195,8 +192,8 @@ void main() {
       group('Repository error handling', () {
         final testCases = [
           {'error': 'Network error', 'expected': 'Network error'},
-          {'error': 'Exception: Invalid credentials', 'expected': 'Exception: Invalid credentials'},
-          {'error': 'Exception: User not found', 'expected': 'Exception: User not found'},
+          {'error': 'Exception: Invalid credentials', 'expected': 'Invalid credentials'},
+          {'error': 'Exception: User not found', 'expected': 'User not found'},
           {'error': 'Timeout occurred', 'expected': 'Timeout occurred'},
         ];
 
