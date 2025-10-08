@@ -67,8 +67,8 @@ void main() {
         // Validate configuration structure
         final isValid = FirebaseOptionsProvider.validateConfiguration();
 
-        // With placeholder configs, validation should return false
-        expect(isValid, isFalse);
+        // With real Firebase configs (no placeholders), validation should return true
+        expect(isValid, isTrue);
 
         // Verify configuration summary is complete
         final summary = FirebaseOptionsProvider.getConfigurationSummary();
