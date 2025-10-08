@@ -19,7 +19,7 @@ void main() {
 
         // Assert
         expect(options.projectId, equals('playwithme-dev'));
-        expect(options.storageBucket, equals('playwithme-dev.appspot.com'));
+        expect(options.storageBucket, equals('playwithme-dev.firebasestorage.app'));
         expect(options.authDomain, equals('playwithme-dev.firebaseapp.com'));
       });
 
@@ -32,7 +32,7 @@ void main() {
 
         // Assert
         expect(options.projectId, equals('playwithme-stg'));
-        expect(options.storageBucket, equals('playwithme-stg.appspot.com'));
+        expect(options.storageBucket, equals('playwithme-stg.firebasestorage.app'));
         expect(options.authDomain, equals('playwithme-stg.firebaseapp.com'));
       });
 
@@ -45,13 +45,13 @@ void main() {
 
         // Assert
         expect(options.projectId, equals('playwithme-prod'));
-        expect(options.storageBucket, equals('playwithme-prod.appspot.com'));
+        expect(options.storageBucket, equals('playwithme-prod.firebasestorage.app'));
         expect(options.authDomain, equals('playwithme-prod.firebaseapp.com'));
       });
     });
 
     group('validateConfiguration', () {
-      test('returns false when configuration has placeholder values', () {
+      test('returns true when configuration has valid values', () {
         // Arrange
         EnvironmentConfig.setEnvironment(Environment.dev);
 
@@ -59,10 +59,10 @@ void main() {
         final isValid = FirebaseOptionsProvider.validateConfiguration();
 
         // Assert
-        expect(isValid, isFalse);
+        expect(isValid, isTrue);
       });
 
-      test('detects placeholder values correctly', () {
+      test('detects valid configuration values correctly', () {
         // Arrange
         EnvironmentConfig.setEnvironment(Environment.dev);
 
@@ -70,9 +70,9 @@ void main() {
         final options = FirebaseOptionsProvider.getFirebaseOptions();
 
         // Assert
-        expect(options.apiKey.contains('placeholder'), isTrue);
-        expect(options.appId.contains('placeholder'), isTrue);
-        expect(options.messagingSenderId.contains('placeholder'), isTrue);
+        expect(options.apiKey.contains('placeholder'), isFalse);
+        expect(options.appId.contains('placeholder'), isFalse);
+        expect(options.messagingSenderId.contains('placeholder'), isFalse);
       });
     });
 
@@ -87,8 +87,8 @@ void main() {
         // Assert
         expect(summary['environment'], equals('Development'));
         expect(summary['projectId'], equals('playwithme-dev'));
-        expect(summary['hasPlaceholders'], equals('true'));
-        expect(summary['storageBucket'], equals('playwithme-dev.appspot.com'));
+        expect(summary['hasPlaceholders'], equals('false'));
+        expect(summary['storageBucket'], equals('playwithme-dev.firebasestorage.app'));
       });
 
       test('returns correct summary for staging environment', () {
@@ -101,8 +101,8 @@ void main() {
         // Assert
         expect(summary['environment'], equals('Staging'));
         expect(summary['projectId'], equals('playwithme-stg'));
-        expect(summary['hasPlaceholders'], equals('true'));
-        expect(summary['storageBucket'], equals('playwithme-stg.appspot.com'));
+        expect(summary['hasPlaceholders'], equals('false'));
+        expect(summary['storageBucket'], equals('playwithme-stg.firebasestorage.app'));
       });
 
       test('returns correct summary for production environment', () {
@@ -115,8 +115,8 @@ void main() {
         // Assert
         expect(summary['environment'], equals('Production'));
         expect(summary['projectId'], equals('playwithme-prod'));
-        expect(summary['hasPlaceholders'], equals('true'));
-        expect(summary['storageBucket'], equals('playwithme-prod.appspot.com'));
+        expect(summary['hasPlaceholders'], equals('false'));
+        expect(summary['storageBucket'], equals('playwithme-prod.firebasestorage.app'));
       });
     });
 
