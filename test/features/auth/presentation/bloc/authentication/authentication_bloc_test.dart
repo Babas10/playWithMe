@@ -1,6 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -13,6 +12,7 @@ void main() {
 
     setUp(() {
       mockAuthRepository = MockAuthRepository();
+      mockAuthRepository.resetCallCounts();
       authenticationBloc = AuthenticationBloc(authRepository: mockAuthRepository);
     });
 
@@ -128,19 +128,19 @@ void main() {
       blocTest<AuthenticationBloc, AuthenticationState>(
         'calls signOut on repository when logout requested',
         build: () {
-          when(mockAuthRepository.signOut()).thenAnswer((_) async {});
+          mockAuthRepository.setSignOutBehavior(() async {});
           return authenticationBloc;
         },
         act: (bloc) => bloc.add(const AuthenticationLogoutRequested()),
         verify: (_) {
-          verify(mockAuthRepository.signOut()).called(1);
+          expect(mockAuthRepository.signOutCallCount, equals(1));
         },
       );
 
       blocTest<AuthenticationBloc, AuthenticationState>(
         'does not emit any state when logout succeeds',
         build: () {
-          when(mockAuthRepository.signOut()).thenAnswer((_) async {});
+          mockAuthRepository.setSignOutBehavior(() async {});
           return authenticationBloc;
         },
         act: (bloc) => bloc.add(const AuthenticationLogoutRequested()),
@@ -150,7 +150,7 @@ void main() {
       blocTest<AuthenticationBloc, AuthenticationState>(
         'does not emit error state when logout fails',
         build: () {
-          when(mockAuthRepository.signOut()).thenThrow(Exception('Logout failed'));
+          mockAuthRepository.setSignOutBehavior(() async => throw Exception('Logout failed'));
           return authenticationBloc;
         },
         act: (bloc) => bloc.add(const AuthenticationLogoutRequested()),
@@ -160,12 +160,12 @@ void main() {
       blocTest<AuthenticationBloc, AuthenticationState>(
         'handles logout with repository error gracefully',
         build: () {
-          when(mockAuthRepository.signOut()).thenThrow(Exception('Network error'));
+          mockAuthRepository.setSignOutBehavior(() async => throw Exception('Network error'));
           return authenticationBloc;
         },
         act: (bloc) => bloc.add(const AuthenticationLogoutRequested()),
         verify: (_) {
-          verify(mockAuthRepository.signOut()).called(1);
+          expect(mockAuthRepository.signOutCallCount, equals(1));
         },
       );
     });
@@ -174,7 +174,7 @@ void main() {
       blocTest<AuthenticationBloc, AuthenticationState>(
         'handles complete authentication flow: start -> login -> logout',
         build: () {
-          when(mockAuthRepository.signOut()).thenAnswer((_) async {});
+          mockAuthRepository.setSignOutBehavior(() async {});
           mockAuthRepository.setCurrentUser(null);
           return authenticationBloc;
         },
@@ -200,7 +200,7 @@ void main() {
           const AuthenticationUnauthenticated(),
         ],
         verify: (_) {
-          verify(mockAuthRepository.signOut()).called(1);
+          expect(mockAuthRepository.signOutCallCount, equals(1));
         },
       );
 
