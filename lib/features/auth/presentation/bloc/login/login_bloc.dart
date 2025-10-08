@@ -50,7 +50,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(const LoginSuccess());
     } catch (error) {
       debugPrint('❌ LoginBloc: Login failed: $error');
-      final errorMessage = error.toString().replaceFirst('Exception: ', '');
+      String errorMessage = error.toString();
+      // Remove "Exception: " prefix if present
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
+      // Also handle nested exceptions like "Exception: Exception: message"
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
       emit(LoginFailure(errorMessage));
     }
   }
@@ -70,7 +78,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(const LoginSuccess());
     } catch (error) {
       debugPrint('❌ LoginBloc: Anonymous login failed: $error');
-      final errorMessage = error.toString().replaceFirst('Exception: ', '');
+      String errorMessage = error.toString();
+      // Remove "Exception: " prefix if present
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
+      // Also handle nested exceptions like "Exception: Exception: message"
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
       emit(LoginFailure(errorMessage));
     }
   }
@@ -85,6 +101,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   /// Basic email validation
   bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    return RegExp(r'^[\w\+\-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 }
