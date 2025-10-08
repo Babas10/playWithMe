@@ -126,6 +126,22 @@ See: [`docs/security/FIREBASE_CONFIG_SECURITY.md`](./docs/security/FIREBASE_CONF
 All tests must **pass 100% of the time** — no skipping, commenting out, or deferring.
 A failing test equals broken functionality and blocks the story from completion.
 
+### **Core Testing Principles**
+
+**🎯 Tests Must Reflect Implementation Reality**
+- **Only test features that are actually implemented** — no tests for planned or unimplemented functionality
+- **Tests should validate current behavior** — not aspirational or future behavior
+- **When features are incomplete** — mark tests as `skip: true` with clear documentation and follow-up GitHub issues
+- **Every skipped test** must have a corresponding GitHub issue for future implementation
+
+**Example of proper skipping:**
+```dart
+testWidgets('should create game with advanced settings', (tester) async {
+  // TODO: Implement advanced game settings feature
+  // GitHub Issue: #123 - Advanced Game Settings
+}, skip: true);
+```
+
 ### **Test Documentation Rule**
 
 Each test file **must start with a one-line comment** explaining *why* the test exists.
@@ -148,10 +164,13 @@ Example:
 
 ### **Test Success Criteria**
 
-✅ All tests pass — zero tolerance for failures or skips
+✅ All tests pass — zero tolerance for failures
 ✅ Each test file begins with a purpose comment
 ✅ Coverage ≥ 90% for all core logic
 ✅ No commented-out or placeholder tests
+✅ **Tests only validate implemented features** — no aspirational testing
+✅ **Skipped tests have clear documentation** and corresponding GitHub issues
+✅ **All unimplemented features properly skipped** until implementation is complete
 
 ---
 

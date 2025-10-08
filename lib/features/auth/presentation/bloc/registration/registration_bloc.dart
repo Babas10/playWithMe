@@ -64,7 +64,15 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       emit(const RegistrationSuccess());
     } catch (error) {
       debugPrint('❌ RegistrationBloc: Registration failed: $error');
-      final errorMessage = error.toString().replaceFirst('Exception: ', '');
+      String errorMessage = error.toString();
+      // Remove "Exception: " prefix if present
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
+      // Also handle nested exceptions like "Exception: Exception: message"
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring(11);
+      }
       emit(RegistrationFailure(errorMessage));
     }
   }
@@ -108,6 +116,6 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
   /// Basic email validation
   bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    return RegExp(r'^[\w\+\-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 }

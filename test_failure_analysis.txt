@@ -1,0 +1,30 @@
+00:03 +172 ~2 -8: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/core/presentation/bloc/user/user_bloc_test.dart: UserBloc LoadCurrentUser emits UserError when stream has error
+00:04 +187 ~3 -8: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/core/services/firebase_service_test.dart: FirebaseService initialization throws StateError when accessing firestore before initialization
+00:04 +188 ~3 -8: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/core/services/firebase_service_test.dart: FirebaseService initialization throws StateError when accessing auth before initialization
+00:04 +194 ~3 -8: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/core/services/firebase_service_test.dart: FirebaseService FirebaseInitializationException creates exception with message
+00:04 +195 ~3 -8: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/core/services/firebase_service_test.dart: FirebaseService FirebaseInitializationException creates exception with message and original exception
+❌ Firebase initialization failed: PlatformException(channel-error, Unable to establish connection on channel: "dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeCore"., null, null)
+Expected Firebase initialization failure in test environment: FirebaseInitializationException: Failed to initialize Firebase: PlatformException(channel-error, Unable to establish connection on channel: "dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeCore"., null, null)
+❌ Firebase initialization failed: PlatformException(channel-error, Unable to establish connection on channel: "dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeCore"., null, null)
+Firebase initialization failed as expected: FirebaseInitializationException: Failed to initialize Firebase: PlatformException(channel-error, Unable to establish connection on channel: "dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeCore"., null, null)
+00:07 +244 ~6 -17: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/features/auth/data/mock_auth_repository_test.dart: MockAuthRepository Error Handling should not emit after dispose
+00:07 +245 ~6 -17: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/features/auth/data/mock_auth_repository_test.dart: MockAuthRepository Error Handling should handle multiple dispose calls
+  dart:async                                                                           _Completer.completeError
+  dart:async                                                                           _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+  dart:async                                                                            _Completer.completeError
+00:07 +265 ~6 -30: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/features/auth/presentation/bloc/registration/registration_bloc_test.dart: RegistrationBloc RegistrationSubmitted Repository error handling handles repository error: Exception: Weak password
+00:07 +265 ~6 -31: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/features/auth/presentation/bloc/registration/registration_bloc_test.dart: RegistrationBloc RegistrationSubmitted Repository error handling handles repository error: Exception: Weak password [E]
+  dart:async                                                                            _Completer.completeError
+00:07 +265 ~6 -31: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/features/auth/presentation/bloc/registration/registration_bloc_test.dart: RegistrationBloc RegistrationSubmitted Repository error handling handles repository error: Exception: Network error
+00:07 +265 ~6 -32: /Users/etiennedubois/PersonalProject/playWithMe/playWithMe/test/features/auth/presentation/bloc/registration/registration_bloc_test.dart: RegistrationBloc RegistrationSubmitted Repository error handling handles repository error: Exception: Network error [E]
+  dart:async                                                                            _Completer.completeError

@@ -58,6 +58,6 @@ class PasswordResetBloc extends Bloc<PasswordResetEvent, PasswordResetState> {
 
   /// Basic email validation
   bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    return RegExp(r'^[\w\+\-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 }
