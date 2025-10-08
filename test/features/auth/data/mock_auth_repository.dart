@@ -9,8 +9,19 @@ class MockAuthRepository implements AuthRepository {
   UserEntity? _currentUser;
   Stream<UserEntity?>? _authStateStream;
 
+  // Call tracking for testing
+  int _signOutCallCount = 0;
+
   // Make controller accessible for testing
   StreamController<UserEntity?> get authStateController => _authStateController;
+
+  // Call tracking getters
+  int get signOutCallCount => _signOutCallCount;
+
+  // Reset call counters for testing
+  void resetCallCounts() {
+    _signOutCallCount = 0;
+  }
 
   @override
   UserEntity? get currentUser => _currentUser;
@@ -56,15 +67,30 @@ class MockAuthRepository implements AuthRepository {
     _authStateStream = null;
   }
 
-  // Configurable behaviors for tests
-  late Future<UserEntity> Function({required String email, required String password}) _signInWithEmailAndPasswordBehavior;
-  late Future<UserEntity> Function({required String email, required String password}) _createUserWithEmailAndPasswordBehavior;
-  late Future<UserEntity> Function() _signInAnonymouslyBehavior;
-  late Future<void> Function({required String email}) _sendPasswordResetEmailBehavior;
-  late Future<void> Function() _sendEmailVerificationBehavior;
-  late Future<void> Function() _reloadUserBehavior;
-  late Future<void> Function() _signOutBehavior;
-  late Future<void> Function({String? displayName, String? photoUrl}) _updateUserProfileBehavior;
+  // Configurable behaviors for tests with default implementations
+  Future<UserEntity> Function({required String email, required String password}) _signInWithEmailAndPasswordBehavior =
+    ({required String email, required String password}) async => TestUserData.testUser;
+
+  Future<UserEntity> Function({required String email, required String password}) _createUserWithEmailAndPasswordBehavior =
+    ({required String email, required String password}) async => TestUserData.testUser;
+
+  Future<UserEntity> Function() _signInAnonymouslyBehavior =
+    () async => TestUserData.anonymousUser;
+
+  Future<void> Function({required String email}) _sendPasswordResetEmailBehavior =
+    ({required String email}) async {};
+
+  Future<void> Function() _sendEmailVerificationBehavior =
+    () async {};
+
+  Future<void> Function() _reloadUserBehavior =
+    () async {};
+
+  Future<void> Function() _signOutBehavior =
+    () async {};
+
+  Future<void> Function({String? displayName, String? photoUrl}) _updateUserProfileBehavior =
+    ({String? displayName, String? photoUrl}) async {};
 
   // Configure behaviors for testing
   void setSignInWithEmailAndPasswordBehavior(Future<UserEntity> Function({required String email, required String password}) behavior) {
@@ -131,6 +157,7 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() {
+    _signOutCallCount++;
     return _signOutBehavior();
   }
 
