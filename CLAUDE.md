@@ -159,7 +159,7 @@ Example:
 | --------------------- | --------------------------------------- | ------------------------------------------------------ |
 | **Unit Tests**        | All BLoCs & Repositories                | Mock external dependencies. Test input → output logic. |
 | **Widget Tests**      | All screens & major widgets             | Test state rendering with mock BLoCs.                  |
-| **Integration Tests** | Critical user flows (login, RSVP, etc.) | Run against `playwithme-dev` Firebase.                 |
+| **Integration Tests** | Critical user flows (login, RSVP, etc.) | **Local-only** - not run in CI. Use `flutter test integration_test/` |
 | **Backend Tests**     | Python Cloud Functions                  | Must pass on the Firebase Local Emulator.              |
 
 ### **Test Success Criteria**

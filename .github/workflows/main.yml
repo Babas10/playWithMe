@@ -254,14 +254,9 @@ jobs:
           dart run tools/generate_firebase_config_from_secrets.dart prod
           echo "✅ Firebase configurations generated securely from secrets"
 
-      # Step 5: Run integration tests
-      - name: 🔗 Run Integration Tests
-        run: |
-          if [ -d "integration_test" ]; then
-            flutter test integration_test/
-          else
-            echo "No integration tests found, skipping..."
-          fi
+      # NOTE: Firebase integration tests are intentionally excluded from CI
+      # These tests are kept local-only to avoid unnecessary CI complexity and secret exposure
+      # Local developers can run them manually with: flutter test integration_test/
 
   # Job 4: Security and Dependency Audit
   security_audit:

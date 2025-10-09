@@ -112,14 +112,14 @@ Map<String, String> _getProjectDataFromEnv(String environment) {
   }
 
   return {
-    'projectId': projectId,
-    'storageBucket': storageBucket,
-    'androidAppId': androidAppId,
-    'iosAppId': iosAppId,
-    'apiKey': apiKey,
-    'messagingSenderId': messagingSenderId,
-    'androidPackageName': androidPackageName,
-    'iosBundleId': iosBundleId,
+    'projectId': projectId!,
+    'storageBucket': storageBucket!,
+    'androidAppId': androidAppId!,
+    'iosAppId': iosAppId!,
+    'apiKey': apiKey!,
+    'messagingSenderId': messagingSenderId!,
+    'androidPackageName': androidPackageName!,
+    'iosBundleId': iosBundleId!,
   };
 }
 
