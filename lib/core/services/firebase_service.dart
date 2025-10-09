@@ -28,11 +28,16 @@ class FirebaseService {
       // Handle both auto-initialization (iOS) and manual initialization
 
       // Handle Firebase initialization with comprehensive duplicate app handling
-      // First, try to use any existing Firebase app to avoid duplicate app errors
+      // Check all available Firebase apps first
+      debugPrint('🔍 Checking Firebase apps: ${Firebase.apps.length} apps available');
+      for (final app in Firebase.apps) {
+        debugPrint('📱 Found Firebase app: ${app.name} (${app.options.projectId})');
+      }
+
+      // Try to get the default app first (handles both auto-initialization and manual initialization)
       try {
-        // Check if Firebase is already initialized
         _app = Firebase.app();
-        debugPrint('🔥 Firebase already initialized, using existing app: ${_app!.name}');
+        debugPrint('🔥 Found existing default Firebase app: ${_app!.name}');
         debugPrint('🔗 Project: ${_app!.options.projectId}');
 
         // Verify the existing app is using the correct project
@@ -43,30 +48,22 @@ class FirebaseService {
           debugPrint('🔧 This may indicate auto-initialization with default config instead of environment-specific config');
         }
       } catch (e) {
-        // If no default app exists, try to initialize one
-        if (e.toString().contains('No Firebase App') || e.toString().contains('not been created')) {
-          debugPrint('🔧 No default Firebase app exists, attempting manual initialization...');
-
+        // If no default app exists, check if there are any other apps we can use
+        if (Firebase.apps.isNotEmpty) {
+          debugPrint('🔧 No default app found, but ${Firebase.apps.length} other apps exist');
+          _app = Firebase.apps.first;
+          debugPrint('🔥 Using first available Firebase app: ${_app!.name}');
+        } else {
+          // No apps exist at all, try to initialize manually
+          debugPrint('🔧 No Firebase apps found, initializing manually...');
           try {
-            debugPrint('🔍 Checking available Firebase apps: ${Firebase.apps.length}');
-            for (final app in Firebase.apps) {
-              debugPrint('📱 Found Firebase app: ${app.name} (${app.options.projectId})');
-            }
-
-            if (Firebase.apps.isNotEmpty) {
-              // Use any existing app
-              _app = Firebase.apps.first;
-              debugPrint('🔥 Using first available Firebase app: ${_app!.name}');
-            } else {
-              // Initialize new app
-              _app = await Firebase.initializeApp(
-                options: FirebaseOptionsProvider.getFirebaseOptions(),
-              );
-              debugPrint('🔥 Firebase initialized manually: ${_app!.name}');
-            }
+            _app = await Firebase.initializeApp(
+              options: FirebaseOptionsProvider.getFirebaseOptions(),
+            );
+            debugPrint('🔥 Firebase initialized manually: ${_app!.name}');
           } catch (duplicateError) {
             if (duplicateError.toString().contains('duplicate-app')) {
-              // Another attempt at initialization succeeded between our checks
+              // Firebase was initialized between our checks (race condition)
               debugPrint('🔧 Firebase was initialized during our attempt, using existing app');
               _app = Firebase.app();
               debugPrint('🔥 Using existing Firebase app: ${_app!.name}');
@@ -75,9 +72,6 @@ class FirebaseService {
               rethrow;
             }
           }
-        } else {
-          // Different error accessing Firebase.app(), re-throw
-          rethrow;
         }
       }
 

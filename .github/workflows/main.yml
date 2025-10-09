@@ -61,14 +61,42 @@ jobs:
             echo "For now, this is informational only"
           }
 
-      # Step 8: Generate Firebase configurations for CI
-      - name: 🔧 Generate Firebase Configs for CI
+      # Step 8: Generate Firebase configurations from secrets
+      - name: 🔧 Generate Firebase Configs from Secrets
+        env:
+          # Dev environment secrets
+          FIREBASE_DEV_PROJECT_ID: ${{ secrets.FIREBASE_DEV_PROJECT_ID }}
+          FIREBASE_DEV_STORAGE_BUCKET: ${{ secrets.FIREBASE_DEV_STORAGE_BUCKET }}
+          FIREBASE_DEV_ANDROID_APP_ID: ${{ secrets.FIREBASE_DEV_ANDROID_APP_ID }}
+          FIREBASE_DEV_IOS_APP_ID: ${{ secrets.FIREBASE_DEV_IOS_APP_ID }}
+          FIREBASE_DEV_API_KEY: ${{ secrets.FIREBASE_DEV_API_KEY }}
+          FIREBASE_DEV_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_DEV_MESSAGING_SENDER_ID }}
+          FIREBASE_DEV_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_DEV_ANDROID_PACKAGE_NAME }}
+          FIREBASE_DEV_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_DEV_IOS_BUNDLE_ID }}
+          # Staging environment secrets
+          FIREBASE_STG_PROJECT_ID: ${{ secrets.FIREBASE_STG_PROJECT_ID }}
+          FIREBASE_STG_STORAGE_BUCKET: ${{ secrets.FIREBASE_STG_STORAGE_BUCKET }}
+          FIREBASE_STG_ANDROID_APP_ID: ${{ secrets.FIREBASE_STG_ANDROID_APP_ID }}
+          FIREBASE_STG_IOS_APP_ID: ${{ secrets.FIREBASE_STG_IOS_APP_ID }}
+          FIREBASE_STG_API_KEY: ${{ secrets.FIREBASE_STG_API_KEY }}
+          FIREBASE_STG_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_STG_MESSAGING_SENDER_ID }}
+          FIREBASE_STG_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_STG_ANDROID_PACKAGE_NAME }}
+          FIREBASE_STG_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_STG_IOS_BUNDLE_ID }}
+          # Production environment secrets
+          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
+          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
+          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
+          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
+          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
+          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
+          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
+          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
         run: |
-          echo "Generating Firebase configurations for CI testing..."
-          dart run tools/generate_firebase_config_ci.dart dev
-          dart run tools/generate_firebase_config_ci.dart stg
-          dart run tools/generate_firebase_config_ci.dart prod
-          echo "✅ Firebase configurations generated for CI"
+          echo "Generating Firebase configurations from GitHub Secrets..."
+          dart run tools/generate_firebase_config_from_secrets.dart dev
+          dart run tools/generate_firebase_config_from_secrets.dart stg
+          dart run tools/generate_firebase_config_from_secrets.dart prod
+          echo "✅ Firebase configurations generated securely from secrets"
 
       # Step 9: Run unit and widget tests
       - name: 🧪 Run Tests
@@ -120,14 +148,42 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 5: Generate Firebase configurations for CI
-      - name: 🔧 Generate Firebase Configs for CI
+      # Step 5: Generate Firebase configurations from secrets
+      - name: 🔧 Generate Firebase Configs from Secrets
+        env:
+          # Dev environment secrets
+          FIREBASE_DEV_PROJECT_ID: ${{ secrets.FIREBASE_DEV_PROJECT_ID }}
+          FIREBASE_DEV_STORAGE_BUCKET: ${{ secrets.FIREBASE_DEV_STORAGE_BUCKET }}
+          FIREBASE_DEV_ANDROID_APP_ID: ${{ secrets.FIREBASE_DEV_ANDROID_APP_ID }}
+          FIREBASE_DEV_IOS_APP_ID: ${{ secrets.FIREBASE_DEV_IOS_APP_ID }}
+          FIREBASE_DEV_API_KEY: ${{ secrets.FIREBASE_DEV_API_KEY }}
+          FIREBASE_DEV_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_DEV_MESSAGING_SENDER_ID }}
+          FIREBASE_DEV_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_DEV_ANDROID_PACKAGE_NAME }}
+          FIREBASE_DEV_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_DEV_IOS_BUNDLE_ID }}
+          # Staging environment secrets
+          FIREBASE_STG_PROJECT_ID: ${{ secrets.FIREBASE_STG_PROJECT_ID }}
+          FIREBASE_STG_STORAGE_BUCKET: ${{ secrets.FIREBASE_STG_STORAGE_BUCKET }}
+          FIREBASE_STG_ANDROID_APP_ID: ${{ secrets.FIREBASE_STG_ANDROID_APP_ID }}
+          FIREBASE_STG_IOS_APP_ID: ${{ secrets.FIREBASE_STG_IOS_APP_ID }}
+          FIREBASE_STG_API_KEY: ${{ secrets.FIREBASE_STG_API_KEY }}
+          FIREBASE_STG_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_STG_MESSAGING_SENDER_ID }}
+          FIREBASE_STG_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_STG_ANDROID_PACKAGE_NAME }}
+          FIREBASE_STG_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_STG_IOS_BUNDLE_ID }}
+          # Production environment secrets
+          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
+          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
+          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
+          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
+          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
+          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
+          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
+          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
         run: |
-          echo "Generating Firebase configurations for CI testing..."
-          dart run tools/generate_firebase_config_ci.dart dev
-          dart run tools/generate_firebase_config_ci.dart stg
-          dart run tools/generate_firebase_config_ci.dart prod
-          echo "✅ Firebase configurations generated for CI"
+          echo "Generating Firebase configurations from GitHub Secrets..."
+          dart run tools/generate_firebase_config_from_secrets.dart dev
+          dart run tools/generate_firebase_config_from_secrets.dart stg
+          dart run tools/generate_firebase_config_from_secrets.dart prod
+          echo "✅ Firebase configurations generated securely from secrets"
 
       # Step 6: Build for the specified platform and flavor
       - name: 🔨 Build ${{ matrix.platform }} (${{ matrix.flavor }})
@@ -161,14 +217,42 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Generate Firebase configurations for CI
-      - name: 🔧 Generate Firebase Configs for CI
+      # Step 4: Generate Firebase configurations from secrets
+      - name: 🔧 Generate Firebase Configs from Secrets
+        env:
+          # Dev environment secrets
+          FIREBASE_DEV_PROJECT_ID: ${{ secrets.FIREBASE_DEV_PROJECT_ID }}
+          FIREBASE_DEV_STORAGE_BUCKET: ${{ secrets.FIREBASE_DEV_STORAGE_BUCKET }}
+          FIREBASE_DEV_ANDROID_APP_ID: ${{ secrets.FIREBASE_DEV_ANDROID_APP_ID }}
+          FIREBASE_DEV_IOS_APP_ID: ${{ secrets.FIREBASE_DEV_IOS_APP_ID }}
+          FIREBASE_DEV_API_KEY: ${{ secrets.FIREBASE_DEV_API_KEY }}
+          FIREBASE_DEV_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_DEV_MESSAGING_SENDER_ID }}
+          FIREBASE_DEV_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_DEV_ANDROID_PACKAGE_NAME }}
+          FIREBASE_DEV_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_DEV_IOS_BUNDLE_ID }}
+          # Staging environment secrets
+          FIREBASE_STG_PROJECT_ID: ${{ secrets.FIREBASE_STG_PROJECT_ID }}
+          FIREBASE_STG_STORAGE_BUCKET: ${{ secrets.FIREBASE_STG_STORAGE_BUCKET }}
+          FIREBASE_STG_ANDROID_APP_ID: ${{ secrets.FIREBASE_STG_ANDROID_APP_ID }}
+          FIREBASE_STG_IOS_APP_ID: ${{ secrets.FIREBASE_STG_IOS_APP_ID }}
+          FIREBASE_STG_API_KEY: ${{ secrets.FIREBASE_STG_API_KEY }}
+          FIREBASE_STG_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_STG_MESSAGING_SENDER_ID }}
+          FIREBASE_STG_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_STG_ANDROID_PACKAGE_NAME }}
+          FIREBASE_STG_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_STG_IOS_BUNDLE_ID }}
+          # Production environment secrets
+          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
+          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
+          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
+          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
+          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
+          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
+          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
+          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
         run: |
-          echo "Generating Firebase configurations for CI testing..."
-          dart run tools/generate_firebase_config_ci.dart dev
-          dart run tools/generate_firebase_config_ci.dart stg
-          dart run tools/generate_firebase_config_ci.dart prod
-          echo "✅ Firebase configurations generated for CI"
+          echo "Generating Firebase configurations from GitHub Secrets..."
+          dart run tools/generate_firebase_config_from_secrets.dart dev
+          dart run tools/generate_firebase_config_from_secrets.dart stg
+          dart run tools/generate_firebase_config_from_secrets.dart prod
+          echo "✅ Firebase configurations generated securely from secrets"
 
       # Step 5: Run integration tests
       - name: 🔗 Run Integration Tests
@@ -202,14 +286,42 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Generate Firebase configurations for CI
-      - name: 🔧 Generate Firebase Configs for CI
+      # Step 4: Generate Firebase configurations from secrets
+      - name: 🔧 Generate Firebase Configs from Secrets
+        env:
+          # Dev environment secrets
+          FIREBASE_DEV_PROJECT_ID: ${{ secrets.FIREBASE_DEV_PROJECT_ID }}
+          FIREBASE_DEV_STORAGE_BUCKET: ${{ secrets.FIREBASE_DEV_STORAGE_BUCKET }}
+          FIREBASE_DEV_ANDROID_APP_ID: ${{ secrets.FIREBASE_DEV_ANDROID_APP_ID }}
+          FIREBASE_DEV_IOS_APP_ID: ${{ secrets.FIREBASE_DEV_IOS_APP_ID }}
+          FIREBASE_DEV_API_KEY: ${{ secrets.FIREBASE_DEV_API_KEY }}
+          FIREBASE_DEV_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_DEV_MESSAGING_SENDER_ID }}
+          FIREBASE_DEV_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_DEV_ANDROID_PACKAGE_NAME }}
+          FIREBASE_DEV_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_DEV_IOS_BUNDLE_ID }}
+          # Staging environment secrets
+          FIREBASE_STG_PROJECT_ID: ${{ secrets.FIREBASE_STG_PROJECT_ID }}
+          FIREBASE_STG_STORAGE_BUCKET: ${{ secrets.FIREBASE_STG_STORAGE_BUCKET }}
+          FIREBASE_STG_ANDROID_APP_ID: ${{ secrets.FIREBASE_STG_ANDROID_APP_ID }}
+          FIREBASE_STG_IOS_APP_ID: ${{ secrets.FIREBASE_STG_IOS_APP_ID }}
+          FIREBASE_STG_API_KEY: ${{ secrets.FIREBASE_STG_API_KEY }}
+          FIREBASE_STG_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_STG_MESSAGING_SENDER_ID }}
+          FIREBASE_STG_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_STG_ANDROID_PACKAGE_NAME }}
+          FIREBASE_STG_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_STG_IOS_BUNDLE_ID }}
+          # Production environment secrets
+          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
+          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
+          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
+          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
+          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
+          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
+          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
+          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
         run: |
-          echo "Generating Firebase configurations for CI testing..."
-          dart run tools/generate_firebase_config_ci.dart dev
-          dart run tools/generate_firebase_config_ci.dart stg
-          dart run tools/generate_firebase_config_ci.dart prod
-          echo "✅ Firebase configurations generated for CI"
+          echo "Generating Firebase configurations from GitHub Secrets..."
+          dart run tools/generate_firebase_config_from_secrets.dart dev
+          dart run tools/generate_firebase_config_from_secrets.dart stg
+          dart run tools/generate_firebase_config_from_secrets.dart prod
+          echo "✅ Firebase configurations generated securely from secrets"
 
       # Step 5: Check for security vulnerabilities in dependencies
       - name: 🔒 Run Security Audit
