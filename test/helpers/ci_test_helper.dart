@@ -19,29 +19,16 @@ class CITestHelper {
   }
 
   /// Get expected project ID for the given environment
-  /// - In CI: Returns mock project ID
-  /// - Locally: Returns real project ID
+  /// - Both CI and local now use real Firebase project IDs
   static String getExpectedProjectId(Environment environment) {
-    if (isCIEnvironment) {
-      // Mock project IDs used in CI
-      switch (environment) {
-        case Environment.dev:
-          return 'mock-project-dev';
-        case Environment.stg:
-          return 'mock-project-stg';
-        case Environment.prod:
-          return 'mock-project-prod';
-      }
-    } else {
-      // Real project IDs used locally
-      switch (environment) {
-        case Environment.dev:
-          return 'playwithme-dev';
-        case Environment.stg:
-          return 'playwithme-stg';
-        case Environment.prod:
-          return 'playwithme-prod';
-      }
+    // Real project IDs used in both CI and local environments
+    switch (environment) {
+      case Environment.dev:
+        return 'playwithme-dev';
+      case Environment.stg:
+        return 'playwithme-stg';
+      case Environment.prod:
+        return 'playwithme-prod';
     }
   }
 
@@ -101,16 +88,13 @@ class CITestHelper {
       }
     }
 
-    // Additional check: if project ID contains 'mock', we're likely in CI
+    // Additional check: if Firebase service account is configured, we're likely in CI
     try {
-      EnvironmentConfig.setEnvironment(Environment.dev);
-      final options = FirebaseOptionsProvider.getFirebaseOptions();
-      if (options.projectId.startsWith('mock-')) {
+      if (Platform.environment.containsKey('GOOGLE_APPLICATION_CREDENTIALS')) {
         return true;
       }
     } catch (e) {
-      // If Firebase options can't be retrieved, assume CI
-      return true;
+      // If environment check fails, fall back to other indicators
     }
 
     return false;
@@ -119,7 +103,7 @@ class CITestHelper {
   /// Get environment description for logging/debugging
   static String getEnvironmentDescription() {
     if (isCIEnvironment) {
-      return 'CI Environment (using mock Firebase configs)';
+      return 'CI Environment (using real Firebase configs)';
     } else {
       return 'Local Environment (using real Firebase configs)';
     }
