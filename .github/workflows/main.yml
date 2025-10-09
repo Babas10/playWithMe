@@ -61,29 +61,18 @@ jobs:
             echo "For now, this is informational only"
           }
 
-      # Step 8: Setup Firebase service account for real testing
-      - name: 🔧 Setup Firebase Service Account
+      # Step 8: Verify Firebase configurations are present
+      - name: 🔧 Verify Firebase Configs
         run: |
-          echo "Setting up Firebase service account for real testing..."
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
-          echo "✅ Firebase service account configured"
+          echo "Verifying Firebase configurations are present..."
+          ls -la lib/core/config/firebase_config_*.dart
+          echo "✅ Firebase configurations verified (using real project configs)"
 
-      # Step 9: Generate Firebase configurations from service account
-      - name: 🔧 Generate Firebase Configs
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-service-account.json
-        run: |
-          echo "Generating Firebase configurations for CI testing..."
-          dart run tools/generate_firebase_config.dart dev
-          dart run tools/generate_firebase_config.dart stg
-          dart run tools/generate_firebase_config.dart prod
-          echo "✅ Firebase configurations generated from service account"
-
-      # Step 10: Run unit and widget tests
+      # Step 9: Run unit and widget tests
       - name: 🧪 Run Tests
         run: flutter test --coverage --reporter=github
 
-      # Step 11: Upload coverage reports (optional but recommended)
+      # Step 10: Upload coverage reports (optional but recommended)
       - name: 📈 Upload Coverage to Codecov
         uses: codecov/codecov-action@v3
         if: success()
@@ -129,25 +118,14 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 5: Setup Firebase service account for real testing
-      - name: 🔧 Setup Firebase Service Account
+      # Step 5: Verify Firebase configurations are present
+      - name: 🔧 Verify Firebase Configs
         run: |
-          echo "Setting up Firebase service account for real testing..."
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
-          echo "✅ Firebase service account configured"
+          echo "Verifying Firebase configurations are present..."
+          ls -la lib/core/config/firebase_config_*.dart
+          echo "✅ Firebase configurations verified (using real project configs)"
 
-      # Step 6: Generate Firebase configurations from service account
-      - name: 🔧 Generate Firebase Configs
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-service-account.json
-        run: |
-          echo "Generating Firebase configurations for CI testing..."
-          dart run tools/generate_firebase_config.dart dev
-          dart run tools/generate_firebase_config.dart stg
-          dart run tools/generate_firebase_config.dart prod
-          echo "✅ Firebase configurations generated from service account"
-
-      # Step 7: Build for the specified platform and flavor
+      # Step 6: Build for the specified platform and flavor
       - name: 🔨 Build ${{ matrix.platform }} (${{ matrix.flavor }})
         run: |
           if [ "${{ matrix.platform }}" == "android" ]; then
@@ -179,25 +157,14 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Setup Firebase service account for real testing
-      - name: 🔧 Setup Firebase Service Account
+      # Step 4: Verify Firebase configurations are present
+      - name: 🔧 Verify Firebase Configs
         run: |
-          echo "Setting up Firebase service account for real testing..."
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
-          echo "✅ Firebase service account configured"
+          echo "Verifying Firebase configurations are present..."
+          ls -la lib/core/config/firebase_config_*.dart
+          echo "✅ Firebase configurations verified (using real project configs)"
 
-      # Step 5: Generate Firebase configurations from service account
-      - name: 🔧 Generate Firebase Configs
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-service-account.json
-        run: |
-          echo "Generating Firebase configurations for CI testing..."
-          dart run tools/generate_firebase_config.dart dev
-          dart run tools/generate_firebase_config.dart stg
-          dart run tools/generate_firebase_config.dart prod
-          echo "✅ Firebase configurations generated from service account"
-
-      # Step 6: Run integration tests
+      # Step 5: Run integration tests
       - name: 🔗 Run Integration Tests
         run: |
           if [ -d "integration_test" ]; then
@@ -229,32 +196,21 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Setup Firebase service account for real testing
-      - name: 🔧 Setup Firebase Service Account
+      # Step 4: Verify Firebase configurations are present
+      - name: 🔧 Verify Firebase Configs
         run: |
-          echo "Setting up Firebase service account for real testing..."
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
-          echo "✅ Firebase service account configured"
+          echo "Verifying Firebase configurations are present..."
+          ls -la lib/core/config/firebase_config_*.dart
+          echo "✅ Firebase configurations verified (using real project configs)"
 
-      # Step 5: Generate Firebase configurations from service account
-      - name: 🔧 Generate Firebase Configs
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-service-account.json
-        run: |
-          echo "Generating Firebase configurations for CI testing..."
-          dart run tools/generate_firebase_config.dart dev
-          dart run tools/generate_firebase_config.dart stg
-          dart run tools/generate_firebase_config.dart prod
-          echo "✅ Firebase configurations generated from service account"
-
-      # Step 6: Check for security vulnerabilities in dependencies
+      # Step 5: Check for security vulnerabilities in dependencies
       - name: 🔒 Run Security Audit
         run: |
           flutter pub deps --json > deps.json
           # Check for known vulnerable packages
           echo "Checking for security vulnerabilities..."
 
-      # Step 7: Verify no secrets are committed
+      # Step 6: Verify no secrets are committed
       - name: 🔍 Check for Secrets
         run: |
           echo "Checking for potential secrets in the codebase..."
