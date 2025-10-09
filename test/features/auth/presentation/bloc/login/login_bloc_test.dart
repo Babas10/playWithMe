@@ -195,8 +195,8 @@ void main() {
       group('Repository error handling', () {
         final testCases = [
           {'error': 'Network error', 'expected': 'Network error'},
-          {'error': 'Exception: Invalid credentials', 'expected': 'Exception: Invalid credentials'},
-          {'error': 'Exception: User not found', 'expected': 'Exception: User not found'},
+          {'error': 'Exception: Invalid credentials', 'expected': 'Invalid credentials'},
+          {'error': 'Exception: User not found', 'expected': 'User not found'},
           {'error': 'Timeout occurred', 'expected': 'Timeout occurred'},
         ];
 
