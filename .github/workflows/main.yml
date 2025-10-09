@@ -61,12 +61,14 @@ jobs:
             echo "For now, this is informational only"
           }
 
-      # Step 8: Verify Firebase configurations are present
-      - name: 🔧 Verify Firebase Configs
+      # Step 8: Generate Firebase configurations for CI
+      - name: 🔧 Generate Firebase Configs for CI
         run: |
-          echo "Verifying Firebase configurations are present..."
-          ls -la lib/core/config/firebase_config_*.dart
-          echo "✅ Firebase configurations verified (using real project configs)"
+          echo "Generating Firebase configurations for CI testing..."
+          dart run tools/generate_firebase_config_ci.dart dev
+          dart run tools/generate_firebase_config_ci.dart stg
+          dart run tools/generate_firebase_config_ci.dart prod
+          echo "✅ Firebase configurations generated for CI"
 
       # Step 9: Run unit and widget tests
       - name: 🧪 Run Tests
@@ -118,12 +120,14 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 5: Verify Firebase configurations are present
-      - name: 🔧 Verify Firebase Configs
+      # Step 5: Generate Firebase configurations for CI
+      - name: 🔧 Generate Firebase Configs for CI
         run: |
-          echo "Verifying Firebase configurations are present..."
-          ls -la lib/core/config/firebase_config_*.dart
-          echo "✅ Firebase configurations verified (using real project configs)"
+          echo "Generating Firebase configurations for CI testing..."
+          dart run tools/generate_firebase_config_ci.dart dev
+          dart run tools/generate_firebase_config_ci.dart stg
+          dart run tools/generate_firebase_config_ci.dart prod
+          echo "✅ Firebase configurations generated for CI"
 
       # Step 6: Build for the specified platform and flavor
       - name: 🔨 Build ${{ matrix.platform }} (${{ matrix.flavor }})
@@ -157,12 +161,14 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Verify Firebase configurations are present
-      - name: 🔧 Verify Firebase Configs
+      # Step 4: Generate Firebase configurations for CI
+      - name: 🔧 Generate Firebase Configs for CI
         run: |
-          echo "Verifying Firebase configurations are present..."
-          ls -la lib/core/config/firebase_config_*.dart
-          echo "✅ Firebase configurations verified (using real project configs)"
+          echo "Generating Firebase configurations for CI testing..."
+          dart run tools/generate_firebase_config_ci.dart dev
+          dart run tools/generate_firebase_config_ci.dart stg
+          dart run tools/generate_firebase_config_ci.dart prod
+          echo "✅ Firebase configurations generated for CI"
 
       # Step 5: Run integration tests
       - name: 🔗 Run Integration Tests
@@ -196,12 +202,14 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Verify Firebase configurations are present
-      - name: 🔧 Verify Firebase Configs
+      # Step 4: Generate Firebase configurations for CI
+      - name: 🔧 Generate Firebase Configs for CI
         run: |
-          echo "Verifying Firebase configurations are present..."
-          ls -la lib/core/config/firebase_config_*.dart
-          echo "✅ Firebase configurations verified (using real project configs)"
+          echo "Generating Firebase configurations for CI testing..."
+          dart run tools/generate_firebase_config_ci.dart dev
+          dart run tools/generate_firebase_config_ci.dart stg
+          dart run tools/generate_firebase_config_ci.dart prod
+          echo "✅ Firebase configurations generated for CI"
 
       # Step 5: Check for security vulnerabilities in dependencies
       - name: 🔒 Run Security Audit
