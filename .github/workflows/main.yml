@@ -61,11 +61,18 @@ jobs:
             echo "For now, this is informational only"
           }
 
-      # Step 8: Run unit and widget tests
+      # Step 8: Generate mock Firebase configurations for CI
+      - name: 🔧 Generate Mock Firebase Configs
+        run: |
+          echo "Generating mock Firebase configurations for CI testing..."
+          dart tools/generate_mock_firebase_configs.dart
+          echo "✅ Mock Firebase configurations generated"
+
+      # Step 9: Run unit and widget tests
       - name: 🧪 Run Tests
         run: flutter test --coverage --reporter=github
 
-      # Step 9: Upload coverage reports (optional but recommended)
+      # Step 10: Upload coverage reports (optional but recommended)
       - name: 📈 Upload Coverage to Codecov
         uses: codecov/codecov-action@v3
         if: success()
@@ -111,7 +118,14 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 5: Build for the specified platform and flavor
+      # Step 5: Generate mock Firebase configurations for CI
+      - name: 🔧 Generate Mock Firebase Configs
+        run: |
+          echo "Generating mock Firebase configurations for CI testing..."
+          dart tools/generate_mock_firebase_configs.dart
+          echo "✅ Mock Firebase configurations generated"
+
+      # Step 6: Build for the specified platform and flavor
       - name: 🔨 Build ${{ matrix.platform }} (${{ matrix.flavor }})
         run: |
           if [ "${{ matrix.platform }}" == "android" ]; then
@@ -143,7 +157,14 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Run integration tests
+      # Step 4: Generate mock Firebase configurations for CI
+      - name: 🔧 Generate Mock Firebase Configs
+        run: |
+          echo "Generating mock Firebase configurations for CI testing..."
+          dart tools/generate_mock_firebase_configs.dart
+          echo "✅ Mock Firebase configurations generated"
+
+      # Step 5: Run integration tests
       - name: 🔗 Run Integration Tests
         run: |
           if [ -d "integration_test" ]; then
@@ -175,14 +196,21 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Check for security vulnerabilities in dependencies
+      # Step 4: Generate mock Firebase configurations for CI
+      - name: 🔧 Generate Mock Firebase Configs
+        run: |
+          echo "Generating mock Firebase configurations for CI testing..."
+          dart tools/generate_mock_firebase_configs.dart
+          echo "✅ Mock Firebase configurations generated"
+
+      # Step 5: Check for security vulnerabilities in dependencies
       - name: 🔒 Run Security Audit
         run: |
           flutter pub deps --json > deps.json
           # Check for known vulnerable packages
           echo "Checking for security vulnerabilities..."
 
-      # Step 5: Verify no secrets are committed
+      # Step 6: Verify no secrets are committed
       - name: 🔍 Check for Secrets
         run: |
           echo "Checking for potential secrets in the codebase..."
