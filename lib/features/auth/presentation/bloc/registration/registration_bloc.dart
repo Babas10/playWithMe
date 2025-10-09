@@ -63,7 +63,6 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
       emit(const RegistrationSuccess());
     } catch (error) {
-      debugPrint('❌ RegistrationBloc: Registration failed: $error');
       String errorMessage = error.toString();
       // Remove "Exception: " prefix if present
       if (errorMessage.startsWith('Exception: ')) {
@@ -73,6 +72,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       if (errorMessage.startsWith('Exception: ')) {
         errorMessage = errorMessage.substring(11);
       }
+      debugPrint('❌ RegistrationBloc: Registration failed: $errorMessage');
       emit(RegistrationFailure(errorMessage));
     }
   }
