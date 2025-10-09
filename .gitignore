@@ -67,3 +67,4 @@ lib/core/config/firebase_config_prod.dart
 
 # Node modules
 node_modules/
+infrastructure/terraform/.terraform/
