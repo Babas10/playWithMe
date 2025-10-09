@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_options_provider.dart';
+import '../../helpers/ci_test_helper.dart';
 
 void main() {
   group('FirebaseOptionsProvider', () {
@@ -18,9 +19,9 @@ void main() {
         final options = FirebaseOptionsProvider.getFirebaseOptions();
 
         // Assert
-        expect(options.projectId, equals('playwithme-dev'));
-        expect(options.storageBucket, equals('playwithme-dev.firebasestorage.app'));
-        expect(options.authDomain, equals('playwithme-dev.firebaseapp.com'));
+        expect(options.projectId, equals(CITestHelper.getExpectedProjectId(Environment.dev)));
+        expect(options.storageBucket, equals(CITestHelper.getExpectedStorageBucket(Environment.dev)));
+        expect(options.authDomain, equals(CITestHelper.getExpectedAuthDomain(Environment.dev)));
       });
 
       test('returns staging options when environment is stg', () {
@@ -31,9 +32,9 @@ void main() {
         final options = FirebaseOptionsProvider.getFirebaseOptions();
 
         // Assert
-        expect(options.projectId, equals('playwithme-stg'));
-        expect(options.storageBucket, equals('playwithme-stg.firebasestorage.app'));
-        expect(options.authDomain, equals('playwithme-stg.firebaseapp.com'));
+        expect(options.projectId, equals(CITestHelper.getExpectedProjectId(Environment.stg)));
+        expect(options.storageBucket, equals(CITestHelper.getExpectedStorageBucket(Environment.stg)));
+        expect(options.authDomain, equals(CITestHelper.getExpectedAuthDomain(Environment.stg)));
       });
 
       test('returns prod options when environment is prod', () {
@@ -44,9 +45,9 @@ void main() {
         final options = FirebaseOptionsProvider.getFirebaseOptions();
 
         // Assert
-        expect(options.projectId, equals('playwithme-prod'));
-        expect(options.storageBucket, equals('playwithme-prod.firebasestorage.app'));
-        expect(options.authDomain, equals('playwithme-prod.firebaseapp.com'));
+        expect(options.projectId, equals(CITestHelper.getExpectedProjectId(Environment.prod)));
+        expect(options.storageBucket, equals(CITestHelper.getExpectedStorageBucket(Environment.prod)));
+        expect(options.authDomain, equals(CITestHelper.getExpectedAuthDomain(Environment.prod)));
       });
     });
 
@@ -86,9 +87,9 @@ void main() {
 
         // Assert
         expect(summary['environment'], equals('Development'));
-        expect(summary['projectId'], equals('playwithme-dev'));
+        expect(summary['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.dev)));
         expect(summary['hasPlaceholders'], equals('false'));
-        expect(summary['storageBucket'], equals('playwithme-dev.firebasestorage.app'));
+        expect(summary['storageBucket'], equals(CITestHelper.getExpectedStorageBucket(Environment.dev)));
       });
 
       test('returns correct summary for staging environment', () {
@@ -100,9 +101,9 @@ void main() {
 
         // Assert
         expect(summary['environment'], equals('Staging'));
-        expect(summary['projectId'], equals('playwithme-stg'));
+        expect(summary['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.stg)));
         expect(summary['hasPlaceholders'], equals('false'));
-        expect(summary['storageBucket'], equals('playwithme-stg.firebasestorage.app'));
+        expect(summary['storageBucket'], equals(CITestHelper.getExpectedStorageBucket(Environment.stg)));
       });
 
       test('returns correct summary for production environment', () {
@@ -114,9 +115,9 @@ void main() {
 
         // Assert
         expect(summary['environment'], equals('Production'));
-        expect(summary['projectId'], equals('playwithme-prod'));
+        expect(summary['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.prod)));
         expect(summary['hasPlaceholders'], equals('false'));
-        expect(summary['storageBucket'], equals('playwithme-prod.firebasestorage.app'));
+        expect(summary['storageBucket'], equals(CITestHelper.getExpectedStorageBucket(Environment.prod)));
       });
     });
 

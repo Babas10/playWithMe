@@ -4,6 +4,7 @@ import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_service.dart';
 import 'package:play_with_me/core/services/firebase_options_provider.dart';
 import '../helpers/firebase_test_helper.dart';
+import '../helpers/ci_test_helper.dart';
 
 void main() {
   group('Firebase Integration Compatibility Tests', () {
@@ -79,9 +80,9 @@ void main() {
     test('Environment switching works correctly with real configs', () {
       // Test switching between environments with real configurations
       final testCases = [
-        (Environment.dev, 'playwithme-dev', 'Development'),
-        (Environment.stg, 'playwithme-stg', 'Staging'),
-        (Environment.prod, 'playwithme-prod', 'Production'),
+        (Environment.dev, CITestHelper.getExpectedProjectId(Environment.dev), 'Development'),
+        (Environment.stg, CITestHelper.getExpectedProjectId(Environment.stg), 'Staging'),
+        (Environment.prod, CITestHelper.getExpectedProjectId(Environment.prod), 'Production'),
       ];
 
       for (final (env, expectedProjectId, expectedName) in testCases) {
@@ -116,7 +117,7 @@ void main() {
       expect(connectionInfo['testMode'], isTrue,
           reason: 'Test mode should be active');
       expect(connectionInfo['environment'], equals('Development'));
-      expect(connectionInfo['projectId'], equals('playwithme-dev'));
+      expect(connectionInfo['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.dev)));
 
       print('✅ Mock Firebase behavior works correctly in test environment');
     });
@@ -124,9 +125,9 @@ void main() {
     test('Real Firebase configs contain expected project identifiers', () {
       // Verify that real Firebase configurations contain the expected project IDs
       final expectedProjects = {
-        Environment.dev: 'playwithme-dev',
-        Environment.stg: 'playwithme-stg',
-        Environment.prod: 'playwithme-prod',
+        Environment.dev: CITestHelper.getExpectedProjectId(Environment.dev),
+        Environment.stg: CITestHelper.getExpectedProjectId(Environment.stg),
+        Environment.prod: CITestHelper.getExpectedProjectId(Environment.prod),
       };
 
       for (final env in expectedProjects.keys) {
@@ -181,9 +182,9 @@ void main() {
 
       expect(projectIds.toSet().length, equals(3),
           reason: 'All environments should have unique project IDs');
-      expect(projectIds.contains('playwithme-dev'), isTrue);
-      expect(projectIds.contains('playwithme-stg'), isTrue);
-      expect(projectIds.contains('playwithme-prod'), isTrue);
+      expect(projectIds.contains(CITestHelper.getExpectedProjectId(Environment.dev)), isTrue);
+      expect(projectIds.contains(CITestHelper.getExpectedProjectId(Environment.stg)), isTrue);
+      expect(projectIds.contains(CITestHelper.getExpectedProjectId(Environment.prod)), isTrue);
     });
 
     test('Firebase configuration accessibility in all environments', () {
@@ -207,9 +208,9 @@ void main() {
 
     test('Environment indicators display correct project IDs', () {
       final testCases = [
-        (Environment.dev, 'playwithme-dev'),
-        (Environment.stg, 'playwithme-stg'),
-        (Environment.prod, 'playwithme-prod'),
+        (Environment.dev, CITestHelper.getExpectedProjectId(Environment.dev)),
+        (Environment.stg, CITestHelper.getExpectedProjectId(Environment.stg)),
+        (Environment.prod, CITestHelper.getExpectedProjectId(Environment.prod)),
       ];
 
       for (final (env, expectedProjectId) in testCases) {

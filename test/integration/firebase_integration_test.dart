@@ -8,6 +8,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_service.dart';
 import 'package:play_with_me/core/services/firebase_options_provider.dart';
+import '../helpers/ci_test_helper.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +45,7 @@ void main() {
         final connectionInfo = FirebaseService.getConnectionInfo();
         expect(connectionInfo['isInitialized'], isTrue);
         expect(connectionInfo['environment'], equals('Development'));
-        expect(connectionInfo['projectId'], equals('playwithme-dev'));
+        expect(connectionInfo['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.dev)));
 
         // Note: In a real integration test environment with proper Firebase config,
         // we would also test actual Firebase operations here
@@ -82,9 +83,9 @@ void main() {
     testWidgets('Environment switching works correctly', (tester) async {
       // Test switching between environments
       final testCases = [
-        (Environment.dev, 'playwithme-dev', 'Development'),
-        (Environment.stg, 'playwithme-stg', 'Staging'),
-        (Environment.prod, 'playwithme-prod', 'Production'),
+        (Environment.dev, CITestHelper.getExpectedProjectId(Environment.dev), 'Development'),
+        (Environment.stg, CITestHelper.getExpectedProjectId(Environment.stg), 'Staging'),
+        (Environment.prod, CITestHelper.getExpectedProjectId(Environment.prod), 'Production'),
       ];
 
       for (final (env, expectedProjectId, expectedName) in testCases) {
