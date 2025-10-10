@@ -10,6 +10,7 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/auth/presentation/pages/login_page.dart';
 import 'package:play_with_me/features/auth/presentation/pages/registration_page.dart';
 import 'package:play_with_me/features/auth/presentation/pages/password_reset_page.dart';
+import 'package:play_with_me/features/auth/presentation/pages/profile_page.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
@@ -55,6 +56,7 @@ class PlayWithMeApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
           '/forgot-password': (context) => const PasswordResetPage(),
+          '/profile': (context) => const ProfilePage(),
         },
       ),
     );
@@ -79,6 +81,12 @@ class HomePage extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                 title: Text('PlayWithMe${EnvironmentConfig.appSuffix}'),
                 actions: [
+                  IconButton(
+                    icon: const Icon(Icons.person),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/profile');
+                    },
+                  ),
                   IconButton(
                     icon: const Icon(Icons.logout),
                     onPressed: () {
