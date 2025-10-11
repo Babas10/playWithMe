@@ -19,16 +19,29 @@ class CITestHelper {
   }
 
   /// Get expected project ID for the given environment
-  /// - Both CI and local now use real Firebase project IDs
+  /// - CI uses real project IDs from GitHub Secrets
+  /// - Local uses placeholder configs with -test suffix
   static String getExpectedProjectId(Environment environment) {
-    // Real project IDs used in both CI and local environments (with -test suffix for development)
-    switch (environment) {
-      case Environment.dev:
-        return 'playwithme-dev-test';
-      case Environment.stg:
-        return 'playwithme-stg-test';
-      case Environment.prod:
-        return 'playwithme-prod-test';
+    if (isCIEnvironment) {
+      // CI uses real Firebase project IDs from GitHub Secrets
+      switch (environment) {
+        case Environment.dev:
+          return 'playwithme-dev';
+        case Environment.stg:
+          return 'playwithme-stg';
+        case Environment.prod:
+          return 'playwithme-prod';
+      }
+    } else {
+      // Local uses placeholder configs with -test suffix
+      switch (environment) {
+        case Environment.dev:
+          return 'playwithme-dev-test';
+        case Environment.stg:
+          return 'playwithme-stg-test';
+        case Environment.prod:
+          return 'playwithme-prod-test';
+      }
     }
   }
 
