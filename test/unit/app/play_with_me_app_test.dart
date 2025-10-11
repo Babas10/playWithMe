@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/app/play_with_me_app.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
-import '../helpers/test_helpers.dart';
+import '../../helpers/test_helpers.dart';
 import '../features/auth/data/mock_auth_repository.dart';
 
 void main() {

@@ -1,8 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/models/firebase_project_info.dart';
+import '../helpers/ci_test_helper.dart';
 
 void main() {
-  group('FirebaseProjectInfo', () {
+  group('FirebaseProjectInfo',
+    skip: !CITestHelper.isCIEnvironment
+      ? 'CI-only tests - run only in GitHub Actions with real Firebase configs'
+      : null, () {
     test('should create instance with required fields', () {
       final projectInfo = FirebaseProjectInfo(
         environment: 'dev',

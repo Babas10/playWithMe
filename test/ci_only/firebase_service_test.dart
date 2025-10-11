@@ -1,9 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_service.dart';
+import '../helpers/ci_test_helper.dart';
 
 void main() {
-  group('FirebaseService', () {
+  group('FirebaseService',
+    skip: !CITestHelper.isCIEnvironment
+      ? 'CI-only tests - run only in GitHub Actions with real Firebase configs'
+      : null, () {
     setUp(() {
       // Reset Firebase state before each test
       if (FirebaseService.isInitialized) {

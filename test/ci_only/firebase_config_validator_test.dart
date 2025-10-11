@@ -3,9 +3,13 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/config/firebase_config_validator.dart';
+import '../helpers/ci_test_helper.dart';
 
 void main() {
-  group('FirebaseConfigValidator', () {
+  group('FirebaseConfigValidator',
+    skip: !CITestHelper.isCIEnvironment
+      ? 'CI-only tests - run only in GitHub Actions with real Firebase configs'
+      : null, () {
     late Directory tempDir;
 
     setUp(() async {
