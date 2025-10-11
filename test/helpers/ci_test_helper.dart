@@ -19,36 +19,23 @@ class CITestHelper {
   }
 
   /// Get expected project ID for the given environment
-  /// - CI uses real project IDs from GitHub Secrets
-  /// - Local uses placeholder configs with -test suffix
+  /// - Both CI and local now use real Firebase project IDs
   static String getExpectedProjectId(Environment environment) {
-    if (isCIEnvironment) {
-      // CI uses real Firebase project IDs from GitHub Secrets
-      switch (environment) {
-        case Environment.dev:
-          return 'playwithme-dev';
-        case Environment.stg:
-          return 'playwithme-stg';
-        case Environment.prod:
-          return 'playwithme-prod';
-      }
-    } else {
-      // Local uses placeholder configs with -test suffix
-      switch (environment) {
-        case Environment.dev:
-          return 'playwithme-dev-test';
-        case Environment.stg:
-          return 'playwithme-stg-test';
-        case Environment.prod:
-          return 'playwithme-prod-test';
-      }
+    // Real project IDs used in both CI and local environments
+    switch (environment) {
+      case Environment.dev:
+        return 'playwithme-dev';
+      case Environment.stg:
+        return 'playwithme-stg';
+      case Environment.prod:
+        return 'playwithme-prod';
     }
   }
 
   /// Get expected storage bucket for the given environment
   static String getExpectedStorageBucket(Environment environment) {
     final projectId = getExpectedProjectId(environment);
-    return '$projectId.appspot.com';
+    return '$projectId.firebasestorage.app';
   }
 
   /// Get expected auth domain for the given environment

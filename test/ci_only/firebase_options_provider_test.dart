@@ -18,11 +18,10 @@ void main() {
         // Act
         final options = FirebaseOptionsProvider.getFirebaseOptions();
 
-        // Assert - CI-only tests should expect real Firebase project IDs
-        expect(options.projectId, equals('playwithme-dev'),
-            reason: 'CI environment should use real dev project ID');
-        expect(options.storageBucket, equals('playwithme-dev.appspot.com'));
-        expect(options.authDomain, equals('playwithme-dev.firebaseapp.com'));
+        // Assert
+        expect(options.projectId, equals(CITestHelper.getExpectedProjectId(Environment.dev)));
+        expect(options.storageBucket, equals(CITestHelper.getExpectedStorageBucket(Environment.dev)));
+        expect(options.authDomain, equals(CITestHelper.getExpectedAuthDomain(Environment.dev)));
       });
 
       test('returns staging options when environment is stg', () {
@@ -32,11 +31,10 @@ void main() {
         // Act
         final options = FirebaseOptionsProvider.getFirebaseOptions();
 
-        // Assert - CI-only tests should expect real Firebase project IDs
-        expect(options.projectId, equals('playwithme-stg'),
-            reason: 'CI environment should use real staging project ID');
-        expect(options.storageBucket, equals('playwithme-stg.appspot.com'));
-        expect(options.authDomain, equals('playwithme-stg.firebaseapp.com'));
+        // Assert
+        expect(options.projectId, equals(CITestHelper.getExpectedProjectId(Environment.stg)));
+        expect(options.storageBucket, equals(CITestHelper.getExpectedStorageBucket(Environment.stg)));
+        expect(options.authDomain, equals(CITestHelper.getExpectedAuthDomain(Environment.stg)));
       });
 
       test('returns prod options when environment is prod', () {
@@ -46,11 +44,10 @@ void main() {
         // Act
         final options = FirebaseOptionsProvider.getFirebaseOptions();
 
-        // Assert - CI-only tests should expect real Firebase project IDs
-        expect(options.projectId, equals('playwithme-prod'),
-            reason: 'CI environment should use real production project ID');
-        expect(options.storageBucket, equals('playwithme-prod.appspot.com'));
-        expect(options.authDomain, equals('playwithme-prod.firebaseapp.com'));
+        // Assert
+        expect(options.projectId, equals(CITestHelper.getExpectedProjectId(Environment.prod)));
+        expect(options.storageBucket, equals(CITestHelper.getExpectedStorageBucket(Environment.prod)));
+        expect(options.authDomain, equals(CITestHelper.getExpectedAuthDomain(Environment.prod)));
       });
     });
 
@@ -90,9 +87,9 @@ void main() {
 
         // Assert
         expect(summary['environment'], equals('Development'));
-        expect(summary['projectId'], equals('playwithme-dev'));
+        expect(summary['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.dev)));
         expect(summary['hasPlaceholders'], equals('false'));
-        expect(summary['storageBucket'], equals('playwithme-dev.appspot.com'));
+        expect(summary['storageBucket'], equals(CITestHelper.getExpectedStorageBucket(Environment.dev)));
       });
 
       test('returns correct summary for staging environment', () {
@@ -104,9 +101,9 @@ void main() {
 
         // Assert
         expect(summary['environment'], equals('Staging'));
-        expect(summary['projectId'], equals('playwithme-stg'));
+        expect(summary['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.stg)));
         expect(summary['hasPlaceholders'], equals('false'));
-        expect(summary['storageBucket'], equals('playwithme-stg.appspot.com'));
+        expect(summary['storageBucket'], equals(CITestHelper.getExpectedStorageBucket(Environment.stg)));
       });
 
       test('returns correct summary for production environment', () {
@@ -118,9 +115,9 @@ void main() {
 
         // Assert
         expect(summary['environment'], equals('Production'));
-        expect(summary['projectId'], equals('playwithme-prod'));
+        expect(summary['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.prod)));
         expect(summary['hasPlaceholders'], equals('false'));
-        expect(summary['storageBucket'], equals('playwithme-prod.appspot.com'));
+        expect(summary['storageBucket'], equals(CITestHelper.getExpectedStorageBucket(Environment.prod)));
       });
     });
 
