@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_options_provider.dart';
-import '../../helpers/ci_test_helper.dart';
+import '../helpers/ci_test_helper.dart';
 
 void main() {
   group('FirebaseOptionsProvider', () {

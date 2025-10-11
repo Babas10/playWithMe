@@ -21,21 +21,21 @@ class CITestHelper {
   /// Get expected project ID for the given environment
   /// - Both CI and local now use real Firebase project IDs
   static String getExpectedProjectId(Environment environment) {
-    // Real project IDs used in both CI and local environments
+    // Real project IDs used in both CI and local environments (with -test suffix for development)
     switch (environment) {
       case Environment.dev:
-        return 'playwithme-dev';
+        return 'playwithme-dev-test';
       case Environment.stg:
-        return 'playwithme-stg';
+        return 'playwithme-stg-test';
       case Environment.prod:
-        return 'playwithme-prod';
+        return 'playwithme-prod-test';
     }
   }
 
   /// Get expected storage bucket for the given environment
   static String getExpectedStorageBucket(Environment environment) {
     final projectId = getExpectedProjectId(environment);
-    return '$projectId.firebasestorage.app';
+    return '$projectId.appspot.com';
   }
 
   /// Get expected auth domain for the given environment
