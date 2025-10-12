@@ -13,6 +13,7 @@ import 'package:play_with_me/features/auth/presentation/pages/password_reset_pag
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/pages/profile_page.dart';
 
 class PlayWithMeApp extends StatelessWidget {
   const PlayWithMeApp({super.key});
@@ -55,6 +56,7 @@ class PlayWithMeApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
           '/forgot-password': (context) => const PasswordResetPage(),
+          '/profile': (context) => const ProfilePage(),
         },
       ),
     );
@@ -80,7 +82,15 @@ class HomePage extends StatelessWidget {
                 title: Text('PlayWithMe${EnvironmentConfig.appSuffix}'),
                 actions: [
                   IconButton(
+                    icon: const Icon(Icons.person),
+                    tooltip: 'Profile',
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/profile');
+                    },
+                  ),
+                  IconButton(
                     icon: const Icon(Icons.logout),
+                    tooltip: 'Sign Out',
                     onPressed: () {
                       context.read<AuthenticationBloc>().add(
                         const AuthenticationLogoutRequested(),
