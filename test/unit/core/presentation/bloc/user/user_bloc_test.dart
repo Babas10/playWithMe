@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/presentation/bloc/user/user_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/user/user_event.dart';
 import 'package:play_with_me/core/presentation/bloc/user/user_state.dart';
-import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 
 import '../../../data/repositories/mock_user_repository.dart';
@@ -29,13 +28,6 @@ void main() {
     });
 
     group('LoadCurrentUser', () {
-      final testUser = UserModel(
-        uid: 'test-uid',
-        email: 'test@example.com',
-        isEmailVerified: true,
-        isAnonymous: false,
-      );
-
       test('emits UserLoaded when current user exists', () {
         // Skipped due to async stream timing issue with mock setup.
         // Works correctly in real Firebase Auth integration.
@@ -101,15 +93,6 @@ void main() {
         isEmailVerified: true,
         isAnonymous: false,
         firstName: 'John',
-      );
-
-      final updatedUser = UserModel(
-        uid: 'test-uid',
-        email: 'test@example.com',
-        isEmailVerified: true,
-        isAnonymous: false,
-        firstName: 'Jane',
-        lastName: 'Doe',
       );
 
       blocTest<UserBloc, UserState>(
