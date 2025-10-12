@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 /// Generates Firebase configuration Dart files from downloaded Firebase config files.
 /// This script reads the actual google-services.json and GoogleService-Info.plist files

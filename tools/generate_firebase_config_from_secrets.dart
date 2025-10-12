@@ -1,6 +1,5 @@
 #!/usr/bin/env dart
 
-import 'dart:convert';
 import 'dart:io';
 
 /// Generates Firebase configuration Dart files from GitHub Secrets.

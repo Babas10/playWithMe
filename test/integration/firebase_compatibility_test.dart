@@ -93,10 +93,12 @@ void main() {
         final options = FirebaseOptionsProvider.getFirebaseOptions();
         final connectionInfo = FirebaseTestHelper.getMockConnectionInfo();
 
-        // Assert
-        expect(options.projectId, equals(expectedProjectId));
+        // Assert - verify project ID matches expected for current environment
+        expect(options.projectId, equals(expectedProjectId),
+            reason: 'Firebase options project ID should match expected for ${env.name}');
         expect(connectionInfo['environment'], equals(expectedName));
-        expect(connectionInfo['projectId'], equals(expectedProjectId));
+        expect(connectionInfo['projectId'], equals(expectedProjectId),
+            reason: 'Connection info project ID should match expected for ${env.name}');
         expect(connectionInfo['testMode'], isTrue,
             reason: 'Should be in test mode during integration tests');
 

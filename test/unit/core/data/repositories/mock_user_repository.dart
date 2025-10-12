@@ -1,14 +1,12 @@
 // Mock repository for UserRepository used in testing
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 
 class MockUserRepository implements UserRepository {
   final StreamController<UserModel?> _currentUserController = StreamController<UserModel?>.broadcast();
   final Map<String, UserModel> _users = {};
-  UserModel? _currentUserValue;
 
   StreamController<UserModel?> get currentUserController => _currentUserController;
 
@@ -17,16 +15,14 @@ class MockUserRepository implements UserRepository {
 
   // Helper methods for testing
   void setCurrentUser(UserModel? user) {
-    debugPrint('🧪 MockUserRepository: Setting current user to ${user?.email ?? 'null'}');
-    _currentUserValue = user;
+    print('🧪 MockUserRepository: Setting current user to ${user?.email ?? 'null'}');
     if (!_currentUserController.isClosed) {
       _currentUserController.add(user);
     }
   }
 
   void setCurrentUserValue(UserModel? user) {
-    debugPrint('🧪 MockUserRepository: Setting current user value to ${user?.email ?? 'null'}');
-    _currentUserValue = user;
+    print('🧪 MockUserRepository: Setting current user value to ${user?.email ?? 'null'}');
     // Emit immediately in the next microtask to ensure listeners are set up
     scheduleMicrotask(() {
       if (!_currentUserController.isClosed) {
@@ -36,7 +32,7 @@ class MockUserRepository implements UserRepository {
   }
 
   void setCurrentUserError(String error) {
-    debugPrint('🧪 MockUserRepository: Setting current user stream error: $error');
+    print('🧪 MockUserRepository: Setting current user stream error: $error');
     // Emit immediately in the next microtask to ensure listeners are set up
     scheduleMicrotask(() {
       if (!_currentUserController.isClosed) {
