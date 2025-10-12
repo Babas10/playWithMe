@@ -1,10 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_options_provider.dart';
-import '../../helpers/ci_test_helper.dart';
+import '../helpers/ci_test_helper.dart';
 
 void main() {
-  group('FirebaseOptionsProvider', () {
+  group('FirebaseOptionsProvider',
+    skip: !CITestHelper.isCIEnvironment
+      ? 'CI-only tests - run only in GitHub Actions with real Firebase configs'
+      : null, () {
     tearDown(() {
       // Reset to default environment after each test
       EnvironmentConfig.setEnvironment(Environment.prod);
