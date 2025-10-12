@@ -5,7 +5,7 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
-import '../features/auth/data/mock_auth_repository.dart';
+import '../unit/features/auth/data/mock_auth_repository.dart';
 
 // Global test repository instance for control during tests
 MockAuthRepository? _globalMockRepo;
