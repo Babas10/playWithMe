@@ -65,6 +65,20 @@ lib/core/config/firebase_config_prod.dart
 **/terraform.plan
 **/terraform-*.plan
 
+# Environment variables and secrets
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+
+# API Keys and credentials
+**/credentials.json
+**/service-account*.json
+**/*-key.json
+**/*_key.json
+**/secrets.json
+
 # Node modules
 node_modules/
 infrastructure/terraform/.terraform/
