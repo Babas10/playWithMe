@@ -84,7 +84,9 @@ Claude must:
 ### **🔒 Security (Critical, Non-Negotiable)**
 
 * **Never commit** Firebase configuration files (`google-services.json`, `GoogleService-Info.plist`, `.firebase_projects.json`).
-* **Always verify** `.gitignore` rules before configuring Firebase.
+* **Never commit** environment files (`.env`, `.env.*`) or API keys.
+* **Always verify** `.gitignore` rules before configuring Firebase or adding any secrets.
+* **Always review** the Pre-Commit Security Checklist before every commit.
 * **Use official scripts** for Firebase setup:
 
   ```bash
@@ -95,7 +97,9 @@ Claude must:
 * **If secrets leak:** Stop work immediately, rotate keys, purge from Git history, and force push.
 * **Never use placeholder configs.**
 
-See: [`docs/security/FIREBASE_CONFIG_SECURITY.md`](./docs/security/FIREBASE_CONFIG_SECURITY.md)
+**Required Reading:**
+* [`docs/security/FIREBASE_CONFIG_SECURITY.md`](./docs/security/FIREBASE_CONFIG_SECURITY.md) - Firebase security guidelines
+* [`docs/security/PRE_COMMIT_SECURITY_CHECKLIST.md`](./docs/security/PRE_COMMIT_SECURITY_CHECKLIST.md) - **MUST CHECK BEFORE EVERY COMMIT**
 
 ---
 
@@ -153,14 +157,46 @@ Example:
 // Verifies that AuthBloc transitions to Authenticated when valid credentials are provided.
 ```
 
-### **Test Categories**
+### **Test Categories & Organization**
 
-| Type                  | Scope                                   | Requirements                                           |
-| --------------------- | --------------------------------------- | ------------------------------------------------------ |
-| **Unit Tests**        | All BLoCs & Repositories                | Mock external dependencies. Test input → output logic. |
-| **Widget Tests**      | All screens & major widgets             | Test state rendering with mock BLoCs.                  |
-| **Integration Tests** | Critical user flows (login, RSVP, etc.) | **Local-only** - not run in CI. Use `flutter test integration_test/` |
-| **Backend Tests**     | Python Cloud Functions                  | Must pass on the Firebase Local Emulator.              |
+Tests are organized into separate directories for different purposes:
+
+```
+test/
+├── unit/               # Unit tests (run locally and in CI)
+│   ├── app/           # App-level widget tests
+│   ├── core/          # Core feature tests
+│   ├── features/      # Feature-specific tests
+│   └── helpers/       # Unit test utilities
+├── integration/        # Integration tests (local only, skipped in CI)
+├── ci_only/           # CI-specific tests (skipped locally)
+└── helpers/           # Shared test helpers
+```
+
+| Type                  | Location           | Scope                                   | When to Run                                           |
+| --------------------- | ------------------ | --------------------------------------- | ----------------------------------------------------- |
+| **Unit Tests**        | `test/unit/`       | All BLoCs & Repositories                | Locally (inner loop) and CI. Mock external dependencies. |
+| **Widget Tests**      | `test/unit/app/`   | All screens & major widgets             | Locally and CI. Test state rendering with mock BLoCs. |
+| **Integration Tests** | `test/integration/` | Critical user flows (login, RSVP, etc.) | **Local-only** - not run in CI. Use `flutter test test/integration/` |
+| **CI-Only Tests**     | `test/ci_only/`    | Firebase config, real service validation | **CI pipeline only** - skipped locally to avoid setup complexity |
+| **Backend Tests**     | Cloud Functions    | Python Firebase Cloud Functions         | Must pass on the Firebase Local Emulator.              |
+
+**Running Tests:**
+```bash
+# Local development (fast inner loop) - only unit tests
+flutter test test/unit/
+
+# Integration tests (local only)
+flutter test test/integration/
+
+# All tests (what CI runs)
+flutter test
+
+# Individual test file
+flutter test test/unit/features/auth/presentation/bloc/login/login_bloc_test.dart
+```
+
+See: [`docs/testing/LOCAL_TESTING_GUIDE.md`](./docs/testing/LOCAL_TESTING_GUIDE.md) for detailed testing workflows.
 
 ### **Test Success Criteria**
 
@@ -209,13 +245,15 @@ Each subtask must have its own GitHub Issue linked to the parent.
 
 Before marking a Story complete, confirm:
 
-* [ ] All tests pass with **0 errors and 0 skips**
+* [ ] **Security**: Reviewed [`PRE_COMMIT_SECURITY_CHECKLIST.md`](./docs/security/PRE_COMMIT_SECURITY_CHECKLIST.md) - no secrets committed
+* [ ] All tests pass with **0 errors and 0 skips** (run `flutter test test/unit/`)
 * [ ] Each test file includes a one-line purpose comment
 * [ ] Documentation in `docs/epic-x/story-y/` is updated
 * [ ] Code passes `flutter analyze` with 0 warnings
 * [ ] Works on Android, iOS, and Web
 * [ ] Commits follow conventional format
 * [ ] Branch is up to date with `main`
+* [ ] No `.env` files, Firebase configs, or API keys in git history
 
 ---
 
@@ -275,6 +313,8 @@ All project documentation is organized by Epic and Story under [`docs/`](./docs/
 
 * **[Epic 0: Project Setup](./docs/epic-0/)**
 * **[Firebase Config Security](./docs/security/FIREBASE_CONFIG_SECURITY.md)** *(mandatory reading before Firebase work)*
+* **[Pre-Commit Security Checklist](./docs/security/PRE_COMMIT_SECURITY_CHECKLIST.md)** *(MUST review before every commit)*
+* **[Local Testing Guide](./docs/testing/LOCAL_TESTING_GUIDE.md)** *(testing workflows and best practices)*
 
 ---
 
@@ -394,13 +434,19 @@ As of **October 2025**, the PlayWithMe app has completed its foundational infras
 
 **🧪 Testing Framework:**
 - Comprehensive test infrastructure with 90%+ coverage requirement
-- Unit, widget, and integration test frameworks
+- Unit, widget, and integration test frameworks properly separated
+- **Story 0.3.2**: Unit/Integration test separation for fast local development
+  - Unit tests in `test/unit/` (run locally and in CI)
+  - Integration tests in `test/integration/` (local only)
+  - CI-only tests in `test/ci_only/` (CI pipeline only)
 - Firebase test helpers for environment-safe testing
 - Automated CI/CD pipeline with linting and test validation
 
 **🔒 Security & Configuration:**
 - Environment-specific Firebase projects: `playwithme-dev`, `playwithme-stg`, `playwithme-prod`
-- Secure configuration management with proper `.gitignore` rules
+- Secure configuration management with comprehensive `.gitignore` rules
+- Pre-commit security checklist to prevent credential leaks
+- Environment files (`.env`, `.env.*`) and API keys blocked from commits
 - Application ID isolation between environments
 - Firebase configuration tools and validation scripts
 
@@ -434,11 +480,14 @@ flutter run --flavor stg -t lib/main_stg.dart
 # Run production environment
 flutter run --flavor prod -t lib/main_prod.dart
 
-# Run tests
-flutter test
+# Run unit tests (local development - fast)
+flutter test test/unit/
 
-# Run integration tests
-flutter test integration_test/
+# Run integration tests (local only)
+flutter test test/integration/
+
+# Run all tests (what CI runs)
+flutter test
 
 # Analyze code
 flutter analyze
