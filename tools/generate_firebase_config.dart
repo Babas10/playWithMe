@@ -43,9 +43,9 @@ String _generateFirebaseConfig(String environment) {
 // Generated from Firebase config files for $environment environment
 // Run: dart tools/generate_firebase_config.dart $environment
 
-import '../firebase_config_base.dart';
+import 'firebase_config_base.dart';
 
-class FirebaseConfig$_capitalize(environment) extends FirebaseConfigBase {
+class FirebaseConfig${_capitalize(environment)} extends FirebaseConfigBase {
   @override
   String get projectId => '${androidConfig['project_info']['project_id']}';
 
