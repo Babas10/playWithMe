@@ -64,16 +64,19 @@ class _ProfileContent extends StatelessWidget {
           // Action buttons
           ProfileActions(
             onEditProfile: () {
+              final authRepository = context.read<AuthRepository>();
+              final authBloc = context.read<AuthenticationBloc>();
+
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (newContext) => MultiRepositoryProvider(
                     providers: [
                       RepositoryProvider.value(
-                        value: context.read<AuthRepository>(),
+                        value: authRepository,
                       ),
                     ],
                     child: BlocProvider.value(
-                      value: context.read<AuthenticationBloc>(),
+                      value: authBloc,
                       child: ProfileEditPage(user: state.user),
                     ),
                   ),
