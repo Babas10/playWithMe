@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -65,7 +66,17 @@ class _ProfileContent extends StatelessWidget {
             onEditProfile: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => ProfileEditPage(user: state.user),
+                  builder: (newContext) => MultiRepositoryProvider(
+                    providers: [
+                      RepositoryProvider.value(
+                        value: context.read<AuthRepository>(),
+                      ),
+                    ],
+                    child: BlocProvider.value(
+                      value: context.read<AuthenticationBloc>(),
+                      child: ProfileEditPage(user: state.user),
+                    ),
+                  ),
                 ),
               );
             },
