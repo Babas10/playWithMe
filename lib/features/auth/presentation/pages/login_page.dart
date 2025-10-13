@@ -48,9 +48,8 @@ class _LoginPageState extends State<LoginPage> {
                   backgroundColor: Colors.red,
                 ),
               );
-          } else if (state is LoginSuccess) {
-            Navigator.of(context).pop();
           }
+          // Don't pop on success - let AuthenticationBloc handle navigation
         },
         child: Padding(
           padding: const EdgeInsets.all(24.0),
