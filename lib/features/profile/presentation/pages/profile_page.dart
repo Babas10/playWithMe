@@ -13,28 +13,36 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        centerTitle: true,
-      ),
-      body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-        builder: (context, state) {
-          if (state is AuthenticationAuthenticated) {
-            return _ProfileContent(state: state);
-          }
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listener: (context, state) {
+        // Pop this page when user becomes unauthenticated
+        if (state is AuthenticationUnauthenticated) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Profile'),
+          centerTitle: true,
+        ),
+        body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+          builder: (context, state) {
+            if (state is AuthenticationAuthenticated) {
+              return _ProfileContent(state: state);
+            }
 
-          if (state is AuthenticationUnknown) {
+            if (state is AuthenticationUnknown) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            // Unauthenticated state - should not happen on profile page
             return const Center(
-              child: CircularProgressIndicator(),
+              child: Text('Please log in to view your profile'),
             );
-          }
-
-          // Unauthenticated state - should not happen on profile page
-          return const Center(
-            child: Text('Please log in to view your profile'),
-          );
-        },
+          },
+        ),
       ),
     );
   }
@@ -101,12 +109,13 @@ class _ProfileContent extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () {
+              // Close dialog first
+              Navigator.of(dialogContext).pop();
               // Trigger logout through AuthenticationBloc
+              // ProfilePage's BlocListener will automatically pop when unauthenticated
               context
                   .read<AuthenticationBloc>()
                   .add(const AuthenticationLogoutRequested());
-              Navigator.of(dialogContext).pop();
-              Navigator.of(context).pop(); // Return to previous screen
             },
             child: const Text('Sign Out'),
           ),
