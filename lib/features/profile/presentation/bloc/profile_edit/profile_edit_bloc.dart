@@ -176,23 +176,19 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
 
     final trimmed = photoUrl.trim();
 
-    // Basic URL validation
+    // Basic URL validation - must start with http:// or https://
     final urlPattern = RegExp(
-      r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
+      r'^https?:\/\/',
+      caseSensitive: false,
     );
 
     if (!urlPattern.hasMatch(trimmed)) {
-      return 'Please enter a valid URL';
+      return 'URL must start with http:// or https://';
     }
 
-    // Check if it's likely an image URL (common extensions)
-    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
-    final hasImageExtension = imageExtensions.any((ext) =>
-      trimmed.toLowerCase().contains(ext)
-    );
-
-    if (!hasImageExtension) {
-      return 'URL should point to an image file';
+    // Must have at least some content after the protocol
+    if (trimmed.length < 12) { // "https://a.co" is minimum
+      return 'Please enter a valid URL';
     }
 
     return null;
