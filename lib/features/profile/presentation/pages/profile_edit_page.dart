@@ -153,26 +153,29 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                           Center(
                             child: Stack(
                               children: [
-                                CircleAvatar(
-                                  radius: 56,
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  backgroundImage: _photoUrlController.text.isNotEmpty
-                                      ? NetworkImage(_photoUrlController.text)
-                                      : null,
-                                  child: _photoUrlController.text.isEmpty
-                                      ? Icon(
+                                _photoUrlController.text.isNotEmpty
+                                    ? CircleAvatar(
+                                        radius: 56,
+                                        backgroundColor:
+                                            Theme.of(context).colorScheme.primary,
+                                        backgroundImage:
+                                            NetworkImage(_photoUrlController.text),
+                                        onBackgroundImageError: (_, __) {
+                                          // Handle image load error silently
+                                        },
+                                      )
+                                    : CircleAvatar(
+                                        radius: 56,
+                                        backgroundColor:
+                                            Theme.of(context).colorScheme.primary,
+                                        child: Icon(
                                           Icons.person,
                                           size: 56,
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onPrimary,
-                                        )
-                                      : null,
-                                  onBackgroundImageError: (_, __) {
-                                    // Handle image load error silently
-                                  },
-                                ),
+                                        ),
+                                      ),
                                 if (isSaving)
                                   Positioned.fill(
                                     child: Container(

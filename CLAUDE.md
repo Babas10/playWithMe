@@ -124,89 +124,181 @@ Claude must:
 * No warnings or errors in the analyzer output.
 
 ---
+Perfect — here’s the **drop-in replacement** for section **4. Testing** in your `CLAUDE.md`, written in the same clean, directive tone as the rest of your document.
+You can paste this directly into your file — no edits needed.
 
-## 🧪 4. Testing (CRITICAL — ZERO TOLERANCE)
+---
 
-All tests must **pass 100% of the time** — no skipping, commenting out, or deferring.
-A failing test equals broken functionality and blocks the story from completion.
+## 🧪 4. Testing (Unified and Deterministic)
 
-### **Core Testing Principles**
+All tests must **pass 100%**, with no skipped or commented-out sections.
+The project uses a **single, consistent testing stack** to ensure clarity, maintainability, and CI reliability.
 
-**🎯 Tests Must Reflect Implementation Reality**
-- **Only test features that are actually implemented** — no tests for planned or unimplemented functionality
-- **Tests should validate current behavior** — not aspirational or future behavior
-- **When features are incomplete** — mark tests as `skip: true` with clear documentation and follow-up GitHub issues
-- **Every skipped test** must have a corresponding GitHub issue for future implementation
+---
 
-**Example of proper skipping:**
+### **4.1 Core Testing Stack**
+
+| Layer                 | Purpose                                                | Frameworks                                 |
+| --------------------- | ------------------------------------------------------ | ------------------------------------------ |
+| **Unit tests**        | Validate logic in BLoCs, repositories, and services    | `flutter_test`, `bloc_test`, `mocktail`    |
+| **Widget tests**      | Verify UI rendering and state transitions              | `flutter_test`, `mocktail`                 |
+| **Integration tests** | End-to-end flow validation using fake Firebase backend | `integration_test`, `fake_cloud_firestore` |
+
+**Key principles:**
+
+* ❌ **Do not use `mockito`** → it introduces codegen overhead and maintenance burden.
+* ✅ **Use only `mocktail`** for mocking, stubbing, and verification.
+* ✅ **Use `fake_cloud_firestore`** for offline backend simulation.
+* ✅ **Use `bloc_test`** for BLoC state assertions.
+
+---
+
+### **4.2 Mocking Policy**
+
+All mocks are written using **Mocktail**:
+
 ```dart
-testWidgets('should create game with advanced settings', (tester) async {
-  // TODO: Implement advanced game settings feature
-  // GitHub Issue: #123 - Advanced Game Settings
-}, skip: true);
+class MockAuthRepository extends Mock implements AuthRepository {}
+
+setUp(() {
+  mockAuthRepository = MockAuthRepository();
+});
+
+when(() => mockAuthRepository.updateUserProfile(
+  displayName: any(named: 'displayName'),
+  photoUrl: any(named: 'photoUrl'),
+)).thenAnswer((_) async {});
 ```
 
-### **Test Documentation Rule**
+**Rationale:**
 
-Each test file **must start with a one-line comment** explaining *why* the test exists.
-This clarifies purpose and intent for future contributors and AI agents.
+* No code generation or `build_runner` required.
+* Consistent null-safe matchers and verification.
+* Fast test execution in both local and CI environments.
 
-Example:
+---
 
-```dart
-// Verifies that AuthBloc transitions to Authenticated when valid credentials are provided.
-```
-
-### **Test Categories & Organization**
-
-Tests are organized into separate directories for different purposes:
+### **4.3 Folder Structure**
 
 ```
 test/
-├── unit/               # Unit tests (run locally and in CI)
-│   ├── app/           # App-level widget tests
-│   ├── core/          # Core feature tests
-│   ├── features/      # Feature-specific tests
-│   └── helpers/       # Unit test utilities
-├── integration/        # Integration tests (local only, skipped in CI)
-├── ci_only/           # CI-specific tests (skipped locally)
-└── helpers/           # Shared test helpers
+├── unit/                # Logic & BLoC tests
+│   ├── features/
+│   ├── core/
+│   └── helpers/
+├── widget/              # Screen/widget rendering tests
+├── integration/         # End-to-end flow tests (with fake Firestore)
+└── helpers/             # Shared mocks, fakes, and test data
 ```
 
-| Type                  | Location           | Scope                                   | When to Run                                           |
-| --------------------- | ------------------ | --------------------------------------- | ----------------------------------------------------- |
-| **Unit Tests**        | `test/unit/`       | All BLoCs & Repositories                | Locally (inner loop) and CI. Mock external dependencies. |
-| **Widget Tests**      | `test/unit/app/`   | All screens & major widgets             | Locally and CI. Test state rendering with mock BLoCs. |
-| **Integration Tests** | `test/integration/` | Critical user flows (login, RSVP, etc.) | **Local-only** - not run in CI. Use `flutter test test/integration/` |
-| **CI-Only Tests**     | `test/ci_only/`    | Firebase config, real service validation | **CI pipeline only** - skipped locally to avoid setup complexity |
-| **Backend Tests**     | Cloud Functions    | Python Firebase Cloud Functions         | Must pass on the Firebase Local Emulator.              |
+---
 
-**Running Tests:**
+### **4.4 Test Hygiene Rules**
+
+✅ Each test file begins with a one-line purpose comment
+
+```dart
+// Validates ProfileEditBloc emits correct states during profile update.
+```
+
+✅ Each test mirrors its source file
+`profile_edit_bloc.dart` → `profile_edit_bloc_test.dart`
+
+✅ No skipped or commented-out tests
+If a feature isn’t ready, mark `skip: true` *only with a GitHub issue reference*.
+
+✅ No mixing frameworks
+Never import both `mockito` and `mocktail`.
+
+✅ Fast inner loop
+All `unit/` and `widget/` tests should complete in under **60 seconds total**.
+
+✅ Minimum coverage
+Maintain **≥ 90% coverage** for BLoC and repository layers.
+
+---
+
+### **4.5 Running Tests**
+
+**Local (inner loop):**
+
 ```bash
-# Local development (fast inner loop) - only unit tests
+# Run only unit + widget tests
 flutter test test/unit/
-
-# Integration tests (local only)
-flutter test test/integration/
-
-# All tests (what CI runs)
-flutter test
-
-# Individual test file
-flutter test test/unit/features/auth/presentation/bloc/login/login_bloc_test.dart
+flutter test test/widget/
 ```
 
-See: [`docs/testing/LOCAL_TESTING_GUIDE.md`](./docs/testing/LOCAL_TESTING_GUIDE.md) for detailed testing workflows.
+**Integration (optional inner loop / CI):**
 
-### **Test Success Criteria**
+```bash
+flutter test test/integration/
+```
 
-✅ All tests pass — zero tolerance for failures
-✅ Each test file begins with a purpose comment
-✅ Coverage ≥ 90% for all core logic
-✅ No commented-out or placeholder tests
-✅ **Tests only validate implemented features** — no aspirational testing
-✅ **Skipped tests have clear documentation** and corresponding GitHub issues
-✅ **All unimplemented features properly skipped** until implementation is complete
+**Full suite (CI pipeline):**
+
+```bash
+flutter test
+```
+
+---
+
+### **4.6 dev_dependencies (Required)**
+
+```yaml
+dev_dependencies:
+  flutter_test:
+  bloc_test:
+  mocktail:
+  fake_cloud_firestore:
+  integration_test:
+```
+
+*(Remove `mockito`, `build_runner`, and any generated `.mocks.dart` files.)*
+
+---
+
+### **4.7 Shared Test Helpers**
+
+Centralize reusable fakes, mocks, and fixtures under `test/helpers/`:
+
+```dart
+class FakeUserEntity extends Fake implements UserEntity {}
+```
+
+---
+
+### **4.8 Optional Enhancements**
+
+**Automated Coverage Gate**
+
+```bash
+dart run test_cov_tool check --threshold 90
+```
+
+→ Blocks PRs if coverage drops below 90%.
+
+**Pre-commit Hook**
+
+```bash
+# .husky/pre-commit
+flutter analyze && flutter test --coverage
+```
+
+**Testing Guide**
+Document reusable patterns in:
+`docs/testing/TESTING_STACK_GUIDE.md`
+
+---
+
+### **4.9 Why This Approach**
+
+| Problem                                    | Unified Stack Fix                   |
+| ------------------------------------------ | ----------------------------------- |
+| Conflicts between `mockito` and `mocktail` | Use only Mocktail                   |
+| Slow CI due to build_runner                | Eliminate code generation           |
+| Inconsistent matcher behavior              | Standardize with Mocktail           |
+| Duplicate stubs or mocks                   | Centralize in helpers/              |
+| Unpredictable coverage                     | Single pipeline with defined layers |
 
 ---
 
