@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
+import 'package:play_with_me/features/profile/presentation/pages/profile_edit_page.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_actions.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_header.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_info_card.dart';
@@ -13,36 +16,28 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthenticationBloc, AuthenticationState>(
-      listener: (context, state) {
-        // Pop this page when user becomes unauthenticated
-        if (state is AuthenticationUnauthenticated) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          centerTitle: true,
-        ),
-        body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-          builder: (context, state) {
-            if (state is AuthenticationAuthenticated) {
-              return _ProfileContent(state: state);
-            }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        centerTitle: true,
+      ),
+      body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        builder: (context, state) {
+          if (state is AuthenticationAuthenticated) {
+            return _ProfileContent(state: state);
+          }
 
-            if (state is AuthenticationUnknown) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            // Unauthenticated state - should not happen on profile page
+          if (state is AuthenticationUnknown) {
             return const Center(
-              child: Text('Please log in to view your profile'),
+              child: CircularProgressIndicator(),
             );
-          },
-        ),
+          }
+
+          // Unauthenticated state - should not happen on profile page
+          return const Center(
+            child: Text('Please log in to view your profile'),
+          );
+        },
       ),
     );
   }
@@ -70,11 +65,26 @@ class _ProfileContent extends StatelessWidget {
           // Action buttons
           ProfileActions(
             onEditProfile: () {
-              // TODO: Navigate to edit profile page (Story 1.4.2)
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Edit profile feature coming soon'),
-                  duration: Duration(seconds: 2),
+              final authRepository = sl<AuthRepository>();
+              final authBloc = context.read<AuthenticationBloc>();
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (newContext) => MultiRepositoryProvider(
+                    providers: [
+                      RepositoryProvider.value(
+                        value: authRepository,
+                      ),
+                    ],
+                    child: MultiBlocProvider(
+                      providers: [
+                        BlocProvider.value(
+                          value: authBloc,
+                        ),
+                      ],
+                      child: ProfileEditPage(user: state.user),
+                    ),
+                  ),
                 ),
               );
             },
@@ -109,13 +119,12 @@ class _ProfileContent extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () {
-              // Close dialog first
-              Navigator.of(dialogContext).pop();
               // Trigger logout through AuthenticationBloc
-              // ProfilePage's BlocListener will automatically pop when unauthenticated
               context
                   .read<AuthenticationBloc>()
                   .add(const AuthenticationLogoutRequested());
+              Navigator.of(dialogContext).pop();
+              Navigator.of(context).pop(); // Return to previous screen
             },
             child: const Text('Sign Out'),
           ),
