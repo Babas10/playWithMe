@@ -162,20 +162,20 @@ void main() {
           ),
         );
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
-        when(() => mockBloc.add(any())).thenReturn(null);
 
         await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
 
-        // Scroll to make the button visible
-        final sendButton = find.widgetWithText(FilledButton, 'Send Verification Email');
-        await tester.scrollUntilVisible(
-          sendButton,
-          100.0,
-          scrollable: find.byType(Scrollable).first,
-        );
+        // Find the send button - it's a FilledButton with "Send Verification Email" text
+        expect(find.text('Send Verification Email'), findsOneWidget);
 
-        await tester.tap(sendButton);
-        await tester.pump();
+        // Tap on the button - tap the FilledButton directly
+        final filledButtons = find.byType(FilledButton);
+        // There should be exactly one FilledButton in this state
+        expect(filledButtons, findsOneWidget);
+
+        await tester.tap(filledButtons.first);
+        await tester.pumpAndSettle();
 
         verify(() => mockBloc.add(
             const EmailVerificationEvent.sendVerificationEmail())).called(1);
@@ -192,14 +192,17 @@ void main() {
           ),
         );
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
-        when(() => mockBloc.add(any())).thenReturn(null);
 
         await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
 
-        // Find the refresh button specifically (not the instruction card text)
-        final refreshButton = find.widgetWithText(FilledButton, 'Refresh Status');
-        await tester.tap(refreshButton);
-        await tester.pump();
+        // When emailSent is true, there are TWO buttons: FilledButton (refresh) and OutlinedButton (resend)
+        // Tap the first FilledButton (refresh button)
+        final filledButtons = find.byType(FilledButton);
+        expect(filledButtons, findsOneWidget);
+
+        await tester.tap(filledButtons.first);
+        await tester.pumpAndSettle();
 
         verify(() =>
                 mockBloc.add(const EmailVerificationEvent.refreshStatus()))
@@ -217,11 +220,17 @@ void main() {
           ),
         );
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
-        when(() => mockBloc.add(any())).thenReturn(null);
 
         await tester.pumpWidget(createWidgetUnderTest());
-        await tester.tap(find.text('Resend Email'));
-        await tester.pump();
+        await tester.pumpAndSettle();
+
+        // When emailSent is true, there are two buttons: FilledButton (refresh) and OutlinedButton (resend)
+        // Tap the OutlinedButton (resend button)
+        final outlinedButtons = find.byType(OutlinedButton);
+        expect(outlinedButtons, findsOneWidget);
+
+        await tester.tap(outlinedButtons.first);
+        await tester.pumpAndSettle();
 
         verify(() => mockBloc.add(
             const EmailVerificationEvent.sendVerificationEmail())).called(1);
@@ -240,13 +249,16 @@ void main() {
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
 
         await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
 
         expect(find.text('Resend in 45s'), findsOneWidget);
 
-        // Find the OutlinedButton with the resend text and verify it's disabled
-        final button = tester.widget<OutlinedButton>(
-          find.widgetWithText(OutlinedButton, 'Resend in 45s'),
-        );
+        // Find all OutlinedButton widgets, there should be only one
+        final outlinedButtons = find.byType(OutlinedButton);
+        expect(outlinedButtons, findsOneWidget);
+
+        // Verify it's disabled
+        final button = tester.widget<OutlinedButton>(outlinedButtons);
         expect(button.onPressed, isNull);
       });
 
@@ -280,18 +292,17 @@ void main() {
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
 
         await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
 
         expect(find.text('Troubleshooting'), findsOneWidget);
 
-        // Scroll to make the troubleshooting section visible
-        await tester.scrollUntilVisible(
-          find.text('Troubleshooting'),
-          100.0,
-          scrollable: find.byType(Scrollable).first,
-        );
+        // Ensure the troubleshooting section is visible
+        final expansionTile = find.byType(ExpansionTile);
+        await tester.ensureVisible(expansionTile);
+        await tester.pumpAndSettle();
 
         // Expand troubleshooting section
-        await tester.tap(find.byType(ExpansionTile));
+        await tester.tap(expansionTile);
         await tester.pumpAndSettle();
 
         expect(find.text('Check your spam/junk folder'), findsOneWidget);
