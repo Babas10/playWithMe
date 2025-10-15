@@ -1,5 +1,6 @@
 // Verifies that FirebaseImageStorageRepository handles avatar upload, deletion, and retrieval correctly
 
+import 'dart:async';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,6 +13,22 @@ class MockReference extends Mock implements Reference {}
 class MockUploadTask extends Mock implements UploadTask {}
 class MockTaskSnapshot extends Mock implements TaskSnapshot {}
 class MockListResult extends Mock implements ListResult {}
+
+// Fake Upload Task that properly implements Future interface
+class FakeUploadTask extends Fake implements UploadTask {
+  final TaskSnapshot _snapshot;
+  final Stream<TaskSnapshot> _snapshotEvents;
+
+  FakeUploadTask(this._snapshot, this._snapshotEvents);
+
+  @override
+  Stream<TaskSnapshot> get snapshotEvents => _snapshotEvents;
+
+  @override
+  Future<S> then<S>(FutureOr<S> Function(TaskSnapshot) onValue, {Function? onError}) {
+    return Future.value(_snapshot).then(onValue, onError: onError);
+  }
+}
 
 void main() {
   late MockFirebaseStorage mockStorage;
@@ -43,15 +60,20 @@ void main() {
         const userId = 'user123';
         const downloadUrl = 'https://storage.example.com/avatar_123.jpg';
 
-        when(() => mockStorage.ref()).thenReturn(mockRef);
-        when(() => mockRef.child(any())).thenReturn(mockUserRef);
-        when(() => mockUserRef.putFile(any())).thenReturn(mockUploadTask);
-        when(() => mockUploadTask.snapshotEvents).thenAnswer(
-          (_) => Stream.value(mockSnapshot),
-        );
+        // Setup mock chain
+        when(() => mockSnapshot.state).thenReturn(TaskState.success);
         when(() => mockSnapshot.ref).thenReturn(mockUserRef);
         when(() => mockSnapshot.bytesTransferred).thenReturn(100);
         when(() => mockSnapshot.totalBytes).thenReturn(100);
+
+        final fakeUploadTask = FakeUploadTask(
+          mockSnapshot,
+          Stream.value(mockSnapshot),
+        );
+
+        when(() => mockStorage.ref()).thenReturn(mockRef);
+        when(() => mockRef.child(any())).thenReturn(mockUserRef);
+        when(() => mockUserRef.putFile(any())).thenAnswer((_) => fakeUploadTask);
         when(() => mockUserRef.getDownloadURL())
             .thenAnswer((_) async => downloadUrl);
 
@@ -77,22 +99,24 @@ void main() {
         const downloadUrl = 'https://storage.example.com/avatar_123.jpg';
         final progressValues = <double>[];
 
-        when(() => mockStorage.ref()).thenReturn(mockRef);
-        when(() => mockRef.child(any())).thenReturn(mockUserRef);
-        when(() => mockUserRef.putFile(any())).thenReturn(mockUploadTask);
+        // Setup mock chain
+        when(() => mockSnapshot.state).thenReturn(TaskState.success);
+        when(() => mockSnapshot.bytesTransferred).thenReturn(50);
+        when(() => mockSnapshot.totalBytes).thenReturn(100);
+        when(() => mockSnapshot.ref).thenReturn(mockUserRef);
 
-        // Simulate progress updates
-        when(() => mockUploadTask.snapshotEvents).thenAnswer(
-          (_) => Stream.fromIterable([
+        final fakeUploadTask = FakeUploadTask(
+          mockSnapshot,
+          Stream.fromIterable([
             mockSnapshot,
             mockSnapshot,
             mockSnapshot,
           ]),
         );
 
-        when(() => mockSnapshot.bytesTransferred).thenReturn(50);
-        when(() => mockSnapshot.totalBytes).thenReturn(100);
-        when(() => mockSnapshot.ref).thenReturn(mockUserRef);
+        when(() => mockStorage.ref()).thenReturn(mockRef);
+        when(() => mockRef.child(any())).thenReturn(mockUserRef);
+        when(() => mockUserRef.putFile(any())).thenAnswer((_) => fakeUploadTask);
         when(() => mockUserRef.getDownloadURL())
             .thenAnswer((_) async => downloadUrl);
 
@@ -116,7 +140,7 @@ void main() {
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child(any())).thenReturn(mockUserRef);
         when(() => mockUserRef.putFile(any()))
-            .thenThrow(FirebaseException(plugin: 'storage', message: 'Upload failed'));
+            .thenThrow(FirebaseException(plugin: 'storage', code: 'unknown', message: 'Upload failed'));
 
         // Act & Assert
         expect(
