@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
+import 'package:play_with_me/core/services/image_picker_service.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
@@ -12,18 +15,34 @@ import 'package:play_with_me/features/profile/presentation/pages/profile_edit_pa
 // Mocktail mocks
 class MockAuthRepository extends Mock implements AuthRepository {}
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+class MockImageStorageRepository extends Mock implements ImageStorageRepository {}
+class MockImagePickerService extends Mock implements ImagePickerService {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockImageStorageRepository mockImageStorageRepository;
+  late MockImagePickerService mockImagePickerService;
+
+  setUpAll(() {
+    // Register GetIt services for AvatarUploadWidget
+    if (!sl.isRegistered<ImageStorageRepository>()) {
+      sl.registerLazySingleton<ImageStorageRepository>(
+        () => MockImageStorageRepository(),
+      );
+    }
+    if (!sl.isRegistered<ImagePickerService>()) {
+      sl.registerLazySingleton<ImagePickerService>(
+        () => MockImagePickerService(),
+      );
+    }
+  });
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     mockAuthBloc = MockAuthenticationBloc();
-  });
-
-  tearDown(() {
-    // Clean up any resources if needed
+    mockImageStorageRepository = MockImageStorageRepository();
+    mockImagePickerService = MockImagePickerService();
   });
 
   Widget createWidgetUnderTest(UserEntity user) {
@@ -59,10 +78,10 @@ void main() {
       // Verify AppBar
       expect(find.text('Edit Profile'), findsOneWidget);
 
-      // Verify form fields are present (only display name field now)
+      // Verify form field is present (display name field)
       expect(find.byType(TextFormField), findsOneWidget);
 
-      // Verify initial values
+      // Verify initial display name value
       expect(find.text('John Doe'), findsOneWidget);
 
       // Verify buttons
@@ -84,12 +103,11 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest(testUser));
       await tester.pumpAndSettle();
 
-      // Find the Save Changes button by text
+      // Find the Save Changes button
       final saveButtonText = find.text('Save Changes');
       expect(saveButtonText, findsOneWidget);
 
-      // The button should be disabled (tapping should have no effect)
-      // We verify this by checking that the button widget itself is disabled
+      // The button should be disabled (onPressed == null)
       final filledButton = find.byWidgetPredicate(
         (widget) => widget is FilledButton && widget.onPressed == null,
       );
@@ -132,9 +150,6 @@ void main() {
       expect(find.text('Display name cannot be empty'), findsOneWidget);
     });
 
-    // Photo URL field has been replaced with avatar upload widget
-    // Validation for photo URLs is now handled by the avatar upload functionality
-
     testWidgets('Save button becomes enabled after valid changes', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest(testUser));
       await tester.pumpAndSettle();
@@ -148,7 +163,7 @@ void main() {
       await tester.enterText(displayNameField, 'Jane Smith');
       await tester.pumpAndSettle();
 
-      // Verify button is now enabled by checking that an enabled FilledButton exists
+      // Verify button is now enabled
       final enabledButton = find.byWidgetPredicate(
         (widget) => widget is FilledButton && widget.onPressed != null,
       );
@@ -181,16 +196,16 @@ void main() {
       ), findsOneWidget);
     });
 
-    testWidgets('Cancel button works', (tester) async {
+    testWidgets('displays avatar upload widget', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest(testUser));
       await tester.pumpAndSettle();
 
-      // Tap cancel button by text
-      await tester.tap(find.text('Cancel'), warnIfMissed: false);
-      await tester.pumpAndSettle();
+      // Verify avatar/profile picture is displayed (CircleAvatar)
+      expect(find.byType(CircleAvatar), findsWidgets);
 
-      // Note: The page may not be popped if there's navigation context issues in tests
-      // This is expected behavior in widget tests without full navigation stack
+      // Avatar should be visible in the UI
+      final circleAvatars = find.byType(CircleAvatar);
+      expect(circleAvatars, findsAtLeastNWidgets(1));
     });
   });
 }
