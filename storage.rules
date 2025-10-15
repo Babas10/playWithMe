@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules for PlayWithMe App
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Helper function to validate image file
+    function isValidImage() {
+      return request.resource.size < 5 * 1024 * 1024 // Max 5MB
+          && request.resource.contentType.matches('image/(jpeg|jpg|png|webp)');
+    }
+
+    // Avatar images: users can upload/read/delete their own avatars
+    match /avatars/{userId}/{fileName} {
+      // Allow read if authenticated (users can see other users' avatars)
+      allow read: if isAuthenticated();
+
+      // Allow write (upload/update) only if user owns the avatar and file is valid
+      allow write: if isAuthenticated()
+                   && isOwner(userId)
+                   && isValidImage();
+
+      // Allow delete only if user owns the avatar
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Deny all other access by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
