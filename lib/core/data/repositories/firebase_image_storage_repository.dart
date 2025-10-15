@@ -30,19 +30,26 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
       // Listen to upload progress if callback provided
       if (onProgress != null) {
         uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-          final progress = snapshot.bytesTransferred / snapshot.totalBytes;
-          onProgress(progress);
+          if (snapshot.totalBytes > 0) {
+            final progress = snapshot.bytesTransferred / snapshot.totalBytes;
+            onProgress(progress);
+          }
         });
       }
 
       // Wait for upload to complete
       final snapshot = await uploadTask;
 
+      // Verify upload was successful
+      if (snapshot.state != TaskState.success) {
+        throw Exception('Upload failed with state: ${snapshot.state}');
+      }
+
       // Get and return the download URL
       final downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } on FirebaseException catch (e) {
-      throw Exception('Failed to upload avatar: ${e.message}');
+      throw Exception('Failed to upload avatar: ${e.code} - ${e.message}');
     } catch (e) {
       throw Exception('Failed to upload avatar: $e');
     }
