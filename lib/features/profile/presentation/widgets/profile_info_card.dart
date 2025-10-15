@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/verification_badge.dart';
 import 'package:intl/intl.dart';
 
 /// Card widget displaying account information
@@ -7,9 +8,11 @@ class ProfileInfoCard extends StatelessWidget {
   const ProfileInfoCard({
     super.key,
     required this.user,
+    this.onVerificationTap,
   });
 
   final UserEntity user;
+  final VoidCallback? onVerificationTap;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +33,58 @@ class ProfileInfoCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+
+            // Email and verification status
+            if (!user.isAnonymous) ...[
+              Row(
+                children: [
+                  Icon(
+                    Icons.email_outlined,
+                    size: 20,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Email',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          user.email,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            VerificationBadge(isVerified: user.isEmailVerified),
+                            if (!user.isEmailVerified && onVerificationTap != null) ...[
+                              const SizedBox(width: 8),
+                              TextButton.icon(
+                                onPressed: onVerificationTap,
+                                icon: const Icon(Icons.send, size: 16),
+                                label: const Text('Verify'),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(height: 24),
+            ],
 
             // Account type
             _InfoRow(
