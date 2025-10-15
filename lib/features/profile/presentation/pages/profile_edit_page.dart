@@ -7,6 +7,7 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_state.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/avatar_upload_widget.dart';
 
 /// Page for editing user profile information
 class ProfileEditPage extends StatelessWidget {
@@ -149,48 +150,21 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Profile photo preview
+                          // Avatar upload widget
                           Center(
-                            child: Stack(
-                              children: [
-                                _photoUrlController.text.isNotEmpty
-                                    ? CircleAvatar(
-                                        radius: 56,
-                                        backgroundColor:
-                                            Theme.of(context).colorScheme.primary,
-                                        backgroundImage:
-                                            NetworkImage(_photoUrlController.text),
-                                        onBackgroundImageError: (_, __) {
-                                          // Handle image load error silently
-                                        },
-                                      )
-                                    : CircleAvatar(
-                                        radius: 56,
-                                        backgroundColor:
-                                            Theme.of(context).colorScheme.primary,
-                                        child: Icon(
-                                          Icons.person,
-                                          size: 56,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary,
-                                        ),
+                            child: AvatarUploadWidget(
+                              currentPhotoUrl: _photoUrlController.text.isEmpty
+                                  ? null
+                                  : _photoUrlController.text,
+                              onPhotoUrlChanged: (newPhotoUrl) {
+                                _photoUrlController.text = newPhotoUrl ?? '';
+                                context.read<ProfileEditBloc>().add(
+                                      ProfileEditEvent.photoUrlChanged(
+                                        newPhotoUrl ?? '',
                                       ),
-                                if (isSaving)
-                                  Positioned.fill(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black54,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
+                                    );
+                              },
+                              enabled: !isSaving,
                             ),
                           ),
                           const SizedBox(height: 32),
@@ -212,31 +186,6 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                             onChanged: (value) {
                               context.read<ProfileEditBloc>().add(
                                     ProfileEditEvent.displayNameChanged(value),
-                                  );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Photo URL Field
-                          TextFormField(
-                            controller: _photoUrlController,
-                            enabled: !isSaving,
-                            decoration: InputDecoration(
-                              labelText: 'Photo URL (optional)',
-                              hintText: 'Enter a URL to your profile photo',
-                              prefixIcon: const Icon(Icons.link),
-                              errorText: state is ProfileEditLoaded
-                                  ? state.photoUrlError
-                                  : null,
-                              border: const OutlineInputBorder(),
-                              helperText:
-                                  'URL should point to an image file (.jpg, .png, etc.)',
-                              helperMaxLines: 2,
-                            ),
-                            keyboardType: TextInputType.url,
-                            onChanged: (value) {
-                              context.read<ProfileEditBloc>().add(
-                                    ProfileEditEvent.photoUrlChanged(value),
                                   );
                             },
                           ),
