@@ -153,28 +153,26 @@ void main() {
 
       testWidgets('send button triggers sendVerificationEmail event',
           (tester) async {
-        when(() => mockBloc.state).thenReturn(
-          const EmailVerificationState.pending(
-            email: 'test@example.com',
-            emailSent: false,
-            lastSentAt: null,
-            resendCooldownSeconds: 0,
-          ),
+        const testState = EmailVerificationState.pending(
+          email: 'test@example.com',
+          emailSent: false,
+          lastSentAt: null,
+          resendCooldownSeconds: 0,
         );
+
+        // Properly stub both state and stream
+        when(() => mockBloc.state).thenReturn(testState);
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
+        when(() => mockBloc.add(any())).thenReturn(null);
 
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        // Find the send button - it's a FilledButton with "Send Verification Email" text
-        expect(find.text('Send Verification Email'), findsOneWidget);
+        // Find the send button and tap it
+        final sendButton = find.widgetWithText(FilledButton, 'Send Verification Email');
+        expect(sendButton, findsOneWidget);
 
-        // Tap on the button - tap the FilledButton directly
-        final filledButtons = find.byType(FilledButton);
-        // There should be exactly one FilledButton in this state
-        expect(filledButtons, findsOneWidget);
-
-        await tester.tap(filledButtons.first);
+        await tester.tap(sendButton);
         await tester.pumpAndSettle();
 
         verify(() => mockBloc.add(
@@ -183,25 +181,26 @@ void main() {
 
       testWidgets('refresh button triggers refreshStatus event',
           (tester) async {
-        when(() => mockBloc.state).thenReturn(
-          EmailVerificationState.pending(
-            email: 'test@example.com',
-            emailSent: true,
-            lastSentAt: DateTime.now(),
-            resendCooldownSeconds: 0,
-          ),
+        final testState = EmailVerificationState.pending(
+          email: 'test@example.com',
+          emailSent: true,
+          lastSentAt: DateTime.now(),
+          resendCooldownSeconds: 0,
         );
+
+        // Properly stub both state and stream
+        when(() => mockBloc.state).thenReturn(testState);
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
+        when(() => mockBloc.add(any())).thenReturn(null);
 
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        // When emailSent is true, there are TWO buttons: FilledButton (refresh) and OutlinedButton (resend)
-        // Tap the first FilledButton (refresh button)
-        final filledButtons = find.byType(FilledButton);
-        expect(filledButtons, findsOneWidget);
+        // Find the refresh button and tap it
+        final refreshButton = find.widgetWithText(FilledButton, 'Refresh Status');
+        expect(refreshButton, findsOneWidget);
 
-        await tester.tap(filledButtons.first);
+        await tester.tap(refreshButton);
         await tester.pumpAndSettle();
 
         verify(() =>
@@ -211,25 +210,26 @@ void main() {
 
       testWidgets('resend button triggers sendVerificationEmail event',
           (tester) async {
-        when(() => mockBloc.state).thenReturn(
-          EmailVerificationState.pending(
-            email: 'test@example.com',
-            emailSent: true,
-            lastSentAt: DateTime.now(),
-            resendCooldownSeconds: 0,
-          ),
+        final testState = EmailVerificationState.pending(
+          email: 'test@example.com',
+          emailSent: true,
+          lastSentAt: DateTime.now(),
+          resendCooldownSeconds: 0,
         );
+
+        // Properly stub both state and stream
+        when(() => mockBloc.state).thenReturn(testState);
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
+        when(() => mockBloc.add(any())).thenReturn(null);
 
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        // When emailSent is true, there are two buttons: FilledButton (refresh) and OutlinedButton (resend)
-        // Tap the OutlinedButton (resend button)
-        final outlinedButtons = find.byType(OutlinedButton);
-        expect(outlinedButtons, findsOneWidget);
+        // Find the resend button and tap it
+        final resendButton = find.widgetWithText(OutlinedButton, 'Resend Email');
+        expect(resendButton, findsOneWidget);
 
-        await tester.tap(outlinedButtons.first);
+        await tester.tap(resendButton);
         await tester.pumpAndSettle();
 
         verify(() => mockBloc.add(
@@ -238,27 +238,36 @@ void main() {
 
       testWidgets('resend button is disabled during cooldown',
           (tester) async {
-        when(() => mockBloc.state).thenReturn(
-          EmailVerificationState.pending(
-            email: 'test@example.com',
-            emailSent: true,
-            lastSentAt: DateTime.now(),
-            resendCooldownSeconds: 45,
-          ),
+        final testState = EmailVerificationState.pending(
+          email: 'test@example.com',
+          emailSent: true,
+          lastSentAt: DateTime.now(),
+          resendCooldownSeconds: 45,
         );
-        when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
+
+        // Properly stub both state and stream
+        when(() => mockBloc.state).thenReturn(testState);
+        when(() => mockBloc.stream).thenAnswer(
+          (_) => Stream.value(testState),
+        );
 
         await tester.pumpWidget(createWidgetUnderTest());
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(milliseconds: 100));
 
         expect(find.text('Resend in 45s'), findsOneWidget);
 
-        // Find all OutlinedButton widgets, there should be only one
-        final outlinedButtons = find.byType(OutlinedButton);
-        expect(outlinedButtons, findsOneWidget);
+        // Find the resend icon - it should be there even when disabled
+        final resendIcon = find.byIcon(Icons.forward_to_inbox);
+        expect(resendIcon, findsOneWidget);
 
-        // Verify it's disabled
-        final button = tester.widget<OutlinedButton>(outlinedButtons);
+        // Get the parent OutlinedButton and verify it's disabled
+        final iconWidget = tester.widget<Icon>(resendIcon);
+        final button = tester.widget<OutlinedButton>(
+          find.ancestor(
+            of: resendIcon,
+            matching: find.byType(OutlinedButton),
+          ),
+        );
         expect(button.onPressed, isNull);
       });
 
