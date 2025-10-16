@@ -78,7 +78,8 @@ void main() {
 
       // Verify user information is displayed
       expect(find.text('Test User'), findsOneWidget);
-      expect(find.text('test@example.com'), findsOneWidget);
+      // Email appears twice: once in ProfileHeader and once in ProfileInfoCard (with verification status)
+      expect(find.text('test@example.com'), findsNWidgets(2));
     });
 
     testWidgets('displays loading indicator when authentication is unknown', (tester) async {
