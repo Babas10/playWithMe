@@ -5,6 +5,9 @@ import 'package:play_with_me/features/auth/domain/repositories/auth_repository.d
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
+import 'package:play_with_me/features/profile/presentation/pages/email_verification_page.dart';
 import 'package:play_with_me/features/profile/presentation/pages/profile_edit_page.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_actions.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_header.dart';
@@ -60,7 +63,10 @@ class _ProfileContent extends StatelessWidget {
           const SizedBox(height: 8),
 
           // Account information card
-          ProfileInfoCard(user: state.user),
+          ProfileInfoCard(
+            user: state.user,
+            onVerificationTap: () => _navigateToEmailVerification(context),
+          ),
 
           // Action buttons
           ProfileActions(
@@ -102,6 +108,21 @@ class _ProfileContent extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  void _navigateToEmailVerification(BuildContext context) {
+    final authRepository = sl<AuthRepository>();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (newContext) => BlocProvider(
+          create: (context) => EmailVerificationBloc(
+            authRepository: authRepository,
+          )..add(const EmailVerificationEvent.checkStatus()),
+          child: const EmailVerificationPage(),
+        ),
       ),
     );
   }
