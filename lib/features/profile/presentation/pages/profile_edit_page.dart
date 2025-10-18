@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/core/utils/countries.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
+import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
+import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_event.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_state.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_state.dart';
@@ -20,45 +27,110 @@ class ProfileEditPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileEditBloc(
-        authRepository: context.read<AuthRepository>(),
-      )..add(ProfileEditEvent.started(
-          currentDisplayName: user.displayName ?? user.email,
-          currentPhotoUrl: user.photoUrl,
-        )),
-      child: BlocListener<ProfileEditBloc, ProfileEditState>(
-        listener: (context, state) {
-          if (state is ProfileEditSuccess) {
-            // Get the updated user from AuthRepository
-            final authRepository = context.read<AuthRepository>();
-            final updatedUser = authRepository.currentUser;
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ProfileEditBloc(
+            authRepository: context.read<AuthRepository>(),
+          )..add(ProfileEditEvent.started(
+              currentDisplayName: user.displayName ?? user.email,
+              currentPhotoUrl: user.photoUrl,
+            )),
+        ),
+        BlocProvider(
+          create: (context) => LocalePreferencesBloc(
+            repository: sl<LocalePreferencesRepository>(),
+          )..add(const LocalePreferencesEvent.loadPreferences()),
+        ),
+      ],
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<ProfileEditBloc, ProfileEditState>(
+            listener: (context, state) {
+              if (state is ProfileEditSuccess) {
+                // Profile saved successfully - now trigger locale preferences save if needed
+                final localeState = context.read<LocalePreferencesBloc>().state;
+                if (localeState is LocalePreferencesLoaded && localeState.hasUnsavedChanges) {
+                  // Locale preferences will be saved separately
+                  return;
+                }
 
-            // Trigger authentication refresh to update user data
-            if (updatedUser != null) {
-              context.read<AuthenticationBloc>().add(
-                    AuthenticationUserChanged(updatedUser),
+                // Get the updated user from AuthRepository
+                final authRepository = context.read<AuthRepository>();
+                final updatedUser = authRepository.currentUser;
+
+                // Trigger authentication refresh to update user data
+                if (updatedUser != null) {
+                  context.read<AuthenticationBloc>().add(
+                        AuthenticationUserChanged(updatedUser),
+                      );
+                }
+
+                // Check if locale preferences are also being saved
+                final localeBloc = context.read<LocalePreferencesBloc>();
+                if (localeBloc.state is LocalePreferencesSaving) {
+                  // Wait for locale preferences to finish
+                  return;
+                }
+
+                // Show success message and navigate back
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Settings updated successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.of(context).pop();
+              } else if (state is ProfileEditError) {
+                // Show error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+          BlocListener<LocalePreferencesBloc, LocalePreferencesState>(
+            listener: (context, state) {
+              if (state is LocalePreferencesSaved) {
+                // Check if profile edit is also complete
+                final profileState = context.read<ProfileEditBloc>().state;
+                if (profileState is ProfileEditSuccess ||
+                    profileState is! ProfileEditSaving) {
+                  // Get the updated user from AuthRepository
+                  final authRepository = context.read<AuthRepository>();
+                  final updatedUser = authRepository.currentUser;
+
+                  // Trigger authentication refresh to update user data
+                  if (updatedUser != null) {
+                    context.read<AuthenticationBloc>().add(
+                          AuthenticationUserChanged(updatedUser),
+                        );
+                  }
+
+                  // Show success message and navigate back
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Settings updated successfully'),
+                      backgroundColor: Colors.green,
+                    ),
                   );
-            }
-
-            // Show success message and navigate back
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Profile updated successfully'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.of(context).pop();
-          } else if (state is ProfileEditError) {
-            // Show error message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
+                  Navigator.of(context).pop();
+                }
+              } else if (state is LocalePreferencesError) {
+                // Show error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
         child: _ProfileEditContent(user: user),
       ),
     );
@@ -101,34 +173,38 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileEditBloc, ProfileEditState>(
-      builder: (context, state) {
-        final isLoading = state is ProfileEditLoading || state is ProfileEditSaving;
-        final isSaving = state is ProfileEditSaving;
+      builder: (context, profileState) {
+        return BlocBuilder<LocalePreferencesBloc, LocalePreferencesState>(
+          builder: (context, localeState) {
+            final isProfileLoading = profileState is ProfileEditLoading || profileState is ProfileEditSaving;
+            final isLocaleLoading = localeState is LocalePreferencesLoading || localeState is LocalePreferencesSaving;
+            final isLoading = isProfileLoading || isLocaleLoading;
+            final isSaving = profileState is ProfileEditSaving || localeState is LocalePreferencesSaving;
 
-        return PopScope(
-          canPop: !(state is ProfileEditLoaded && state.hasUnsavedChanges),
-          onPopInvokedWithResult: (didPop, result) async {
-            if (!didPop && state is ProfileEditLoaded && state.hasUnsavedChanges) {
-              final shouldPop = await _showUnsavedChangesDialog(context);
-              if (shouldPop && context.mounted) {
-                Navigator.of(context).pop();
-              }
-            }
-          },
+            final profileHasChanges = profileState is ProfileEditLoaded && profileState.hasUnsavedChanges;
+            final localeHasChanges = localeState is LocalePreferencesLoaded && localeState.hasUnsavedChanges;
+            final hasUnsavedChanges = profileHasChanges || localeHasChanges;
+
+            return PopScope(
+              canPop: !hasUnsavedChanges,
+              onPopInvokedWithResult: (didPop, result) async {
+                if (!didPop && hasUnsavedChanges) {
+                  final shouldPop = await _showUnsavedChangesDialog(context);
+                  if (shouldPop && context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                }
+              },
           child: Scaffold(
             appBar: AppBar(
-              title: const Text('Edit Profile'),
+              title: const Text('Account Settings'),
               centerTitle: true,
               actions: [
-                if (state is ProfileEditLoaded && state.hasUnsavedChanges)
+                if (hasUnsavedChanges)
                   TextButton(
                     onPressed: isSaving
                         ? null
-                        : () {
-                            context
-                                .read<ProfileEditBloc>()
-                                .add(const ProfileEditEvent.saveRequested());
-                          },
+                        : () => _handleSaveAll(context, widget.user.uid),
                     child: Text(
                       'Save',
                       style: TextStyle(
@@ -141,7 +217,7 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                   ),
               ],
             ),
-            body: isLoading && state is ProfileEditLoading
+            body: isLoading && (profileState is ProfileEditLoading || localeState is LocalePreferencesLoading)
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
@@ -177,8 +253,8 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                               labelText: 'Display Name',
                               hintText: 'Enter your display name',
                               prefixIcon: const Icon(Icons.person_outline),
-                              errorText: state is ProfileEditLoaded
-                                  ? state.displayNameError
+                              errorText: profileState is ProfileEditLoaded
+                                  ? profileState.displayNameError
                                   : null,
                               border: const OutlineInputBorder(),
                             ),
@@ -191,16 +267,93 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                           ),
                           const SizedBox(height: 32),
 
+                          // Preferences Section Header
+                          Text(
+                            'Preferences',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          const Divider(),
+                          const SizedBox(height: 16),
+
+                          // Language Dropdown
+                          DropdownButtonFormField<Locale>(
+                            value: localeState is LocalePreferencesLoaded
+                                ? localeState.preferences.locale
+                                : const Locale('en'),
+                            decoration: const InputDecoration(
+                              labelText: 'Preferred Language',
+                              helperText: 'Select your preferred language',
+                              prefixIcon: Icon(Icons.language),
+                              border: OutlineInputBorder(),
+                            ),
+                            items: LocalePreferencesEntity.supportedLocales.map((locale) {
+                              return DropdownMenuItem(
+                                value: locale,
+                                child: Text(LocalePreferencesEntity.getLanguageName(locale)),
+                              );
+                            }).toList(),
+                            onChanged: isSaving
+                                ? null
+                                : (locale) {
+                                    if (locale != null) {
+                                      context.read<LocalePreferencesBloc>().add(
+                                            LocalePreferencesEvent.updateLanguage(locale),
+                                          );
+                                    }
+                                  },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Country Dropdown
+                          DropdownButtonFormField<String>(
+                            value: localeState is LocalePreferencesLoaded
+                                ? localeState.preferences.country
+                                : 'United States',
+                            decoration: const InputDecoration(
+                              labelText: 'Country',
+                              helperText: 'Select your country',
+                              prefixIcon: Icon(Icons.flag),
+                              border: OutlineInputBorder(),
+                            ),
+                            items: Countries.all.map((country) {
+                              return DropdownMenuItem(
+                                value: country,
+                                child: Text(country),
+                              );
+                            }).toList(),
+                            onChanged: isSaving
+                                ? null
+                                : (country) {
+                                    if (country != null) {
+                                      context.read<LocalePreferencesBloc>().add(
+                                            LocalePreferencesEvent.updateCountry(country),
+                                          );
+                                    }
+                                  },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Time Zone (Read-only)
+                          TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Time Zone',
+                              helperText: 'Automatically detected from your device',
+                              prefixIcon: Icon(Icons.access_time),
+                              border: OutlineInputBorder(),
+                            ),
+                            initialValue: localeState is LocalePreferencesLoaded
+                                ? localeState.preferences.timeZone ?? 'Not detected'
+                                : 'Not detected',
+                            enabled: false,
+                          ),
+                          const SizedBox(height: 32),
+
                           // Save Button
                           FilledButton.icon(
-                            onPressed: (state is ProfileEditLoaded &&
-                                    state.hasUnsavedChanges &&
-                                    !isSaving)
-                                ? () {
-                                    context
-                                        .read<ProfileEditBloc>()
-                                        .add(const ProfileEditEvent.saveRequested());
-                                  }
+                            onPressed: (hasUnsavedChanges && !isSaving)
+                                ? () => _handleSaveAll(context, widget.user.uid)
                                 : null,
                             icon: isSaving
                                 ? const SizedBox(
@@ -221,8 +374,7 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                             onPressed: isSaving
                                 ? null
                                 : () async {
-                                    if (state is ProfileEditLoaded &&
-                                        state.hasUnsavedChanges) {
+                                    if (hasUnsavedChanges) {
                                       final shouldPop =
                                           await _showUnsavedChangesDialog(context);
                                       if (shouldPop && context.mounted) {
@@ -271,6 +423,26 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
         );
       },
     );
+        },
+      );
+  }
+
+  /// Handle saving both profile and locale preferences
+  void _handleSaveAll(BuildContext context, String userId) {
+    final profileState = context.read<ProfileEditBloc>().state;
+    final localeState = context.read<LocalePreferencesBloc>().state;
+
+    // Trigger save for profile if there are changes
+    if (profileState is ProfileEditLoaded && profileState.hasUnsavedChanges) {
+      context.read<ProfileEditBloc>().add(const ProfileEditEvent.saveRequested());
+    }
+
+    // Trigger save for locale preferences if there are changes
+    if (localeState is LocalePreferencesLoaded && localeState.hasUnsavedChanges) {
+      context.read<LocalePreferencesBloc>().add(
+            LocalePreferencesEvent.savePreferences(userId),
+          );
+    }
   }
 
   /// Show dialog for unsaved changes warning
