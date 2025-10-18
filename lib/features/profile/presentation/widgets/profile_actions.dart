@@ -5,12 +5,10 @@ class ProfileActions extends StatelessWidget {
   const ProfileActions({
     super.key,
     required this.onEditProfile,
-    required this.onSettings,
     required this.onSignOut,
   });
 
   final VoidCallback onEditProfile;
-  final VoidCallback onSettings;
   final VoidCallback onSignOut;
 
   @override
@@ -20,17 +18,9 @@ class ProfileActions extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Edit Profile button
+          // Account Settings button (renamed from Edit Profile)
           FilledButton.icon(
             onPressed: onEditProfile,
-            icon: const Icon(Icons.edit),
-            label: const Text('Edit Profile'),
-          ),
-          const SizedBox(height: 12),
-
-          // Settings button
-          OutlinedButton.icon(
-            onPressed: onSettings,
             icon: const Icon(Icons.settings),
             label: const Text('Account Settings'),
           ),

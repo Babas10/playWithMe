@@ -94,15 +94,6 @@ class _ProfileContent extends StatelessWidget {
                 ),
               );
             },
-            onSettings: () {
-              // TODO: Navigate to settings page (Story 1.4.4)
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Settings feature coming soon'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
             onSignOut: () {
               _showSignOutDialog(context);
             },

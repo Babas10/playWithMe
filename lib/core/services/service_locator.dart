@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:play_with_me/features/auth/data/repositories/firebase_auth_repository.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
@@ -17,11 +19,24 @@ import 'package:play_with_me/core/services/image_picker_service.dart';
 import 'package:play_with_me/core/presentation/bloc/user/user_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/game/game_bloc.dart';
+import 'package:play_with_me/features/profile/data/repositories/locale_preferences_repository_impl.dart';
+import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 
 final GetIt sl = GetIt.instance;
 
 Future<void> initializeDependencies() async {
   // Firebase service is initialized statically, no need to register
+
+  // Register SharedPreferences
+  if (!sl.isRegistered<SharedPreferences>()) {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  }
+
+  // Register Firestore
+  if (!sl.isRegistered<FirebaseFirestore>()) {
+    sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+  }
 
   // Register repositories only if not already registered
   if (!sl.isRegistered<AuthRepository>()) {
@@ -52,6 +67,15 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<ImageStorageRepository>()) {
     sl.registerLazySingleton<ImageStorageRepository>(
       () => FirebaseImageStorageRepository(),
+    );
+  }
+
+  if (!sl.isRegistered<LocalePreferencesRepository>()) {
+    sl.registerLazySingleton<LocalePreferencesRepository>(
+      () => LocalePreferencesRepositoryImpl(
+        sharedPreferences: sl(),
+        firestore: sl(),
+      ),
     );
   }
 
