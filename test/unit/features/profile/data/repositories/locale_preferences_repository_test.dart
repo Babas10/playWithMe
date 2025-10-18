@@ -99,5 +99,165 @@ void main() {
         expect(result, isNotEmpty);
       });
     });
+
+    group('syncToFirestore', () {
+      test('syncs preferences to Firestore successfully', () async {
+        final mockCollection = MockCollectionReference();
+        final mockDoc = MockDocumentReference();
+
+        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
+        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
+        when(() => mockDoc.set(any(), any())).thenAnswer((_) async {});
+
+        final preferences = const LocalePreferencesEntity(
+          locale: Locale('de'),
+          country: 'Germany',
+          timeZone: 'Europe/Berlin',
+          lastSyncedAt: null,
+        );
+
+        await repository.syncToFirestore('user123', preferences);
+
+        verify(() => mockFirestore.collection('users')).called(1);
+        verify(() => mockDoc.set(any(), any())).called(1);
+      });
+
+      test('throws exception when Firestore sync fails', () async {
+        final mockCollection = MockCollectionReference();
+        final mockDoc = MockDocumentReference();
+
+        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
+        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
+        when(() => mockDoc.set(any(), any()))
+            .thenThrow(Exception('Network error'));
+
+        final preferences = const LocalePreferencesEntity(
+          locale: Locale('de'),
+          country: 'Germany',
+          timeZone: 'Europe/Berlin',
+          lastSyncedAt: null,
+        );
+
+        expect(
+          () => repository.syncToFirestore('user123', preferences),
+          throwsA(isA<Exception>()),
+        );
+      });
+    });
+
+    group('loadFromFirestore', () {
+      test('loads preferences from Firestore successfully', () async {
+        final mockCollection = MockCollectionReference();
+        final mockDoc = MockDocumentReference();
+        final mockSnapshot = MockDocumentSnapshot();
+
+        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
+        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
+        when(() => mockDoc.get()).thenAnswer((_) async => mockSnapshot);
+        when(() => mockSnapshot.exists).thenReturn(true);
+        when(() => mockSnapshot.data()).thenReturn({
+          'language': 'it',
+          'country': 'Italy',
+          'timeZone': 'Europe/Rome',
+          'lastSyncedAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+        });
+
+        final result = await repository.loadFromFirestore('user123');
+
+        expect(result, isNotNull);
+        expect(result!.locale, const Locale('it'));
+        expect(result.country, 'Italy');
+        expect(result.timeZone, 'Europe/Rome');
+      });
+
+      test('returns null when Firestore document does not exist', () async {
+        final mockCollection = MockCollectionReference();
+        final mockDoc = MockDocumentReference();
+        final mockSnapshot = MockDocumentSnapshot();
+
+        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
+        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
+        when(() => mockDoc.get()).thenAnswer((_) async => mockSnapshot);
+        when(() => mockSnapshot.exists).thenReturn(false);
+
+        final result = await repository.loadFromFirestore('user123');
+
+        expect(result, isNull);
+      });
+
+      test('returns null when Firestore document data is null', () async {
+        final mockCollection = MockCollectionReference();
+        final mockDoc = MockDocumentReference();
+        final mockSnapshot = MockDocumentSnapshot();
+
+        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
+        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
+        when(() => mockDoc.get()).thenAnswer((_) async => mockSnapshot);
+        when(() => mockSnapshot.exists).thenReturn(true);
+        when(() => mockSnapshot.data()).thenReturn(null);
+
+        final result = await repository.loadFromFirestore('user123');
+
+        expect(result, isNull);
+      });
+
+      test('throws exception when Firestore load fails', () async {
+        final mockCollection = MockCollectionReference();
+        final mockDoc = MockDocumentReference();
+
+        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
+        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
+        when(() => mockDoc.get()).thenThrow(Exception('Network error'));
+
+        expect(
+          () => repository.loadFromFirestore('user123'),
+          throwsA(isA<Exception>()),
+        );
+      });
+    });
+
+    group('Error Handling', () {
+      test('loadPreferences handles corrupted data gracefully', () async {
+        when(() => mockSharedPreferences.getString('user_locale_language'))
+            .thenReturn('invalid_locale_code_that_is_very_long');
+        when(() => mockSharedPreferences.getString('user_locale_country'))
+            .thenReturn('Country Name');
+
+        final result = await repository.loadPreferences();
+
+        // Should still return a valid entity
+        expect(result.locale.languageCode, 'invalid_locale_code_that_is_very_long');
+        expect(result.country, 'Country Name');
+      });
+
+      test('savePreferences handles SharedPreferences failure', () async {
+        when(() => mockSharedPreferences.setString(any(), any()))
+            .thenThrow(Exception('Storage full'));
+
+        final preferences = const LocalePreferencesEntity(
+          locale: Locale('fr'),
+          country: 'France',
+          timeZone: 'Europe/Paris',
+          lastSyncedAt: null,
+        );
+
+        expect(
+          () => repository.savePreferences(preferences),
+          throwsA(isA<Exception>()),
+        );
+      });
+    });
   });
 }
