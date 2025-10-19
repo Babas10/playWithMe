@@ -10,6 +10,8 @@ import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
+import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import 'package:play_with_me/features/profile/presentation/pages/profile_edit_page.dart';
 
 // Mocktail mocks
@@ -17,23 +19,52 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 class MockImageStorageRepository extends Mock implements ImageStorageRepository {}
 class MockImagePickerService extends Mock implements ImagePickerService {}
+class MockLocalePreferencesRepository extends Mock implements LocalePreferencesRepository {}
+
+// Fakes for fallback values
+class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntity {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
   late MockAuthenticationBloc mockAuthBloc;
-  late MockImageStorageRepository mockImageStorageRepository;
-  late MockImagePickerService mockImagePickerService;
 
   setUpAll(() {
-    // Register GetIt services for AvatarUploadWidget
+    // Register fallback values for mocktail matchers
+    registerFallbackValue(FakeLocalePreferencesEntity());
+    // Create mock instances that will be reused
+    final mockImageStorage = MockImageStorageRepository();
+    final mockImagePicker = MockImagePickerService();
+    final mockLocalePrefs = MockLocalePreferencesRepository();
+
+    // Stub the locale preferences repository with default behavior
+    when(() => mockLocalePrefs.loadPreferences()).thenAnswer(
+      (_) async => LocalePreferencesEntity.defaultPreferences(),
+    );
+    when(() => mockLocalePrefs.savePreferences(any())).thenAnswer(
+      (_) async {},
+    );
+    when(() => mockLocalePrefs.syncToFirestore(any(), any())).thenAnswer(
+      (_) async {},
+    );
+    when(() => mockLocalePrefs.loadFromFirestore(any())).thenAnswer(
+      (_) async => null,
+    );
+    when(() => mockLocalePrefs.getDeviceTimeZone()).thenReturn('UTC');
+
+    // Register GetIt services for AvatarUploadWidget and LocalePreferences
     if (!sl.isRegistered<ImageStorageRepository>()) {
       sl.registerLazySingleton<ImageStorageRepository>(
-        () => MockImageStorageRepository(),
+        () => mockImageStorage,
       );
     }
     if (!sl.isRegistered<ImagePickerService>()) {
       sl.registerLazySingleton<ImagePickerService>(
-        () => MockImagePickerService(),
+        () => mockImagePicker,
+      );
+    }
+    if (!sl.isRegistered<LocalePreferencesRepository>()) {
+      sl.registerLazySingleton<LocalePreferencesRepository>(
+        () => mockLocalePrefs,
       );
     }
   });
@@ -41,8 +72,6 @@ void main() {
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     mockAuthBloc = MockAuthenticationBloc();
-    mockImageStorageRepository = MockImageStorageRepository();
-    mockImagePickerService = MockImagePickerService();
   });
 
   Widget createWidgetUnderTest(UserEntity user) {
@@ -76,10 +105,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify AppBar
-      expect(find.text('Edit Profile'), findsOneWidget);
+      expect(find.text('Account Settings'), findsOneWidget);
 
-      // Verify form field is present (display name field)
-      expect(find.byType(TextFormField), findsOneWidget);
+      // Verify form fields are present (display name + time zone fields)
+      expect(find.byType(TextFormField), findsNWidgets(2));
 
       // Verify initial display name value
       expect(find.text('John Doe'), findsOneWidget);
@@ -342,9 +371,11 @@ void main() {
         await tester.pumpWidget(createWidgetUnderTest(testUser));
         await tester.pumpAndSettle();
 
-        // Should have exactly 1 TextFormField (display name only)
-        // Photo URL field has been removed and replaced with AvatarUploadWidget
-        expect(find.byType(TextFormField), findsOneWidget);
+        // Should have 2 TextFormFields (display name + time zone)
+        // Should have 2 DropdownButtonFormFields (language + country)
+        expect(find.byType(TextFormField), findsNWidgets(2));
+        expect(find.byType(DropdownButtonFormField<Locale>), findsOneWidget);
+        expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
       });
     });
   });
