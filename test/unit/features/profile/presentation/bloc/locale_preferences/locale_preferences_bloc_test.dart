@@ -142,7 +142,7 @@ void main() {
 
     group('SavePreferences', () {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
-        'emits [saving, saved] when preferences are saved successfully',
+        'emits [saving, saved, loaded] when preferences are saved successfully',
         build: () {
           when(() => mockRepository.loadPreferences())
               .thenAnswer((_) async => testPreferences);
@@ -172,6 +172,7 @@ void main() {
         expect: () => [
           isA<LocalePreferencesSaving>(),
           const LocalePreferencesState.saved(),
+          isA<LocalePreferencesLoaded>(),
         ],
         verify: (_) {
           verify(() => mockRepository.savePreferences(any())).called(1);
