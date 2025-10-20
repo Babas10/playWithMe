@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // User preferences subcollection - users can read/write their own preferences
+      match /preferences/{preferenceId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Groups: Members can read, creators can write
+    match /groups/{groupId} {
+      allow read: if request.auth != null &&
+                     (request.auth.uid in resource.data.members ||
+                      request.auth.uid == resource.data.createdBy);
+      allow create: if request.auth != null &&
+                       request.auth.uid == request.resource.data.createdBy;
+      allow update: if request.auth != null &&
+                       request.auth.uid == resource.data.createdBy;
+      allow delete: if request.auth != null &&
+                       request.auth.uid == resource.data.createdBy;
+    }
+
+    // Games: Group members can read, creators can write
+    match /games/{gameId} {
+      allow read: if request.auth != null &&
+                     request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.members;
+      allow create: if request.auth != null &&
+                       request.auth.uid == request.resource.data.createdBy;
+      allow update: if request.auth != null &&
+                       (request.auth.uid == resource.data.createdBy ||
+                        request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.members);
+      allow delete: if request.auth != null &&
+                       request.auth.uid == resource.data.createdBy;
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

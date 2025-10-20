@@ -2,13 +2,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/features/auth/presentation/pages/login_page.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/widgets/auth_button.dart';
+import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'helpers/test_helpers.dart';
 
+// Fake for mocktail matchers
+class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntity {}
+
 void main() {
+  setUpAll(() {
+    // Register fallback values for mocktail matchers
+    registerFallbackValue(FakeLocalePreferencesEntity());
+  });
+
   setUp(() async {
     await initializeTestDependencies();
   });
@@ -21,6 +33,13 @@ void main() {
     // Create a test app with the real LoginPage and proper BLoC setup
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
         home: BlocProvider<LoginBloc>(
           create: (context) => sl<LoginBloc>(),
           child: const LoginPage(),

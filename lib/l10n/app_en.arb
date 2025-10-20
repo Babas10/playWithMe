@@ -1,0 +1,242 @@
+{
+  "@@locale": "en",
+  "appTitle": "PlayWithMe",
+  "@appTitle": {
+    "description": "The application title"
+  },
+
+  "welcomeMessage": "Welcome to PlayWithMe!",
+  "@welcomeMessage": {
+    "description": "Welcome message on home page"
+  },
+
+  "beachVolleyballOrganizer": "Beach volleyball games organizer",
+  "@beachVolleyballOrganizer": {
+    "description": "App description subtitle"
+  },
+
+  "firebaseConnected": "Connected",
+  "@firebaseConnected": {
+    "description": "Firebase connection status - connected"
+  },
+
+  "firebaseDisconnected": "Disconnected",
+  "@firebaseDisconnected": {
+    "description": "Firebase connection status - disconnected"
+  },
+
+  "firebase": "Firebase",
+  "@firebase": {
+    "description": "Firebase label"
+  },
+
+  "environment": "Environment",
+  "@environment": {
+    "description": "Environment label"
+  },
+
+  "project": "Project",
+  "@project": {
+    "description": "Project label"
+  },
+
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading text"
+  },
+
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile button tooltip and page title"
+  },
+
+  "signOut": "Sign Out",
+  "@signOut": {
+    "description": "Sign out button tooltip"
+  },
+
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings page title"
+  },
+
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+
+  "displayName": "Display Name",
+  "@displayName": {
+    "description": "Display name field label"
+  },
+
+  "language": "Language",
+  "@language": {
+    "description": "Language preference label"
+  },
+
+  "country": "Country",
+  "@country": {
+    "description": "Country preference label"
+  },
+
+  "timezone": "Time Zone",
+  "@timezone": {
+    "description": "Time zone field label"
+  },
+
+  "saveChanges": "Save Changes",
+  "@saveChanges": {
+    "description": "Save changes button text"
+  },
+
+  "settingsUpdatedSuccessfully": "Settings updated successfully",
+  "@settingsUpdatedSuccessfully": {
+    "description": "Success message when settings are saved"
+  },
+
+  "removeAvatar": "Remove Avatar",
+  "@removeAvatar": {
+    "description": "Remove avatar button text"
+  },
+
+  "takePhoto": "Take Photo",
+  "@takePhoto": {
+    "description": "Take photo option in image picker"
+  },
+
+  "chooseFromGallery": "Choose from Gallery",
+  "@chooseFromGallery": {
+    "description": "Choose from gallery option in image picker"
+  },
+
+  "confirmRemoveAvatar": "Are you sure you want to remove your avatar?",
+  "@confirmRemoveAvatar": {
+    "description": "Confirmation dialog message for removing avatar"
+  },
+
+  "remove": "Remove",
+  "@remove": {
+    "description": "Remove button text"
+  },
+
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+
+  "login": "Login",
+  "@login": {
+    "description": "Login button text"
+  },
+
+  "register": "Register",
+  "@register": {
+    "description": "Register button text"
+  },
+
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+
+  "unsavedChangesTitle": "Unsaved Changes",
+  "@unsavedChangesTitle": {
+    "description": "Title for unsaved changes dialog"
+  },
+
+  "unsavedChangesMessage": "You have unsaved changes. Are you sure you want to leave?",
+  "@unsavedChangesMessage": {
+    "description": "Message for unsaved changes dialog"
+  },
+
+  "discard": "Discard",
+  "@discard": {
+    "description": "Discard button text"
+  },
+
+  "displayNameHint": "Enter your display name",
+  "@displayNameHint": {
+    "description": "Hint text for display name field"
+  },
+
+  "preferredLanguage": "Preferred Language",
+  "@preferredLanguage": {
+    "description": "Preferred language field label"
+  },
+
+  "saving": "Saving...",
+  "@saving": {
+    "description": "Saving indicator text"
+  },
+
+  "stay": "Stay",
+  "@stay": {
+    "description": "Stay button in unsaved changes dialog"
+  },
+
+  "accountInformation": "Account Information",
+  "@accountInformation": {
+    "description": "Account information section title"
+  },
+
+  "verify": "Verify",
+  "@verify": {
+    "description": "Verify email button text"
+  },
+
+  "accountType": "Account Type",
+  "@accountType": {
+    "description": "Account type label"
+  },
+
+  "anonymous": "Anonymous",
+  "@anonymous": {
+    "description": "Anonymous account type"
+  },
+
+  "regular": "Regular",
+  "@regular": {
+    "description": "Regular account type"
+  },
+
+  "memberSince": "Member Since",
+  "@memberSince": {
+    "description": "Member since label"
+  },
+
+  "lastActive": "Last Active",
+  "@lastActive": {
+    "description": "Last active label"
+  },
+
+  "userId": "User ID",
+  "@userId": {
+    "description": "User ID label"
+  },
+
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings button text"
+  },
+
+  "signOutConfirm": "Are you sure you want to sign out?",
+  "@signOutConfirm": {
+    "description": "Sign out confirmation message"
+  },
+
+  "pleaseLogIn": "Please log in to view your profile",
+  "@pleaseLogIn": {
+    "description": "Message shown when user is not logged in"
+  }
+}
