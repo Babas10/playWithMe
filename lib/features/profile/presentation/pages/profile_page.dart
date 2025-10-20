@@ -12,6 +12,7 @@ import 'package:play_with_me/features/profile/presentation/pages/profile_edit_pa
 import 'package:play_with_me/features/profile/presentation/widgets/profile_actions.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_header.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_info_card.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Profile page displaying user information and account details
 class ProfilePage extends StatelessWidget {
@@ -21,7 +22,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(AppLocalizations.of(context)!.profile),
         centerTitle: true,
       ),
       body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
@@ -37,8 +38,8 @@ class ProfilePage extends StatelessWidget {
           }
 
           // Unauthenticated state - should not happen on profile page
-          return const Center(
-            child: Text('Please log in to view your profile'),
+          return Center(
+            child: Text(AppLocalizations.of(context)!.pleaseLogIn),
           );
         },
       ),
@@ -94,15 +95,6 @@ class _ProfileContent extends StatelessWidget {
                 ),
               );
             },
-            onSettings: () {
-              // TODO: Navigate to settings page (Story 1.4.4)
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Settings feature coming soon'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
             onSignOut: () {
               _showSignOutDialog(context);
             },
@@ -128,15 +120,16 @@ class _ProfileContent extends StatelessWidget {
   }
 
   void _showSignOutDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: Text(l10n.signOut),
+        content: Text(l10n.signOutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -147,7 +140,7 @@ class _ProfileContent extends StatelessWidget {
               Navigator.of(dialogContext).pop();
               Navigator.of(context).pop(); // Return to previous screen
             },
-            child: const Text('Sign Out'),
+            child: Text(l10n.signOut),
           ),
         ],
       ),
