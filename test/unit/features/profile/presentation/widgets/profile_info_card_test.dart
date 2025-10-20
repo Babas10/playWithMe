@@ -132,37 +132,6 @@ void main() {
       expect(find.text('Oct 12, 2024'), findsOneWidget);
     });
 
-    testWidgets('displays truncated user ID', (tester) async {
-      final testUser = UserEntity(
-        uid: 'test-uid-123456789',
-        email: 'test@example.com',
-        displayName: 'Test User',
-        photoUrl: null,
-        isEmailVerified: true,
-        createdAt: DateTime(2024, 1, 1),
-        lastSignInAt: DateTime(2024, 10, 1),
-        isAnonymous: false,
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: ProfileInfoCard(user: testUser),
-          ),
-        ),
-      );
-
-      expect(find.text('User ID'), findsOneWidget);
-      expect(find.text('test-uid...'), findsOneWidget);
-    });
-
     testWidgets('omits member since when createdAt is null', (tester) async {
       final testUser = UserEntity(
         uid: 'test-uid-123',

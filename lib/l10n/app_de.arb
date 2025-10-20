@@ -44,8 +44,6 @@
   "regular": "Normal",
   "memberSince": "Mitglied Seit",
   "lastActive": "Zuletzt Aktiv",
-  "userId": "Benutzer-ID",
-  "accountSettings": "Kontoeinstellungen",
   "signOutConfirm": "Möchten Sie sich wirklich abmelden?",
   "pleaseLogIn": "Bitte melden Sie sich an, um Ihr Profil zu sehen"
 }
