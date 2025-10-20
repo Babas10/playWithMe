@@ -28,22 +28,13 @@ class ProfileEditPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => ProfileEditBloc(
-            authRepository: context.read<AuthRepository>(),
-          )..add(ProfileEditEvent.started(
-              currentDisplayName: user.displayName ?? user.email,
-              currentPhotoUrl: user.photoUrl,
-            )),
-        ),
-        BlocProvider(
-          create: (context) => LocalePreferencesBloc(
-            repository: sl<LocalePreferencesRepository>(),
-          )..add(const LocalePreferencesEvent.loadPreferences()),
-        ),
-      ],
+    return BlocProvider(
+      create: (context) => ProfileEditBloc(
+        authRepository: context.read<AuthRepository>(),
+      )..add(ProfileEditEvent.started(
+          currentDisplayName: user.displayName ?? user.email,
+          currentPhotoUrl: user.photoUrl,
+        )),
       child: MultiBlocListener(
         listeners: [
           BlocListener<ProfileEditBloc, ProfileEditState>(
