@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:play_with_me/features/profile/presentation/pages/profile_page.da
 import 'package:play_with_me/features/profile/presentation/widgets/profile_header.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_info_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_actions.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 // Fake AuthenticationBloc for testing
 class FakeAuthenticationBloc extends Fake implements AuthenticationBloc {
@@ -43,6 +45,13 @@ void main() {
     final fakeBloc = FakeAuthenticationBloc(state);
 
     return MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
       home: BlocProvider<AuthenticationBloc>.value(
         value: fakeBloc,
         child: const ProfilePage(),
