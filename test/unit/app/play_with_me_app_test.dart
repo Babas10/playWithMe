@@ -1,8 +1,10 @@
 // Verifies that PlayWithMeApp correctly handles authentication state transitions and UI updates
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/app/play_with_me_app.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import '../helpers/test_helpers.dart';
 import '../features/auth/data/mock_auth_repository.dart';
 
@@ -162,7 +164,16 @@ void main() {
 
     testWidgets('should render correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: HomePage()),
+        const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('en')],
+          home: HomePage(),
+        ),
       );
 
       expect(find.byType(AppBar), findsOneWidget);
@@ -174,7 +185,16 @@ void main() {
 
     testWidgets('should have correct layout structure', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: HomePage()),
+        const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('en')],
+          home: HomePage(),
+        ),
       );
 
       expect(find.byType(Scaffold), findsOneWidget);
@@ -187,7 +207,16 @@ void main() {
     testWidgets('should show correct environment indicator colors', (WidgetTester tester) async {
       // Test development environment (red)
       EnvironmentConfig.setEnvironment(Environment.dev);
-      await tester.pumpWidget(const MaterialApp(home: HomePage()));
+      await tester.pumpWidget(const MaterialApp(
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [Locale('en')],
+        home: HomePage(),
+      ));
 
       // Use controlled pump instead of pumpAndSettle to avoid timeouts
       await tester.pump();
@@ -220,7 +249,16 @@ void main() {
 
       // Test staging environment (orange)
       EnvironmentConfig.setEnvironment(Environment.stg);
-      await tester.pumpWidget(const MaterialApp(home: HomePage()));
+      await tester.pumpWidget(const MaterialApp(
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [Locale('en')],
+        home: HomePage(),
+      ));
       await tester.pump();
 
       // Verify staging environment text
@@ -250,7 +288,16 @@ void main() {
 
       // Test production environment (green)
       EnvironmentConfig.setEnvironment(Environment.prod);
-      await tester.pumpWidget(const MaterialApp(home: HomePage()));
+      await tester.pumpWidget(const MaterialApp(
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [Locale('en')],
+        home: HomePage(),
+      ));
       await tester.pump();
 
       // Verify production environment text
