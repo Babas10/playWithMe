@@ -140,7 +140,14 @@ class LocalePreferencesBloc
       _originalPreferences = preferencesToSave;
       _currentPreferences = preferencesToSave;
 
+      // First emit saved state for listeners (shows success message)
       emit(const LocalePreferencesState.saved());
+
+      // Then immediately emit loaded state so the app updates the locale
+      emit(LocalePreferencesState.loaded(
+        preferences: preferencesToSave,
+        hasUnsavedChanges: false,
+      ));
     } catch (e) {
       emit(LocalePreferencesState.error(
         message: 'Failed to save preferences: $e',

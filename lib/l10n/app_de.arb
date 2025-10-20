@@ -32,5 +32,9 @@
   "forgotPassword": "Passwort Vergessen?",
   "unsavedChangesTitle": "Nicht Gespeicherte Änderungen",
   "unsavedChangesMessage": "Sie haben nicht gespeicherte Änderungen. Möchten Sie wirklich fortfahren?",
-  "discard": "Verwerfen"
+  "discard": "Verwerfen",
+  "displayNameHint": "Geben Sie Ihren Anzeigenamen ein",
+  "preferredLanguage": "Bevorzugte Sprache",
+  "saving": "Speichern...",
+  "stay": "Bleiben"
 }

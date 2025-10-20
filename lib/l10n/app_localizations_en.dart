@@ -108,4 +108,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discard => 'Discard';
+
+  @override
+  String get displayNameHint => 'Enter your display name';
+
+  @override
+  String get preferredLanguage => 'Preferred Language';
+
+  @override
+  String get saving => 'Saving...';
+
+  @override
+  String get stay => 'Stay';
 }

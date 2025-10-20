@@ -32,5 +32,9 @@
   "forgotPassword": "¿Olvidaste tu Contraseña?",
   "unsavedChangesTitle": "Cambios No Guardados",
   "unsavedChangesMessage": "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?",
-  "discard": "Descartar"
+  "discard": "Descartar",
+  "displayNameHint": "Ingresa tu nombre para mostrar",
+  "preferredLanguage": "Idioma Preferido",
+  "saving": "Guardando...",
+  "stay": "Quedarse"
 }

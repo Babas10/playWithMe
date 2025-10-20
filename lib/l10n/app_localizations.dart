@@ -301,6 +301,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discard'**
   String get discard;
+
+  /// Hint text for display name field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your display name'**
+  String get displayNameHint;
+
+  /// Preferred language field label
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Language'**
+  String get preferredLanguage;
+
+  /// Saving indicator text
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get saving;
+
+  /// Stay button in unsaved changes dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get stay;
 }
 
 class _AppLocalizationsDelegate

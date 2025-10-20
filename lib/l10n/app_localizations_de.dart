@@ -109,4 +109,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get discard => 'Verwerfen';
+
+  @override
+  String get displayNameHint => 'Geben Sie Ihren Anzeigenamen ein';
+
+  @override
+  String get preferredLanguage => 'Bevorzugte Sprache';
+
+  @override
+  String get saving => 'Speichern...';
+
+  @override
+  String get stay => 'Bleiben';
 }
