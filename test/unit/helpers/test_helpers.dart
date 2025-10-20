@@ -1,11 +1,18 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
+import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
+import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import '../features/auth/data/mock_auth_repository.dart';
+
+// Mock for LocalePreferencesRepository
+class MockLocalePreferencesRepository extends Mock implements LocalePreferencesRepository {}
 
 // Global test repository instance for control during tests
 MockAuthRepository? _globalMockRepo;
@@ -50,6 +57,26 @@ Future<void> initializeTestDependencies({
 
   sl.registerFactory<PasswordResetBloc>(
     () => PasswordResetBloc(authRepository: sl<AuthRepository>()),
+  );
+
+  // Register mock LocalePreferencesRepository
+  final mockLocalePrefsRepo = MockLocalePreferencesRepository();
+  when(() => mockLocalePrefsRepo.loadPreferences()).thenAnswer(
+    (_) async => LocalePreferencesEntity.defaultPreferences(),
+  );
+  when(() => mockLocalePrefsRepo.savePreferences(any())).thenAnswer(
+    (_) async {},
+  );
+  when(() => mockLocalePrefsRepo.syncToFirestore(any(), any())).thenAnswer(
+    (_) async {},
+  );
+  when(() => mockLocalePrefsRepo.loadFromFirestore(any())).thenAnswer(
+    (_) async => null,
+  );
+  when(() => mockLocalePrefsRepo.getDeviceTimeZone()).thenReturn('UTC');
+
+  sl.registerLazySingleton<LocalePreferencesRepository>(
+    () => mockLocalePrefsRepo,
   );
 }
 
