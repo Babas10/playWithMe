@@ -183,5 +183,60 @@
   "stay": "Stay",
   "@stay": {
     "description": "Stay button in unsaved changes dialog"
+  },
+
+  "accountInformation": "Account Information",
+  "@accountInformation": {
+    "description": "Account information section title"
+  },
+
+  "verify": "Verify",
+  "@verify": {
+    "description": "Verify email button text"
+  },
+
+  "accountType": "Account Type",
+  "@accountType": {
+    "description": "Account type label"
+  },
+
+  "anonymous": "Anonymous",
+  "@anonymous": {
+    "description": "Anonymous account type"
+  },
+
+  "regular": "Regular",
+  "@regular": {
+    "description": "Regular account type"
+  },
+
+  "memberSince": "Member Since",
+  "@memberSince": {
+    "description": "Member since label"
+  },
+
+  "lastActive": "Last Active",
+  "@lastActive": {
+    "description": "Last active label"
+  },
+
+  "userId": "User ID",
+  "@userId": {
+    "description": "User ID label"
+  },
+
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings button text"
+  },
+
+  "signOutConfirm": "Are you sure you want to sign out?",
+  "@signOutConfirm": {
+    "description": "Sign out confirmation message"
+  },
+
+  "pleaseLogIn": "Please log in to view your profile",
+  "@pleaseLogIn": {
+    "description": "Message shown when user is not logged in"
   }
 }

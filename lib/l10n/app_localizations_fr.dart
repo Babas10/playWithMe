@@ -121,4 +121,34 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get stay => 'Rester';
+
+  @override
+  String get accountInformation => 'Informations du Compte';
+
+  @override
+  String get verify => 'Vérifier';
+
+  @override
+  String get accountType => 'Type de Compte';
+
+  @override
+  String get anonymous => 'Anonyme';
+
+  @override
+  String get regular => 'Régulier';
+
+  @override
+  String get memberSince => 'Membre Depuis';
+
+  @override
+  String get lastActive => 'Dernière Activité';
+
+  @override
+  String get userId => 'ID Utilisateur';
+
+  @override
+  String get signOutConfirm => 'Êtes-vous sûr de vouloir vous déconnecter ?';
+
+  @override
+  String get pleaseLogIn => 'Veuillez vous connecter pour voir votre profil';
 }

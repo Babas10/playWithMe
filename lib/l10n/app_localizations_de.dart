@@ -121,4 +121,34 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get stay => 'Bleiben';
+
+  @override
+  String get accountInformation => 'Kontoinformationen';
+
+  @override
+  String get verify => 'Verifizieren';
+
+  @override
+  String get accountType => 'Kontotyp';
+
+  @override
+  String get anonymous => 'Anonym';
+
+  @override
+  String get regular => 'Normal';
+
+  @override
+  String get memberSince => 'Mitglied Seit';
+
+  @override
+  String get lastActive => 'Zuletzt Aktiv';
+
+  @override
+  String get userId => 'Benutzer-ID';
+
+  @override
+  String get signOutConfirm => 'Möchten Sie sich wirklich abmelden?';
+
+  @override
+  String get pleaseLogIn => 'Bitte melden Sie sich an, um Ihr Profil zu sehen';
 }

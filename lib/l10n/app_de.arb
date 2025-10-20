@@ -36,5 +36,16 @@
   "displayNameHint": "Geben Sie Ihren Anzeigenamen ein",
   "preferredLanguage": "Bevorzugte Sprache",
   "saving": "Speichern...",
-  "stay": "Bleiben"
+  "stay": "Bleiben",
+  "accountInformation": "Kontoinformationen",
+  "verify": "Verifizieren",
+  "accountType": "Kontotyp",
+  "anonymous": "Anonym",
+  "regular": "Normal",
+  "memberSince": "Mitglied Seit",
+  "lastActive": "Zuletzt Aktiv",
+  "userId": "Benutzer-ID",
+  "accountSettings": "Kontoeinstellungen",
+  "signOutConfirm": "Möchten Sie sich wirklich abmelden?",
+  "pleaseLogIn": "Bitte melden Sie sich an, um Ihr Profil zu sehen"
 }
