@@ -13,6 +13,9 @@ import 'package:play_with_me/features/auth/domain/repositories/auth_repository.d
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_event.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_state.dart';
 import 'package:play_with_me/features/profile/presentation/pages/profile_edit_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
@@ -22,17 +25,24 @@ class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 class MockImageStorageRepository extends Mock implements ImageStorageRepository {}
 class MockImagePickerService extends Mock implements ImagePickerService {}
 class MockLocalePreferencesRepository extends Mock implements LocalePreferencesRepository {}
+class MockLocalePreferencesBloc extends Mock implements LocalePreferencesBloc {}
 
 // Fakes for fallback values
 class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntity {}
+class FakeLocalePreferencesEvent extends Fake implements LocalePreferencesEvent {}
+class FakeLocalePreferencesState extends Fake implements LocalePreferencesState {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockLocalePreferencesBloc mockLocalePrefsBloc;
 
   setUpAll(() {
     // Register fallback values for mocktail matchers
     registerFallbackValue(FakeLocalePreferencesEntity());
+    registerFallbackValue(FakeLocalePreferencesEvent());
+    registerFallbackValue(FakeLocalePreferencesState());
+
     // Create mock instances that will be reused
     final mockImageStorage = MockImageStorageRepository();
     final mockImagePicker = MockImagePickerService();
@@ -74,6 +84,24 @@ void main() {
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     mockAuthBloc = MockAuthenticationBloc();
+    mockLocalePrefsBloc = MockLocalePreferencesBloc();
+
+    // Stub the locale preferences bloc with default behavior
+    when(() => mockLocalePrefsBloc.state).thenReturn(
+      LocalePreferencesState.loaded(
+        preferences: LocalePreferencesEntity.defaultPreferences(),
+        hasUnsavedChanges: false,
+      ),
+    );
+    when(() => mockLocalePrefsBloc.stream).thenAnswer(
+      (_) => Stream<LocalePreferencesState>.value(
+        LocalePreferencesState.loaded(
+          preferences: LocalePreferencesEntity.defaultPreferences(),
+          hasUnsavedChanges: false,
+        ),
+      ),
+    );
+    when(() => mockLocalePrefsBloc.add(any())).thenReturn(null);
   });
 
   Widget createWidgetUnderTest(UserEntity user) {
@@ -89,8 +117,11 @@ void main() {
         providers: [
           RepositoryProvider<AuthRepository>.value(value: mockAuthRepository),
         ],
-        child: BlocProvider<AuthenticationBloc>.value(
-          value: mockAuthBloc,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            BlocProvider<LocalePreferencesBloc>.value(value: mockLocalePrefsBloc),
+          ],
           child: ProfileEditPage(user: user),
         ),
       ),
