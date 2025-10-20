@@ -110,4 +110,16 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get discard => 'Scarta';
+
+  @override
+  String get displayNameHint => 'Inserisci il tuo nome visualizzato';
+
+  @override
+  String get preferredLanguage => 'Lingua Preferita';
+
+  @override
+  String get saving => 'Salvataggio...';
+
+  @override
+  String get stay => 'Rimani';
 }

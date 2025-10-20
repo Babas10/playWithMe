@@ -15,6 +15,7 @@ import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/pro
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_state.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/avatar_upload_widget.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Page for editing user profile information
 class ProfileEditPage extends StatelessWidget {
@@ -75,8 +76,8 @@ class ProfileEditPage extends StatelessWidget {
 
                 // Show success message and navigate back
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Settings updated successfully'),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.settingsUpdatedSuccessfully),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -112,8 +113,8 @@ class ProfileEditPage extends StatelessWidget {
 
                   // Show success message and navigate back
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Settings updated successfully'),
+                    SnackBar(
+                      content: Text(AppLocalizations.of(context)!.settingsUpdatedSuccessfully),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -197,7 +198,7 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
               },
           child: Scaffold(
             appBar: AppBar(
-              title: const Text('Account Settings'),
+              title: Text(AppLocalizations.of(context)!.accountSettings),
               centerTitle: true,
               actions: [
                 if (hasUnsavedChanges)
@@ -206,7 +207,7 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                         ? null
                         : () => _handleSaveAll(context, widget.user.uid),
                     child: Text(
-                      'Save',
+                      AppLocalizations.of(context)!.save,
                       style: TextStyle(
                         color: isSaving
                             ? Colors.grey
@@ -250,8 +251,8 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                             controller: _displayNameController,
                             enabled: !isSaving,
                             decoration: InputDecoration(
-                              labelText: 'Display Name',
-                              hintText: 'Enter your display name',
+                              labelText: AppLocalizations.of(context)!.displayName,
+                              hintText: AppLocalizations.of(context)!.displayNameHint,
                               prefixIcon: const Icon(Icons.person_outline),
                               errorText: profileState is ProfileEditLoaded
                                   ? profileState.displayNameError
@@ -282,11 +283,11 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                             value: localeState is LocalePreferencesLoaded
                                 ? localeState.preferences.locale
                                 : const Locale('en'),
-                            decoration: const InputDecoration(
-                              labelText: 'Preferred Language',
+                            decoration: InputDecoration(
+                              labelText: AppLocalizations.of(context)!.preferredLanguage,
                               helperText: 'Select your preferred language',
-                              prefixIcon: Icon(Icons.language),
-                              border: OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.language),
+                              border: const OutlineInputBorder(),
                             ),
                             items: LocalePreferencesEntity.supportedLocales.map((locale) {
                               return DropdownMenuItem(
@@ -311,11 +312,11 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                             value: localeState is LocalePreferencesLoaded
                                 ? localeState.preferences.country
                                 : 'United States',
-                            decoration: const InputDecoration(
-                              labelText: 'Country',
+                            decoration: InputDecoration(
+                              labelText: AppLocalizations.of(context)!.country,
                               helperText: 'Select your country',
-                              prefixIcon: Icon(Icons.flag),
-                              border: OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.flag),
+                              border: const OutlineInputBorder(),
                             ),
                             items: Countries.all.map((country) {
                               return DropdownMenuItem(
@@ -337,11 +338,11 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
 
                           // Time Zone (Read-only)
                           TextFormField(
-                            decoration: const InputDecoration(
-                              labelText: 'Time Zone',
+                            decoration: InputDecoration(
+                              labelText: AppLocalizations.of(context)!.timezone,
                               helperText: 'Automatically detected from your device',
-                              prefixIcon: Icon(Icons.access_time),
-                              border: OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.access_time),
+                              border: const OutlineInputBorder(),
                             ),
                             initialValue: localeState is LocalePreferencesLoaded
                                 ? localeState.preferences.timeZone ?? 'Not detected'
@@ -365,7 +366,7 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                                     ),
                                   )
                                 : const Icon(Icons.save),
-                            label: Text(isSaving ? 'Saving...' : 'Save Changes'),
+                            label: Text(isSaving ? AppLocalizations.of(context)!.saving : AppLocalizations.of(context)!.saveChanges),
                           ),
                           const SizedBox(height: 12),
 
@@ -385,7 +386,7 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                                     }
                                   },
                             icon: const Icon(Icons.cancel_outlined),
-                            label: const Text('Cancel'),
+                            label: Text(AppLocalizations.of(context)!.cancel),
                           ),
 
                           // Info text
@@ -447,21 +448,20 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
 
   /// Show dialog for unsaved changes warning
   Future<bool> _showUnsavedChangesDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Unsaved Changes'),
-        content: const Text(
-          'You have unsaved changes. Are you sure you want to leave without saving?',
-        ),
+        title: Text(l10n.unsavedChangesTitle),
+        content: Text(l10n.unsavedChangesMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Stay'),
+            child: Text(l10n.stay),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Discard'),
+            child: Text(l10n.discard),
           ),
         ],
       ),

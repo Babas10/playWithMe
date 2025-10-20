@@ -32,5 +32,9 @@
   "forgotPassword": "Password Dimenticata?",
   "unsavedChangesTitle": "Modifiche Non Salvate",
   "unsavedChangesMessage": "Hai modifiche non salvate. Sei sicuro di voler uscire?",
-  "discard": "Scarta"
+  "discard": "Scarta",
+  "displayNameHint": "Inserisci il tuo nome visualizzato",
+  "preferredLanguage": "Lingua Preferita",
+  "saving": "Salvataggio...",
+  "stay": "Rimani"
 }

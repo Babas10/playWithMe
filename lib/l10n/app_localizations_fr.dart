@@ -109,4 +109,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get discard => 'Abandonner';
+
+  @override
+  String get displayNameHint => 'Entrez votre nom d\'affichage';
+
+  @override
+  String get preferredLanguage => 'Langue Préférée';
+
+  @override
+  String get saving => 'Enregistrement...';
+
+  @override
+  String get stay => 'Rester';
 }
