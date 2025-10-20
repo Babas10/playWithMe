@@ -44,8 +44,6 @@
   "regular": "Regular",
   "memberSince": "Miembro Desde",
   "lastActive": "Última Actividad",
-  "userId": "ID de Usuario",
-  "accountSettings": "Configuración de Cuenta",
   "signOutConfirm": "¿Estás seguro de que quieres cerrar sesión?",
   "pleaseLogIn": "Por favor inicia sesión para ver tu perfil"
 }

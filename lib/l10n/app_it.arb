@@ -44,8 +44,6 @@
   "regular": "Normale",
   "memberSince": "Membro Dal",
   "lastActive": "Ultima Attività",
-  "userId": "ID Utente",
-  "accountSettings": "Impostazioni Account",
   "signOutConfirm": "Sei sicuro di voler disconnetterti?",
   "pleaseLogIn": "Effettua l'accesso per visualizzare il tuo profilo"
 }

@@ -113,19 +113,7 @@ class ProfileInfoCard extends StatelessWidget {
                 label: l10n.lastActive,
                 value: dateFormat.format(user.lastSignInAt!),
               ),
-              const Divider(height: 24),
             ],
-
-            // User ID
-            _InfoRow(
-              icon: Icons.fingerprint,
-              label: l10n.userId,
-              value: '${user.uid.substring(0, 8)}...',
-              valueStyle: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: 'monospace',
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
           ],
         ),
       ),
