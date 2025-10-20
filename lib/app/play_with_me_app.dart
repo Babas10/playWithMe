@@ -20,6 +20,8 @@ import 'package:play_with_me/features/profile/presentation/bloc/locale_preferenc
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_state.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
+import 'package:play_with_me/features/groups/presentation/pages/group_creation_page.dart';
+import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -207,6 +209,21 @@ class HomePage extends StatelessWidget {
           // Debug panel for development
           const FirebaseDebugPanel(),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Navigate to group creation page
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => sl<GroupBloc>(),
+                child: const GroupCreationPage(),
+              ),
+            ),
+          );
+        },
+        icon: const Icon(Icons.group_add),
+        label: const Text('Create Group'),
       ),
     );
   }

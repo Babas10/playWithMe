@@ -144,9 +144,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get lastActive => 'Zuletzt Aktiv';
 
   @override
-  String get userId => 'Benutzer-ID';
-
-  @override
   String get signOutConfirm => 'Möchten Sie sich wirklich abmelden?';
 
   @override
