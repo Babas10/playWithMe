@@ -220,16 +220,6 @@
     "description": "Last active label"
   },
 
-  "userId": "User ID",
-  "@userId": {
-    "description": "User ID label"
-  },
-
-  "accountSettings": "Account Settings",
-  "@accountSettings": {
-    "description": "Account settings button text"
-  },
-
   "signOutConfirm": "Are you sure you want to sign out?",
   "@signOutConfirm": {
     "description": "Sign out confirmation message"
