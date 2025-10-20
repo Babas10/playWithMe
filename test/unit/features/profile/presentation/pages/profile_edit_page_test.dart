@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
@@ -13,6 +14,7 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import 'package:play_with_me/features/profile/presentation/pages/profile_edit_page.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 // Mocktail mocks
 class MockAuthRepository extends Mock implements AuthRepository {}
@@ -76,6 +78,13 @@ void main() {
 
   Widget createWidgetUnderTest(UserEntity user) {
     return MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
       home: MultiRepositoryProvider(
         providers: [
           RepositoryProvider<AuthRepository>.value(value: mockAuthRepository),
