@@ -170,7 +170,7 @@ abstract class AppLocalizations {
   /// **'Sign Out'**
   String get signOut;
 
-  /// Account settings page title
+  /// Account settings button text
   ///
   /// In en, this message translates to:
   /// **'Account Settings'**
@@ -325,6 +325,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stay'**
   String get stay;
+
+  /// Account information section title
+  ///
+  /// In en, this message translates to:
+  /// **'Account Information'**
+  String get accountInformation;
+
+  /// Verify email button text
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// Account type label
+  ///
+  /// In en, this message translates to:
+  /// **'Account Type'**
+  String get accountType;
+
+  /// Anonymous account type
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous'**
+  String get anonymous;
+
+  /// Regular account type
+  ///
+  /// In en, this message translates to:
+  /// **'Regular'**
+  String get regular;
+
+  /// Member since label
+  ///
+  /// In en, this message translates to:
+  /// **'Member Since'**
+  String get memberSince;
+
+  /// Last active label
+  ///
+  /// In en, this message translates to:
+  /// **'Last Active'**
+  String get lastActive;
+
+  /// User ID label
+  ///
+  /// In en, this message translates to:
+  /// **'User ID'**
+  String get userId;
+
+  /// Sign out confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out?'**
+  String get signOutConfirm;
+
+  /// Message shown when user is not logged in
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to view your profile'**
+  String get pleaseLogIn;
 }
 
 class _AppLocalizationsDelegate

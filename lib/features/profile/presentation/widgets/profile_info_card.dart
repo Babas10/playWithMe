@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/verification_badge.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 /// Card widget displaying account information
@@ -17,6 +18,7 @@ class ProfileInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final dateFormat = DateFormat('MMM d, yyyy');
 
     return Card(
@@ -27,7 +29,7 @@ class ProfileInfoCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Account Information',
+              l10n.accountInformation,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -49,7 +51,7 @@ class ProfileInfoCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Email',
+                          l10n.email,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -68,7 +70,7 @@ class ProfileInfoCard extends StatelessWidget {
                               TextButton.icon(
                                 onPressed: onVerificationTap,
                                 icon: const Icon(Icons.send, size: 16),
-                                label: const Text('Verify'),
+                                label: Text(l10n.verify),
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   minimumSize: Size.zero,
@@ -89,8 +91,8 @@ class ProfileInfoCard extends StatelessWidget {
             // Account type
             _InfoRow(
               icon: Icons.person_outline,
-              label: 'Account Type',
-              value: user.isAnonymous ? 'Anonymous' : 'Regular',
+              label: l10n.accountType,
+              value: user.isAnonymous ? l10n.anonymous : l10n.regular,
             ),
             const Divider(height: 24),
 
@@ -98,7 +100,7 @@ class ProfileInfoCard extends StatelessWidget {
             if (user.createdAt != null) ...[
               _InfoRow(
                 icon: Icons.calendar_today,
-                label: 'Member Since',
+                label: l10n.memberSince,
                 value: dateFormat.format(user.createdAt!),
               ),
               const Divider(height: 24),
@@ -108,7 +110,7 @@ class ProfileInfoCard extends StatelessWidget {
             if (user.lastSignInAt != null) ...[
               _InfoRow(
                 icon: Icons.access_time,
-                label: 'Last Active',
+                label: l10n.lastActive,
                 value: dateFormat.format(user.lastSignInAt!),
               ),
               const Divider(height: 24),
@@ -117,7 +119,7 @@ class ProfileInfoCard extends StatelessWidget {
             // User ID
             _InfoRow(
               icon: Icons.fingerprint,
-              label: 'User ID',
+              label: l10n.userId,
               value: '${user.uid.substring(0, 8)}...',
               valueStyle: theme.textTheme.bodyMedium?.copyWith(
                 fontFamily: 'monospace',

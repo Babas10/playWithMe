@@ -122,4 +122,35 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get stay => 'Rimani';
+
+  @override
+  String get accountInformation => 'Informazioni Account';
+
+  @override
+  String get verify => 'Verifica';
+
+  @override
+  String get accountType => 'Tipo di Account';
+
+  @override
+  String get anonymous => 'Anonimo';
+
+  @override
+  String get regular => 'Normale';
+
+  @override
+  String get memberSince => 'Membro Dal';
+
+  @override
+  String get lastActive => 'Ultima Attività';
+
+  @override
+  String get userId => 'ID Utente';
+
+  @override
+  String get signOutConfirm => 'Sei sicuro di voler disconnetterti?';
+
+  @override
+  String get pleaseLogIn =>
+      'Effettua l\'accesso per visualizzare il tuo profilo';
 }

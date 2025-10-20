@@ -120,4 +120,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stay => 'Stay';
+
+  @override
+  String get accountInformation => 'Account Information';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get accountType => 'Account Type';
+
+  @override
+  String get anonymous => 'Anonymous';
+
+  @override
+  String get regular => 'Regular';
+
+  @override
+  String get memberSince => 'Member Since';
+
+  @override
+  String get lastActive => 'Last Active';
+
+  @override
+  String get userId => 'User ID';
+
+  @override
+  String get signOutConfirm => 'Are you sure you want to sign out?';
+
+  @override
+  String get pleaseLogIn => 'Please log in to view your profile';
 }

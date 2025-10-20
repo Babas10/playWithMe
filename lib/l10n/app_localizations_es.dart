@@ -122,4 +122,34 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get stay => 'Quedarse';
+
+  @override
+  String get accountInformation => 'Información de la Cuenta';
+
+  @override
+  String get verify => 'Verificar';
+
+  @override
+  String get accountType => 'Tipo de Cuenta';
+
+  @override
+  String get anonymous => 'Anónimo';
+
+  @override
+  String get regular => 'Regular';
+
+  @override
+  String get memberSince => 'Miembro Desde';
+
+  @override
+  String get lastActive => 'Última Actividad';
+
+  @override
+  String get userId => 'ID de Usuario';
+
+  @override
+  String get signOutConfirm => '¿Estás seguro de que quieres cerrar sesión?';
+
+  @override
+  String get pleaseLogIn => 'Por favor inicia sesión para ver tu perfil';
 }
