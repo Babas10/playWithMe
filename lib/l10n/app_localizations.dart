@@ -170,7 +170,7 @@ abstract class AppLocalizations {
   /// **'Sign Out'**
   String get signOut;
 
-  /// Account settings button text
+  /// Account settings page title
   ///
   /// In en, this message translates to:
   /// **'Account Settings'**
@@ -367,12 +367,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last Active'**
   String get lastActive;
-
-  /// User ID label
-  ///
-  /// In en, this message translates to:
-  /// **'User ID'**
-  String get userId;
 
   /// Sign out confirmation message
   ///
