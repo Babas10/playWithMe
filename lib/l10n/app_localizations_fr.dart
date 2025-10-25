@@ -148,4 +148,73 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get pleaseLogIn => 'Veuillez vous connecter pour voir votre profil';
+
+  @override
+  String get userId => 'ID Utilisateur';
+
+  @override
+  String get myGroups => 'Mes Groupes';
+
+  @override
+  String get pleaseLogInToViewGroups =>
+      'Veuillez vous connecter pour voir vos groupes';
+
+  @override
+  String get errorLoadingGroups => 'Erreur de Chargement des Groupes';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get createGroup => 'Créer un Groupe';
+
+  @override
+  String get groupDetailsComingSoon =>
+      'Page de détails du groupe bientôt disponible !';
+
+  @override
+  String get noGroupsYet =>
+      'Vous ne faites partie d\'aucun groupe pour le moment';
+
+  @override
+  String get noGroupsMessage =>
+      'Créez ou rejoignez des groupes pour commencer à organiser des matchs de beach-volley avec vos amis !';
+
+  @override
+  String memberCount(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$countString membres',
+      one: '1 membre',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get publicGroup => 'Public';
+
+  @override
+  String get inviteOnlyGroup => 'Sur Invitation Uniquement';
+
+  @override
+  String get privateGroup => 'Privé';
+
+  @override
+  String get createYourFirstGroup => 'Créer Votre Premier Groupe';
+
+  @override
+  String get useCreateGroupButton =>
+      'Utilisez le bouton Créer un Groupe ci-dessous pour commencer.';
+
+  @override
+  String get home => 'Accueil';
+
+  @override
+  String get groups => 'Groupes';
 }
