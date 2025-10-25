@@ -20,8 +20,9 @@ import 'package:play_with_me/features/profile/presentation/bloc/locale_preferenc
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_state.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
-import 'package:play_with_me/features/groups/presentation/pages/group_creation_page.dart';
+import 'package:play_with_me/features/groups/presentation/pages/group_list_page.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/group/group_event.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -95,8 +96,52 @@ class PlayWithMeApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  // Pages for bottom navigation
+  late final List<Widget> _pages;
+  late final GroupBloc _groupBloc;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Create GroupBloc and initialize it with the current user
+    final authState = context.read<AuthenticationBloc>().state;
+    _groupBloc = sl<GroupBloc>();
+
+    if (authState is AuthenticationAuthenticated) {
+      _groupBloc.add(LoadGroupsForUser(userId: authState.user.uid));
+    }
+
+    _pages = [
+      const _HomeTab(),
+      BlocProvider<GroupBloc>.value(
+        value: _groupBloc,
+        child: const GroupListPage(),
+      ),
+    ];
+  }
+
+  @override
+  void dispose() {
+    _groupBloc.close();
+    super.dispose();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +156,10 @@ class HomePage extends StatelessWidget {
               // App bar
               AppBar(
                 backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                title: Text('${AppLocalizations.of(context)!.appTitle}${EnvironmentConfig.appSuffix}'),
+                title: Text(_selectedIndex == 0
+                    ? '${AppLocalizations.of(context)!.appTitle}${EnvironmentConfig.appSuffix}'
+                    : AppLocalizations.of(context)!.myGroups),
+                centerTitle: true,
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.person),
@@ -134,73 +182,9 @@ class HomePage extends StatelessWidget {
 
               // Main content
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        AppLocalizations.of(context)!.welcomeMessage,
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        AppLocalizations.of(context)!.beachVolleyballOrganizer,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 32),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: EnvironmentConfig.isDevelopment
-                              ? Colors.red.withValues(alpha: 0.1)
-                              : EnvironmentConfig.isStaging
-                                  ? Colors.orange.withValues(alpha: 0.1)
-                                  : Colors.green.withValues(alpha: 0.1),
-                          border: Border.all(
-                            color: EnvironmentConfig.isDevelopment
-                                ? Colors.red
-                                : EnvironmentConfig.isStaging
-                                    ? Colors.orange
-                                    : Colors.green,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  FirebaseService.isInitialized
-                                      ? Icons.cloud_done
-                                      : Icons.cloud_off,
-                                  size: 16,
-                                  color: FirebaseService.isInitialized
-                                      ? Colors.green
-                                      : Colors.red,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '${AppLocalizations.of(context)!.firebase}: ${FirebaseService.isInitialized ? AppLocalizations.of(context)!.firebaseConnected : AppLocalizations.of(context)!.firebaseDisconnected}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '${AppLocalizations.of(context)!.environment}: ${EnvironmentConfig.environmentName}',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${AppLocalizations.of(context)!.project}: ${EnvironmentConfig.firebaseProjectId}',
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                child: IndexedStack(
+                  index: _selectedIndex,
+                  children: _pages,
                 ),
               ),
             ],
@@ -210,20 +194,96 @@ class HomePage extends StatelessWidget {
           const FirebaseDebugPanel(),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Navigate to group creation page
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => sl<GroupBloc>(),
-                child: const GroupCreationPage(),
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.home),
+            label: AppLocalizations.of(context)!.home,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.group),
+            label: AppLocalizations.of(context)!.groups,
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+// Home tab content (original HomePage content)
+class _HomeTab extends StatelessWidget {
+  const _HomeTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            AppLocalizations.of(context)!.welcomeMessage,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            AppLocalizations.of(context)!.beachVolleyballOrganizer,
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 32),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: EnvironmentConfig.isDevelopment
+                  ? Colors.red.withValues(alpha: 0.1)
+                  : EnvironmentConfig.isStaging
+                      ? Colors.orange.withValues(alpha: 0.1)
+                      : Colors.green.withValues(alpha: 0.1),
+              border: Border.all(
+                color: EnvironmentConfig.isDevelopment
+                    ? Colors.red
+                    : EnvironmentConfig.isStaging
+                        ? Colors.orange
+                        : Colors.green,
               ),
+              borderRadius: BorderRadius.circular(8),
             ),
-          );
-        },
-        icon: const Icon(Icons.group_add),
-        label: const Text('Create Group'),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      FirebaseService.isInitialized
+                          ? Icons.cloud_done
+                          : Icons.cloud_off,
+                      size: 16,
+                      color: FirebaseService.isInitialized
+                          ? Colors.green
+                          : Colors.red,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${AppLocalizations.of(context)!.firebase}: ${FirebaseService.isInitialized ? AppLocalizations.of(context)!.firebaseConnected : AppLocalizations.of(context)!.firebaseDisconnected}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${AppLocalizations.of(context)!.environment}: ${EnvironmentConfig.environmentName}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${AppLocalizations.of(context)!.project}: ${EnvironmentConfig.firebaseProjectId}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

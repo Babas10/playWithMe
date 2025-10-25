@@ -3,13 +3,24 @@ import 'dart:async';
 
 import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
+import 'package:rxdart/rxdart.dart';
 
 class MockGroupRepository implements GroupRepository {
-  final StreamController<List<GroupModel>> _groupsController = StreamController<List<GroupModel>>.broadcast();
+  // Use BehaviorSubject for synchronous, deterministic emissions
+  final BehaviorSubject<List<GroupModel>> _groupsController = BehaviorSubject<List<GroupModel>>.seeded([]);
   final Map<String, GroupModel> _groups = {};
   String _lastCreatedGroupId = '';
 
-  StreamController<List<GroupModel>> get groupsController => _groupsController;
+  MockGroupRepository();
+
+  BehaviorSubject<List<GroupModel>> get groupsController => _groupsController;
+
+  // Synchronous method to get current groups for a user (for deterministic testing)
+  List<GroupModel> getCurrentGroupsForUser(String userId) {
+    return _groupsController.value
+        .where((group) => group.memberIds.contains(userId))
+        .toList();
+  }
 
   // Helper methods for testing
   void addGroup(GroupModel group) {
@@ -48,10 +59,16 @@ class MockGroupRepository implements GroupRepository {
   }
 
   @override
-  Stream<List<GroupModel>> getGroupsForUser(String userId) {
-    // Return stream that emits groups where user is a member
-    return _groupsController.stream.map((groups) =>
-        groups.where((group) => group.memberIds.contains(userId)).toList());
+  Stream<List<GroupModel>> getGroupsForUser(String userId) async* {
+    // Immediately yield the current value from BehaviorSubject
+    yield _groupsController.value
+        .where((group) => group.memberIds.contains(userId))
+        .toList();
+
+    // Then continue listening for future updates
+    yield* _groupsController.stream.map(
+      (groups) => groups.where((group) => group.memberIds.contains(userId)).toList(),
+    );
   }
 
   @override
