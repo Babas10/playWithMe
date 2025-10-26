@@ -61,10 +61,13 @@ class FirestoreGroupRepository implements GroupRepository {
           .where('memberIds', arrayContains: userId)
           .orderBy('lastActivity', descending: true)
           .snapshots()
-          .map((snapshot) => snapshot.docs
-              .where((doc) => doc.exists)
-              .map((doc) => GroupModel.fromFirestore(doc))
-              .toList());
+          .map((snapshot) {
+            final groups = snapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GroupModel.fromFirestore(doc))
+                .toList();
+            return groups;
+          });
     } catch (e) {
       throw Exception('Failed to get groups for user: $e');
     }
@@ -73,9 +76,11 @@ class FirestoreGroupRepository implements GroupRepository {
   @override
   Future<String> createGroup(GroupModel group) async {
     try {
+      final data = group.toFirestore();
+
       final docRef = await _firestore
           .collection(_collection)
-          .add(group.toFirestore());
+          .add(data);
       return docRef.id;
     } catch (e) {
       throw Exception('Failed to create group: $e');

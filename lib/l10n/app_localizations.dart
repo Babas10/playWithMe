@@ -379,6 +379,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please log in to view your profile'**
   String get pleaseLogIn;
+
+  /// User ID label
+  ///
+  /// In en, this message translates to:
+  /// **'User ID'**
+  String get userId;
+
+  /// My groups page title
+  ///
+  /// In en, this message translates to:
+  /// **'My Groups'**
+  String get myGroups;
+
+  /// Message shown when user is not logged in on groups page
+  ///
+  /// In en, this message translates to:
+  /// **'Please log in to view your groups'**
+  String get pleaseLogInToViewGroups;
+
+  /// Error message title when groups fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error Loading Groups'**
+  String get errorLoadingGroups;
+
+  /// Retry button text
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Create group button text
+  ///
+  /// In en, this message translates to:
+  /// **'Create Group'**
+  String get createGroup;
+
+  /// Coming soon message for group details
+  ///
+  /// In en, this message translates to:
+  /// **'Group details page coming soon!'**
+  String get groupDetailsComingSoon;
+
+  /// Empty state title when user has no groups
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re not part of any group yet'**
+  String get noGroupsYet;
+
+  /// Empty state message when user has no groups
+  ///
+  /// In en, this message translates to:
+  /// **'Create or join groups to start organizing beach volleyball games with your friends!'**
+  String get noGroupsMessage;
+
+  /// Member count label with pluralization
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 member} other{{count} members}}'**
+  String memberCount(int count);
+
+  /// Public group privacy label
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get publicGroup;
+
+  /// Invite only group privacy label
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Only'**
+  String get inviteOnlyGroup;
+
+  /// Private group privacy label
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get privateGroup;
+
+  /// Button text to create first group in empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your First Group'**
+  String get createYourFirstGroup;
+
+  /// Instruction text for creating groups in empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Use the Create Group button below to get started.'**
+  String get useCreateGroupButton;
+
+  /// Home navigation tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
+  /// Groups navigation tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get groups;
 }
 
 class _AppLocalizationsDelegate

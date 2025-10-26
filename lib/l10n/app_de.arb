@@ -45,5 +45,22 @@
   "memberSince": "Mitglied Seit",
   "lastActive": "Zuletzt Aktiv",
   "signOutConfirm": "Möchten Sie sich wirklich abmelden?",
-  "pleaseLogIn": "Bitte melden Sie sich an, um Ihr Profil zu sehen"
+  "pleaseLogIn": "Bitte melden Sie sich an, um Ihr Profil zu sehen",
+  "userId": "Benutzer-ID",
+  "myGroups": "Meine Gruppen",
+  "pleaseLogInToViewGroups": "Bitte melden Sie sich an, um Ihre Gruppen zu sehen",
+  "errorLoadingGroups": "Fehler beim Laden der Gruppen",
+  "retry": "Erneut Versuchen",
+  "createGroup": "Gruppe Erstellen",
+  "groupDetailsComingSoon": "Gruppenseite bald verfügbar!",
+  "noGroupsYet": "Sie sind noch in keiner Gruppe",
+  "noGroupsMessage": "Erstellen oder treten Sie Gruppen bei, um Beachvolleyball-Spiele mit Ihren Freunden zu organisieren!",
+  "memberCount": "{count, plural, =1{1 Mitglied} other{{count} Mitglieder}}",
+  "publicGroup": "Öffentlich",
+  "inviteOnlyGroup": "Nur auf Einladung",
+  "privateGroup": "Privat",
+  "createYourFirstGroup": "Erstellen Sie Ihre Erste Gruppe",
+  "useCreateGroupButton": "Verwenden Sie die Schaltfläche Gruppe Erstellen unten, um loszulegen.",
+  "home": "Startseite",
+  "groups": "Gruppen"
 }
