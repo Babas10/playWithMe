@@ -66,7 +66,7 @@ service cloud.firestore {
 
     // Groups: Members can read, admins can write
     match /groups/{groupId} {
-      // Allow reading individual group documents if user is a member
+      // Allow reading individual group documents if user is a member or creator
       allow get: if isAuthenticated() &&
                     (request.auth.uid in resource.data.memberIds ||
                      request.auth.uid == resource.data.createdBy);
