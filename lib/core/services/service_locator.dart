@@ -11,14 +11,17 @@ import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
+import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_user_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_group_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_game_repository.dart';
 import 'package:play_with_me/core/data/repositories/firebase_image_storage_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_invitation_repository.dart';
 import 'package:play_with_me/core/services/image_picker_service.dart';
 import 'package:play_with_me/core/presentation/bloc/user/user_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/game/game_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/features/profile/data/repositories/locale_preferences_repository_impl.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 
@@ -79,6 +82,14 @@ Future<void> initializeDependencies() async {
     );
   }
 
+  if (!sl.isRegistered<InvitationRepository>()) {
+    sl.registerLazySingleton<InvitationRepository>(
+      () => FirestoreInvitationRepository(
+        groupRepository: sl(),
+      ),
+    );
+  }
+
   // Register services
   if (!sl.isRegistered<ImagePickerService>()) {
     sl.registerLazySingleton<ImagePickerService>(
@@ -127,6 +138,12 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<GameBloc>()) {
     sl.registerFactory<GameBloc>(
       () => GameBloc(gameRepository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<InvitationBloc>()) {
+    sl.registerFactory<InvitationBloc>(
+      () => InvitationBloc(invitationRepository: sl()),
     );
   }
 }
