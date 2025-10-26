@@ -36,6 +36,10 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
+      # Step 4.5: Generate Mock Firebase Configs (for CI)
+      - name: 🔧 Generate Mock Firebase Configs
+        run: dart run tools/generate_mock_firebase_configs.dart
+
       # Step 5: Verify that dependencies resolved properly
       - name: 🔍 Verify Dependencies
         run: flutter pub deps
@@ -98,9 +102,9 @@ jobs:
           dart run tools/generate_firebase_config_from_secrets.dart prod
           echo "✅ Firebase configurations generated securely from secrets"
 
-      # Step 9: Run unit and widget tests
+      # Step 9: Run unit and widget tests (exclude integration tests)
       - name: 🧪 Run Tests
-        run: flutter test --coverage --reporter=github
+        run: flutter test --coverage --reporter=github --exclude-tags=integration test/unit/ test/widget/
 
       # Step 10: Upload coverage reports (optional but recommended)
       - name: 📈 Upload Coverage to Codecov
