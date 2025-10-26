@@ -228,5 +228,96 @@
   "pleaseLogIn": "Please log in to view your profile",
   "@pleaseLogIn": {
     "description": "Message shown when user is not logged in"
+  },
+
+  "userId": "User ID",
+  "@userId": {
+    "description": "User ID label"
+  },
+
+  "myGroups": "My Groups",
+  "@myGroups": {
+    "description": "My groups page title"
+  },
+
+  "pleaseLogInToViewGroups": "Please log in to view your groups",
+  "@pleaseLogInToViewGroups": {
+    "description": "Message shown when user is not logged in on groups page"
+  },
+
+  "errorLoadingGroups": "Error Loading Groups",
+  "@errorLoadingGroups": {
+    "description": "Error message title when groups fail to load"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "createGroup": "Create Group",
+  "@createGroup": {
+    "description": "Create group button text"
+  },
+
+  "groupDetailsComingSoon": "Group details page coming soon!",
+  "@groupDetailsComingSoon": {
+    "description": "Coming soon message for group details"
+  },
+
+  "noGroupsYet": "You're not part of any group yet",
+  "@noGroupsYet": {
+    "description": "Empty state title when user has no groups"
+  },
+
+  "noGroupsMessage": "Create or join groups to start organizing beach volleyball games with your friends!",
+  "@noGroupsMessage": {
+    "description": "Empty state message when user has no groups"
+  },
+
+  "memberCount": "{count, plural, =1{1 member} other{{count} members}}",
+  "@memberCount": {
+    "description": "Member count label with pluralization",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "compact"
+      }
+    }
+  },
+
+  "publicGroup": "Public",
+  "@publicGroup": {
+    "description": "Public group privacy label"
+  },
+
+  "inviteOnlyGroup": "Invite Only",
+  "@inviteOnlyGroup": {
+    "description": "Invite only group privacy label"
+  },
+
+  "privateGroup": "Private",
+  "@privateGroup": {
+    "description": "Private group privacy label"
+  },
+
+  "createYourFirstGroup": "Create Your First Group",
+  "@createYourFirstGroup": {
+    "description": "Button text to create first group in empty state"
+  },
+
+  "useCreateGroupButton": "Use the Create Group button below to get started.",
+  "@useCreateGroupButton": {
+    "description": "Instruction text for creating groups in empty state"
+  },
+
+  "home": "Home",
+  "@home": {
+    "description": "Home navigation tab label"
+  },
+
+  "groups": "Groups",
+  "@groups": {
+    "description": "Groups navigation tab label"
   }
 }

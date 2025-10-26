@@ -2,10 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/app/play_with_me_app.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import '../helpers/test_helpers.dart';
 import '../features/auth/data/mock_auth_repository.dart';
@@ -168,23 +171,38 @@ void main() {
   });
 
   group('HomePage', () {
-    setUp(() {
+    setUp(() async {
       EnvironmentConfig.setEnvironment(Environment.prod);
+      await initializeTestDependencies();
+    });
+
+    tearDown(() {
+      cleanupTestDependencies();
     });
 
     testWidgets('should render correctly', (WidgetTester tester) async {
+      // Set up authenticated user for HomePage
+      final mockRepo = getTestAuthRepository()!;
+      const testUser = TestUserData.testUser;
+      mockRepo.setCurrentUser(testUser);
+
       await tester.pumpWidget(
-        const MaterialApp(
-          localizationsDelegates: [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: [Locale('en')],
-          home: HomePage(),
+        BlocProvider<AuthenticationBloc>(
+          create: (context) => sl<AuthenticationBloc>(),
+          child: const MaterialApp(
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [Locale('en')],
+            home: HomePage(),
+          ),
         ),
       );
+
+      await tester.pump(); // Allow initial build
 
       expect(find.byType(AppBar), findsOneWidget);
       expect(find.text('PlayWithMe'), findsOneWidget);
@@ -194,18 +212,28 @@ void main() {
     });
 
     testWidgets('should have correct layout structure', (WidgetTester tester) async {
+      // Set up authenticated user for HomePage
+      final mockRepo = getTestAuthRepository()!;
+      const testUser = TestUserData.testUser;
+      mockRepo.setCurrentUser(testUser);
+
       await tester.pumpWidget(
-        const MaterialApp(
-          localizationsDelegates: [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: [Locale('en')],
-          home: HomePage(),
+        BlocProvider<AuthenticationBloc>(
+          create: (context) => sl<AuthenticationBloc>(),
+          child: const MaterialApp(
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [Locale('en')],
+            home: HomePage(),
+          ),
         ),
       );
+
+      await tester.pump(); // Allow initial build
 
       expect(find.byType(Scaffold), findsOneWidget);
       expect(find.byType(AppBar), findsOneWidget);
@@ -217,15 +245,24 @@ void main() {
     testWidgets('should show correct environment indicator colors', (WidgetTester tester) async {
       // Test development environment (red)
       EnvironmentConfig.setEnvironment(Environment.dev);
-      await tester.pumpWidget(const MaterialApp(
-        localizationsDelegates: [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: [Locale('en')],
-        home: HomePage(),
+
+      // Set up authenticated user for HomePage
+      final mockRepo = getTestAuthRepository()!;
+      const testUser = TestUserData.testUser;
+      mockRepo.setCurrentUser(testUser);
+
+      await tester.pumpWidget(BlocProvider<AuthenticationBloc>(
+        create: (context) => sl<AuthenticationBloc>(),
+        child: const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('en')],
+          home: HomePage(),
+        ),
       ));
 
       // Use controlled pump instead of pumpAndSettle to avoid timeouts
@@ -258,16 +295,25 @@ void main() {
       expect(border.top.color, Colors.red);
 
       // Test staging environment (orange)
+      // Clean up and reinitialize for staging test
+      await tester.pumpWidget(Container()); // Clear the widget tree
+      await tester.pump();
+
       EnvironmentConfig.setEnvironment(Environment.stg);
-      await tester.pumpWidget(const MaterialApp(
-        localizationsDelegates: [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: [Locale('en')],
-        home: HomePage(),
+      mockRepo.setCurrentUser(testUser); // Ensure user is still set
+
+      await tester.pumpWidget(BlocProvider<AuthenticationBloc>(
+        create: (context) => sl<AuthenticationBloc>(),
+        child: const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('en')],
+          home: HomePage(),
+        ),
       ));
       await tester.pump();
 
@@ -297,16 +343,25 @@ void main() {
       expect(stagingBorder.top.color, Colors.orange);
 
       // Test production environment (green)
+      // Clean up and reinitialize for production test
+      await tester.pumpWidget(Container()); // Clear the widget tree
+      await tester.pump();
+
       EnvironmentConfig.setEnvironment(Environment.prod);
-      await tester.pumpWidget(const MaterialApp(
-        localizationsDelegates: [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: [Locale('en')],
-        home: HomePage(),
+      mockRepo.setCurrentUser(testUser); // Ensure user is still set
+
+      await tester.pumpWidget(BlocProvider<AuthenticationBloc>(
+        create: (context) => sl<AuthenticationBloc>(),
+        child: const MaterialApp(
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [Locale('en')],
+          home: HomePage(),
+        ),
       ));
       await tester.pump();
 

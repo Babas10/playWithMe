@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../../../data/models/group_model.dart';
 import 'group_event.dart';
 import 'group_state.dart';
 
@@ -50,19 +51,26 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroupsForUser event,
     Emitter<GroupState> emit,
   ) async {
-    try {
-      emit(const GroupLoading());
 
-      await _groupsSubscription?.cancel();
-      _groupsSubscription = _groupRepository.getGroupsForUser(event.userId).listen(
-        (groups) {
-          emit(GroupsLoaded(groups: groups));
+    // Cancel existing subscription
+    await _groupsSubscription?.cancel();
+
+    try {
+      final stream = _groupRepository.getGroupsForUser(event.userId);
+
+      // Use emit.forEach to keep the emitter alive and automatically emit states
+      await emit.forEach<List<GroupModel>>(
+        stream,
+        onData: (groups) {
+          for (var i = 0; i < groups.length; i++) {
+          }
+          return GroupsLoaded(groups: groups);
         },
-        onError: (error) {
-          emit(GroupError(
+        onError: (error, stackTrace) {
+          return GroupError(
             message: 'Failed to load user groups: ${error.toString()}',
             errorCode: 'LOAD_USER_GROUPS_ERROR',
-          ));
+          );
         },
       );
     } catch (e) {

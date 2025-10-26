@@ -1,0 +1,228 @@
+name: Integration Tests (Firebase Emulator)
+
+# Run on pull requests and pushes to main/develop
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  integration-tests:
+    name: 🔥 Firebase Integration Tests
+    runs-on: ubuntu-latest
+
+    env:
+      # Mark this as CI environment
+      CI: true
+      # Firebase Emulator connection settings
+      # These env vars help Flutter app connect to local emulators
+      FIRESTORE_EMULATOR_HOST: localhost:8080
+      FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Flutter
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: 'stable'
+          cache: true
+
+      # Step 3: Setup Node.js (required for Firebase CLI)
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Step 4: Install Firebase CLI
+      - name: 🔥 Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      # Step 5: Verify Firebase CLI installation
+      - name: 🔍 Verify Firebase CLI
+        run: firebase --version
+
+      # Step 6: Setup Java (required for Firestore Emulator)
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      # Step 7: Verify Java installation
+      - name: 🔍 Verify Java Installation
+        run: java -version
+
+      # Step 8: Get Flutter dependencies
+      - name: 📦 Get Flutter Dependencies
+        run: flutter pub get
+
+      # Step 9: Generate Mock Firebase Configs (for CI)
+      - name: 🔧 Generate Mock Firebase Configs
+        run: dart run tools/generate_mock_firebase_configs.dart
+
+      # Step 9.5: Setup ChromeDriver for Web Tests
+      - name: 🌐 Setup ChromeDriver
+        run: |
+          # ChromeDriver is pre-installed on GitHub Actions Ubuntu runners
+          # Just verify it's available
+          chromedriver --version
+          google-chrome --version
+
+          # Start ChromeDriver in background
+          chromedriver --port=4444 &
+          echo "CHROMEDRIVER_PID=$!" >> $GITHUB_ENV
+          sleep 2
+          echo "✅ ChromeDriver started on port 4444"
+
+      # Step 10: Start Firebase Emulators in background
+      - name: 🚀 Start Firebase Emulators
+        run: |
+          echo "Starting Firebase Emulators..."
+          firebase emulators:start --only auth,firestore --project playwithme-dev &
+          EMULATOR_PID=$!
+          echo "EMULATOR_PID=$EMULATOR_PID" >> $GITHUB_ENV
+
+          echo "Waiting for emulators to start..."
+          # Wait up to 60 seconds for emulators to be ready
+          for i in {1..60}; do
+            if curl -s http://localhost:4000 > /dev/null 2>&1; then
+              echo "✅ Emulators are ready!"
+              break
+            fi
+            echo "Waiting... ($i/60)"
+            sleep 1
+          done
+
+          # Verify emulators are running
+          curl -s http://localhost:4000 > /dev/null && echo "✅ Emulator UI accessible" || echo "❌ Emulator UI not accessible"
+          curl -s http://localhost:8080 > /dev/null && echo "✅ Firestore emulator running" || echo "❌ Firestore emulator not running"
+          curl -s http://localhost:9099 > /dev/null && echo "✅ Auth emulator running" || echo "❌ Auth emulator not running"
+
+      # Step 10.5: Smoke Check - Verify Firestore Emulator Health
+      - name: 🔍 Verify Firebase Emulator Health
+        run: |
+          echo "Performing smoke check on Firestore emulator..."
+
+          # Check Firestore emulator health endpoint
+          # The emulator should respond to root endpoint
+          if curl -s -f http://localhost:8080 > /dev/null 2>&1; then
+            echo "✅ Firestore emulator is responding!"
+          else
+            echo "❌ Firestore emulator health check failed!"
+            echo "Emulator may not be fully initialized. Dumping logs..."
+            cat firestore-debug.log 2>/dev/null || echo "No firestore-debug.log found"
+            exit 1
+          fi
+
+          # Check Auth emulator health
+          if curl -s -f http://localhost:9099 > /dev/null 2>&1; then
+            echo "✅ Auth emulator is responding!"
+          else
+            echo "❌ Auth emulator health check failed!"
+            exit 1
+          fi
+
+          echo "🎉 All emulators passed health check!"
+
+      # Step 11: Run Integration Tests
+      - name: 🧪 Run Integration Tests
+        run: |
+          echo "Running integration tests against Firebase Emulator on Chrome (headless)..."
+          # Run each integration test file with flutter drive
+          for test_file in integration_test/*_test.dart; do
+            echo "Running $test_file..."
+            flutter drive \
+              --driver=test_driver/integration_test.dart \
+              --target="$test_file" \
+              -d web-server \
+              --web-port=7357 \
+              --web-browser-flag="--disable-gpu" \
+              --web-browser-flag="--no-sandbox" \
+              --web-browser-flag="--headless"
+          done
+        env:
+          # Ensure tests know they're running in CI
+          CI: true
+
+      # Step 12: Stop Firebase Emulators and ChromeDriver (cleanup)
+      - name: 🛑 Stop Emulators and ChromeDriver
+        if: always()
+        run: |
+          # Stop Firebase Emulators
+          if [ -n "$EMULATOR_PID" ]; then
+            echo "Stopping Firebase Emulators (PID: $EMULATOR_PID)..."
+            kill $EMULATOR_PID || true
+          fi
+          pkill -f "firebase emulators" || true
+
+          # Stop ChromeDriver
+          if [ -n "$CHROMEDRIVER_PID" ]; then
+            echo "Stopping ChromeDriver (PID: $CHROMEDRIVER_PID)..."
+            kill $CHROMEDRIVER_PID || true
+          fi
+          pkill -f "chromedriver" || true
+
+      # Step 13: Upload Firebase Emulator logs (on failure)
+      - name: 📤 Upload Firebase Emulator Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firebase-emulator-logs
+          path: |
+            firestore-debug.log
+            firebase-debug.log
+            ui-debug.log
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # Step 13.5: Upload Integration Test Logs (always run)
+      - name: 📦 Upload Integration Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-logs
+          path: |
+            build/reports/**/*
+            build/test-results/**/*
+            **/*_test.dart.browser_test.dart.browser.log
+            **/*_test.dart.vm_test.dart.vm.log
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # Step 14: Comment on PR with results (optional)
+      - name: 💬 Comment Test Results on PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue_number = context.payload.pull_request.number;
+            const message = `## 🔥 Integration Tests Failed
+
+            The Firebase integration tests have failed. Please check the logs for details.
+
+            **Emulator Configuration:**
+            - Auth Emulator: http://localhost:9099
+            - Firestore Emulator: http://localhost:8080
+            - Emulator UI: http://localhost:4000
+
+            **Next Steps:**
+            1. Review the test logs above
+            2. Run tests locally: \`firebase emulators:start --only auth,firestore\` then \`flutter test test/integration/\`
+            3. Check Firestore security rules if seeing permission-denied errors
+
+            📋 [View full workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              body: message
+            });

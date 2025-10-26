@@ -138,18 +138,19 @@ The project uses a **single, consistent testing stack** to ensure clarity, maint
 
 ### **4.1 Core Testing Stack**
 
-| Layer                 | Purpose                                                | Frameworks                                 |
-| --------------------- | ------------------------------------------------------ | ------------------------------------------ |
-| **Unit tests**        | Validate logic in BLoCs, repositories, and services    | `flutter_test`, `bloc_test`, `mocktail`    |
-| **Widget tests**      | Verify UI rendering and state transitions              | `flutter_test`, `mocktail`                 |
-| **Integration tests** | End-to-end flow validation using fake Firebase backend | `integration_test`, `fake_cloud_firestore` |
+| Layer                 | Purpose                                                    | Frameworks                                          |
+| --------------------- | ---------------------------------------------------------- | --------------------------------------------------- |
+| **Unit tests**        | Validate logic in BLoCs, repositories, and services        | `flutter_test`, `bloc_test`, `mocktail`             |
+| **Widget tests**      | Verify UI rendering and state transitions                  | `flutter_test`, `mocktail`                          |
+| **Integration tests** | End-to-end flow validation using real Firebase Emulator    | `integration_test`, Firebase Emulator (auth, firestore) |
 
 **Key principles:**
 
 * ❌ **Do not use `mockito`** → it introduces codegen overhead and maintenance burden.
-* ✅ **Use only `mocktail`** for mocking, stubbing, and verification.
-* ✅ **Use `fake_cloud_firestore`** for offline backend simulation.
+* ✅ **Use only `mocktail`** for mocking, stubbing, and verification in unit/widget tests.
+* ✅ **Use Firebase Emulator** for integration tests with real Firebase SDK behavior.
 * ✅ **Use `bloc_test`** for BLoC state assertions.
+* ✅ **Use `flutter drive`** to run integration tests on web in CI.
 
 ---
 
@@ -182,13 +183,17 @@ when(() => mockAuthRepository.updateUserProfile(
 
 ```
 test/
-├── unit/                # Logic & BLoC tests
+├── unit/                # Logic & BLoC tests (mocked dependencies)
 │   ├── features/
 │   ├── core/
 │   └── helpers/
-├── widget/              # Screen/widget rendering tests
-├── integration/         # End-to-end flow tests (with fake Firestore)
-└── helpers/             # Shared mocks, fakes, and test data
+├── widget/              # Screen/widget rendering tests (mocked dependencies)
+integration_test/        # End-to-end flow tests (real Firebase Emulator)
+├── helpers/             # Firebase Emulator test helpers
+│   └── firebase_emulator_helper.dart
+└── *_test.dart          # Integration test files
+test_driver/             # Test driver for flutter drive
+└── integration_test.dart
 ```
 
 ---
@@ -220,24 +225,37 @@ Maintain **≥ 90% coverage** for BLoC and repository layers.
 
 ### **4.5 Running Tests**
 
-**Local (inner loop):**
+**Local (inner loop - fast):**
 
 ```bash
-# Run only unit + widget tests
+# Run only unit + widget tests (with mocks)
 flutter test test/unit/
 flutter test test/widget/
 ```
 
-**Integration (optional inner loop / CI):**
+**Integration tests (local with Firebase Emulator):**
 
 ```bash
-flutter test test/integration/
+# Step 1: Start Firebase Emulators
+firebase emulators:start --only auth,firestore --project playwithme-dev
+
+# Step 2: Run integration tests (in another terminal)
+flutter drive \
+  --driver=test_driver/integration_test.dart \
+  --target=integration_test/invitation_acceptance_test.dart \
+  -d chrome
+
+# Or run all integration tests
+for test in integration_test/*_test.dart; do
+  flutter drive --driver=test_driver/integration_test.dart --target="$test" -d chrome
+done
 ```
 
 **Full suite (CI pipeline):**
 
 ```bash
-flutter test
+# CI runs unit + widget tests only (integration tests run in separate workflow)
+flutter test test/unit/ test/widget/
 ```
 
 ---
@@ -249,20 +267,50 @@ dev_dependencies:
   flutter_test:
   bloc_test:
   mocktail:
-  fake_cloud_firestore:
   integration_test:
+  # Firebase dependencies (for integration tests)
+  firebase_core:
+  cloud_firestore:
+  firebase_auth:
 ```
 
-*(Remove `mockito`, `build_runner`, and any generated `.mocks.dart` files.)*
+**Note**: Remove `mockito`, `build_runner`, `fake_cloud_firestore`, and any generated `.mocks.dart` files.
 
 ---
 
 ### **4.7 Shared Test Helpers**
 
-Centralize reusable fakes, mocks, and fixtures under `test/helpers/`:
+**For unit/widget tests** - Centralize reusable fakes and mocks under `test/helpers/`:
 
 ```dart
 class FakeUserEntity extends Fake implements UserEntity {}
+class MockAuthRepository extends Mock implements AuthRepository {}
+```
+
+**For integration tests** - Use `FirebaseEmulatorHelper` in `integration_test/helpers/`:
+
+```dart
+// integration_test/helpers/firebase_emulator_helper.dart
+class FirebaseEmulatorHelper {
+  static Future<void> initialize() async {
+    // Initialize Firebase with emulator configuration
+    await Firebase.initializeApp(options: const FirebaseOptions(...));
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  }
+
+  static Future<void> clearFirestore() async {
+    // Clear all test data between tests
+  }
+
+  static Future<User> createCompleteTestUser({
+    required String email,
+    required String password,
+    required String displayName,
+  }) async {
+    // Create authenticated user + Firestore profile
+  }
+}
 ```
 
 ---
@@ -292,13 +340,16 @@ Document reusable patterns in:
 
 ### **4.9 Why This Approach**
 
-| Problem                                    | Unified Stack Fix                   |
-| ------------------------------------------ | ----------------------------------- |
-| Conflicts between `mockito` and `mocktail` | Use only Mocktail                   |
-| Slow CI due to build_runner                | Eliminate code generation           |
-| Inconsistent matcher behavior              | Standardize with Mocktail           |
-| Duplicate stubs or mocks                   | Centralize in helpers/              |
-| Unpredictable coverage                     | Single pipeline with defined layers |
+| Problem                                    | Solution                                    |
+| ------------------------------------------ | ------------------------------------------- |
+| Conflicts between `mockito` and `mocktail` | Use only Mocktail for unit/widget tests     |
+| Slow CI due to build_runner                | Eliminate code generation entirely          |
+| Inconsistent matcher behavior              | Standardize with Mocktail                   |
+| Fake Firebase doesn't match real behavior  | Use real Firebase Emulator for integration  |
+| Platform channel errors in tests           | Use `flutter drive` with web for CI         |
+| Duplicate stubs or mocks                   | Centralize in helpers/                      |
+| Unpredictable coverage                     | Single pipeline with defined layers         |
+| Integration tests too slow                 | Parallelize with matrix strategy (optional) |
 
 ---
 
