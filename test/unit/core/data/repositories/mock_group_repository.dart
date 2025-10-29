@@ -150,6 +150,13 @@ class MockGroupRepository implements GroupRepository {
   }
 
   @override
+  Future<void> leaveGroup(String groupId) async {
+    // In mock, leaveGroup doesn't need userId since it's implied
+    // This is just a stub for testing - real implementation uses Cloud Function
+    throw UnimplementedError('leaveGroup should be mocked in tests that use it');
+  }
+
+  @override
   Future<void> promoteToAdmin(String groupId, String userId) async {
     final group = _groups[groupId];
     if (group == null) throw Exception('Group not found');
