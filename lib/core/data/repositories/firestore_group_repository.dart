@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 import '../../domain/repositories/group_repository.dart';
 import '../models/group_model.dart';
@@ -184,6 +185,24 @@ class FirestoreGroupRepository implements GroupRepository {
           .set(updatedGroup.toFirestore(), SetOptions(merge: true));
     } catch (e) {
       throw Exception('Failed to remove member: $e');
+    }
+  }
+
+  @override
+  Future<void> leaveGroup(String groupId) async {
+    try {
+      final callable = FirebaseFunctions.instance.httpsCallable('leaveGroup');
+      final result = await callable.call<Map<String, dynamic>>({
+        'groupId': groupId,
+      });
+
+      if (result.data['success'] != true) {
+        throw Exception(result.data['message'] ?? 'Failed to leave group');
+      }
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception(e.message ?? 'Failed to leave group');
+    } catch (e) {
+      throw Exception('Failed to leave group: $e');
     }
   }
 

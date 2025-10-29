@@ -37,6 +37,9 @@ abstract class GroupRepository {
   /// Remove member from group
   Future<void> removeMember(String groupId, String userId);
 
+  /// Leave group (current user leaves the group via Cloud Function)
+  Future<void> leaveGroup(String groupId);
+
   /// Promote member to admin
   Future<void> promoteToAdmin(String groupId, String userId);
 

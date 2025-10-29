@@ -10,3 +10,4 @@ export {checkPendingInvitation} from "./checkPendingInvitation";
 export {acceptInvitation} from "./acceptInvitation";
 export {declineInvitation} from "./declineInvitation";
 export {getUsersByIds} from "./getUsersByIds";
+export {leaveGroup} from "./leaveGroup";

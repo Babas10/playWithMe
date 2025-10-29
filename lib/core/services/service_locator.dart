@@ -22,6 +22,7 @@ import 'package:play_with_me/core/presentation/bloc/user/user_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/game/game_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/group_member/group_member_bloc.dart';
 import 'package:play_with_me/features/profile/data/repositories/locale_preferences_repository_impl.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 
@@ -147,6 +148,12 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<InvitationBloc>()) {
     sl.registerFactory<InvitationBloc>(
       () => InvitationBloc(invitationRepository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<GroupMemberBloc>()) {
+    sl.registerFactory<GroupMemberBloc>(
+      () => GroupMemberBloc(groupRepository: sl()),
     );
   }
 }
