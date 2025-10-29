@@ -1,5 +1,6 @@
 // Tests FirestoreInvitationRepository methods with fake Firestore
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -8,18 +9,31 @@ import 'package:play_with_me/core/data/repositories/firestore_invitation_reposit
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 
 class MockGroupRepository extends Mock implements GroupRepository {}
+class MockFirebaseFunctions extends Mock implements FirebaseFunctions {}
+class MockHttpsCallable extends Mock implements HttpsCallable {}
+class MockHttpsCallableResult extends Mock implements HttpsCallableResult {}
 
 void main() {
   group('FirestoreInvitationRepository', () {
     late FakeFirebaseFirestore fakeFirestore;
     late MockGroupRepository mockGroupRepository;
+    late MockFirebaseFunctions mockFunctions;
+    late MockHttpsCallable mockCallable;
     late FirestoreInvitationRepository repository;
 
     setUp(() {
       fakeFirestore = FakeFirebaseFirestore();
       mockGroupRepository = MockGroupRepository();
+      mockFunctions = MockFirebaseFunctions();
+      mockCallable = MockHttpsCallable();
+
+      // Setup default mock behavior for Cloud Functions
+      when(() => mockFunctions.httpsCallable(any())).thenReturn(mockCallable);
+      when(() => mockCallable.call(any())).thenAnswer((_) async => MockHttpsCallableResult());
+
       repository = FirestoreInvitationRepository(
         firestore: fakeFirestore,
+        functions: mockFunctions,
         groupRepository: mockGroupRepository,
       );
     });
@@ -57,7 +71,10 @@ void main() {
         expect(data['createdAt'], isA<Timestamp>());
       });
 
-      test('throws exception when user already has pending invitation', () async {
+      test('creates invitation even if pending invitation exists (duplicate check is in UI layer)', () async {
+        // Note: Duplicate checking is now handled in the UI layer via checkPendingInvitation Cloud Function
+        // The repository no longer enforces this constraint
+
         // Arrange - Create existing pending invitation
         await fakeFirestore
             .collection('users')
@@ -73,17 +90,27 @@ void main() {
           'createdAt': Timestamp.now(),
         });
 
-        // Act & Assert
-        expect(
-          () => repository.sendInvitation(
-            groupId: 'group-123',
-            groupName: 'Test Group',
-            invitedUserId: 'user-456',
-            invitedBy: 'user-123',
-            inviterName: 'John Doe',
-          ),
-          throwsA(isA<Exception>()),
+        // Act - Repository allows creating another invitation (UI prevents this)
+        final invitationId = await repository.sendInvitation(
+          groupId: 'group-123',
+          groupName: 'Test Group',
+          invitedUserId: 'user-456',
+          invitedBy: 'user-123',
+          inviterName: 'John Doe',
         );
+
+        // Assert - Second invitation was created
+        expect(invitationId, isNotEmpty);
+
+        // Verify both invitations exist
+        final snapshot = await fakeFirestore
+            .collection('users')
+            .doc('user-456')
+            .collection('invitations')
+            .where('groupId', isEqualTo: 'group-123')
+            .where('status', isEqualTo: 'pending')
+            .get();
+        expect(snapshot.docs.length, 2);
       });
 
       test('allows sending invitation if previous invitation was declined', () async {
@@ -307,82 +334,38 @@ void main() {
     });
 
     group('acceptInvitation', () {
-      test('updates invitation status and adds user to group', () async {
-        // Arrange
-        final invitationRef = await fakeFirestore
-            .collection('users')
-            .doc('user-456')
-            .collection('invitations')
-            .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
-
-        // Create the group in Firestore
-        await fakeFirestore.collection('groups').doc('group-123').set({
-          'name': 'Test Group',
-          'createdBy': 'user-123',
-          'createdAt': Timestamp.now(),
-          'memberIds': ['user-123'],
-          'adminIds': ['user-123'],
-        });
+      test('calls Cloud Function to accept invitation', () async {
+        // Note: acceptInvitation now delegates to a Cloud Function
+        // The actual Firestore updates happen in the Cloud Function
+        // This test verifies the repository correctly calls the function
 
         // Act
         await repository.acceptInvitation(
           userId: 'user-456',
-          invitationId: invitationRef.id,
+          invitationId: 'invitation-123',
         );
 
-        // Assert - Check invitation status
-        final invitationDoc = await invitationRef.get();
-        expect(invitationDoc.data()!['status'], 'accepted');
-        expect(invitationDoc.data()!['respondedAt'], isA<Timestamp>());
-
-        // Assert - Check user was added to group
-        final groupDoc = await fakeFirestore
-            .collection('groups')
-            .doc('group-123')
-            .get();
-        expect(groupDoc.data()!['memberIds'], contains('user-456'));
+        // Assert - Verify Cloud Function was called with correct parameters
+        verify(() => mockFunctions.httpsCallable('acceptInvitation')).called(1);
+        verify(() => mockCallable.call({
+          'invitationId': 'invitation-123',
+        })).called(1);
       });
 
-      test('throws exception when invitation does not exist', () async {
+      test('throws exception when Cloud Function fails', () async {
+        // Arrange - Mock Cloud Function to throw error
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'not-found',
+            message: 'Invitation not found',
+          ),
+        );
+
         // Act & Assert
         expect(
           () => repository.acceptInvitation(
             userId: 'user-456',
             invitationId: 'non-existent-id',
-          ),
-          throwsA(isA<Exception>()),
-        );
-      });
-
-      test('throws exception when invitation is not pending', () async {
-        // Arrange
-        final invitationRef = await fakeFirestore
-            .collection('users')
-            .doc('user-456')
-            .collection('invitations')
-            .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'accepted',
-          'createdAt': Timestamp.now(),
-        });
-
-        // Act & Assert
-        expect(
-          () => repository.acceptInvitation(
-            userId: 'user-456',
-            invitationId: invitationRef.id,
           ),
           throwsA(isA<Exception>()),
         );
@@ -390,66 +373,38 @@ void main() {
     });
 
     group('declineInvitation', () {
-      test('updates invitation status to declined', () async {
-        // Arrange
-        final invitationRef = await fakeFirestore
-            .collection('users')
-            .doc('user-456')
-            .collection('invitations')
-            .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
+      test('calls Cloud Function to decline invitation', () async {
+        // Note: declineInvitation now delegates to a Cloud Function
+        // The actual Firestore updates happen in the Cloud Function
+        // This test verifies the repository correctly calls the function
 
         // Act
         await repository.declineInvitation(
           userId: 'user-456',
-          invitationId: invitationRef.id,
+          invitationId: 'invitation-123',
         );
 
-        // Assert
-        final invitationDoc = await invitationRef.get();
-        expect(invitationDoc.data()!['status'], 'declined');
-        expect(invitationDoc.data()!['respondedAt'], isA<Timestamp>());
+        // Assert - Verify Cloud Function was called with correct parameters
+        verify(() => mockFunctions.httpsCallable('declineInvitation')).called(1);
+        verify(() => mockCallable.call({
+          'invitationId': 'invitation-123',
+        })).called(1);
       });
 
-      test('throws exception when invitation does not exist', () async {
+      test('throws exception when Cloud Function fails', () async {
+        // Arrange - Mock Cloud Function to throw error
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'not-found',
+            message: 'Invitation not found',
+          ),
+        );
+
         // Act & Assert
         expect(
           () => repository.declineInvitation(
             userId: 'user-456',
             invitationId: 'non-existent-id',
-          ),
-          throwsA(isA<Exception>()),
-        );
-      });
-
-      test('throws exception when invitation is not pending', () async {
-        // Arrange
-        final invitationRef = await fakeFirestore
-            .collection('users')
-            .doc('user-456')
-            .collection('invitations')
-            .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'declined',
-          'createdAt': Timestamp.now(),
-        });
-
-        // Act & Assert
-        expect(
-          () => repository.declineInvitation(
-            userId: 'user-456',
-            invitationId: invitationRef.id,
           ),
           throwsA(isA<Exception>()),
         );

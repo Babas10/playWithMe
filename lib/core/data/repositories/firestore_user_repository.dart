@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../domain/repositories/user_repository.dart';
@@ -48,25 +49,30 @@ class FirestoreUserRepository implements UserRepository {
     if (uids.isEmpty) return [];
 
     try {
-      final List<UserModel> users = [];
+      // Use Cloud Function for secure cross-user query
+      final callable = FirebaseFunctions.instance.httpsCallable('getUsersByIds');
+      final result = await callable.call({
+        'userIds': uids,
+      });
 
-      // Firestore 'in' queries are limited to 10 items
-      const int batchSize = 10;
-      for (int i = 0; i < uids.length; i += batchSize) {
-        final batch = uids.skip(i).take(batchSize).toList();
-        final query = await _firestore
-            .collection(_collection)
-            .where(FieldPath.documentId, whereIn: batch)
-            .get();
+      // Convert result.data to Map<String, dynamic> safely
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final usersData = List<Map<String, dynamic>>.from(
+        (data['users'] as List).map((u) => Map<String, dynamic>.from(u as Map))
+      );
 
-        for (final doc in query.docs) {
-          if (doc.exists) {
-            users.add(UserModel.fromFirestore(doc));
-          }
-        }
-      }
-
-      return users;
+      return usersData.map((userData) {
+        return UserModel(
+          uid: userData['uid'] as String,
+          email: userData['email'] as String,
+          displayName: userData['displayName'] as String?,
+          photoUrl: userData['photoUrl'] as String?,
+          isEmailVerified: false, // Not returned by Cloud Function
+          isAnonymous: false, // Not returned by Cloud Function
+        );
+      }).toList();
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception('Failed to get users: ${e.message ?? e.code}');
     } catch (e) {
       throw Exception('Failed to get users: $e');
     }
