@@ -23,6 +23,10 @@ import 'package:play_with_me/features/profile/domain/repositories/locale_prefere
 import 'package:play_with_me/features/groups/presentation/pages/group_list_page.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
+import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -109,17 +113,20 @@ class _HomePageState extends State<HomePage> {
   // Pages for bottom navigation
   late final List<Widget> _pages;
   late final GroupBloc _groupBloc;
+  late final InvitationBloc _invitationBloc;
 
   @override
   void initState() {
     super.initState();
 
-    // Create GroupBloc and initialize it with the current user
+    // Create GroupBloc and InvitationBloc and initialize them with the current user
     final authState = context.read<AuthenticationBloc>().state;
     _groupBloc = sl<GroupBloc>();
+    _invitationBloc = sl<InvitationBloc>();
 
     if (authState is AuthenticationAuthenticated) {
       _groupBloc.add(LoadGroupsForUser(userId: authState.user.uid));
+      _invitationBloc.add(LoadPendingInvitations(userId: authState.user.uid));
     }
 
     _pages = [
@@ -134,6 +141,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _groupBloc.close();
+    _invitationBloc.close();
     super.dispose();
   }
 
@@ -145,40 +153,96 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              // Environment indicator at the top
-              const EnvironmentIndicator(showDetails: true),
+    return BlocProvider<InvitationBloc>.value(
+      value: _invitationBloc,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                // Environment indicator at the top
+                const EnvironmentIndicator(showDetails: true),
 
-              // App bar
-              AppBar(
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                title: Text(_selectedIndex == 0
-                    ? '${AppLocalizations.of(context)!.appTitle}${EnvironmentConfig.appSuffix}'
-                    : AppLocalizations.of(context)!.myGroups),
-                centerTitle: true,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.person),
-                    tooltip: AppLocalizations.of(context)!.profile,
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/profile');
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.logout),
-                    tooltip: AppLocalizations.of(context)!.signOut,
-                    onPressed: () {
-                      context.read<AuthenticationBloc>().add(
-                        const AuthenticationLogoutRequested(),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                // App bar
+                AppBar(
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  title: Text(_selectedIndex == 0
+                      ? '${AppLocalizations.of(context)!.appTitle}${EnvironmentConfig.appSuffix}'
+                      : AppLocalizations.of(context)!.myGroups),
+                  centerTitle: true,
+                  actions: [
+                    // Invitation badge
+                    BlocBuilder<InvitationBloc, InvitationState>(
+                      builder: (context, state) {
+                        int pendingCount = 0;
+                        if (state is InvitationsLoaded) {
+                          pendingCount = state.invitations.length;
+                        }
+
+                        return Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.mail_outline),
+                              tooltip: 'Invitations',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BlocProvider<InvitationBloc>.value(
+                                      value: _invitationBloc,
+                                      child: const PendingInvitationsPage(),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            if (pendingCount > 0)
+                              Positioned(
+                                right: 8,
+                                top: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 18,
+                                    minHeight: 18,
+                                  ),
+                                  child: Text(
+                                    pendingCount > 9 ? '9+' : '$pendingCount',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.person),
+                      tooltip: AppLocalizations.of(context)!.profile,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/profile');
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.logout),
+                      tooltip: AppLocalizations.of(context)!.signOut,
+                      onPressed: () {
+                        context.read<AuthenticationBloc>().add(
+                          const AuthenticationLogoutRequested(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
 
               // Main content
               Expanded(
@@ -194,19 +258,20 @@ class _HomePageState extends State<HomePage> {
           const FirebaseDebugPanel(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: AppLocalizations.of(context)!.home,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.group),
-            label: AppLocalizations.of(context)!.groups,
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        bottomNavigationBar: BottomNavigationBar(
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home),
+              label: AppLocalizations.of(context)!.home,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.group),
+              label: AppLocalizations.of(context)!.groups,
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_options_provider.dart';
@@ -83,6 +84,9 @@ class FirebaseService {
       // Configure Firestore settings
       await _configureFirestore();
 
+      // Configure Cloud Functions (emulator for dev)
+      _configureCloudFunctions();
+
       _isInitialized = true;
 
       debugPrint('✅ Firebase initialized successfully');
@@ -113,6 +117,32 @@ class FirebaseService {
     }
 
     debugPrint('🗄️ Firestore configured for ${EnvironmentConfig.environmentName}');
+  }
+
+  /// Configure Cloud Functions (use emulator in development if enabled)
+  static void _configureCloudFunctions() {
+    try {
+      // Only use emulator if explicitly enabled via environment variable or compile-time constant
+      const bool useEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR', defaultValue: false);
+
+      if (useEmulator && EnvironmentConfig.isDevelopment) {
+        // Use localhost emulator for dev environment
+        // Note: For web, this should work automatically
+        // For mobile platforms, you may need to use platform-specific host
+        if (kIsWeb) {
+          FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
+          debugPrint('⚡ Cloud Functions (Web) configured to use emulator on localhost:5001');
+        } else {
+          // For mobile emulators/simulators, use 10.0.2.2 (Android) or localhost (iOS)
+          FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
+          debugPrint('⚡ Cloud Functions (Mobile) configured to use emulator on localhost:5001');
+        }
+      } else {
+        debugPrint('⚡ Cloud Functions configured for ${EnvironmentConfig.environmentName} (live)');
+      }
+    } catch (e) {
+      debugPrint('⚠️ Warning: Failed to configure Cloud Functions: $e');
+    }
   }
 
 
