@@ -42,8 +42,11 @@ service cloud.firestore {
         allow create: if isAuthenticated() &&
                          isGroupAdmin(request.resource.data.groupId);
 
-        // Only the invited user can read their invitations
-        allow read: if isAuthenticated() && request.auth.uid == userId;
+        // The invited user can read their own invitations (get individual docs)
+        allow get: if isAuthenticated() && request.auth.uid == userId;
+
+        // The invited user can list/query their own invitations
+        allow list: if isAuthenticated() && request.auth.uid == userId;
 
         // Only the invited user can update invitation status (accept/decline)
         allow update: if isAuthenticated() &&

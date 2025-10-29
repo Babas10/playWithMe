@@ -103,6 +103,153 @@ Claude must:
 
 ---
 
+### **🔐 Firebase Data Access Rules (Critical)**
+
+**Never query sensitive collections directly from the Flutter client** if the data might expose information about other users.
+
+#### **Direct Firestore Access Policy**
+
+* ✅ **Allowed:** Direct reads/writes to the authenticated user's own data only
+  * Example: `users/{userId}` where `userId == auth.uid`
+* ❌ **Forbidden:** Collection-wide queries, searches, or listing operations
+  * Example: Searching all users, listing group members, finding invitations
+
+#### **Cross-User Query Pattern: Cloud Functions Only**
+
+For any operation that involves multiple users or cross-user data:
+
+**✅ Always Use: Cloud Function Wrapper Pattern**
+
+1. Client calls a Firebase Callable Function
+   ```dart
+   final callable = FirebaseFunctions.instance.httpsCallable('functionName');
+   final result = await callable.call({'param': value});
+   ```
+
+2. Function validates permissions using `context.auth`
+   ```typescript
+   if (!context.auth) {
+     throw new functions.https.HttpsError('unauthenticated', '...');
+   }
+   ```
+
+3. Function performs Firestore query securely on backend (Admin SDK bypasses rules)
+   ```typescript
+   const snapshot = await admin.firestore()
+     .collection('users')
+     .where('email', '==', email)
+     .get();
+   ```
+
+4. Function returns minimal, non-sensitive data only
+   ```typescript
+   return {
+     found: true,
+     user: {
+       uid: doc.id,
+       displayName: data.displayName,
+       email: data.email,
+       // ❌ No passwords, tokens, roles, or private data
+     }
+   };
+   ```
+
+**Benefits:**
+* ✅ Prevents `permission-denied` errors
+* ✅ Enforces privacy at backend level
+* ✅ Centralizes security logic
+* ✅ Provides audit trail
+* ✅ Enables rate limiting
+
+#### **Firestore Security Rules Standards**
+
+```javascript
+// ✅ CORRECT: User can only read their own document
+match /users/{userId} {
+  allow read, update, delete: if request.auth.uid == userId;
+  allow create: if request.auth != null;
+}
+
+// ❌ NEVER DO THIS: Global read access
+match /users/{userId} {
+  allow read: if request.auth != null;  // ❌ Exposes all users!
+}
+```
+
+**Rules:**
+* User-level documents (`/users/{userId}`) must only be readable by their owner
+* Never grant collection-wide read access
+* All search or cross-user operations must go through Cloud Functions
+* Document IDs should not contain sensitive information
+
+#### **Error Handling Standards**
+
+**Cloud Functions must return structured errors:**
+
+```typescript
+// TypeScript (Cloud Function)
+throw new functions.https.HttpsError(
+  'not-found',  // Error code
+  'User not found with that email'  // User-friendly message
+);
+```
+
+**Flutter client must catch and display friendly messages:**
+
+```dart
+try {
+  final result = await callable.call(params);
+} on FirebaseFunctionsException catch (e) {
+  String message;
+  switch (e.code) {
+    case 'unauthenticated':
+      message = 'You must be logged in';
+      break;
+    case 'permission-denied':
+      message = 'You don\'t have permission';
+      break;
+    case 'not-found':
+      message = 'User not found';
+      break;
+    default:
+      message = 'An error occurred: ${e.message}';
+  }
+  // Show user-friendly error to user
+}
+```
+
+**Standard Error Codes:**
+* `unauthenticated` - User not logged in
+* `permission-denied` - Insufficient permissions
+* `invalid-argument` - Bad input (validation failed)
+* `not-found` - Resource doesn't exist
+* `already-exists` - Duplicate resource
+* `internal` - Server error
+
+#### **When to Use Cloud Functions vs Direct Access**
+
+| Operation | Approach | Reason |
+|-----------|----------|--------|
+| Read own user profile | ✅ Direct Firestore | User owns the data |
+| Update own user profile | ✅ Direct Firestore | User owns the data |
+| Search users by email | ❌ Cloud Function | Cross-user query |
+| List group members | ❌ Cloud Function | Cross-user query |
+| Get pending invitations | ✅ Direct Firestore (with query) | User's own invitations |
+| Send invitation | ✅ Direct Firestore (create) | Creates user's own document |
+| Check if user exists | ❌ Cloud Function | Privacy concern |
+| Get public groups | ❌ Cloud Function | Collection-wide query |
+
+**Implementation Checklist:**
+- [ ] Cloud Function has authentication check
+- [ ] Cloud Function validates all inputs
+- [ ] Cloud Function returns only non-sensitive data
+- [ ] Flutter client has error handling for all error codes
+- [ ] Firestore rules deny direct access to sensitive collections
+- [ ] Function is tested with unit tests
+- [ ] Function is deployed to dev/staging/prod
+
+---
+
 ### **Code Style & Naming**
 
 | Element             | Convention                                          |
