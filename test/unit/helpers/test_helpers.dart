@@ -8,7 +8,11 @@ import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.da
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
+import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import '../features/auth/data/mock_auth_repository.dart';
@@ -17,14 +21,28 @@ import '../core/data/repositories/mock_group_repository.dart';
 // Mock for LocalePreferencesRepository
 class MockLocalePreferencesRepository extends Mock implements LocalePreferencesRepository {}
 
+// Mock for UserRepository
+class MockUserRepository extends Mock implements UserRepository {}
+
+// Mock for InvitationRepository
+class MockInvitationRepository extends Mock implements InvitationRepository {}
+
+// Fake for UserModel (required for mocktail's any() matcher)
+class FakeUserModel extends Fake implements UserModel {}
+
 // Global test repository instances for control during tests
 MockAuthRepository? _globalMockRepo;
 MockGroupRepository? _globalMockGroupRepo;
+MockUserRepository? _globalMockUserRepo;
+MockInvitationRepository? _globalMockInvitationRepo;
 
 /// Initialize test dependencies with mock services instead of real Firebase
 Future<void> initializeTestDependencies({
   bool startUnauthenticated = true,
 }) async {
+  // Register fallback values for mocktail's any() matcher
+  registerFallbackValue(FakeUserModel());
+
   // Reset service locator
   sl.reset();
 
@@ -47,6 +65,13 @@ Future<void> initializeTestDependencies({
     () => _globalMockRepo!,
   );
 
+  // Register mock UserRepository
+  _globalMockUserRepo = MockUserRepository();
+  when(() => _globalMockUserRepo!.createOrUpdateUser(any())).thenAnswer((_) async {});
+  sl.registerLazySingleton<UserRepository>(
+    () => _globalMockUserRepo!,
+  );
+
   // Register BLoCs with mock repository
   sl.registerFactory<AuthenticationBloc>(
     () => AuthenticationBloc(authRepository: sl<AuthRepository>()),
@@ -57,7 +82,10 @@ Future<void> initializeTestDependencies({
   );
 
   sl.registerFactory<RegistrationBloc>(
-    () => RegistrationBloc(authRepository: sl<AuthRepository>()),
+    () => RegistrationBloc(
+      authRepository: sl<AuthRepository>(),
+      userRepository: sl<UserRepository>(),
+    ),
   );
 
   sl.registerFactory<PasswordResetBloc>(
@@ -92,6 +120,15 @@ Future<void> initializeTestDependencies({
   sl.registerFactory<GroupBloc>(
     () => GroupBloc(groupRepository: sl<GroupRepository>()),
   );
+
+  // Register MockInvitationRepository for invitation-related tests
+  _globalMockInvitationRepo = MockInvitationRepository();
+  sl.registerLazySingleton<InvitationRepository>(() => _globalMockInvitationRepo!);
+
+  // Register InvitationBloc factory that uses the mock repository
+  sl.registerFactory<InvitationBloc>(
+    () => InvitationBloc(invitationRepository: sl<InvitationRepository>()),
+  );
 }
 
 /// Get the mock repository for test control
@@ -100,12 +137,20 @@ MockAuthRepository? getTestAuthRepository() => _globalMockRepo;
 /// Get the mock group repository for test control
 MockGroupRepository? getTestGroupRepository() => _globalMockGroupRepo;
 
+/// Get the mock user repository for test control
+MockUserRepository? getTestUserRepository() => _globalMockUserRepo;
+
+/// Get the mock invitation repository for test control
+MockInvitationRepository? getTestInvitationRepository() => _globalMockInvitationRepo;
+
 /// Clean up test dependencies
 void cleanupTestDependencies() {
   _globalMockRepo?.dispose();
   _globalMockRepo = null;
   _globalMockGroupRepo?.dispose();
   _globalMockGroupRepo = null;
+  _globalMockUserRepo = null;
+  _globalMockInvitationRepo = null;
   sl.reset();
 }
 

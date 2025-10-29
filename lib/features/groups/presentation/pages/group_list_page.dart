@@ -9,6 +9,7 @@ import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/features/groups/presentation/pages/group_creation_page.dart';
+import 'package:play_with_me/features/groups/presentation/pages/group_details_page.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/group_list_item.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/empty_group_list.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -139,11 +140,9 @@ class GroupListPage extends StatelessWidget {
   }
 
   void _navigateToGroupDetails(BuildContext context, GroupModel group) {
-    // TODO: Navigate to Group Details page (Story 2.4)
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.groupDetailsComingSoon),
-        duration: const Duration(seconds: 2),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => GroupDetailsPage(groupId: group.id),
       ),
     );
   }

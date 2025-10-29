@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 import '../../domain/repositories/group_repository.dart';
 import '../../domain/repositories/invitation_repository.dart';
@@ -8,14 +9,17 @@ import '../models/invitation_model.dart';
 
 class FirestoreInvitationRepository implements InvitationRepository {
   final FirebaseFirestore _firestore;
+  final FirebaseFunctions _functions;
 
   static const String _usersCollection = 'users';
   static const String _invitationsSubcollection = 'invitations';
 
   FirestoreInvitationRepository({
     FirebaseFirestore? firestore,
+    FirebaseFunctions? functions,
     GroupRepository? groupRepository,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance;
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _functions = functions ?? FirebaseFunctions.instance;
 
   @override
   Future<String> sendInvitation({
@@ -26,16 +30,8 @@ class FirestoreInvitationRepository implements InvitationRepository {
     required String inviterName,
   }) async {
     try {
-      // Check if invitation already exists
-      final existingPending = await hasPendingInvitation(
-        userId: invitedUserId,
-        groupId: groupId,
-      );
-
-      if (existingPending) {
-        throw Exception(
-            'User already has a pending invitation for this group');
-      }
+      // Note: Duplicate check is now handled in the UI layer via Cloud Function
+      // (checkPendingInvitation) before calling this method for better security
 
       // Create invitation
       final invitation = InvitationModel(
@@ -126,46 +122,14 @@ class FirestoreInvitationRepository implements InvitationRepository {
     required String invitationId,
   }) async {
     try {
-      // Get invitation
-      final invitation = await getInvitationById(
-        userId: userId,
-        invitationId: invitationId,
-      );
-
-      if (invitation == null) {
-        throw Exception('Invitation not found');
-      }
-
-      if (invitation.status != InvitationStatus.pending) {
-        throw Exception('Invitation is not pending');
-      }
-
-      // Use a batch write for atomicity
-      final batch = _firestore.batch();
-
-      // Update invitation status
-      final invitationRef = _firestore
-          .collection(_usersCollection)
-          .doc(userId)
-          .collection(_invitationsSubcollection)
-          .doc(invitationId);
-
-      batch.update(invitationRef, {
-        'status': 'accepted',
-        'respondedAt': Timestamp.now(),
+      // Use Cloud Function for secure invitation acceptance
+      // This bypasses Firestore security rules and ensures atomic operation
+      final callable = _functions.httpsCallable('acceptInvitation');
+      await callable.call({
+        'invitationId': invitationId,
       });
-
-      // Add user to group members
-      final groupRef =
-          _firestore.collection('groups').doc(invitation.groupId);
-
-      batch.update(groupRef, {
-        'memberIds': FieldValue.arrayUnion([userId]),
-        'updatedAt': Timestamp.now(),
-        'lastActivity': Timestamp.now(),
-      });
-
-      await batch.commit();
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception('Failed to accept invitation: ${e.message ?? e.code}');
     } catch (e) {
       throw Exception('Failed to accept invitation: $e');
     }
@@ -177,30 +141,13 @@ class FirestoreInvitationRepository implements InvitationRepository {
     required String invitationId,
   }) async {
     try {
-      // Get invitation
-      final invitation = await getInvitationById(
-        userId: userId,
-        invitationId: invitationId,
-      );
-
-      if (invitation == null) {
-        throw Exception('Invitation not found');
-      }
-
-      if (invitation.status != InvitationStatus.pending) {
-        throw Exception('Invitation is not pending');
-      }
-
-      // Update invitation status
-      await _firestore
-          .collection(_usersCollection)
-          .doc(userId)
-          .collection(_invitationsSubcollection)
-          .doc(invitationId)
-          .update({
-        'status': 'declined',
-        'respondedAt': Timestamp.now(),
+      // Use Cloud Function for secure invitation decline
+      final callable = _functions.httpsCallable('declineInvitation');
+      await callable.call({
+        'invitationId': invitationId,
       });
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception('Failed to decline invitation: ${e.message ?? e.code}');
     } catch (e) {
       throw Exception('Failed to decline invitation: $e');
     }
