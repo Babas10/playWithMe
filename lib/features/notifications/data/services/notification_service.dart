@@ -85,10 +85,23 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_channel);
 
+    // For iOS: Get APNS token first, then FCM token
+    try {
+      // Wait for APNS token to be available on iOS
+      final apnsToken = await _fcm.getAPNSToken();
+      if (apnsToken != null) {
+        print('APNS token obtained: ${apnsToken.substring(0, 10)}...');
+      }
+    } catch (e) {
+      print('APNS token not available (may be Android or simulator): $e');
+    }
+
     // Get and save FCM token
     final token = await _fcm.getToken();
     if (token != null) {
       await _saveTokenToFirestore(token);
+    } else {
+      print('FCM token is null, will retry on token refresh');
     }
 
     // Listen for token refresh
