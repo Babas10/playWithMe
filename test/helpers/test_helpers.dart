@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
 import '../unit/features/auth/data/mock_auth_repository.dart';
+import '../unit/core/data/repositories/mock_user_repository.dart';
 
-// Global test repository instance for control during tests
+// Global test repository instances for control during tests
 MockAuthRepository? _globalMockRepo;
+MockUserRepository? _globalMockUserRepo;
 
 /// Initialize test dependencies with mock services instead of real Firebase
 Future<void> initializeTestDependencies({
@@ -17,11 +20,12 @@ Future<void> initializeTestDependencies({
   // Reset service locator
   sl.reset();
 
-  // Dispose of previous mock repository if it exists
+  // Dispose of previous mock repositories if they exist
   _globalMockRepo?.dispose();
 
-  // Create and configure mock repository with initial state
+  // Create and configure mock repositories with initial state
   _globalMockRepo = MockAuthRepository();
+  _globalMockUserRepo = MockUserRepository();
 
   if (startUnauthenticated) {
     // Set initial state to unauthenticated (null user) immediately
@@ -30,9 +34,13 @@ Future<void> initializeTestDependencies({
     await Future.delayed(Duration.zero);
   }
 
-  // Register mock repository
+  // Register mock repositories
   sl.registerLazySingleton<AuthRepository>(
     () => _globalMockRepo!,
+  );
+
+  sl.registerLazySingleton<UserRepository>(
+    () => _globalMockUserRepo!,
   );
 
   // Register BLoCs with mock repository
@@ -45,7 +53,10 @@ Future<void> initializeTestDependencies({
   );
 
   sl.registerFactory<RegistrationBloc>(
-    () => RegistrationBloc(authRepository: sl<AuthRepository>()),
+    () => RegistrationBloc(
+      authRepository: sl<AuthRepository>(),
+      userRepository: sl<UserRepository>(),
+    ),
   );
 
   sl.registerFactory<PasswordResetBloc>(
@@ -60,6 +71,7 @@ MockAuthRepository? getTestAuthRepository() => _globalMockRepo;
 void cleanupTestDependencies() {
   _globalMockRepo?.dispose();
   _globalMockRepo = null;
+  _globalMockUserRepo = null;
   sl.reset();
 }
 

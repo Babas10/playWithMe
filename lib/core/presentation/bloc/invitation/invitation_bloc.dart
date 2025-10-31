@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/repositories/invitation_repository.dart';
 import '../../../data/models/invitation_model.dart';
+import '../../../utils/error_messages.dart';
 import 'invitation_event.dart';
 import 'invitation_state.dart';
 
@@ -37,9 +38,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
 
       emit(InvitationSent(invitationId: invitationId));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? InvitationErrorMessages.getErrorMessage(e)
+          : ('Failed to send invitation', true);
       emit(InvitationError(
-        message: 'Failed to send invitation: ${e.toString()}',
+        message: message,
         errorCode: 'SEND_INVITATION_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -61,16 +66,24 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
           return InvitationsLoaded(invitations: invitations);
         },
         onError: (error, stackTrace) {
+          final (message, isRetryable) = error is Exception
+              ? InvitationErrorMessages.getErrorMessage(error)
+              : ('Failed to load pending invitations', true);
           return InvitationError(
-            message: 'Failed to load pending invitations: ${error.toString()}',
+            message: message,
             errorCode: 'LOAD_PENDING_INVITATIONS_ERROR',
+            isRetryable: isRetryable,
           );
         },
       );
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? InvitationErrorMessages.getErrorMessage(e)
+          : ('Failed to load pending invitations', true);
       emit(InvitationError(
-        message: 'Failed to load pending invitations: ${e.toString()}',
+        message: message,
         errorCode: 'LOAD_PENDING_INVITATIONS_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -86,9 +99,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
 
       emit(InvitationsLoaded(invitations: invitations));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? InvitationErrorMessages.getErrorMessage(e)
+          : ('Failed to load invitations', true);
       emit(InvitationError(
-        message: 'Failed to load invitations: ${e.toString()}',
+        message: message,
         errorCode: 'LOAD_INVITATIONS_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -107,9 +124,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
 
       emit(InvitationAccepted(invitationId: event.invitationId));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? InvitationErrorMessages.getErrorMessage(e)
+          : ('Failed to accept invitation', true);
       emit(InvitationError(
-        message: 'Failed to accept invitation: ${e.toString()}',
+        message: message,
         errorCode: 'ACCEPT_INVITATION_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -128,9 +149,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
 
       emit(InvitationDeclined(invitationId: event.invitationId));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? InvitationErrorMessages.getErrorMessage(e)
+          : ('Failed to decline invitation', true);
       emit(InvitationError(
-        message: 'Failed to decline invitation: ${e.toString()}',
+        message: message,
         errorCode: 'DECLINE_INVITATION_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -149,9 +174,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
 
       emit(InvitationDeleted(invitationId: event.invitationId));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? InvitationErrorMessages.getErrorMessage(e)
+          : ('Failed to delete invitation', true);
       emit(InvitationError(
-        message: 'Failed to delete invitation: ${e.toString()}',
+        message: message,
         errorCode: 'DELETE_INVITATION_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
