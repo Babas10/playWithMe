@@ -80,14 +80,17 @@ class GameError extends GameState implements ErrorState {
   final String message;
   @override
   final String? errorCode;
+  @override
+  final bool isRetryable;
 
   const GameError({
     required this.message,
     this.errorCode,
+    this.isRetryable = true,
   });
 
   @override
-  List<Object?> get props => [message, errorCode];
+  List<Object?> get props => [message, errorCode, isRetryable];
 }
 
 class GameNotFound extends GameState implements ErrorState {
@@ -95,12 +98,15 @@ class GameNotFound extends GameState implements ErrorState {
   final String message;
   @override
   final String? errorCode;
+  @override
+  final bool isRetryable;
 
   const GameNotFound({
     this.message = 'Game not found',
     this.errorCode,
+    this.isRetryable = false,
   });
 
   @override
-  List<Object?> get props => [message, errorCode];
+  List<Object?> get props => [message, errorCode, isRetryable];
 }

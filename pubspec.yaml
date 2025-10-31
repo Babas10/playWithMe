@@ -67,6 +67,9 @@ dependencies:
   timeago: ^3.7.1
   cloud_functions: ^5.6.2
 
+  # Connectivity
+  connectivity_plus: ^6.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

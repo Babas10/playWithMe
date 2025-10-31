@@ -80,14 +80,17 @@ class GroupError extends GroupState implements ErrorState {
   final String message;
   @override
   final String? errorCode;
+  @override
+  final bool isRetryable;
 
   const GroupError({
     required this.message,
     this.errorCode,
+    this.isRetryable = true,
   });
 
   @override
-  List<Object?> get props => [message, errorCode];
+  List<Object?> get props => [message, errorCode, isRetryable];
 }
 
 class GroupNotFound extends GroupState implements ErrorState {
@@ -95,12 +98,15 @@ class GroupNotFound extends GroupState implements ErrorState {
   final String message;
   @override
   final String? errorCode;
+  @override
+  final bool isRetryable;
 
   const GroupNotFound({
     this.message = 'Group not found',
     this.errorCode,
+    this.isRetryable = false,
   });
 
   @override
-  List<Object?> get props => [message, errorCode];
+  List<Object?> get props => [message, errorCode, isRetryable];
 }

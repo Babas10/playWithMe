@@ -58,14 +58,17 @@ class UserError extends UserState implements ErrorState {
   final String message;
   @override
   final String? errorCode;
+  @override
+  final bool isRetryable;
 
   const UserError({
     required this.message,
     this.errorCode,
+    this.isRetryable = true,
   });
 
   @override
-  List<Object?> get props => [message, errorCode];
+  List<Object?> get props => [message, errorCode, isRetryable];
 }
 
 class UserNotFound extends UserState implements ErrorState {
@@ -73,12 +76,15 @@ class UserNotFound extends UserState implements ErrorState {
   final String message;
   @override
   final String? errorCode;
+  @override
+  final bool isRetryable;
 
   const UserNotFound({
     this.message = 'User not found',
     this.errorCode,
+    this.isRetryable = false,
   });
 
   @override
-  List<Object?> get props => [message, errorCode];
+  List<Object?> get props => [message, errorCode, isRetryable];
 }
