@@ -12,6 +12,7 @@ import 'package:play_with_me/features/profile/presentation/pages/profile_edit_pa
 import 'package:play_with_me/features/profile/presentation/widgets/profile_actions.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_header.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_info_card.dart';
+import 'package:play_with_me/features/notifications/presentation/pages/notification_settings_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Profile page displaying user information and account details
@@ -92,6 +93,13 @@ class _ProfileContent extends StatelessWidget {
                       child: ProfileEditPage(user: state.user),
                     ),
                   ),
+                ),
+              );
+            },
+            onNotificationSettings: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const NotificationSettingsPage(),
                 ),
               );
             },
