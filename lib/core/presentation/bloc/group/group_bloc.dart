@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../data/models/group_model.dart';
+import '../../../utils/error_messages.dart';
 import 'group_event.dart';
 import 'group_state.dart';
 
@@ -40,9 +41,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         emit(const GroupNotFound(message: 'Group not found'));
       }
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to load group', true);
       emit(GroupError(
-        message: 'Failed to load group: ${e.toString()}',
+        message: message,
         errorCode: 'LOAD_GROUP_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -67,16 +72,24 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
           return GroupsLoaded(groups: groups);
         },
         onError: (error, stackTrace) {
+          final (message, isRetryable) = error is Exception
+              ? GroupErrorMessages.getErrorMessage(error)
+              : ('Failed to load user groups', true);
           return GroupError(
-            message: 'Failed to load user groups: ${error.toString()}',
+            message: message,
             errorCode: 'LOAD_USER_GROUPS_ERROR',
+            isRetryable: isRetryable,
           );
         },
       );
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to load user groups', true);
       emit(GroupError(
-        message: 'Failed to load user groups: ${e.toString()}',
+        message: message,
         errorCode: 'LOAD_USER_GROUPS_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -96,9 +109,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         group: createdGroup,
       ));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to create group', true);
       emit(GroupError(
-        message: 'Failed to create group: ${e.toString()}',
+        message: message,
         errorCode: 'CREATE_GROUP_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -130,9 +147,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         ));
       }
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to update group info', true);
       emit(GroupError(
-        message: 'Failed to update group info: ${e.toString()}',
+        message: message,
         errorCode: 'UPDATE_GROUP_INFO_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -166,9 +187,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         ));
       }
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to update group settings', true);
       emit(GroupError(
-        message: 'Failed to update group settings: ${e.toString()}',
+        message: message,
         errorCode: 'UPDATE_GROUP_SETTINGS_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -194,9 +219,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         ));
       }
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to add member', true);
       emit(GroupError(
-        message: 'Failed to add member: ${e.toString()}',
+        message: message,
         errorCode: 'ADD_MEMBER_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -222,9 +251,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         ));
       }
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to remove member', true);
       emit(GroupError(
-        message: 'Failed to remove member: ${e.toString()}',
+        message: message,
         errorCode: 'REMOVE_MEMBER_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -250,9 +283,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         ));
       }
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to promote member', true);
       emit(GroupError(
-        message: 'Failed to promote member: ${e.toString()}',
+        message: message,
         errorCode: 'PROMOTE_MEMBER_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -278,9 +315,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         ));
       }
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to demote admin', true);
       emit(GroupError(
-        message: 'Failed to demote admin: ${e.toString()}',
+        message: message,
         errorCode: 'DEMOTE_ADMIN_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -299,9 +340,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       emit(GroupsLoaded(groups: groups));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to search groups', true);
       emit(GroupError(
-        message: 'Failed to search groups: ${e.toString()}',
+        message: message,
         errorCode: 'SEARCH_GROUPS_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -316,9 +361,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       final stats = await _groupRepository.getGroupStats(event.groupId);
       emit(GroupStatsLoaded(stats: stats));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to load group stats', true);
       emit(GroupError(
-        message: 'Failed to load group stats: ${e.toString()}',
+        message: message,
         errorCode: 'LOAD_GROUP_STATS_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }
@@ -336,9 +385,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         message: 'Group deleted successfully',
       ));
     } catch (e) {
+      final (message, isRetryable) = e is Exception
+          ? GroupErrorMessages.getErrorMessage(e)
+          : ('Failed to delete group', true);
       emit(GroupError(
-        message: 'Failed to delete group: ${e.toString()}',
+        message: message,
         errorCode: 'DELETE_GROUP_ERROR',
+        isRetryable: isRetryable,
       ));
     }
   }

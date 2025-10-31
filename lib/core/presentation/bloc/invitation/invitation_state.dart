@@ -79,12 +79,15 @@ class InvitationError extends InvitationState implements ErrorState {
   final String message;
   @override
   final String? errorCode;
+  @override
+  final bool isRetryable;
 
   const InvitationError({
     required this.message,
     this.errorCode,
+    this.isRetryable = true,
   });
 
   @override
-  List<Object?> get props => [message, errorCode];
+  List<Object?> get props => [message, errorCode, isRetryable];
 }

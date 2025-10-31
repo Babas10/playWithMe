@@ -4,16 +4,44 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 import '../../domain/repositories/group_repository.dart';
+import '../../utils/error_messages.dart';
 import '../models/group_model.dart';
 
 class FirestoreGroupRepository implements GroupRepository {
   final FirebaseFirestore _firestore;
 
   static const String _collection = 'groups';
+  static const int _maxRetries = 3;
+  static const Duration _retryDelay = Duration(seconds: 2);
 
   FirestoreGroupRepository({
     FirebaseFirestore? firestore,
   }) : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  /// Retry operation with exponential backoff for retryable errors.
+  Future<T> _retryOperation<T>(
+    Future<T> Function() operation, {
+    int maxRetries = _maxRetries,
+    Duration delayBetweenRetries = _retryDelay,
+  }) async {
+    int attempts = 0;
+    while (attempts < maxRetries) {
+      try {
+        return await operation();
+      } on FirebaseException catch (e) {
+        attempts++;
+        if (attempts >= maxRetries || !ErrorMessages.isRetryableError(e)) {
+          rethrow;
+        }
+        // Exponential backoff: delay * 2^(attempts-1)
+        await Future.delayed(delayBetweenRetries * attempts);
+      } catch (e) {
+        // For non-Firebase exceptions, rethrow immediately
+        rethrow;
+      }
+    }
+    throw Exception('Max retries exceeded');
+  }
 
   @override
   Future<GroupModel?> getGroupById(String groupId) async {
@@ -76,16 +104,18 @@ class FirestoreGroupRepository implements GroupRepository {
 
   @override
   Future<String> createGroup(GroupModel group) async {
-    try {
-      final data = group.toFirestore();
+    return _retryOperation(() async {
+      try {
+        final data = group.toFirestore();
 
-      final docRef = await _firestore
-          .collection(_collection)
-          .add(data);
-      return docRef.id;
-    } catch (e) {
-      throw Exception('Failed to create group: $e');
-    }
+        final docRef = await _firestore
+            .collection(_collection)
+            .add(data);
+        return docRef.id;
+      } catch (e) {
+        throw Exception('Failed to create group: $e');
+      }
+    });
   }
 
   @override
@@ -95,26 +125,28 @@ class FirestoreGroupRepository implements GroupRepository {
     String? photoUrl,
     String? location,
   }) async {
-    try {
-      final currentGroup = await getGroupById(groupId);
-      if (currentGroup == null) {
-        throw Exception('Group not found');
+    return _retryOperation(() async {
+      try {
+        final currentGroup = await getGroupById(groupId);
+        if (currentGroup == null) {
+          throw Exception('Group not found');
+        }
+
+        final updatedGroup = currentGroup.updateInfo(
+          name: name,
+          description: description,
+          photoUrl: photoUrl,
+          location: location,
+        );
+
+        await _firestore
+            .collection(_collection)
+            .doc(groupId)
+            .set(updatedGroup.toFirestore(), SetOptions(merge: true));
+      } catch (e) {
+        throw Exception('Failed to update group info: $e');
       }
-
-      final updatedGroup = currentGroup.updateInfo(
-        name: name,
-        description: description,
-        photoUrl: photoUrl,
-        location: location,
-      );
-
-      await _firestore
-          .collection(_collection)
-          .doc(groupId)
-          .set(updatedGroup.toFirestore(), SetOptions(merge: true));
-    } catch (e) {
-      throw Exception('Failed to update group info: $e');
-    }
+    });
   }
 
   @override
@@ -152,21 +184,23 @@ class FirestoreGroupRepository implements GroupRepository {
 
   @override
   Future<void> addMember(String groupId, String userId) async {
-    try {
-      final currentGroup = await getGroupById(groupId);
-      if (currentGroup == null) {
-        throw Exception('Group not found');
+    return _retryOperation(() async {
+      try {
+        final currentGroup = await getGroupById(groupId);
+        if (currentGroup == null) {
+          throw Exception('Group not found');
+        }
+
+        final updatedGroup = currentGroup.addMember(userId);
+
+        await _firestore
+            .collection(_collection)
+            .doc(groupId)
+            .set(updatedGroup.toFirestore(), SetOptions(merge: true));
+      } catch (e) {
+        throw Exception('Failed to add member: $e');
       }
-
-      final updatedGroup = currentGroup.addMember(userId);
-
-      await _firestore
-          .collection(_collection)
-          .doc(groupId)
-          .set(updatedGroup.toFirestore(), SetOptions(merge: true));
-    } catch (e) {
-      throw Exception('Failed to add member: $e');
-    }
+    });
   }
 
   @override

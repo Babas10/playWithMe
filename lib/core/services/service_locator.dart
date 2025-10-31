@@ -37,9 +37,22 @@ Future<void> initializeDependencies() async {
     sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
   }
 
-  // Register Firestore
+  // Register Firestore with offline persistence enabled
   if (!sl.isRegistered<FirebaseFirestore>()) {
-    sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+    sl.registerLazySingleton<FirebaseFirestore>(() {
+      final firestore = FirebaseFirestore.instance;
+      // Configure offline persistence (will only apply on first access)
+      try {
+        firestore.settings = const Settings(
+          persistenceEnabled: true,
+          cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+        );
+      } catch (e) {
+        // Settings can only be set once before first Firestore operation
+        // If it fails, we can safely ignore as it's already configured
+      }
+      return firestore;
+    });
   }
 
   // Register repositories only if not already registered
