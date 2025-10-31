@@ -6,10 +6,12 @@ class ProfileActions extends StatelessWidget {
     super.key,
     required this.onEditProfile,
     required this.onSignOut,
+    this.onNotificationSettings,
   });
 
   final VoidCallback onEditProfile;
   final VoidCallback onSignOut;
+  final VoidCallback? onNotificationSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,15 @@ class ProfileActions extends StatelessWidget {
             icon: const Icon(Icons.settings),
             label: const Text('Account Settings'),
           ),
+          const SizedBox(height: 12),
+
+          // Notification Settings button
+          if (onNotificationSettings != null)
+            OutlinedButton.icon(
+              onPressed: onNotificationSettings,
+              icon: const Icon(Icons.notifications_outlined),
+              label: const Text('Notification Settings'),
+            ),
           const SizedBox(height: 24),
 
           // Sign Out button
