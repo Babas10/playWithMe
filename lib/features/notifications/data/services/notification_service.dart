@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Background message handler (must be top-level function)
 @pragma('vm:entry-point')
@@ -85,24 +87,8 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_channel);
 
-    // For iOS: Get APNS token first, then FCM token
-    try {
-      // Wait for APNS token to be available on iOS
-      final apnsToken = await _fcm.getAPNSToken();
-      if (apnsToken != null) {
-        print('APNS token obtained: ${apnsToken.substring(0, 10)}...');
-      }
-    } catch (e) {
-      print('APNS token not available (may be Android or simulator): $e');
-    }
-
-    // Get and save FCM token
-    final token = await _fcm.getToken();
-    if (token != null) {
-      await _saveTokenToFirestore(token);
-    } else {
-      print('FCM token is null, will retry on token refresh');
-    }
+    // Get and save FCM token with platform-specific handling
+    await _initializeFcmToken();
 
     // Listen for token refresh
     _fcm.onTokenRefresh.listen(_saveTokenToFirestore);
@@ -115,6 +101,50 @@ class NotificationService {
 
     // Handle background messages
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  }
+
+  /// Initialize FCM token with platform-specific handling
+  Future<void> _initializeFcmToken() async {
+    try {
+      // Check if running on iOS (not web, not Android)
+      final isIOS = !kIsWeb && Platform.isIOS;
+
+      if (isIOS) {
+        // On iOS, we need to ensure APNS token is available first
+        print('iOS detected: Checking APNS token availability...');
+
+        // Try to get APNS token with retries
+        String? apnsToken;
+        for (int i = 0; i < 3; i++) {
+          apnsToken = await _fcm.getAPNSToken();
+          if (apnsToken != null) {
+            print('✅ APNS token obtained: ${apnsToken.substring(0, 10)}...');
+            break;
+          }
+          print('⏳ APNS token not available yet, waiting... (attempt ${i + 1}/3)');
+          await Future.delayed(const Duration(seconds: 1));
+        }
+
+        if (apnsToken == null) {
+          print('⚠️ APNS token not available after retries.');
+          print('   This is normal on iOS Simulator (push notifications not supported).');
+          print('   FCM token will be saved when available via onTokenRefresh.');
+          return;
+        }
+      }
+
+      // Get FCM token
+      final token = await _fcm.getToken();
+      if (token != null) {
+        print('✅ FCM token obtained: ${token.substring(0, 20)}...');
+        await _saveTokenToFirestore(token);
+      } else {
+        print('⚠️ FCM token is null, will retry on token refresh');
+      }
+    } catch (e) {
+      print('⚠️ Error initializing FCM token: $e');
+      print('   Token will be saved when available via onTokenRefresh.');
+    }
   }
 
   /// Save FCM token to Firestore
