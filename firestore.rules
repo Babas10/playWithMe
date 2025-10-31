@@ -29,7 +29,18 @@ service cloud.firestore {
 
     // Users can read and write their own user document
     match /users/{userId} {
-      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+      // Users can read their own document
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+
+      // Users can create their own document
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+
+      // Users can update their own document, including notification preferences and FCM tokens
+      // Only allow updating specific fields to prevent unauthorized changes
+      allow update: if isAuthenticated() &&
+                       request.auth.uid == userId &&
+                       // Ensure only safe fields are updated
+                       (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email', 'createdAt']));
 
       // User preferences subcollection - users can read/write their own preferences
       match /preferences/{preferenceId} {
