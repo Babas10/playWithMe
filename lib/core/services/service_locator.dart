@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:play_with_me/features/auth/data/repositories/firebase_auth_repository.dart';
@@ -25,6 +28,9 @@ import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.d
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_bloc.dart';
 import 'package:play_with_me/features/profile/data/repositories/locale_preferences_repository_impl.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
+import 'package:play_with_me/features/notifications/data/repositories/firestore_notification_repository.dart';
+import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
+import 'package:play_with_me/features/notifications/domain/repositories/notification_repository.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -53,6 +59,20 @@ Future<void> initializeDependencies() async {
       }
       return firestore;
     });
+  }
+
+  if (!sl.isRegistered<FirebaseAuth>()) {
+    sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+  }
+
+  if (!sl.isRegistered<FirebaseMessaging>()) {
+    sl.registerLazySingleton<FirebaseMessaging>(() => FirebaseMessaging.instance);
+  }
+
+  if (!sl.isRegistered<FlutterLocalNotificationsPlugin>()) {
+    sl.registerLazySingleton<FlutterLocalNotificationsPlugin>(
+      () => FlutterLocalNotificationsPlugin(),
+    );
   }
 
   // Register repositories only if not already registered
@@ -104,10 +124,30 @@ Future<void> initializeDependencies() async {
     );
   }
 
+  if (!sl.isRegistered<NotificationRepository>()) {
+    sl.registerLazySingleton<NotificationRepository>(
+      () => FirestoreNotificationRepository(
+        firestore: sl(),
+        auth: sl(),
+      ),
+    );
+  }
+
   // Register services
   if (!sl.isRegistered<ImagePickerService>()) {
     sl.registerLazySingleton<ImagePickerService>(
       () => ImagePickerService(),
+    );
+  }
+
+  if (!sl.isRegistered<NotificationService>()) {
+    sl.registerLazySingleton<NotificationService>(
+      () => NotificationService(
+        fcm: sl(),
+        localNotifications: sl(),
+        firestore: sl(),
+        auth: sl(),
+      ),
     );
   }
 

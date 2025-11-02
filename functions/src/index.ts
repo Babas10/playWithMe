@@ -11,3 +11,13 @@ export {acceptInvitation} from "./acceptInvitation";
 export {declineInvitation} from "./declineInvitation";
 export {getUsersByIds} from "./getUsersByIds";
 export {leaveGroup} from "./leaveGroup";
+
+// Export notification functions
+export {
+  onInvitationCreated,
+  onInvitationAccepted,
+  onGameCreated,
+  onMemberJoined,
+  onMemberLeft,
+  onRoleChanged,
+} from "./notifications";

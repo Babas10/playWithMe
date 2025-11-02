@@ -25,6 +25,7 @@ mixin _$UserEntity {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get lastSignInAt => throw _privateConstructorUsedError;
   bool get isAnonymous => throw _privateConstructorUsedError;
+  List<String> get fcmTokens => throw _privateConstructorUsedError;
 
   /// Create a copy of UserEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -49,6 +50,7 @@ abstract class $UserEntityCopyWith<$Res> {
     DateTime? createdAt,
     DateTime? lastSignInAt,
     bool isAnonymous,
+    List<String> fcmTokens,
   });
 }
 
@@ -75,6 +77,7 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
     Object? createdAt = freezed,
     Object? lastSignInAt = freezed,
     Object? isAnonymous = null,
+    Object? fcmTokens = null,
   }) {
     return _then(
       _value.copyWith(
@@ -110,6 +113,10 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
                 ? _value.isAnonymous
                 : isAnonymous // ignore: cast_nullable_to_non_nullable
                       as bool,
+            fcmTokens: null == fcmTokens
+                ? _value.fcmTokens
+                : fcmTokens // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
           )
           as $Val,
     );
@@ -134,6 +141,7 @@ abstract class _$$UserEntityImplCopyWith<$Res>
     DateTime? createdAt,
     DateTime? lastSignInAt,
     bool isAnonymous,
+    List<String> fcmTokens,
   });
 }
 
@@ -159,6 +167,7 @@ class __$$UserEntityImplCopyWithImpl<$Res>
     Object? createdAt = freezed,
     Object? lastSignInAt = freezed,
     Object? isAnonymous = null,
+    Object? fcmTokens = null,
   }) {
     return _then(
       _$UserEntityImpl(
@@ -194,6 +203,10 @@ class __$$UserEntityImplCopyWithImpl<$Res>
             ? _value.isAnonymous
             : isAnonymous // ignore: cast_nullable_to_non_nullable
                   as bool,
+        fcmTokens: null == fcmTokens
+            ? _value._fcmTokens
+            : fcmTokens // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
       ),
     );
   }
@@ -211,7 +224,9 @@ class _$UserEntityImpl extends _UserEntity {
     this.createdAt,
     this.lastSignInAt,
     required this.isAnonymous,
-  }) : super._();
+    final List<String> fcmTokens = const [],
+  }) : _fcmTokens = fcmTokens,
+       super._();
 
   @override
   final String uid;
@@ -229,10 +244,18 @@ class _$UserEntityImpl extends _UserEntity {
   final DateTime? lastSignInAt;
   @override
   final bool isAnonymous;
+  final List<String> _fcmTokens;
+  @override
+  @JsonKey()
+  List<String> get fcmTokens {
+    if (_fcmTokens is EqualUnmodifiableListView) return _fcmTokens;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_fcmTokens);
+  }
 
   @override
   String toString() {
-    return 'UserEntity(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, isAnonymous: $isAnonymous)';
+    return 'UserEntity(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, isAnonymous: $isAnonymous, fcmTokens: $fcmTokens)';
   }
 
   @override
@@ -253,7 +276,11 @@ class _$UserEntityImpl extends _UserEntity {
             (identical(other.lastSignInAt, lastSignInAt) ||
                 other.lastSignInAt == lastSignInAt) &&
             (identical(other.isAnonymous, isAnonymous) ||
-                other.isAnonymous == isAnonymous));
+                other.isAnonymous == isAnonymous) &&
+            const DeepCollectionEquality().equals(
+              other._fcmTokens,
+              _fcmTokens,
+            ));
   }
 
   @override
@@ -267,6 +294,7 @@ class _$UserEntityImpl extends _UserEntity {
     createdAt,
     lastSignInAt,
     isAnonymous,
+    const DeepCollectionEquality().hash(_fcmTokens),
   );
 
   /// Create a copy of UserEntity
@@ -288,6 +316,7 @@ abstract class _UserEntity extends UserEntity {
     final DateTime? createdAt,
     final DateTime? lastSignInAt,
     required final bool isAnonymous,
+    final List<String> fcmTokens,
   }) = _$UserEntityImpl;
   const _UserEntity._() : super._();
 
@@ -307,6 +336,8 @@ abstract class _UserEntity extends UserEntity {
   DateTime? get lastSignInAt;
   @override
   bool get isAnonymous;
+  @override
+  List<String> get fcmTokens;
 
   /// Create a copy of UserEntity
   /// with the given fields replaced by the non-null parameter values.

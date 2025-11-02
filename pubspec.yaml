@@ -70,6 +70,10 @@ dependencies:
   # Connectivity
   connectivity_plus: ^6.1.2
 
+  # Push Notifications
+  firebase_messaging: ^15.1.5
+  flutter_local_notifications: ^18.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
