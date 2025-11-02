@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -27,6 +28,7 @@ import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.d
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
+import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -127,6 +129,9 @@ class _HomePageState extends State<HomePage> {
     if (authState is AuthenticationAuthenticated) {
       _groupBloc.add(LoadGroupsForUser(userId: authState.user.uid));
       _invitationBloc.add(LoadPendingInvitations(userId: authState.user.uid));
+
+      // Initialize notification service
+      _initializeNotifications();
     }
 
     _pages = [
@@ -136,6 +141,51 @@ class _HomePageState extends State<HomePage> {
         child: const GroupListPage(),
       ),
     ];
+  }
+
+  Future<void> _initializeNotifications() async {
+    try {
+      final notificationService = sl<NotificationService>();
+      await notificationService.initialize(
+        onMessageTapped: _handleNotificationTap,
+      );
+    } catch (e) {
+      debugPrint('Failed to initialize notifications: $e');
+    }
+  }
+
+  void _handleNotificationTap(RemoteMessage message) {
+    final data = message.data;
+    final type = data['type'] as String?;
+    final groupId = data['groupId'] as String?;
+
+    if (!mounted) return;
+
+    switch (type) {
+      case 'invitation':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider<InvitationBloc>.value(
+              value: _invitationBloc,
+              child: const PendingInvitationsPage(),
+            ),
+          ),
+        );
+        break;
+      case 'game_created':
+        // Navigate to game details (not yet implemented in this story)
+        debugPrint('Game created notification tapped: ${data['gameId']}');
+        break;
+      case 'member_joined':
+      case 'member_left':
+      case 'role_changed':
+        // Navigate to group details (not yet implemented in this story)
+        debugPrint('Group event notification tapped for group: $groupId');
+        break;
+      default:
+        debugPrint('Unknown notification type: $type');
+    }
   }
 
   @override

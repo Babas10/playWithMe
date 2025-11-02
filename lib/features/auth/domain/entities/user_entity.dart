@@ -13,6 +13,7 @@ class UserEntity with _$UserEntity {
     DateTime? createdAt,
     DateTime? lastSignInAt,
     required bool isAnonymous,
+    @Default([]) List<String> fcmTokens,
   }) = _UserEntity;
 
   const UserEntity._();
