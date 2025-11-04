@@ -15,6 +15,9 @@ void main() {
         expect(preferences.memberJoined, false);
         expect(preferences.memberLeft, false);
         expect(preferences.roleChanged, true);
+        expect(preferences.friendRequestReceived, true);
+        expect(preferences.friendRequestAccepted, true);
+        expect(preferences.friendRemoved, false);
         expect(preferences.quietHoursEnabled, false);
         expect(preferences.quietHoursStart, null);
         expect(preferences.quietHoursEnd, null);
@@ -29,6 +32,9 @@ void main() {
           memberJoined: true,
           memberLeft: true,
           roleChanged: false,
+          friendRequestReceived: false,
+          friendRequestAccepted: false,
+          friendRemoved: true,
           quietHoursEnabled: true,
           quietHoursStart: '22:00',
           quietHoursEnd: '08:00',
@@ -41,6 +47,9 @@ void main() {
         expect(preferences.memberJoined, true);
         expect(preferences.memberLeft, true);
         expect(preferences.roleChanged, false);
+        expect(preferences.friendRequestReceived, false);
+        expect(preferences.friendRequestAccepted, false);
+        expect(preferences.friendRemoved, true);
         expect(preferences.quietHoursEnabled, true);
         expect(preferences.quietHoursStart, '22:00');
         expect(preferences.quietHoursEnd, '08:00');
@@ -197,6 +206,9 @@ void main() {
           memberJoined: false,
           memberLeft: true,
           roleChanged: false,
+          friendRequestReceived: true,
+          friendRequestAccepted: false,
+          friendRemoved: true,
           quietHoursEnabled: true,
           quietHoursStart: '22:00',
           quietHoursEnd: '08:00',
@@ -211,6 +223,9 @@ void main() {
         expect(json['memberJoined'], false);
         expect(json['memberLeft'], true);
         expect(json['roleChanged'], false);
+        expect(json['friendRequestReceived'], true);
+        expect(json['friendRequestAccepted'], false);
+        expect(json['friendRemoved'], true);
         expect(json['quietHoursEnabled'], true);
         expect(json['quietHoursStart'], '22:00');
         expect(json['quietHoursEnd'], '08:00');
@@ -225,6 +240,9 @@ void main() {
           'memberJoined': true,
           'memberLeft': false,
           'roleChanged': true,
+          'friendRequestReceived': false,
+          'friendRequestAccepted': true,
+          'friendRemoved': false,
           'quietHoursEnabled': true,
           'quietHoursStart': '21:00',
           'quietHoursEnd': '07:00',
@@ -239,6 +257,9 @@ void main() {
         expect(preferences.memberJoined, true);
         expect(preferences.memberLeft, false);
         expect(preferences.roleChanged, true);
+        expect(preferences.friendRequestReceived, false);
+        expect(preferences.friendRequestAccepted, true);
+        expect(preferences.friendRemoved, false);
         expect(preferences.quietHoursEnabled, true);
         expect(preferences.quietHoursStart, '21:00');
         expect(preferences.quietHoursEnd, '07:00');
@@ -256,6 +277,9 @@ void main() {
         expect(preferences.memberJoined, false);
         expect(preferences.memberLeft, false);
         expect(preferences.roleChanged, true);
+        expect(preferences.friendRequestReceived, true);
+        expect(preferences.friendRequestAccepted, true);
+        expect(preferences.friendRemoved, false);
         expect(preferences.quietHoursEnabled, false);
         expect(preferences.quietHoursStart, null);
         expect(preferences.quietHoursEnd, null);
@@ -270,6 +294,9 @@ void main() {
           memberJoined: true,
           memberLeft: true,
           roleChanged: false,
+          friendRequestReceived: false,
+          friendRequestAccepted: true,
+          friendRemoved: true,
           quietHoursEnabled: true,
           quietHoursStart: '23:00',
           quietHoursEnd: '07:30',

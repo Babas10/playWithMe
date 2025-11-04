@@ -30,4 +30,8 @@ export {
   onMemberJoined,
   onMemberLeft,
   onRoleChanged,
+  onFriendRequestSent,
+  onFriendRequestAccepted,
+  onFriendRequestDeclined,
+  onFriendRemoved,
 } from "./notifications";

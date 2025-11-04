@@ -631,3 +631,366 @@ export const onRoleChanged = functions.firestore
       return null;
     }
   });
+
+/**
+ * Send notification when a friend request is sent
+ */
+export const onFriendRequestSent = functions.firestore
+  .document("friendships/{friendshipId}")
+  .onCreate(async (snapshot, context) => {
+    const friendship = snapshot.data();
+
+    // Only trigger for pending status (new friend requests)
+    if (friendship.status !== "pending") {
+      return null;
+    }
+
+    const recipientId = friendship.recipientId;
+    const initiatorId = friendship.initiatorId;
+    const friendshipId = context.params.friendshipId;
+
+    try {
+      // Get recipient's FCM tokens
+      const recipientDoc = await admin
+        .firestore()
+        .collection("users")
+        .doc(recipientId)
+        .get();
+
+      const recipientData = recipientDoc.data();
+      if (!recipientData) {
+        console.log(`Recipient ${recipientId} not found`);
+        return null;
+      }
+
+      const fcmTokens = recipientData.fcmTokens || [];
+      if (fcmTokens.length === 0) {
+        console.log(`Recipient ${recipientId} has no FCM tokens`);
+        return null;
+      }
+
+      // Check notification preferences
+      const prefs = recipientData.notificationPreferences || {};
+      if (prefs.friendRequestReceived === false) {
+        console.log(`Recipient ${recipientId} has disabled friend request notifications`);
+        return null;
+      }
+
+      // Check quiet hours
+      if (isQuietHours(prefs.quietHours)) {
+        console.log(`Recipient ${recipientId} is in quiet hours`);
+        return null;
+      }
+
+      // Get initiator details
+      const initiatorDoc = await admin
+        .firestore()
+        .collection("users")
+        .doc(initiatorId)
+        .get();
+
+      const initiatorData = initiatorDoc.data();
+      const initiatorName =
+        friendship.initiatorName ||
+        initiatorData?.displayName ||
+        "Someone";
+
+      // Send notification
+      const message: admin.messaging.MulticastMessage = {
+        tokens: fcmTokens,
+        notification: {
+          title: "Friend Request",
+          body: `${initiatorName} sent you a friend request`,
+          imageUrl: initiatorData?.photoUrl,
+        },
+        data: {
+          type: "friend_request",
+          friendshipId: friendshipId,
+          initiatorId: initiatorId,
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "high_importance_channel",
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              badge: 1,
+              sound: "default",
+            },
+          },
+        },
+      };
+
+      const response = await admin.messaging().sendEachForMulticast(message);
+      console.log(
+        `Successfully sent ${response.successCount} friend request notifications`
+      );
+
+      // Remove invalid tokens
+      if (response.failureCount > 0) {
+        const tokensToRemove: string[] = [];
+        response.responses.forEach((resp, idx) => {
+          if (
+            !resp.success &&
+            (resp.error?.code === "messaging/invalid-registration-token" ||
+              resp.error?.code === "messaging/registration-token-not-registered")
+          ) {
+            tokensToRemove.push(fcmTokens[idx]);
+          }
+        });
+
+        if (tokensToRemove.length > 0) {
+          await admin
+            .firestore()
+            .collection("users")
+            .doc(recipientId)
+            .update({
+              fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+            });
+          console.log(`Removed ${tokensToRemove.length} invalid tokens`);
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error sending friend request notification:", error);
+      return null;
+    }
+  });
+
+/**
+ * Send notification when a friend request is accepted
+ */
+export const onFriendRequestAccepted = functions.firestore
+  .document("friendships/{friendshipId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+
+    // Only trigger if status changed from pending to accepted
+    if (before.status !== "pending" || after.status !== "accepted") {
+      return null;
+    }
+
+    const initiatorId = after.initiatorId;
+    const recipientId = after.recipientId;
+    const friendshipId = context.params.friendshipId;
+
+    try {
+      // Get initiator's FCM tokens
+      const initiatorDoc = await admin
+        .firestore()
+        .collection("users")
+        .doc(initiatorId)
+        .get();
+
+      const initiatorData = initiatorDoc.data();
+      if (!initiatorData) {
+        console.log(`Initiator ${initiatorId} not found`);
+        return null;
+      }
+
+      const fcmTokens = initiatorData.fcmTokens || [];
+      if (fcmTokens.length === 0) {
+        console.log(`Initiator ${initiatorId} has no FCM tokens`);
+        return null;
+      }
+
+      // Check notification preferences
+      const prefs = initiatorData.notificationPreferences || {};
+      if (prefs.friendRequestAccepted === false) {
+        console.log(`Initiator ${initiatorId} has disabled friend request accepted notifications`);
+        return null;
+      }
+
+      // Check quiet hours
+      if (isQuietHours(prefs.quietHours)) {
+        console.log(`Initiator ${initiatorId} is in quiet hours`);
+        return null;
+      }
+
+      // Get recipient details
+      const recipientDoc = await admin
+        .firestore()
+        .collection("users")
+        .doc(recipientId)
+        .get();
+
+      const recipientData = recipientDoc.data();
+      const recipientName =
+        after.recipientName ||
+        recipientData?.displayName ||
+        "Someone";
+
+      // Update both users' friendIds cache and friendCount
+      const db = admin.firestore();
+      await db.runTransaction(async (transaction) => {
+        const initiatorRef = db.collection("users").doc(initiatorId);
+        const recipientRef = db.collection("users").doc(recipientId);
+
+        transaction.update(initiatorRef, {
+          friendIds: admin.firestore.FieldValue.arrayUnion(recipientId),
+          friendCount: admin.firestore.FieldValue.increment(1),
+        });
+
+        transaction.update(recipientRef, {
+          friendIds: admin.firestore.FieldValue.arrayUnion(initiatorId),
+          friendCount: admin.firestore.FieldValue.increment(1),
+        });
+      });
+
+      console.log(`Updated friend caches for users ${initiatorId} and ${recipientId}`);
+
+      // Send notification
+      const message: admin.messaging.MulticastMessage = {
+        tokens: fcmTokens,
+        notification: {
+          title: "Friend Request Accepted",
+          body: `${recipientName} accepted your friend request`,
+          imageUrl: recipientData?.photoUrl,
+        },
+        data: {
+          type: "friend_accepted",
+          friendshipId: friendshipId,
+          recipientId: recipientId,
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "high_importance_channel",
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              badge: 1,
+              sound: "default",
+            },
+          },
+        },
+      };
+
+      const response = await admin.messaging().sendEachForMulticast(message);
+      console.log(
+        `Successfully sent ${response.successCount} friend request accepted notifications`
+      );
+
+      // Remove invalid tokens
+      if (response.failureCount > 0) {
+        const tokensToRemove: string[] = [];
+        response.responses.forEach((resp, idx) => {
+          if (
+            !resp.success &&
+            (resp.error?.code === "messaging/invalid-registration-token" ||
+              resp.error?.code === "messaging/registration-token-not-registered")
+          ) {
+            tokensToRemove.push(fcmTokens[idx]);
+          }
+        });
+
+        if (tokensToRemove.length > 0) {
+          await admin
+            .firestore()
+            .collection("users")
+            .doc(initiatorId)
+            .update({
+              fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+            });
+          console.log(`Removed ${tokensToRemove.length} invalid tokens`);
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error sending friend request accepted notification:", error);
+      return null;
+    }
+  });
+
+/**
+ * Silent cleanup when a friend request is declined
+ */
+export const onFriendRequestDeclined = functions.firestore
+  .document("friendships/{friendshipId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+
+    // Only trigger if status changed from pending to declined
+    if (before.status !== "pending" || after.status !== "declined") {
+      return null;
+    }
+
+    // Silent cleanup - no notification sent
+    // Log for analytics
+    console.log(
+      `Friend request ${context.params.friendshipId} declined by ${after.recipientId}`
+    );
+
+    return null;
+  });
+
+/**
+ * Handle friend removal (cleanup caches)
+ */
+export const onFriendRemoved = functions.firestore
+  .document("friendships/{friendshipId}")
+  .onDelete(async (snapshot, context) => {
+    const friendship = snapshot.data();
+
+    // Only process if friendship was accepted
+    if (friendship.status !== "accepted") {
+      console.log(
+        `Friendship ${context.params.friendshipId} deleted with status ${friendship.status}, no cache cleanup needed`
+      );
+      return null;
+    }
+
+    const initiatorId = friendship.initiatorId;
+    const recipientId = friendship.recipientId;
+
+    try {
+      // Update both users' friendIds cache and friendCount
+      const db = admin.firestore();
+      await db.runTransaction(async (transaction) => {
+        const initiatorRef = db.collection("users").doc(initiatorId);
+        const recipientRef = db.collection("users").doc(recipientId);
+
+        // Get current user documents to safely decrement
+        const initiatorDoc = await transaction.get(initiatorRef);
+        const recipientDoc = await transaction.get(recipientRef);
+
+        if (initiatorDoc.exists) {
+          transaction.update(initiatorRef, {
+            friendIds: admin.firestore.FieldValue.arrayRemove(recipientId),
+            friendCount: admin.firestore.FieldValue.increment(-1),
+          });
+        }
+
+        if (recipientDoc.exists) {
+          transaction.update(recipientRef, {
+            friendIds: admin.firestore.FieldValue.arrayRemove(initiatorId),
+            friendCount: admin.firestore.FieldValue.increment(-1),
+          });
+        }
+      });
+
+      console.log(
+        `Updated friend caches after removal for users ${initiatorId} and ${recipientId}`
+      );
+
+      // Optional: Notify the other user
+      // For now, we'll skip notification as specified (friendRemoved default is false)
+      // Future enhancement: Check both users' preferences and notify if enabled
+
+      return null;
+    } catch (error) {
+      console.error("Error handling friend removal:", error);
+      return null;
+    }
+  });
