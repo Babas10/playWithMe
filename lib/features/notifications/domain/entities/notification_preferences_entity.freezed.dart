@@ -29,6 +29,9 @@ mixin _$NotificationPreferencesEntity {
   bool get memberJoined => throw _privateConstructorUsedError;
   bool get memberLeft => throw _privateConstructorUsedError;
   bool get roleChanged => throw _privateConstructorUsedError;
+  bool get friendRequestReceived => throw _privateConstructorUsedError;
+  bool get friendRequestAccepted => throw _privateConstructorUsedError;
+  bool get friendRemoved => throw _privateConstructorUsedError;
   bool get quietHoursEnabled => throw _privateConstructorUsedError;
   String? get quietHoursStart => throw _privateConstructorUsedError;
   String? get quietHoursEnd => throw _privateConstructorUsedError;
@@ -62,6 +65,9 @@ abstract class $NotificationPreferencesEntityCopyWith<$Res> {
     bool memberJoined,
     bool memberLeft,
     bool roleChanged,
+    bool friendRequestReceived,
+    bool friendRequestAccepted,
+    bool friendRemoved,
     bool quietHoursEnabled,
     String? quietHoursStart,
     String? quietHoursEnd,
@@ -93,6 +99,9 @@ class _$NotificationPreferencesEntityCopyWithImpl<
     Object? memberJoined = null,
     Object? memberLeft = null,
     Object? roleChanged = null,
+    Object? friendRequestReceived = null,
+    Object? friendRequestAccepted = null,
+    Object? friendRemoved = null,
     Object? quietHoursEnabled = null,
     Object? quietHoursStart = freezed,
     Object? quietHoursEnd = freezed,
@@ -123,6 +132,18 @@ class _$NotificationPreferencesEntityCopyWithImpl<
             roleChanged: null == roleChanged
                 ? _value.roleChanged
                 : roleChanged // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            friendRequestReceived: null == friendRequestReceived
+                ? _value.friendRequestReceived
+                : friendRequestReceived // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            friendRequestAccepted: null == friendRequestAccepted
+                ? _value.friendRequestAccepted
+                : friendRequestAccepted // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            friendRemoved: null == friendRemoved
+                ? _value.friendRemoved
+                : friendRemoved // ignore: cast_nullable_to_non_nullable
                       as bool,
             quietHoursEnabled: null == quietHoursEnabled
                 ? _value.quietHoursEnabled
@@ -162,6 +183,9 @@ abstract class _$$NotificationPreferencesEntityImplCopyWith<$Res>
     bool memberJoined,
     bool memberLeft,
     bool roleChanged,
+    bool friendRequestReceived,
+    bool friendRequestAccepted,
+    bool friendRemoved,
     bool quietHoursEnabled,
     String? quietHoursStart,
     String? quietHoursEnd,
@@ -193,6 +217,9 @@ class __$$NotificationPreferencesEntityImplCopyWithImpl<$Res>
     Object? memberJoined = null,
     Object? memberLeft = null,
     Object? roleChanged = null,
+    Object? friendRequestReceived = null,
+    Object? friendRequestAccepted = null,
+    Object? friendRemoved = null,
     Object? quietHoursEnabled = null,
     Object? quietHoursStart = freezed,
     Object? quietHoursEnd = freezed,
@@ -223,6 +250,18 @@ class __$$NotificationPreferencesEntityImplCopyWithImpl<$Res>
         roleChanged: null == roleChanged
             ? _value.roleChanged
             : roleChanged // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        friendRequestReceived: null == friendRequestReceived
+            ? _value.friendRequestReceived
+            : friendRequestReceived // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        friendRequestAccepted: null == friendRequestAccepted
+            ? _value.friendRequestAccepted
+            : friendRequestAccepted // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        friendRemoved: null == friendRemoved
+            ? _value.friendRemoved
+            : friendRemoved // ignore: cast_nullable_to_non_nullable
                   as bool,
         quietHoursEnabled: null == quietHoursEnabled
             ? _value.quietHoursEnabled
@@ -256,6 +295,9 @@ class _$NotificationPreferencesEntityImpl
     this.memberJoined = false,
     this.memberLeft = false,
     this.roleChanged = true,
+    this.friendRequestReceived = true,
+    this.friendRequestAccepted = true,
+    this.friendRemoved = false,
     this.quietHoursEnabled = false,
     this.quietHoursStart,
     this.quietHoursEnd,
@@ -287,6 +329,15 @@ class _$NotificationPreferencesEntityImpl
   final bool roleChanged;
   @override
   @JsonKey()
+  final bool friendRequestReceived;
+  @override
+  @JsonKey()
+  final bool friendRequestAccepted;
+  @override
+  @JsonKey()
+  final bool friendRemoved;
+  @override
+  @JsonKey()
   final bool quietHoursEnabled;
   @override
   final String? quietHoursStart;
@@ -303,7 +354,7 @@ class _$NotificationPreferencesEntityImpl
 
   @override
   String toString() {
-    return 'NotificationPreferencesEntity(groupInvitations: $groupInvitations, invitationAccepted: $invitationAccepted, gameCreated: $gameCreated, memberJoined: $memberJoined, memberLeft: $memberLeft, roleChanged: $roleChanged, quietHoursEnabled: $quietHoursEnabled, quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, groupSpecific: $groupSpecific)';
+    return 'NotificationPreferencesEntity(groupInvitations: $groupInvitations, invitationAccepted: $invitationAccepted, gameCreated: $gameCreated, memberJoined: $memberJoined, memberLeft: $memberLeft, roleChanged: $roleChanged, friendRequestReceived: $friendRequestReceived, friendRequestAccepted: $friendRequestAccepted, friendRemoved: $friendRemoved, quietHoursEnabled: $quietHoursEnabled, quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, groupSpecific: $groupSpecific)';
   }
 
   @override
@@ -323,6 +374,12 @@ class _$NotificationPreferencesEntityImpl
                 other.memberLeft == memberLeft) &&
             (identical(other.roleChanged, roleChanged) ||
                 other.roleChanged == roleChanged) &&
+            (identical(other.friendRequestReceived, friendRequestReceived) ||
+                other.friendRequestReceived == friendRequestReceived) &&
+            (identical(other.friendRequestAccepted, friendRequestAccepted) ||
+                other.friendRequestAccepted == friendRequestAccepted) &&
+            (identical(other.friendRemoved, friendRemoved) ||
+                other.friendRemoved == friendRemoved) &&
             (identical(other.quietHoursEnabled, quietHoursEnabled) ||
                 other.quietHoursEnabled == quietHoursEnabled) &&
             (identical(other.quietHoursStart, quietHoursStart) ||
@@ -345,6 +402,9 @@ class _$NotificationPreferencesEntityImpl
     memberJoined,
     memberLeft,
     roleChanged,
+    friendRequestReceived,
+    friendRequestAccepted,
+    friendRemoved,
     quietHoursEnabled,
     quietHoursStart,
     quietHoursEnd,
@@ -379,6 +439,9 @@ abstract class _NotificationPreferencesEntity
     final bool memberJoined,
     final bool memberLeft,
     final bool roleChanged,
+    final bool friendRequestReceived,
+    final bool friendRequestAccepted,
+    final bool friendRemoved,
     final bool quietHoursEnabled,
     final String? quietHoursStart,
     final String? quietHoursEnd,
@@ -401,6 +464,12 @@ abstract class _NotificationPreferencesEntity
   bool get memberLeft;
   @override
   bool get roleChanged;
+  @override
+  bool get friendRequestReceived;
+  @override
+  bool get friendRequestAccepted;
+  @override
+  bool get friendRemoved;
   @override
   bool get quietHoursEnabled;
   @override
