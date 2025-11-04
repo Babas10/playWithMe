@@ -38,7 +38,6 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
   final TextEditingController _searchController = TextEditingController();
   late final FirebaseFunctions _functions;
   late final GroupRepository _groupRepository;
-  late final InvitationRepository _invitationRepository;
 
   UserModel? _searchResult; // Single user result
   List<String> _memberIds = [];
@@ -52,7 +51,6 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
     super.initState();
     _functions = widget.functionsOverride ?? FirebaseFunctions.instance;
     _groupRepository = widget.groupRepositoryOverride ?? sl<GroupRepository>();
-    _invitationRepository = widget.invitationRepositoryOverride ?? sl<InvitationRepository>();
     _loadGroupMembers();
   }
 

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/core/utils/countries.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
-import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_state.dart';
