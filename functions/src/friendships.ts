@@ -1,0 +1,744 @@
+// Cloud Functions for managing friendships in the social graph
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+
+// ============================================================================
+// Type Definitions
+// ============================================================================
+
+interface UserProfile {
+  uid: string;
+  displayName: string | null;
+  email: string;
+  photoUrl?: string | null;
+}
+
+interface SendFriendRequestRequest {
+  targetUserId: string;
+}
+
+interface SendFriendRequestResponse {
+  success: boolean;
+  friendshipId: string;
+}
+
+interface AcceptFriendRequestRequest {
+  friendshipId: string;
+}
+
+interface AcceptFriendRequestResponse {
+  success: boolean;
+}
+
+interface DeclineFriendRequestRequest {
+  friendshipId: string;
+}
+
+interface DeclineFriendRequestResponse {
+  success: boolean;
+}
+
+interface RemoveFriendRequest {
+  friendshipId: string;
+}
+
+interface RemoveFriendResponse {
+  success: boolean;
+}
+
+interface GetFriendsRequest {
+  userId?: string;
+}
+
+interface GetFriendsResponse {
+  friends: UserProfile[];
+}
+
+interface CheckFriendshipStatusRequest {
+  userId: string;
+}
+
+interface CheckFriendshipStatusResponse {
+  isFriend: boolean;
+  hasPendingRequest: boolean;
+  requestDirection?: "sent" | "received";
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Check if a user exists in Firestore
+ */
+async function userExists(userId: string): Promise<boolean> {
+  const db = admin.firestore();
+  const userDoc = await db.collection("users").doc(userId).get();
+  return userDoc.exists;
+}
+
+/**
+ * Get user profile data
+ */
+async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  const db = admin.firestore();
+  const userDoc = await db.collection("users").doc(userId).get();
+
+  if (!userDoc.exists) {
+    return null;
+  }
+
+  const userData = userDoc.data()!;
+  return {
+    uid: userDoc.id,
+    displayName: userData.displayName || null,
+    email: userData.email,
+    photoUrl: userData.photoUrl || null,
+  };
+}
+
+/**
+ * Check if a friendship exists between two users (in either direction)
+ */
+async function findExistingFriendship(
+  userId1: string,
+  userId2: string
+): Promise<FirebaseFirestore.QueryDocumentSnapshot | null> {
+  const db = admin.firestore();
+  const friendshipsRef = db.collection("friendships");
+
+  // Check direction 1: userId1 -> userId2
+  const query1 = await friendshipsRef
+    .where("initiatorId", "==", userId1)
+    .where("recipientId", "==", userId2)
+    .limit(1)
+    .get();
+
+  if (!query1.empty) {
+    return query1.docs[0];
+  }
+
+  // Check direction 2: userId2 -> userId1
+  const query2 = await friendshipsRef
+    .where("initiatorId", "==", userId2)
+    .where("recipientId", "==", userId1)
+    .limit(1)
+    .get();
+
+  if (!query2.empty) {
+    return query2.docs[0];
+  }
+
+  return null;
+}
+
+// ============================================================================
+// Function 1: Send Friend Request
+// ============================================================================
+
+/**
+ * Handler for sending a friend request
+ */
+export async function sendFriendRequestHandler(
+  data: SendFriendRequestRequest,
+  context: functions.https.CallableContext
+): Promise<SendFriendRequestResponse> {
+  // Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated to send friend requests"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // Validate input
+  if (!data || typeof data.targetUserId !== "string") {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "targetUserId is required and must be a string"
+    );
+  }
+
+  const { targetUserId } = data;
+
+  // Cannot friend yourself
+  if (currentUserId === targetUserId) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "You cannot send a friend request to yourself"
+    );
+  }
+
+  try {
+    // Check if target user exists
+    const targetExists = await userExists(targetUserId);
+    if (!targetExists) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        "The user you're trying to add doesn't exist"
+      );
+    }
+
+    // Check for existing friendship
+    const existingFriendship = await findExistingFriendship(
+      currentUserId,
+      targetUserId
+    );
+
+    if (existingFriendship) {
+      const friendshipData = existingFriendship.data();
+      const status = friendshipData.status;
+
+      if (status === "accepted") {
+        throw new functions.https.HttpsError(
+          "already-exists",
+          "You are already friends with this user"
+        );
+      }
+
+      if (status === "pending") {
+        throw new functions.https.HttpsError(
+          "already-exists",
+          "A friend request already exists between you and this user"
+        );
+      }
+
+      // If declined, allow creating a new request
+      // (old declined friendship stays for audit trail)
+    }
+
+    // Get user profiles for denormalized names
+    const initiatorProfile = await getUserProfile(currentUserId);
+    const recipientProfile = await getUserProfile(targetUserId);
+
+    if (!initiatorProfile || !recipientProfile) {
+      throw new functions.https.HttpsError(
+        "internal",
+        "Failed to retrieve user profiles"
+      );
+    }
+
+    // Create new friendship document
+    const db = admin.firestore();
+    const friendshipRef = await db.collection("friendships").add({
+      initiatorId: currentUserId,
+      recipientId: targetUserId,
+      status: "pending",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      initiatorName: initiatorProfile.displayName || initiatorProfile.email,
+      recipientName: recipientProfile.displayName || recipientProfile.email,
+    });
+
+    return {
+      success: true,
+      friendshipId: friendshipRef.id,
+    };
+  } catch (error) {
+    // Re-throw HttpsError
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    console.error("Error sending friend request:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to send friend request"
+    );
+  }
+}
+
+/**
+ * Cloud Function to send a friend request
+ */
+export const sendFriendRequest = functions.https.onCall(
+  sendFriendRequestHandler
+);
+
+// ============================================================================
+// Function 2: Accept Friend Request
+// ============================================================================
+
+/**
+ * Handler for accepting a friend request
+ */
+export async function acceptFriendRequestHandler(
+  data: AcceptFriendRequestRequest,
+  context: functions.https.CallableContext
+): Promise<AcceptFriendRequestResponse> {
+  // Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated to accept friend requests"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // Validate input
+  if (!data || typeof data.friendshipId !== "string") {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "friendshipId is required and must be a string"
+    );
+  }
+
+  const { friendshipId } = data;
+
+  try {
+    const db = admin.firestore();
+    const friendshipRef = db.collection("friendships").doc(friendshipId);
+
+    // Use transaction to ensure consistency
+    await db.runTransaction(async (transaction) => {
+      const friendshipDoc = await transaction.get(friendshipRef);
+
+      if (!friendshipDoc.exists) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "Friend request not found"
+        );
+      }
+
+      const friendshipData = friendshipDoc.data()!;
+
+      // Caller must be the recipient
+      if (friendshipData.recipientId !== currentUserId) {
+        throw new functions.https.HttpsError(
+          "permission-denied",
+          "You can only accept friend requests sent to you"
+        );
+      }
+
+      // Friendship must be in pending status
+      if (friendshipData.status !== "pending") {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          `Cannot accept friend request with status: ${friendshipData.status}`
+        );
+      }
+
+      // Update status to accepted
+      transaction.update(friendshipRef, {
+        status: "accepted",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    // Re-throw HttpsError
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    console.error("Error accepting friend request:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to accept friend request"
+    );
+  }
+}
+
+/**
+ * Cloud Function to accept a friend request
+ */
+export const acceptFriendRequest = functions.https.onCall(
+  acceptFriendRequestHandler
+);
+
+// ============================================================================
+// Function 3: Decline Friend Request
+// ============================================================================
+
+/**
+ * Handler for declining a friend request
+ */
+export async function declineFriendRequestHandler(
+  data: DeclineFriendRequestRequest,
+  context: functions.https.CallableContext
+): Promise<DeclineFriendRequestResponse> {
+  // Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated to decline friend requests"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // Validate input
+  if (!data || typeof data.friendshipId !== "string") {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "friendshipId is required and must be a string"
+    );
+  }
+
+  const { friendshipId } = data;
+
+  try {
+    const db = admin.firestore();
+    const friendshipRef = db.collection("friendships").doc(friendshipId);
+
+    // Use transaction to ensure consistency
+    await db.runTransaction(async (transaction) => {
+      const friendshipDoc = await transaction.get(friendshipRef);
+
+      if (!friendshipDoc.exists) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "Friend request not found"
+        );
+      }
+
+      const friendshipData = friendshipDoc.data()!;
+
+      // Caller must be the recipient
+      if (friendshipData.recipientId !== currentUserId) {
+        throw new functions.https.HttpsError(
+          "permission-denied",
+          "You can only decline friend requests sent to you"
+        );
+      }
+
+      // Friendship must be in pending status
+      if (friendshipData.status !== "pending") {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          `Cannot decline friend request with status: ${friendshipData.status}`
+        );
+      }
+
+      // Update status to declined (kept for audit trail)
+      transaction.update(friendshipRef, {
+        status: "declined",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    // Re-throw HttpsError
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    console.error("Error declining friend request:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to decline friend request"
+    );
+  }
+}
+
+/**
+ * Cloud Function to decline a friend request
+ */
+export const declineFriendRequest = functions.https.onCall(
+  declineFriendRequestHandler
+);
+
+// ============================================================================
+// Function 4: Remove Friend
+// ============================================================================
+
+/**
+ * Handler for removing a friend (deletes friendship document)
+ */
+export async function removeFriendHandler(
+  data: RemoveFriendRequest,
+  context: functions.https.CallableContext
+): Promise<RemoveFriendResponse> {
+  // Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated to remove friends"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // Validate input
+  if (!data || typeof data.friendshipId !== "string") {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "friendshipId is required and must be a string"
+    );
+  }
+
+  const { friendshipId } = data;
+
+  try {
+    const db = admin.firestore();
+    const friendshipRef = db.collection("friendships").doc(friendshipId);
+    const friendshipDoc = await friendshipRef.get();
+
+    if (!friendshipDoc.exists) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        "Friendship not found"
+      );
+    }
+
+    const friendshipData = friendshipDoc.data()!;
+
+    // Caller must be either initiator or recipient
+    if (
+      friendshipData.initiatorId !== currentUserId &&
+      friendshipData.recipientId !== currentUserId
+    ) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "You can only remove your own friendships"
+      );
+    }
+
+    // Delete the friendship document
+    await friendshipRef.delete();
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    // Re-throw HttpsError
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    console.error("Error removing friend:", error);
+    throw new functions.https.HttpsError("internal", "Failed to remove friend");
+  }
+}
+
+/**
+ * Cloud Function to remove a friend
+ */
+export const removeFriend = functions.https.onCall(removeFriendHandler);
+
+// ============================================================================
+// Function 5: Get Friends
+// ============================================================================
+
+/**
+ * Handler for getting a user's friends list
+ */
+export async function getFriendsHandler(
+  data: GetFriendsRequest,
+  context: functions.https.CallableContext
+): Promise<GetFriendsResponse> {
+  // Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated to get friends list"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // Default to current user if userId not provided
+  const targetUserId = data?.userId || currentUserId;
+
+  // Users can only get their own friends list (privacy)
+  if (targetUserId !== currentUserId) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "You can only view your own friends list"
+    );
+  }
+
+  try {
+    const db = admin.firestore();
+    const friendshipsRef = db.collection("friendships");
+
+    // Get friendships where user is initiator (accepted only)
+    const asInitiatorQuery = friendshipsRef
+      .where("initiatorId", "==", targetUserId)
+      .where("status", "==", "accepted")
+      .get();
+
+    // Get friendships where user is recipient (accepted only)
+    const asRecipientQuery = friendshipsRef
+      .where("recipientId", "==", targetUserId)
+      .where("status", "==", "accepted")
+      .get();
+
+    // Execute both queries in parallel
+    const [asInitiatorSnapshot, asRecipientSnapshot] = await Promise.all([
+      asInitiatorQuery,
+      asRecipientQuery,
+    ]);
+
+    // Collect friend user IDs
+    const friendUserIds = new Set<string>();
+
+    asInitiatorSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      friendUserIds.add(data.recipientId);
+    });
+
+    asRecipientSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      friendUserIds.add(data.initiatorId);
+    });
+
+    // If no friends, return empty array
+    if (friendUserIds.size === 0) {
+      return {
+        friends: [],
+      };
+    }
+
+    // Fetch friend profiles
+    const friendProfiles: UserProfile[] = [];
+    const usersRef = db.collection("users");
+
+    // Firestore 'in' query limited to 10 items, so batch if needed
+    const friendIdsArray = Array.from(friendUserIds);
+    for (let i = 0; i < friendIdsArray.length; i += 10) {
+      const batch = friendIdsArray.slice(i, i + 10);
+      const usersSnapshot = await usersRef
+        .where(admin.firestore.FieldPath.documentId(), "in", batch)
+        .get();
+
+      usersSnapshot.docs.forEach((doc) => {
+        const userData = doc.data();
+        friendProfiles.push({
+          uid: doc.id,
+          displayName: userData.displayName || null,
+          email: userData.email,
+          photoUrl: userData.photoUrl || null,
+        });
+      });
+    }
+
+    return {
+      friends: friendProfiles,
+    };
+  } catch (error) {
+    // Re-throw HttpsError
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    console.error("Error getting friends list:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to retrieve friends list"
+    );
+  }
+}
+
+/**
+ * Cloud Function to get a user's friends list
+ */
+export const getFriends = functions.https.onCall(getFriendsHandler);
+
+// ============================================================================
+// Function 6: Check Friendship Status
+// ============================================================================
+
+/**
+ * Handler for checking friendship status with another user
+ */
+export async function checkFriendshipStatusHandler(
+  data: CheckFriendshipStatusRequest,
+  context: functions.https.CallableContext
+): Promise<CheckFriendshipStatusResponse> {
+  // Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated to check friendship status"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // Validate input
+  if (!data || typeof data.userId !== "string") {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "userId is required and must be a string"
+    );
+  }
+
+  const { userId } = data;
+
+  // Cannot check friendship with yourself
+  if (currentUserId === userId) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Cannot check friendship status with yourself"
+    );
+  }
+
+  try {
+    // Find existing friendship
+    const existingFriendship = await findExistingFriendship(
+      currentUserId,
+      userId
+    );
+
+    if (!existingFriendship) {
+      return {
+        isFriend: false,
+        hasPendingRequest: false,
+      };
+    }
+
+    const friendshipData = existingFriendship.data();
+    const status = friendshipData.status;
+
+    if (status === "accepted") {
+      return {
+        isFriend: true,
+        hasPendingRequest: false,
+      };
+    }
+
+    if (status === "pending") {
+      // Determine direction
+      const isSent = friendshipData.initiatorId === currentUserId;
+      return {
+        isFriend: false,
+        hasPendingRequest: true,
+        requestDirection: isSent ? "sent" : "received",
+      };
+    }
+
+    // Status is "declined" - treat as no relationship
+    return {
+      isFriend: false,
+      hasPendingRequest: false,
+    };
+  } catch (error) {
+    // Re-throw HttpsError
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    console.error("Error checking friendship status:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to check friendship status"
+    );
+  }
+}
+
+/**
+ * Cloud Function to check friendship status with another user
+ */
+export const checkFriendshipStatus = functions.https.onCall(
+  checkFriendshipStatusHandler
+);

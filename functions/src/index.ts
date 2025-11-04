@@ -12,6 +12,16 @@ export {declineInvitation} from "./declineInvitation";
 export {getUsersByIds} from "./getUsersByIds";
 export {leaveGroup} from "./leaveGroup";
 
+// Export friendship functions
+export {
+  sendFriendRequest,
+  acceptFriendRequest,
+  declineFriendRequest,
+  removeFriend,
+  getFriends,
+  checkFriendshipStatus,
+} from "./friendships";
+
 // Export notification functions
 export {
   onInvitationCreated,
