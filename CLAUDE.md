@@ -271,11 +271,6 @@ try {
 * No warnings or errors in the analyzer output.
 
 ---
-Perfect — here’s the **drop-in replacement** for section **4. Testing** in your `CLAUDE.md`, written in the same clean, directive tone as the rest of your document.
-You can paste this directly into your file — no edits needed.
-
----
-
 ## 🧪 4. Testing (Unified and Deterministic)
 
 All tests must **pass 100%**, with no skipped or commented-out sections.
