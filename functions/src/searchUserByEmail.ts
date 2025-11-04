@@ -14,6 +14,8 @@ interface SearchUserByEmailResponse {
     email: string;
     photoUrl?: string | null;
   };
+  isFriend?: boolean;
+  hasPendingRequest?: boolean;
   error?: string;
 }
 
@@ -82,15 +84,57 @@ export async function searchUserByEmailHandler(
     // User found - return non-sensitive data only
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
+    const foundUserId = userDoc.id;
+    const currentUserId = context.auth.uid;
+
+    // Check friendship status if users are different
+    let isFriend = false;
+    let hasPendingRequest = false;
+
+    if (foundUserId !== currentUserId) {
+      try {
+        const friendshipsRef = db.collection("friendships");
+
+        // Check for existing friendship in both directions
+        const friendshipQuery = await friendshipsRef
+          .where("initiatorId", "in", [currentUserId, foundUserId])
+          .where("recipientId", "in", [currentUserId, foundUserId])
+          .limit(1)
+          .get();
+
+        if (!friendshipQuery.empty) {
+          const friendshipDoc = friendshipQuery.docs[0];
+          const friendshipData = friendshipDoc.data();
+
+          // Verify it's actually between these two users
+          const involves =
+            (friendshipData.initiatorId === currentUserId &&
+              friendshipData.recipientId === foundUserId) ||
+            (friendshipData.initiatorId === foundUserId &&
+              friendshipData.recipientId === currentUserId);
+
+          if (involves) {
+            isFriend = friendshipData.status === "accepted";
+            hasPendingRequest = friendshipData.status === "pending";
+          }
+        }
+      } catch (friendshipError) {
+        // Log error but don't fail the main function
+        console.error("Error checking friendship status:", friendshipError);
+        // Continue without friendship status
+      }
+    }
 
     return {
       found: true,
       user: {
-        uid: userDoc.id,
+        uid: foundUserId,
         displayName: userData.displayName || null,
         email: userData.email,
         photoUrl: userData.photoUrl || null,
       },
+      isFriend,
+      hasPendingRequest,
     };
   } catch (error) {
     console.error("Error searching for user:", error);
