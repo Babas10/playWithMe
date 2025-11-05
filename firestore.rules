@@ -37,10 +37,11 @@ service cloud.firestore {
 
       // Users can update their own document, including notification preferences and FCM tokens
       // Only allow updating specific fields to prevent unauthorized changes
+      // friendIds and friendCount are managed by Cloud Functions triggers and cannot be modified directly
       allow update: if isAuthenticated() &&
                        request.auth.uid == userId &&
                        // Ensure only safe fields are updated
-                       (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email', 'createdAt']));
+                       (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email', 'createdAt', 'friendIds', 'friendCount']));
 
       // User preferences subcollection - users can read/write their own preferences
       match /preferences/{preferenceId} {
@@ -72,6 +73,41 @@ service cloud.firestore {
                          (request.auth.uid == userId ||
                           request.auth.uid == resource.data.invitedBy);
       }
+    }
+
+    // ============================================
+    // Friendships (Epic 11)
+    // ============================================
+
+    match /friendships/{friendshipId} {
+      // Users can only read friendships they're part of
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == resource.data.initiatorId ||
+                      request.auth.uid == resource.data.recipientId);
+
+      // Only initiator can create a friend request
+      // Must be pending status, cannot friend yourself, and recipient must exist
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.initiatorId &&
+                       request.resource.data.status == 'pending' &&
+                       request.resource.data.initiatorId != request.resource.data.recipientId &&
+                       exists(/databases/$(database)/documents/users/$(request.resource.data.recipientId));
+
+      // Only recipient can update status (accept/decline)
+      // Can only transition from pending to accepted/declined
+      // Cannot modify initiator/recipient IDs
+      allow update: if isAuthenticated() &&
+                       request.auth.uid == resource.data.recipientId &&
+                       request.resource.data.status in ['accepted', 'declined'] &&
+                       resource.data.status == 'pending' &&
+                       // Prevent modifying other fields
+                       request.resource.data.initiatorId == resource.data.initiatorId &&
+                       request.resource.data.recipientId == resource.data.recipientId;
+
+      // Both users can delete the friendship
+      allow delete: if isAuthenticated() &&
+                       (request.auth.uid == resource.data.initiatorId ||
+                        request.auth.uid == resource.data.recipientId);
     }
 
     // ============================================
