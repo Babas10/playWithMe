@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -15,11 +16,13 @@ import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
 import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
+import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_user_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_group_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_game_repository.dart';
 import 'package:play_with_me/core/data/repositories/firebase_image_storage_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_invitation_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_friend_repository.dart';
 import 'package:play_with_me/core/services/image_picker_service.dart';
 import 'package:play_with_me/core/presentation/bloc/user/user_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
@@ -67,6 +70,10 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<FirebaseMessaging>()) {
     sl.registerLazySingleton<FirebaseMessaging>(() => FirebaseMessaging.instance);
+  }
+
+  if (!sl.isRegistered<FirebaseFunctions>()) {
+    sl.registerLazySingleton<FirebaseFunctions>(() => FirebaseFunctions.instance);
   }
 
   if (!sl.isRegistered<FlutterLocalNotificationsPlugin>()) {
@@ -127,6 +134,16 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<NotificationRepository>()) {
     sl.registerLazySingleton<NotificationRepository>(
       () => FirestoreNotificationRepository(
+        firestore: sl(),
+        auth: sl(),
+      ),
+    );
+  }
+
+  if (!sl.isRegistered<FriendRepository>()) {
+    sl.registerLazySingleton<FriendRepository>(
+      () => FirestoreFriendRepository(
+        functions: sl(),
         firestore: sl(),
         auth: sl(),
       ),
