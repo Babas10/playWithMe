@@ -126,7 +126,7 @@ void main() {
       );
 
       blocTest<FriendBloc, FriendState>(
-        'emits [loading, error] when repository throws FriendshipException',
+        'emits [loading, loaded] with empty lists when repository throws FriendshipException',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
           when(() => mockFriendRepository.getFriends(any()))
@@ -136,7 +136,11 @@ void main() {
         act: (bloc) => bloc.add(const FriendEvent.loadRequested()),
         expect: () => [
           const FriendState.loading(),
-          const FriendState.error(message: 'Failed to load friends'),
+          const FriendState.loaded(
+            friends: [],
+            receivedRequests: [],
+            sentRequests: [],
+          ),
         ],
       );
     });
