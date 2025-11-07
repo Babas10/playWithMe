@@ -34,6 +34,7 @@ import 'package:play_with_me/features/profile/domain/repositories/locale_prefere
 import 'package:play_with_me/features/notifications/data/repositories/firestore_notification_repository.dart';
 import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
 import 'package:play_with_me/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -224,6 +225,15 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<GroupMemberBloc>()) {
     sl.registerFactory<GroupMemberBloc>(
       () => GroupMemberBloc(groupRepository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<FriendBloc>()) {
+    sl.registerFactory<FriendBloc>(
+      () => FriendBloc(
+        friendRepository: sl(),
+        authRepository: sl(),
+      ),
     );
   }
 }
