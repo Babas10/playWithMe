@@ -1,11 +1,8 @@
-name: CI/CD Pipeline (Full Build Matrix)
+name: CI/CD Pipeline (Tests & Quality Checks)
 
-# Full build matrix workflow - runs on merge to main/develop
-# For PRs, use pr-fast-check.yml for faster feedback
+# Runs tests, analysis, and quality checks on pull requests
+# For builds, see build-verification.yml (manual or on-demand)
 on:
-  push:
-    branches: [ main, develop ]
-  # Also run on pull_request for full verification if needed
   pull_request:
     branches: [ main, develop ]
 
@@ -36,15 +33,15 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4.5: Generate Mock Firebase Configs (for CI)
+      # Step 5: Generate Mock Firebase Configs (for CI)
       - name: 🔧 Generate Mock Firebase Configs
         run: dart run tools/generate_mock_firebase_configs.dart
 
-      # Step 5: Verify that dependencies resolved properly
+      # Step 6: Verify that dependencies resolved properly
       - name: 🔍 Verify Dependencies
         run: flutter pub deps
 
-      # Step 6: Run static code analysis (initially warn-only to establish baseline)
+      # Step 7: Run static code analysis
       - name: 📊 Run Static Analysis
         run: |
           echo "Running Flutter analyze..."
@@ -55,7 +52,7 @@ jobs:
           # TODO: In future iterations, enable --fatal-warnings when code quality improves
           echo "✅ Static analysis completed (warnings-only mode for CI/CD baseline)"
 
-      # Step 7: Check code formatting (report only for now)
+      # Step 8: Check code formatting
       - name: 🎨 Check Code Formatting
         run: |
           echo "Checking code formatting..."
@@ -65,48 +62,11 @@ jobs:
             echo "For now, this is informational only"
           }
 
-      # Step 8: Generate Firebase configurations from secrets
-      - name: 🔧 Generate Firebase Configs from Secrets
-        env:
-          # Dev environment secrets
-          FIREBASE_DEV_PROJECT_ID: ${{ secrets.FIREBASE_DEV_PROJECT_ID }}
-          FIREBASE_DEV_STORAGE_BUCKET: ${{ secrets.FIREBASE_DEV_STORAGE_BUCKET }}
-          FIREBASE_DEV_ANDROID_APP_ID: ${{ secrets.FIREBASE_DEV_ANDROID_APP_ID }}
-          FIREBASE_DEV_IOS_APP_ID: ${{ secrets.FIREBASE_DEV_IOS_APP_ID }}
-          FIREBASE_DEV_API_KEY: ${{ secrets.FIREBASE_DEV_API_KEY }}
-          FIREBASE_DEV_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_DEV_MESSAGING_SENDER_ID }}
-          FIREBASE_DEV_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_DEV_ANDROID_PACKAGE_NAME }}
-          FIREBASE_DEV_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_DEV_IOS_BUNDLE_ID }}
-          # Staging environment secrets
-          FIREBASE_STG_PROJECT_ID: ${{ secrets.FIREBASE_STG_PROJECT_ID }}
-          FIREBASE_STG_STORAGE_BUCKET: ${{ secrets.FIREBASE_STG_STORAGE_BUCKET }}
-          FIREBASE_STG_ANDROID_APP_ID: ${{ secrets.FIREBASE_STG_ANDROID_APP_ID }}
-          FIREBASE_STG_IOS_APP_ID: ${{ secrets.FIREBASE_STG_IOS_APP_ID }}
-          FIREBASE_STG_API_KEY: ${{ secrets.FIREBASE_STG_API_KEY }}
-          FIREBASE_STG_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_STG_MESSAGING_SENDER_ID }}
-          FIREBASE_STG_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_STG_ANDROID_PACKAGE_NAME }}
-          FIREBASE_STG_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_STG_IOS_BUNDLE_ID }}
-          # Production environment secrets
-          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
-          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
-          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
-          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
-          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
-          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
-          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
-          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
-        run: |
-          echo "Generating Firebase configurations from GitHub Secrets..."
-          dart run tools/generate_firebase_config_from_secrets.dart dev
-          dart run tools/generate_firebase_config_from_secrets.dart stg
-          dart run tools/generate_firebase_config_from_secrets.dart prod
-          echo "✅ Firebase configurations generated securely from secrets"
-
       # Step 9: Run unit and widget tests (exclude integration tests)
       - name: 🧪 Run Tests
         run: flutter test --coverage --reporter=github --exclude-tags=integration test/unit/ test/widget/
 
-      # Step 10: Upload coverage reports (optional but recommended)
+      # Step 10: Upload coverage reports
       - name: 📈 Upload Coverage to Codecov
         uses: codecov/codecov-action@v3
         if: success()
@@ -116,119 +76,7 @@ jobs:
           name: PlayWithMe Coverage
           fail_ci_if_error: false
 
-      # Step 11: Upload Firebase configs as artifact for other jobs
-      - name: 📤 Upload Firebase Configs
-        uses: actions/upload-artifact@v4
-        with:
-          name: firebase-configs
-          path: |
-            lib/core/config/firebase_config_dev.dart
-            lib/core/config/firebase_config_stg.dart
-            lib/core/config/firebase_config_prod.dart
-            android/app/google-services.json
-          retention-days: 1
-
-  # Job 2: Build Verification for Multiple Platforms
-  build_verification:
-    name: 🔨 Build Verification
-    runs-on: ubuntu-latest
-    needs: analyze_and_test # Only run if analysis and tests pass
-
-    strategy:
-      matrix:
-        platform: [android, web]
-        # Only build dev flavor for PRs, full matrix (dev, stg, prod) for pushes to main/develop
-        flavor: ${{ github.event_name == 'pull_request' && fromJSON('["dev"]') || fromJSON('["dev", "stg", "prod"]') }}
-
-    steps:
-      # Step 1: Checkout the repository code
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
-
-      # Step 2: Setup Flutter environment
-      - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.32.6'
-          channel: 'stable'
-          cache: true
-
-      # Step 3: Setup Java for Android builds
-      - name: ☕ Setup Java
-        if: matrix.platform == 'android'
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      # Step 3.5: Setup Gradle Build Cache (for Android builds)
-      - name: 💾 Setup Gradle Build Cache
-        if: matrix.platform == 'android'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.android/build-cache
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/buildSrc/**/*.kt') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      # Step 4: Get Flutter dependencies
-      - name: 📦 Get Dependencies
-        run: flutter pub get
-
-      # Step 5: Download Firebase configs from artifact (instead of regenerating)
-      - name: 📥 Download Firebase Configs
-        uses: actions/download-artifact@v4
-        with:
-          name: firebase-configs
-
-      # Step 6: Build for the specified platform and flavor
-      - name: 🔨 Build ${{ matrix.platform }} (${{ matrix.flavor }})
-        run: |
-          if [ "${{ matrix.platform }}" == "android" ]; then
-            # Use release builds for faster compilation (no debug symbols)
-            flutter build apk --flavor ${{ matrix.flavor }} -t lib/main_${{ matrix.flavor }}.dart --release
-          elif [ "${{ matrix.platform }}" == "web" ]; then
-            # Use release builds for faster compilation
-            flutter build web -t lib/main_${{ matrix.flavor }}.dart --release
-          fi
-
-  # Job 3: Integration Tests (when applicable)
-  integration_tests:
-    name: 🔗 Integration Tests
-    runs-on: ubuntu-latest
-    needs: analyze_and_test # Only run if analysis and tests pass
-
-    steps:
-      # Step 1: Checkout the repository code
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
-
-      # Step 2: Setup Flutter environment
-      - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.32.6'
-          channel: 'stable'
-          cache: true
-
-      # Step 3: Get Flutter dependencies
-      - name: 📦 Get Dependencies
-        run: flutter pub get
-
-      # Step 4: Download Firebase configs from artifact (instead of regenerating)
-      - name: 📥 Download Firebase Configs
-        uses: actions/download-artifact@v4
-        with:
-          name: firebase-configs
-
-      # NOTE: Firebase integration tests are intentionally excluded from CI
-      # These tests are kept local-only to avoid unnecessary CI complexity and secret exposure
-      # Local developers can run them manually with: flutter test integration_test/
-
-  # Job 4: Security and Dependency Audit
+  # Job 2: Security and Dependency Audit
   security_audit:
     name: 🔒 Security Audit
     runs-on: ubuntu-latest
@@ -251,20 +99,14 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Download Firebase configs from artifact (instead of regenerating)
-      - name: 📥 Download Firebase Configs
-        uses: actions/download-artifact@v4
-        with:
-          name: firebase-configs
-
-      # Step 5: Check for security vulnerabilities in dependencies
+      # Step 4: Run Security Audit
       - name: 🔒 Run Security Audit
         run: |
           flutter pub deps --json > deps.json
           # Check for known vulnerable packages
           echo "Checking for security vulnerabilities..."
 
-      # Step 6: Verify no secrets are committed
+      # Step 5: Verify no secrets are committed
       - name: 🔍 Check for Secrets
         run: |
           echo "Checking for potential secrets in the codebase..."
@@ -281,33 +123,31 @@ jobs:
           fi
           echo "✅ No Firebase config files found in repository"
 
-  # Job 5: Final Status Check
+  # Job 3: Final Status Check
   ci_success:
     name: ✅ CI Success
     runs-on: ubuntu-latest
-    needs: [analyze_and_test, build_verification, integration_tests, security_audit]
+    needs: [analyze_and_test, security_audit]
     if: always()
 
     steps:
       - name: 🎉 All Checks Passed
-        if: needs.analyze_and_test.result == 'success' && needs.build_verification.result == 'success' && needs.integration_tests.result == 'success' && needs.security_audit.result == 'success'
+        if: needs.analyze_and_test.result == 'success' && needs.security_audit.result == 'success'
         run: |
           echo "🎉 All CI/CD checks passed successfully!"
           echo "✅ Static Analysis: Passed"
           echo "✅ Tests: Passed"
-          echo "✅ Build Verification: Passed"
-          echo "✅ Integration Tests: Passed"
           echo "✅ Security Audit: Passed"
           echo ""
-          echo "🚀 Ready for merge!"
+          echo "🚀 Ready for review!"
+          echo ""
+          echo "ℹ️ Note: Platform builds are available via build-verification.yml workflow"
 
       - name: ❌ CI Failed
-        if: needs.analyze_and_test.result != 'success' || needs.build_verification.result != 'success' || needs.integration_tests.result != 'success' || needs.security_audit.result != 'success'
+        if: needs.analyze_and_test.result != 'success' || needs.security_audit.result != 'success'
         run: |
           echo "❌ CI/CD pipeline failed!"
           echo "📊 Analysis & Tests: ${{ needs.analyze_and_test.result }}"
-          echo "🔨 Build Verification: ${{ needs.build_verification.result }}"
-          echo "🔗 Integration Tests: ${{ needs.integration_tests.result }}"
           echo "🔒 Security Audit: ${{ needs.security_audit.result }}"
           echo ""
           echo "🛑 Please fix the failing checks before merging."
