@@ -217,4 +217,51 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get groups => 'Grupos';
+
+  @override
+  String get community => 'Comunidad';
+
+  @override
+  String get myCommunity => 'Mi Comunidad';
+
+  @override
+  String get friends => 'Amigos';
+
+  @override
+  String get requests => 'Solicitudes';
+
+  @override
+  String get noFriendsYet => 'Aún no tienes amigos';
+
+  @override
+  String get searchForFriends => '¡Busca amigos para comenzar!';
+
+  @override
+  String get noPendingRequests => 'No hay solicitudes de amistad pendientes';
+
+  @override
+  String get receivedRequests => 'Solicitudes Recibidas';
+
+  @override
+  String get sentRequests => 'Solicitudes Enviadas';
+
+  @override
+  String get accept => 'Aceptar';
+
+  @override
+  String get decline => 'Rechazar';
+
+  @override
+  String get pending => 'Pendiente';
+
+  @override
+  String get removeFriend => '¿Eliminar Amigo?';
+
+  @override
+  String removeFriendConfirmation(String name) {
+    return '¿Estás seguro de que quieres eliminar a $name de tus amigos?';
+  }
+
+  @override
+  String get errorLoadingFriends => 'Error al cargar amigos';
 }

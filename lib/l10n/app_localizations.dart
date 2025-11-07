@@ -481,6 +481,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Groups'**
   String get groups;
+
+  /// Community navigation tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get community;
+
+  /// My Community page title
+  ///
+  /// In en, this message translates to:
+  /// **'My Community'**
+  String get myCommunity;
+
+  /// Friends tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friends;
+
+  /// Friend requests tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Requests'**
+  String get requests;
+
+  /// Empty state title when user has no friends
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any friends yet'**
+  String get noFriendsYet;
+
+  /// Empty state message when user has no friends
+  ///
+  /// In en, this message translates to:
+  /// **'Search for friends to get started!'**
+  String get searchForFriends;
+
+  /// Empty state message when no pending requests
+  ///
+  /// In en, this message translates to:
+  /// **'No pending friend requests'**
+  String get noPendingRequests;
+
+  /// Section title for received friend requests
+  ///
+  /// In en, this message translates to:
+  /// **'Received Requests'**
+  String get receivedRequests;
+
+  /// Section title for sent friend requests
+  ///
+  /// In en, this message translates to:
+  /// **'Sent Requests'**
+  String get sentRequests;
+
+  /// Accept friend request button
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// Decline friend request button
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get decline;
+
+  /// Pending status label
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// Remove friend confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Friend?'**
+  String get removeFriend;
+
+  /// Remove friend confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove {name} from your friends?'**
+  String removeFriendConfirmation(String name);
+
+  /// Error message when friends fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading friends'**
+  String get errorLoadingFriends;
 }
 
 class _AppLocalizationsDelegate

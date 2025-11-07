@@ -10,9 +10,11 @@ import 'package:play_with_me/features/auth/presentation/bloc/password_reset/pass
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
+import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import '../features/auth/data/mock_auth_repository.dart';
@@ -27,6 +29,9 @@ class MockUserRepository extends Mock implements UserRepository {}
 // Mock for InvitationRepository
 class MockInvitationRepository extends Mock implements InvitationRepository {}
 
+// Mock for FriendRepository
+class MockFriendRepository extends Mock implements FriendRepository {}
+
 // Fake for UserModel (required for mocktail's any() matcher)
 class FakeUserModel extends Fake implements UserModel {}
 
@@ -35,6 +40,7 @@ MockAuthRepository? _globalMockRepo;
 MockGroupRepository? _globalMockGroupRepo;
 MockUserRepository? _globalMockUserRepo;
 MockInvitationRepository? _globalMockInvitationRepo;
+MockFriendRepository? _globalMockFriendRepo;
 
 /// Initialize test dependencies with mock services instead of real Firebase
 Future<void> initializeTestDependencies({
@@ -129,6 +135,18 @@ Future<void> initializeTestDependencies({
   sl.registerFactory<InvitationBloc>(
     () => InvitationBloc(invitationRepository: sl<InvitationRepository>()),
   );
+
+  // Register MockFriendRepository for friend-related tests
+  _globalMockFriendRepo = MockFriendRepository();
+  sl.registerLazySingleton<FriendRepository>(() => _globalMockFriendRepo!);
+
+  // Register FriendBloc factory that uses the mock repository
+  sl.registerFactory<FriendBloc>(
+    () => FriendBloc(
+      friendRepository: sl<FriendRepository>(),
+      authRepository: sl<AuthRepository>(),
+    ),
+  );
 }
 
 /// Get the mock repository for test control
@@ -143,6 +161,9 @@ MockUserRepository? getTestUserRepository() => _globalMockUserRepo;
 /// Get the mock invitation repository for test control
 MockInvitationRepository? getTestInvitationRepository() => _globalMockInvitationRepo;
 
+/// Get the mock friend repository for test control
+MockFriendRepository? getTestFriendRepository() => _globalMockFriendRepo;
+
 /// Clean up test dependencies
 void cleanupTestDependencies() {
   _globalMockRepo?.dispose();
@@ -151,6 +172,7 @@ void cleanupTestDependencies() {
   _globalMockGroupRepo = null;
   _globalMockUserRepo = null;
   _globalMockInvitationRepo = null;
+  _globalMockFriendRepo = null;
   sl.reset();
 }
 
