@@ -219,49 +219,49 @@ class AppLocalizationsFr extends AppLocalizations {
   String get groups => 'Groupes';
 
   @override
-  String get community => 'Community';
+  String get community => 'Communauté';
 
   @override
-  String get myCommunity => 'My Community';
+  String get myCommunity => 'Ma Communauté';
 
   @override
-  String get friends => 'Friends';
+  String get friends => 'Amis';
 
   @override
-  String get requests => 'Requests';
+  String get requests => 'Demandes';
 
   @override
-  String get noFriendsYet => 'You don\'t have any friends yet';
+  String get noFriendsYet => 'Vous n\'avez pas encore d\'amis';
 
   @override
-  String get searchForFriends => 'Search for friends to get started!';
+  String get searchForFriends => 'Recherchez des amis pour commencer !';
 
   @override
-  String get noPendingRequests => 'No pending friend requests';
+  String get noPendingRequests => 'Aucune demande d\'ami en attente';
 
   @override
-  String get receivedRequests => 'Received Requests';
+  String get receivedRequests => 'Demandes Reçues';
 
   @override
-  String get sentRequests => 'Sent Requests';
+  String get sentRequests => 'Demandes Envoyées';
 
   @override
-  String get accept => 'Accept';
+  String get accept => 'Accepter';
 
   @override
-  String get decline => 'Decline';
+  String get decline => 'Refuser';
 
   @override
-  String get pending => 'Pending';
+  String get pending => 'En Attente';
 
   @override
-  String get removeFriend => 'Remove Friend?';
+  String get removeFriend => 'Supprimer l\'Ami ?';
 
   @override
   String removeFriendConfirmation(String name) {
-    return 'Are you sure you want to remove $name from your friends?';
+    return 'Êtes-vous sûr de vouloir retirer $name de vos amis ?';
   }
 
   @override
-  String get errorLoadingFriends => 'Error loading friends';
+  String get errorLoadingFriends => 'Erreur lors du chargement des amis';
 }
