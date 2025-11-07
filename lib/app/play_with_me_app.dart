@@ -29,6 +29,7 @@ import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
 import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
+import 'package:play_with_me/features/friends/presentation/pages/my_community_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -94,6 +95,7 @@ class PlayWithMeApp extends StatelessWidget {
               '/register': (context) => const RegistrationPage(),
               '/forgot-password': (context) => const PasswordResetPage(),
               '/profile': (context) => const ProfilePage(),
+              '/my-community': (context) => const MyCommunityPage(),
             },
           );
         },
@@ -140,6 +142,7 @@ class _HomePageState extends State<HomePage> {
         value: _groupBloc,
         child: const GroupListPage(),
       ),
+      const MyCommunityPage(),
     ];
   }
 
@@ -218,7 +221,9 @@ class _HomePageState extends State<HomePage> {
                   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                   title: Text(_selectedIndex == 0
                       ? '${AppLocalizations.of(context)!.appTitle}${EnvironmentConfig.appSuffix}'
-                      : AppLocalizations.of(context)!.myGroups),
+                      : _selectedIndex == 1
+                          ? AppLocalizations.of(context)!.myGroups
+                          : 'My Community'),
                   centerTitle: true,
                   actions: [
                     // Invitation badge
@@ -317,6 +322,10 @@ class _HomePageState extends State<HomePage> {
             BottomNavigationBarItem(
               icon: const Icon(Icons.group),
               label: AppLocalizations.of(context)!.groups,
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: 'Community',
             ),
           ],
           currentIndex: _selectedIndex,
