@@ -223,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                       ? '${AppLocalizations.of(context)!.appTitle}${EnvironmentConfig.appSuffix}'
                       : _selectedIndex == 1
                           ? AppLocalizations.of(context)!.myGroups
-                          : 'My Community'),
+                          : AppLocalizations.of(context)!.myCommunity),
                   centerTitle: true,
                   actions: [
                     // Invitation badge
@@ -323,9 +323,9 @@ class _HomePageState extends State<HomePage> {
               icon: const Icon(Icons.group),
               label: AppLocalizations.of(context)!.groups,
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.people),
-              label: 'Community',
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.people),
+              label: AppLocalizations.of(context)!.community,
             ),
           ],
           currentIndex: _selectedIndex,

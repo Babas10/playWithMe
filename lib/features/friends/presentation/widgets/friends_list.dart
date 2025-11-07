@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'friend_tile.dart';
 
 /// Widget for displaying a list of friends
@@ -17,6 +18,8 @@ class FriendsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (friends.isEmpty) {
       return Center(
         child: Padding(
@@ -31,13 +34,13 @@ class FriendsList extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'You don\'t have any friends yet',
+                l10n.noFriendsYet,
                 style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'Search for friends to get started!',
+                l10n.searchForFriends,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -66,17 +69,19 @@ class FriendsList extends StatelessWidget {
   }
 
   void _showRemoveConfirmation(BuildContext context, UserEntity friend) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remove Friend?'),
+        title: Text(l10n.removeFriend),
         content: Text(
-          'Are you sure you want to remove ${friend.displayName ?? friend.email} from your friends?',
+          l10n.removeFriendConfirmation(friend.displayName ?? friend.email),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -89,7 +94,7 @@ class FriendsList extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: Colors.red,
             ),
-            child: const Text('Remove'),
+            child: Text(l10n.remove),
           ),
         ],
       ),

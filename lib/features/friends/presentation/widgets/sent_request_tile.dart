@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/domain/entities/friendship_entity.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Widget for displaying a sent friend request
 class SentRequestTile extends StatelessWidget {
@@ -14,6 +15,8 @@ class SentRequestTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return ListTile(
       leading: CircleAvatar(
         child: Text(
@@ -33,9 +36,9 @@ class SentRequestTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Chip(
-            label: const Text(
-              'Pending',
-              style: TextStyle(fontSize: 12),
+            label: Text(
+              l10n.pending,
+              style: const TextStyle(fontSize: 12),
             ),
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
             labelStyle: TextStyle(
@@ -46,7 +49,7 @@ class SentRequestTile extends StatelessWidget {
           const SizedBox(width: 8),
           TextButton(
             onPressed: onCancel,
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),

@@ -217,4 +217,51 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get groups => 'Groupes';
+
+  @override
+  String get community => 'Community';
+
+  @override
+  String get myCommunity => 'My Community';
+
+  @override
+  String get friends => 'Friends';
+
+  @override
+  String get requests => 'Requests';
+
+  @override
+  String get noFriendsYet => 'You don\'t have any friends yet';
+
+  @override
+  String get searchForFriends => 'Search for friends to get started!';
+
+  @override
+  String get noPendingRequests => 'No pending friend requests';
+
+  @override
+  String get receivedRequests => 'Received Requests';
+
+  @override
+  String get sentRequests => 'Sent Requests';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get decline => 'Decline';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get removeFriend => 'Remove Friend?';
+
+  @override
+  String removeFriendConfirmation(String name) {
+    return 'Are you sure you want to remove $name from your friends?';
+  }
+
+  @override
+  String get errorLoadingFriends => 'Error loading friends';
 }

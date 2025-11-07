@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/domain/entities/friendship_entity.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'received_request_tile.dart';
 import 'sent_request_tile.dart';
 
@@ -22,6 +23,7 @@ class FriendRequestsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasReceivedRequests = receivedRequests.isNotEmpty;
     final hasSentRequests = sentRequests.isNotEmpty;
 
@@ -39,7 +41,7 @@ class FriendRequestsList extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'No pending friend requests',
+                l10n.noPendingRequests,
                 style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
@@ -55,7 +57,7 @@ class FriendRequestsList extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Received Requests',
+              l10n.receivedRequests,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -75,7 +77,7 @@ class FriendRequestsList extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Sent Requests',
+              l10n.sentRequests,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
