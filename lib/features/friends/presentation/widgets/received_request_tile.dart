@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/domain/entities/friendship_entity.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Widget for displaying a received friend request
 class ReceivedRequestTile extends StatelessWidget {
@@ -16,6 +17,8 @@ class ReceivedRequestTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return ListTile(
       leading: CircleAvatar(
         child: Text(
@@ -40,7 +43,7 @@ class ReceivedRequestTile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               backgroundColor: Colors.green,
             ),
-            child: const Text('Accept'),
+            child: Text(l10n.accept),
           ),
           const SizedBox(width: 8),
           OutlinedButton(
@@ -50,7 +53,7 @@ class ReceivedRequestTile extends StatelessWidget {
               foregroundColor: Colors.red,
               side: const BorderSide(color: Colors.red),
             ),
-            child: const Text('Decline'),
+            child: Text(l10n.decline),
           ),
         ],
       ),

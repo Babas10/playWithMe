@@ -6,6 +6,7 @@ import 'package:play_with_me/features/friends/presentation/bloc/friend_event.dar
 import 'package:play_with_me/features/friends/presentation/bloc/friend_state.dart';
 import 'package:play_with_me/features/friends/presentation/widgets/friends_list.dart';
 import 'package:play_with_me/features/friends/presentation/widgets/friend_requests_list.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Page for managing friends and friend requests
 class MyCommunityPage extends StatelessWidget {
@@ -45,48 +46,50 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Community'),
-        centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Friends'),
-            Tab(text: 'Requests'),
-          ],
-        ),
-      ),
-      body: BlocListener<FriendBloc, FriendState>(
-        listener: (context, state) {
-          state.when(
-            initial: () {},
-            loading: () {},
-            loaded: (friends, receivedRequests, sentRequests) {},
-            searchResult: (user, isFriend, hasPendingRequest, requestDirection) {},
-            statusResult: (status) {},
-            error: (message) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            },
-            actionSuccess: (message) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(message),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-          );
-        },
-        child: BlocBuilder<FriendBloc, FriendState>(
-          builder: (context, state) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            tabs: [
+              Tab(text: l10n.friends),
+              Tab(text: l10n.requests),
+            ],
+          ),
+          Expanded(
+            child: BlocListener<FriendBloc, FriendState>(
+              listener: (context, state) {
+                state.when(
+                  initial: () {},
+                  loading: () {},
+                  loaded: (friends, receivedRequests, sentRequests) {},
+                  searchResult: (user, isFriend, hasPendingRequest, requestDirection) {},
+                  statusResult: (status) {},
+                  error: (message) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(message),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  },
+                  actionSuccess: (message) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(message),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  },
+                );
+              },
+              child: BlocBuilder<FriendBloc, FriendState>(
+                builder: (context, state) {
             return state.when(
-              initial: () => const Center(child: Text('Loading...')),
+              initial: () => Center(child: Text(l10n.loading)),
               loading: () => const Center(child: CircularProgressIndicator()),
               loaded: (friends, receivedRequests, sentRequests) {
                 return TabBarView(
@@ -162,7 +165,7 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Error loading friends',
+                        l10n.errorLoadingFriends,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
@@ -178,7 +181,7 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
                                 const FriendEvent.loadRequested(),
                               );
                         },
-                        child: const Text('Retry'),
+                        child: Text(l10n.retry),
                       ),
                     ],
                   ),
@@ -189,8 +192,11 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
                 return const Center(child: CircularProgressIndicator());
               },
             );
-          },
-        ),
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -319,5 +319,85 @@
   "groups": "Groups",
   "@groups": {
     "description": "Groups navigation tab label"
+  },
+
+  "community": "Community",
+  "@community": {
+    "description": "Community navigation tab label"
+  },
+
+  "myCommunity": "My Community",
+  "@myCommunity": {
+    "description": "My Community page title"
+  },
+
+  "friends": "Friends",
+  "@friends": {
+    "description": "Friends tab label"
+  },
+
+  "requests": "Requests",
+  "@requests": {
+    "description": "Friend requests tab label"
+  },
+
+  "noFriendsYet": "You don't have any friends yet",
+  "@noFriendsYet": {
+    "description": "Empty state title when user has no friends"
+  },
+
+  "searchForFriends": "Search for friends to get started!",
+  "@searchForFriends": {
+    "description": "Empty state message when user has no friends"
+  },
+
+  "noPendingRequests": "No pending friend requests",
+  "@noPendingRequests": {
+    "description": "Empty state message when no pending requests"
+  },
+
+  "receivedRequests": "Received Requests",
+  "@receivedRequests": {
+    "description": "Section title for received friend requests"
+  },
+
+  "sentRequests": "Sent Requests",
+  "@sentRequests": {
+    "description": "Section title for sent friend requests"
+  },
+
+  "accept": "Accept",
+  "@accept": {
+    "description": "Accept friend request button"
+  },
+
+  "decline": "Decline",
+  "@decline": {
+    "description": "Decline friend request button"
+  },
+
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending status label"
+  },
+
+  "removeFriend": "Remove Friend?",
+  "@removeFriend": {
+    "description": "Remove friend confirmation dialog title"
+  },
+
+  "removeFriendConfirmation": "Are you sure you want to remove {name} from your friends?",
+  "@removeFriendConfirmation": {
+    "description": "Remove friend confirmation message",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorLoadingFriends": "Error loading friends",
+  "@errorLoadingFriends": {
+    "description": "Error message when friends fail to load"
   }
 }
