@@ -1,0 +1,215 @@
+name: Build Verification (Manual/On-Demand)
+
+# Builds platform artifacts for verification or deployment
+# Can be triggered manually or via workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Platforms to build (comma-separated: android,web,ios)'
+        required: false
+        default: 'android,web'
+      flavors:
+        description: 'Flavors to build (comma-separated: dev,stg,prod)'
+        required: false
+        default: 'dev'
+
+jobs:
+  # Job 1: Generate Firebase Configs
+  prepare_configs:
+    name: 🔧 Prepare Firebase Configs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+
+      - name: 🔧 Generate Firebase Configs from Secrets
+        env:
+          # Dev environment secrets
+          FIREBASE_DEV_PROJECT_ID: ${{ secrets.FIREBASE_DEV_PROJECT_ID }}
+          FIREBASE_DEV_STORAGE_BUCKET: ${{ secrets.FIREBASE_DEV_STORAGE_BUCKET }}
+          FIREBASE_DEV_ANDROID_APP_ID: ${{ secrets.FIREBASE_DEV_ANDROID_APP_ID }}
+          FIREBASE_DEV_IOS_APP_ID: ${{ secrets.FIREBASE_DEV_IOS_APP_ID }}
+          FIREBASE_DEV_API_KEY: ${{ secrets.FIREBASE_DEV_API_KEY }}
+          FIREBASE_DEV_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_DEV_MESSAGING_SENDER_ID }}
+          FIREBASE_DEV_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_DEV_ANDROID_PACKAGE_NAME }}
+          FIREBASE_DEV_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_DEV_IOS_BUNDLE_ID }}
+          # Staging environment secrets
+          FIREBASE_STG_PROJECT_ID: ${{ secrets.FIREBASE_STG_PROJECT_ID }}
+          FIREBASE_STG_STORAGE_BUCKET: ${{ secrets.FIREBASE_STG_STORAGE_BUCKET }}
+          FIREBASE_STG_ANDROID_APP_ID: ${{ secrets.FIREBASE_STG_ANDROID_APP_ID }}
+          FIREBASE_STG_IOS_APP_ID: ${{ secrets.FIREBASE_STG_IOS_APP_ID }}
+          FIREBASE_STG_API_KEY: ${{ secrets.FIREBASE_STG_API_KEY }}
+          FIREBASE_STG_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_STG_MESSAGING_SENDER_ID }}
+          FIREBASE_STG_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_STG_ANDROID_PACKAGE_NAME }}
+          FIREBASE_STG_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_STG_IOS_BUNDLE_ID }}
+          # Production environment secrets
+          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
+          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
+          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
+          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
+          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
+          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
+          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
+          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
+        run: |
+          echo "Generating Firebase configurations from GitHub Secrets..."
+          dart run tools/generate_firebase_config_from_secrets.dart dev
+          dart run tools/generate_firebase_config_from_secrets.dart stg
+          dart run tools/generate_firebase_config_from_secrets.dart prod
+          echo "✅ Firebase configurations generated securely from secrets"
+
+      - name: 📤 Upload Firebase Configs
+        uses: actions/upload-artifact@v4
+        with:
+          name: firebase-configs
+          path: |
+            lib/core/config/firebase_config_dev.dart
+            lib/core/config/firebase_config_stg.dart
+            lib/core/config/firebase_config_prod.dart
+            android/app/google-services.json
+          retention-days: 1
+
+  # Job 2: Build Android
+  build_android:
+    name: 🤖 Build Android
+    runs-on: ubuntu-latest
+    needs: prepare_configs
+    if: contains(github.event.inputs.platforms, 'android') || github.event.inputs.platforms == ''
+
+    strategy:
+      matrix:
+        flavor: ${{ fromJSON(format('["{0}"]', github.event.inputs.flavors || 'dev')) }}
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: 'stable'
+          cache: true
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 💾 Setup Gradle Build Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android/build-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/buildSrc/**/*.kt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+
+      - name: 📥 Download Firebase Configs
+        uses: actions/download-artifact@v4
+        with:
+          name: firebase-configs
+
+      - name: 🔨 Build Android APK (${{ matrix.flavor }})
+        run: |
+          echo "Building Android APK for flavor: ${{ matrix.flavor }}"
+          flutter build apk --flavor ${{ matrix.flavor }} -t lib/main_${{ matrix.flavor }}.dart --release
+
+      - name: 📤 Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-${{ matrix.flavor }}
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 7
+
+  # Job 3: Build Web
+  build_web:
+    name: 🌐 Build Web
+    runs-on: ubuntu-latest
+    needs: prepare_configs
+    if: contains(github.event.inputs.platforms, 'web') || github.event.inputs.platforms == ''
+
+    strategy:
+      matrix:
+        flavor: ${{ fromJSON(format('["{0}"]', github.event.inputs.flavors || 'dev')) }}
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+
+      - name: 📥 Download Firebase Configs
+        uses: actions/download-artifact@v4
+        with:
+          name: firebase-configs
+
+      - name: 🔨 Build Web (${{ matrix.flavor }})
+        run: |
+          echo "Building Web for flavor: ${{ matrix.flavor }}"
+          flutter build web -t lib/main_${{ matrix.flavor }}.dart --release
+
+      - name: 📤 Upload Web Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build-${{ matrix.flavor }}
+          path: build/web/
+          retention-days: 7
+
+  # Job 4: Build Status
+  build_success:
+    name: ✅ Build Success
+    runs-on: ubuntu-latest
+    needs: [build_android, build_web]
+    if: always()
+
+    steps:
+      - name: 🎉 All Builds Passed
+        if: |
+          (needs.build_android.result == 'success' || needs.build_android.result == 'skipped') &&
+          (needs.build_web.result == 'success' || needs.build_web.result == 'skipped')
+        run: |
+          echo "🎉 All builds completed successfully!"
+          echo "✅ Android: ${{ needs.build_android.result }}"
+          echo "✅ Web: ${{ needs.build_web.result }}"
+          echo ""
+          echo "📦 Build artifacts are available in the Actions tab"
+          echo "⏰ Artifacts will be retained for 7 days"
+
+      - name: ❌ Build Failed
+        if: |
+          needs.build_android.result == 'failure' ||
+          needs.build_web.result == 'failure'
+        run: |
+          echo "❌ Build pipeline failed!"
+          echo "🤖 Android: ${{ needs.build_android.result }}"
+          echo "🌐 Web: ${{ needs.build_web.result }}"
+          echo ""
+          echo "🛑 Please check the build logs for details."
+          exit 1
