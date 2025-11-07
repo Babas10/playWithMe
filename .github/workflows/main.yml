@@ -1,11 +1,8 @@
 name: CI/CD Pipeline (Full Build Matrix)
 
-# Full build matrix workflow - runs on merge to main/develop
-# For PRs, use pr-fast-check.yml for faster feedback
+# Full build matrix workflow - runs only on pull requests
+# For fast PR feedback, use pr-fast-check.yml
 on:
-  push:
-    branches: [ main, develop ]
-  # Also run on pull_request for full verification if needed
   pull_request:
     branches: [ main, develop ]
 
