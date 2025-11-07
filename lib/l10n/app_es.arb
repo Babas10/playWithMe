@@ -62,5 +62,20 @@
   "createYourFirstGroup": "Crea Tu Primer Grupo",
   "useCreateGroupButton": "Usa el botón Crear Grupo a continuación para comenzar.",
   "home": "Inicio",
-  "groups": "Grupos"
+  "groups": "Grupos",
+  "community": "Comunidad",
+  "myCommunity": "Mi Comunidad",
+  "friends": "Amigos",
+  "requests": "Solicitudes",
+  "noFriendsYet": "Aún no tienes amigos",
+  "searchForFriends": "¡Busca amigos para comenzar!",
+  "noPendingRequests": "No hay solicitudes de amistad pendientes",
+  "receivedRequests": "Solicitudes Recibidas",
+  "sentRequests": "Solicitudes Enviadas",
+  "accept": "Aceptar",
+  "decline": "Rechazar",
+  "pending": "Pendiente",
+  "removeFriend": "¿Eliminar Amigo?",
+  "removeFriendConfirmation": "¿Estás seguro de que quieres eliminar a {name} de tus amigos?",
+  "errorLoadingFriends": "Error al cargar amigos"
 }
