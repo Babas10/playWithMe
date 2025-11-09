@@ -26,6 +26,7 @@ mixin _$FriendEvent {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -37,6 +38,7 @@ mixin _$FriendEvent {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -48,6 +50,7 @@ mixin _$FriendEvent {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
@@ -60,6 +63,7 @@ mixin _$FriendEvent {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -71,6 +75,7 @@ mixin _$FriendEvent {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -82,6 +87,7 @@ mixin _$FriendEvent {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
@@ -160,6 +166,7 @@ class _$FriendLoadRequestedImpl implements FriendLoadRequested {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) {
     return loadRequested();
@@ -175,6 +182,7 @@ class _$FriendLoadRequestedImpl implements FriendLoadRequested {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) {
     return loadRequested?.call();
@@ -190,6 +198,7 @@ class _$FriendLoadRequestedImpl implements FriendLoadRequested {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) {
@@ -209,6 +218,7 @@ class _$FriendLoadRequestedImpl implements FriendLoadRequested {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) {
     return loadRequested(this);
@@ -224,6 +234,7 @@ class _$FriendLoadRequestedImpl implements FriendLoadRequested {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) {
     return loadRequested?.call(this);
@@ -239,6 +250,7 @@ class _$FriendLoadRequestedImpl implements FriendLoadRequested {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) {
@@ -334,6 +346,7 @@ class _$FriendRequestSentImpl implements FriendRequestSent {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) {
     return requestSent(targetUserId);
@@ -349,6 +362,7 @@ class _$FriendRequestSentImpl implements FriendRequestSent {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) {
     return requestSent?.call(targetUserId);
@@ -364,6 +378,7 @@ class _$FriendRequestSentImpl implements FriendRequestSent {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) {
@@ -383,6 +398,7 @@ class _$FriendRequestSentImpl implements FriendRequestSent {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) {
     return requestSent(this);
@@ -398,6 +414,7 @@ class _$FriendRequestSentImpl implements FriendRequestSent {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) {
     return requestSent?.call(this);
@@ -413,6 +430,7 @@ class _$FriendRequestSentImpl implements FriendRequestSent {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) {
@@ -518,6 +536,7 @@ class _$FriendRequestAcceptedImpl implements FriendRequestAccepted {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) {
     return requestAccepted(friendshipId);
@@ -533,6 +552,7 @@ class _$FriendRequestAcceptedImpl implements FriendRequestAccepted {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) {
     return requestAccepted?.call(friendshipId);
@@ -548,6 +568,7 @@ class _$FriendRequestAcceptedImpl implements FriendRequestAccepted {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) {
@@ -567,6 +588,7 @@ class _$FriendRequestAcceptedImpl implements FriendRequestAccepted {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) {
     return requestAccepted(this);
@@ -582,6 +604,7 @@ class _$FriendRequestAcceptedImpl implements FriendRequestAccepted {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) {
     return requestAccepted?.call(this);
@@ -597,6 +620,7 @@ class _$FriendRequestAcceptedImpl implements FriendRequestAccepted {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) {
@@ -702,6 +726,7 @@ class _$FriendRequestDeclinedImpl implements FriendRequestDeclined {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) {
     return requestDeclined(friendshipId);
@@ -717,6 +742,7 @@ class _$FriendRequestDeclinedImpl implements FriendRequestDeclined {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) {
     return requestDeclined?.call(friendshipId);
@@ -732,6 +758,7 @@ class _$FriendRequestDeclinedImpl implements FriendRequestDeclined {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) {
@@ -751,6 +778,7 @@ class _$FriendRequestDeclinedImpl implements FriendRequestDeclined {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) {
     return requestDeclined(this);
@@ -766,6 +794,7 @@ class _$FriendRequestDeclinedImpl implements FriendRequestDeclined {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) {
     return requestDeclined?.call(this);
@@ -781,6 +810,7 @@ class _$FriendRequestDeclinedImpl implements FriendRequestDeclined {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) {
@@ -886,6 +916,7 @@ class _$FriendRequestCancelledImpl implements FriendRequestCancelled {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) {
     return requestCancelled(friendshipId);
@@ -901,6 +932,7 @@ class _$FriendRequestCancelledImpl implements FriendRequestCancelled {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) {
     return requestCancelled?.call(friendshipId);
@@ -916,6 +948,7 @@ class _$FriendRequestCancelledImpl implements FriendRequestCancelled {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) {
@@ -935,6 +968,7 @@ class _$FriendRequestCancelledImpl implements FriendRequestCancelled {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) {
     return requestCancelled(this);
@@ -950,6 +984,7 @@ class _$FriendRequestCancelledImpl implements FriendRequestCancelled {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) {
     return requestCancelled?.call(this);
@@ -965,6 +1000,7 @@ class _$FriendRequestCancelledImpl implements FriendRequestCancelled {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) {
@@ -1066,6 +1102,7 @@ class _$FriendRemovedImpl implements FriendRemoved {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) {
     return removed(friendshipId);
@@ -1081,6 +1118,7 @@ class _$FriendRemovedImpl implements FriendRemoved {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) {
     return removed?.call(friendshipId);
@@ -1096,6 +1134,7 @@ class _$FriendRemovedImpl implements FriendRemoved {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) {
@@ -1115,6 +1154,7 @@ class _$FriendRemovedImpl implements FriendRemoved {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) {
     return removed(this);
@@ -1130,6 +1170,7 @@ class _$FriendRemovedImpl implements FriendRemoved {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) {
     return removed?.call(this);
@@ -1145,6 +1186,7 @@ class _$FriendRemovedImpl implements FriendRemoved {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) {
@@ -1249,6 +1291,7 @@ class _$FriendSearchRequestedImpl implements FriendSearchRequested {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) {
     return searchRequested(email);
@@ -1264,6 +1307,7 @@ class _$FriendSearchRequestedImpl implements FriendSearchRequested {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) {
     return searchRequested?.call(email);
@@ -1279,6 +1323,7 @@ class _$FriendSearchRequestedImpl implements FriendSearchRequested {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) {
@@ -1298,6 +1343,7 @@ class _$FriendSearchRequestedImpl implements FriendSearchRequested {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) {
     return searchRequested(this);
@@ -1313,6 +1359,7 @@ class _$FriendSearchRequestedImpl implements FriendSearchRequested {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) {
     return searchRequested?.call(this);
@@ -1328,6 +1375,7 @@ class _$FriendSearchRequestedImpl implements FriendSearchRequested {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) {
@@ -1349,6 +1397,156 @@ abstract class FriendSearchRequested implements FriendEvent {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$FriendSearchRequestedImplCopyWith<_$FriendSearchRequestedImpl>
   get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$FriendSearchClearedImplCopyWith<$Res> {
+  factory _$$FriendSearchClearedImplCopyWith(
+    _$FriendSearchClearedImpl value,
+    $Res Function(_$FriendSearchClearedImpl) then,
+  ) = __$$FriendSearchClearedImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$FriendSearchClearedImplCopyWithImpl<$Res>
+    extends _$FriendEventCopyWithImpl<$Res, _$FriendSearchClearedImpl>
+    implements _$$FriendSearchClearedImplCopyWith<$Res> {
+  __$$FriendSearchClearedImplCopyWithImpl(
+    _$FriendSearchClearedImpl _value,
+    $Res Function(_$FriendSearchClearedImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of FriendEvent
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$FriendSearchClearedImpl implements FriendSearchCleared {
+  const _$FriendSearchClearedImpl();
+
+  @override
+  String toString() {
+    return 'FriendEvent.searchCleared()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FriendSearchClearedImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loadRequested,
+    required TResult Function(String targetUserId) requestSent,
+    required TResult Function(String friendshipId) requestAccepted,
+    required TResult Function(String friendshipId) requestDeclined,
+    required TResult Function(String friendshipId) requestCancelled,
+    required TResult Function(String friendshipId) removed,
+    required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
+    required TResult Function(String userId) statusChecked,
+  }) {
+    return searchCleared();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loadRequested,
+    TResult? Function(String targetUserId)? requestSent,
+    TResult? Function(String friendshipId)? requestAccepted,
+    TResult? Function(String friendshipId)? requestDeclined,
+    TResult? Function(String friendshipId)? requestCancelled,
+    TResult? Function(String friendshipId)? removed,
+    TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
+    TResult? Function(String userId)? statusChecked,
+  }) {
+    return searchCleared?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loadRequested,
+    TResult Function(String targetUserId)? requestSent,
+    TResult Function(String friendshipId)? requestAccepted,
+    TResult Function(String friendshipId)? requestDeclined,
+    TResult Function(String friendshipId)? requestCancelled,
+    TResult Function(String friendshipId)? removed,
+    TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
+    TResult Function(String userId)? statusChecked,
+    required TResult orElse(),
+  }) {
+    if (searchCleared != null) {
+      return searchCleared();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(FriendLoadRequested value) loadRequested,
+    required TResult Function(FriendRequestSent value) requestSent,
+    required TResult Function(FriendRequestAccepted value) requestAccepted,
+    required TResult Function(FriendRequestDeclined value) requestDeclined,
+    required TResult Function(FriendRequestCancelled value) requestCancelled,
+    required TResult Function(FriendRemoved value) removed,
+    required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
+    required TResult Function(FriendStatusChecked value) statusChecked,
+  }) {
+    return searchCleared(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FriendLoadRequested value)? loadRequested,
+    TResult? Function(FriendRequestSent value)? requestSent,
+    TResult? Function(FriendRequestAccepted value)? requestAccepted,
+    TResult? Function(FriendRequestDeclined value)? requestDeclined,
+    TResult? Function(FriendRequestCancelled value)? requestCancelled,
+    TResult? Function(FriendRemoved value)? removed,
+    TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
+    TResult? Function(FriendStatusChecked value)? statusChecked,
+  }) {
+    return searchCleared?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(FriendLoadRequested value)? loadRequested,
+    TResult Function(FriendRequestSent value)? requestSent,
+    TResult Function(FriendRequestAccepted value)? requestAccepted,
+    TResult Function(FriendRequestDeclined value)? requestDeclined,
+    TResult Function(FriendRequestCancelled value)? requestCancelled,
+    TResult Function(FriendRemoved value)? removed,
+    TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
+    TResult Function(FriendStatusChecked value)? statusChecked,
+    required TResult orElse(),
+  }) {
+    if (searchCleared != null) {
+      return searchCleared(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class FriendSearchCleared implements FriendEvent {
+  const factory FriendSearchCleared() = _$FriendSearchClearedImpl;
 }
 
 /// @nodoc
@@ -1431,6 +1629,7 @@ class _$FriendStatusCheckedImpl implements FriendStatusChecked {
     required TResult Function(String friendshipId) requestCancelled,
     required TResult Function(String friendshipId) removed,
     required TResult Function(String email) searchRequested,
+    required TResult Function() searchCleared,
     required TResult Function(String userId) statusChecked,
   }) {
     return statusChecked(userId);
@@ -1446,6 +1645,7 @@ class _$FriendStatusCheckedImpl implements FriendStatusChecked {
     TResult? Function(String friendshipId)? requestCancelled,
     TResult? Function(String friendshipId)? removed,
     TResult? Function(String email)? searchRequested,
+    TResult? Function()? searchCleared,
     TResult? Function(String userId)? statusChecked,
   }) {
     return statusChecked?.call(userId);
@@ -1461,6 +1661,7 @@ class _$FriendStatusCheckedImpl implements FriendStatusChecked {
     TResult Function(String friendshipId)? requestCancelled,
     TResult Function(String friendshipId)? removed,
     TResult Function(String email)? searchRequested,
+    TResult Function()? searchCleared,
     TResult Function(String userId)? statusChecked,
     required TResult orElse(),
   }) {
@@ -1480,6 +1681,7 @@ class _$FriendStatusCheckedImpl implements FriendStatusChecked {
     required TResult Function(FriendRequestCancelled value) requestCancelled,
     required TResult Function(FriendRemoved value) removed,
     required TResult Function(FriendSearchRequested value) searchRequested,
+    required TResult Function(FriendSearchCleared value) searchCleared,
     required TResult Function(FriendStatusChecked value) statusChecked,
   }) {
     return statusChecked(this);
@@ -1495,6 +1697,7 @@ class _$FriendStatusCheckedImpl implements FriendStatusChecked {
     TResult? Function(FriendRequestCancelled value)? requestCancelled,
     TResult? Function(FriendRemoved value)? removed,
     TResult? Function(FriendSearchRequested value)? searchRequested,
+    TResult? Function(FriendSearchCleared value)? searchCleared,
     TResult? Function(FriendStatusChecked value)? statusChecked,
   }) {
     return statusChecked?.call(this);
@@ -1510,6 +1713,7 @@ class _$FriendStatusCheckedImpl implements FriendStatusChecked {
     TResult Function(FriendRequestCancelled value)? requestCancelled,
     TResult Function(FriendRemoved value)? removed,
     TResult Function(FriendSearchRequested value)? searchRequested,
+    TResult Function(FriendSearchCleared value)? searchCleared,
     TResult Function(FriendStatusChecked value)? statusChecked,
     required TResult orElse(),
   }) {

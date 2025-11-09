@@ -11,6 +11,10 @@ interface UserProfile {
   displayName: string | null;
   email: string;
   photoUrl?: string | null;
+  isEmailVerified?: boolean;
+  isAnonymous?: boolean;
+  createdAt?: string | null;
+  lastSignInAt?: string | null;
 }
 
 interface SendFriendRequestRequest {
@@ -62,6 +66,22 @@ interface CheckFriendshipStatusResponse {
   isFriend: boolean;
   hasPendingRequest: boolean;
   requestDirection?: "sent" | "received";
+}
+
+interface FriendshipRequest {
+  id: string;
+  initiatorId: string;
+  initiatorName: string;
+  recipientId: string;
+  recipientName: string;
+  status: string;
+  createdAt: FirebaseFirestore.Timestamp;
+  updatedAt: FirebaseFirestore.Timestamp;
+}
+
+interface GetFriendshipRequestsResponse {
+  receivedRequests: FriendshipRequest[];
+  sentRequests: FriendshipRequest[];
 }
 
 // ============================================================================
@@ -163,8 +183,16 @@ export async function sendFriendRequestHandler(
 
   const { targetUserId } = data;
 
+  functions.logger.info("Sending friend request", {
+    from: currentUserId,
+    to: targetUserId,
+  });
+
   // Cannot friend yourself
   if (currentUserId === targetUserId) {
+    functions.logger.warn("Attempt to send friend request to self", {
+      userId: currentUserId,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "You cannot send a friend request to yourself"
@@ -175,11 +203,20 @@ export async function sendFriendRequestHandler(
     // Check if target user exists
     const targetExists = await userExists(targetUserId);
     if (!targetExists) {
+      functions.logger.warn("Target user not found", {
+        from: currentUserId,
+        targetUserId,
+      });
       throw new functions.https.HttpsError(
         "not-found",
         "The user you're trying to add doesn't exist"
       );
     }
+
+    functions.logger.debug("Target user exists, checking for existing friendship", {
+      from: currentUserId,
+      to: targetUserId,
+    });
 
     // Check for existing friendship
     const existingFriendship = await findExistingFriendship(
@@ -190,6 +227,13 @@ export async function sendFriendRequestHandler(
     if (existingFriendship) {
       const friendshipData = existingFriendship.data();
       const status = friendshipData.status;
+
+      functions.logger.warn("Existing friendship found", {
+        from: currentUserId,
+        to: targetUserId,
+        friendshipId: existingFriendship.id,
+        status,
+      });
 
       if (status === "accepted") {
         throw new functions.https.HttpsError(
@@ -207,6 +251,10 @@ export async function sendFriendRequestHandler(
 
       // If declined, allow creating a new request
       // (old declined friendship stays for audit trail)
+      functions.logger.info("Previous friendship was declined, allowing new request", {
+        from: currentUserId,
+        to: targetUserId,
+      });
     }
 
     // Get user profiles for denormalized names
@@ -214,6 +262,12 @@ export async function sendFriendRequestHandler(
     const recipientProfile = await getUserProfile(targetUserId);
 
     if (!initiatorProfile || !recipientProfile) {
+      functions.logger.error("Failed to retrieve user profiles", {
+        from: currentUserId,
+        to: targetUserId,
+        hasInitiator: !!initiatorProfile,
+        hasRecipient: !!recipientProfile,
+      });
       throw new functions.https.HttpsError(
         "internal",
         "Failed to retrieve user profiles"
@@ -232,6 +286,12 @@ export async function sendFriendRequestHandler(
       recipientName: recipientProfile.displayName || recipientProfile.email,
     });
 
+    functions.logger.info("Friend request created successfully", {
+      from: currentUserId,
+      to: targetUserId,
+      friendshipId: friendshipRef.id,
+    });
+
     return {
       success: true,
       friendshipId: friendshipRef.id,
@@ -242,7 +302,12 @@ export async function sendFriendRequestHandler(
       throw error;
     }
 
-    console.error("Error sending friend request:", error);
+    functions.logger.error("Error sending friend request", {
+      from: currentUserId,
+      to: targetUserId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     throw new functions.https.HttpsError(
       "internal",
       "Failed to send friend request"
@@ -558,6 +623,10 @@ export async function getFriendsHandler(
   }
 
   try {
+    functions.logger.info("Getting friends list", {
+      userId: targetUserId,
+    });
+
     const db = admin.firestore();
     const friendshipsRef = db.collection("friendships");
 
@@ -579,6 +648,12 @@ export async function getFriendsHandler(
       asRecipientQuery,
     ]);
 
+    functions.logger.debug("Friendships query results", {
+      userId: targetUserId,
+      asInitiator: asInitiatorSnapshot.size,
+      asRecipient: asRecipientSnapshot.size,
+    });
+
     // Collect friend user IDs
     const friendUserIds = new Set<string>();
 
@@ -594,10 +669,19 @@ export async function getFriendsHandler(
 
     // If no friends, return empty array
     if (friendUserIds.size === 0) {
+      functions.logger.info("No friends found", {
+        userId: targetUserId,
+      });
       return {
         friends: [],
       };
     }
+
+    functions.logger.debug("Found friend user IDs", {
+      userId: targetUserId,
+      friendCount: friendUserIds.size,
+      friendIds: Array.from(friendUserIds),
+    });
 
     // Fetch friend profiles
     const friendProfiles: UserProfile[] = [];
@@ -618,9 +702,19 @@ export async function getFriendsHandler(
           displayName: userData.displayName || null,
           email: userData.email,
           photoUrl: userData.photoUrl || null,
+          isEmailVerified: userData.isEmailVerified || false,
+          isAnonymous: userData.isAnonymous || false,
+          // Convert Firestore Timestamps to ISO8601 strings for Flutter
+          createdAt: userData.createdAt?.toDate().toISOString() || null,
+          lastSignInAt: userData.lastSignInAt?.toDate().toISOString() || null,
         });
       });
     }
+
+    functions.logger.info("Successfully retrieved friends list", {
+      userId: targetUserId,
+      friendCount: friendProfiles.length,
+    });
 
     return {
       friends: friendProfiles,
@@ -631,7 +725,11 @@ export async function getFriendsHandler(
       throw error;
     }
 
-    console.error("Error getting friends list:", error);
+    functions.logger.error("Error getting friends list", {
+      userId: targetUserId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     throw new functions.https.HttpsError(
       "internal",
       "Failed to retrieve friends list"
@@ -741,4 +839,107 @@ export async function checkFriendshipStatusHandler(
  */
 export const checkFriendshipStatus = functions.https.onCall(
   checkFriendshipStatusHandler
+);
+
+// ============================================================================
+// Function 7: Get Friendship Requests
+// ============================================================================
+
+/**
+ * Handler for getting all pending friend requests for the authenticated user
+ * Returns both received requests (where user is recipient) and sent requests (where user is initiator)
+ */
+export async function getFriendshipRequestsHandler(
+  data: unknown,
+  context: functions.https.CallableContext
+): Promise<GetFriendshipRequestsResponse> {
+  // Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "You must be logged in to view friend requests"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  try {
+    functions.logger.info("Getting friendship requests", {
+      userId: currentUserId,
+    });
+
+    const db = admin.firestore();
+    const friendshipsRef = db.collection("friendships");
+
+    // Query for received requests (where user is recipient)
+    const receivedQuery = await friendshipsRef
+      .where("recipientId", "==", currentUserId)
+      .where("status", "==", "pending")
+      .get();
+
+    // Query for sent requests (where user is initiator)
+    const sentQuery = await friendshipsRef
+      .where("initiatorId", "==", currentUserId)
+      .where("status", "==", "pending")
+      .get();
+
+    // Map received requests to response format
+    const receivedRequests: FriendshipRequest[] = receivedQuery.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        initiatorId: data.initiatorId,
+        initiatorName: data.initiatorName,
+        recipientId: data.recipientId,
+        recipientName: data.recipientName,
+        status: data.status,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      };
+    });
+
+    // Map sent requests to response format
+    const sentRequests: FriendshipRequest[] = sentQuery.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        initiatorId: data.initiatorId,
+        initiatorName: data.initiatorName,
+        recipientId: data.recipientId,
+        recipientName: data.recipientName,
+        status: data.status,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      };
+    });
+
+    functions.logger.info("Successfully retrieved friendship requests", {
+      userId: currentUserId,
+      receivedCount: receivedRequests.length,
+      sentCount: sentRequests.length,
+    });
+
+    return {
+      receivedRequests,
+      sentRequests,
+    };
+  } catch (error) {
+    functions.logger.error("Error getting friendship requests", {
+      userId: currentUserId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to retrieve friend requests"
+    );
+  }
+}
+
+/**
+ * Cloud Function to get all pending friendship requests for the authenticated user
+ */
+export const getFriendshipRequests = functions.https.onCall(
+  getFriendshipRequestsHandler
 );

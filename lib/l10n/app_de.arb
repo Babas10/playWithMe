@@ -77,5 +77,18 @@
   "pending": "Ausstehend",
   "removeFriend": "Freund Entfernen?",
   "removeFriendConfirmation": "Möchten Sie {name} wirklich aus Ihrer Freundesliste entfernen?",
-  "errorLoadingFriends": "Fehler beim Laden der Freunde"
+  "errorLoadingFriends": "Fehler beim Laden der Freunde",
+  "searchFriendsByEmail": "Freunde per E-Mail suchen...",
+  "cannotAddYourself": "Sie können sich nicht selbst als Freund hinzufügen",
+  "userNotFoundWithEmail": "Kein Benutzer mit der E-Mail gefunden: {email}",
+  "makeSureEmailCorrect": "Stellen Sie sicher, dass die E-Mail korrekt ist",
+  "requestPending": "Ausstehend",
+  "acceptRequest": "Anfrage Akzeptieren",
+  "sendFriendRequest": "Hinzufügen",
+  "search": "Suchen",
+  "addFriend": "Freund Hinzufügen",
+  "searchForFriendsToAdd": "Suche nach Freunden zum Hinzufügen",
+  "enterEmailToFindFriends": "Geben Sie eine E-Mail-Adresse ein, um Benutzer zu finden",
+  "checkRequestsTab": "Überprüfen Sie die Registerkarte Anfragen, um die Freundschaftsanfrage anzunehmen",
+  "ok": "OK"
 }

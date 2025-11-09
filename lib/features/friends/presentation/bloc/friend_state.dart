@@ -21,12 +21,16 @@ class FriendState with _$FriendState {
     required List<FriendshipEntity> sentRequests,
   }) = FriendLoaded;
 
+  /// Search loading state
+  const factory FriendState.searchLoading() = FriendSearchLoading;
+
   /// Search result state
   const factory FriendState.searchResult({
     UserEntity? user,
     required bool isFriend,
     required bool hasPendingRequest,
     String? requestDirection,
+    required String searchedEmail,
   }) = FriendSearchResult;
 
   /// Status check result state
