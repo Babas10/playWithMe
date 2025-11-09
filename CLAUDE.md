@@ -69,6 +69,60 @@ Claude must:
 
 ---
 
+> **Users → My Community (Social Graph) → Groups → Games**
+>
+> Where:
+>
+> * The **social graph** (My Community) manages friendships and invitations.
+> * **Groups** query the social graph to validate or restrict membership (only friends can join).
+> * **Games** operate strictly within a group’s context and never talk to the social graph directly.
+
+
+---
+
+### **Architecture Overview: Social Graph–Driven Design**
+
+The platform follows a **layered architecture** that separates social relationships, group organization, and game participation.
+
+#### **1. My Community (Social Graph Layer)**
+
+* Represents a user’s network of acquaintances (“friends”).
+* Handles friend requests, acceptances, and removals through callable Cloud Functions.
+* Defines the **social boundary** — only users connected in the social graph can be invited to groups.
+* Exposed via Cloud Functions (`sendFriendRequest`, `acceptFriendRequest`, `declineFriendRequest`, etc.).
+* Designed for scalability and minimal coupling — higher layers query this layer through APIs, not direct Firestore access.
+
+#### **2. Groups Layer**
+
+* A group (e.g., “Beach Volleyball”, “Basketball”) is a **subset of My Community**.
+* Groups do not store or manage friendships.
+* When a user invites someone to a group, the group queries the social graph to verify friendship.
+* Invitation and membership lifecycle handled via Firestore and Cloud Functions:
+
+  * `onInvitationCreated`, `onInvitationAccepted`, `onMemberJoined`, etc.
+* Groups remain agnostic to how the social graph is implemented — they only rely on public callable functions.
+
+#### **3. Games Layer**
+
+* Games are always tied to a specific group.
+* Games never query the social graph — they only depend on the group membership list.
+* Firestore triggers handle notifications like `onGameCreated`.
+* This ensures that the game layer remains isolated from social logic and focuses on scheduling, participation, and scoring.
+
+#### **4. Data & Dependency Flow**
+
+```
+Users ⇄ My Community ⇄ Groups ⇄ Games
+```
+
+* **Data Flow:** each layer depends only on the one immediately below.
+* **Dependency Inversion:** upper layers query the lower ones through well-defined Cloud Function interfaces.
+* **No cyclic dependencies** — My Community never queries Groups or Games.
+* This approach allows independent scaling and simpler evolution of the social graph into a richer network later (e.g., followers, blocking, activity feeds).
+
+---
+
+
 ## ✍️ 3. Coding & Quality Standards
 
 ### **General Rules**
@@ -785,4 +839,207 @@ flutter analyze
 - **Environments**: 3 (dev, staging, production)
 - **Lines of Code**: ~2,000+ (infrastructure and tests)
 
-The foundation is solid and ready for feature development! 🚀
+The foundation is solid and ready for feature development!
+
+## ☁️ 11. Cloud Functions Development Standards
+
+All new **Firebase Cloud Functions** must be written with production-grade robustness, consistency, and observability in mind.
+The goal is to ensure **predictable behavior**, **data safety**, and **low operational cost** across environments.
+
+---
+
+### **11.1 Function Design Principles**
+
+Every Cloud Function must be:
+
+| Principle           | Description                                                                                                              |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Idempotent**      | Multiple identical invocations must have the same effect (e.g., using unique operation IDs or transaction-based writes). |
+| **Atomic**          | Database operations should be performed within Firestore transactions when modifying multiple documents.                 |
+| **Fail-Fast**       | Validate all inputs and authentication **before** any write or external API call.                                        |
+| **Deterministic**   | The same inputs should always produce the same output; no random or time-dependent side effects.                         |
+| **Observable**      | All functions must emit structured logs for every significant branch (start, success, error).                            |
+| **Minimal Surface** | Return only the necessary, non-sensitive data. Never return full documents or nested user structures.                    |
+| **Auditable**       | Any data mutation must include a clear actor (from `context.auth.uid`) and a traceable operation path.                   |
+
+---
+
+### **11.2 Input Validation**
+
+Before executing logic, all functions must:
+
+1. Validate authentication:
+
+   ```typescript
+   if (!context.auth) {
+     throw new functions.https.HttpsError('unauthenticated', 'You must be logged in to perform this operation.');
+   }
+   ```
+2. Validate parameters:
+
+   ```typescript
+   if (!data || typeof data.email !== 'string') {
+     throw new functions.https.HttpsError('invalid-argument', 'Expected parameter "email" of type string.');
+   }
+   ```
+3. Validate permissions (custom checks for ownership or roles).
+
+**Rule of thumb:**
+
+> Never trust client input. All assumptions must be revalidated server-side.
+
+---
+
+### **11.3 Firestore Access Pattern**
+
+When querying or mutating Firestore from Cloud Functions:
+
+* Always use the **Admin SDK** (`admin.firestore()`).
+* Use **transactions** for multi-document writes or updates.
+* Keep reads/writes per function call **below 10** to avoid latency and cost spikes.
+* Cache frequently accessed non-sensitive metadata in memory (e.g., collection paths or static configs).
+* Use **indexes** for any repeated compound queries — no unindexed queries in production.
+
+---
+
+### **11.4 Idempotency Enforcement**
+
+Avoid duplicate side effects caused by retries or network instability.
+
+**Strategies:**
+
+* Include a client-generated `operationId` in write operations.
+* Use Firestore transactions to check if the operation has already been applied.
+* Log and short-circuit repeated invocations.
+
+**Example:**
+
+```typescript
+const existing = await db.collection('operations').doc(data.operationId).get();
+if (existing.exists) {
+  return { status: 'duplicate', message: 'Operation already processed.' };
+}
+await db.collection('operations').doc(data.operationId).set({
+  uid: context.auth.uid,
+  type: 'invite_sent',
+  timestamp: admin.firestore.FieldValue.serverTimestamp(),
+});
+```
+
+---
+
+### **11.5 Error Handling & Logging**
+
+Use structured logging and standardized error codes.
+
+**Example:**
+
+```typescript
+try {
+  // Core logic
+} catch (error) {
+  console.error('[inviteUser] Error:', { uid: context.auth?.uid, error });
+  throw new functions.https.HttpsError('internal', 'Failed to send invitation. Please try again later.');
+}
+```
+
+**Required Log Fields:**
+
+* Function name
+* Authenticated user ID (if available)
+* Input summary (never full payload)
+* Error message (on failure)
+* Duration (optional)
+
+**Standard Error Codes:**
+
+| Code                  | Description                                 |
+| --------------------- | ------------------------------------------- |
+| `unauthenticated`     | User not logged in                          |
+| `permission-denied`   | Insufficient privileges                     |
+| `invalid-argument`    | Bad input data                              |
+| `not-found`           | Missing resource                            |
+| `already-exists`      | Duplicate operation or entity               |
+| `failed-precondition` | State conflict (e.g., already joined group) |
+| `internal`            | Unexpected server error                     |
+
+---
+
+### **11.6 Function Deployment Standards**
+
+| Environment | Trigger Type                        | Deployment Rule                                  |
+| ----------- | ----------------------------------- | ------------------------------------------------ |
+| `dev`       | `https.onCall` or `https.onRequest` | Deploy on every merge to `main`                  |
+| `stg`       | `https.onCall` only                 | Manual deploy after QA validation                |
+| `prod`      | `https.onCall` only                 | Deploy via CI/CD pipeline after staging approval |
+
+**Naming convention:**
+
+```
+onUserInviteSent
+onGroupCreated
+onGameScheduled
+```
+
+Always prefix with an **action** (`on` + Verb + Object`).
+
+---
+
+### **11.7 Observability**
+
+* Use **structured JSON logging** — avoid console logs with raw strings.
+* Add **execution time measurement** for long operations.
+* In production, connect to **Google Cloud Logging** for centralized traceability.
+
+---
+
+### **11.8 Testing Cloud Functions**
+
+All functions must have **unit tests + integration tests**.
+
+**Unit Tests:**
+
+* Run with mocked Firestore (`firebase-functions-test`)
+* Cover all branches (valid input, invalid input, unauthenticated, failure)
+
+**Integration Tests:**
+
+* Run using Firebase Emulator Suite
+* Verify Firestore updates, security rules, and callable responses
+
+**Example:**
+
+```bash
+firebase emulators:start --only functions,firestore,auth
+npm run test:functions
+```
+
+---
+
+### **11.9 Cost Efficiency Practices**
+
+| Practice           | Description                                                       |
+| ------------------ | ----------------------------------------------------------------- |
+| Minimize reads     | Aggregate queries in backend or use cached structures             |
+| Batch writes       | Use batched writes when possible                                  |
+| Avoid hot paths    | Use sharding or randomized IDs for high-frequency writes          |
+| Set timeouts       | Explicitly define short timeouts for `onCall` functions           |
+| Denormalize wisely | Duplicate lightweight data (e.g., names, avatars) to reduce joins |
+
+---
+
+### **11.10 Cloud Function Pre-Commit Checklist**
+
+Before committing any new or modified Cloud Function, ensure:
+
+* [ ] Function name follows convention (`onVerbObject`)
+* [ ] Authentication validated (`context.auth`)
+* [ ] Input parameters validated with types
+* [ ] Errors use `HttpsError` with clear codes
+* [ ] Logs structured with context info
+* [ ] Function is idempotent
+* [ ] Tested locally with emulator
+* [ ] Deployed to dev environment only (for review)
+* [ ] Firestore rules reviewed for corresponding access pattern
+
+

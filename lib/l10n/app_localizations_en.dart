@@ -260,4 +260,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorLoadingFriends => 'Error loading friends';
+
+  @override
+  String get searchFriendsByEmail => 'Search friends by email...';
+
+  @override
+  String get cannotAddYourself => 'You cannot add yourself as a friend';
+
+  @override
+  String userNotFoundWithEmail(String email) {
+    return 'No user found with email: $email';
+  }
+
+  @override
+  String get makeSureEmailCorrect => 'Make sure the email is correct';
+
+  @override
+  String get requestPending => 'Pending';
+
+  @override
+  String get acceptRequest => 'Accept Request';
+
+  @override
+  String get sendFriendRequest => 'Add';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get addFriend => 'Add Friend';
+
+  @override
+  String get searchForFriendsToAdd => 'Search for friends to add';
+
+  @override
+  String get enterEmailToFindFriends => 'Enter an email address to find users';
+
+  @override
+  String get checkRequestsTab =>
+      'Check the Requests tab to accept the friend request';
+
+  @override
+  String get ok => 'OK';
 }

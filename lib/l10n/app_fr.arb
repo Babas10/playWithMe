@@ -77,5 +77,18 @@
   "pending": "En Attente",
   "removeFriend": "Supprimer l'Ami ?",
   "removeFriendConfirmation": "Êtes-vous sûr de vouloir retirer {name} de vos amis ?",
-  "errorLoadingFriends": "Erreur lors du chargement des amis"
+  "errorLoadingFriends": "Erreur lors du chargement des amis",
+  "searchFriendsByEmail": "Rechercher des amis par e-mail...",
+  "cannotAddYourself": "Vous ne pouvez pas vous ajouter vous-même comme ami",
+  "userNotFoundWithEmail": "Aucun utilisateur trouvé avec l'e-mail : {email}",
+  "makeSureEmailCorrect": "Assurez-vous que l'e-mail est correct",
+  "requestPending": "En Attente",
+  "acceptRequest": "Accepter la Demande",
+  "sendFriendRequest": "Ajouter",
+  "search": "Rechercher",
+  "addFriend": "Ajouter un Ami",
+  "searchForFriendsToAdd": "Rechercher des amis à ajouter",
+  "enterEmailToFindFriends": "Entrez une adresse e-mail pour trouver des utilisateurs",
+  "checkRequestsTab": "Consultez l'onglet Demandes pour accepter la demande d'ami",
+  "ok": "OK"
 }

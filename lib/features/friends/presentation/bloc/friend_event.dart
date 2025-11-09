@@ -38,6 +38,9 @@ class FriendEvent with _$FriendEvent {
     required String email,
   }) = FriendSearchRequested;
 
+  /// Clear search results
+  const factory FriendEvent.searchCleared() = FriendSearchCleared;
+
   /// Check friendship status with a specific user
   const factory FriendEvent.statusChecked({
     required String userId,

@@ -4,6 +4,9 @@ import * as admin from "firebase-admin";
 // Initialize Firebase Admin SDK
 admin.initializeApp();
 
+// Export Auth triggers
+export {createUserDocument, deleteUserDocument} from "./createUserDocument";
+
 // Export all Cloud Functions
 export {searchUserByEmail} from "./searchUserByEmail";
 export {checkPendingInvitation} from "./checkPendingInvitation";
@@ -20,6 +23,7 @@ export {
   removeFriend,
   getFriends,
   checkFriendshipStatus,
+  getFriendshipRequests,
 } from "./friendships";
 
 // Export notification functions

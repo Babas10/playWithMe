@@ -57,7 +57,7 @@ class FirebaseEmulatorHelper {
     final firestore = FirebaseFirestore.instance;
 
     // Collections to clear
-    final collections = ['users', 'groups', 'games'];
+    final collections = ['users', 'groups', 'games', 'friendships'];
 
     for (final collection in collections) {
       try {
