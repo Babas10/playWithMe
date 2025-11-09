@@ -262,4 +262,49 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorLoadingFriends => 'Fehler beim Laden der Freunde';
+
+  @override
+  String get searchFriendsByEmail => 'Freunde per E-Mail suchen...';
+
+  @override
+  String get cannotAddYourself =>
+      'Sie können sich nicht selbst als Freund hinzufügen';
+
+  @override
+  String userNotFoundWithEmail(String email) {
+    return 'Kein Benutzer mit der E-Mail gefunden: $email';
+  }
+
+  @override
+  String get makeSureEmailCorrect =>
+      'Stellen Sie sicher, dass die E-Mail korrekt ist';
+
+  @override
+  String get requestPending => 'Ausstehend';
+
+  @override
+  String get acceptRequest => 'Anfrage Akzeptieren';
+
+  @override
+  String get sendFriendRequest => 'Hinzufügen';
+
+  @override
+  String get search => 'Suchen';
+
+  @override
+  String get addFriend => 'Freund Hinzufügen';
+
+  @override
+  String get searchForFriendsToAdd => 'Suche nach Freunden zum Hinzufügen';
+
+  @override
+  String get enterEmailToFindFriends =>
+      'Geben Sie eine E-Mail-Adresse ein, um Benutzer zu finden';
+
+  @override
+  String get checkRequestsTab =>
+      'Überprüfen Sie die Registerkarte Anfragen, um die Freundschaftsanfrage anzunehmen';
+
+  @override
+  String get ok => 'OK';
 }

@@ -6,6 +6,7 @@ import 'package:play_with_me/features/friends/presentation/bloc/friend_event.dar
 import 'package:play_with_me/features/friends/presentation/bloc/friend_state.dart';
 import 'package:play_with_me/features/friends/presentation/widgets/friends_list.dart';
 import 'package:play_with_me/features/friends/presentation/widgets/friend_requests_list.dart';
+import 'package:play_with_me/features/friends/presentation/pages/add_friend_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Page for managing friends and friend requests
@@ -48,25 +49,24 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          TabBar(
+    return Scaffold(
+        appBar: AppBar(
+          bottom: TabBar(
             controller: _tabController,
             tabs: [
               Tab(text: l10n.friends),
               Tab(text: l10n.requests),
             ],
           ),
-          Expanded(
-            child: BlocListener<FriendBloc, FriendState>(
+        ),
+        body: BlocListener<FriendBloc, FriendState>(
               listener: (context, state) {
                 state.when(
                   initial: () {},
                   loading: () {},
                   loaded: (friends, receivedRequests, sentRequests) {},
-                  searchResult: (user, isFriend, hasPendingRequest, requestDirection) {},
+                  searchLoading: () {},
+                  searchResult: (user, isFriend, hasPendingRequest, requestDirection, searchedEmail) {},
                   statusResult: (status) {},
                   error: (message) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -111,7 +111,9 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
                         friends: friends,
                         onRemoveFriend: (friendshipId) {
                           context.read<FriendBloc>().add(
-                                FriendEvent.removed(friendshipId: friendshipId),
+                                FriendEvent.removed(
+                                  friendshipId: friendshipId,
+                                ),
                               );
                         },
                       ),
@@ -145,14 +147,10 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
                   ],
                 );
               },
-              searchResult: (user, isFriend, hasPendingRequest, requestDirection) {
-                // This state is not used in this page
-                return const Center(child: Text('Search result'));
-              },
-              statusResult: (status) {
-                // This state is not used in this page
-                return const Center(child: Text('Status result'));
-              },
+              searchLoading: () => const Center(child: CircularProgressIndicator()),
+              searchResult: (user, isFriend, hasPendingRequest, requestDirection, searchedEmail) =>
+                  const Center(child: CircularProgressIndicator()),
+              statusResult: (status) => const Center(child: CircularProgressIndicator()),
               error: (message) {
                 return Center(
                   child: Column(
@@ -194,10 +192,28 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
             );
                 },
               ),
+        ),
+        floatingActionButton: _buildAddFriendButton(context, l10n),
+      );
+  }
+
+  Widget _buildAddFriendButton(BuildContext context, AppLocalizations l10n) {
+    return FloatingActionButton.extended(
+      heroTag: 'add_friend_fab', // Unique tag to avoid Hero conflicts
+      onPressed: () {
+        // Capture the bloc before navigation to avoid context issues
+        final friendBloc = context.read<FriendBloc>();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: friendBloc,
+              child: const AddFriendPage(),
             ),
           ),
-        ],
-      ),
+        );
+      },
+      icon: const Icon(Icons.person_add),
+      label: Text(l10n.addFriend),
     );
   }
 }

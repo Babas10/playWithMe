@@ -27,11 +27,13 @@ mixin _$FriendState {
       List<FriendshipEntity> sentRequests,
     )
     loaded,
+    required TResult Function() searchLoading,
     required TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -48,11 +50,13 @@ mixin _$FriendState {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult? Function()? searchLoading,
     TResult? Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -69,11 +73,13 @@ mixin _$FriendState {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult Function()? searchLoading,
     TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -86,6 +92,7 @@ mixin _$FriendState {
     required TResult Function(FriendInitial value) initial,
     required TResult Function(FriendLoading value) loading,
     required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
     required TResult Function(FriendSearchResult value) searchResult,
     required TResult Function(FriendStatusResult value) statusResult,
     required TResult Function(FriendError value) error,
@@ -96,6 +103,7 @@ mixin _$FriendState {
     TResult? Function(FriendInitial value)? initial,
     TResult? Function(FriendLoading value)? loading,
     TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
     TResult? Function(FriendSearchResult value)? searchResult,
     TResult? Function(FriendStatusResult value)? statusResult,
     TResult? Function(FriendError value)? error,
@@ -106,6 +114,7 @@ mixin _$FriendState {
     TResult Function(FriendInitial value)? initial,
     TResult Function(FriendLoading value)? loading,
     TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
     TResult Function(FriendSearchResult value)? searchResult,
     TResult Function(FriendStatusResult value)? statusResult,
     TResult Function(FriendError value)? error,
@@ -187,11 +196,13 @@ class _$FriendInitialImpl implements FriendInitial {
       List<FriendshipEntity> sentRequests,
     )
     loaded,
+    required TResult Function() searchLoading,
     required TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -212,11 +223,13 @@ class _$FriendInitialImpl implements FriendInitial {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult? Function()? searchLoading,
     TResult? Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -237,11 +250,13 @@ class _$FriendInitialImpl implements FriendInitial {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult Function()? searchLoading,
     TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -261,6 +276,7 @@ class _$FriendInitialImpl implements FriendInitial {
     required TResult Function(FriendInitial value) initial,
     required TResult Function(FriendLoading value) loading,
     required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
     required TResult Function(FriendSearchResult value) searchResult,
     required TResult Function(FriendStatusResult value) statusResult,
     required TResult Function(FriendError value) error,
@@ -275,6 +291,7 @@ class _$FriendInitialImpl implements FriendInitial {
     TResult? Function(FriendInitial value)? initial,
     TResult? Function(FriendLoading value)? loading,
     TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
     TResult? Function(FriendSearchResult value)? searchResult,
     TResult? Function(FriendStatusResult value)? statusResult,
     TResult? Function(FriendError value)? error,
@@ -289,6 +306,7 @@ class _$FriendInitialImpl implements FriendInitial {
     TResult Function(FriendInitial value)? initial,
     TResult Function(FriendLoading value)? loading,
     TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
     TResult Function(FriendSearchResult value)? searchResult,
     TResult Function(FriendStatusResult value)? statusResult,
     TResult Function(FriendError value)? error,
@@ -357,11 +375,13 @@ class _$FriendLoadingImpl implements FriendLoading {
       List<FriendshipEntity> sentRequests,
     )
     loaded,
+    required TResult Function() searchLoading,
     required TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -382,11 +402,13 @@ class _$FriendLoadingImpl implements FriendLoading {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult? Function()? searchLoading,
     TResult? Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -407,11 +429,13 @@ class _$FriendLoadingImpl implements FriendLoading {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult Function()? searchLoading,
     TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -431,6 +455,7 @@ class _$FriendLoadingImpl implements FriendLoading {
     required TResult Function(FriendInitial value) initial,
     required TResult Function(FriendLoading value) loading,
     required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
     required TResult Function(FriendSearchResult value) searchResult,
     required TResult Function(FriendStatusResult value) statusResult,
     required TResult Function(FriendError value) error,
@@ -445,6 +470,7 @@ class _$FriendLoadingImpl implements FriendLoading {
     TResult? Function(FriendInitial value)? initial,
     TResult? Function(FriendLoading value)? loading,
     TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
     TResult? Function(FriendSearchResult value)? searchResult,
     TResult? Function(FriendStatusResult value)? statusResult,
     TResult? Function(FriendError value)? error,
@@ -459,6 +485,7 @@ class _$FriendLoadingImpl implements FriendLoading {
     TResult Function(FriendInitial value)? initial,
     TResult Function(FriendLoading value)? loading,
     TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
     TResult Function(FriendSearchResult value)? searchResult,
     TResult Function(FriendStatusResult value)? statusResult,
     TResult Function(FriendError value)? error,
@@ -611,11 +638,13 @@ class _$FriendLoadedImpl implements FriendLoaded {
       List<FriendshipEntity> sentRequests,
     )
     loaded,
+    required TResult Function() searchLoading,
     required TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -636,11 +665,13 @@ class _$FriendLoadedImpl implements FriendLoaded {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult? Function()? searchLoading,
     TResult? Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -661,11 +692,13 @@ class _$FriendLoadedImpl implements FriendLoaded {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult Function()? searchLoading,
     TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -685,6 +718,7 @@ class _$FriendLoadedImpl implements FriendLoaded {
     required TResult Function(FriendInitial value) initial,
     required TResult Function(FriendLoading value) loading,
     required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
     required TResult Function(FriendSearchResult value) searchResult,
     required TResult Function(FriendStatusResult value) statusResult,
     required TResult Function(FriendError value) error,
@@ -699,6 +733,7 @@ class _$FriendLoadedImpl implements FriendLoaded {
     TResult? Function(FriendInitial value)? initial,
     TResult? Function(FriendLoading value)? loading,
     TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
     TResult? Function(FriendSearchResult value)? searchResult,
     TResult? Function(FriendStatusResult value)? statusResult,
     TResult? Function(FriendError value)? error,
@@ -713,6 +748,7 @@ class _$FriendLoadedImpl implements FriendLoaded {
     TResult Function(FriendInitial value)? initial,
     TResult Function(FriendLoading value)? loading,
     TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
     TResult Function(FriendSearchResult value)? searchResult,
     TResult Function(FriendStatusResult value)? statusResult,
     TResult Function(FriendError value)? error,
@@ -745,6 +781,186 @@ abstract class FriendLoaded implements FriendState {
 }
 
 /// @nodoc
+abstract class _$$FriendSearchLoadingImplCopyWith<$Res> {
+  factory _$$FriendSearchLoadingImplCopyWith(
+    _$FriendSearchLoadingImpl value,
+    $Res Function(_$FriendSearchLoadingImpl) then,
+  ) = __$$FriendSearchLoadingImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$FriendSearchLoadingImplCopyWithImpl<$Res>
+    extends _$FriendStateCopyWithImpl<$Res, _$FriendSearchLoadingImpl>
+    implements _$$FriendSearchLoadingImplCopyWith<$Res> {
+  __$$FriendSearchLoadingImplCopyWithImpl(
+    _$FriendSearchLoadingImpl _value,
+    $Res Function(_$FriendSearchLoadingImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of FriendState
+  /// with the given fields replaced by the non-null parameter values.
+}
+
+/// @nodoc
+
+class _$FriendSearchLoadingImpl implements FriendSearchLoading {
+  const _$FriendSearchLoadingImpl();
+
+  @override
+  String toString() {
+    return 'FriendState.searchLoading()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FriendSearchLoadingImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(
+      List<UserEntity> friends,
+      List<FriendshipEntity> receivedRequests,
+      List<FriendshipEntity> sentRequests,
+    )
+    loaded,
+    required TResult Function() searchLoading,
+    required TResult Function(
+      UserEntity? user,
+      bool isFriend,
+      bool hasPendingRequest,
+      String? requestDirection,
+      String searchedEmail,
+    )
+    searchResult,
+    required TResult Function(FriendshipStatusResult status) statusResult,
+    required TResult Function(String message) error,
+    required TResult Function(String message) actionSuccess,
+  }) {
+    return searchLoading();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(
+      List<UserEntity> friends,
+      List<FriendshipEntity> receivedRequests,
+      List<FriendshipEntity> sentRequests,
+    )?
+    loaded,
+    TResult? Function()? searchLoading,
+    TResult? Function(
+      UserEntity? user,
+      bool isFriend,
+      bool hasPendingRequest,
+      String? requestDirection,
+      String searchedEmail,
+    )?
+    searchResult,
+    TResult? Function(FriendshipStatusResult status)? statusResult,
+    TResult? Function(String message)? error,
+    TResult? Function(String message)? actionSuccess,
+  }) {
+    return searchLoading?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(
+      List<UserEntity> friends,
+      List<FriendshipEntity> receivedRequests,
+      List<FriendshipEntity> sentRequests,
+    )?
+    loaded,
+    TResult Function()? searchLoading,
+    TResult Function(
+      UserEntity? user,
+      bool isFriend,
+      bool hasPendingRequest,
+      String? requestDirection,
+      String searchedEmail,
+    )?
+    searchResult,
+    TResult Function(FriendshipStatusResult status)? statusResult,
+    TResult Function(String message)? error,
+    TResult Function(String message)? actionSuccess,
+    required TResult orElse(),
+  }) {
+    if (searchLoading != null) {
+      return searchLoading();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(FriendInitial value) initial,
+    required TResult Function(FriendLoading value) loading,
+    required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
+    required TResult Function(FriendSearchResult value) searchResult,
+    required TResult Function(FriendStatusResult value) statusResult,
+    required TResult Function(FriendError value) error,
+    required TResult Function(FriendActionSuccess value) actionSuccess,
+  }) {
+    return searchLoading(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(FriendInitial value)? initial,
+    TResult? Function(FriendLoading value)? loading,
+    TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
+    TResult? Function(FriendSearchResult value)? searchResult,
+    TResult? Function(FriendStatusResult value)? statusResult,
+    TResult? Function(FriendError value)? error,
+    TResult? Function(FriendActionSuccess value)? actionSuccess,
+  }) {
+    return searchLoading?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(FriendInitial value)? initial,
+    TResult Function(FriendLoading value)? loading,
+    TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
+    TResult Function(FriendSearchResult value)? searchResult,
+    TResult Function(FriendStatusResult value)? statusResult,
+    TResult Function(FriendError value)? error,
+    TResult Function(FriendActionSuccess value)? actionSuccess,
+    required TResult orElse(),
+  }) {
+    if (searchLoading != null) {
+      return searchLoading(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class FriendSearchLoading implements FriendState {
+  const factory FriendSearchLoading() = _$FriendSearchLoadingImpl;
+}
+
+/// @nodoc
 abstract class _$$FriendSearchResultImplCopyWith<$Res> {
   factory _$$FriendSearchResultImplCopyWith(
     _$FriendSearchResultImpl value,
@@ -756,6 +972,7 @@ abstract class _$$FriendSearchResultImplCopyWith<$Res> {
     bool isFriend,
     bool hasPendingRequest,
     String? requestDirection,
+    String searchedEmail,
   });
 
   $UserEntityCopyWith<$Res>? get user;
@@ -779,6 +996,7 @@ class __$$FriendSearchResultImplCopyWithImpl<$Res>
     Object? isFriend = null,
     Object? hasPendingRequest = null,
     Object? requestDirection = freezed,
+    Object? searchedEmail = null,
   }) {
     return _then(
       _$FriendSearchResultImpl(
@@ -798,6 +1016,10 @@ class __$$FriendSearchResultImplCopyWithImpl<$Res>
             ? _value.requestDirection
             : requestDirection // ignore: cast_nullable_to_non_nullable
                   as String?,
+        searchedEmail: null == searchedEmail
+            ? _value.searchedEmail
+            : searchedEmail // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -825,6 +1047,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
     required this.isFriend,
     required this.hasPendingRequest,
     this.requestDirection,
+    required this.searchedEmail,
   });
 
   @override
@@ -835,10 +1058,12 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
   final bool hasPendingRequest;
   @override
   final String? requestDirection;
+  @override
+  final String searchedEmail;
 
   @override
   String toString() {
-    return 'FriendState.searchResult(user: $user, isFriend: $isFriend, hasPendingRequest: $hasPendingRequest, requestDirection: $requestDirection)';
+    return 'FriendState.searchResult(user: $user, isFriend: $isFriend, hasPendingRequest: $hasPendingRequest, requestDirection: $requestDirection, searchedEmail: $searchedEmail)';
   }
 
   @override
@@ -852,7 +1077,9 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
             (identical(other.hasPendingRequest, hasPendingRequest) ||
                 other.hasPendingRequest == hasPendingRequest) &&
             (identical(other.requestDirection, requestDirection) ||
-                other.requestDirection == requestDirection));
+                other.requestDirection == requestDirection) &&
+            (identical(other.searchedEmail, searchedEmail) ||
+                other.searchedEmail == searchedEmail));
   }
 
   @override
@@ -862,6 +1089,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
     isFriend,
     hasPendingRequest,
     requestDirection,
+    searchedEmail,
   );
 
   /// Create a copy of FriendState
@@ -886,18 +1114,26 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       List<FriendshipEntity> sentRequests,
     )
     loaded,
+    required TResult Function() searchLoading,
     required TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
     required TResult Function(String message) error,
     required TResult Function(String message) actionSuccess,
   }) {
-    return searchResult(user, isFriend, hasPendingRequest, requestDirection);
+    return searchResult(
+      user,
+      isFriend,
+      hasPendingRequest,
+      requestDirection,
+      searchedEmail,
+    );
   }
 
   @override
@@ -911,11 +1147,13 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult? Function()? searchLoading,
     TResult? Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -927,6 +1165,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       isFriend,
       hasPendingRequest,
       requestDirection,
+      searchedEmail,
     );
   }
 
@@ -941,11 +1180,13 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult Function()? searchLoading,
     TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -954,7 +1195,13 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
     required TResult orElse(),
   }) {
     if (searchResult != null) {
-      return searchResult(user, isFriend, hasPendingRequest, requestDirection);
+      return searchResult(
+        user,
+        isFriend,
+        hasPendingRequest,
+        requestDirection,
+        searchedEmail,
+      );
     }
     return orElse();
   }
@@ -965,6 +1212,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
     required TResult Function(FriendInitial value) initial,
     required TResult Function(FriendLoading value) loading,
     required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
     required TResult Function(FriendSearchResult value) searchResult,
     required TResult Function(FriendStatusResult value) statusResult,
     required TResult Function(FriendError value) error,
@@ -979,6 +1227,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
     TResult? Function(FriendInitial value)? initial,
     TResult? Function(FriendLoading value)? loading,
     TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
     TResult? Function(FriendSearchResult value)? searchResult,
     TResult? Function(FriendStatusResult value)? statusResult,
     TResult? Function(FriendError value)? error,
@@ -993,6 +1242,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
     TResult Function(FriendInitial value)? initial,
     TResult Function(FriendLoading value)? loading,
     TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
     TResult Function(FriendSearchResult value)? searchResult,
     TResult Function(FriendStatusResult value)? statusResult,
     TResult Function(FriendError value)? error,
@@ -1012,12 +1262,14 @@ abstract class FriendSearchResult implements FriendState {
     required final bool isFriend,
     required final bool hasPendingRequest,
     final String? requestDirection,
+    required final String searchedEmail,
   }) = _$FriendSearchResultImpl;
 
   UserEntity? get user;
   bool get isFriend;
   bool get hasPendingRequest;
   String? get requestDirection;
+  String get searchedEmail;
 
   /// Create a copy of FriendState
   /// with the given fields replaced by the non-null parameter values.
@@ -1119,11 +1371,13 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
       List<FriendshipEntity> sentRequests,
     )
     loaded,
+    required TResult Function() searchLoading,
     required TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -1144,11 +1398,13 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult? Function()? searchLoading,
     TResult? Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -1169,11 +1425,13 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult Function()? searchLoading,
     TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -1193,6 +1451,7 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
     required TResult Function(FriendInitial value) initial,
     required TResult Function(FriendLoading value) loading,
     required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
     required TResult Function(FriendSearchResult value) searchResult,
     required TResult Function(FriendStatusResult value) statusResult,
     required TResult Function(FriendError value) error,
@@ -1207,6 +1466,7 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
     TResult? Function(FriendInitial value)? initial,
     TResult? Function(FriendLoading value)? loading,
     TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
     TResult? Function(FriendSearchResult value)? searchResult,
     TResult? Function(FriendStatusResult value)? statusResult,
     TResult? Function(FriendError value)? error,
@@ -1221,6 +1481,7 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
     TResult Function(FriendInitial value)? initial,
     TResult Function(FriendLoading value)? loading,
     TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
     TResult Function(FriendSearchResult value)? searchResult,
     TResult Function(FriendStatusResult value)? statusResult,
     TResult Function(FriendError value)? error,
@@ -1326,11 +1587,13 @@ class _$FriendErrorImpl implements FriendError {
       List<FriendshipEntity> sentRequests,
     )
     loaded,
+    required TResult Function() searchLoading,
     required TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -1351,11 +1614,13 @@ class _$FriendErrorImpl implements FriendError {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult? Function()? searchLoading,
     TResult? Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -1376,11 +1641,13 @@ class _$FriendErrorImpl implements FriendError {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult Function()? searchLoading,
     TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -1400,6 +1667,7 @@ class _$FriendErrorImpl implements FriendError {
     required TResult Function(FriendInitial value) initial,
     required TResult Function(FriendLoading value) loading,
     required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
     required TResult Function(FriendSearchResult value) searchResult,
     required TResult Function(FriendStatusResult value) statusResult,
     required TResult Function(FriendError value) error,
@@ -1414,6 +1682,7 @@ class _$FriendErrorImpl implements FriendError {
     TResult? Function(FriendInitial value)? initial,
     TResult? Function(FriendLoading value)? loading,
     TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
     TResult? Function(FriendSearchResult value)? searchResult,
     TResult? Function(FriendStatusResult value)? statusResult,
     TResult? Function(FriendError value)? error,
@@ -1428,6 +1697,7 @@ class _$FriendErrorImpl implements FriendError {
     TResult Function(FriendInitial value)? initial,
     TResult Function(FriendLoading value)? loading,
     TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
     TResult Function(FriendSearchResult value)? searchResult,
     TResult Function(FriendStatusResult value)? statusResult,
     TResult Function(FriendError value)? error,
@@ -1535,11 +1805,13 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
       List<FriendshipEntity> sentRequests,
     )
     loaded,
+    required TResult Function() searchLoading,
     required TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -1560,11 +1832,13 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult? Function()? searchLoading,
     TResult? Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -1585,11 +1859,13 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
       List<FriendshipEntity> sentRequests,
     )?
     loaded,
+    TResult Function()? searchLoading,
     TResult Function(
       UserEntity? user,
       bool isFriend,
       bool hasPendingRequest,
       String? requestDirection,
+      String searchedEmail,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -1609,6 +1885,7 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
     required TResult Function(FriendInitial value) initial,
     required TResult Function(FriendLoading value) loading,
     required TResult Function(FriendLoaded value) loaded,
+    required TResult Function(FriendSearchLoading value) searchLoading,
     required TResult Function(FriendSearchResult value) searchResult,
     required TResult Function(FriendStatusResult value) statusResult,
     required TResult Function(FriendError value) error,
@@ -1623,6 +1900,7 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
     TResult? Function(FriendInitial value)? initial,
     TResult? Function(FriendLoading value)? loading,
     TResult? Function(FriendLoaded value)? loaded,
+    TResult? Function(FriendSearchLoading value)? searchLoading,
     TResult? Function(FriendSearchResult value)? searchResult,
     TResult? Function(FriendStatusResult value)? statusResult,
     TResult? Function(FriendError value)? error,
@@ -1637,6 +1915,7 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
     TResult Function(FriendInitial value)? initial,
     TResult Function(FriendLoading value)? loading,
     TResult Function(FriendLoaded value)? loaded,
+    TResult Function(FriendSearchLoading value)? searchLoading,
     TResult Function(FriendSearchResult value)? searchResult,
     TResult Function(FriendStatusResult value)? statusResult,
     TResult Function(FriendError value)? error,
