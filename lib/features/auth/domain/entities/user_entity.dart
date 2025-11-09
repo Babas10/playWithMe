@@ -14,6 +14,10 @@ class UserEntity with _$UserEntity {
     DateTime? lastSignInAt,
     required bool isAnonymous,
     @Default([]) List<String> fcmTokens,
+    // Social graph cache fields (Story 11.6)
+    @Default([]) List<String> friendIds,
+    @Default(0) int friendCount,
+    DateTime? friendsLastUpdated,
   }) = _UserEntity;
 
   const UserEntity._();
@@ -23,4 +27,16 @@ class UserEntity with _$UserEntity {
 
   /// Get display name or fallback to email
   String get displayNameOrEmail => displayName ?? email;
+
+  /// Check if user is a friend (Story 11.6)
+  bool isFriend(String userId) => friendIds.contains(userId);
+
+  /// Check if friend cache needs refresh (Story 11.6)
+  /// Cache is considered stale after 24 hours
+  bool get needsFriendCacheRefresh {
+    if (friendsLastUpdated == null) return true;
+    final hoursSinceUpdate =
+        DateTime.now().difference(friendsLastUpdated!).inHours;
+    return hoursSinceUpdate > 24;
+  }
 }

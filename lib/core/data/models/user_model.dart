@@ -25,6 +25,10 @@ class UserModel with _$UserModel {
     String? bio,
     @Default([]) List<String> groupIds,
     @Default([]) List<String> gameIds,
+    // Social graph cache fields (Story 11.6)
+    @Default([]) List<String> friendIds,
+    @Default(0) int friendCount,
+    @TimestampConverter() DateTime? friendsLastUpdated,
     // User preferences
     @Default(true) bool notificationsEnabled,
     @Default(true) bool emailNotifications,
@@ -182,6 +186,40 @@ class UserModel with _$UserModel {
       totalScore: totalScore + score,
       updatedAt: DateTime.now(),
     );
+  }
+
+  /// Add friend to cache (Story 11.6)
+  UserModel addFriend(String friendId) {
+    if (friendIds.contains(friendId)) return this;
+    return copyWith(
+      friendIds: [...friendIds, friendId],
+      friendCount: friendCount + 1,
+      friendsLastUpdated: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Remove friend from cache (Story 11.6)
+  UserModel removeFriend(String friendId) {
+    if (!friendIds.contains(friendId)) return this;
+    return copyWith(
+      friendIds: friendIds.where((id) => id != friendId).toList(),
+      friendCount: friendCount > 0 ? friendCount - 1 : 0,
+      friendsLastUpdated: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Check if user is a friend (Story 11.6)
+  bool isFriend(String userId) => friendIds.contains(userId);
+
+  /// Check if friend cache needs refresh (Story 11.6)
+  /// Cache is considered stale after 24 hours
+  bool get needsFriendCacheRefresh {
+    if (friendsLastUpdated == null) return true;
+    final hoursSinceUpdate =
+        DateTime.now().difference(friendsLastUpdated!).inHours;
+    return hoursSinceUpdate > 24;
   }
 }
 
