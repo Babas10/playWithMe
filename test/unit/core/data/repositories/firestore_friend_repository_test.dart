@@ -493,41 +493,36 @@ void main() {
   group('getPendingRequests', () {
     test('should return list of sent pending requests', () async {
       // Arrange
-      final mockCollection = MockCollectionReference();
-      final mockQuery = MockQuery();
-      final mockQuerySnapshot = MockQuerySnapshot();
-      final mockDoc1 = MockQueryDocumentSnapshot();
-      final mockDoc2 = MockQueryDocumentSnapshot();
+      final mockCallable = MockHttpsCallable();
+      final mockResult = MockHttpsCallableResult();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('initiatorId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.get()).thenAnswer((_) async => mockQuerySnapshot);
-      when(() => mockQuerySnapshot.docs).thenReturn([mockDoc1, mockDoc2]);
-
-      when(() => mockDoc1.id).thenReturn('friendship-1');
-      when(() => mockDoc1.data()).thenReturn({
-        'initiatorId': 'test-user-id',
-        'recipientId': 'recipient-1',
-        'initiatorName': 'Test User',
-        'recipientName': 'Recipient One',
-        'status': 'pending',
-        'createdAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
-      });
-
-      when(() => mockDoc2.id).thenReturn('friendship-2');
-      when(() => mockDoc2.data()).thenReturn({
-        'initiatorId': 'test-user-id',
-        'recipientId': 'recipient-2',
-        'initiatorName': 'Test User',
-        'recipientName': 'Recipient Two',
-        'status': 'pending',
-        'createdAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
+      when(() => mockFunctions.httpsCallable('getFriendshipRequests'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call()).thenAnswer((_) async => mockResult);
+      when(() => mockResult.data).thenReturn({
+        'sentRequests': [
+          {
+            'id': 'friendship-1',
+            'initiatorId': 'test-user-id',
+            'recipientId': 'recipient-1',
+            'initiatorName': 'Test User',
+            'recipientName': 'Recipient One',
+            'status': 'pending',
+            'createdAt': {'_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000},
+            'updatedAt': {'_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000},
+          },
+          {
+            'id': 'friendship-2',
+            'initiatorId': 'test-user-id',
+            'recipientId': 'recipient-2',
+            'initiatorName': 'Test User',
+            'recipientName': 'Recipient Two',
+            'status': 'pending',
+            'createdAt': {'_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000},
+            'updatedAt': {'_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000},
+          },
+        ],
+        'receivedRequests': [],
       });
 
       // Act
@@ -544,18 +539,16 @@ void main() {
 
     test('should return list of received pending requests', () async {
       // Arrange
-      final mockCollection = MockCollectionReference();
-      final mockQuery = MockQuery();
-      final mockQuerySnapshot = MockQuerySnapshot();
+      final mockCallable = MockHttpsCallable();
+      final mockResult = MockHttpsCallableResult();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('recipientId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.get()).thenAnswer((_) async => mockQuerySnapshot);
-      when(() => mockQuerySnapshot.docs).thenReturn([]);
+      when(() => mockFunctions.httpsCallable('getFriendshipRequests'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call()).thenAnswer((_) async => mockResult);
+      when(() => mockResult.data).thenReturn({
+        'sentRequests': [],
+        'receivedRequests': [],
+      });
 
       // Act
       final requests = await repository.getPendingRequests(
@@ -564,8 +557,7 @@ void main() {
 
       // Assert
       expect(requests, isEmpty);
-      verify(() => mockQuery.where('recipientId', isEqualTo: 'test-user-id'))
-          .called(1);
+      verify(() => mockFunctions.httpsCallable('getFriendshipRequests')).called(1);
     });
 
     test('should throw FriendshipException when user not authenticated',
@@ -586,20 +578,15 @@ void main() {
       );
     });
 
-    test('should throw FriendshipException on Firestore error', () async {
+    test('should throw FriendshipException on Cloud Function error', () async {
       // Arrange
-      final mockCollection = MockCollectionReference();
-      final mockQuery = MockQuery();
+      final mockCallable = MockHttpsCallable();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('initiatorId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.get()).thenThrow(
-        FirebaseException(
-          plugin: 'firestore',
+      when(() => mockFunctions.httpsCallable('getFriendshipRequests'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call()).thenThrow(
+        FirebaseFunctionsException(
+          code: 'internal',
           message: 'Network error',
         ),
       );
