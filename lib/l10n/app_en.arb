@@ -399,5 +399,75 @@
   "errorLoadingFriends": "Error loading friends",
   "@errorLoadingFriends": {
     "description": "Error message when friends fail to load"
+  },
+
+  "searchFriendsByEmail": "Search friends by email...",
+  "@searchFriendsByEmail": {
+    "description": "Hint text for friend search input"
+  },
+
+  "cannotAddYourself": "You cannot add yourself as a friend",
+  "@cannotAddYourself": {
+    "description": "Message when user searches for their own email"
+  },
+
+  "userNotFoundWithEmail": "No user found with email: {email}",
+  "@userNotFoundWithEmail": {
+    "description": "Message when no user is found with the searched email",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+
+  "makeSureEmailCorrect": "Make sure the email is correct",
+  "@makeSureEmailCorrect": {
+    "description": "Suggestion message for email not found"
+  },
+
+  "requestPending": "Pending",
+  "@requestPending": {
+    "description": "Label for pending friend request"
+  },
+
+  "acceptRequest": "Accept Request",
+  "@acceptRequest": {
+    "description": "Button text to accept a friend request"
+  },
+
+  "sendFriendRequest": "Add",
+  "@sendFriendRequest": {
+    "description": "Button text to send a friend request"
+  },
+
+  "search": "Search",
+  "@search": {
+    "description": "Search button label"
+  },
+
+  "addFriend": "Add Friend",
+  "@addFriend": {
+    "description": "Button to add a new friend"
+  },
+
+  "searchForFriendsToAdd": "Search for friends to add",
+  "@searchForFriendsToAdd": {
+    "description": "Empty state title on add friend page"
+  },
+
+  "enterEmailToFindFriends": "Enter an email address to find users",
+  "@enterEmailToFindFriends": {
+    "description": "Empty state subtitle on add friend page"
+  },
+
+  "checkRequestsTab": "Check the Requests tab to accept the friend request",
+  "@checkRequestsTab": {
+    "description": "Message shown when user needs to navigate to requests tab"
+  },
+
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button label"
   }
 }

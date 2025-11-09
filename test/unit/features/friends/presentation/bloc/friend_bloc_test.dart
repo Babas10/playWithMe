@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/domain/entities/friendship_entity.dart';
 import 'package:play_with_me/core/domain/entities/friendship_status_result.dart';
+import 'package:play_with_me/core/domain/entities/user_search_result.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
@@ -376,14 +377,50 @@ void main() {
 
     group('FriendSearchRequested', () {
       blocTest<FriendBloc, FriendState>(
-        'emits [loading, error] as search is not yet implemented',
-        build: () => friendBloc,
+        'emits [searchLoading, searchResult] when user is found',
+        build: () {
+          when(() => mockAuthRepository.currentUser).thenReturn(testUser);
+          when(() => mockFriendRepository.searchUserByEmail('friend@example.com'))
+              .thenAnswer((_) async => UserSearchResult(
+                    user: testFriend,
+                    isFriend: false,
+                    hasPendingRequest: false,
+                  ));
+          return friendBloc;
+        },
+        act: (bloc) => bloc.add(
+          const FriendEvent.searchRequested(email: 'friend@example.com'),
+        ),
+        expect: () => [
+          const FriendState.searchLoading(),
+          FriendState.searchResult(
+            user: testFriend,
+            isFriend: false,
+            hasPendingRequest: false,
+            requestDirection: null,
+            searchedEmail: 'friend@example.com',
+          ),
+        ],
+      );
+
+      blocTest<FriendBloc, FriendState>(
+        'emits [searchLoading, searchResult] with null user when searching own email',
+        build: () {
+          when(() => mockAuthRepository.currentUser).thenReturn(testUser);
+          return friendBloc;
+        },
         act: (bloc) => bloc.add(
           const FriendEvent.searchRequested(email: 'test@example.com'),
         ),
         expect: () => [
-          const FriendState.loading(),
-          const FriendState.error(message: 'User search not yet implemented'),
+          const FriendState.searchLoading(),
+          const FriendState.searchResult(
+            user: null,
+            isFriend: false,
+            hasPendingRequest: false,
+            requestDirection: null,
+            searchedEmail: 'test@example.com',
+          ),
         ],
       );
     });

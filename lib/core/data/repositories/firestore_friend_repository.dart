@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:play_with_me/core/domain/entities/friendship_entity.dart';
 import 'package:play_with_me/core/domain/entities/friendship_status_result.dart';
+import 'package:play_with_me/core/domain/entities/user_search_result.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 
@@ -138,24 +139,27 @@ class FirestoreFriendRepository implements FriendRepository {
     try {
       final callable = _functions.httpsCallable('getFriends');
       final result = await callable.call({'userId': userId});
-      final friendsData = (result.data['friends'] as List);
+
+      // Safely cast the result data
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final friendsData = (data['friends'] as List? ?? []);
 
       // Convert each friend data to UserEntity
       final friends = friendsData.map((json) {
-        final data = json as Map<String, dynamic>;
+        final userData = Map<String, dynamic>.from(json as Map);
         return UserEntity(
-          uid: data['uid'] as String,
-          email: data['email'] as String,
-          displayName: data['displayName'] as String?,
-          photoUrl: data['photoUrl'] as String?,
-          isEmailVerified: data['isEmailVerified'] as bool? ?? false,
-          createdAt: data['createdAt'] != null
-              ? DateTime.parse(data['createdAt'] as String)
+          uid: userData['uid'] as String,
+          email: userData['email'] as String,
+          displayName: userData['displayName'] as String?,
+          photoUrl: userData['photoUrl'] as String?,
+          isEmailVerified: userData['isEmailVerified'] as bool? ?? false,
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'] as String)
               : null,
-          lastSignInAt: data['lastSignInAt'] != null
-              ? DateTime.parse(data['lastSignInAt'] as String)
+          lastSignInAt: userData['lastSignInAt'] != null
+              ? DateTime.parse(userData['lastSignInAt'] as String)
               : null,
-          isAnonymous: data['isAnonymous'] as bool? ?? false,
+          isAnonymous: userData['isAnonymous'] as bool? ?? false,
         );
       }).toList();
 
@@ -177,29 +181,51 @@ class FirestoreFriendRepository implements FriendRepository {
         throw FriendshipException('User not authenticated');
       }
 
-      // Query friendships where status is pending
-      // and current user is either initiator (sent) or recipient (received)
-      Query<Map<String, dynamic>> query = _firestore
-          .collection('friendships')
-          .where('status', isEqualTo: 'pending');
+      // Call Cloud Function to get friendship requests
+      // This uses Admin SDK on backend to bypass security rules
+      final callable = _functions.httpsCallable('getFriendshipRequests');
+      final result = await callable.call();
 
-      if (type == FriendRequestType.sent) {
-        query = query.where('initiatorId', isEqualTo: currentUserId);
-      } else {
-        query = query.where('recipientId', isEqualTo: currentUserId);
-      }
+      final data = Map<String, dynamic>.from(result.data as Map);
 
-      final snapshot = await query.get();
-      return snapshot.docs
-          .map((doc) => FriendshipEntity.fromJson({
-                'id': doc.id,
-                ...doc.data(),
-              }))
-          .toList();
+      // Parse the appropriate list based on request type
+      final List<dynamic> requestsData = type == FriendRequestType.received
+          ? (data['receivedRequests'] as List? ?? [])
+          : (data['sentRequests'] as List? ?? []);
+
+      return requestsData.map((json) {
+        final requestData = Map<String, dynamic>.from(json as Map);
+
+        // Convert Firestore Timestamps to DateTime
+        // The Cloud Function returns Timestamp objects that need conversion
+        DateTime parseTimestamp(dynamic timestamp) {
+          if (timestamp == null) return DateTime.now();
+          if (timestamp is DateTime) return timestamp;
+          // Firestore Timestamp has _seconds and _nanoseconds fields
+          if (timestamp is Map) {
+            final seconds = timestamp['_seconds'] ?? timestamp['seconds'];
+            if (seconds != null) {
+              return DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+            }
+          }
+          return DateTime.now();
+        }
+
+        return FriendshipEntity.fromJson({
+          'id': requestData['id'],
+          'initiatorId': requestData['initiatorId'],
+          'initiatorName': requestData['initiatorName'],
+          'recipientId': requestData['recipientId'],
+          'recipientName': requestData['recipientName'],
+          'status': requestData['status'],
+          'createdAt': parseTimestamp(requestData['createdAt']).toIso8601String(),
+          'updatedAt': parseTimestamp(requestData['updatedAt']).toIso8601String(),
+        });
+      }).toList();
+    } on FirebaseFunctionsException catch (e) {
+      throw _handleError(e);
     } on FriendshipException {
       rethrow;
-    } on FirebaseException catch (e) {
-      throw FriendshipException('Failed to get pending requests: ${e.message}');
     } catch (e) {
       throw FriendshipException('Failed to get pending requests: $e');
     }
@@ -217,6 +243,51 @@ class FirestoreFriendRepository implements FriendRepository {
       throw _handleError(e);
     } catch (e) {
       throw FriendshipException('Failed to check friendship status: $e');
+    }
+  }
+
+  @override
+  Future<UserSearchResult> searchUserByEmail(String email) async {
+    try {
+      final callable = _functions.httpsCallable('searchUserByEmail');
+      final result = await callable.call({'email': email});
+
+      // Convert result.data to Map<String, dynamic> safely
+      final data = Map<String, dynamic>.from(result.data as Map);
+
+      // Parse user data if present
+      UserEntity? user;
+      if (data['user'] != null) {
+        // Convert nested map safely
+        final userDataRaw = data['user'];
+        final userData = Map<String, dynamic>.from(userDataRaw as Map);
+
+        user = UserEntity(
+          uid: userData['uid'] as String,
+          email: userData['email'] as String,
+          displayName: userData['displayName'] as String?,
+          photoUrl: userData['photoUrl'] as String?,
+          isEmailVerified: userData['isEmailVerified'] as bool? ?? false,
+          createdAt: userData['createdAt'] != null
+              ? DateTime.parse(userData['createdAt'] as String)
+              : null,
+          lastSignInAt: userData['lastSignInAt'] != null
+              ? DateTime.parse(userData['lastSignInAt'] as String)
+              : null,
+          isAnonymous: userData['isAnonymous'] as bool? ?? false,
+        );
+      }
+
+      return UserSearchResult(
+        user: user,
+        isFriend: data['isFriend'] as bool? ?? false,
+        hasPendingRequest: data['hasPendingRequest'] as bool? ?? false,
+        requestDirection: data['requestDirection'] as String?,
+      );
+    } on FirebaseFunctionsException catch (e) {
+      throw _handleError(e);
+    } catch (e) {
+      throw FriendshipException('Failed to search user by email: $e');
     }
   }
 

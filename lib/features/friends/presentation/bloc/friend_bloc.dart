@@ -25,6 +25,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     on<FriendRequestCancelled>(_onRequestCancelled);
     on<FriendRemoved>(_onRemoved);
     on<FriendSearchRequested>(_onSearchRequested);
+    on<FriendSearchCleared>(_onSearchCleared);
     on<FriendStatusChecked>(_onStatusChecked);
   }
 
@@ -67,7 +68,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
           sentRequests: [],
         ));
       }
-    } on FriendshipException catch (e) {
+    } on FriendshipException {
       // Show empty state instead of error for missing cloud functions
       emit(const FriendState.loaded(
         friends: [],
@@ -200,12 +201,35 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     Emitter<FriendState> emit,
   ) async {
     try {
-      emit(const FriendState.loading());
+      emit(const FriendState.searchLoading());
 
-      // This would require a cloud function to search users by email
-      // For now, we'll emit an error indicating this feature needs implementation
-      emit(const FriendState.error(
-        message: 'User search not yet implemented',
+      final currentUser = _authRepository.currentUser;
+      if (currentUser == null) {
+        emit(const FriendState.error(message: 'User not authenticated'));
+        return;
+      }
+
+      // Check if searching for own email
+      if (event.email.toLowerCase() == currentUser.email.toLowerCase()) {
+        emit(FriendState.searchResult(
+          user: null,
+          isFriend: false,
+          hasPendingRequest: false,
+          requestDirection: null,
+          searchedEmail: event.email,
+        ));
+        return;
+      }
+
+      // Call repository to search by email
+      final result = await _friendRepository.searchUserByEmail(event.email);
+
+      emit(FriendState.searchResult(
+        user: result.user,
+        isFriend: result.isFriend,
+        hasPendingRequest: result.hasPendingRequest,
+        requestDirection: result.requestDirection,
+        searchedEmail: event.email,
       ));
     } on FriendshipException catch (e) {
       emit(FriendState.error(message: e.message));
@@ -215,6 +239,14 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
           : ('Failed to search for user', true);
       emit(FriendState.error(message: message));
     }
+  }
+
+  Future<void> _onSearchCleared(
+    FriendSearchCleared event,
+    Emitter<FriendState> emit,
+  ) async {
+    // Return to initial/loaded state
+    add(const FriendEvent.loadRequested());
   }
 
   Future<void> _onStatusChecked(

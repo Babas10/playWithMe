@@ -571,6 +571,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error loading friends'**
   String get errorLoadingFriends;
+
+  /// Hint text for friend search input
+  ///
+  /// In en, this message translates to:
+  /// **'Search friends by email...'**
+  String get searchFriendsByEmail;
+
+  /// Message when user searches for their own email
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot add yourself as a friend'**
+  String get cannotAddYourself;
+
+  /// Message when no user is found with the searched email
+  ///
+  /// In en, this message translates to:
+  /// **'No user found with email: {email}'**
+  String userNotFoundWithEmail(String email);
+
+  /// Suggestion message for email not found
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure the email is correct'**
+  String get makeSureEmailCorrect;
+
+  /// Label for pending friend request
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get requestPending;
+
+  /// Button text to accept a friend request
+  ///
+  /// In en, this message translates to:
+  /// **'Accept Request'**
+  String get acceptRequest;
+
+  /// Button text to send a friend request
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get sendFriendRequest;
+
+  /// Search button label
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// Button to add a new friend
+  ///
+  /// In en, this message translates to:
+  /// **'Add Friend'**
+  String get addFriend;
+
+  /// Empty state title on add friend page
+  ///
+  /// In en, this message translates to:
+  /// **'Search for friends to add'**
+  String get searchForFriendsToAdd;
+
+  /// Empty state subtitle on add friend page
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an email address to find users'**
+  String get enterEmailToFindFriends;
+
+  /// Message shown when user needs to navigate to requests tab
+  ///
+  /// In en, this message translates to:
+  /// **'Check the Requests tab to accept the friend request'**
+  String get checkRequestsTab;
+
+  /// OK button label
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
 }
 
 class _AppLocalizationsDelegate
