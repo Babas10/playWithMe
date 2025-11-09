@@ -42,7 +42,11 @@ mixin _$UserModel {
   String? get bio => throw _privateConstructorUsedError;
   List<String> get groupIds => throw _privateConstructorUsedError;
   List<String> get gameIds =>
-      throw _privateConstructorUsedError; // User preferences
+      throw _privateConstructorUsedError; // Social graph cache fields (Story 11.6)
+  List<String> get friendIds => throw _privateConstructorUsedError;
+  int get friendCount => throw _privateConstructorUsedError;
+  @TimestampConverter()
+  DateTime? get friendsLastUpdated => throw _privateConstructorUsedError; // User preferences
   bool get notificationsEnabled => throw _privateConstructorUsedError;
   bool get emailNotifications => throw _privateConstructorUsedError;
   bool get pushNotifications =>
@@ -87,6 +91,9 @@ abstract class $UserModelCopyWith<$Res> {
     String? bio,
     List<String> groupIds,
     List<String> gameIds,
+    List<String> friendIds,
+    int friendCount,
+    @TimestampConverter() DateTime? friendsLastUpdated,
     bool notificationsEnabled,
     bool emailNotifications,
     bool pushNotifications,
@@ -131,6 +138,9 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? bio = freezed,
     Object? groupIds = null,
     Object? gameIds = null,
+    Object? friendIds = null,
+    Object? friendCount = null,
+    Object? friendsLastUpdated = freezed,
     Object? notificationsEnabled = null,
     Object? emailNotifications = null,
     Object? pushNotifications = null,
@@ -211,6 +221,18 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.gameIds
                 : gameIds // ignore: cast_nullable_to_non_nullable
                       as List<String>,
+            friendIds: null == friendIds
+                ? _value.friendIds
+                : friendIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            friendCount: null == friendCount
+                ? _value.friendCount
+                : friendCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+            friendsLastUpdated: freezed == friendsLastUpdated
+                ? _value.friendsLastUpdated
+                : friendsLastUpdated // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             notificationsEnabled: null == notificationsEnabled
                 ? _value.notificationsEnabled
                 : notificationsEnabled // ignore: cast_nullable_to_non_nullable
@@ -280,6 +302,9 @@ abstract class _$$UserModelImplCopyWith<$Res>
     String? bio,
     List<String> groupIds,
     List<String> gameIds,
+    List<String> friendIds,
+    int friendCount,
+    @TimestampConverter() DateTime? friendsLastUpdated,
     bool notificationsEnabled,
     bool emailNotifications,
     bool pushNotifications,
@@ -323,6 +348,9 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? bio = freezed,
     Object? groupIds = null,
     Object? gameIds = null,
+    Object? friendIds = null,
+    Object? friendCount = null,
+    Object? friendsLastUpdated = freezed,
     Object? notificationsEnabled = null,
     Object? emailNotifications = null,
     Object? pushNotifications = null,
@@ -403,6 +431,18 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value._gameIds
             : gameIds // ignore: cast_nullable_to_non_nullable
                   as List<String>,
+        friendIds: null == friendIds
+            ? _value._friendIds
+            : friendIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        friendCount: null == friendCount
+            ? _value.friendCount
+            : friendCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+        friendsLastUpdated: freezed == friendsLastUpdated
+            ? _value.friendsLastUpdated
+            : friendsLastUpdated // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         notificationsEnabled: null == notificationsEnabled
             ? _value.notificationsEnabled
             : notificationsEnabled // ignore: cast_nullable_to_non_nullable
@@ -465,6 +505,9 @@ class _$UserModelImpl extends _UserModel {
     this.bio,
     final List<String> groupIds = const [],
     final List<String> gameIds = const [],
+    final List<String> friendIds = const [],
+    this.friendCount = 0,
+    @TimestampConverter() this.friendsLastUpdated,
     this.notificationsEnabled = true,
     this.emailNotifications = true,
     this.pushNotifications = true,
@@ -476,6 +519,7 @@ class _$UserModelImpl extends _UserModel {
     this.totalScore = 0,
   }) : _groupIds = groupIds,
        _gameIds = gameIds,
+       _friendIds = friendIds,
        super._();
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -533,6 +577,23 @@ class _$UserModelImpl extends _UserModel {
     return EqualUnmodifiableListView(_gameIds);
   }
 
+  // Social graph cache fields (Story 11.6)
+  final List<String> _friendIds;
+  // Social graph cache fields (Story 11.6)
+  @override
+  @JsonKey()
+  List<String> get friendIds {
+    if (_friendIds is EqualUnmodifiableListView) return _friendIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_friendIds);
+  }
+
+  @override
+  @JsonKey()
+  final int friendCount;
+  @override
+  @TimestampConverter()
+  final DateTime? friendsLastUpdated;
   // User preferences
   @override
   @JsonKey()
@@ -566,7 +627,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, totalScore: $totalScore)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, totalScore: $totalScore)';
   }
 
   @override
@@ -603,6 +664,14 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.bio, bio) || other.bio == bio) &&
             const DeepCollectionEquality().equals(other._groupIds, _groupIds) &&
             const DeepCollectionEquality().equals(other._gameIds, _gameIds) &&
+            const DeepCollectionEquality().equals(
+              other._friendIds,
+              _friendIds,
+            ) &&
+            (identical(other.friendCount, friendCount) ||
+                other.friendCount == friendCount) &&
+            (identical(other.friendsLastUpdated, friendsLastUpdated) ||
+                other.friendsLastUpdated == friendsLastUpdated) &&
             (identical(other.notificationsEnabled, notificationsEnabled) ||
                 other.notificationsEnabled == notificationsEnabled) &&
             (identical(other.emailNotifications, emailNotifications) ||
@@ -644,6 +713,9 @@ class _$UserModelImpl extends _UserModel {
     bio,
     const DeepCollectionEquality().hash(_groupIds),
     const DeepCollectionEquality().hash(_gameIds),
+    const DeepCollectionEquality().hash(_friendIds),
+    friendCount,
+    friendsLastUpdated,
     notificationsEnabled,
     emailNotifications,
     pushNotifications,
@@ -688,6 +760,9 @@ abstract class _UserModel extends UserModel {
     final String? bio,
     final List<String> groupIds,
     final List<String> gameIds,
+    final List<String> friendIds,
+    final int friendCount,
+    @TimestampConverter() final DateTime? friendsLastUpdated,
     final bool notificationsEnabled,
     final bool emailNotifications,
     final bool pushNotifications,
@@ -739,7 +814,14 @@ abstract class _UserModel extends UserModel {
   @override
   List<String> get groupIds;
   @override
-  List<String> get gameIds; // User preferences
+  List<String> get gameIds; // Social graph cache fields (Story 11.6)
+  @override
+  List<String> get friendIds;
+  @override
+  int get friendCount;
+  @override
+  @TimestampConverter()
+  DateTime? get friendsLastUpdated; // User preferences
   @override
   bool get notificationsEnabled;
   @override

@@ -517,6 +517,147 @@ void main() {
         expect(result, null);
       });
     });
+
+    // Story 11.6: Tests for friend cache methods
+    group('Friend cache methods (Story 11.6)', () {
+      test('addFriend adds friend to friendIds and increments count', () {
+        final user = testUser.copyWith(friendIds: [], friendCount: 0);
+        final updatedUser = user.addFriend('friend1');
+
+        expect(updatedUser.friendIds, ['friend1']);
+        expect(updatedUser.friendCount, 1);
+        expect(updatedUser.friendsLastUpdated, isNotNull);
+      });
+
+      test('addFriend does not add duplicate friend', () {
+        final user = testUser.copyWith(
+          friendIds: ['friend1'],
+          friendCount: 1,
+        );
+        final updatedUser = user.addFriend('friend1');
+
+        expect(updatedUser.friendIds, ['friend1']);
+        expect(updatedUser.friendCount, 1);
+        expect(updatedUser, equals(user));
+      });
+
+      test('addFriend updates friendsLastUpdated timestamp', () {
+        final user = testUser.copyWith(
+          friendIds: [],
+          friendCount: 0,
+          friendsLastUpdated: DateTime(2023, 1, 1),
+        );
+
+        final updatedUser = user.addFriend('friend1');
+
+        expect(updatedUser.friendsLastUpdated, isNotNull);
+        expect(
+          updatedUser.friendsLastUpdated!.isAfter(DateTime(2023, 1, 1)),
+          true,
+        );
+      });
+
+      test('removeFriend removes friend from friendIds and decrements count', () {
+        final user = testUser.copyWith(
+          friendIds: ['friend1', 'friend2'],
+          friendCount: 2,
+        );
+        final updatedUser = user.removeFriend('friend1');
+
+        expect(updatedUser.friendIds, ['friend2']);
+        expect(updatedUser.friendCount, 1);
+        expect(updatedUser.friendsLastUpdated, isNotNull);
+      });
+
+      test('removeFriend does nothing when friend not in list', () {
+        final user = testUser.copyWith(
+          friendIds: ['friend1'],
+          friendCount: 1,
+        );
+        final updatedUser = user.removeFriend('friend2');
+
+        expect(updatedUser.friendIds, ['friend1']);
+        expect(updatedUser.friendCount, 1);
+        expect(updatedUser, equals(user));
+      });
+
+      test('removeFriend does not go below zero count', () {
+        final user = testUser.copyWith(
+          friendIds: ['friend1'],
+          friendCount: 0, // Manually set to 0 (inconsistent state)
+        );
+        final updatedUser = user.removeFriend('friend1');
+
+        expect(updatedUser.friendIds, isEmpty);
+        expect(updatedUser.friendCount, 0);
+      });
+
+      test('removeFriend updates friendsLastUpdated timestamp', () {
+        final user = testUser.copyWith(
+          friendIds: ['friend1'],
+          friendCount: 1,
+          friendsLastUpdated: DateTime(2023, 1, 1),
+        );
+
+        final updatedUser = user.removeFriend('friend1');
+
+        expect(updatedUser.friendsLastUpdated, isNotNull);
+        expect(
+          updatedUser.friendsLastUpdated!.isAfter(DateTime(2023, 1, 1)),
+          true,
+        );
+      });
+
+      test('isFriend returns true when userId is in friendIds', () {
+        final user = testUser.copyWith(
+          friendIds: ['friend1', 'friend2', 'friend3'],
+        );
+
+        expect(user.isFriend('friend1'), true);
+        expect(user.isFriend('friend2'), true);
+        expect(user.isFriend('friend3'), true);
+      });
+
+      test('isFriend returns false when userId is not in friendIds', () {
+        final user = testUser.copyWith(
+          friendIds: ['friend1', 'friend2'],
+        );
+
+        expect(user.isFriend('friend3'), false);
+        expect(user.isFriend('nonexistent'), false);
+      });
+
+      test('needsFriendCacheRefresh returns true when friendsLastUpdated is null', () {
+        final user = testUser.copyWith(friendsLastUpdated: null);
+
+        expect(user.needsFriendCacheRefresh, true);
+      });
+
+      test('needsFriendCacheRefresh returns false when cache is fresh', () {
+        final user = testUser.copyWith(
+          friendsLastUpdated: DateTime.now().subtract(const Duration(hours: 1)),
+        );
+
+        expect(user.needsFriendCacheRefresh, false);
+      });
+
+      test('needsFriendCacheRefresh returns true when cache is stale (>24 hours)', () {
+        final user = testUser.copyWith(
+          friendsLastUpdated: DateTime.now().subtract(const Duration(hours: 25)),
+        );
+
+        expect(user.needsFriendCacheRefresh, true);
+      });
+
+      test('needsFriendCacheRefresh returns false when exactly 24 hours old', () {
+        final user = testUser.copyWith(
+          friendsLastUpdated: DateTime.now().subtract(const Duration(hours: 24)),
+        );
+
+        // Should be false because we check for > 24 hours
+        expect(user.needsFriendCacheRefresh, false);
+      });
+    });
   });
 }
 

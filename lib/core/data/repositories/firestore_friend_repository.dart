@@ -137,35 +137,88 @@ class FirestoreFriendRepository implements FriendRepository {
   @override
   Future<List<UserEntity>> getFriends(String userId) async {
     try {
-      final callable = _functions.httpsCallable('getFriends');
-      final result = await callable.call({'userId': userId});
+      // Story 11.6: Use cached friendIds from user document for optimal performance
+      // This reduces Firestore reads from O(n) friendship queries to 1 user doc read
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw FriendshipException('User not authenticated');
+      }
 
-      // Safely cast the result data
-      final data = Map<String, dynamic>.from(result.data as Map);
-      final friendsData = (data['friends'] as List? ?? []);
-
-      // Convert each friend data to UserEntity
-      final friends = friendsData.map((json) {
-        final userData = Map<String, dynamic>.from(json as Map);
-        return UserEntity(
-          uid: userData['uid'] as String,
-          email: userData['email'] as String,
-          displayName: userData['displayName'] as String?,
-          photoUrl: userData['photoUrl'] as String?,
-          isEmailVerified: userData['isEmailVerified'] as bool? ?? false,
-          createdAt: userData['createdAt'] != null
-              ? DateTime.parse(userData['createdAt'] as String)
-              : null,
-          lastSignInAt: userData['lastSignInAt'] != null
-              ? DateTime.parse(userData['lastSignInAt'] as String)
-              : null,
-          isAnonymous: userData['isAnonymous'] as bool? ?? false,
+      // Only the current user can fetch their own friends list
+      if (userId != currentUserId) {
+        throw FriendshipException(
+          'You can only view your own friends list',
+          code: 'permission-denied',
         );
-      }).toList();
+      }
+
+      // Read user document to get cached friendIds
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+
+      if (!userDoc.exists) {
+        throw FriendshipException(
+          'User not found',
+          code: 'not-found',
+        );
+      }
+
+      final userData = userDoc.data()!;
+      final friendIds = List<String>.from(userData['friendIds'] ?? []);
+
+      // If no friends, return empty list immediately
+      if (friendIds.isEmpty) {
+        return [];
+      }
+
+      // Fetch friend profiles in batches of 10 (Firestore 'in' query limit)
+      final friends = <UserEntity>[];
+      for (var i = 0; i < friendIds.length; i += 10) {
+        final batch = friendIds.skip(i).take(10).toList();
+        final snapshot = await _firestore
+            .collection('users')
+            .where(FieldPath.documentId, whereIn: batch)
+            .get();
+
+        for (final doc in snapshot.docs) {
+          final data = doc.data();
+          friends.add(UserEntity(
+            uid: doc.id,
+            email: data['email'] as String,
+            displayName: data['displayName'] as String?,
+            photoUrl: data['photoUrl'] as String?,
+            isEmailVerified: data['isEmailVerified'] as bool? ?? false,
+            createdAt: data['createdAt'] != null
+                ? (data['createdAt'] as Timestamp).toDate()
+                : null,
+            lastSignInAt: data['lastSignInAt'] != null
+                ? (data['lastSignInAt'] as Timestamp).toDate()
+                : null,
+            isAnonymous: data['isAnonymous'] as bool? ?? false,
+            friendIds: List<String>.from(data['friendIds'] ?? []),
+            friendCount: data['friendCount'] as int? ?? 0,
+            friendsLastUpdated: data['friendsLastUpdated'] != null
+                ? (data['friendsLastUpdated'] as Timestamp).toDate()
+                : null,
+          ));
+        }
+      }
 
       return friends;
-    } on FirebaseFunctionsException catch (e) {
-      throw _handleError(e);
+    } on FriendshipException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw FriendshipException(
+          'You don\'t have permission to view this friends list',
+          code: 'permission-denied',
+        );
+      } else if (e.code == 'not-found') {
+        throw FriendshipException(
+          'User not found',
+          code: 'not-found',
+        );
+      }
+      throw FriendshipException('Failed to get friends: ${e.message}');
     } catch (e) {
       throw FriendshipException('Failed to get friends: $e');
     }
@@ -234,13 +287,88 @@ class FirestoreFriendRepository implements FriendRepository {
   @override
   Future<FriendshipStatusResult> checkFriendshipStatus(String userId) async {
     try {
-      final callable = _functions.httpsCallable('checkFriendshipStatus');
-      final result = await callable.call({'userId': userId});
-      return FriendshipStatusResult.fromJson(
-        result.data as Map<String, dynamic>,
+      // Story 11.6: Use cached friendIds for fast friendship checks
+      // This optimizes from 2+ Firestore queries to 1 user doc read
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw FriendshipException('User not authenticated');
+      }
+
+      // Cannot check friendship with yourself
+      if (currentUserId == userId) {
+        throw FriendshipException(
+          'Cannot check friendship status with yourself',
+          code: 'invalid-argument',
+        );
+      }
+
+      // Read current user's document to check cached friendIds
+      final userDoc =
+          await _firestore.collection('users').doc(currentUserId).get();
+
+      if (!userDoc.exists) {
+        throw FriendshipException(
+          'User not found',
+          code: 'not-found',
+        );
+      }
+
+      final userData = userDoc.data()!;
+      final friendIds = List<String>.from(userData['friendIds'] ?? []);
+
+      // Check if already friends using cache
+      if (friendIds.contains(userId)) {
+        return FriendshipStatusResult(
+          isFriend: true,
+          hasPendingRequest: false,
+        );
+      }
+
+      // Not in cache, check for pending requests
+      // Query friendships collection for pending status
+      final pendingQuery = await _firestore
+          .collection('friendships')
+          .where('status', isEqualTo: 'pending')
+          .get();
+
+      for (final doc in pendingQuery.docs) {
+        final data = doc.data();
+        final initiatorId = data['initiatorId'] as String;
+        final recipientId = data['recipientId'] as String;
+
+        // Check if there's a pending request between these users
+        if ((initiatorId == currentUserId && recipientId == userId) ||
+            (initiatorId == userId && recipientId == currentUserId)) {
+          return FriendshipStatusResult(
+            isFriend: false,
+            hasPendingRequest: true,
+            requestDirection:
+                initiatorId == currentUserId ? 'sent' : 'received',
+          );
+        }
+      }
+
+      // No friendship or pending request
+      return FriendshipStatusResult(
+        isFriend: false,
+        hasPendingRequest: false,
       );
-    } on FirebaseFunctionsException catch (e) {
-      throw _handleError(e);
+    } on FriendshipException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw FriendshipException(
+          'You don\'t have permission to check friendship status',
+          code: 'permission-denied',
+        );
+      } else if (e.code == 'not-found') {
+        throw FriendshipException(
+          'User not found',
+          code: 'not-found',
+        );
+      }
+      throw FriendshipException(
+          'Failed to check friendship status: ${e.message}');
     } catch (e) {
       throw FriendshipException('Failed to check friendship status: $e');
     }

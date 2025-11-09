@@ -943,3 +943,143 @@ export async function getFriendshipRequestsHandler(
 export const getFriendshipRequests = functions.https.onCall(
   getFriendshipRequestsHandler
 );
+
+// ============================================================================
+// Firestore Triggers for Friend Cache Maintenance (Story 11.6)
+// ============================================================================
+
+/**
+ * Trigger: Update both users' friend caches when a friendship is accepted
+ *
+ * This function:
+ * 1. Detects when a friendship status changes to "accepted"
+ * 2. Updates both users' cached friendIds arrays
+ * 3. Increments both users' friendCount
+ * 4. Updates friendsLastUpdated timestamp
+ *
+ * Performance: Uses batched writes to minimize Firestore operations
+ */
+export const onFriendRequestAccepted = functions.firestore
+  .document("friendships/{friendshipId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+
+    // Only trigger when status changes to "accepted"
+    if (before.status !== "accepted" && after.status === "accepted") {
+      const initiatorId = after.initiatorId;
+      const recipientId = after.recipientId;
+
+      functions.logger.info("Friendship accepted, updating caches", {
+        friendshipId: context.params.friendshipId,
+        initiatorId,
+        recipientId,
+      });
+
+      try {
+        const db = admin.firestore();
+        const batch = db.batch();
+
+        // Update initiator's cache
+        const initiatorRef = db.collection("users").doc(initiatorId);
+        batch.update(initiatorRef, {
+          friendIds: admin.firestore.FieldValue.arrayUnion(recipientId),
+          friendCount: admin.firestore.FieldValue.increment(1),
+          friendsLastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        // Update recipient's cache
+        const recipientRef = db.collection("users").doc(recipientId);
+        batch.update(recipientRef, {
+          friendIds: admin.firestore.FieldValue.arrayUnion(initiatorId),
+          friendCount: admin.firestore.FieldValue.increment(1),
+          friendsLastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        await batch.commit();
+
+        functions.logger.info("Friend caches updated successfully", {
+          friendshipId: context.params.friendshipId,
+          initiatorId,
+          recipientId,
+        });
+      } catch (error) {
+        functions.logger.error("Failed to update friend caches", {
+          friendshipId: context.params.friendshipId,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
+        // Don't throw - this is a background trigger
+        // The cache will be stale but can be refreshed later
+      }
+    }
+  });
+
+/**
+ * Trigger: Remove friend IDs from both users' caches when a friendship is deleted
+ *
+ * This function:
+ * 1. Detects when a friendship document is deleted
+ * 2. Removes each user's ID from the other's cached friendIds array
+ * 3. Decrements both users' friendCount
+ * 4. Updates friendsLastUpdated timestamp
+ *
+ * Performance: Uses batched writes to minimize Firestore operations
+ */
+export const onFriendRemoved = functions.firestore
+  .document("friendships/{friendshipId}")
+  .onDelete(async (snap, context) => {
+    const data = snap.data();
+
+    // Only process if friendship was accepted
+    if (data.status === "accepted") {
+      const initiatorId = data.initiatorId;
+      const recipientId = data.recipientId;
+
+      functions.logger.info("Friendship removed, updating caches", {
+        friendshipId: context.params.friendshipId,
+        initiatorId,
+        recipientId,
+      });
+
+      try {
+        const db = admin.firestore();
+        const batch = db.batch();
+
+        // Update initiator's cache
+        const initiatorRef = db.collection("users").doc(initiatorId);
+        batch.update(initiatorRef, {
+          friendIds: admin.firestore.FieldValue.arrayRemove(recipientId),
+          friendCount: admin.firestore.FieldValue.increment(-1),
+          friendsLastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        // Update recipient's cache
+        const recipientRef = db.collection("users").doc(recipientId);
+        batch.update(recipientRef, {
+          friendIds: admin.firestore.FieldValue.arrayRemove(initiatorId),
+          friendCount: admin.firestore.FieldValue.increment(-1),
+          friendsLastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        await batch.commit();
+
+        functions.logger.info("Friend caches updated after removal", {
+          friendshipId: context.params.friendshipId,
+          initiatorId,
+          recipientId,
+        });
+      } catch (error) {
+        functions.logger.error("Failed to update friend caches after removal", {
+          friendshipId: context.params.friendshipId,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
+        // Don't throw - this is a background trigger
+      }
+    }
+  });

@@ -25,7 +25,11 @@ mixin _$UserEntity {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get lastSignInAt => throw _privateConstructorUsedError;
   bool get isAnonymous => throw _privateConstructorUsedError;
-  List<String> get fcmTokens => throw _privateConstructorUsedError;
+  List<String> get fcmTokens =>
+      throw _privateConstructorUsedError; // Social graph cache fields (Story 11.6)
+  List<String> get friendIds => throw _privateConstructorUsedError;
+  int get friendCount => throw _privateConstructorUsedError;
+  DateTime? get friendsLastUpdated => throw _privateConstructorUsedError;
 
   /// Create a copy of UserEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -51,6 +55,9 @@ abstract class $UserEntityCopyWith<$Res> {
     DateTime? lastSignInAt,
     bool isAnonymous,
     List<String> fcmTokens,
+    List<String> friendIds,
+    int friendCount,
+    DateTime? friendsLastUpdated,
   });
 }
 
@@ -78,6 +85,9 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
     Object? lastSignInAt = freezed,
     Object? isAnonymous = null,
     Object? fcmTokens = null,
+    Object? friendIds = null,
+    Object? friendCount = null,
+    Object? friendsLastUpdated = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -117,6 +127,18 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
                 ? _value.fcmTokens
                 : fcmTokens // ignore: cast_nullable_to_non_nullable
                       as List<String>,
+            friendIds: null == friendIds
+                ? _value.friendIds
+                : friendIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            friendCount: null == friendCount
+                ? _value.friendCount
+                : friendCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+            friendsLastUpdated: freezed == friendsLastUpdated
+                ? _value.friendsLastUpdated
+                : friendsLastUpdated // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
@@ -142,6 +164,9 @@ abstract class _$$UserEntityImplCopyWith<$Res>
     DateTime? lastSignInAt,
     bool isAnonymous,
     List<String> fcmTokens,
+    List<String> friendIds,
+    int friendCount,
+    DateTime? friendsLastUpdated,
   });
 }
 
@@ -168,6 +193,9 @@ class __$$UserEntityImplCopyWithImpl<$Res>
     Object? lastSignInAt = freezed,
     Object? isAnonymous = null,
     Object? fcmTokens = null,
+    Object? friendIds = null,
+    Object? friendCount = null,
+    Object? friendsLastUpdated = freezed,
   }) {
     return _then(
       _$UserEntityImpl(
@@ -207,6 +235,18 @@ class __$$UserEntityImplCopyWithImpl<$Res>
             ? _value._fcmTokens
             : fcmTokens // ignore: cast_nullable_to_non_nullable
                   as List<String>,
+        friendIds: null == friendIds
+            ? _value._friendIds
+            : friendIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        friendCount: null == friendCount
+            ? _value.friendCount
+            : friendCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+        friendsLastUpdated: freezed == friendsLastUpdated
+            ? _value.friendsLastUpdated
+            : friendsLastUpdated // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -225,7 +265,11 @@ class _$UserEntityImpl extends _UserEntity {
     this.lastSignInAt,
     required this.isAnonymous,
     final List<String> fcmTokens = const [],
+    final List<String> friendIds = const [],
+    this.friendCount = 0,
+    this.friendsLastUpdated,
   }) : _fcmTokens = fcmTokens,
+       _friendIds = friendIds,
        super._();
 
   @override
@@ -253,9 +297,26 @@ class _$UserEntityImpl extends _UserEntity {
     return EqualUnmodifiableListView(_fcmTokens);
   }
 
+  // Social graph cache fields (Story 11.6)
+  final List<String> _friendIds;
+  // Social graph cache fields (Story 11.6)
+  @override
+  @JsonKey()
+  List<String> get friendIds {
+    if (_friendIds is EqualUnmodifiableListView) return _friendIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_friendIds);
+  }
+
+  @override
+  @JsonKey()
+  final int friendCount;
+  @override
+  final DateTime? friendsLastUpdated;
+
   @override
   String toString() {
-    return 'UserEntity(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, isAnonymous: $isAnonymous, fcmTokens: $fcmTokens)';
+    return 'UserEntity(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, isAnonymous: $isAnonymous, fcmTokens: $fcmTokens, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated)';
   }
 
   @override
@@ -280,7 +341,15 @@ class _$UserEntityImpl extends _UserEntity {
             const DeepCollectionEquality().equals(
               other._fcmTokens,
               _fcmTokens,
-            ));
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._friendIds,
+              _friendIds,
+            ) &&
+            (identical(other.friendCount, friendCount) ||
+                other.friendCount == friendCount) &&
+            (identical(other.friendsLastUpdated, friendsLastUpdated) ||
+                other.friendsLastUpdated == friendsLastUpdated));
   }
 
   @override
@@ -295,6 +364,9 @@ class _$UserEntityImpl extends _UserEntity {
     lastSignInAt,
     isAnonymous,
     const DeepCollectionEquality().hash(_fcmTokens),
+    const DeepCollectionEquality().hash(_friendIds),
+    friendCount,
+    friendsLastUpdated,
   );
 
   /// Create a copy of UserEntity
@@ -317,6 +389,9 @@ abstract class _UserEntity extends UserEntity {
     final DateTime? lastSignInAt,
     required final bool isAnonymous,
     final List<String> fcmTokens,
+    final List<String> friendIds,
+    final int friendCount,
+    final DateTime? friendsLastUpdated,
   }) = _$UserEntityImpl;
   const _UserEntity._() : super._();
 
@@ -337,7 +412,13 @@ abstract class _UserEntity extends UserEntity {
   @override
   bool get isAnonymous;
   @override
-  List<String> get fcmTokens;
+  List<String> get fcmTokens; // Social graph cache fields (Story 11.6)
+  @override
+  List<String> get friendIds;
+  @override
+  int get friendCount;
+  @override
+  DateTime? get friendsLastUpdated;
 
   /// Create a copy of UserEntity
   /// with the given fields replaced by the non-null parameter values.
