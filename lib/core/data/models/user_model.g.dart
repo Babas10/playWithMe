@@ -32,6 +32,13 @@ _$UserModelImpl _$$UserModelImplFromJson(
   gameIds:
       (json['gameIds'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
+  friendIds:
+      (json['friendIds'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  friendCount: (json['friendCount'] as num?)?.toInt() ?? 0,
+  friendsLastUpdated: const TimestampConverter().fromJson(
+    json['friendsLastUpdated'],
+  ),
   notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
   emailNotifications: json['emailNotifications'] as bool? ?? true,
   pushNotifications: json['pushNotifications'] as bool? ?? true,
@@ -64,6 +71,11 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'bio': instance.bio,
       'groupIds': instance.groupIds,
       'gameIds': instance.gameIds,
+      'friendIds': instance.friendIds,
+      'friendCount': instance.friendCount,
+      'friendsLastUpdated': const TimestampConverter().toJson(
+        instance.friendsLastUpdated,
+      ),
       'notificationsEnabled': instance.notificationsEnabled,
       'emailNotifications': instance.emailNotifications,
       'pushNotifications': instance.pushNotifications,

@@ -423,28 +423,51 @@ void main() {
 
   group('getFriends', () {
     test('should return list of UserEntity on successful call', () async {
-      // Arrange
-      final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
-      when(() => mockCallable.call(any())).thenAnswer(
-        (_) async => mockResult,
-      );
-      when(() => mockResult.data).thenReturn({
-        'friends': [
-          {
-            'uid': 'friend-1',
-            'email': 'friend1@test.com',
-            'displayName': 'Friend One',
-            'isEmailVerified': true,
-            'isAnonymous': false,
-          },
-          {
-            'uid': 'friend-2',
-            'email': 'friend2@test.com',
-            'displayName': 'Friend Two',
-            'isEmailVerified': true,
-            'isAnonymous': false,
-          },
-        ],
+      // Arrange - Story 11.6: Now uses cached friendIds from user document
+      final mockCollection = MockCollectionReference();
+      final mockUserDoc = MockDocumentReference();
+      final mockUserSnapshot = MockQueryDocumentSnapshot();
+      final mockFriendsQuery = MockQuery();
+      final mockFriendsSnapshot = MockQuerySnapshot();
+      final mockFriendDoc1 = MockQueryDocumentSnapshot();
+      final mockFriendDoc2 = MockQueryDocumentSnapshot();
+
+      // Mock user document read to get cached friendIds
+      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+      when(() => mockCollection.doc('test-user-id')).thenReturn(mockUserDoc);
+      when(() => mockUserDoc.get()).thenAnswer((_) async => mockUserSnapshot);
+      when(() => mockUserSnapshot.exists).thenReturn(true);
+      when(() => mockUserSnapshot.data()).thenReturn({
+        'friendIds': ['friend-1', 'friend-2'],
+        'friendCount': 2,
+      });
+
+      // Mock batch friend profile fetch
+      when(() => mockCollection.where(any(), whereIn: ['friend-1', 'friend-2']))
+          .thenReturn(mockFriendsQuery);
+      when(() => mockFriendsQuery.get())
+          .thenAnswer((_) async => mockFriendsSnapshot);
+      when(() => mockFriendsSnapshot.docs)
+          .thenReturn([mockFriendDoc1, mockFriendDoc2]);
+
+      when(() => mockFriendDoc1.id).thenReturn('friend-1');
+      when(() => mockFriendDoc1.data()).thenReturn({
+        'email': 'friend1@test.com',
+        'displayName': 'Friend One',
+        'isEmailVerified': true,
+        'isAnonymous': false,
+        'friendIds': [],
+        'friendCount': 0,
+      });
+
+      when(() => mockFriendDoc2.id).thenReturn('friend-2');
+      when(() => mockFriendDoc2.data()).thenReturn({
+        'email': 'friend2@test.com',
+        'displayName': 'Friend Two',
+        'isEmailVerified': true,
+        'isAnonymous': false,
+        'friendIds': [],
+        'friendCount': 0,
       });
 
       // Act
@@ -455,16 +478,23 @@ void main() {
       expect(friends[0].uid, 'friend-1');
       expect(friends[0].email, 'friend1@test.com');
       expect(friends[1].uid, 'friend-2');
-      verify(() => mockCallable.call({'userId': 'test-user-id'})).called(1);
+      verify(() => mockUserDoc.get()).called(1);
     });
 
     test('should return empty list when no friends', () async {
-      // Arrange
-      final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
-      when(() => mockCallable.call(any())).thenAnswer(
-        (_) async => mockResult,
-      );
-      when(() => mockResult.data).thenReturn({'friends': []});
+      // Arrange - Story 11.6: Empty friendIds array
+      final mockCollection = MockCollectionReference();
+      final mockUserDoc = MockDocumentReference();
+      final mockUserSnapshot = MockQueryDocumentSnapshot();
+
+      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+      when(() => mockCollection.doc('test-user-id')).thenReturn(mockUserDoc);
+      when(() => mockUserDoc.get()).thenAnswer((_) async => mockUserSnapshot);
+      when(() => mockUserSnapshot.exists).thenReturn(true);
+      when(() => mockUserSnapshot.data()).thenReturn({
+        'friendIds': [], // Empty cache
+        'friendCount': 0,
+      });
 
       // Act
       final friends = await repository.getFriends('test-user-id');
@@ -475,11 +505,10 @@ void main() {
 
     test('should throw FriendshipException on error', () async {
       // Arrange
-      when(() => mockCallable.call(any())).thenThrow(
-        FirebaseFunctionsException(
-          code: 'unauthenticated',
-          message: 'Not authenticated',
-        ),
+      final mockCollection = MockCollectionReference();
+      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+      when(() => mockCollection.doc(any())).thenThrow(
+        Exception('Firestore error'),
       );
 
       // Act & Assert
@@ -601,16 +630,18 @@ void main() {
 
   group('checkFriendshipStatus', () {
     test('should return FriendshipStatusResult on successful call', () async {
-      // Arrange
-      final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
-      when(() => mockCallable.call(any())).thenAnswer(
-        (_) async => mockResult,
-      );
-      when(() => mockResult.data).thenReturn({
-        'isFriend': true,
-        'hasPendingRequest': false,
-        'requestDirection': null,
-        'friendshipId': 'friendship-123',
+      // Arrange - Story 11.6: Check cached friendIds first
+      final mockCollection = MockCollectionReference();
+      final mockUserDoc = MockDocumentReference();
+      final mockUserSnapshot = MockQueryDocumentSnapshot();
+
+      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+      when(() => mockCollection.doc('test-user-id')).thenReturn(mockUserDoc);
+      when(() => mockUserDoc.get()).thenAnswer((_) async => mockUserSnapshot);
+      when(() => mockUserSnapshot.exists).thenReturn(true);
+      when(() => mockUserSnapshot.data()).thenReturn({
+        'friendIds': ['friend-user-id'], // Friend is in cache
+        'friendCount': 1,
       });
 
       // Act
@@ -619,21 +650,41 @@ void main() {
       // Assert
       expect(status.isFriend, true);
       expect(status.hasPendingRequest, false);
-      expect(status.friendshipId, 'friendship-123');
-      verify(() => mockCallable.call({'userId': 'friend-user-id'})).called(1);
+      verify(() => mockUserDoc.get()).called(1);
     });
 
     test('should return pending request status', () async {
-      // Arrange
-      final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
-      when(() => mockCallable.call(any())).thenAnswer(
-        (_) async => mockResult,
-      );
-      when(() => mockResult.data).thenReturn({
-        'isFriend': false,
-        'hasPendingRequest': true,
-        'requestDirection': 'sent',
-        'friendshipId': 'friendship-456',
+      // Arrange - Story 11.6: Not in cache, check pending requests
+      final mockCollection = MockCollectionReference();
+      final mockUserDoc = MockDocumentReference();
+      final mockUserSnapshot = MockQueryDocumentSnapshot();
+      final mockFriendshipsQuery = MockQuery();
+      final mockFriendshipsSnapshot = MockQuerySnapshot();
+      final mockFriendshipDoc = MockQueryDocumentSnapshot();
+
+      // Mock user doc read (friend not in cache)
+      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+      when(() => mockCollection.doc('test-user-id')).thenReturn(mockUserDoc);
+      when(() => mockUserDoc.get()).thenAnswer((_) async => mockUserSnapshot);
+      when(() => mockUserSnapshot.exists).thenReturn(true);
+      when(() => mockUserSnapshot.data()).thenReturn({
+        'friendIds': [], // Not in cache
+        'friendCount': 0,
+      });
+
+      // Mock pending requests query
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockFriendshipsQuery);
+      when(() => mockFriendshipsQuery.get())
+          .thenAnswer((_) async => mockFriendshipsSnapshot);
+      when(() => mockFriendshipsSnapshot.docs).thenReturn([mockFriendshipDoc]);
+
+      when(() => mockFriendshipDoc.data()).thenReturn({
+        'initiatorId': 'test-user-id',
+        'recipientId': 'other-user-id',
+        'status': 'pending',
       });
 
       // Act
@@ -643,16 +694,14 @@ void main() {
       expect(status.isFriend, false);
       expect(status.hasPendingRequest, true);
       expect(status.requestDirection, 'sent');
-      expect(status.friendshipId, 'friendship-456');
     });
 
     test('should throw FriendshipException on error', () async {
       // Arrange
-      when(() => mockCallable.call(any())).thenThrow(
-        FirebaseFunctionsException(
-          code: 'not-found',
-          message: 'User not found',
-        ),
+      final mockCollection = MockCollectionReference();
+      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+      when(() => mockCollection.doc(any())).thenThrow(
+        Exception('Firestore error'),
       );
 
       // Act & Assert

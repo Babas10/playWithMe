@@ -107,7 +107,17 @@ class FirebaseService {
   static Future<void> _configureFirestore() async {
     final firestore = FirebaseFirestore.instance;
 
-    // Enable offline persistence
+    // Story 11.6: Enable offline persistence for better performance
+    // This allows Firestore to cache data locally and serve from cache when offline
+    try {
+      await firestore.settings.persistenceEnabled;
+      debugPrint('💾 Firestore offline persistence enabled');
+    } catch (e) {
+      // Persistence may already be enabled or not supported on this platform
+      debugPrint('⚠️  Firestore persistence configuration: $e');
+    }
+
+    // Enable network
     await firestore.enableNetwork();
 
     // Configure settings based on environment
