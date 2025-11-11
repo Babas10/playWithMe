@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import {checkFriendship} from "./friendships";
 
 /**
  * Request interface for acceptInvitation Cloud Function
@@ -84,6 +85,17 @@ export async function acceptInvitationHandler(
       );
     }
 
+    // Story 11.4: Always validate friendship (no backward compatibility)
+    const inviterId = invitationData.invitedBy;
+    const areFriends = await checkFriendship(inviterId, userId);
+
+    if (!areFriends) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "You can only accept invitations from friends. Please add them as a friend first."
+      );
+    }
+
     const groupId = invitationData.groupId;
     const groupRef = db.collection("groups").doc(groupId);
 
@@ -133,14 +145,16 @@ export async function acceptInvitationHandler(
  *
  * This function handles the atomic operation of:
  * 1. Verifying the invitation exists and is pending
- * 2. Adding the user to the group's memberIds
- * 3. Updating the invitation status to 'accepted'
- * 4. Updating group metadata (updatedAt, lastActivity)
+ * 2. Validating friendship between inviter and invitee (Story 11.4)
+ * 3. Adding the user to the group's memberIds
+ * 4. Updating the invitation status to 'accepted'
+ * 5. Updating group metadata (updatedAt, lastActivity)
  *
  * Security:
  * - Requires authentication
  * - Uses Admin SDK to bypass security rules
  * - Validates invitation ownership
+ * - Validates friendship (Story 11.4 - mandatory for all invitations)
  * - Atomic batch operation for data consistency
  */
 export const acceptInvitation = functions.https.onCall(acceptInvitationHandler);
