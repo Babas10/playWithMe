@@ -15,7 +15,7 @@ export {declineInvitation} from "./declineInvitation";
 export {getUsersByIds} from "./getUsersByIds";
 export {leaveGroup} from "./leaveGroup";
 
-// Export friendship functions
+// Export friendship functions (callable functions)
 export {
   sendFriendRequest,
   acceptFriendRequest,
@@ -24,6 +24,13 @@ export {
   getFriends,
   checkFriendshipStatus,
   getFriendshipRequests,
+} from "./friendships";
+
+// Export friendship cache update triggers (Firestore triggers)
+// Note: These are different from notification triggers - they update cached friendIds
+export {
+  onFriendRequestAccepted as onFriendshipCacheUpdate,
+  onFriendRemoved as onFriendshipCacheRemove,
 } from "./friendships";
 
 // Export notification functions

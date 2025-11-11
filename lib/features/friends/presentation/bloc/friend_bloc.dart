@@ -61,6 +61,8 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
           sentRequests: results[2] as List<FriendshipEntity>,
         ));
       } catch (e) {
+        // Log the actual error for debugging
+        print('❌ Error loading friends: $e');
         // If cloud function doesn't exist or returns error, just show empty state
         emit(const FriendState.loaded(
           friends: [],
@@ -68,7 +70,9 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
           sentRequests: [],
         ));
       }
-    } on FriendshipException {
+    } on FriendshipException catch (e) {
+      // Log the actual error for debugging
+      print('❌ FriendshipException loading friends: ${e.message}');
       // Show empty state instead of error for missing cloud functions
       emit(const FriendState.loaded(
         friends: [],
@@ -76,6 +80,8 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
         sentRequests: [],
       ));
     } catch (e) {
+      // Log the actual error for debugging
+      print('❌ Unexpected error loading friends: $e');
       // Show empty state instead of error for any other issues
       emit(const FriendState.loaded(
         friends: [],
