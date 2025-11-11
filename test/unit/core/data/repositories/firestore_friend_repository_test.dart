@@ -422,52 +422,38 @@ void main() {
   });
 
   group('getFriends', () {
-    test('should return list of UserEntity on successful call', () async {
-      // Arrange - Story 11.6: Now uses cached friendIds from user document
-      final mockCollection = MockCollectionReference();
-      final mockUserDoc = MockDocumentReference();
-      final mockUserSnapshot = MockQueryDocumentSnapshot();
-      final mockFriendsQuery = MockQuery();
-      final mockFriendsSnapshot = MockQuerySnapshot();
-      final mockFriendDoc1 = MockQueryDocumentSnapshot();
-      final mockFriendDoc2 = MockQueryDocumentSnapshot();
-
-      // Mock user document read to get cached friendIds
-      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
-      when(() => mockCollection.doc('test-user-id')).thenReturn(mockUserDoc);
-      when(() => mockUserDoc.get()).thenAnswer((_) async => mockUserSnapshot);
-      when(() => mockUserSnapshot.exists).thenReturn(true);
-      when(() => mockUserSnapshot.data()).thenReturn({
-        'friendIds': ['friend-1', 'friend-2'],
-        'friendCount': 2,
-      });
-
-      // Mock batch friend profile fetch
-      when(() => mockCollection.where(any(), whereIn: ['friend-1', 'friend-2']))
-          .thenReturn(mockFriendsQuery);
-      when(() => mockFriendsQuery.get())
-          .thenAnswer((_) async => mockFriendsSnapshot);
-      when(() => mockFriendsSnapshot.docs)
-          .thenReturn([mockFriendDoc1, mockFriendDoc2]);
-
-      when(() => mockFriendDoc1.id).thenReturn('friend-1');
-      when(() => mockFriendDoc1.data()).thenReturn({
-        'email': 'friend1@test.com',
-        'displayName': 'Friend One',
-        'isEmailVerified': true,
-        'isAnonymous': false,
-        'friendIds': [],
-        'friendCount': 0,
-      });
-
-      when(() => mockFriendDoc2.id).thenReturn('friend-2');
-      when(() => mockFriendDoc2.data()).thenReturn({
-        'email': 'friend2@test.com',
-        'displayName': 'Friend Two',
-        'isEmailVerified': true,
-        'isAnonymous': false,
-        'friendIds': [],
-        'friendCount': 0,
+    test('should return list of UserEntity from Cloud Function', () async {
+      // Arrange - Story 11.13: Uses Cloud Function following Epic 11 architecture
+      when(() => mockFunctions.httpsCallable('getFriends'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call({'userId': 'test-user-id'}))
+          .thenAnswer((_) async {
+        final result = MockHttpsCallableResult();
+        when(() => result.data).thenReturn({
+          'friends': [
+            {
+              'uid': 'friend-1',
+              'email': 'friend1@test.com',
+              'displayName': 'Friend One',
+              'photoUrl': null,
+              'isEmailVerified': true,
+              'isAnonymous': false,
+              'createdAt': DateTime.now().toIso8601String(),
+              'lastSignInAt': DateTime.now().toIso8601String(),
+            },
+            {
+              'uid': 'friend-2',
+              'email': 'friend2@test.com',
+              'displayName': 'Friend Two',
+              'photoUrl': 'https://example.com/photo.jpg',
+              'isEmailVerified': false,
+              'isAnonymous': false,
+              'createdAt': DateTime.now().toIso8601String(),
+              'lastSignInAt': null,
+            },
+          ],
+        });
+        return result;
       });
 
       // Act
@@ -477,23 +463,25 @@ void main() {
       expect(friends, hasLength(2));
       expect(friends[0].uid, 'friend-1');
       expect(friends[0].email, 'friend1@test.com');
+      expect(friends[0].displayName, 'Friend One');
+      expect(friends[0].isEmailVerified, true);
       expect(friends[1].uid, 'friend-2');
-      verify(() => mockUserDoc.get()).called(1);
+      expect(friends[1].email, 'friend2@test.com');
+      expect(friends[1].photoUrl, 'https://example.com/photo.jpg');
+      verify(() => mockCallable.call({'userId': 'test-user-id'})).called(1);
     });
 
-    test('should return empty list when no friends', () async {
-      // Arrange - Story 11.6: Empty friendIds array
-      final mockCollection = MockCollectionReference();
-      final mockUserDoc = MockDocumentReference();
-      final mockUserSnapshot = MockQueryDocumentSnapshot();
-
-      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
-      when(() => mockCollection.doc('test-user-id')).thenReturn(mockUserDoc);
-      when(() => mockUserDoc.get()).thenAnswer((_) async => mockUserSnapshot);
-      when(() => mockUserSnapshot.exists).thenReturn(true);
-      when(() => mockUserSnapshot.data()).thenReturn({
-        'friendIds': [], // Empty cache
-        'friendCount': 0,
+    test('should return empty list when no friends from Cloud Function', () async {
+      // Arrange
+      when(() => mockFunctions.httpsCallable('getFriends'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call({'userId': 'test-user-id'}))
+          .thenAnswer((_) async {
+        final result = MockHttpsCallableResult();
+        when(() => result.data).thenReturn({
+          'friends': [],
+        });
+        return result;
       });
 
       // Act
@@ -501,15 +489,53 @@ void main() {
 
       // Assert
       expect(friends, isEmpty);
+      verify(() => mockCallable.call({'userId': 'test-user-id'})).called(1);
     });
 
-    test('should throw FriendshipException on error', () async {
+    test('should throw FriendshipException when user not authenticated', () async {
       // Arrange
-      final mockCollection = MockCollectionReference();
-      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
-      when(() => mockCollection.doc(any())).thenThrow(
-        Exception('Firestore error'),
+      when(() => mockAuth.currentUser).thenReturn(null);
+
+      // Act & Assert
+      expect(
+        () => repository.getFriends('test-user-id'),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            'User not authenticated',
+          ),
+        ),
       );
+    });
+
+    test('should throw FriendshipException when trying to view another user\'s friends', () async {
+      // Arrange - current user is 'user-1' but trying to fetch friends of 'user-2'
+      when(() => mockAuth.currentUser).thenReturn(mockUser);
+      when(() => mockUser.uid).thenReturn('user-1');
+
+      // Act & Assert
+      expect(
+        () => repository.getFriends('user-2'),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            'You can only view your own friends list',
+          ),
+        ),
+      );
+    });
+
+    test('should handle Cloud Function errors gracefully', () async {
+      // Arrange
+      when(() => mockFunctions.httpsCallable('getFriends'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call({'userId': 'test-user-id'}))
+          .thenThrow(FirebaseFunctionsException(
+        code: 'internal',
+        message: 'Failed to retrieve friends list',
+      ));
 
       // Act & Assert
       expect(
