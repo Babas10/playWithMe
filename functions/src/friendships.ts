@@ -1083,3 +1083,48 @@ export const onFriendRemoved = functions.firestore
       }
     }
   });
+
+// ============================================================================
+// Helper Functions (Story 11.4)
+// ============================================================================
+
+/**
+ * Check if two users are friends
+ *
+ * Validates bidirectional friendship by querying for accepted friendships
+ * in either direction (A→B or B→A).
+ *
+ * Performance: Uses cached friendIds from Story 11.6 for O(1) lookup
+ *
+ * @param userAId - First user's ID
+ * @param userBId - Second user's ID
+ * @returns true if users are friends, false otherwise
+ */
+export async function checkFriendship(
+  userAId: string,
+  userBId: string
+): Promise<boolean> {
+  try {
+    const db = admin.firestore();
+
+    // Story 11.6: Use cached friendIds for fast lookup
+    const userADoc = await db.collection("users").doc(userAId).get();
+
+    if (!userADoc.exists) {
+      return false;
+    }
+
+    const userData = userADoc.data();
+    const friendIds = userData?.friendIds || [];
+
+    // Check if userB is in userA's cached friendIds
+    return friendIds.includes(userBId);
+  } catch (error) {
+    functions.logger.error("Error checking friendship", {
+      userAId,
+      userBId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return false; // Fail closed - deny if error
+  }
+}
