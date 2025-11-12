@@ -9,6 +9,7 @@ export {createUserDocument, deleteUserDocument} from "./createUserDocument";
 
 // Export all Cloud Functions
 export {searchUserByEmail} from "./searchUserByEmail";
+export {searchUsers} from "./searchUsers"; // Story 11.12
 export {checkPendingInvitation} from "./checkPendingInvitation";
 export {acceptInvitation} from "./acceptInvitation";
 export {declineInvitation} from "./declineInvitation";
