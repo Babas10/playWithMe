@@ -8,6 +8,7 @@ import {
   getFriendsHandler,
   checkFriendshipStatusHandler,
   getFriendshipsHandler,
+  verifyFriendshipHandler,
 } from "../../src/friendships";
 import {createMockFirestore} from "../helpers/mockFirestore";
 
@@ -1097,6 +1098,112 @@ describe("Friendship Cloud Functions", () => {
         isFriend: false,
         hasPendingRequest: false,
       });
+    });
+  });
+
+  describe("verifyFriendship", () => {
+    it("should throw error if user is not authenticated", async () => {
+      await expect(
+        verifyFriendshipHandler({initiatorId: "user1", recipientId: "user2"}, {auth: undefined} as any)
+      ).rejects.toThrow("You must be logged in to verify friendships");
+    });
+
+    it("should throw error if initiatorId is missing", async () => {
+      await expect(
+        verifyFriendshipHandler({initiatorId: "", recipientId: "user2"}, mockContext)
+      ).rejects.toThrow("Parameter 'initiatorId' is required and must be a string");
+    });
+
+    it("should throw error if recipientId is missing", async () => {
+      await expect(
+        verifyFriendshipHandler({initiatorId: "user1", recipientId: ""}, mockContext)
+      ).rejects.toThrow("Parameter 'recipientId' is required and must be a string");
+    });
+
+    it("should return false if users are not friends", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({
+                friendIds: ["user3", "user4"],
+              }),
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await verifyFriendshipHandler(
+        {initiatorId: "user1", recipientId: "user2"},
+        mockContext
+      );
+
+      expect(result).toEqual({areFriends: false});
+    });
+
+    it("should return true if users are friends", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({
+                friendIds: ["user2", "user3"],
+              }),
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await verifyFriendshipHandler(
+        {initiatorId: "user1", recipientId: "user2"},
+        mockContext
+      );
+
+      expect(result).toEqual({areFriends: true});
+    });
+
+    it("should return false if initiator user does not exist", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: false,
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await verifyFriendshipHandler(
+        {initiatorId: "nonexistent", recipientId: "user2"},
+        mockContext
+      );
+
+      expect(result).toEqual({areFriends: false});
+    });
+
+    it("should return false on Firestore errors (fail-closed behavior)", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockRejectedValue(new Error("Firestore error")),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      // checkFriendship fails closed - returns false on error
+      // verifyFriendship should return this false value
+      const result = await verifyFriendshipHandler(
+        {initiatorId: "user1", recipientId: "user2"},
+        mockContext
+      );
+
+      expect(result).toEqual({areFriends: false});
     });
   });
 });

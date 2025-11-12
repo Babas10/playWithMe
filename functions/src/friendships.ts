@@ -84,6 +84,15 @@ interface GetFriendshipRequestsResponse {
   sentRequests: FriendshipRequest[];
 }
 
+interface VerifyFriendshipRequest {
+  initiatorId: string;
+  recipientId: string;
+}
+
+interface VerifyFriendshipResponse {
+  areFriends: boolean;
+}
+
 // ============================================================================
 // Helper Functions
 // ============================================================================
@@ -1361,3 +1370,84 @@ export async function checkFriendship(
     return false; // Fail closed - deny if error
   }
 }
+
+// ============================================================================
+// Story 11.14: Group Validation via Social Graph
+// ============================================================================
+
+/**
+ * Cloud Function handler for verifying friendship between two users
+ *
+ * This function is called by the Groups layer to validate that users
+ * are friends before allowing group invitations or membership changes.
+ * It enforces the architectural boundary: Groups query the social graph
+ * via this API, they do not manage friendships directly.
+ *
+ * @param data - Request containing initiatorId and recipientId
+ * @param context - Firebase callable context with auth info
+ * @returns Response indicating whether the users are friends
+ */
+export async function verifyFriendshipHandler(
+  data: VerifyFriendshipRequest,
+  context: functions.https.CallableContext
+): Promise<VerifyFriendshipResponse> {
+  // Validate authentication
+  if (!context.auth) {
+    functions.logger.warn("Unauthenticated verifyFriendship attempt");
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "You must be logged in to verify friendships"
+    );
+  }
+
+  const {initiatorId, recipientId} = data;
+
+  // Validate required parameters
+  if (!initiatorId || typeof initiatorId !== "string") {
+    functions.logger.warn("Missing or invalid initiatorId", {
+      userId: context.auth.uid,
+    });
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Parameter 'initiatorId' is required and must be a string"
+    );
+  }
+
+  if (!recipientId || typeof recipientId !== "string") {
+    functions.logger.warn("Missing or invalid recipientId", {
+      userId: context.auth.uid,
+    });
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Parameter 'recipientId' is required and must be a string"
+    );
+  }
+
+  functions.logger.info("Verifying friendship", {
+    initiatorId,
+    recipientId,
+    requesterId: context.auth.uid,
+  });
+
+  // Use existing checkFriendship helper from Story 11.4
+  // which leverages cached friendIds from Story 11.6 for O(1) performance
+  // Note: checkFriendship is designed to fail closed (return false on error)
+  const areFriends = await checkFriendship(initiatorId, recipientId);
+
+  functions.logger.info("Friendship verification complete", {
+    initiatorId,
+    recipientId,
+    areFriends,
+  });
+
+  return {areFriends};
+}
+
+/**
+ * Cloud Function: Verify friendship between two users
+ * Story 11.14: Enables Groups layer to validate member invitations
+ * via the social graph API
+ */
+export const verifyFriendship = functions.https.onCall(
+  verifyFriendshipHandler
+);
