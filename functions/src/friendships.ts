@@ -1085,6 +1085,239 @@ export const onFriendRemoved = functions.firestore
   });
 
 // ============================================================================
+// Function 8: Get Friendships (Story 11.13)
+// ============================================================================
+
+interface FriendshipWithUser {
+  id: string;
+  otherUser: UserProfile;
+  status: string;
+  createdAt: FirebaseFirestore.Timestamp;
+  updatedAt: FirebaseFirestore.Timestamp;
+  // Additional context fields
+  isInitiator: boolean; // True if current user initiated the friendship
+}
+
+interface GetFriendshipsRequest {
+  status: "pending" | "accepted" | "declined";
+}
+
+interface GetFriendshipsResponse {
+  friendships: FriendshipWithUser[];
+}
+
+/**
+ * Handler for getting friendships by status with denormalized user info
+ * Story 11.13: Unified function to replace getFriends and getFriendshipRequests
+ */
+export async function getFriendshipsHandler(
+  data: GetFriendshipsRequest,
+  context: functions.https.CallableContext
+): Promise<GetFriendshipsResponse> {
+  // Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated to get friendships"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // Validate input
+  if (!data || !data.status) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "status is required and must be one of: pending, accepted, declined"
+    );
+  }
+
+  const { status } = data;
+
+  // Validate status value
+  if (!["pending", "accepted", "declined"].includes(status)) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "status must be one of: pending, accepted, declined"
+    );
+  }
+
+  try {
+    functions.logger.info("Getting friendships by status", {
+      userId: currentUserId,
+      status,
+    });
+
+    const db = admin.firestore();
+    const friendshipsRef = db.collection("friendships");
+
+    // Get friendships where user is initiator with specified status
+    const asInitiatorQuery = friendshipsRef
+      .where("initiatorId", "==", currentUserId)
+      .where("status", "==", status)
+      .get();
+
+    // Get friendships where user is recipient with specified status
+    const asRecipientQuery = friendshipsRef
+      .where("recipientId", "==", currentUserId)
+      .where("status", "==", status)
+      .get();
+
+    // Execute both queries in parallel
+    const [asInitiatorSnapshot, asRecipientSnapshot] = await Promise.all([
+      asInitiatorQuery,
+      asRecipientQuery,
+    ]);
+
+    functions.logger.debug("Friendships query results", {
+      userId: currentUserId,
+      status,
+      asInitiator: asInitiatorSnapshot.size,
+      asRecipient: asRecipientSnapshot.size,
+    });
+
+    // Collect friendship data with the other user's ID
+    const friendshipsData: Array<{
+      id: string;
+      otherUserId: string;
+      status: string;
+      createdAt: FirebaseFirestore.Timestamp;
+      updatedAt: FirebaseFirestore.Timestamp;
+      isInitiator: boolean;
+    }> = [];
+
+    // Process friendships where current user is initiator
+    asInitiatorSnapshot.docs.forEach((doc) => {
+      const docData = doc.data();
+      friendshipsData.push({
+        id: doc.id,
+        otherUserId: docData.recipientId,
+        status: docData.status,
+        createdAt: docData.createdAt,
+        updatedAt: docData.updatedAt,
+        isInitiator: true,
+      });
+    });
+
+    // Process friendships where current user is recipient
+    asRecipientSnapshot.docs.forEach((doc) => {
+      const docData = doc.data();
+      friendshipsData.push({
+        id: doc.id,
+        otherUserId: docData.initiatorId,
+        status: docData.status,
+        createdAt: docData.createdAt,
+        updatedAt: docData.updatedAt,
+        isInitiator: false,
+      });
+    });
+
+    // If no friendships, return empty array
+    if (friendshipsData.length === 0) {
+      functions.logger.info("No friendships found", {
+        userId: currentUserId,
+        status,
+      });
+      return {
+        friendships: [],
+      };
+    }
+
+    functions.logger.debug("Found friendships", {
+      userId: currentUserId,
+      status,
+      count: friendshipsData.length,
+    });
+
+    // Fetch user profiles for all "other users"
+    const otherUserIds = friendshipsData.map((f) => f.otherUserId);
+    const userProfiles = new Map<string, UserProfile>();
+    const usersRef = db.collection("users");
+
+    // Firestore 'in' query limited to 10 items, so batch if needed
+    for (let i = 0; i < otherUserIds.length; i += 10) {
+      const batch = otherUserIds.slice(i, i + 10);
+      const usersSnapshot = await usersRef
+        .where(admin.firestore.FieldPath.documentId(), "in", batch)
+        .get();
+
+      usersSnapshot.docs.forEach((doc) => {
+        const userData = doc.data();
+        userProfiles.set(doc.id, {
+          uid: doc.id,
+          displayName: userData.displayName || null,
+          email: userData.email,
+          photoUrl: userData.photoUrl || null,
+          isEmailVerified: userData.isEmailVerified || false,
+          isAnonymous: userData.isAnonymous || false,
+          createdAt: userData.createdAt?.toDate().toISOString() || null,
+          lastSignInAt: userData.lastSignInAt?.toDate().toISOString() || null,
+        });
+      });
+    }
+
+    // Build response with denormalized user info
+    const friendshipsWithUsers: FriendshipWithUser[] = friendshipsData.map((friendship) => {
+      const otherUser = userProfiles.get(friendship.otherUserId);
+
+      // If user profile not found, use a placeholder
+      // This shouldn't happen in normal circumstances
+      const userProfile: UserProfile = otherUser || {
+        uid: friendship.otherUserId,
+        displayName: null,
+        email: "unknown@example.com",
+        photoUrl: null,
+        isEmailVerified: false,
+        isAnonymous: false,
+        createdAt: null,
+        lastSignInAt: null,
+      };
+
+      return {
+        id: friendship.id,
+        otherUser: userProfile,
+        status: friendship.status,
+        createdAt: friendship.createdAt,
+        updatedAt: friendship.updatedAt,
+        isInitiator: friendship.isInitiator,
+      };
+    });
+
+    functions.logger.info("Successfully retrieved friendships with user info", {
+      userId: currentUserId,
+      status,
+      count: friendshipsWithUsers.length,
+    });
+
+    return {
+      friendships: friendshipsWithUsers,
+    };
+  } catch (error) {
+    // Re-throw HttpsError
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    functions.logger.error("Error getting friendships", {
+      userId: currentUserId,
+      status,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to retrieve friendships"
+    );
+  }
+}
+
+/**
+ * Cloud Function to get friendships by status with denormalized user info
+ * Story 11.13: Unified function to replace getFriends and getFriendshipRequests
+ */
+export const getFriendships = functions.https.onCall(getFriendshipsHandler);
+
+// ============================================================================
 // Helper Functions (Story 11.4)
 // ============================================================================
 
