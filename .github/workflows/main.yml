@@ -76,7 +76,40 @@ jobs:
           name: PlayWithMe Coverage
           fail_ci_if_error: false
 
-  # Job 2: Security and Dependency Audit
+  # Job 2: Cloud Functions Tests
+  cloud_functions_tests:
+    name: ☁️ Cloud Functions Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: functions
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js environment
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: functions/package-lock.json
+
+      # Step 3: Install dependencies
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      # Step 4: Run TypeScript compilation check
+      - name: 🔍 Check TypeScript Compilation
+        run: npm run build
+
+      # Step 5: Run unit tests
+      - name: 🧪 Run Cloud Functions Tests
+        run: npm test
+
+  # Job 3: Security and Dependency Audit
   security_audit:
     name: 🔒 Security Audit
     runs-on: ubuntu-latest
@@ -123,20 +156,21 @@ jobs:
           fi
           echo "✅ No Firebase config files found in repository"
 
-  # Job 3: Final Status Check
+  # Job 4: Final Status Check
   ci_success:
     name: ✅ CI Success
     runs-on: ubuntu-latest
-    needs: [analyze_and_test, security_audit]
+    needs: [analyze_and_test, cloud_functions_tests, security_audit]
     if: always()
 
     steps:
       - name: 🎉 All Checks Passed
-        if: needs.analyze_and_test.result == 'success' && needs.security_audit.result == 'success'
+        if: needs.analyze_and_test.result == 'success' && needs.cloud_functions_tests.result == 'success' && needs.security_audit.result == 'success'
         run: |
           echo "🎉 All CI/CD checks passed successfully!"
           echo "✅ Static Analysis: Passed"
-          echo "✅ Tests: Passed"
+          echo "✅ Flutter Tests: Passed"
+          echo "✅ Cloud Functions Tests: Passed"
           echo "✅ Security Audit: Passed"
           echo ""
           echo "🚀 Ready for review!"
@@ -144,10 +178,11 @@ jobs:
           echo "ℹ️ Note: Platform builds are available via build-verification.yml workflow"
 
       - name: ❌ CI Failed
-        if: needs.analyze_and_test.result != 'success' || needs.security_audit.result != 'success'
+        if: needs.analyze_and_test.result != 'success' || needs.cloud_functions_tests.result != 'success' || needs.security_audit.result != 'success'
         run: |
           echo "❌ CI/CD pipeline failed!"
-          echo "📊 Analysis & Tests: ${{ needs.analyze_and_test.result }}"
+          echo "📊 Flutter Analysis & Tests: ${{ needs.analyze_and_test.result }}"
+          echo "☁️ Cloud Functions Tests: ${{ needs.cloud_functions_tests.result }}"
           echo "🔒 Security Audit: ${{ needs.security_audit.result }}"
           echo ""
           echo "🛑 Please fix the failing checks before merging."
