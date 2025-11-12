@@ -7,6 +7,7 @@ import {
   removeFriendHandler,
   getFriendsHandler,
   checkFriendshipStatusHandler,
+  getFriendshipsHandler,
 } from "../../src/friendships";
 import {createMockFirestore} from "../helpers/mockFirestore";
 
@@ -586,6 +587,376 @@ describe("Friendship Cloud Functions", () => {
       const result = await getFriendsHandler({}, mockContext);
 
       expect(result.friends).toHaveLength(15);
+    });
+  });
+
+  // ===========================================================================
+  // getFriendships Tests (Story 11.13)
+  // ===========================================================================
+
+  describe("getFriendships", () => {
+    it("should throw error if user is not authenticated", async () => {
+      await expect(
+        getFriendshipsHandler({status: "pending"} as any, {auth: undefined} as any)
+      ).rejects.toThrow();
+    });
+
+    it("should throw error if status is missing", async () => {
+      await expect(
+        getFriendshipsHandler({} as any, mockContext)
+      ).rejects.toThrow();
+    });
+
+    it("should throw error if status is invalid", async () => {
+      await expect(
+        getFriendshipsHandler({status: "invalid"} as any, mockContext)
+      ).rejects.toThrow();
+    });
+
+    it("should return empty array if user has no friendships with given status", async () => {
+      const mockFriendshipsCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn()
+          .mockResolvedValueOnce({docs: [], empty: true})
+          .mockResolvedValueOnce({docs: [], empty: true}),
+      };
+
+      const mockFirestore = {
+        collection: jest.fn(() => mockFriendshipsCollection),
+      };
+
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await getFriendshipsHandler({status: "pending"}, mockContext);
+
+      expect(result).toEqual({friendships: []});
+    });
+
+    it("should return pending friendships with denormalized user info", async () => {
+      const mockTimestamp = {toDate: () => new Date("2024-01-01")};
+
+      const mockFriendshipsCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn()
+          .mockResolvedValueOnce({
+            docs: [
+              {
+                id: "friendship1",
+                data: () => ({
+                  initiatorId: "user1",
+                  recipientId: "user2",
+                  status: "pending",
+                  createdAt: mockTimestamp,
+                  updatedAt: mockTimestamp,
+                }),
+              },
+            ],
+            empty: false,
+          })
+          .mockResolvedValueOnce({
+            docs: [
+              {
+                id: "friendship2",
+                data: () => ({
+                  initiatorId: "user3",
+                  recipientId: "user1",
+                  status: "pending",
+                  createdAt: mockTimestamp,
+                  updatedAt: mockTimestamp,
+                }),
+              },
+            ],
+            empty: false,
+          }),
+      };
+
+      const mockUsersCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({
+          docs: [
+            {
+              id: "user2",
+              data: () => ({
+                email: "user2@example.com",
+                displayName: "User 2",
+                photoUrl: null,
+                isEmailVerified: true,
+                isAnonymous: false,
+              }),
+            },
+            {
+              id: "user3",
+              data: () => ({
+                email: "user3@example.com",
+                displayName: "User 3",
+                photoUrl: "https://example.com/photo.jpg",
+                isEmailVerified: false,
+                isAnonymous: false,
+              }),
+            },
+          ],
+        }),
+      };
+
+      const mockFirestore = {
+        collection: jest.fn((name: string) => {
+          if (name === "friendships") return mockFriendshipsCollection;
+          if (name === "users") return mockUsersCollection;
+          return {};
+        }),
+        FieldPath: {documentId: jest.fn(() => "__name__")},
+      };
+
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await getFriendshipsHandler({status: "pending"}, mockContext);
+
+      expect(result.friendships).toHaveLength(2);
+      expect(result.friendships).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: "friendship1",
+            otherUser: expect.objectContaining({
+              uid: "user2",
+              displayName: "User 2",
+              email: "user2@example.com",
+            }),
+            status: "pending",
+            isInitiator: true,
+          }),
+          expect.objectContaining({
+            id: "friendship2",
+            otherUser: expect.objectContaining({
+              uid: "user3",
+              displayName: "User 3",
+              email: "user3@example.com",
+            }),
+            status: "pending",
+            isInitiator: false,
+          }),
+        ])
+      );
+    });
+
+    it("should return accepted friendships", async () => {
+      const mockTimestamp = {toDate: () => new Date("2024-01-01")};
+
+      const mockFriendshipsCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn()
+          .mockResolvedValueOnce({
+            docs: [
+              {
+                id: "friendship1",
+                data: () => ({
+                  initiatorId: "user1",
+                  recipientId: "user2",
+                  status: "accepted",
+                  createdAt: mockTimestamp,
+                  updatedAt: mockTimestamp,
+                }),
+              },
+            ],
+            empty: false,
+          })
+          .mockResolvedValueOnce({docs: [], empty: true}),
+      };
+
+      const mockUsersCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({
+          docs: [
+            {
+              id: "user2",
+              data: () => ({
+                email: "user2@example.com",
+                displayName: "User 2",
+                photoUrl: null,
+              }),
+            },
+          ],
+        }),
+      };
+
+      const mockFirestore = {
+        collection: jest.fn((name: string) => {
+          if (name === "friendships") return mockFriendshipsCollection;
+          if (name === "users") return mockUsersCollection;
+          return {};
+        }),
+        FieldPath: {documentId: jest.fn(() => "__name__")},
+      };
+
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await getFriendshipsHandler({status: "accepted"}, mockContext);
+
+      expect(result.friendships).toHaveLength(1);
+      expect(result.friendships[0].status).toBe("accepted");
+      expect(result.friendships[0].isInitiator).toBe(true);
+    });
+
+    it("should return declined friendships", async () => {
+      const mockTimestamp = {toDate: () => new Date("2024-01-01")};
+
+      const mockFriendshipsCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn()
+          .mockResolvedValueOnce({docs: [], empty: true})
+          .mockResolvedValueOnce({
+            docs: [
+              {
+                id: "friendship1",
+                data: () => ({
+                  initiatorId: "user2",
+                  recipientId: "user1",
+                  status: "declined",
+                  createdAt: mockTimestamp,
+                  updatedAt: mockTimestamp,
+                }),
+              },
+            ],
+            empty: false,
+          }),
+      };
+
+      const mockUsersCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({
+          docs: [
+            {
+              id: "user2",
+              data: () => ({
+                email: "user2@example.com",
+                displayName: "User 2",
+                photoUrl: null,
+              }),
+            },
+          ],
+        }),
+      };
+
+      const mockFirestore = {
+        collection: jest.fn((name: string) => {
+          if (name === "friendships") return mockFriendshipsCollection;
+          if (name === "users") return mockUsersCollection;
+          return {};
+        }),
+        FieldPath: {documentId: jest.fn(() => "__name__")},
+      };
+
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await getFriendshipsHandler({status: "declined"}, mockContext);
+
+      expect(result.friendships).toHaveLength(1);
+      expect(result.friendships[0].status).toBe("declined");
+      expect(result.friendships[0].isInitiator).toBe(false);
+    });
+
+    it("should handle batch fetching for more than 10 friendships", async () => {
+      const mockTimestamp = {toDate: () => new Date("2024-01-01")};
+      const friendIds = Array.from({length: 15}, (_, i) => `user${i + 2}`);
+
+      const mockFriendshipsCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn()
+          .mockResolvedValueOnce({
+            docs: friendIds.map((id, index) => ({
+              id: `friendship${index}`,
+              data: () => ({
+                initiatorId: "user1",
+                recipientId: id,
+                status: "accepted",
+                createdAt: mockTimestamp,
+                updatedAt: mockTimestamp,
+              }),
+            })),
+            empty: false,
+          })
+          .mockResolvedValueOnce({docs: [], empty: true}),
+      };
+
+      const mockUsersCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn()
+          .mockResolvedValueOnce({
+            docs: friendIds.slice(0, 10).map((id) => ({
+              id,
+              data: () => ({email: `${id}@example.com`, displayName: id}),
+            })),
+          })
+          .mockResolvedValueOnce({
+            docs: friendIds.slice(10).map((id) => ({
+              id,
+              data: () => ({email: `${id}@example.com`, displayName: id}),
+            })),
+          }),
+      };
+
+      const mockFirestore = {
+        collection: jest.fn((name: string) => {
+          if (name === "friendships") return mockFriendshipsCollection;
+          if (name === "users") return mockUsersCollection;
+          return {};
+        }),
+        FieldPath: {documentId: jest.fn(() => "__name__")},
+      };
+
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await getFriendshipsHandler({status: "accepted"}, mockContext);
+
+      expect(result.friendships).toHaveLength(15);
+    });
+
+    it("should handle missing user profiles gracefully", async () => {
+      const mockTimestamp = {toDate: () => new Date("2024-01-01")};
+
+      const mockFriendshipsCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn()
+          .mockResolvedValueOnce({
+            docs: [
+              {
+                id: "friendship1",
+                data: () => ({
+                  initiatorId: "user1",
+                  recipientId: "deleted-user",
+                  status: "accepted",
+                  createdAt: mockTimestamp,
+                  updatedAt: mockTimestamp,
+                }),
+              },
+            ],
+            empty: false,
+          })
+          .mockResolvedValueOnce({docs: [], empty: true}),
+      };
+
+      const mockUsersCollection = {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({
+          docs: [], // User not found
+        }),
+      };
+
+      const mockFirestore = {
+        collection: jest.fn((name: string) => {
+          if (name === "friendships") return mockFriendshipsCollection;
+          if (name === "users") return mockUsersCollection;
+          return {};
+        }),
+        FieldPath: {documentId: jest.fn(() => "__name__")},
+      };
+
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await getFriendshipsHandler({status: "accepted"}, mockContext);
+
+      expect(result.friendships).toHaveLength(1);
+      expect(result.friendships[0].otherUser.uid).toBe("deleted-user");
+      expect(result.friendships[0].otherUser.email).toBe("unknown@example.com");
     });
   });
 
