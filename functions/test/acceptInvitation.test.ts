@@ -1,6 +1,11 @@
 import functionsTest from "firebase-functions-test";
 import {acceptInvitationHandler} from "../src/acceptInvitation";
 
+// Mock checkFriendship from friendships module
+jest.mock("../src/friendships", () => ({
+  checkFriendship: jest.fn(),
+}));
+
 // Mock admin.firestore()
 jest.mock("firebase-admin", () => {
   const mockFieldValue = {
@@ -31,9 +36,14 @@ const test = functionsTest();
 const admin = require("firebase-admin");
 const mockFirestore = admin.firestore();
 
+// Get mock checkFriendship
+const {checkFriendship} = require("../src/friendships");
+
 describe("acceptInvitation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default: mock checkFriendship to return true (users are friends)
+    (checkFriendship as jest.Mock).mockResolvedValue(true);
   });
 
   afterAll(() => {

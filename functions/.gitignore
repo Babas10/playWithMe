@@ -13,7 +13,7 @@ node_modules/
 
 # npm
 npm-debug.log
-package-lock.json
+# Note: package-lock.json is now committed for deterministic builds in CI
 
 # Firebase cache
 .firebase/
