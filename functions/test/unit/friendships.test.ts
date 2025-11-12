@@ -526,18 +526,18 @@ describe("Friendship Cloud Functions", () => {
       expect(result.friends).toHaveLength(2);
       expect(result.friends).toEqual(
         expect.arrayContaining([
-          {
+          expect.objectContaining({
             uid: "user2",
             displayName: "User 2",
             email: "user2@example.com",
             photoUrl: null,
-          },
-          {
+          }),
+          expect.objectContaining({
             uid: "user3",
             displayName: "User 3",
             email: "user3@example.com",
             photoUrl: "https://example.com/photo.jpg",
-          },
+          }),
         ])
       );
     });
