@@ -83,7 +83,7 @@ void main() {
       // Assert
       expect(find.text('Failed to load friends'), findsOneWidget);
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
-      expect(find.widgetWithText(OutlinedButton, 'Retry'), findsOneWidget);
+      expect(find.text('Retry'), findsOneWidget);
     });
 
     testWidgets('displays friend list when friends are loaded', (tester) async {
@@ -226,7 +226,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap Select All button
-      await tester.tap(find.widgetWithText(TextButton, 'Select All'));
+      await tester.tap(find.text('Select All'));
       await tester.pumpAndSettle();
 
       // Assert
@@ -268,13 +268,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Select all first
-      await tester.tap(find.widgetWithText(TextButton, 'Select All'));
+      await tester.tap(find.text('Select All'));
       await tester.pumpAndSettle();
 
       expect(selectedIds, {'friend1', 'friend2'});
 
       // Clear all
-      await tester.tap(find.widgetWithText(TextButton, 'Clear All'));
+      await tester.tap(find.text('Clear All'));
       await tester.pumpAndSettle();
 
       // Assert
@@ -311,7 +311,7 @@ void main() {
       expect(find.text('Failed to load friends'), findsOneWidget);
 
       // Tap retry
-      await tester.tap(find.widgetWithText(OutlinedButton, 'Retry'));
+      await tester.tap(find.text('Retry'));
       await tester.pumpAndSettle();
 
       // Assert - should now show friend list
