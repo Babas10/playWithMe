@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
+import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_event.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_state.dart';
@@ -148,11 +149,22 @@ class GroupListPage extends StatelessWidget {
   }
 
   void _navigateToCreateGroup(BuildContext context) {
+    // Try to get FriendRepository from DI, but allow it to be null in test environments
+    FriendRepository? friendRepository;
+    try {
+      friendRepository = sl<FriendRepository>();
+    } catch (e) {
+      // FriendRepository not registered (likely in test environment)
+      // Friend selector will not be shown
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => BlocProvider(
           create: (context) => sl<GroupBloc>(),
-          child: const GroupCreationPage(),
+          child: GroupCreationPage(
+            friendRepository: friendRepository,
+          ),
         ),
       ),
     );

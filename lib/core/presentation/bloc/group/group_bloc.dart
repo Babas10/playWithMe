@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/repositories/group_repository.dart';
+import '../../../domain/repositories/invitation_repository.dart';
 import '../../../data/models/group_model.dart';
 import '../../../utils/error_messages.dart';
 import 'group_event.dart';
@@ -8,10 +9,14 @@ import 'group_state.dart';
 
 class GroupBloc extends Bloc<GroupEvent, GroupState> {
   final GroupRepository _groupRepository;
+  final InvitationRepository? _invitationRepository;
   StreamSubscription<dynamic>? _groupsSubscription;
 
-  GroupBloc({required GroupRepository groupRepository})
-      : _groupRepository = groupRepository,
+  GroupBloc({
+    required GroupRepository groupRepository,
+    InvitationRepository? invitationRepository,
+  })  : _groupRepository = groupRepository,
+        _invitationRepository = invitationRepository,
         super(const GroupInitial()) {
     on<LoadGroupById>(_onLoadGroupById);
     on<LoadGroupsForUser>(_onLoadGroupsForUser);
@@ -103,6 +108,27 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       final groupId = await _groupRepository.createGroup(event.group);
       final createdGroup = event.group.copyWith(id: groupId);
+
+      // Send invitations to selected friends
+      if (event.friendIdsToInvite != null &&
+          event.friendIdsToInvite!.isNotEmpty &&
+          _invitationRepository != null) {
+        try {
+          for (final friendId in event.friendIdsToInvite!) {
+            await _invitationRepository!.sendInvitation(
+              groupId: groupId,
+              groupName: createdGroup.name,
+              invitedUserId: friendId,
+              invitedBy: createdGroup.createdBy,
+              inviterName: '', // Will be filled by backend from user document
+            );
+          }
+        } catch (inviteError) {
+          // Log invitation errors but don't fail group creation
+          // Group was created successfully, invitation failures are non-critical
+          print('Warning: Failed to send some invitations: $inviteError');
+        }
+      }
 
       emit(GroupCreated(
         groupId: groupId,

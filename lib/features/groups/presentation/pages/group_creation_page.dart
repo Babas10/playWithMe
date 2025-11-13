@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
+import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_event.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_state.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
+import '../widgets/friend_selector_widget.dart';
 
 class GroupCreationPage extends StatefulWidget {
-  const GroupCreationPage({super.key});
+  final FriendRepository? friendRepository;
+
+  const GroupCreationPage({
+    super.key,
+    this.friendRepository,
+  });
 
   @override
   State<GroupCreationPage> createState() => _GroupCreationPageState();
@@ -18,6 +25,7 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  Set<String> _selectedFriendIds = {};
 
   @override
   void dispose() {
@@ -56,7 +64,10 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
       lastActivity: now, // Set initial activity to creation time
     );
 
-    context.read<GroupBloc>().add(CreateGroup(group: newGroup));
+    context.read<GroupBloc>().add(CreateGroup(
+          group: newGroup,
+          friendIdsToInvite: _selectedFriendIds.isNotEmpty ? _selectedFriendIds : null,
+        ));
   }
 
   @override
@@ -159,6 +170,21 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                         textCapitalization: TextCapitalization.sentences,
                       ),
                       const SizedBox(height: 24),
+
+                      // Friend selector (only if repository is provided)
+                      if (widget.friendRepository != null) ...[
+                        FriendSelectorWidget(
+                          currentUserId: authState.user.uid,
+                          friendRepository: widget.friendRepository!,
+                          onSelectionChanged: (selectedIds) {
+                            setState(() {
+                              _selectedFriendIds = selectedIds;
+                            });
+                          },
+                          initialSelection: _selectedFriendIds,
+                        ),
+                        const SizedBox(height: 24),
+                      ],
 
                       // Info card
                       Card(
