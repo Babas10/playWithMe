@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
@@ -11,7 +10,12 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import '../widgets/friend_selector_widget.dart';
 
 class GroupCreationPage extends StatefulWidget {
-  const GroupCreationPage({super.key});
+  final FriendRepository? friendRepository;
+
+  const GroupCreationPage({
+    super.key,
+    this.friendRepository,
+  });
 
   @override
   State<GroupCreationPage> createState() => _GroupCreationPageState();
@@ -167,18 +171,20 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Friend selector
-                      FriendSelectorWidget(
-                        currentUserId: authState.user.uid,
-                        friendRepository: GetIt.instance<FriendRepository>(),
-                        onSelectionChanged: (selectedIds) {
-                          setState(() {
-                            _selectedFriendIds = selectedIds;
-                          });
-                        },
-                        initialSelection: _selectedFriendIds,
-                      ),
-                      const SizedBox(height: 24),
+                      // Friend selector (only if repository is provided)
+                      if (widget.friendRepository != null) ...[
+                        FriendSelectorWidget(
+                          currentUserId: authState.user.uid,
+                          friendRepository: widget.friendRepository!,
+                          onSelectionChanged: (selectedIds) {
+                            setState(() {
+                              _selectedFriendIds = selectedIds;
+                            });
+                          },
+                          initialSelection: _selectedFriendIds,
+                        ),
+                        const SizedBox(height: 24),
+                      ],
 
                       // Info card
                       Card(
