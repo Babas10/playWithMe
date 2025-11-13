@@ -152,7 +152,9 @@ class GroupListPage extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => BlocProvider(
           create: (context) => sl<GroupBloc>(),
-          child: const GroupCreationPage(),
+          child: GroupCreationPage(
+            friendRepository: sl(),
+          ),
         ),
       ),
     );
