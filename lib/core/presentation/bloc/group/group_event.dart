@@ -25,11 +25,15 @@ class LoadGroupsForUser extends GroupEvent {
 
 class CreateGroup extends GroupEvent {
   final GroupModel group;
+  final Set<String>? friendIdsToInvite;
 
-  const CreateGroup({required this.group});
+  const CreateGroup({
+    required this.group,
+    this.friendIdsToInvite,
+  });
 
   @override
-  List<Object?> get props => [group];
+  List<Object?> get props => [group, friendIdsToInvite];
 }
 
 class UpdateGroupInfo extends GroupEvent {
