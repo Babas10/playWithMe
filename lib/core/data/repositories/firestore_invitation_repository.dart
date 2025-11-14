@@ -30,28 +30,40 @@ class FirestoreInvitationRepository implements InvitationRepository {
     required String inviterName,
   }) async {
     try {
-      // Note: Duplicate check is now handled in the UI layer via Cloud Function
-      // (checkPendingInvitation) before calling this method for better security
+      // Story 11.16: Use Cloud Function for secure invitation with friendship validation
+      // This enforces that only friends can be invited to groups
+      final callable = _functions.httpsCallable('inviteToGroup');
+      final result = await callable.call({
+        'groupId': groupId,
+        'invitedUserId': invitedUserId,
+      });
 
-      // Create invitation
-      final invitation = InvitationModel(
-        id: '', // Will be set by Firestore
-        groupId: groupId,
-        groupName: groupName,
-        invitedUserId: invitedUserId,
-        invitedBy: invitedBy,
-        inviterName: inviterName,
-        status: InvitationStatus.pending,
-        createdAt: DateTime.now(),
-      );
-
-      final docRef = await _firestore
-          .collection(_usersCollection)
-          .doc(invitedUserId)
-          .collection(_invitationsSubcollection)
-          .add(invitation.toFirestore());
-
-      return docRef.id;
+      // Cloud Function returns { success: true, invitationId: string }
+      final data = result.data as Map<String, dynamic>;
+      return data['invitationId'] as String;
+    } on FirebaseFunctionsException catch (e) {
+      // Map Firebase Functions errors to user-friendly messages
+      String message;
+      switch (e.code) {
+        case 'unauthenticated':
+          message = 'You must be logged in to send invitations';
+          break;
+        case 'permission-denied':
+          message = e.message ?? 'You can only invite friends to groups';
+          break;
+        case 'not-found':
+          message = e.message ?? 'User or group not found';
+          break;
+        case 'already-exists':
+          message = e.message ?? 'Invitation already exists or user is already a member';
+          break;
+        case 'invalid-argument':
+          message = e.message ?? 'Invalid invitation parameters';
+          break;
+        default:
+          message = 'Failed to send invitation: ${e.message ?? e.code}';
+      }
+      throw Exception(message);
     } catch (e) {
       throw Exception('Failed to send invitation: $e');
     }

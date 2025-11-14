@@ -1,6 +1,7 @@
 // Cloud Function for searching users by email securely
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import {checkFriendship} from "./friendships";
 
 interface SearchUserByEmailRequest {
   email: string;
@@ -93,29 +94,31 @@ export async function searchUserByEmailHandler(
 
     if (foundUserId !== currentUserId) {
       try {
-        const friendshipsRef = db.collection("friendships");
+        // Story 11.16: Use checkFriendship helper from social graph API
+        // This enforces the architectural boundary - no direct friendship queries
+        isFriend = await checkFriendship(currentUserId, foundUserId);
 
-        // Check for existing friendship in both directions
-        const friendshipQuery = await friendshipsRef
-          .where("initiatorId", "in", [currentUserId, foundUserId])
-          .where("recipientId", "in", [currentUserId, foundUserId])
-          .limit(1)
-          .get();
+        // If not friends, check for pending requests
+        if (!isFriend) {
+          const friendshipsRef = db.collection("friendships");
 
-        if (!friendshipQuery.empty) {
-          const friendshipDoc = friendshipQuery.docs[0];
-          const friendshipData = friendshipDoc.data();
+          // Check for pending friendship requests only
+          const pendingQuery = await friendshipsRef
+            .where("status", "==", "pending")
+            .get();
 
-          // Verify it's actually between these two users
-          const involves =
-            (friendshipData.initiatorId === currentUserId &&
-              friendshipData.recipientId === foundUserId) ||
-            (friendshipData.initiatorId === foundUserId &&
-              friendshipData.recipientId === currentUserId);
+          for (const doc of pendingQuery.docs) {
+            const data = doc.data();
+            const involves =
+              (data.initiatorId === currentUserId &&
+                data.recipientId === foundUserId) ||
+              (data.initiatorId === foundUserId &&
+                data.recipientId === currentUserId);
 
-          if (involves) {
-            isFriend = friendshipData.status === "accepted";
-            hasPendingRequest = friendshipData.status === "pending";
+            if (involves) {
+              hasPendingRequest = true;
+              break;
+            }
           }
         }
       } catch (friendshipError) {
