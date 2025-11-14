@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
@@ -460,6 +461,14 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
 
     return FloatingActionButton.extended(
       onPressed: () {
+        // Try to get FriendRepository from DI
+        FriendRepository? friendRepository;
+        try {
+          friendRepository = sl<FriendRepository>();
+        } catch (e) {
+          // FriendRepository not registered (unlikely in production)
+        }
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -468,6 +477,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
               child: InviteMemberPage(
                 groupId: widget.groupId,
                 groupName: _group!.name,
+                friendRepository: friendRepository,
               ),
             ),
           ),
