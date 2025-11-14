@@ -206,7 +206,10 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<GroupBloc>()) {
     sl.registerFactory<GroupBloc>(
-      () => GroupBloc(groupRepository: sl()),
+      () => GroupBloc(
+        groupRepository: sl(),
+        invitationRepository: sl(),
+      ),
     );
   }
 
