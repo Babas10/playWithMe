@@ -8,15 +8,21 @@ import 'package:play_with_me/core/presentation/bloc/group/group_state.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
 
 import '../../../data/repositories/mock_group_repository.dart';
+import '../../../data/repositories/mock_invitation_repository.dart';
 
 void main() {
   group('GroupBloc', () {
     late GroupBloc groupBloc;
     late MockGroupRepository mockGroupRepository;
+    late MockInvitationRepository mockInvitationRepository;
 
     setUp(() {
       mockGroupRepository = MockGroupRepository();
-      groupBloc = GroupBloc(groupRepository: mockGroupRepository);
+      mockInvitationRepository = MockInvitationRepository();
+      groupBloc = GroupBloc(
+        groupRepository: mockGroupRepository,
+        invitationRepository: mockInvitationRepository,
+      );
     });
 
     tearDown(() {
@@ -81,6 +87,31 @@ void main() {
           const GroupLoading(),
           isA<GroupCreated>(),
         ],
+      );
+
+      blocTest<GroupBloc, GroupState>(
+        'emits GroupCreated and sends invitations when friendIdsToInvite provided',
+        build: () {
+          mockGroupRepository.clearGroups();
+          mockInvitationRepository.clearInvitations();
+          return groupBloc;
+        },
+        act: (bloc) => bloc.add(CreateGroup(
+          group: newGroup,
+          friendIdsToInvite: {'friend-1', 'friend-2'},
+        )),
+        expect: () => [
+          const GroupLoading(),
+          isA<GroupCreated>(),
+        ],
+        verify: (_) async {
+          // Verify that invitations were sent to both friends
+          final sentInvitations =
+              await mockInvitationRepository.getInvitationsSentByUser('user-1');
+          expect(sentInvitations.length, 2);
+          expect(sentInvitations.map((i) => i.invitedUserId).toSet(),
+              {'friend-1', 'friend-2'});
+        },
       );
     });
 
