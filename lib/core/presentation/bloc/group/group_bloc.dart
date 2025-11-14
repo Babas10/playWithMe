@@ -126,7 +126,9 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
         } catch (inviteError) {
           // Log invitation errors but don't fail group creation
           // Group was created successfully, invitation failures are non-critical
-          print('Warning: Failed to send some invitations: $inviteError');
+          // Using print for now - consider using a proper logger in production
+          // ignore: avoid_print
+          print('⚠️ Warning: Failed to send invitations during group creation: $inviteError');
         }
       }
 

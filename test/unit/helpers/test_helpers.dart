@@ -124,7 +124,10 @@ Future<void> initializeTestDependencies({
 
   // Register GroupBloc factory that uses the mock repository
   sl.registerFactory<GroupBloc>(
-    () => GroupBloc(groupRepository: sl<GroupRepository>()),
+    () => GroupBloc(
+      groupRepository: sl<GroupRepository>(),
+      invitationRepository: sl<InvitationRepository>(),
+    ),
   );
 
   // Register MockInvitationRepository for invitation-related tests
