@@ -15,6 +15,7 @@ export {acceptInvitation} from "./acceptInvitation";
 export {declineInvitation} from "./declineInvitation";
 export {getUsersByIds} from "./getUsersByIds";
 export {leaveGroup} from "./leaveGroup";
+export {inviteToGroup} from "./inviteToGroup"; // Story 11.16
 
 // Export friendship functions (callable functions)
 export {

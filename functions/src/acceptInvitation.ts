@@ -40,6 +40,8 @@ export async function acceptInvitationHandler(
   const userId = context.auth.uid;
   const {invitationId} = data;
 
+  console.log(`[acceptInvitation] Called by user ${userId} for invitation ${invitationId}`);
+
   // Validate required parameters
   if (!invitationId || typeof invitationId !== "string") {
     throw new functions.https.HttpsError(
@@ -59,6 +61,8 @@ export async function acceptInvitationHandler(
       .doc(invitationId);
 
     const invitationDoc = await invitationRef.get();
+
+    console.log(`[acceptInvitation] Invitation exists: ${invitationDoc.exists}`);
 
     if (!invitationDoc.exists) {
       throw new functions.https.HttpsError(
@@ -99,6 +103,18 @@ export async function acceptInvitationHandler(
     const groupId = invitationData.groupId;
     const groupRef = db.collection("groups").doc(groupId);
 
+    // Verify group exists before proceeding
+    const groupDoc = await groupRef.get();
+    if (!groupDoc.exists) {
+      console.error(`[acceptInvitation] Group ${groupId} not found for invitation ${invitationId}`);
+      throw new functions.https.HttpsError(
+        "not-found",
+        "The group for this invitation no longer exists"
+      );
+    }
+
+    console.log(`[acceptInvitation] Accepting invitation ${invitationId} for user ${userId} to group ${groupId}`);
+
     // Use a batch write for atomicity
     const batch = db.batch();
 
@@ -117,6 +133,8 @@ export async function acceptInvitationHandler(
 
     // Commit the batch
     await batch.commit();
+
+    console.log(`[acceptInvitation] Successfully added user ${userId} to group ${groupId}`);
 
     return {
       success: true,
