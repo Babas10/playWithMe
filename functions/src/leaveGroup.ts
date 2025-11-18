@@ -108,22 +108,42 @@ export async function leaveGroupHandler(
       );
     }
 
-    // Use a batch write for atomicity
-    const batch = db.batch();
+    // Use a transaction for atomic read-modify-write
+    // This prevents race conditions if group is modified during the operation
+    await db.runTransaction(async (transaction) => {
+      // Re-read group within transaction to ensure current state
+      const currentGroupDoc = await transaction.get(groupRef);
+      if (!currentGroupDoc.exists) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "Group no longer exists"
+        );
+      }
 
-    // Remove user from group members
-    batch.update(groupRef, {
-      memberIds: admin.firestore.FieldValue.arrayRemove(userId),
-      // If user is admin, also remove from adminIds
-      ...(isAdmin && {
-        adminIds: admin.firestore.FieldValue.arrayRemove(userId),
-      }),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      lastActivity: admin.firestore.FieldValue.serverTimestamp(),
+      const currentGroupData = currentGroupDoc.data();
+
+      // Re-verify user is still a member
+      if (!currentGroupData?.memberIds || !currentGroupData.memberIds.includes(userId)) {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "You are no longer a member of this group"
+        );
+      }
+
+      // Re-check admin status within transaction
+      const currentIsAdmin = currentGroupData.adminIds && currentGroupData.adminIds.includes(userId);
+
+      // Remove user from group members
+      transaction.update(groupRef, {
+        memberIds: admin.firestore.FieldValue.arrayRemove(userId),
+        // If user is admin, also remove from adminIds
+        ...(currentIsAdmin && {
+          adminIds: admin.firestore.FieldValue.arrayRemove(userId),
+        }),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastActivity: admin.firestore.FieldValue.serverTimestamp(),
+      });
     });
-
-    // Commit the batch
-    await batch.commit();
 
     functions.logger.info("User left group successfully", {
       userId,
