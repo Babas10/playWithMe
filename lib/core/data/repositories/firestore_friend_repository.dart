@@ -421,6 +421,136 @@ class FirestoreFriendRepository implements FriendRepository {
     }
   }
 
+  @override
+  Future<FriendRequestStatus> getFriendRequestStatus(
+    String currentUserId,
+    String targetUserId,
+  ) async {
+    try {
+      // Validate that current user is authenticated
+      final authUserId = _auth.currentUser?.uid;
+      if (authUserId == null) {
+        throw FriendshipException('User not authenticated');
+      }
+
+      // Ensure currentUserId matches authenticated user
+      if (currentUserId != authUserId) {
+        throw FriendshipException(
+          'Can only check request status for authenticated user',
+          code: 'permission-denied',
+        );
+      }
+
+      // Cannot check request status with yourself
+      if (currentUserId == targetUserId) {
+        throw FriendshipException(
+          'Cannot check request status with yourself',
+          code: 'invalid-argument',
+        );
+      }
+
+      // Check if currentUserId sent request to targetUserId
+      final sentByMe = await _firestore
+          .collection('friendships')
+          .where('initiatorId', isEqualTo: currentUserId)
+          .where('recipientId', isEqualTo: targetUserId)
+          .where('status', isEqualTo: 'pending')
+          .limit(1)
+          .get();
+
+      if (sentByMe.docs.isNotEmpty) {
+        return FriendRequestStatus.sentByMe;
+      }
+
+      // Check if targetUserId sent request to currentUserId
+      final receivedFromThem = await _firestore
+          .collection('friendships')
+          .where('initiatorId', isEqualTo: targetUserId)
+          .where('recipientId', isEqualTo: currentUserId)
+          .where('status', isEqualTo: 'pending')
+          .limit(1)
+          .get();
+
+      if (receivedFromThem.docs.isNotEmpty) {
+        return FriendRequestStatus.receivedFromThem;
+      }
+
+      // No pending request found
+      return FriendRequestStatus.none;
+    } on FriendshipException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        throw FriendshipException(
+          'You don\'t have permission to check request status',
+          code: 'permission-denied',
+        );
+      }
+      throw FriendshipException(
+          'Failed to check friend request status: ${e.message}');
+    } catch (e) {
+      throw FriendshipException('Failed to check friend request status: $e');
+    }
+  }
+
+  @override
+  Future<Map<String, FriendRequestStatus>> batchCheckFriendRequestStatus(
+    List<String> userIds,
+  ) async {
+    try {
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw FriendshipException('User not authenticated');
+      }
+
+      // Handle empty list early
+      if (userIds.isEmpty) {
+        return {};
+      }
+
+      // Validate input size
+      if (userIds.length > 100) {
+        throw FriendshipException(
+          'Maximum 100 users can be checked at once',
+          code: 'invalid-argument',
+        );
+      }
+
+      // Call Cloud Function (Story 11.19)
+      final callable = _functions.httpsCallable('batchCheckFriendRequestStatus');
+      final result = await callable.call({'userIds': userIds});
+
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final requestStatuses =
+          Map<String, dynamic>.from(data['requestStatuses'] as Map);
+
+      // Convert string values to FriendRequestStatus enum
+      return requestStatuses.map((key, value) {
+        final statusString = value as String;
+        FriendRequestStatus status;
+        switch (statusString) {
+          case 'sentByMe':
+            status = FriendRequestStatus.sentByMe;
+            break;
+          case 'receivedFromThem':
+            status = FriendRequestStatus.receivedFromThem;
+            break;
+          case 'none':
+          default:
+            status = FriendRequestStatus.none;
+            break;
+        }
+        return MapEntry(key, status);
+      });
+    } on FirebaseFunctionsException catch (e) {
+      throw _handleError(e);
+    } on FriendshipException {
+      rethrow;
+    } catch (e) {
+      throw FriendshipException('Failed to check friend request statuses: $e');
+    }
+  }
+
   /// Map FirebaseFunctionsException to user-friendly FriendshipException
   FriendshipException _handleError(FirebaseFunctionsException e) {
     switch (e.code) {
@@ -452,6 +582,11 @@ class FirestoreFriendRepository implements FriendRepository {
       case 'unauthenticated':
         return FriendshipException(
           'You must be logged in to perform this action',
+          code: e.code,
+        );
+      case 'resource-exhausted':
+        return FriendshipException(
+          'You have sent too many friend requests recently. Please try again later.',
           code: e.code,
         );
       default:
