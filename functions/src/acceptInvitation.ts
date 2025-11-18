@@ -40,7 +40,10 @@ export async function acceptInvitationHandler(
   const userId = context.auth.uid;
   const {invitationId} = data;
 
-  console.log(`[acceptInvitation] Called by user ${userId} for invitation ${invitationId}`);
+  functions.logger.info("Accepting invitation", {
+    userId,
+    invitationId,
+  });
 
   // Validate required parameters
   if (!invitationId || typeof invitationId !== "string") {
@@ -62,9 +65,17 @@ export async function acceptInvitationHandler(
 
     const invitationDoc = await invitationRef.get();
 
-    console.log(`[acceptInvitation] Invitation exists: ${invitationDoc.exists}`);
+    functions.logger.debug("Invitation lookup result", {
+      userId,
+      invitationId,
+      exists: invitationDoc.exists,
+    });
 
     if (!invitationDoc.exists) {
+      functions.logger.warn("Invitation not found", {
+        userId,
+        invitationId,
+      });
       throw new functions.https.HttpsError(
         "not-found",
         "Invitation not found"
@@ -75,6 +86,11 @@ export async function acceptInvitationHandler(
 
     // Verify invitation is pending
     if (invitationData?.status !== "pending") {
+      functions.logger.warn("Invitation is not pending", {
+        userId,
+        invitationId,
+        currentStatus: invitationData?.status,
+      });
       throw new functions.https.HttpsError(
         "failed-precondition",
         "Invitation is not pending"
@@ -83,6 +99,11 @@ export async function acceptInvitationHandler(
 
     // Verify invitation is for the authenticated user
     if (invitationData.invitedUserId !== userId) {
+      functions.logger.warn("Invitation ownership mismatch", {
+        userId,
+        invitationId,
+        invitedUserId: invitationData.invitedUserId,
+      });
       throw new functions.https.HttpsError(
         "permission-denied",
         "This invitation is not for you"
@@ -93,7 +114,18 @@ export async function acceptInvitationHandler(
     const inviterId = invitationData.invitedBy;
     const areFriends = await checkFriendship(inviterId, userId);
 
+    functions.logger.debug("Friendship validation result", {
+      userId,
+      inviterId,
+      areFriends,
+    });
+
     if (!areFriends) {
+      functions.logger.warn("Non-friend attempting to accept invitation", {
+        userId,
+        inviterId,
+        invitationId,
+      });
       throw new functions.https.HttpsError(
         "permission-denied",
         "You can only accept invitations from friends. Please add them as a friend first."
@@ -106,14 +138,23 @@ export async function acceptInvitationHandler(
     // Verify group exists before proceeding
     const groupDoc = await groupRef.get();
     if (!groupDoc.exists) {
-      console.error(`[acceptInvitation] Group ${groupId} not found for invitation ${invitationId}`);
+      functions.logger.error("Group not found for invitation", {
+        userId,
+        invitationId,
+        groupId,
+      });
       throw new functions.https.HttpsError(
         "not-found",
         "The group for this invitation no longer exists"
       );
     }
 
-    console.log(`[acceptInvitation] Accepting invitation ${invitationId} for user ${userId} to group ${groupId}`);
+    functions.logger.info("Proceeding to accept invitation", {
+      userId,
+      invitationId,
+      groupId,
+      groupName: invitationData.groupName,
+    });
 
     // Use a batch write for atomicity
     const batch = db.batch();
@@ -134,7 +175,12 @@ export async function acceptInvitationHandler(
     // Commit the batch
     await batch.commit();
 
-    console.log(`[acceptInvitation] Successfully added user ${userId} to group ${groupId}`);
+    functions.logger.info("Invitation accepted successfully", {
+      userId,
+      invitationId,
+      groupId,
+      groupName: invitationData.groupName,
+    });
 
     return {
       success: true,
@@ -148,7 +194,12 @@ export async function acceptInvitationHandler(
     }
 
     // Log unexpected errors
-    console.error("Error accepting invitation:", error);
+    functions.logger.error("Error accepting invitation", {
+      userId,
+      invitationId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
     // Throw generic error for unexpected failures
     throw new functions.https.HttpsError(
