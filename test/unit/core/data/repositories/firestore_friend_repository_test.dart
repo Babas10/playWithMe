@@ -737,4 +737,251 @@ void main() {
       );
     });
   });
+
+  group('batchCheckFriendship', () {
+    test('should return map of friendship statuses for multiple users', () async {
+      // Arrange - Story 11.17: Batch check friendships
+      final mockCallable = MockHttpsCallable();
+      final mockResult = MockHttpsCallableResult();
+
+      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call({'userIds': ['user1', 'user2', 'user3']}))
+          .thenAnswer((_) async => mockResult);
+      when(() => mockResult.data).thenReturn({
+        'friendships': {
+          'user1': true,
+          'user2': false,
+          'user3': true,
+        },
+      });
+
+      // Act
+      final result = await repository.batchCheckFriendship(['user1', 'user2', 'user3']);
+
+      // Assert
+      expect(result, hasLength(3));
+      expect(result['user1'], true);
+      expect(result['user2'], false);
+      expect(result['user3'], true);
+      verify(() => mockCallable.call({'userIds': ['user1', 'user2', 'user3']})).called(1);
+    });
+
+    test('should return empty map when userIds list is empty', () async {
+      // Arrange
+      // Act
+      final result = await repository.batchCheckFriendship([]);
+
+      // Assert
+      expect(result, isEmpty);
+      verifyNever(() => mockFunctions.httpsCallable('batchCheckFriendship'));
+    });
+
+    test('should handle single user check', () async {
+      // Arrange
+      final mockCallable = MockHttpsCallable();
+      final mockResult = MockHttpsCallableResult();
+
+      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call({'userIds': ['user1']}))
+          .thenAnswer((_) async => mockResult);
+      when(() => mockResult.data).thenReturn({
+        'friendships': {
+          'user1': true,
+        },
+      });
+
+      // Act
+      final result = await repository.batchCheckFriendship(['user1']);
+
+      // Assert
+      expect(result, hasLength(1));
+      expect(result['user1'], true);
+    });
+
+    test('should handle all users as non-friends', () async {
+      // Arrange
+      final mockCallable = MockHttpsCallable();
+      final mockResult = MockHttpsCallableResult();
+
+      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call({'userIds': ['user1', 'user2']}))
+          .thenAnswer((_) async => mockResult);
+      when(() => mockResult.data).thenReturn({
+        'friendships': {
+          'user1': false,
+          'user2': false,
+        },
+      });
+
+      // Act
+      final result = await repository.batchCheckFriendship(['user1', 'user2']);
+
+      // Assert
+      expect(result, hasLength(2));
+      expect(result['user1'], false);
+      expect(result['user2'], false);
+    });
+
+    test('should throw FriendshipException when user not authenticated', () async {
+      // Arrange
+      when(() => mockAuth.currentUser).thenReturn(null);
+
+      // Act & Assert
+      expect(
+        () => repository.batchCheckFriendship(['user1', 'user2']),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            'User not authenticated',
+          ),
+        ),
+      );
+    });
+
+    test('should throw FriendshipException when checking more than 100 users', () async {
+      // Arrange
+      final tooManyUsers = List.generate(101, (index) => 'user$index');
+
+      // Act & Assert
+      expect(
+        () => repository.batchCheckFriendship(tooManyUsers),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            'Maximum 100 users can be checked at once',
+          ),
+        ),
+      );
+    });
+
+    test('should handle exactly 100 users (edge case)', () async {
+      // Arrange
+      final exactly100Users = List.generate(100, (index) => 'user$index');
+      final mockCallable = MockHttpsCallable();
+      final mockResult = MockHttpsCallableResult();
+
+      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call({'userIds': exactly100Users}))
+          .thenAnswer((_) async => mockResult);
+
+      // Generate response with all users as non-friends
+      final friendships = Map.fromIterable(
+        exactly100Users,
+        key: (user) => user,
+        value: (_) => false,
+      );
+
+      when(() => mockResult.data).thenReturn({
+        'friendships': friendships,
+      });
+
+      // Act
+      final result = await repository.batchCheckFriendship(exactly100Users);
+
+      // Assert
+      expect(result, hasLength(100));
+      verify(() => mockCallable.call({'userIds': exactly100Users})).called(1);
+    });
+
+    test('should throw FriendshipException on Cloud Function error', () async {
+      // Arrange
+      final mockCallable = MockHttpsCallable();
+
+      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call(any())).thenThrow(
+        FirebaseFunctionsException(
+          code: 'internal',
+          message: 'Failed to check friendships',
+        ),
+      );
+
+      // Act & Assert
+      expect(
+        () => repository.batchCheckFriendship(['user1', 'user2']),
+        throwsA(isA<FriendshipException>()),
+      );
+    });
+
+    test('should throw FriendshipException on unauthenticated error from Cloud Function', () async {
+      // Arrange
+      final mockCallable = MockHttpsCallable();
+
+      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call(any())).thenThrow(
+        FirebaseFunctionsException(
+          code: 'unauthenticated',
+          message: 'User must be logged in',
+        ),
+      );
+
+      // Act & Assert
+      expect(
+        () => repository.batchCheckFriendship(['user1', 'user2']),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            contains('must be logged in'),
+          ),
+        ),
+      );
+    });
+
+    test('should throw FriendshipException on not-found error from Cloud Function', () async {
+      // Arrange
+      final mockCallable = MockHttpsCallable();
+
+      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call(any())).thenThrow(
+        FirebaseFunctionsException(
+          code: 'not-found',
+          message: 'User not found',
+        ),
+      );
+
+      // Act & Assert
+      expect(
+        () => repository.batchCheckFriendship(['user1', 'user2']),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            'User not found',
+          ),
+        ),
+      );
+    });
+
+    test('should throw FriendshipException on generic error', () async {
+      // Arrange
+      final mockCallable = MockHttpsCallable();
+
+      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+          .thenReturn(mockCallable);
+      when(() => mockCallable.call(any())).thenThrow(
+        Exception('Network error'),
+      );
+
+      // Act & Assert
+      expect(
+        () => repository.batchCheckFriendship(['user1', 'user2']),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            contains('Failed to check friendships'),
+          ),
+        ),
+      );
+    });
+  });
 }

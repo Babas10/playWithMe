@@ -1206,4 +1206,263 @@ describe("Friendship Cloud Functions", () => {
       expect(result).toEqual({areFriends: false});
     });
   });
+
+  // ============================================================================
+  // Story 11.17: Batch Friendship Validation
+  // ============================================================================
+
+  describe("batchCheckFriendship", () => {
+    const mockContext = {
+      auth: {uid: "user1"},
+    };
+
+    const {batchCheckFriendshipHandler} =
+      require("../../src/friendships");
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should throw unauthenticated error when user is not logged in", async () => {
+      const unauthContext = {auth: null};
+
+      await expect(
+        batchCheckFriendshipHandler({userIds: ["user2"]}, unauthContext as any)
+      ).rejects.toThrow("You must be logged in to check friendships");
+    });
+
+    it("should throw invalid-argument when userIds is not an array", async () => {
+      await expect(
+        batchCheckFriendshipHandler({userIds: "not-an-array"} as any, mockContext as any)
+      ).rejects.toThrow("userIds must be an array");
+    });
+
+    it("should throw invalid-argument when userIds is missing", async () => {
+      await expect(
+        batchCheckFriendshipHandler({} as any, mockContext as any)
+      ).rejects.toThrow("userIds must be an array");
+    });
+
+    it("should return empty map when userIds array is empty", async () => {
+      const result = await batchCheckFriendshipHandler(
+        {userIds: []},
+        mockContext as any
+      );
+
+      expect(result).toEqual({friendships: {}});
+    });
+
+    it("should throw invalid-argument when checking more than 100 users", async () => {
+      const userIds = Array.from({length: 101}, (_, i) => `user${i}`);
+
+      await expect(
+        batchCheckFriendshipHandler({userIds}, mockContext as any)
+      ).rejects.toThrow("Maximum 100 users can be checked at once");
+    });
+
+    it("should throw not-found when current user does not exist", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: false,
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      await expect(
+        batchCheckFriendshipHandler(
+          {userIds: ["user2", "user3"]},
+          mockContext as any
+        )
+      ).rejects.toThrow("User not found");
+    });
+
+    it("should return correct friendship status for multiple users", async () => {
+      // Mock user with cached friendIds: user2 and user4 are friends
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({
+                friendIds: ["user2", "user4"],
+              }),
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await batchCheckFriendshipHandler(
+        {userIds: ["user2", "user3", "user4", "user5"]},
+        mockContext as any
+      );
+
+      expect(result).toEqual({
+        friendships: {
+          user2: true, // is a friend
+          user3: false, // not a friend
+          user4: true, // is a friend
+          user5: false, // not a friend
+        },
+      });
+    });
+
+    it("should handle user with no friends (empty friendIds)", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({
+                friendIds: [],
+              }),
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await batchCheckFriendshipHandler(
+        {userIds: ["user2", "user3"]},
+        mockContext as any
+      );
+
+      expect(result).toEqual({
+        friendships: {
+          user2: false,
+          user3: false,
+        },
+      });
+    });
+
+    it("should handle user with missing friendIds field", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({}), // No friendIds field
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await batchCheckFriendshipHandler(
+        {userIds: ["user2"]},
+        mockContext as any
+      );
+
+      expect(result).toEqual({
+        friendships: {
+          user2: false,
+        },
+      });
+    });
+
+    it("should handle single user check", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({
+                friendIds: ["user2"],
+              }),
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const result = await batchCheckFriendshipHandler(
+        {userIds: ["user2"]},
+        mockContext as any
+      );
+
+      expect(result).toEqual({
+        friendships: {
+          user2: true,
+        },
+      });
+    });
+
+    it("should handle exactly 100 users (edge case)", async () => {
+      const friendIds = Array.from({length: 50}, (_, i) => `user${i * 2}`);
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({
+                friendIds,
+              }),
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const userIds = Array.from({length: 100}, (_, i) => `user${i}`);
+      const result = await batchCheckFriendshipHandler(
+        {userIds},
+        mockContext as any
+      );
+
+      expect(Object.keys(result.friendships)).toHaveLength(100);
+      expect(result.friendships["user0"]).toBe(true); // Even index = friend
+      expect(result.friendships["user1"]).toBe(false); // Odd index = not friend
+    });
+
+    it("should handle firestore error gracefully", async () => {
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockRejectedValue(new Error("Firestore error")),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      await expect(
+        batchCheckFriendshipHandler(
+          {userIds: ["user2"]},
+          mockContext as any
+        )
+      ).rejects.toThrow("Failed to check friendships");
+    });
+
+    it("should use Set for efficient lookup", async () => {
+      // This test verifies the implementation uses Set (O(1)) not Array (O(n))
+      const largeFriendList = Array.from({length: 50}, (_, i) => `friend${i}`);
+      const mockFirestore = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              data: () => ({
+                friendIds: largeFriendList,
+              }),
+            }),
+          }),
+        }),
+      };
+      admin.firestore.mockReturnValue(mockFirestore);
+
+      const checkUsers = ["friend25", "friend40", "notfriend1", "notfriend2"];
+      const result = await batchCheckFriendshipHandler(
+        {userIds: checkUsers},
+        mockContext as any
+      );
+
+      expect(result.friendships["friend25"]).toBe(true);
+      expect(result.friendships["friend40"]).toBe(true);
+      expect(result.friendships["notfriend1"]).toBe(false);
+      expect(result.friendships["notfriend2"]).toBe(false);
+    });
+  });
 });
