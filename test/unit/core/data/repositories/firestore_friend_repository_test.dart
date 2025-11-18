@@ -984,4 +984,268 @@ void main() {
       );
     });
   });
+
+  group('getFriendRequestStatus', () {
+    setUp(() {
+      when(() => mockAuth.currentUser).thenReturn(mockUser);
+      when(() => mockUser.uid).thenReturn('test-user-id');
+    });
+
+    test('should return sentByMe when current user sent request', () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery = MockQuery();
+      final mockQuerySnapshot = MockQuerySnapshot();
+      final mockDoc = MockQueryDocumentSnapshot();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('recipientId', isEqualTo: 'target-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.limit(1)).thenReturn(mockQuery);
+      when(() => mockQuery.get()).thenAnswer((_) async => mockQuerySnapshot);
+      when(() => mockQuerySnapshot.docs).thenReturn([mockDoc]);
+
+      // Act
+      final status = await repository.getFriendRequestStatus(
+        'test-user-id',
+        'target-user-id',
+      );
+
+      // Assert
+      expect(status, FriendRequestStatus.sentByMe);
+    });
+
+    test('should return receivedFromThem when target user sent request',
+        () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery1 = MockQuery();
+      final mockQuery2 = MockQuery();
+      final mockQuerySnapshot1 = MockQuerySnapshot();
+      final mockQuerySnapshot2 = MockQuerySnapshot();
+      final mockDoc = MockQueryDocumentSnapshot();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+
+      // First query (sent by me) - empty
+      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery1);
+      when(() => mockQuery1.where('recipientId', isEqualTo: 'target-user-id'))
+          .thenReturn(mockQuery1);
+      when(() => mockQuery1.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery1);
+      when(() => mockQuery1.limit(1)).thenReturn(mockQuery1);
+      when(() => mockQuery1.get()).thenAnswer((_) async => mockQuerySnapshot1);
+      when(() => mockQuerySnapshot1.docs).thenReturn([]);
+
+      // Second query (received from them) - has doc
+      when(() =>
+              mockCollection.where('initiatorId', isEqualTo: 'target-user-id'))
+          .thenReturn(mockQuery2);
+      when(() => mockQuery2.where('recipientId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery2);
+      when(() => mockQuery2.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery2);
+      when(() => mockQuery2.limit(1)).thenReturn(mockQuery2);
+      when(() => mockQuery2.get()).thenAnswer((_) async => mockQuerySnapshot2);
+      when(() => mockQuerySnapshot2.docs).thenReturn([mockDoc]);
+
+      // Act
+      final status = await repository.getFriendRequestStatus(
+        'test-user-id',
+        'target-user-id',
+      );
+
+      // Assert
+      expect(status, FriendRequestStatus.receivedFromThem);
+    });
+
+    test('should return none when no pending request exists', () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery1 = MockQuery();
+      final mockQuery2 = MockQuery();
+      final mockQuerySnapshot1 = MockQuerySnapshot();
+      final mockQuerySnapshot2 = MockQuerySnapshot();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+
+      // First query (sent by me) - empty
+      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery1);
+      when(() => mockQuery1.where('recipientId', isEqualTo: 'target-user-id'))
+          .thenReturn(mockQuery1);
+      when(() => mockQuery1.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery1);
+      when(() => mockQuery1.limit(1)).thenReturn(mockQuery1);
+      when(() => mockQuery1.get()).thenAnswer((_) async => mockQuerySnapshot1);
+      when(() => mockQuerySnapshot1.docs).thenReturn([]);
+
+      // Second query (received from them) - empty
+      when(() =>
+              mockCollection.where('initiatorId', isEqualTo: 'target-user-id'))
+          .thenReturn(mockQuery2);
+      when(() => mockQuery2.where('recipientId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery2);
+      when(() => mockQuery2.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery2);
+      when(() => mockQuery2.limit(1)).thenReturn(mockQuery2);
+      when(() => mockQuery2.get()).thenAnswer((_) async => mockQuerySnapshot2);
+      when(() => mockQuerySnapshot2.docs).thenReturn([]);
+
+      // Act
+      final status = await repository.getFriendRequestStatus(
+        'test-user-id',
+        'target-user-id',
+      );
+
+      // Assert
+      expect(status, FriendRequestStatus.none);
+    });
+
+    test('should throw FriendshipException when user is not authenticated',
+        () async {
+      // Arrange
+      when(() => mockAuth.currentUser).thenReturn(null);
+
+      // Act & Assert
+      expect(
+        () => repository.getFriendRequestStatus(
+          'test-user-id',
+          'target-user-id',
+        ),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            'User not authenticated',
+          ),
+        ),
+      );
+    });
+
+    test(
+        'should throw FriendshipException when currentUserId does not match authenticated user',
+        () async {
+      // Arrange
+      when(() => mockAuth.currentUser).thenReturn(mockUser);
+      when(() => mockUser.uid).thenReturn('test-user-id');
+
+      // Act & Assert
+      expect(
+        () => repository.getFriendRequestStatus(
+          'different-user-id',
+          'target-user-id',
+        ),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            'Can only check request status for authenticated user',
+          ),
+        ),
+      );
+    });
+
+    test('should throw FriendshipException when checking status with yourself',
+        () async {
+      // Arrange
+      when(() => mockAuth.currentUser).thenReturn(mockUser);
+      when(() => mockUser.uid).thenReturn('test-user-id');
+
+      // Act & Assert
+      expect(
+        () => repository.getFriendRequestStatus(
+          'test-user-id',
+          'test-user-id',
+        ),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            'Cannot check request status with yourself',
+          ),
+        ),
+      );
+    });
+
+    test('should throw FriendshipException on Firestore permission denied error',
+        () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery = MockQuery();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('recipientId', isEqualTo: 'target-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.limit(1)).thenReturn(mockQuery);
+      when(() => mockQuery.get()).thenThrow(
+        FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'permission-denied',
+        ),
+      );
+
+      // Act & Assert
+      expect(
+        () => repository.getFriendRequestStatus(
+          'test-user-id',
+          'target-user-id',
+        ),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            contains('permission'),
+          ),
+        ),
+      );
+    });
+
+    test('should throw FriendshipException on generic error', () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery = MockQuery();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('recipientId', isEqualTo: 'target-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.limit(1)).thenReturn(mockQuery);
+      when(() => mockQuery.get()).thenThrow(
+        Exception('Network error'),
+      );
+
+      // Act & Assert
+      expect(
+        () => repository.getFriendRequestStatus(
+          'test-user-id',
+          'target-user-id',
+        ),
+        throwsA(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            contains('Failed to check friend request status'),
+          ),
+        ),
+      );
+    });
+  });
 }

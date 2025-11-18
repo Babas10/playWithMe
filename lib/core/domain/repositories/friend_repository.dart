@@ -47,6 +47,22 @@ abstract class FriendRepository {
   /// Maximum 100 users can be checked at once
   /// Throws [FriendshipException] on error
   Future<Map<String, bool>> batchCheckFriendship(List<String> userIds);
+
+  /// Check if there's a pending friend request between two users
+  /// Returns the status of any pending request
+  /// Throws [FriendshipException] on error
+  Future<FriendRequestStatus> getFriendRequestStatus(
+    String currentUserId,
+    String targetUserId,
+  );
+
+  /// Batch check friend request status for multiple users
+  /// Returns map of userId → FriendRequestStatus
+  /// Maximum 100 users can be checked at once
+  /// Throws [FriendshipException] on error
+  Future<Map<String, FriendRequestStatus>> batchCheckFriendRequestStatus(
+    List<String> userIds,
+  );
 }
 
 /// Type of friend request to filter by
@@ -56,6 +72,18 @@ enum FriendRequestType {
 
   /// Requests received by current user
   received,
+}
+
+/// Status of a friend request between two users
+enum FriendRequestStatus {
+  /// No request exists
+  none,
+
+  /// Current user sent a request to target user
+  sentByMe,
+
+  /// Target user sent a request to current user
+  receivedFromThem,
 }
 
 /// Custom exception for friendship-related errors
