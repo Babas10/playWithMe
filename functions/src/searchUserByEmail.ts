@@ -47,10 +47,15 @@ export async function searchUserByEmailHandler(
     );
   }
 
+  const currentUserId = context.auth.uid;
+
   // Normalize email
   const email = data.email.toLowerCase().trim();
 
   if (!email) {
+    functions.logger.warn("Empty email provided", {
+      currentUserId,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Email cannot be empty"
@@ -60,13 +65,22 @@ export async function searchUserByEmailHandler(
   // Basic email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
+    functions.logger.warn("Invalid email format", {
+      currentUserId,
+      emailLength: email.length,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Invalid email format"
     );
   }
 
-  try {
+  functions.logger.info("Searching user by email", {
+    currentUserId,
+    emailDomain: email.split("@")[1],
+  });
+
+  try{
     // Query Firestore for user with matching email
     const db = admin.firestore();
     const usersRef = db.collection("users");
@@ -77,6 +91,10 @@ export async function searchUserByEmailHandler(
 
     // User not found
     if (querySnapshot.empty) {
+      functions.logger.info("User not found by email", {
+        currentUserId,
+        emailDomain: email.split("@")[1],
+      });
       return {
         found: false,
       };
@@ -86,7 +104,11 @@ export async function searchUserByEmailHandler(
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
     const foundUserId = userDoc.id;
-    const currentUserId = context.auth.uid;
+
+    functions.logger.debug("User found by email", {
+      currentUserId,
+      foundUserId,
+    });
 
     // Check friendship status if users are different
     let isFriend = false;
@@ -123,10 +145,21 @@ export async function searchUserByEmailHandler(
         }
       } catch (friendshipError) {
         // Log error but don't fail the main function
-        console.error("Error checking friendship status:", friendshipError);
+        functions.logger.error("Error checking friendship status", {
+          currentUserId,
+          foundUserId,
+          error: friendshipError instanceof Error ? friendshipError.message : String(friendshipError),
+        });
         // Continue without friendship status
       }
     }
+
+    functions.logger.info("User search completed successfully", {
+      currentUserId,
+      foundUserId,
+      isFriend,
+      hasPendingRequest,
+    });
 
     return {
       found: true,
@@ -140,7 +173,11 @@ export async function searchUserByEmailHandler(
       hasPendingRequest,
     };
   } catch (error) {
-    console.error("Error searching for user:", error);
+    functions.logger.error("Error searching for user", {
+      currentUserId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
     // Check if it's a permission error
     if ((error as any).code === "permission-denied") {
