@@ -206,7 +206,7 @@ describe("acceptInvitation", () => {
     ).rejects.toThrow("This invitation is not for you");
   });
 
-  it("should successfully accept invitation and add user to group", async () => {
+  it("should throw not-found error when group does not exist", async () => {
     const context = {
       auth: {uid: "user123"},
     };
@@ -222,24 +222,26 @@ describe("acceptInvitation", () => {
         data: () => ({
           status: "pending",
           invitedUserId: "user123",
+          invitedBy: "inviter456",
           groupId: "group456",
           groupName: "Test Group",
         }),
       }),
     };
 
-    // Mock batch operations
-    const mockBatch = {
-      update: jest.fn(),
-      commit: jest.fn().mockResolvedValue(undefined),
+    // Mock group document not existing
+    const mockGroupRef = {
+      get: jest.fn().mockResolvedValue({
+        exists: false,
+      }),
     };
-
-    mockFirestore.batch = jest.fn().mockReturnValue(mockBatch);
 
     // Mock collection/doc structure
     const mockDoc = jest.fn((docId) => {
       if (docId === "invitation123") {
         return mockInvitationRef;
+      } else if (docId === "group456") {
+        return mockGroupRef;
       }
       return {doc: jest.fn()};
     });
@@ -256,7 +258,81 @@ describe("acceptInvitation", () => {
       if (collectionName === "users") {
         return {doc: mockDoc2};
       } else if (collectionName === "groups") {
-        return {doc: jest.fn()};
+        return {doc: mockDoc};
+      }
+      return {doc: jest.fn()};
+    });
+
+    await expect(
+      acceptInvitationHandler(data, context as any)
+    ).rejects.toThrow("The group for this invitation no longer exists");
+  });
+
+  it("should successfully accept invitation and add user to group", async () => {
+    const context = {
+      auth: {uid: "user123"},
+    };
+
+    const data = {
+      invitationId: "invitation123",
+    };
+
+    // Mock invitation document
+    const mockInvitationRef = {
+      get: jest.fn().mockResolvedValue({
+        exists: true,
+        data: () => ({
+          status: "pending",
+          invitedUserId: "user123",
+          invitedBy: "inviter456",
+          groupId: "group456",
+          groupName: "Test Group",
+        }),
+      }),
+    };
+
+    // Mock group document (must exist for acceptance to succeed)
+    const mockGroupRef = {
+      get: jest.fn().mockResolvedValue({
+        exists: true,
+        data: () => ({
+          name: "Test Group",
+          memberIds: ["inviter456"],
+        }),
+      }),
+    };
+
+    // Mock batch operations
+    const mockBatch = {
+      update: jest.fn(),
+      commit: jest.fn().mockResolvedValue(undefined),
+    };
+
+    mockFirestore.batch = jest.fn().mockReturnValue(mockBatch);
+
+    // Mock collection/doc structure
+    const mockDoc = jest.fn((docId) => {
+      if (docId === "invitation123") {
+        return mockInvitationRef;
+      } else if (docId === "group456") {
+        return mockGroupRef;
+      }
+      return {doc: jest.fn()};
+    });
+
+    const mockCollection2 = jest.fn().mockReturnValue({
+      doc: mockDoc,
+    });
+
+    const mockDoc2 = jest.fn().mockReturnValue({
+      collection: mockCollection2,
+    });
+
+    mockFirestore.collection = jest.fn((collectionName) => {
+      if (collectionName === "users") {
+        return {doc: mockDoc2};
+      } else if (collectionName === "groups") {
+        return {doc: mockDoc};
       }
       return {doc: jest.fn()};
     });
@@ -289,8 +365,20 @@ describe("acceptInvitation", () => {
         data: () => ({
           status: "pending",
           invitedUserId: "user123",
+          invitedBy: "inviter456",
           groupId: "group456",
           groupName: "Test Group",
+        }),
+      }),
+    };
+
+    // Mock group document
+    const mockGroupRef = {
+      get: jest.fn().mockResolvedValue({
+        exists: true,
+        data: () => ({
+          name: "Test Group",
+          memberIds: ["inviter456"],
         }),
       }),
     };
@@ -307,6 +395,8 @@ describe("acceptInvitation", () => {
     const mockDoc = jest.fn((docId) => {
       if (docId === "invitation123") {
         return mockInvitationRef;
+      } else if (docId === "group456") {
+        return mockGroupRef;
       }
       return {doc: jest.fn()};
     });
@@ -323,7 +413,7 @@ describe("acceptInvitation", () => {
       if (collectionName === "users") {
         return {doc: mockDoc2};
       } else if (collectionName === "groups") {
-        return {doc: jest.fn()};
+        return {doc: mockDoc};
       }
       return {doc: jest.fn()};
     });
