@@ -35,6 +35,14 @@ export const onInvitationCreated = functions.firestore
   .onCreate(async (snapshot, context) => {
     const invitation = snapshot.data();
     const userId = context.params.userId;
+    const invitationId = context.params.invitationId;
+
+    functions.logger.info("Invitation created, processing notification", {
+      userId,
+      invitationId,
+      groupId: invitation.groupId,
+      invitedBy: invitation.invitedBy,
+    });
 
     try {
       // Get user's FCM tokens
@@ -46,26 +54,38 @@ export const onInvitationCreated = functions.firestore
 
       const userData = userDoc.data();
       if (!userData) {
-        console.log(`User ${userId} not found`);
+        functions.logger.warn("User not found for invitation notification", {
+          userId,
+          invitationId,
+        });
         return null;
       }
 
       const fcmTokens = userData.fcmTokens || [];
       if (fcmTokens.length === 0) {
-        console.log(`User ${userId} has no FCM tokens`);
+        functions.logger.info("User has no FCM tokens", {
+          userId,
+          invitationId,
+        });
         return null;
       }
 
       // Check notification preferences
       const prefs = userData.notificationPreferences || {};
       if (prefs.groupInvitations === false) {
-        console.log(`User ${userId} has disabled group invitation notifications`);
+        functions.logger.info("User has disabled group invitation notifications", {
+          userId,
+          invitationId,
+        });
         return null;
       }
 
       // Check quiet hours
       if (isQuietHours(prefs.quietHours)) {
-        console.log(`User ${userId} is in quiet hours`);
+        functions.logger.info("User is in quiet hours", {
+          userId,
+          invitationId,
+        });
         return null;
       }
 
@@ -78,7 +98,11 @@ export const onInvitationCreated = functions.firestore
 
       const groupData = groupDoc.data();
       if (!groupData) {
-        console.log(`Group ${invitation.groupId} not found`);
+        functions.logger.warn("Group not found for invitation notification", {
+          userId,
+          invitationId,
+          groupId: invitation.groupId,
+        });
         return null;
       }
 
@@ -113,9 +137,12 @@ export const onInvitationCreated = functions.firestore
       };
 
       const response = await admin.messaging().sendEachForMulticast(message);
-      console.log(
-        `Successfully sent ${response.successCount} notifications for invitation`
-      );
+      functions.logger.info("Invitation notification sent successfully", {
+        userId,
+        invitationId,
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+      });
 
       // Remove invalid tokens
       if (response.failureCount > 0) {
@@ -138,13 +165,22 @@ export const onInvitationCreated = functions.firestore
             .update({
               fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
             });
-          console.log(`Removed ${tokensToRemove.length} invalid tokens`);
+          functions.logger.info("Removed invalid FCM tokens", {
+            userId,
+            invitationId,
+            removedCount: tokensToRemove.length,
+          });
         }
       }
 
       return null;
     } catch (error) {
-      console.error("Error sending invitation notification:", error);
+      functions.logger.error("Error sending invitation notification", {
+        userId,
+        invitationId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
@@ -164,8 +200,17 @@ export const onInvitationAccepted = functions.firestore
     }
 
     const inviterId = after.invitedBy;
+    const invitationId = context.params.invitationId;
+    const userId = context.params.userId;
 
-    try {
+    functions.logger.info("Invitation accepted, processing notification", {
+      inviterId,
+      userId,
+      invitationId,
+      groupId: after.groupId,
+    });
+
+    try{
       // Get inviter's FCM tokens
       const inviterDoc = await admin
         .firestore()
@@ -175,25 +220,37 @@ export const onInvitationAccepted = functions.firestore
 
       const inviterData = inviterDoc.data();
       if (!inviterData) {
-        console.log(`Inviter ${inviterId} not found`);
+        functions.logger.warn("Inviter not found", {
+          inviterId,
+          invitationId,
+        });
         return null;
       }
 
       const fcmTokens = inviterData.fcmTokens || [];
       if (fcmTokens.length === 0) {
-        console.log(`Inviter ${inviterId} has no FCM tokens`);
+        functions.logger.info("Inviter has no FCM tokens", {
+          inviterId,
+          invitationId,
+        });
         return null;
       }
 
       // Check preferences
       const prefs = inviterData.notificationPreferences || {};
       if (prefs.invitationAccepted === false) {
-        console.log(`Inviter ${inviterId} has disabled invitation accepted notifications`);
+        functions.logger.info("Inviter has disabled invitation accepted notifications", {
+          inviterId,
+          invitationId,
+        });
         return null;
       }
 
       if (isQuietHours(prefs.quietHours)) {
-        console.log(`Inviter ${inviterId} is in quiet hours`);
+        functions.logger.info("Inviter is in quiet hours", {
+          inviterId,
+          invitationId,
+        });
         return null;
       }
 
@@ -232,10 +289,20 @@ export const onInvitationAccepted = functions.firestore
         },
       });
 
-      console.log("Successfully sent invitation accepted notification");
+      functions.logger.info("Invitation accepted notification sent successfully", {
+        inviterId,
+        invitationId,
+        userId,
+      });
       return null;
     } catch (error) {
-      console.error("Error sending invitation accepted notification:", error);
+      functions.logger.error("Error sending invitation accepted notification", {
+        inviterId,
+        invitationId,
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
@@ -248,6 +315,13 @@ export const onGameCreated = functions.firestore
   .onCreate(async (snapshot, context) => {
     const game = snapshot.data();
     const groupId = context.params.groupId;
+    const gameId = context.params.gameId;
+
+    functions.logger.info("Game created, processing notifications", {
+      groupId,
+      gameId,
+      createdBy: game.createdBy,
+    });
 
     try {
       // Get group members
@@ -259,11 +333,20 @@ export const onGameCreated = functions.firestore
 
       const groupData = groupDoc.data();
       if (!groupData) {
-        console.log(`Group ${groupId} not found`);
+        functions.logger.warn("Group not found for game notification", {
+          groupId,
+          gameId,
+        });
         return null;
       }
 
       const members: string[] = groupData.memberIds || [];
+
+      functions.logger.debug("Processing game notifications for members", {
+        groupId,
+        gameId,
+        memberCount: members.length,
+      });
 
       // Get all members' FCM tokens (excluding game creator)
       const memberTokens: string[] = [];
@@ -292,12 +375,20 @@ export const onGameCreated = functions.firestore
           groupPrefs?.gameCreated !== false && prefs.gameCreated !== false;
 
         if (!shouldNotify) {
-          console.log(`Member ${memberId} has disabled game notifications`);
+          functions.logger.debug("Member has disabled game notifications", {
+            memberId,
+            groupId,
+            gameId,
+          });
           continue;
         }
 
         if (isQuietHours(prefs.quietHours)) {
-          console.log(`Member ${memberId} is in quiet hours`);
+          functions.logger.debug("Member is in quiet hours", {
+            memberId,
+            groupId,
+            gameId,
+          });
           continue;
         }
 
@@ -306,7 +397,10 @@ export const onGameCreated = functions.firestore
       }
 
       if (memberTokens.length === 0) {
-        console.log("No members to notify for new game");
+        functions.logger.info("No members to notify for new game", {
+          groupId,
+          gameId,
+        });
         return null;
       }
 
@@ -335,10 +429,19 @@ export const onGameCreated = functions.firestore
         },
       });
 
-      console.log(`Successfully sent game created notification to ${memberTokens.length} tokens`);
+      functions.logger.info("Game created notification sent successfully", {
+        groupId,
+        gameId,
+        tokenCount: memberTokens.length,
+      });
       return null;
     } catch (error) {
-      console.error("Error sending game created notification:", error);
+      functions.logger.error("Error sending game created notification", {
+        groupId,
+        gameId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
@@ -363,6 +466,12 @@ export const onMemberJoined = functions.firestore
     }
 
     const groupId = context.params.groupId;
+
+    functions.logger.info("Member joined group, processing notifications", {
+      groupId,
+      newMemberCount: newMembers.length,
+      newMembers,
+    });
 
     try {
       // Get all admin IDs
@@ -396,12 +505,20 @@ export const onMemberJoined = functions.firestore
 
           const prefs = adminData.notificationPreferences || {};
           if (prefs.memberJoined === false) {
-            console.log(`Admin ${adminId} has disabled member joined notifications`);
+            functions.logger.info("Admin has disabled member joined notifications", {
+              adminId,
+              groupId,
+              newMemberId,
+            });
             continue;
           }
 
           if (isQuietHours(prefs.quietHours)) {
-            console.log(`Admin ${adminId} is in quiet hours`);
+            functions.logger.debug("Admin is in quiet hours", {
+              adminId,
+              groupId,
+              newMemberId,
+            });
             continue;
           }
 
@@ -424,13 +541,21 @@ export const onMemberJoined = functions.firestore
             },
           });
 
-          console.log(`Notified admins about new member ${newMemberId}`);
+          functions.logger.info("Notified admins about new member", {
+            groupId,
+            newMemberId,
+            adminTokenCount: adminTokens.length,
+          });
         }
       }
 
       return null;
     } catch (error) {
-      console.error("Error sending member joined notification:", error);
+      functions.logger.error("Error sending member joined notification", {
+        groupId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
@@ -456,7 +581,13 @@ export const onMemberLeft = functions.firestore
 
     const groupId = context.params.groupId;
 
-    try {
+    functions.logger.info("Member left group, processing notifications", {
+      groupId,
+      removedMemberCount: removedMembers.length,
+      removedMembers,
+    });
+
+    try{
       // Get all admin IDs
       const adminIds: string[] = after.adminIds || [];
 
@@ -488,12 +619,20 @@ export const onMemberLeft = functions.firestore
 
           const prefs = adminData.notificationPreferences || {};
           if (prefs.memberLeft === false) {
-            console.log(`Admin ${adminId} has disabled member left notifications`);
+            functions.logger.info("Admin has disabled member left notifications", {
+              adminId,
+              groupId,
+              removedMemberId,
+            });
             continue;
           }
 
           if (isQuietHours(prefs.quietHours)) {
-            console.log(`Admin ${adminId} is in quiet hours`);
+            functions.logger.debug("Admin is in quiet hours", {
+              adminId,
+              groupId,
+              removedMemberId,
+            });
             continue;
           }
 
@@ -515,13 +654,21 @@ export const onMemberLeft = functions.firestore
             },
           });
 
-          console.log(`Notified admins about member ${removedMemberId} leaving`);
+          functions.logger.info("Notified admins about member leaving", {
+            groupId,
+            removedMemberId,
+            adminTokenCount: adminTokens.length,
+          });
         }
       }
 
       return null;
     } catch (error) {
-      console.error("Error sending member left notification:", error);
+      functions.logger.error("Error sending member left notification", {
+        groupId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
@@ -546,6 +693,16 @@ export const onRoleChanged = functions.firestore
 
     const groupId = context.params.groupId;
 
+    if (promoted.length > 0 || demoted.length > 0) {
+      functions.logger.info("Role changes detected, processing notifications", {
+        groupId,
+        promotedCount: promoted.length,
+        demotedCount: demoted.length,
+        promoted,
+        demoted,
+      });
+    }
+
     try {
       // Notify promoted users
       for (const userId of promoted) {
@@ -558,12 +715,18 @@ export const onRoleChanged = functions.firestore
 
         const prefs = userData.notificationPreferences || {};
         if (prefs.roleChanged === false) {
-          console.log(`User ${userId} has disabled role changed notifications`);
+          functions.logger.info("User has disabled role changed notifications", {
+            userId,
+            groupId,
+          });
           continue;
         }
 
         if (isQuietHours(prefs.quietHours)) {
-          console.log(`User ${userId} is in quiet hours`);
+          functions.logger.debug("User is in quiet hours", {
+            userId,
+            groupId,
+          });
           continue;
         }
 
@@ -582,7 +745,10 @@ export const onRoleChanged = functions.firestore
             },
           });
 
-          console.log(`Notified user ${userId} about promotion`);
+          functions.logger.info("Notified user about promotion", {
+            userId,
+            groupId,
+          });
         }
       }
 
@@ -597,12 +763,18 @@ export const onRoleChanged = functions.firestore
 
         const prefs = userData.notificationPreferences || {};
         if (prefs.roleChanged === false) {
-          console.log(`User ${userId} has disabled role changed notifications`);
+          functions.logger.info("User has disabled role changed notifications", {
+            userId,
+            groupId,
+          });
           continue;
         }
 
         if (isQuietHours(prefs.quietHours)) {
-          console.log(`User ${userId} is in quiet hours`);
+          functions.logger.debug("User is in quiet hours", {
+            userId,
+            groupId,
+          });
           continue;
         }
 
@@ -621,13 +793,20 @@ export const onRoleChanged = functions.firestore
             },
           });
 
-          console.log(`Notified user ${userId} about demotion`);
+          functions.logger.info("Notified user about demotion", {
+            userId,
+            groupId,
+          });
         }
       }
 
       return null;
     } catch (error) {
-      console.error("Error sending role changed notification:", error);
+      functions.logger.error("Error sending role changed notification", {
+        groupId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
@@ -649,6 +828,12 @@ export const onFriendRequestSent = functions.firestore
     const initiatorId = friendship.initiatorId;
     const friendshipId = context.params.friendshipId;
 
+    functions.logger.info("Friend request sent, processing notification", {
+      friendshipId,
+      initiatorId,
+      recipientId,
+    });
+
     try {
       // Get recipient's FCM tokens
       const recipientDoc = await admin
@@ -659,26 +844,38 @@ export const onFriendRequestSent = functions.firestore
 
       const recipientData = recipientDoc.data();
       if (!recipientData) {
-        console.log(`Recipient ${recipientId} not found`);
+        functions.logger.warn("Recipient not found for friend request notification", {
+          friendshipId,
+          recipientId,
+        });
         return null;
       }
 
       const fcmTokens = recipientData.fcmTokens || [];
       if (fcmTokens.length === 0) {
-        console.log(`Recipient ${recipientId} has no FCM tokens`);
+        functions.logger.info("Recipient has no FCM tokens", {
+          friendshipId,
+          recipientId,
+        });
         return null;
       }
 
       // Check notification preferences
       const prefs = recipientData.notificationPreferences || {};
       if (prefs.friendRequestReceived === false) {
-        console.log(`Recipient ${recipientId} has disabled friend request notifications`);
+        functions.logger.info("Recipient has disabled friend request notifications", {
+          friendshipId,
+          recipientId,
+        });
         return null;
       }
 
       // Check quiet hours
       if (isQuietHours(prefs.quietHours)) {
-        console.log(`Recipient ${recipientId} is in quiet hours`);
+        functions.logger.info("Recipient is in quiet hours", {
+          friendshipId,
+          recipientId,
+        });
         return null;
       }
 
@@ -726,9 +923,12 @@ export const onFriendRequestSent = functions.firestore
       };
 
       const response = await admin.messaging().sendEachForMulticast(message);
-      console.log(
-        `Successfully sent ${response.successCount} friend request notifications`
-      );
+      functions.logger.info("Friend request notification sent successfully", {
+        friendshipId,
+        recipientId,
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+      });
 
       // Remove invalid tokens
       if (response.failureCount > 0) {
@@ -751,13 +951,22 @@ export const onFriendRequestSent = functions.firestore
             .update({
               fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
             });
-          console.log(`Removed ${tokensToRemove.length} invalid tokens`);
+          functions.logger.info("Removed invalid FCM tokens", {
+            friendshipId,
+            recipientId,
+            removedCount: tokensToRemove.length,
+          });
         }
       }
 
       return null;
     } catch (error) {
-      console.error("Error sending friend request notification:", error);
+      functions.logger.error("Error sending friend request notification", {
+        friendshipId,
+        recipientId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
@@ -780,6 +989,12 @@ export const onFriendRequestAccepted = functions.firestore
     const recipientId = after.recipientId;
     const friendshipId = context.params.friendshipId;
 
+    functions.logger.info("Friend request accepted, processing notification", {
+      friendshipId,
+      initiatorId,
+      recipientId,
+    });
+
     try {
       // Get initiator's FCM tokens
       const initiatorDoc = await admin
@@ -790,26 +1005,38 @@ export const onFriendRequestAccepted = functions.firestore
 
       const initiatorData = initiatorDoc.data();
       if (!initiatorData) {
-        console.log(`Initiator ${initiatorId} not found`);
+        functions.logger.warn("Initiator not found for friend accepted notification", {
+          friendshipId,
+          initiatorId,
+        });
         return null;
       }
 
       const fcmTokens = initiatorData.fcmTokens || [];
       if (fcmTokens.length === 0) {
-        console.log(`Initiator ${initiatorId} has no FCM tokens`);
+        functions.logger.info("Initiator has no FCM tokens", {
+          friendshipId,
+          initiatorId,
+        });
         return null;
       }
 
       // Check notification preferences
       const prefs = initiatorData.notificationPreferences || {};
       if (prefs.friendRequestAccepted === false) {
-        console.log(`Initiator ${initiatorId} has disabled friend request accepted notifications`);
+        functions.logger.info("Initiator has disabled friend request accepted notifications", {
+          friendshipId,
+          initiatorId,
+        });
         return null;
       }
 
       // Check quiet hours
       if (isQuietHours(prefs.quietHours)) {
-        console.log(`Initiator ${initiatorId} is in quiet hours`);
+        functions.logger.info("Initiator is in quiet hours", {
+          friendshipId,
+          initiatorId,
+        });
         return null;
       }
 
@@ -843,7 +1070,11 @@ export const onFriendRequestAccepted = functions.firestore
         });
       });
 
-      console.log(`Updated friend caches for users ${initiatorId} and ${recipientId}`);
+      functions.logger.info("Updated friend caches", {
+        friendshipId,
+        initiatorId,
+        recipientId,
+      });
 
       // Send notification
       const message: admin.messaging.MulticastMessage = {
@@ -876,9 +1107,13 @@ export const onFriendRequestAccepted = functions.firestore
       };
 
       const response = await admin.messaging().sendEachForMulticast(message);
-      console.log(
-        `Successfully sent ${response.successCount} friend request accepted notifications`
-      );
+      functions.logger.info("Friend request accepted notification sent successfully", {
+        friendshipId,
+        initiatorId,
+        recipientId,
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+      });
 
       // Remove invalid tokens
       if (response.failureCount > 0) {
@@ -901,13 +1136,23 @@ export const onFriendRequestAccepted = functions.firestore
             .update({
               fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
             });
-          console.log(`Removed ${tokensToRemove.length} invalid tokens`);
+          functions.logger.info("Removed invalid FCM tokens", {
+            friendshipId,
+            initiatorId,
+            removedCount: tokensToRemove.length,
+          });
         }
       }
 
       return null;
     } catch (error) {
-      console.error("Error sending friend request accepted notification:", error);
+      functions.logger.error("Error sending friend request accepted notification", {
+        friendshipId,
+        initiatorId,
+        recipientId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
@@ -926,11 +1171,15 @@ export const onFriendRequestDeclined = functions.firestore
       return null;
     }
 
+    const friendshipId = context.params.friendshipId;
+
     // Silent cleanup - no notification sent
     // Log for analytics
-    console.log(
-      `Friend request ${context.params.friendshipId} declined by ${after.recipientId}`
-    );
+    functions.logger.info("Friend request declined", {
+      friendshipId,
+      recipientId: after.recipientId,
+      initiatorId: after.initiatorId,
+    });
 
     return null;
   });
@@ -942,17 +1191,25 @@ export const onFriendRemoved = functions.firestore
   .document("friendships/{friendshipId}")
   .onDelete(async (snapshot, context) => {
     const friendship = snapshot.data();
+    const friendshipId = context.params.friendshipId;
 
     // Only process if friendship was accepted
     if (friendship.status !== "accepted") {
-      console.log(
-        `Friendship ${context.params.friendshipId} deleted with status ${friendship.status}, no cache cleanup needed`
-      );
+      functions.logger.info("Friendship deleted with non-accepted status, no cache cleanup needed", {
+        friendshipId,
+        status: friendship.status,
+      });
       return null;
     }
 
     const initiatorId = friendship.initiatorId;
     const recipientId = friendship.recipientId;
+
+    functions.logger.info("Friend removed, processing cache cleanup", {
+      friendshipId,
+      initiatorId,
+      recipientId,
+    });
 
     try {
       // Update both users' friendIds cache and friendCount
@@ -980,9 +1237,11 @@ export const onFriendRemoved = functions.firestore
         }
       });
 
-      console.log(
-        `Updated friend caches after removal for users ${initiatorId} and ${recipientId}`
-      );
+      functions.logger.info("Updated friend caches after removal", {
+        friendshipId,
+        initiatorId,
+        recipientId,
+      });
 
       // Optional: Notify the other user
       // For now, we'll skip notification as specified (friendRemoved default is false)
@@ -990,7 +1249,13 @@ export const onFriendRemoved = functions.firestore
 
       return null;
     } catch (error) {
-      console.error("Error handling friend removal:", error);
+      functions.logger.error("Error handling friend removal", {
+        friendshipId,
+        initiatorId,
+        recipientId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return null;
     }
   });
