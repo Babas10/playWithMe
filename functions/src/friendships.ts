@@ -93,6 +93,16 @@ interface VerifyFriendshipResponse {
   areFriends: boolean;
 }
 
+interface BatchCheckFriendshipRequest {
+  userIds: string[]; // List of user IDs to check friendship with
+}
+
+interface BatchCheckFriendshipResponse {
+  friendships: {
+    [userId: string]: boolean; // userId -> isFriend mapping
+  };
+}
+
 // ============================================================================
 // Helper Functions
 // ============================================================================
@@ -1450,4 +1460,125 @@ export async function verifyFriendshipHandler(
  */
 export const verifyFriendship = functions.https.onCall(
   verifyFriendshipHandler
+);
+
+// ============================================================================
+// Story 11.17: Batch Friendship Validation
+// ============================================================================
+
+/**
+ * Cloud Function handler for batch checking friendships
+ * Story 11.17: Performance optimization for validating multiple friendships
+ *
+ * This function optimizes friendship validation when checking multiple users
+ * at once (e.g., when inviting multiple friends to a group). It reduces
+ * Firestore reads from N queries to 1 query by using the cached friendIds array.
+ *
+ * Performance:
+ * - Before: N individual checks = N Firestore reads
+ * - After: 1 batch check = 1 Firestore read
+ * - Savings: (N-1)/N reduction in reads (e.g., 90% for 10 users)
+ *
+ * @param data - Request containing array of user IDs to check
+ * @param context - Firebase callable context with auth info
+ * @returns Map of userId -> isFriend boolean
+ */
+export async function batchCheckFriendshipHandler(
+  data: BatchCheckFriendshipRequest,
+  context: functions.https.CallableContext
+): Promise<BatchCheckFriendshipResponse> {
+  // 1. Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "You must be logged in to check friendships"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // 2. Validate input
+  if (!data || !Array.isArray(data.userIds)) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "userIds must be an array"
+    );
+  }
+
+  if (data.userIds.length === 0) {
+    return {friendships: {}};
+  }
+
+  if (data.userIds.length > 100) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Maximum 100 users can be checked at once"
+    );
+  }
+
+  try {
+    functions.logger.info("Batch checking friendships", {
+      userId: currentUserId,
+      count: data.userIds.length,
+    });
+
+    const db = admin.firestore();
+
+    // 3. Single read: Get current user's cached friendIds (Story 11.6)
+    const userDoc = await db.collection("users").doc(currentUserId).get();
+
+    if (!userDoc.exists) {
+      throw new functions.https.HttpsError("not-found", "User not found");
+    }
+
+    const userData = userDoc.data()!;
+    const friendIds = new Set(userData.friendIds || []);
+
+    // 4. Build response: O(N) where N = userIds.length
+    const friendships: {[key: string]: boolean} = {};
+
+    for (const userId of data.userIds) {
+      friendships[userId] = friendIds.has(userId);
+    }
+
+    const friendsCount = Object.values(friendships).filter(Boolean).length;
+
+    functions.logger.info("Batch friendship check complete", {
+      userId: currentUserId,
+      totalChecked: data.userIds.length,
+      friendsFound: friendsCount,
+    });
+
+    return {friendships};
+  } catch (error) {
+    // Re-throw HttpsErrors as-is
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    functions.logger.error("Error in batch friendship check", {
+      userId: currentUserId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to check friendships"
+    );
+  }
+}
+
+/**
+ * Cloud Function: Batch check friendships for multiple users
+ * Story 11.17: Performance optimization for group invitations
+ *
+ * Use this when:
+ * - Inviting multiple users to a group
+ * - Checking friendship status for a list of users
+ * - Any operation requiring N friendship validations
+ *
+ * Performance: O(1) Firestore reads regardless of user count (up to 100)
+ */
+export const batchCheckFriendship = functions.https.onCall(
+  batchCheckFriendshipHandler
 );
