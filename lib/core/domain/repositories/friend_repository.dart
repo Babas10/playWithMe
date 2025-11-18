@@ -41,6 +41,12 @@ abstract class FriendRepository {
   /// Returns UserEntity if found with friendship status information
   /// Throws [FriendshipException] on error
   Future<UserSearchResult> searchUserByEmail(String email);
+
+  /// Batch check friendship status for multiple users
+  /// Returns map of userId → isFriend boolean
+  /// Maximum 100 users can be checked at once
+  /// Throws [FriendshipException] on error
+  Future<Map<String, bool>> batchCheckFriendship(List<String> userIds);
 }
 
 /// Type of friend request to filter by

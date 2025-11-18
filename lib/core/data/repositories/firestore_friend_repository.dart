@@ -382,6 +382,45 @@ class FirestoreFriendRepository implements FriendRepository {
     }
   }
 
+  @override
+  Future<Map<String, bool>> batchCheckFriendship(List<String> userIds) async {
+    try {
+      final currentUserId = _auth.currentUser?.uid;
+      if (currentUserId == null) {
+        throw FriendshipException('User not authenticated');
+      }
+
+      // Handle empty list early
+      if (userIds.isEmpty) {
+        return {};
+      }
+
+      // Validate input size
+      if (userIds.length > 100) {
+        throw FriendshipException(
+          'Maximum 100 users can be checked at once',
+          code: 'invalid-argument',
+        );
+      }
+
+      // Call Cloud Function (Story 11.17)
+      final callable = _functions.httpsCallable('batchCheckFriendship');
+      final result = await callable.call({'userIds': userIds});
+
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final friendships = Map<String, dynamic>.from(data['friendships'] as Map);
+
+      // Convert to Map<String, bool>
+      return friendships.map((key, value) => MapEntry(key, value as bool));
+    } on FirebaseFunctionsException catch (e) {
+      throw _handleError(e);
+    } on FriendshipException {
+      rethrow;
+    } catch (e) {
+      throw FriendshipException('Failed to check friendships: $e');
+    }
+  }
+
   /// Map FirebaseFunctionsException to user-friendly FriendshipException
   FriendshipException _handleError(FirebaseFunctionsException e) {
     switch (e.code) {
