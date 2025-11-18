@@ -156,24 +156,42 @@ export async function acceptInvitationHandler(
       groupName: invitationData.groupName,
     });
 
-    // Use a batch write for atomicity
-    const batch = db.batch();
+    // Use a transaction for atomic read-modify-write
+    // This prevents race conditions if multiple operations happen simultaneously
+    await db.runTransaction(async (transaction) => {
+      // Re-read invitation within transaction to ensure it's still pending
+      const currentInvitationDoc = await transaction.get(invitationRef);
+      const currentInvitationData = currentInvitationDoc.data();
 
-    // Update invitation status
-    batch.update(invitationRef, {
-      status: "accepted",
-      respondedAt: admin.firestore.FieldValue.serverTimestamp(),
+      if (!currentInvitationDoc.exists || currentInvitationData?.status !== "pending") {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "Invitation is no longer pending"
+        );
+      }
+
+      // Re-read group within transaction to ensure it still exists
+      const currentGroupDoc = await transaction.get(groupRef);
+      if (!currentGroupDoc.exists) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "Group no longer exists"
+        );
+      }
+
+      // Update invitation status
+      transaction.update(invitationRef, {
+        status: "accepted",
+        respondedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // Add user to group members
+      transaction.update(groupRef, {
+        memberIds: admin.firestore.FieldValue.arrayUnion(userId),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastActivity: admin.firestore.FieldValue.serverTimestamp(),
+      });
     });
-
-    // Add user to group members
-    batch.update(groupRef, {
-      memberIds: admin.firestore.FieldValue.arrayUnion(userId),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      lastActivity: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    // Commit the batch
-    await batch.commit();
 
     functions.logger.info("Invitation accepted successfully", {
       userId,
