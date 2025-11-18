@@ -40,11 +40,19 @@ export async function declineInvitationHandler(
 
   // Validate required parameters
   if (!invitationId || typeof invitationId !== "string") {
+    functions.logger.warn("Missing or invalid invitationId", {
+      userId,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "invitationId is required and must be a string"
     );
   }
+
+  functions.logger.info("Declining invitation", {
+    userId,
+    invitationId,
+  });
 
   const db = admin.firestore();
 
@@ -59,6 +67,10 @@ export async function declineInvitationHandler(
     const invitationDoc = await invitationRef.get();
 
     if (!invitationDoc.exists) {
+      functions.logger.warn("Invitation not found", {
+        userId,
+        invitationId,
+      });
       throw new functions.https.HttpsError(
         "not-found",
         "Invitation not found"
@@ -69,6 +81,11 @@ export async function declineInvitationHandler(
 
     // Verify invitation is pending
     if (invitationData?.status !== "pending") {
+      functions.logger.warn("Invitation is not pending", {
+        userId,
+        invitationId,
+        currentStatus: invitationData?.status,
+      });
       throw new functions.https.HttpsError(
         "failed-precondition",
         "Invitation is not pending"
@@ -77,6 +94,11 @@ export async function declineInvitationHandler(
 
     // Verify invitation is for the authenticated user
     if (invitationData.invitedUserId !== userId) {
+      functions.logger.warn("Invitation ownership mismatch", {
+        userId,
+        invitationId,
+        invitedUserId: invitationData.invitedUserId,
+      });
       throw new functions.https.HttpsError(
         "permission-denied",
         "This invitation is not for you"
@@ -87,6 +109,12 @@ export async function declineInvitationHandler(
     await invitationRef.update({
       status: "declined",
       respondedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    functions.logger.info("Invitation declined successfully", {
+      userId,
+      invitationId,
+      groupName: invitationData.groupName,
     });
 
     return {
@@ -100,7 +128,12 @@ export async function declineInvitationHandler(
     }
 
     // Log unexpected errors
-    console.error("Error declining invitation:", error);
+    functions.logger.error("Error declining invitation", {
+      userId,
+      invitationId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
     // Throw generic error for unexpected failures
     throw new functions.https.HttpsError(

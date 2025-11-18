@@ -44,10 +44,14 @@ export async function getUsersByIdsHandler(
     );
   }
 
+  const currentUserId = context.auth.uid;
   const {userIds} = data;
 
   // Validate required parameters
   if (!userIds || !Array.isArray(userIds)) {
+    functions.logger.warn("Missing or invalid userIds", {
+      currentUserId,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "userIds is required and must be an array"
@@ -56,6 +60,10 @@ export async function getUsersByIdsHandler(
 
   // Limit to prevent abuse
   if (userIds.length > 100) {
+    functions.logger.warn("Exceeded maximum user fetch limit", {
+      currentUserId,
+      requestedCount: userIds.length,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Maximum 100 users can be fetched at once"
@@ -64,8 +72,16 @@ export async function getUsersByIdsHandler(
 
   // Return empty array if no IDs provided
   if (userIds.length === 0) {
+    functions.logger.info("Empty userIds array provided", {
+      currentUserId,
+    });
     return {users: []};
   }
+
+  functions.logger.info("Fetching users by IDs", {
+    currentUserId,
+    userCount: userIds.length,
+  });
 
   const db = admin.firestore();
   const users: PublicUserData[] = [];
@@ -97,9 +113,20 @@ export async function getUsersByIdsHandler(
       }
     }
 
+    functions.logger.info("Users fetched successfully", {
+      currentUserId,
+      requestedCount: userIds.length,
+      foundCount: users.length,
+    });
+
     return {users};
   } catch (error) {
-    console.error("Error fetching users:", error);
+    functions.logger.error("Error fetching users", {
+      currentUserId,
+      requestedCount: userIds.length,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     throw new functions.https.HttpsError(
       "internal",
       "Failed to fetch users"

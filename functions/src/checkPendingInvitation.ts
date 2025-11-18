@@ -35,10 +35,15 @@ export async function checkPendingInvitationHandler(
     );
   }
 
+  const currentUserId = context.auth.uid;
+
   // Validate required parameters
   const {targetUserId, groupId} = data;
 
   if (!targetUserId || typeof targetUserId !== "string") {
+    functions.logger.warn("Missing or invalid targetUserId", {
+      currentUserId,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "targetUserId is required and must be a string"
@@ -46,11 +51,21 @@ export async function checkPendingInvitationHandler(
   }
 
   if (!groupId || typeof groupId !== "string") {
+    functions.logger.warn("Missing or invalid groupId", {
+      currentUserId,
+      targetUserId,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "groupId is required and must be a string"
     );
   }
+
+  functions.logger.info("Checking pending invitation", {
+    currentUserId,
+    targetUserId,
+    groupId,
+  });
 
   try {
     // Query Firestore using Admin SDK (bypasses security rules)
@@ -66,12 +81,27 @@ export async function checkPendingInvitationHandler(
       .limit(1)
       .get();
 
+    const exists = !snapshot.empty;
+
+    functions.logger.info("Pending invitation check result", {
+      currentUserId,
+      targetUserId,
+      groupId,
+      exists,
+    });
+
     // Return only whether invitation exists (no sensitive data)
     return {
-      exists: !snapshot.empty,
+      exists,
     };
   } catch (error) {
-    console.error("Error checking pending invitation:", error);
+    functions.logger.error("Error checking pending invitation", {
+      currentUserId,
+      targetUserId,
+      groupId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     throw new functions.https.HttpsError(
       "internal",
       "Failed to check for pending invitation"

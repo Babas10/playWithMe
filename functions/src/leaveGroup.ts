@@ -40,11 +40,19 @@ export async function leaveGroupHandler(
 
   // Validate required parameters
   if (!groupId || typeof groupId !== "string") {
+    functions.logger.warn("Missing or invalid groupId", {
+      userId,
+    });
     throw new functions.https.HttpsError(
       "invalid-argument",
       "groupId is required and must be a string"
     );
   }
+
+  functions.logger.info("User leaving group", {
+    userId,
+    groupId,
+  });
 
   const db = admin.firestore();
 
@@ -54,6 +62,10 @@ export async function leaveGroupHandler(
 
     // Verify group exists
     if (!groupDoc.exists) {
+      functions.logger.warn("Group not found", {
+        userId,
+        groupId,
+      });
       throw new functions.https.HttpsError(
         "not-found",
         "Group not found"
@@ -64,6 +76,10 @@ export async function leaveGroupHandler(
 
     // Verify user is a member
     if (!groupData?.memberIds || !groupData.memberIds.includes(userId)) {
+      functions.logger.warn("User is not a member of group", {
+        userId,
+        groupId,
+      });
       throw new functions.https.HttpsError(
         "failed-precondition",
         "You are not a member of this group"
@@ -73,8 +89,19 @@ export async function leaveGroupHandler(
     // Check if user is an admin
     const isAdmin = groupData.adminIds && groupData.adminIds.includes(userId);
 
+    functions.logger.debug("Group membership check", {
+      userId,
+      groupId,
+      isAdmin,
+      adminCount: groupData.adminIds?.length || 0,
+    });
+
     // If user is the only admin, prevent leaving
     if (isAdmin && groupData.adminIds.length <= 1) {
+      functions.logger.warn("Last admin attempting to leave group", {
+        userId,
+        groupId,
+      });
       throw new functions.https.HttpsError(
         "failed-precondition",
         "Cannot leave group as the last admin. Promote another member to admin first."
@@ -98,6 +125,13 @@ export async function leaveGroupHandler(
     // Commit the batch
     await batch.commit();
 
+    functions.logger.info("User left group successfully", {
+      userId,
+      groupId,
+      groupName: groupData.name,
+      wasAdmin: isAdmin,
+    });
+
     return {
       success: true,
       message: `Successfully left ${groupData.name}`,
@@ -109,7 +143,12 @@ export async function leaveGroupHandler(
     }
 
     // Log unexpected errors
-    console.error("Error leaving group:", error);
+    functions.logger.error("Error leaving group", {
+      userId,
+      groupId,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
     // Throw generic error for unexpected failures
     throw new functions.https.HttpsError(
