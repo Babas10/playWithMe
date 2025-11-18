@@ -16,6 +16,7 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/groups/presentation/widgets/member_action_menu.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/member_action_dialogs.dart';
 import 'package:play_with_me/features/groups/presentation/pages/invite_member_page.dart';
+import 'package:play_with_me/features/groups/presentation/widgets/member_list_item_with_friendship.dart';
 
 class GroupDetailsPage extends StatelessWidget {
   final String groupId;
@@ -60,9 +61,13 @@ class _GroupDetailsPageContent extends StatefulWidget {
 class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   late final GroupRepository _groupRepository;
   late final UserRepository _userRepository;
+  late final FriendRepository _friendRepository;
   GroupModel? _group;
   List<UserModel> _members = [];
+  Map<String, bool> _friendshipStatus = {};
+  Map<String, FriendRequestStatus> _requestStatus = {};
   bool _isLoading = true;
+  bool _isLoadingFriendships = true;
   String? _error;
 
   @override
@@ -70,6 +75,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     super.initState();
     _groupRepository = widget.groupRepositoryOverride ?? sl<GroupRepository>();
     _userRepository = widget.userRepositoryOverride ?? sl<UserRepository>();
+    _friendRepository = sl<FriendRepository>();
     _loadGroupDetails();
   }
 
@@ -98,10 +104,109 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
         _members = members;
         _isLoading = false;
       });
+
+      // Load friendship status for all members
+      await _loadFriendshipStatus();
     } catch (e) {
       setState(() {
         _error = 'Failed to load group details: $e';
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _sendFriendRequest(String targetUserId) async {
+    try {
+      await _friendRepository.sendFriendRequest(targetUserId);
+
+      if (!mounted) return;
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Friend request sent successfully'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // Refresh friendship status
+      await _loadFriendshipStatus();
+    } catch (e) {
+      if (!mounted) return;
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send friend request: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  Future<void> _loadFriendshipStatus() async {
+    if (_members.isEmpty) return;
+
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) return;
+
+    final currentUserId = authState.user.uid;
+
+    // Filter out current user from members list
+    final otherMembers = _members
+        .where((member) => member.uid != currentUserId)
+        .map((member) => member.uid)
+        .toList();
+
+    if (otherMembers.isEmpty) {
+      setState(() {
+        _isLoadingFriendships = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingFriendships = true;
+    });
+
+    try {
+      // Batch check friendships
+      final friendships =
+          await _friendRepository.batchCheckFriendship(otherMembers);
+
+      // Get list of non-friends to check request status
+      final nonFriends = otherMembers
+          .where((memberId) => !(friendships[memberId] ?? false))
+          .toList();
+
+      // Batch check request status for non-friends only
+      final Map<String, FriendRequestStatus> requestStatuses = {};
+      if (nonFriends.isNotEmpty) {
+        try {
+          final batchRequestStatuses =
+              await _friendRepository.batchCheckFriendRequestStatus(nonFriends);
+          requestStatuses.addAll(batchRequestStatuses);
+        } catch (e) {
+          // If batch check fails, default all non-friends to none
+          for (final memberId in nonFriends) {
+            requestStatuses[memberId] = FriendRequestStatus.none;
+          }
+        }
+      }
+
+      setState(() {
+        _friendshipStatus = friendships;
+        _requestStatus = requestStatuses;
+        _isLoadingFriendships = false;
+      });
+    } catch (e) {
+      // On error, default to empty status
+      setState(() {
+        _friendshipStatus = {};
+        _requestStatus = {};
+        _isLoadingFriendships = false;
       });
     }
   }
@@ -311,80 +416,49 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                     final member = _members[index];
                     final isAdmin = _group!.isAdmin(member.uid);
                     final isCreator = _group!.createdBy == member.uid;
-                    final canDemote = _group!.adminCount > 1;
+                    final isCurrentUser = member.uid == currentUserId;
+                    final isFriend = _friendshipStatus[member.uid] ?? false;
+                    final requestStatus =
+                        _requestStatus[member.uid] ?? FriendRequestStatus.none;
 
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: member.photoUrl != null
-                            ? NetworkImage(member.photoUrl!)
-                            : null,
-                        child: member.photoUrl == null
-                            ? Text(
-                                _getInitials(
-                                    member.displayName ?? member.email),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              )
-                            : null,
-                      ),
-                      title: Row(
-                        children: [
-                          Text(
-                            member.displayName ?? member.email,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                          if (isAdmin) ...[
-                            const SizedBox(width: 8),
-                            Chip(
-                              label: const Text(
-                                'Admin',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                              labelStyle: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onPrimaryContainer,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              padding: EdgeInsets.zero,
-                            ),
-                          ],
-                          if (isCreator) ...[
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.star,
-                              size: 16,
-                              color: Colors.amber[700],
-                            ),
-                          ],
-                        ],
-                      ),
-                      subtitle: member.displayName != null
-                          ? Text(member.email)
-                          : null,
-                      trailing: isCurrentUserAdmin &&
-                              member.uid != currentUserId &&
-                              !isProcessing
-                          ? MemberActionMenu(
-                              isCurrentUserAdmin: isCurrentUserAdmin,
-                              isTargetUserAdmin: isAdmin,
-                              isTargetUserCreator: isCreator,
-                              canDemote: canDemote,
-                              onActionSelected: (action) =>
-                                  _handleMemberAction(context, action, member),
-                            )
-                          : isProcessing
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2),
+                    // Show loading indicator while friendship status loads
+                    if (_isLoadingFriendships && !isCurrentUser) {
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: member.photoUrl != null
+                              ? NetworkImage(member.photoUrl!)
+                              : null,
+                          child: member.photoUrl == null
+                              ? Text(
+                                  _getInitials(
+                                      member.displayName ?? member.email),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 )
                               : null,
+                        ),
+                        title: Text(
+                          member.displayName ?? member.email,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        trailing: const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    }
+
+                    return MemberListItemWithFriendship(
+                      user: member,
+                      isAdmin: isAdmin,
+                      isCreator: isCreator,
+                      isCurrentUser: isCurrentUser,
+                      currentUserId: currentUserId,
+                      isFriend: isFriend,
+                      requestStatus: requestStatus,
+                      onRefresh: _loadFriendshipStatus,
+                      onSendFriendRequest: _sendFriendRequest,
                     );
                   },
                 );

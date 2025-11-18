@@ -103,6 +103,16 @@ interface BatchCheckFriendshipResponse {
   };
 }
 
+interface BatchCheckFriendRequestStatusRequest {
+  userIds: string[]; // List of user IDs to check request status with
+}
+
+interface BatchCheckFriendRequestStatusResponse {
+  requestStatuses: {
+    [userId: string]: "none" | "sentByMe" | "receivedFromThem";
+  };
+}
+
 // ============================================================================
 // Helper Functions
 // ============================================================================
@@ -219,6 +229,31 @@ export async function sendFriendRequestHandler(
   }
 
   try {
+    // Rate limiting: Check recent requests from this user
+    // Story 11.19: Prevent spam by limiting to 10 requests per hour
+    const db = admin.firestore();
+    const oneHourAgo = admin.firestore.Timestamp.fromMillis(
+      Date.now() - 60 * 60 * 1000
+    );
+
+    const recentRequests = await db
+      .collection("friendships")
+      .where("initiatorId", "==", currentUserId)
+      .where("createdAt", ">", oneHourAgo)
+      .where("status", "==", "pending")
+      .get();
+
+    if (recentRequests.size >= 10) {
+      functions.logger.warn("Rate limit exceeded for friend requests", {
+        userId: currentUserId,
+        recentRequestCount: recentRequests.size,
+      });
+      throw new functions.https.HttpsError(
+        "resource-exhausted",
+        "You have sent too many friend requests recently. Please try again later."
+      );
+    }
+
     // Check if target user exists
     const targetExists = await userExists(targetUserId);
     if (!targetExists) {
@@ -294,7 +329,6 @@ export async function sendFriendRequestHandler(
     }
 
     // Create new friendship document
-    const db = admin.firestore();
     const friendshipRef = await db.collection("friendships").add({
       initiatorId: currentUserId,
       recipientId: targetUserId,
@@ -1581,4 +1615,166 @@ export async function batchCheckFriendshipHandler(
  */
 export const batchCheckFriendship = functions.https.onCall(
   batchCheckFriendshipHandler
+);
+
+// ============================================================================
+// Story 11.19: Batch Friend Request Status Checking
+// ============================================================================
+
+/**
+ * Cloud Function handler for batch checking friend request statuses
+ * Story 11.19: Performance optimization for group member friendship indicators
+ *
+ * This function optimizes friend request status checking when viewing multiple
+ * group members. Instead of N individual queries (2N Firestore reads), it
+ * performs 2 batch queries to check all pending requests at once.
+ *
+ * Performance:
+ * - Before: N individual checks = 2N Firestore reads
+ * - After: 2 batch queries = 2 Firestore reads
+ * - Savings: (2N-2)/2N reduction (e.g., 90% for 10 users)
+ *
+ * @param data - Request containing array of user IDs to check
+ * @param context - Firebase callable context with auth info
+ * @returns Map of userId -> request status (none/sentByMe/receivedFromThem)
+ */
+export async function batchCheckFriendRequestStatusHandler(
+  data: BatchCheckFriendRequestStatusRequest,
+  context: functions.https.CallableContext
+): Promise<BatchCheckFriendRequestStatusResponse> {
+  // 1. Authentication check
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "You must be logged in to check friend request statuses"
+    );
+  }
+
+  const currentUserId = context.auth.uid;
+
+  // 2. Validate input
+  if (!data || !Array.isArray(data.userIds)) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "userIds must be an array"
+    );
+  }
+
+  if (data.userIds.length === 0) {
+    return {requestStatuses: {}};
+  }
+
+  if (data.userIds.length > 100) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Maximum 100 users can be checked at once"
+    );
+  }
+
+  try {
+    functions.logger.info("Batch checking friend request statuses", {
+      userId: currentUserId,
+      count: data.userIds.length,
+    });
+
+    const db = admin.firestore();
+    const requestStatuses: {
+      [key: string]: "none" | "sentByMe" | "receivedFromThem";
+    } = {};
+
+    // Initialize all users with "none" status
+    for (const userId of data.userIds) {
+      requestStatuses[userId] = "none";
+    }
+
+    // 3. Query 1: Check for requests sent by current user (where they are initiator)
+    // Using 'in' query to batch check multiple recipients
+    // Firestore 'in' limited to 10 items, so batch in chunks
+    for (let i = 0; i < data.userIds.length; i += 10) {
+      const userIdBatch = data.userIds.slice(i, i + 10);
+
+      const sentRequests = await db
+        .collection("friendships")
+        .where("initiatorId", "==", currentUserId)
+        .where("recipientId", "in", userIdBatch)
+        .where("status", "==", "pending")
+        .get();
+
+      sentRequests.docs.forEach((doc) => {
+        const docData = doc.data();
+        const recipientId = docData.recipientId;
+        requestStatuses[recipientId] = "sentByMe";
+      });
+    }
+
+    // 4. Query 2: Check for requests received by current user (where they are recipient)
+    for (let i = 0; i < data.userIds.length; i += 10) {
+      const userIdBatch = data.userIds.slice(i, i + 10);
+
+      const receivedRequests = await db
+        .collection("friendships")
+        .where("initiatorId", "in", userIdBatch)
+        .where("recipientId", "==", currentUserId)
+        .where("status", "==", "pending")
+        .get();
+
+      receivedRequests.docs.forEach((doc) => {
+        const docData = doc.data();
+        const initiatorId = docData.initiatorId;
+        // Only set if not already marked as sentByMe
+        // (shouldn't happen, but just in case)
+        if (requestStatuses[initiatorId] === "none") {
+          requestStatuses[initiatorId] = "receivedFromThem";
+        }
+      });
+    }
+
+    const sentCount = Object.values(requestStatuses).filter(
+      (s) => s === "sentByMe"
+    ).length;
+    const receivedCount = Object.values(requestStatuses).filter(
+      (s) => s === "receivedFromThem"
+    ).length;
+
+    functions.logger.info("Batch friend request status check complete", {
+      userId: currentUserId,
+      totalChecked: data.userIds.length,
+      sentByMe: sentCount,
+      receivedFromThem: receivedCount,
+      none: data.userIds.length - sentCount - receivedCount,
+    });
+
+    return {requestStatuses};
+  } catch (error) {
+    // Re-throw HttpsErrors as-is
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    functions.logger.error("Error in batch friend request status check", {
+      userId: currentUserId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    throw new functions.https.HttpsError(
+      "internal",
+      "Failed to check friend request statuses"
+    );
+  }
+}
+
+/**
+ * Cloud Function: Batch check friend request statuses for multiple users
+ * Story 11.19: Performance optimization for group member lists
+ *
+ * Use this when:
+ * - Displaying group members with friendship indicators
+ * - Showing friend request status for multiple users
+ * - Any UI that needs to show pending request status for N users
+ *
+ * Performance: O(N/10) Firestore reads (due to 'in' query limit of 10)
+ * Still much better than 2N individual reads
+ */
+export const batchCheckFriendRequestStatus = functions.https.onCall(
+  batchCheckFriendRequestStatusHandler
 );
