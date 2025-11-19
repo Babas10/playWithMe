@@ -16,6 +16,7 @@ jest.mock("firebase-admin", () => {
   const mockFirestore = {
     collection: jest.fn(),
     batch: jest.fn(),
+    runTransaction: jest.fn(),
   };
 
   return {
@@ -302,13 +303,38 @@ describe("acceptInvitation", () => {
       }),
     };
 
-    // Mock batch operations
-    const mockBatch = {
+    // Mock transaction operations
+    const mockTransaction = {
+      get: jest.fn((ref) => {
+        // Return invitation or group doc based on which ref is passed
+        if (ref === mockInvitationRef) {
+          return Promise.resolve({
+            exists: true,
+            data: () => ({
+              status: "pending",
+              invitedUserId: "user123",
+              invitedBy: "inviter456",
+              groupId: "group456",
+              groupName: "Test Group",
+            }),
+          });
+        } else if (ref === mockGroupRef) {
+          return Promise.resolve({
+            exists: true,
+            data: () => ({
+              name: "Test Group",
+              memberIds: ["inviter456"],
+            }),
+          });
+        }
+        return Promise.resolve({exists: false});
+      }),
       update: jest.fn(),
-      commit: jest.fn().mockResolvedValue(undefined),
     };
 
-    mockFirestore.batch = jest.fn().mockReturnValue(mockBatch);
+    mockFirestore.runTransaction = jest.fn(async (callback) => {
+      return callback(mockTransaction);
+    });
 
     // Mock collection/doc structure
     const mockDoc = jest.fn((docId) => {
@@ -345,8 +371,8 @@ describe("acceptInvitation", () => {
       message: "Successfully joined Test Group",
     });
 
-    expect(mockBatch.update).toHaveBeenCalledTimes(2);
-    expect(mockBatch.commit).toHaveBeenCalledTimes(1);
+    expect(mockFirestore.runTransaction).toHaveBeenCalledTimes(1);
+    expect(mockTransaction.update).toHaveBeenCalledTimes(2);
   });
 
   it("should handle atomic transaction failure gracefully", async () => {
