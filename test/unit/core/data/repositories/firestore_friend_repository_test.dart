@@ -1248,4 +1248,161 @@ void main() {
       );
     });
   });
+
+  group('getPendingFriendRequestCount', () {
+    test('should return stream with correct count of pending requests', () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery = MockQuery();
+      final mockQuerySnapshot = MockQuerySnapshot();
+      final mockDoc1 = MockQueryDocumentSnapshot();
+      final mockDoc2 = MockQueryDocumentSnapshot();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.snapshots()).thenAnswer(
+        (_) => Stream.value(mockQuerySnapshot),
+      );
+      when(() => mockQuerySnapshot.docs).thenReturn([mockDoc1, mockDoc2]);
+
+      // Act
+      final stream = repository.getPendingFriendRequestCount('test-user-id');
+
+      // Assert
+      await expectLater(
+        stream,
+        emits(2),
+      );
+    });
+
+    test('should return stream with zero when no pending requests', () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery = MockQuery();
+      final mockQuerySnapshot = MockQuerySnapshot();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.snapshots()).thenAnswer(
+        (_) => Stream.value(mockQuerySnapshot),
+      );
+      when(() => mockQuerySnapshot.docs).thenReturn([]);
+
+      // Act
+      final stream = repository.getPendingFriendRequestCount('test-user-id');
+
+      // Assert
+      await expectLater(
+        stream,
+        emits(0),
+      );
+    });
+
+    test('should emit updated count when friendships collection changes', () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery = MockQuery();
+      final mockQuerySnapshot1 = MockQuerySnapshot();
+      final mockQuerySnapshot2 = MockQuerySnapshot();
+      final mockDoc1 = MockQueryDocumentSnapshot();
+      final mockDoc2 = MockQueryDocumentSnapshot();
+      final mockDoc3 = MockQueryDocumentSnapshot();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.snapshots()).thenAnswer(
+        (_) => Stream.fromIterable([mockQuerySnapshot1, mockQuerySnapshot2]),
+      );
+      when(() => mockQuerySnapshot1.docs).thenReturn([mockDoc1, mockDoc2]);
+      when(() => mockQuerySnapshot2.docs).thenReturn([mockDoc1, mockDoc2, mockDoc3]);
+
+      // Act
+      final stream = repository.getPendingFriendRequestCount('test-user-id');
+
+      // Assert
+      await expectLater(
+        stream,
+        emitsInOrder([2, 3]),
+      );
+    });
+
+    test('should handle permission denied error in stream', () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery = MockQuery();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.snapshots()).thenAnswer(
+        (_) => Stream.error(
+          FirebaseException(
+            plugin: 'cloud_firestore',
+            code: 'permission-denied',
+          ),
+        ),
+      );
+
+      // Act
+      final stream = repository.getPendingFriendRequestCount('test-user-id');
+
+      // Assert
+      await expectLater(
+        stream,
+        emitsError(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            contains('permission'),
+          ),
+        ),
+      );
+    });
+
+    test('should handle generic error in stream', () async {
+      // Arrange
+      final mockCollection = MockCollectionReference();
+      final mockQuery = MockQuery();
+
+      when(() => mockFirestore.collection('friendships'))
+          .thenReturn(mockCollection);
+      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.where('status', isEqualTo: 'pending'))
+          .thenReturn(mockQuery);
+      when(() => mockQuery.snapshots()).thenAnswer(
+        (_) => Stream.error(Exception('Network error')),
+      );
+
+      // Act
+      final stream = repository.getPendingFriendRequestCount('test-user-id');
+
+      // Assert
+      await expectLater(
+        stream,
+        emitsError(
+          isA<FriendshipException>().having(
+            (e) => e.message,
+            'message',
+            contains('Failed to get pending friend request count'),
+          ),
+        ),
+      );
+    });
+  });
 }

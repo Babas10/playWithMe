@@ -551,6 +551,36 @@ class FirestoreFriendRepository implements FriendRepository {
     }
   }
 
+  @override
+  Stream<int> getPendingFriendRequestCount(String userId) {
+    try {
+      // Query friendships collection for pending requests where user is the recipient
+      // This provides real-time updates via Firestore snapshots
+      return _firestore
+          .collection('friendships')
+          .where('recipientId', isEqualTo: userId)
+          .where('status', isEqualTo: 'pending')
+          .snapshots()
+          .map((snapshot) => snapshot.docs.length)
+          .handleError((error) {
+        if (error is FirebaseException) {
+          if (error.code == 'permission-denied') {
+            throw FriendshipException(
+              'You don\'t have permission to access friend requests',
+              code: 'permission-denied',
+            );
+          }
+        }
+        throw FriendshipException(
+          'Failed to get pending friend request count: $error',
+        );
+      });
+    } catch (e) {
+      // Return error stream for any immediate errors
+      throw FriendshipException('Failed to get pending friend request count: $e');
+    }
+  }
+
   /// Map FirebaseFunctionsException to user-friendly FriendshipException
   FriendshipException _handleError(FirebaseFunctionsException e) {
     switch (e.code) {

@@ -63,6 +63,12 @@ abstract class FriendRepository {
   Future<Map<String, FriendRequestStatus>> batchCheckFriendRequestStatus(
     List<String> userIds,
   );
+
+  /// Get pending friend request count as a stream (real-time updates)
+  /// Returns stream of count of pending friend requests received by the user
+  /// Emits new count whenever friendships collection changes
+  /// Throws [FriendshipException] on error
+  Stream<int> getPendingFriendRequestCount(String userId);
 }
 
 /// Type of friend request to filter by

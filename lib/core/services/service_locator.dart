@@ -35,6 +35,7 @@ import 'package:play_with_me/features/notifications/data/repositories/firestore_
 import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
 import 'package:play_with_me/features/notifications/domain/repositories/notification_repository.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -236,6 +237,14 @@ Future<void> initializeDependencies() async {
       () => FriendBloc(
         friendRepository: sl(),
         authRepository: sl(),
+      ),
+    );
+  }
+
+  if (!sl.isRegistered<FriendRequestCountBloc>()) {
+    sl.registerFactory<FriendRequestCountBloc>(
+      () => FriendRequestCountBloc(
+        friendRepository: sl(),
       ),
     );
   }

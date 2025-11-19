@@ -7,6 +7,8 @@ import 'package:play_with_me/features/friends/presentation/bloc/friend_state.dar
 import 'package:play_with_me/features/friends/presentation/widgets/friends_list.dart';
 import 'package:play_with_me/features/friends/presentation/widgets/friend_requests_list.dart';
 import 'package:play_with_me/features/friends/presentation/pages/add_friend_page.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_state.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Page for managing friends and friend requests
@@ -55,7 +57,43 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
             controller: _tabController,
             tabs: [
               Tab(text: l10n.friends),
-              Tab(text: l10n.requests),
+              BlocBuilder<FriendRequestCountBloc, FriendRequestCountState>(
+                builder: (context, state) {
+                  final count = state is FriendRequestCountLoaded ? state.count : 0;
+                  return Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(l10n.requests),
+                        if (count > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            child: Text(
+                              count > 9 ? '9+' : '$count',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
