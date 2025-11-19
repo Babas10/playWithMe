@@ -105,6 +105,12 @@ export const createUserDocument = functions.auth.user().onCreate(async (user) =>
  */
 export const deleteUserDocument = functions.auth.user().onDelete(async (user) => {
   const db = admin.firestore();
+
+  // Note: Using batch instead of transaction for cleanup operations
+  // Rationale: This is a best-effort cleanup where we want to delete/update
+  // multiple unrelated collections. Transactions would be overkill and could
+  // fail more easily due to contention on multiple document paths.
+  // The batch ensures all-or-nothing writes within the 500 document limit.
   const batch = db.batch();
 
   try {
