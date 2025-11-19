@@ -17,6 +17,8 @@ import 'package:play_with_me/features/groups/presentation/widgets/member_action_
 import 'package:play_with_me/features/groups/presentation/widgets/member_action_dialogs.dart';
 import 'package:play_with_me/features/groups/presentation/pages/invite_member_page.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/member_list_item_with_friendship.dart';
+import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
+import 'package:play_with_me/features/games/presentation/pages/game_creation_page.dart';
 
 class GroupDetailsPage extends StatelessWidget {
   final String groupId;
@@ -569,26 +571,51 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     BuildContext context,
     AuthenticationAuthenticated authState,
   ) {
-    return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert),
-      onSelected: (value) {
-        if (value == 'leave') {
-          _handleLeaveGroup(context, authState.user.uid);
-        }
-      },
-      itemBuilder: (context) => [
-        const PopupMenuItem(
-          value: 'leave',
-          child: Row(
-            children: [
-              Icon(Icons.exit_to_app, size: 20, color: Colors.red),
-              SizedBox(width: 12),
-              Text(
-                'Leave Group',
-                style: TextStyle(color: Colors.red),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Create Game button
+        IconButton(
+          icon: const Icon(Icons.sports_volleyball),
+          tooltip: 'Create Game',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => sl<GameCreationBloc>(),
+                  child: GameCreationPage(
+                    groupId: widget.groupId,
+                    groupName: _group!.name,
+                  ),
+                ),
               ),
-            ],
-          ),
+            );
+          },
+        ),
+        // Menu button
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert),
+          onSelected: (value) {
+            if (value == 'leave') {
+              _handleLeaveGroup(context, authState.user.uid);
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'leave',
+              child: Row(
+                children: [
+                  Icon(Icons.exit_to_app, size: 20, color: Colors.red),
+                  SizedBox(width: 12),
+                  Text(
+                    'Leave Group',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
