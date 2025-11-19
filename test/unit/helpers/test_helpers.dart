@@ -15,6 +15,7 @@ import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import '../features/auth/data/mock_auth_repository.dart';
@@ -141,6 +142,9 @@ Future<void> initializeTestDependencies({
 
   // Register MockFriendRepository for friend-related tests
   _globalMockFriendRepo = MockFriendRepository();
+  // Mock the getPendingFriendRequestCount stream to return 0 by default
+  when(() => _globalMockFriendRepo!.getPendingFriendRequestCount(any()))
+      .thenAnswer((_) => Stream.value(0));
   sl.registerLazySingleton<FriendRepository>(() => _globalMockFriendRepo!);
 
   // Register FriendBloc factory that uses the mock repository
@@ -148,6 +152,13 @@ Future<void> initializeTestDependencies({
     () => FriendBloc(
       friendRepository: sl<FriendRepository>(),
       authRepository: sl<AuthRepository>(),
+    ),
+  );
+
+  // Register FriendRequestCountBloc factory that uses the mock repository
+  sl.registerFactory<FriendRequestCountBloc>(
+    () => FriendRequestCountBloc(
+      friendRepository: sl<FriendRepository>(),
     ),
   );
 }

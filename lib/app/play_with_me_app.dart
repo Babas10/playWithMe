@@ -30,6 +30,9 @@ import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.
 import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
 import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
 import 'package:play_with_me/features/friends/presentation/pages/my_community_page.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_event.dart';
+import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_state.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -118,19 +121,24 @@ class _HomePageState extends State<HomePage> {
   late final List<Widget> _pages;
   late final GroupBloc _groupBloc;
   late final InvitationBloc _invitationBloc;
+  late final FriendRequestCountBloc _friendRequestCountBloc;
 
   @override
   void initState() {
     super.initState();
 
-    // Create GroupBloc and InvitationBloc and initialize them with the current user
+    // Create GroupBloc, InvitationBloc, and FriendRequestCountBloc and initialize them with the current user
     final authState = context.read<AuthenticationBloc>().state;
     _groupBloc = sl<GroupBloc>();
     _invitationBloc = sl<InvitationBloc>();
+    _friendRequestCountBloc = sl<FriendRequestCountBloc>();
 
     if (authState is AuthenticationAuthenticated) {
       _groupBloc.add(LoadGroupsForUser(userId: authState.user.uid));
       _invitationBloc.add(LoadPendingInvitations(userId: authState.user.uid));
+      _friendRequestCountBloc.add(
+        FriendRequestCountEvent.startListening(userId: authState.user.uid),
+      );
 
       // Initialize notification service
       _initializeNotifications();
@@ -195,6 +203,7 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _groupBloc.close();
     _invitationBloc.close();
+    _friendRequestCountBloc.close();
     super.dispose();
   }
 
@@ -206,8 +215,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<InvitationBloc>.value(
-      value: _invitationBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<InvitationBloc>.value(value: _invitationBloc),
+        BlocProvider<FriendRequestCountBloc>.value(value: _friendRequestCountBloc),
+      ],
       child: Scaffold(
         body: Stack(
           children: [
@@ -324,7 +336,41 @@ class _HomePageState extends State<HomePage> {
               label: AppLocalizations.of(context)!.groups,
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.people),
+              icon: BlocBuilder<FriendRequestCountBloc, FriendRequestCountState>(
+                builder: (context, state) {
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(Icons.people),
+                      if (state is FriendRequestCountLoaded && state.count > 0)
+                        Positioned(
+                          right: -6,
+                          top: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            child: Text(
+                              state.count > 9 ? '9+' : '${state.count}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
               label: AppLocalizations.of(context)!.community,
             ),
           ],
