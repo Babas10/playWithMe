@@ -16,6 +16,7 @@ class MockGameRepository implements GameRepository {
   void addGame(GameModel game) {
     _games[game.id] = game;
     _emitGames();
+    _emitGameUpdate(game.id); // Emit to individual game stream as well
   }
 
   void clearGames() {
@@ -54,19 +55,16 @@ class MockGameRepository implements GameRepository {
   Stream<GameModel?> getGameStream(String gameId) {
     if (!_gameStreamControllers.containsKey(gameId)) {
       _gameStreamControllers[gameId] = StreamController<GameModel?>.broadcast();
+
+      // Emit initial value after a short delay to ensure listener is set up
+      Future.delayed(const Duration(milliseconds: 10), () {
+        if (!_gameStreamControllers[gameId]!.isClosed) {
+          _gameStreamControllers[gameId]!.add(_games[gameId]);
+        }
+      });
     }
 
-    // Always emit the current value immediately when someone subscribes
-    final controller = _gameStreamControllers[gameId]!;
-
-    // Use Future.microtask to emit current value after subscription is established
-    Future.microtask(() {
-      if (!controller.isClosed) {
-        controller.add(_games[gameId]);
-      }
-    });
-
-    return controller.stream;
+    return _gameStreamControllers[gameId]!.stream;
   }
 
   @override
