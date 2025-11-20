@@ -33,6 +33,7 @@ class MockGameRepository implements GameRepository {
   void _emitGameUpdate(String gameId) {
     final controller = _gameStreamControllers[gameId];
     if (controller != null && !controller.isClosed) {
+      // Synchronous emission - no delays, no async
       controller.add(_games[gameId]);
     }
   }
@@ -54,14 +55,16 @@ class MockGameRepository implements GameRepository {
   @override
   Stream<GameModel?> getGameStream(String gameId) {
     if (!_gameStreamControllers.containsKey(gameId)) {
-      _gameStreamControllers[gameId] = StreamController<GameModel?>.broadcast();
-
-      // Emit initial value after a short delay to ensure listener is set up
-      Future.delayed(const Duration(milliseconds: 10), () {
-        if (!_gameStreamControllers[gameId]!.isClosed) {
-          _gameStreamControllers[gameId]!.add(_games[gameId]);
-        }
-      });
+      // Create broadcast controller with synchronous emission on listen
+      late final StreamController<GameModel?> controller;
+      controller = StreamController<GameModel?>.broadcast(
+        onListen: () {
+          // Always emit current value SYNCHRONOUSLY when listener attaches
+          // This ensures no timing race conditions
+          controller.add(_games[gameId]);
+        },
+      );
+      _gameStreamControllers[gameId] = controller;
     }
 
     return _gameStreamControllers[gameId]!.stream;

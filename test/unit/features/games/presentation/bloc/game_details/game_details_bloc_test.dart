@@ -64,13 +64,22 @@ void main() {
         'emits [operation in progress, loaded] when join succeeds',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame);
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          // Establish stream subscription before test
+          bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
+          return bloc;
         },
-        seed: () => GameDetailsLoaded(game: TestGameData.testGame),
-        act: (bloc) => bloc.add(
-          const JoinGameDetails(gameId: 'test-game-123', userId: 'new-user-456'),
-        ),
+        skip: 1, // Skip the initial loading state
+        act: (bloc) async {
+          // Wait for stream to be established
+          await Future.delayed(Duration.zero);
+          // Then join the game
+          bloc.add(
+            const JoinGameDetails(gameId: 'test-game-123', userId: 'new-user-456'),
+          );
+        },
         expect: () => [
+          GameDetailsLoaded(game: TestGameData.testGame), // Initial load
           GameDetailsOperationInProgress(
             game: TestGameData.testGame,
             operation: 'join',
@@ -107,13 +116,22 @@ void main() {
         'handles user joining full game to waitlist',
         build: () {
           mockGameRepository.addGame(TestGameData.fullGame);
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          // Establish stream subscription before test
+          bloc.add(const LoadGameDetails(gameId: 'full-game-101'));
+          return bloc;
         },
-        seed: () => GameDetailsLoaded(game: TestGameData.fullGame),
-        act: (bloc) => bloc.add(
-          const JoinGameDetails(gameId: 'full-game-101', userId: 'new-user-789'),
-        ),
+        skip: 1, // Skip the initial loading state
+        act: (bloc) async {
+          // Wait for stream to be established
+          await Future.delayed(Duration.zero);
+          // Then join the game
+          bloc.add(
+            const JoinGameDetails(gameId: 'full-game-101', userId: 'new-user-789'),
+          );
+        },
         expect: () => [
+          GameDetailsLoaded(game: TestGameData.fullGame), // Initial load
           GameDetailsOperationInProgress(
             game: TestGameData.fullGame,
             operation: 'join',
@@ -132,13 +150,22 @@ void main() {
         'emits [operation in progress, loaded] when leave succeeds',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame);
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          // Establish stream subscription before test
+          bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
+          return bloc;
         },
-        seed: () => GameDetailsLoaded(game: TestGameData.testGame),
-        act: (bloc) => bloc.add(
-          const LeaveGameDetails(gameId: 'test-game-123', userId: 'user-uid-789'),
-        ),
+        skip: 1, // Skip the initial loading state
+        act: (bloc) async {
+          // Wait for stream to be established
+          await Future.delayed(Duration.zero);
+          // Then leave the game
+          bloc.add(
+            const LeaveGameDetails(gameId: 'test-game-123', userId: 'user-uid-789'),
+          );
+        },
         expect: () => [
+          GameDetailsLoaded(game: TestGameData.testGame), // Initial load
           GameDetailsOperationInProgress(
             game: TestGameData.testGame,
             operation: 'leave',
@@ -180,18 +207,22 @@ void main() {
             waitlistIds: ['waitlist-1', 'waitlist-2'],
           );
           mockGameRepository.addGame(gameWithWaitlist);
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          // Establish stream subscription before test
+          bloc.add(const LoadGameDetails(gameId: 'full-game-101'));
+          return bloc;
         },
-        seed: () => GameDetailsLoaded(
-          game: TestGameData.fullGame.copyWith(
-            playerIds: ['player-1', 'player-2'],
-            waitlistIds: ['waitlist-1', 'waitlist-2'],
-          ),
-        ),
-        act: (bloc) => bloc.add(
-          const LeaveGameDetails(gameId: 'full-game-101', userId: 'player-2'),
-        ),
+        skip: 1, // Skip the initial loading state
+        act: (bloc) async {
+          // Wait for stream to be established
+          await Future.delayed(Duration.zero);
+          // Then leave the game
+          bloc.add(
+            const LeaveGameDetails(gameId: 'full-game-101', userId: 'player-2'),
+          );
+        },
         expect: () => [
+          isA<GameDetailsLoaded>(), // Initial load with game + waitlist
           isA<GameDetailsOperationInProgress>(),
           isA<GameDetailsLoaded>().having(
             (state) {
