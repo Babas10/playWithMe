@@ -26,6 +26,20 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Stream<GameModel?> getGameStream(String gameId) {
+    try {
+      return _firestore
+          .collection(_collection)
+          .doc(gameId)
+          .snapshots()
+          .map((snapshot) =>
+              snapshot.exists ? GameModel.fromFirestore(snapshot) : null);
+    } catch (e) {
+      throw Exception('Failed to stream game: $e');
+    }
+  }
+
+  @override
   Future<List<GameModel>> getGamesByIds(List<String> gameIds) async {
     if (gameIds.isEmpty) return [];
 
