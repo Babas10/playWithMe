@@ -1,0 +1,565 @@
+// Game details page displaying game information and allowing RSVP actions.
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../core/domain/repositories/game_repository.dart';
+import '../../../../core/data/models/game_model.dart';
+import '../../../../core/services/service_locator.dart';
+import '../../../auth/presentation/bloc/authentication/authentication_bloc.dart';
+import '../../../auth/presentation/bloc/authentication/authentication_state.dart';
+import '../bloc/game_details/game_details_bloc.dart';
+import '../bloc/game_details/game_details_event.dart';
+import '../bloc/game_details/game_details_state.dart';
+
+class GameDetailsPage extends StatelessWidget {
+  final String gameId;
+  final GameRepository? gameRepository;
+
+  const GameDetailsPage({
+    super.key,
+    required this.gameId,
+    this.gameRepository,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => GameDetailsBloc(
+        gameRepository: gameRepository ?? sl<GameRepository>(),
+      )..add(LoadGameDetails(gameId: gameId)),
+      child: const _GameDetailsView(),
+    );
+  }
+}
+
+class _GameDetailsView extends StatelessWidget {
+  const _GameDetailsView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Game Details'),
+        elevation: 0,
+      ),
+      body: BlocBuilder<GameDetailsBloc, GameDetailsState>(
+        builder: (context, state) {
+          if (state is GameDetailsLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (state is GameDetailsError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      state.message,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    if (state.isRetryable) ...[
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Go Back'),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if (state is GameDetailsNotFound) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.search_off,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Game Not Found',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      state.message,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Go Back'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if (state is GameDetailsLoaded ||
+              state is GameDetailsOperationInProgress) {
+            final game = state is GameDetailsLoaded
+                ? state.game
+                : (state as GameDetailsOperationInProgress).game;
+
+            final isOperationInProgress = state is GameDetailsOperationInProgress;
+
+            return Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _GameInfoCard(game: game),
+                        const SizedBox(height: 16),
+                        _LocationCard(location: game.location),
+                        const SizedBox(height: 16),
+                        _PlayersCard(game: game),
+                      ],
+                    ),
+                  ),
+                ),
+                _RsvpButtons(
+                  game: game,
+                  isOperationInProgress: isOperationInProgress,
+                ),
+              ],
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+}
+
+class _GameInfoCard extends StatelessWidget {
+  final GameModel game;
+
+  const _GameInfoCard({required this.game});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateFormat = DateFormat('EEEE, MMMM d, yyyy');
+    final timeFormat = DateFormat('h:mm a');
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              game.title,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            if (game.description != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                game.description!,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+            const SizedBox(height: 16),
+            _InfoRow(
+              icon: Icons.calendar_today,
+              label: 'Date',
+              value: dateFormat.format(game.scheduledAt),
+            ),
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.access_time,
+              label: 'Time',
+              value: timeFormat.format(game.scheduledAt),
+            ),
+            const SizedBox(height: 8),
+            _InfoRow(
+              icon: Icons.people,
+              label: 'Players',
+              value:
+                  '${game.currentPlayerCount}/${game.maxPlayers} (min: ${game.minPlayers})',
+            ),
+            if (game.notes != null) ...[
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 8),
+              Text(
+                'Notes',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                game.notes!,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _InfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LocationCard extends StatelessWidget {
+  final GameLocation location;
+
+  const _LocationCard({required this.location});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.location_on,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Location',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              location.name,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+            if (location.address != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                location.address!,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+            if (location.description != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                location.description!,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayersCard extends StatelessWidget {
+  final GameModel game;
+
+  const _PlayersCard({required this.game});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Confirmed Players',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                Chip(
+                  label: Text(
+                    '${game.currentPlayerCount}/${game.maxPlayers}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  backgroundColor: game.isFull
+                      ? Theme.of(context).colorScheme.error.withOpacity(0.2)
+                      : Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (game.playerIds.isEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    'No players yet. Be the first to join!',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
+                        ),
+                  ),
+                ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: game.playerIds.length,
+                separatorBuilder: (context, index) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final playerId = game.playerIds[index];
+                  final isCreator = playerId == game.createdBy;
+
+                  return ListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    leading: CircleAvatar(
+                      child: Text('${index + 1}'),
+                    ),
+                    title: Text(
+                      'Player ${index + 1}',
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    subtitle: Text(playerId),
+                    trailing: isCreator
+                        ? Chip(
+                            label: const Text('Organizer'),
+                            backgroundColor: Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withOpacity(0.2),
+                          )
+                        : null,
+                  );
+                },
+              ),
+            if (game.waitlistIds.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 8),
+              Text(
+                'Waitlist (${game.waitlistIds.length})',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              ...game.waitlistIds.asMap().entries.map((entry) {
+                return ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surface.withOpacity(0.5),
+                    child: Text('${entry.key + 1}'),
+                  ),
+                  title: Text('Waitlist ${entry.key + 1}'),
+                  subtitle: Text(entry.value),
+                );
+              }),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RsvpButtons extends StatelessWidget {
+  final GameModel game;
+  final bool isOperationInProgress;
+
+  const _RsvpButtons({
+    required this.game,
+    required this.isOperationInProgress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, authState) {
+        if (authState is! AuthenticationAuthenticated) {
+          return const SizedBox.shrink();
+        }
+
+        final userId = authState.user.uid;
+        final isPlaying = game.isPlayer(userId);
+        final isOnWaitlist = game.isOnWaitlist(userId);
+        final canJoin = game.canUserJoin(userId);
+
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Row(
+              children: [
+                if (isPlaying || isOnWaitlist) ...[
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: isOperationInProgress
+                          ? null
+                          : () {
+                              context.read<GameDetailsBloc>().add(
+                                    LeaveGameDetails(
+                                      gameId: game.id,
+                                      userId: userId,
+                                    ),
+                                  );
+                            },
+                      icon: isOperationInProgress
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.remove_circle_outline),
+                      label: Text(isOnWaitlist ? 'Leave Waitlist' : 'I\'m Out'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        foregroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ] else if (canJoin) ...[
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: isOperationInProgress
+                          ? null
+                          : () {
+                              context.read<GameDetailsBloc>().add(
+                                    JoinGameDetails(
+                                      gameId: game.id,
+                                      userId: userId,
+                                    ),
+                                  );
+                            },
+                      icon: isOperationInProgress
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.add_circle_outline),
+                      label: Text(game.isFull ? 'Join Waitlist' : 'I\'m In'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      alignment: Alignment.center,
+                      child: Text(
+                        game.isPast
+                            ? 'Game has ended'
+                            : 'Game is full and waitlist is disabled',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.6),
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

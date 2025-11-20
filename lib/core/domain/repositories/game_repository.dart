@@ -4,6 +4,9 @@ abstract class GameRepository {
   /// Get game by ID
   Future<GameModel?> getGameById(String gameId);
 
+  /// Stream game by ID (real-time updates)
+  Stream<GameModel?> getGameStream(String gameId);
+
   /// Get multiple games by IDs
   Future<List<GameModel>> getGamesByIds(List<String> gameIds);
 

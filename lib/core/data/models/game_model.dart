@@ -61,6 +61,19 @@ class GameModel with _$GameModel {
   Map<String, dynamic> toFirestore() {
     final json = toJson();
     json.remove('id'); // Remove id as it's the document ID
+
+    // Ensure nested objects are properly serialized
+    if (json['location'] is GameLocation) {
+      json['location'] = (json['location'] as GameLocation).toJson();
+    }
+
+    // Ensure scores list is properly serialized
+    if (json['scores'] is List && (json['scores'] as List).isNotEmpty) {
+      json['scores'] = (json['scores'] as List)
+          .map((score) => score is GameScore ? score.toJson() : score)
+          .toList();
+    }
+
     return json;
   }
 
