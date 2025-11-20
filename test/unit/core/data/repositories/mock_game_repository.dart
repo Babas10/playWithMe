@@ -6,6 +6,7 @@ import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 
 class MockGameRepository implements GameRepository {
   final StreamController<List<GameModel>> _gamesController = StreamController<List<GameModel>>.broadcast();
+  final Map<String, StreamController<GameModel?>> _gameStreamControllers = {};
   final Map<String, GameModel> _games = {};
   String _lastCreatedGameId = '';
 
@@ -28,14 +29,44 @@ class MockGameRepository implements GameRepository {
     }
   }
 
+  void _emitGameUpdate(String gameId) {
+    final controller = _gameStreamControllers[gameId];
+    if (controller != null && !controller.isClosed) {
+      controller.add(_games[gameId]);
+    }
+  }
+
   void dispose() {
     _gamesController.close();
+    for (final controller in _gameStreamControllers.values) {
+      controller.close();
+    }
+    _gameStreamControllers.clear();
   }
 
   // Repository methods
   @override
   Future<GameModel?> getGameById(String gameId) async {
     return _games[gameId];
+  }
+
+  @override
+  Stream<GameModel?> getGameStream(String gameId) {
+    if (!_gameStreamControllers.containsKey(gameId)) {
+      _gameStreamControllers[gameId] = StreamController<GameModel?>.broadcast();
+    }
+
+    // Always emit the current value immediately when someone subscribes
+    final controller = _gameStreamControllers[gameId]!;
+
+    // Use Future.microtask to emit current value after subscription is established
+    Future.microtask(() {
+      if (!controller.isClosed) {
+        controller.add(_games[gameId]);
+      }
+    });
+
+    return controller.stream;
   }
 
   @override
@@ -157,6 +188,7 @@ class MockGameRepository implements GameRepository {
     final updatedGame = game.addPlayer(userId);
     _games[gameId] = updatedGame;
     _emitGames();
+    _emitGameUpdate(gameId);
   }
 
   @override
@@ -167,6 +199,7 @@ class MockGameRepository implements GameRepository {
     final updatedGame = game.removePlayer(userId);
     _games[gameId] = updatedGame;
     _emitGames();
+    _emitGameUpdate(gameId);
   }
 
   @override
