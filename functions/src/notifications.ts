@@ -308,7 +308,8 @@ export const onInvitationAccepted = functions.firestore
   });
 
 /**
- * Send notification when new game is created
+ * Send notification when a new game is created
+ * Notifies all group members except the creator
  */
 export const onGameCreated = functions.firestore
   .document("groups/{groupId}/games/{gameId}")
@@ -324,7 +325,7 @@ export const onGameCreated = functions.firestore
     });
 
     try {
-      // Get group members
+      // Get group details
       const groupDoc = await admin
         .firestore()
         .collection("groups")
@@ -348,9 +349,21 @@ export const onGameCreated = functions.firestore
         memberCount: members.length,
       });
 
-      // Get all members' FCM tokens (excluding game creator)
-      const memberTokens: string[] = [];
+      // Get creator details for notification message
+      const creatorDoc = await admin
+        .firestore()
+        .collection("users")
+        .doc(game.createdBy)
+        .get();
 
+      const creatorData = creatorDoc.data();
+      const creatorName = creatorData?.displayName || "Someone";
+
+      // Track notifications sent per user for cleanup
+      const userTokenMap = new Map<string, string[]>();
+      const allTokens: string[] = [];
+
+      // Collect FCM tokens from all eligible members
       for (const memberId of members) {
         if (memberId === game.createdBy) {
           continue; // Don't notify creator
@@ -364,6 +377,13 @@ export const onGameCreated = functions.firestore
 
         const memberData = memberDoc.data();
         if (!memberData) {
+          functions.logger.debug("Member not found", {memberId, groupId, gameId});
+          continue;
+        }
+
+        const fcmTokens = memberData.fcmTokens || [];
+        if (fcmTokens.length === 0) {
+          functions.logger.debug("Member has no FCM tokens", {memberId, groupId, gameId});
           continue;
         }
 
@@ -383,6 +403,7 @@ export const onGameCreated = functions.firestore
           continue;
         }
 
+        // Check quiet hours
         if (isQuietHours(prefs.quietHours)) {
           functions.logger.debug("Member is in quiet hours", {
             memberId,
@@ -392,11 +413,12 @@ export const onGameCreated = functions.firestore
           continue;
         }
 
-        const tokens = memberData.fcmTokens || [];
-        memberTokens.push(...tokens);
+        // Add tokens to map for later cleanup if needed
+        userTokenMap.set(memberId, fcmTokens);
+        allTokens.push(...fcmTokens);
       }
 
-      if (memberTokens.length === 0) {
+      if (allTokens.length === 0) {
         functions.logger.info("No members to notify for new game", {
           groupId,
           gameId,
@@ -404,22 +426,12 @@ export const onGameCreated = functions.firestore
         return null;
       }
 
-      // Get creator details
-      const creatorDoc = await admin
-        .firestore()
-        .collection("users")
-        .doc(game.createdBy)
-        .get();
-
-      const creatorData = creatorDoc.data();
-      const creatorName = creatorData?.displayName || "Someone";
-
       // Send notification
-      await admin.messaging().sendEachForMulticast({
-        tokens: memberTokens,
+      const message: admin.messaging.MulticastMessage = {
+        tokens: allTokens,
         notification: {
           title: `New Game in ${groupData.name}`,
-          body: `${creatorName} created a new game`,
+          body: `${creatorName} created a new game${game.title ? `: ${game.title}` : ""}`,
           imageUrl: groupData.photoUrl,
         },
         data: {
@@ -427,13 +439,76 @@ export const onGameCreated = functions.firestore
           groupId: groupId,
           gameId: snapshot.id,
         },
-      });
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "high_importance_channel",
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              badge: 1,
+              sound: "default",
+            },
+          },
+        },
+      };
+
+      const response = await admin.messaging().sendEachForMulticast(message);
 
       functions.logger.info("Game created notification sent successfully", {
         groupId,
         gameId,
-        tokenCount: memberTokens.length,
+        successCount: response.successCount,
+        failureCount: response.failureCount,
       });
+
+      // Remove invalid tokens
+      if (response.failureCount > 0) {
+        const invalidTokensByUser = new Map<string, string[]>();
+
+        response.responses.forEach((resp, idx) => {
+          if (
+            !resp.success &&
+            (resp.error?.code === "messaging/invalid-registration-token" ||
+              resp.error?.code === "messaging/registration-token-not-registered")
+          ) {
+            const invalidToken = allTokens[idx];
+
+            // Find which user this token belongs to
+            for (const [userId, tokens] of userTokenMap.entries()) {
+              if (tokens.includes(invalidToken)) {
+                if (!invalidTokensByUser.has(userId)) {
+                  invalidTokensByUser.set(userId, []);
+                }
+                invalidTokensByUser.get(userId)!.push(invalidToken);
+                break;
+              }
+            }
+          }
+        });
+
+        // Clean up invalid tokens per user
+        for (const [userId, tokensToRemove] of invalidTokensByUser.entries()) {
+          await admin
+            .firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+              fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+            });
+
+          functions.logger.info("Removed invalid FCM tokens", {
+            userId,
+            groupId,
+            gameId,
+            removedCount: tokensToRemove.length,
+          });
+        }
+      }
+
       return null;
     } catch (error) {
       functions.logger.error("Error sending game created notification", {
