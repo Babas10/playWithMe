@@ -90,6 +90,7 @@ dev_dependencies:
   mocktail: ^1.0.4
   fake_cloud_firestore: ^3.0.3
   rxdart: ^0.28.0
+  async: ^2.11.0
   integration_test:
     sdk: flutter
 

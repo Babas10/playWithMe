@@ -37,6 +37,7 @@ import 'package:play_with_me/features/notifications/domain/repositories/notifica
 import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
+import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -253,6 +254,12 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<GameCreationBloc>()) {
     sl.registerFactory<GameCreationBloc>(
       () => GameCreationBloc(gameRepository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<GameDetailsBloc>()) {
+    sl.registerFactory<GameDetailsBloc>(
+      () => GameDetailsBloc(gameRepository: sl()),
     );
   }
 }

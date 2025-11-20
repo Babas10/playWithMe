@@ -6,6 +6,7 @@ import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 
 class MockGameRepository implements GameRepository {
   final StreamController<List<GameModel>> _gamesController = StreamController<List<GameModel>>.broadcast();
+  final Map<String, StreamController<GameModel?>> _gameStreamControllers = {};
   final Map<String, GameModel> _games = {};
   String _lastCreatedGameId = '';
 
@@ -15,6 +16,7 @@ class MockGameRepository implements GameRepository {
   void addGame(GameModel game) {
     _games[game.id] = game;
     _emitGames();
+    _emitGameUpdate(game.id); // Emit to individual game stream as well
   }
 
   void clearGames() {
@@ -28,14 +30,44 @@ class MockGameRepository implements GameRepository {
     }
   }
 
+  void _emitGameUpdate(String gameId) {
+    final controller = _gameStreamControllers[gameId];
+    if (controller != null && !controller.isClosed) {
+      // Synchronous emission - no delays, no async
+      controller.add(_games[gameId]);
+    }
+  }
+
   void dispose() {
     _gamesController.close();
+    for (final controller in _gameStreamControllers.values) {
+      controller.close();
+    }
+    _gameStreamControllers.clear();
   }
 
   // Repository methods
   @override
   Future<GameModel?> getGameById(String gameId) async {
     return _games[gameId];
+  }
+
+  @override
+  Stream<GameModel?> getGameStream(String gameId) {
+    if (!_gameStreamControllers.containsKey(gameId)) {
+      // Create broadcast controller with synchronous emission on listen
+      late final StreamController<GameModel?> controller;
+      controller = StreamController<GameModel?>.broadcast(
+        onListen: () {
+          // Always emit current value SYNCHRONOUSLY when listener attaches
+          // This ensures no timing race conditions
+          controller.add(_games[gameId]);
+        },
+      );
+      _gameStreamControllers[gameId] = controller;
+    }
+
+    return _gameStreamControllers[gameId]!.stream;
   }
 
   @override
@@ -157,6 +189,7 @@ class MockGameRepository implements GameRepository {
     final updatedGame = game.addPlayer(userId);
     _games[gameId] = updatedGame;
     _emitGames();
+    _emitGameUpdate(gameId);
   }
 
   @override
@@ -167,6 +200,7 @@ class MockGameRepository implements GameRepository {
     final updatedGame = game.removePlayer(userId);
     _games[gameId] = updatedGame;
     _emitGames();
+    _emitGameUpdate(gameId);
   }
 
   @override
