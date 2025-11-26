@@ -56,8 +56,9 @@ Claude must:
 * **Provider:** Firebase
 * **Database:** Cloud Firestore
 * **Authentication:** Firebase Auth
-* **Serverless Logic:** **Python Firebase Cloud Functions** deployed with `functions-framework`.
-  All sensitive or shared logic (notifications, leaderboards) must live here.
+* **Serverless Logic:** **TypeScript Firebase Cloud Functions** (Node.js runtime).
+  All sensitive or shared logic (notifications, cross-user queries, group invitations) must live here.
+  Functions are located in `functions/src/` and deployed via `firebase deploy --only functions`.
 
 ### **Development Environments**
 
@@ -864,7 +865,30 @@ Every Cloud Function must be:
 
 ---
 
-### **11.2 Input Validation**
+### **11.2 When to Use Cloud Functions vs Direct Firestore Access**
+
+**Use Cloud Functions for:**
+- ✅ Cross-user queries (searching users, listing group members)
+- ✅ One-time data fetches requiring server-side validation
+- ✅ Operations that modify multiple documents atomically
+- ✅ Sensitive operations (friend requests, group invitations)
+- ✅ Complex business logic requiring server-side computation
+
+**Use Direct Firestore Snapshots for:**
+- ✅ Real-time updates for user's own data
+- ✅ Queries scoped to data the user owns or has membership in
+- ✅ Scenarios where Firestore security rules can validate access
+- ✅ High-frequency updates (games list, notifications, live scores)
+
+**Example: Games for a Group**
+- Firestore rules allow `.snapshots()` queries filtered by `groupId` and validate group membership
+- Cloud Function `getGamesForGroup` exists as an alternative for one-time batch fetches
+- Primary method: Direct Firestore snapshots for real-time updates
+- See: `firestore.rules` (games collection) and `functions/src/getGamesForGroup.ts`
+
+---
+
+### **11.3 Input Validation**
 
 Before executing logic, all functions must:
 
@@ -890,7 +914,7 @@ Before executing logic, all functions must:
 
 ---
 
-### **11.3 Firestore Access Pattern**
+### **11.4 Firestore Access Pattern**
 
 When querying or mutating Firestore from Cloud Functions:
 
@@ -902,7 +926,7 @@ When querying or mutating Firestore from Cloud Functions:
 
 ---
 
-### **11.4 Idempotency Enforcement**
+### **11.5 Idempotency Enforcement**
 
 Avoid duplicate side effects caused by retries or network instability.
 
@@ -928,7 +952,7 @@ await db.collection('operations').doc(data.operationId).set({
 
 ---
 
-### **11.5 Error Handling & Logging**
+### **11.6 Error Handling & Logging**
 
 Use structured logging and standardized error codes.
 
@@ -965,7 +989,7 @@ try {
 
 ---
 
-### **11.6 Function Deployment Standards**
+### **11.7 Function Deployment Standards**
 
 | Environment | Trigger Type                        | Deployment Rule                                  |
 | ----------- | ----------------------------------- | ------------------------------------------------ |
@@ -985,7 +1009,7 @@ Always prefix with an **action** (`on` + Verb + Object`).
 
 ---
 
-### **11.7 Observability**
+### **11.8 Observability**
 
 * Use **structured JSON logging** — avoid console logs with raw strings.
 * Add **execution time measurement** for long operations.
@@ -993,7 +1017,7 @@ Always prefix with an **action** (`on` + Verb + Object`).
 
 ---
 
-### **11.8 Testing Cloud Functions**
+### **11.9 Testing Cloud Functions**
 
 All functions must have **unit tests + integration tests**.
 
@@ -1016,7 +1040,7 @@ npm run test:functions
 
 ---
 
-### **11.9 Cost Efficiency Practices**
+### **11.10 Cost Efficiency Practices**
 
 | Practice           | Description                                                       |
 | ------------------ | ----------------------------------------------------------------- |
@@ -1028,7 +1052,7 @@ npm run test:functions
 
 ---
 
-### **11.10 Cloud Function Pre-Commit Checklist**
+### **11.11 Cloud Function Pre-Commit Checklist**
 
 Before committing any new or modified Cloud Function, ensure:
 
