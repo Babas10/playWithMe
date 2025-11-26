@@ -57,12 +57,16 @@
       ]
     },
     {
-      "collectionGroup": "friendships",
+      "collectionGroup": "games",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
+          "fieldPath": "groupId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "scheduledAt",
+          "order": "ASCENDING"
         }
       ]
     }

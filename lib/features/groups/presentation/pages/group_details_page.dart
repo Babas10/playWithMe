@@ -20,6 +20,7 @@ import 'package:play_with_me/features/groups/presentation/widgets/member_list_it
 import 'package:play_with_me/features/groups/presentation/widgets/group_bottom_nav_bar.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_creation_page.dart';
+import 'package:play_with_me/features/games/presentation/pages/games_list_page.dart';
 
 class GroupDetailsPage extends StatelessWidget {
   final String groupId;
@@ -606,13 +607,14 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   }
 
   void _showGamesListComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Games list coming soon!'),
-        behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {},
+    if (_group == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GamesListPage(
+          groupId: widget.groupId,
+          groupName: _group!.name,
         ),
       ),
     );
