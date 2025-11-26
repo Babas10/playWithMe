@@ -10,6 +10,11 @@ class MockGameRepository implements GameRepository {
   final Map<String, GameModel> _games = {};
   String _lastCreatedGameId = '';
 
+  MockGameRepository() {
+    // Seed initial empty list to match real repository behavior
+    _gamesController.add(const []);
+  }
+
   StreamController<List<GameModel>> get gamesController => _gamesController;
 
   // Helper methods for testing
@@ -86,9 +91,14 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
-  Stream<List<GameModel>> getGamesForGroup(String groupId) {
-    return _gamesController.stream.map((games) =>
-        games.where((game) => game.groupId == groupId).toList());
+  Stream<List<GameModel>> getGamesForGroup(String groupId) async* {
+    // Emit current state immediately
+    yield _games.values.where((game) => game.groupId == groupId).toList();
+
+    // Then emit future updates
+    await for (final games in _gamesController.stream) {
+      yield games.where((game) => game.groupId == groupId).toList();
+    }
   }
 
   @override

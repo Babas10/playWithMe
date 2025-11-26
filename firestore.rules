@@ -143,16 +143,34 @@ service cloud.firestore {
                        request.auth.uid in resource.data.adminIds;
     }
 
-    // Games: Group members can read, creators can write
+    // ============================================
+    // Games
+    // ============================================
+
+    // Games: Group members can read, creators can manage
     match /games/{gameId} {
-      allow read: if request.auth != null &&
-                     request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.members;
-      allow create: if request.auth != null &&
-                       request.auth.uid == request.resource.data.createdBy;
-      allow update: if request.auth != null &&
+      // Individual game reads allowed for members (used by GameDetailsPage)
+      allow get: if isAuthenticated() &&
+                    request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds;
+
+      // List/query operations allowed for group members
+      // Each document is checked individually - user must be member of the game's group
+      allow list: if isAuthenticated() &&
+                     request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds;
+
+      // Game creation allowed for authenticated users
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.createdBy &&
+                       // Verify user is a member of the group they're creating a game for
+                       request.auth.uid in get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.memberIds;
+
+      // Game updates allowed for creator or group members (for RSVP, scores, etc.)
+      allow update: if isAuthenticated() &&
                        (request.auth.uid == resource.data.createdBy ||
-                        request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.members);
-      allow delete: if request.auth != null &&
+                        request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds);
+
+      // Only creator can delete games
+      allow delete: if isAuthenticated() &&
                        request.auth.uid == resource.data.createdBy;
     }
 
