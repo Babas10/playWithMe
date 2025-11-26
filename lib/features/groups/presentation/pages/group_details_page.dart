@@ -17,6 +17,7 @@ import 'package:play_with_me/features/groups/presentation/widgets/member_action_
 import 'package:play_with_me/features/groups/presentation/widgets/member_action_dialogs.dart';
 import 'package:play_with_me/features/groups/presentation/pages/invite_member_page.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/member_list_item_with_friendship.dart';
+import 'package:play_with_me/features/groups/presentation/widgets/group_bottom_nav_bar.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_creation_page.dart';
 
@@ -321,12 +322,42 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
               title: const Text('Group Details'),
               centerTitle: true,
               actions: [
+                // Menu button for Leave Group
                 if (_group != null)
-                  _buildAppBarActions(context, authState),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    onSelected: (value) {
+                      if (value == 'leave') {
+                        _handleLeaveGroup(context, authState.user.uid);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'leave',
+                        child: Row(
+                          children: [
+                            Icon(Icons.exit_to_app, size: 20, color: Colors.red),
+                            SizedBox(width: 12),
+                            Text(
+                              'Leave Group',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
             body: _buildBody(context, authState),
-            floatingActionButton: _buildFloatingActionButton(context, authState),
+            bottomNavigationBar: _group != null
+                ? GroupBottomNavBar(
+                    isAdmin: _group!.isAdmin(authState.user.uid),
+                    onInviteTap: () => _navigateToInvitePage(context),
+                    onCreateGameTap: () => _navigateToGameCreation(context),
+                    onGamesListTap: () => _showGamesListComingSoon(context),
+                  )
+                : null,
           );
         },
       ),
@@ -528,96 +559,62 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     );
   }
 
-  Widget? _buildFloatingActionButton(
-      BuildContext context, AuthenticationAuthenticated authState) {
-    // Only show invite button to admins
-    if (_group == null || !_group!.isAdmin(authState.user.uid)) {
-      return null;
+  void _navigateToInvitePage(BuildContext context) {
+    if (_group == null) return;
+
+    // Try to get FriendRepository from DI
+    FriendRepository? friendRepository;
+    try {
+      friendRepository = sl<FriendRepository>();
+    } catch (e) {
+      // FriendRepository not registered (unlikely in production)
     }
 
-    return FloatingActionButton.extended(
-      onPressed: () {
-        // Try to get FriendRepository from DI
-        FriendRepository? friendRepository;
-        try {
-          friendRepository = sl<FriendRepository>();
-        } catch (e) {
-          // FriendRepository not registered (unlikely in production)
-        }
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlocProvider(
-              create: (context) => sl<InvitationBloc>(),
-              child: InviteMemberPage(
-                groupId: widget.groupId,
-                groupName: _group!.name,
-                friendRepository: friendRepository,
-              ),
-            ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => sl<InvitationBloc>(),
+          child: InviteMemberPage(
+            groupId: widget.groupId,
+            groupName: _group!.name,
+            friendRepository: friendRepository,
           ),
-        ).then((_) {
-          // Refresh group details after returning from invite page
-          _loadGroupDetails();
-        });
-      },
-      icon: const Icon(Icons.person_add),
-      label: const Text('Invite Member'),
+        ),
+      ),
+    ).then((_) {
+      // Refresh group details after returning from invite page
+      _loadGroupDetails();
+    });
+  }
+
+  void _navigateToGameCreation(BuildContext context) {
+    if (_group == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => sl<GameCreationBloc>(),
+          child: GameCreationPage(
+            groupId: widget.groupId,
+            groupName: _group!.name,
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildAppBarActions(
-    BuildContext context,
-    AuthenticationAuthenticated authState,
-  ) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Create Game button
-        IconButton(
-          icon: const Icon(Icons.sports_volleyball),
-          tooltip: 'Create Game',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlocProvider(
-                  create: (context) => sl<GameCreationBloc>(),
-                  child: GameCreationPage(
-                    groupId: widget.groupId,
-                    groupName: _group!.name,
-                  ),
-                ),
-              ),
-            );
-          },
+  void _showGamesListComingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Games list coming soon!'),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {},
         ),
-        // Menu button
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert),
-          onSelected: (value) {
-            if (value == 'leave') {
-              _handleLeaveGroup(context, authState.user.uid);
-            }
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'leave',
-              child: Row(
-                children: [
-                  Icon(Icons.exit_to_app, size: 20, color: Colors.red),
-                  SizedBox(width: 12),
-                  Text(
-                    'Leave Group',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
+      ),
     );
   }
 
