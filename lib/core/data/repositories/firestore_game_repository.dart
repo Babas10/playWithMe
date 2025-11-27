@@ -106,14 +106,28 @@ class FirestoreGameRepository implements GameRepository {
   Stream<int> getUpcomingGamesCount(String groupId) {
     try {
       final now = Timestamp.now();
+      print('🔍 DEBUG getUpcomingGamesCount: groupId = $groupId');
+      print('🔍 DEBUG getUpcomingGamesCount: now = $now');
+
       return _firestore
           .collection(_collection)
           .where('groupId', isEqualTo: groupId)
           .where('scheduledAt', isGreaterThan: now)
           .where('status', isEqualTo: 'scheduled')
           .snapshots()
-          .map((snapshot) => snapshot.docs.length);
+          .map((snapshot) {
+            print('🔍 DEBUG getUpcomingGamesCount: Found ${snapshot.docs.length} games');
+            for (var doc in snapshot.docs) {
+              final data = doc.data();
+              print('🔍 DEBUG Game: ${doc.id}');
+              print('  - scheduledAt: ${data['scheduledAt']}');
+              print('  - status: ${data['status']}');
+              print('  - groupId: ${data['groupId']}');
+            }
+            return snapshot.docs.length;
+          });
     } catch (e) {
+      print('🔍 DEBUG getUpcomingGamesCount ERROR: $e');
       throw Exception('Failed to get upcoming games count: $e');
     }
   }
