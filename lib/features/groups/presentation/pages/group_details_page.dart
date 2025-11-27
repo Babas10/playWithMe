@@ -364,12 +364,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                     stream: _gameRepository.getUpcomingGamesCount(widget.groupId),
                     builder: (context, snapshot) {
                       final gameCount = snapshot.data ?? 0;
-                      print('🔍 DEBUG GroupDetailsPage: Game count = $gameCount');
-                      print('🔍 DEBUG GroupDetailsPage: Has data = ${snapshot.hasData}');
-                      print('🔍 DEBUG GroupDetailsPage: Has error = ${snapshot.hasError}');
-                      if (snapshot.hasError) {
-                        print('🔍 DEBUG GroupDetailsPage: Error = ${snapshot.error}');
-                      }
                       return GroupBottomNavBar(
                         isAdmin: _group!.isAdmin(authState.user.uid),
                         upcomingGamesCount: gameCount,

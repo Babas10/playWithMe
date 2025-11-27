@@ -19,9 +19,6 @@ class GroupBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('🔍 DEBUG GroupBottomNavBar: upcomingGamesCount = $upcomingGamesCount');
-    print('🔍 DEBUG GroupBottomNavBar: Badge visible = ${upcomingGamesCount > 0}');
-
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       onTap: (index) {

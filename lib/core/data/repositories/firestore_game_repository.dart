@@ -106,47 +106,14 @@ class FirestoreGameRepository implements GameRepository {
   Stream<int> getUpcomingGamesCount(String groupId) {
     try {
       final now = Timestamp.now();
-      print('🔍 DEBUG getUpcomingGamesCount: groupId = $groupId');
-      print('🔍 DEBUG getUpcomingGamesCount: now = $now');
-
-      // First, let's see ALL games for this group (no filters)
-      _firestore
-          .collection(_collection)
-          .where('groupId', isEqualTo: groupId)
-          .get()
-          .then((snapshot) {
-            print('🔍 DEBUG Total games in group: ${snapshot.docs.length}');
-            for (var doc in snapshot.docs) {
-              final data = doc.data();
-              final scheduledAt = data['scheduledAt'] as Timestamp?;
-              final isFuture = scheduledAt != null && scheduledAt.compareTo(now) > 0;
-              print('🔍 DEBUG All Games - ${doc.id}:');
-              print('  - title: ${data['title']}');
-              print('  - scheduledAt: $scheduledAt (future: $isFuture)');
-              print('  - status: ${data['status']}');
-              print('  - groupId: ${data['groupId']}');
-            }
-          });
-
       return _firestore
           .collection(_collection)
           .where('groupId', isEqualTo: groupId)
           .where('scheduledAt', isGreaterThan: now)
           .where('status', isEqualTo: 'scheduled')
           .snapshots()
-          .map((snapshot) {
-            print('🔍 DEBUG getUpcomingGamesCount: Found ${snapshot.docs.length} upcoming scheduled games');
-            for (var doc in snapshot.docs) {
-              final data = doc.data();
-              print('🔍 DEBUG Matching Game: ${doc.id}');
-              print('  - scheduledAt: ${data['scheduledAt']}');
-              print('  - status: ${data['status']}');
-              print('  - groupId: ${data['groupId']}');
-            }
-            return snapshot.docs.length;
-          });
+          .map((snapshot) => snapshot.docs.length);
     } catch (e) {
-      print('🔍 DEBUG getUpcomingGamesCount ERROR: $e');
       throw Exception('Failed to get upcoming games count: $e');
     }
   }
