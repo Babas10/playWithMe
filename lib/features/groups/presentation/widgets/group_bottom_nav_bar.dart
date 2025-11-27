@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class GroupBottomNavBar extends StatelessWidget {
   final bool isAdmin;
+  final int upcomingGamesCount;
   final VoidCallback? onInviteTap;
   final VoidCallback? onCreateGameTap;
   final VoidCallback? onGamesListTap;
@@ -10,6 +11,7 @@ class GroupBottomNavBar extends StatelessWidget {
   const GroupBottomNavBar({
     super.key,
     required this.isAdmin,
+    this.upcomingGamesCount = 0,
     this.onInviteTap,
     this.onCreateGameTap,
     this.onGamesListTap,
@@ -54,9 +56,13 @@ class GroupBottomNavBar extends StatelessWidget {
           tooltip: 'Create a new game',
         ),
         BottomNavigationBarItem(
-          icon: Icon(
-            Icons.list,
-            color: Theme.of(context).colorScheme.primary,
+          icon: Badge(
+            label: Text(upcomingGamesCount > 9 ? '9+' : '$upcomingGamesCount'),
+            isLabelVisible: upcomingGamesCount > 0,
+            child: Icon(
+              Icons.list,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           label: 'Games',
           tooltip: 'View all games',
