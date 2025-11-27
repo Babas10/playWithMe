@@ -420,7 +420,335 @@ Maintain **≥ 90% coverage** for BLoC and repository layers.
 
 ---
 
-### **4.5 Running Tests**
+### **4.5 What to Test Where: The Critical Testing Strategy**
+
+**⚠️ CRITICAL: This section prevents 90% of recurring test failures.**
+
+The biggest source of test failures comes from testing the wrong thing in the wrong place. Follow this guide **exactly** to avoid flaky, timing-dependent, or impossible-to-mock tests.
+
+---
+
+#### **🚫 The Root Cause of Recurring Test Problems**
+
+**DO NOT** attempt to unit test Firestore behavior with `fake_cloud_firestore`. This causes:
+
+- ❌ Stream timing issues ("listener not ready", "initial value not emitted")
+- ❌ Timestamp comparison errors (`type 'Timestamp' is not a subtype of type 'String'`)
+- ❌ Unsupported Firestore features (range queries, compound indexes, `orderBy` + `where`)
+- ❌ Race conditions depending on machine/CI speed
+- ❌ Tests that pass locally but fail in CI
+- ❌ Tests that fail randomly and require arbitrary delays
+
+**Why `fake_cloud_firestore` fails:**
+
+- Does NOT support Timestamp comparisons in `.where()` clauses
+- Does NOT support range filters with DateTime/Timestamp
+- Does NOT support compound queries with `orderBy` + `where` on Timestamp
+- Does NOT replicate real Firestore snapshot emission timing
+- Does NOT emit initial snapshots like real Firestore
+
+**Example of what BREAKS with `fake_cloud_firestore`:**
+
+```dart
+// ❌ This WILL fail in fake_cloud_firestore
+return _firestore
+  .collection('games')
+  .where('groupId', isEqualTo: groupId)
+  .where('scheduledAt', isGreaterThan: Timestamp.now())  // 💥 BREAKS
+  .where('status', isEqualTo: 'scheduled')
+  .snapshots();
+```
+
+---
+
+#### **✅ The Correct Testing Strategy**
+
+| What to Test | Where to Test It | How to Test It | Why |
+|-------------|-----------------|----------------|-----|
+| **Firestore queries** (filtering, sorting, timestamps) | 🔥 **Integration tests** with Firebase Emulator | Real Firestore SDK + emulator | Emulator supports ALL Firestore features correctly |
+| **Repository interface** (method contracts, error handling) | ✅ **Unit tests** | Mock entire repository with `mocktail` | Tests business logic, not Firestore internals |
+| **BLoC logic** (state transitions, event handling) | ✅ **Unit tests** | Mock repositories with `mocktail` or `bloc_test` | Tests state management, not data layer |
+| **Widget behavior** (UI rendering, user interaction) | ✅ **Widget tests** | Fake/mock repositories with simple synchronous data | Tests UI, not real-time streams |
+| **End-to-end flows** (multi-step user journeys) | 🔥 **Integration tests** | Real Firebase Emulator + `flutter_driver` | Tests complete user flows with real backend |
+
+---
+
+#### **📋 Detailed Testing Rules by Layer**
+
+##### **1. Repository Layer**
+
+**🔥 Integration Tests (Firebase Emulator) - Test HERE:**
+
+- ✅ Firestore query correctness (filters, sorting, pagination)
+- ✅ Timestamp comparisons and range queries
+- ✅ Real-time stream emission and updates
+- ✅ Compound queries with multiple conditions
+- ✅ Document creation/update/delete operations
+- ✅ Transaction and batch operations
+
+**Example:**
+```dart
+// integration_test/repositories/firestore_game_repository_test.dart
+testWidgets('getUpcomingGamesCount returns correct count', (tester) async {
+  await FirebaseEmulatorHelper.initialize();
+  final repository = FirestoreGameRepository(firestore: FirebaseFirestore.instance);
+
+  // Create test games with real Timestamps
+  await createTestGame(scheduledAt: DateTime.now().add(Duration(days: 1)));
+
+  final stream = repository.getUpcomingGamesCount('group-123');
+
+  await expectLater(stream, emits(1));
+});
+```
+
+**❌ Unit Tests - DO NOT test Firestore queries here:**
+
+- ❌ NO Firestore query logic
+- ❌ NO `fake_cloud_firestore`
+- ❌ NO stream emission timing
+
+**If you need to test repository methods in unit tests:**
+
+Mock the ENTIRE repository interface, don't try to replicate Firestore:
+
+```dart
+// ✅ CORRECT - Mock the repository
+class MockGameRepository extends Mock implements GameRepository {}
+
+test('should return game count', () {
+  when(() => mockRepo.getUpcomingGamesCount('group-123'))
+    .thenAnswer((_) => Stream.value(5));
+
+  // Test code that USES the repository
+});
+```
+
+---
+
+##### **2. BLoC Layer**
+
+**✅ Unit Tests - Test HERE:**
+
+- ✅ State transitions (initial → loading → loaded → error)
+- ✅ Event handling logic
+- ✅ Error handling and edge cases
+- ✅ Business logic and validation
+
+**How to test:**
+
+Use **mocked repositories** (NOT fake_cloud_firestore):
+
+```dart
+// ✅ CORRECT
+class MockGameRepository extends Mock implements GameRepository {}
+
+blocTest<GameBloc, GameState>(
+  'emits [loading, loaded] when games are fetched',
+  build: () {
+    when(() => mockRepo.getUpcomingGamesCount('group-123'))
+      .thenAnswer((_) => Stream.value(3));
+    return GameBloc(repository: mockRepo);
+  },
+  act: (bloc) => bloc.add(LoadGames('group-123')),
+  expect: () => [
+    GameState.loading(),
+    GameState.loaded(count: 3),
+  ],
+);
+```
+
+**❌ DO NOT:**
+- ❌ Use `fake_cloud_firestore` in BLoC tests
+- ❌ Add delays or timers to "wait for streams"
+- ❌ Test Firestore query correctness here
+
+---
+
+##### **3. Widget Layer**
+
+**✅ Widget Tests - Test HERE:**
+
+- ✅ UI rendering with different states
+- ✅ User interactions (taps, scrolls, input)
+- ✅ Widget composition and layout
+- ✅ State-dependent UI changes
+
+**How to test:**
+
+Use **fake repositories** with simple synchronous data:
+
+```dart
+// ✅ CORRECT - Simple fake repository
+class FakeGameRepository implements GameRepository {
+  final int _count;
+  FakeGameRepository(this._count);
+
+  @override
+  Stream<int> getUpcomingGamesCount(String groupId) {
+    return Stream.value(_count);  // Simple synchronous stream
+  }
+}
+
+testWidgets('badge shows count', (tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: GroupBottomNavBar(
+        upcomingGamesCount: 5,  // Direct value, no streams
+      ),
+    ),
+  );
+
+  expect(find.text('5'), findsOneWidget);
+});
+```
+
+**❌ DO NOT:**
+- ❌ Use real Firestore or Firebase Emulator
+- ❌ Use `fake_cloud_firestore`
+- ❌ Test stream timing or emission order
+- ❌ Add `await Future.delayed()` hacks
+
+---
+
+##### **4. Integration Tests**
+
+**🔥 Integration Tests (Firebase Emulator) - Test HERE:**
+
+- ✅ Complete user flows (login → create group → create game → RSVP)
+- ✅ Multi-screen navigation
+- ✅ Real-time updates across widgets
+- ✅ Cloud Function triggers and side effects
+- ✅ Security rules validation
+- ✅ Cross-user interactions
+
+**How to test:**
+
+Use Firebase Emulator with `flutter_driver`:
+
+```dart
+// integration_test/game_creation_flow_test.dart
+testWidgets('user can create game and see it in list', (tester) async {
+  await FirebaseEmulatorHelper.initialize();
+
+  // Create test user and group
+  final user = await FirebaseEmulatorHelper.createCompleteTestUser(
+    email: 'test@example.com',
+    password: 'password123',
+    displayName: 'Test User',
+  );
+
+  // Navigate and create game
+  await tester.tap(find.text('Create Game'));
+  await tester.pumpAndSettle();
+
+  // Verify game appears in Firestore
+  final games = await FirebaseFirestore.instance
+    .collection('games')
+    .where('createdBy', isEqualTo: user.uid)
+    .get();
+
+  expect(games.docs.length, 1);
+});
+```
+
+---
+
+#### **🎯 Decision Tree: Where Should This Test Go?**
+
+Ask yourself these questions **in order**:
+
+1. **Does it test Firestore queries, timestamps, or real-time streams?**
+   → 🔥 **Integration test** with Firebase Emulator
+
+2. **Does it test a complete user flow across multiple screens?**
+   → 🔥 **Integration test** with Firebase Emulator
+
+3. **Does it test BLoC state transitions or event handling?**
+   → ✅ **Unit test** with mocked repository
+
+4. **Does it test UI rendering or user interaction?**
+   → ✅ **Widget test** with fake/mock data
+
+5. **Does it test a simple function/utility with no dependencies?**
+   → ✅ **Unit test** (no mocks needed)
+
+---
+
+#### **🚨 Common Anti-Patterns to AVOID**
+
+| ❌ Anti-Pattern | ✅ Correct Approach |
+|----------------|---------------------|
+| Unit testing Firestore queries with `fake_cloud_firestore` | Integration test with Firebase Emulator |
+| Adding `await Future.delayed()` to wait for streams | Use synchronous fakes in tests, or use emulator |
+| Mocking `StreamController` to replicate Firestore timing | Mock repository interface, not stream internals |
+| Widget tests with real Firebase SDK | Use fake repositories with simple values |
+| Skipping tests because they're "too flaky" | Move to correct test layer (usually integration) |
+| Testing UI in integration tests | Separate into widget tests + integration tests |
+
+---
+
+#### **📊 Coverage Expectations**
+
+| Layer | Target Coverage | Test Location |
+|-------|----------------|---------------|
+| BLoC | 90%+ | Unit tests |
+| Repository interface | 90%+ | Unit tests (mocked) |
+| Repository implementation | Not in unit tests | Integration tests |
+| Widgets | 80%+ | Widget tests |
+| End-to-end flows | All critical paths | Integration tests |
+
+---
+
+#### **🔍 Examples from This Project**
+
+**✅ CORRECT Example: Game Count Badge**
+
+```dart
+// ✅ Widget test - tests badge display logic
+testWidgets('badge shows "9+" for 10+ games', (tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: GroupBottomNavBar(
+        upcomingGamesCount: 15,  // Simple int, no streams
+      ),
+    ),
+  );
+  expect(find.text('9+'), findsOneWidget);
+});
+
+// 🔥 Integration test would test - Firestore query correctness
+// (This would go in integration_test/, not test/unit/)
+testWidgets('getUpcomingGamesCount filters correctly', (tester) async {
+  await FirebaseEmulatorHelper.initialize();
+  final repo = FirestoreGameRepository(firestore: FirebaseFirestore.instance);
+
+  // Create games with real Timestamps
+  await createScheduledGame(DateTime.now().add(Duration(days: 1)));
+  await createPastGame(DateTime.now().subtract(Duration(days: 1)));
+
+  final count = await repo.getUpcomingGamesCount('group-123').first;
+  expect(count, 1);  // Only future game counted
+});
+```
+
+---
+
+#### **📚 Summary: The Golden Rules**
+
+1. **🔥 Firestore = Emulator** - Never mock Firestore query behavior
+2. **✅ Repositories = Mock Interface** - Don't replicate data layer logic
+3. **✅ BLoCs = Mock Dependencies** - Test state transitions only
+4. **✅ Widgets = Fake Data** - Simple synchronous values only
+5. **🔥 E2E = Real Backend** - Use emulator for complete flows
+6. **❌ Never use `fake_cloud_firestore` for Timestamp queries**
+7. **❌ Never add delays to "fix" timing issues** - wrong test layer
+
+Following these rules eliminates 90% of flaky, failing, and unmaintainable tests.
+
+---
+
+### **4.6 Running Tests**
 
 **Local (inner loop - fast):**
 
