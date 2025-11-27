@@ -62,6 +62,23 @@ class GameModel with _$GameModel {
     final json = toJson();
     json.remove('id'); // Remove id as it's the document ID
 
+    // Convert DateTime fields to Firestore Timestamps
+    if (json['createdAt'] is String) {
+      json['createdAt'] = Timestamp.fromDate(createdAt);
+    }
+    if (json['scheduledAt'] is String) {
+      json['scheduledAt'] = Timestamp.fromDate(scheduledAt);
+    }
+    if (updatedAt != null && json['updatedAt'] is String) {
+      json['updatedAt'] = Timestamp.fromDate(updatedAt!);
+    }
+    if (startedAt != null && json['startedAt'] is String) {
+      json['startedAt'] = Timestamp.fromDate(startedAt!);
+    }
+    if (endedAt != null && json['endedAt'] is String) {
+      json['endedAt'] = Timestamp.fromDate(endedAt!);
+    }
+
     // Ensure nested objects are properly serialized
     if (json['location'] is GameLocation) {
       json['location'] = (json['location'] as GameLocation).toJson();

@@ -6,6 +6,7 @@ import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_event.dart';
@@ -26,12 +27,14 @@ class GroupDetailsPage extends StatelessWidget {
   final String groupId;
   final GroupRepository? groupRepositoryOverride; // For testing
   final UserRepository? userRepositoryOverride; // For testing
+  final GameRepository? gameRepositoryOverride; // For testing
 
   const GroupDetailsPage({
     super.key,
     required this.groupId,
     this.groupRepositoryOverride,
     this.userRepositoryOverride,
+    this.gameRepositoryOverride,
   });
 
   @override
@@ -42,6 +45,7 @@ class GroupDetailsPage extends StatelessWidget {
         groupId: groupId,
         groupRepositoryOverride: groupRepositoryOverride,
         userRepositoryOverride: userRepositoryOverride,
+        gameRepositoryOverride: gameRepositoryOverride,
       ),
     );
   }
@@ -51,11 +55,13 @@ class _GroupDetailsPageContent extends StatefulWidget {
   final String groupId;
   final GroupRepository? groupRepositoryOverride;
   final UserRepository? userRepositoryOverride;
+  final GameRepository? gameRepositoryOverride;
 
   const _GroupDetailsPageContent({
     required this.groupId,
     this.groupRepositoryOverride,
     this.userRepositoryOverride,
+    this.gameRepositoryOverride,
   });
 
   @override
@@ -66,6 +72,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   late final GroupRepository _groupRepository;
   late final UserRepository _userRepository;
   late final FriendRepository _friendRepository;
+  late final GameRepository _gameRepository;
   GroupModel? _group;
   List<UserModel> _members = [];
   Map<String, bool> _friendshipStatus = {};
@@ -80,6 +87,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     _groupRepository = widget.groupRepositoryOverride ?? sl<GroupRepository>();
     _userRepository = widget.userRepositoryOverride ?? sl<UserRepository>();
     _friendRepository = sl<FriendRepository>();
+    _gameRepository = widget.gameRepositoryOverride ?? sl<GameRepository>();
     _loadGroupDetails();
   }
 
@@ -352,11 +360,18 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
             ),
             body: _buildBody(context, authState),
             bottomNavigationBar: _group != null
-                ? GroupBottomNavBar(
-                    isAdmin: _group!.isAdmin(authState.user.uid),
-                    onInviteTap: () => _navigateToInvitePage(context),
-                    onCreateGameTap: () => _navigateToGameCreation(context),
-                    onGamesListTap: () => _showGamesListComingSoon(context),
+                ? StreamBuilder<int>(
+                    stream: _gameRepository.getUpcomingGamesCount(widget.groupId),
+                    builder: (context, snapshot) {
+                      final gameCount = snapshot.data ?? 0;
+                      return GroupBottomNavBar(
+                        isAdmin: _group!.isAdmin(authState.user.uid),
+                        upcomingGamesCount: gameCount,
+                        onInviteTap: () => _navigateToInvitePage(context),
+                        onCreateGameTap: () => _navigateToGameCreation(context),
+                        onGamesListTap: () => _showGamesListComingSoon(context),
+                      );
+                    },
                   )
                 : null,
           );
