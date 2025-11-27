@@ -109,6 +109,25 @@ class FirestoreGameRepository implements GameRepository {
       print('🔍 DEBUG getUpcomingGamesCount: groupId = $groupId');
       print('🔍 DEBUG getUpcomingGamesCount: now = $now');
 
+      // First, let's see ALL games for this group (no filters)
+      _firestore
+          .collection(_collection)
+          .where('groupId', isEqualTo: groupId)
+          .get()
+          .then((snapshot) {
+            print('🔍 DEBUG Total games in group: ${snapshot.docs.length}');
+            for (var doc in snapshot.docs) {
+              final data = doc.data();
+              final scheduledAt = data['scheduledAt'] as Timestamp?;
+              final isFuture = scheduledAt != null && scheduledAt.compareTo(now) > 0;
+              print('🔍 DEBUG All Games - ${doc.id}:');
+              print('  - title: ${data['title']}');
+              print('  - scheduledAt: $scheduledAt (future: $isFuture)');
+              print('  - status: ${data['status']}');
+              print('  - groupId: ${data['groupId']}');
+            }
+          });
+
       return _firestore
           .collection(_collection)
           .where('groupId', isEqualTo: groupId)
@@ -116,10 +135,10 @@ class FirestoreGameRepository implements GameRepository {
           .where('status', isEqualTo: 'scheduled')
           .snapshots()
           .map((snapshot) {
-            print('🔍 DEBUG getUpcomingGamesCount: Found ${snapshot.docs.length} games');
+            print('🔍 DEBUG getUpcomingGamesCount: Found ${snapshot.docs.length} upcoming scheduled games');
             for (var doc in snapshot.docs) {
               final data = doc.data();
-              print('🔍 DEBUG Game: ${doc.id}');
+              print('🔍 DEBUG Matching Game: ${doc.id}');
               print('  - scheduledAt: ${data['scheduledAt']}');
               print('  - status: ${data['status']}');
               print('  - groupId: ${data['groupId']}');
