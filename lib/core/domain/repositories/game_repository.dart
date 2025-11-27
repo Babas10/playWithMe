@@ -16,6 +16,9 @@ abstract class GameRepository {
   /// Get games for a group
   Stream<List<GameModel>> getGamesForGroup(String groupId);
 
+  /// Get count of upcoming games for a group
+  Stream<int> getUpcomingGamesCount(String groupId);
+
   /// Get upcoming games for a user
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId);
 
