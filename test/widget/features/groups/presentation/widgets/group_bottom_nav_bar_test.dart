@@ -236,5 +236,163 @@ void main() {
 
       expect(bottomNavBar.type, BottomNavigationBarType.fixed);
     });
+
+    group('Badge Display', () {
+      testWidgets('shows no badge when game count is 0', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: GroupBottomNavBar(
+                isAdmin: true,
+                upcomingGamesCount: 0,
+                onInviteTap: () {},
+                onCreateGameTap: () {},
+                onGamesListTap: () {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Badge should not be visible when count is 0
+        final badgeFinder = find.byType(Badge);
+        expect(badgeFinder, findsOneWidget);
+
+        final badge = tester.widget<Badge>(badgeFinder);
+        expect(badge.isLabelVisible, isFalse);
+      });
+
+      testWidgets('shows badge with correct count when games exist',
+          (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: GroupBottomNavBar(
+                isAdmin: true,
+                upcomingGamesCount: 3,
+                onInviteTap: () {},
+                onCreateGameTap: () {},
+                onGamesListTap: () {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Badge should be visible
+        final badgeFinder = find.byType(Badge);
+        expect(badgeFinder, findsOneWidget);
+
+        final badge = tester.widget<Badge>(badgeFinder);
+        expect(badge.isLabelVisible, isTrue);
+
+        // Check badge label shows correct count
+        expect(find.text('3'), findsOneWidget);
+      });
+
+      testWidgets('shows "9+" when game count is 10 or more',
+          (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: GroupBottomNavBar(
+                isAdmin: true,
+                upcomingGamesCount: 15,
+                onInviteTap: () {},
+                onCreateGameTap: () {},
+                onGamesListTap: () {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Badge should be visible
+        final badgeFinder = find.byType(Badge);
+        expect(badgeFinder, findsOneWidget);
+
+        final badge = tester.widget<Badge>(badgeFinder);
+        expect(badge.isLabelVisible, isTrue);
+
+        // Check badge label shows "9+"
+        expect(find.text('9+'), findsOneWidget);
+      });
+
+      testWidgets('shows exact count for 9 games', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: GroupBottomNavBar(
+                isAdmin: true,
+                upcomingGamesCount: 9,
+                onInviteTap: () {},
+                onCreateGameTap: () {},
+                onGamesListTap: () {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Badge should be visible
+        final badgeFinder = find.byType(Badge);
+        expect(badgeFinder, findsOneWidget);
+
+        final badge = tester.widget<Badge>(badgeFinder);
+        expect(badge.isLabelVisible, isTrue);
+
+        // Check badge label shows exact count "9"
+        expect(find.text('9'), findsOneWidget);
+      });
+
+      testWidgets('badge appears on Games icon', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: GroupBottomNavBar(
+                isAdmin: true,
+                upcomingGamesCount: 5,
+                onInviteTap: () {},
+                onCreateGameTap: () {},
+                onGamesListTap: () {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Find the badge
+        final badgeFinder = find.byType(Badge);
+        expect(badgeFinder, findsOneWidget);
+
+        // Verify badge wraps the Games list icon
+        final badge = tester.widget<Badge>(badgeFinder);
+        expect(badge.child, isA<Icon>());
+      });
+
+      testWidgets('defaults to 0 games when not specified', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              bottomNavigationBar: GroupBottomNavBar(
+                isAdmin: true,
+                // upcomingGamesCount not specified, should default to 0
+                onInviteTap: () {},
+                onCreateGameTap: () {},
+                onGamesListTap: () {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Badge should exist but not be visible
+        final badgeFinder = find.byType(Badge);
+        expect(badgeFinder, findsOneWidget);
+
+        final badge = tester.widget<Badge>(badgeFinder);
+        expect(badge.isLabelVisible, isFalse);
+      });
+    });
   });
 }

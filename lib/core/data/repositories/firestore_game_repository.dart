@@ -103,6 +103,22 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Stream<int> getUpcomingGamesCount(String groupId) {
+    try {
+      final now = Timestamp.now();
+      return _firestore
+          .collection(_collection)
+          .where('groupId', isEqualTo: groupId)
+          .where('scheduledAt', isGreaterThan: now)
+          .where('status', isEqualTo: 'scheduled')
+          .snapshots()
+          .map((snapshot) => snapshot.docs.length);
+    } catch (e) {
+      throw Exception('Failed to get upcoming games count: $e');
+    }
+  }
+
+  @override
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId) {
     try {
       final now = Timestamp.now();

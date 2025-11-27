@@ -102,6 +102,30 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Stream<int> getUpcomingGamesCount(String groupId) async* {
+    final now = DateTime.now();
+
+    // Emit current count immediately
+    yield _games.values
+        .where((game) =>
+            game.groupId == groupId &&
+            game.scheduledAt.isAfter(now) &&
+            game.status == GameStatus.scheduled)
+        .length;
+
+    // Then emit future updates
+    await for (final games in _gamesController.stream) {
+      final updatedNow = DateTime.now();
+      yield games
+          .where((game) =>
+              game.groupId == groupId &&
+              game.scheduledAt.isAfter(updatedNow) &&
+              game.status == GameStatus.scheduled)
+          .length;
+    }
+  }
+
+  @override
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId) {
     final now = DateTime.now();
     return _gamesController.stream.map((games) =>
