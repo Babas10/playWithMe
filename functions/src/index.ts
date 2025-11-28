@@ -51,4 +51,5 @@ export {
   onFriendRequestAccepted,
   onFriendRequestDeclined,
   onFriendRemoved,
+  onPlayerJoinedGame,
 } from "./notifications";
