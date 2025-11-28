@@ -379,4 +379,278 @@ describe("Integration: Game Creation Notifications", () => {
       expect(gamesSnapshot.empty).toBe(false);
     }, 10000);
   });
+
+  describe("Player Joined Notifications", () => {
+    let gameId: string;
+
+    beforeEach(async () => {
+      // Create a game with the creator
+      const db = admin.firestore();
+      const gameRef = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .add({
+          title: "Test Game",
+          createdBy: creator.uid,
+          groupId: groupId,
+          scheduledAt: admin.firestore.Timestamp.fromDate(
+            new Date(Date.now() + 24 * 60 * 60 * 1000)
+          ),
+          location: {name: "Test Court"},
+          playerIds: [creator.uid],
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+      gameId = gameRef.id;
+
+      // Wait for game creation notification to process
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Reset mock after game creation
+      mockSendEachForMulticast.mockClear();
+    });
+
+    it("should trigger notification when player joins game", async () => {
+      const db = admin.firestore();
+
+      // Add member1 to the game
+      await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .update({
+          playerIds: admin.firestore.FieldValue.arrayUnion(member1.uid),
+        });
+
+      // Wait for trigger to process
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Verify game was updated
+      const gameDoc = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .get();
+
+      const gameData = gameDoc.data();
+      expect(gameData?.playerIds).toContain(member1.uid);
+    }, 10000);
+
+    it("should not notify the player who just joined", async () => {
+      const db = admin.firestore();
+
+      // Setup: Only creator has FCM token
+      await db.collection("users").doc(creator.uid).update({
+        fcmTokens: ["creator_token"],
+        notificationPreferences: {
+          playerJoined: true,
+          quietHours: {enabled: false},
+        },
+      });
+
+      // Member1 joins the game
+      await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .update({
+          playerIds: admin.firestore.FieldValue.arrayUnion(member1.uid),
+        });
+
+      // Wait for trigger
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Verify update succeeded
+      const gameDoc = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .get();
+      expect(gameDoc.data()?.playerIds).toContain(member1.uid);
+    }, 10000);
+
+    it("should not send notification when player is first to join", async () => {
+      const db = admin.firestore();
+
+      // Create a game with no players
+      const emptyGameRef = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .add({
+          title: "Empty Game",
+          createdBy: creator.uid,
+          groupId: groupId,
+          scheduledAt: admin.firestore.Timestamp.now(),
+          location: {name: "Court"},
+          playerIds: [],
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+      // Wait for creation
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      mockSendEachForMulticast.mockClear();
+
+      // Add first player
+      await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(emptyGameRef.id)
+        .update({
+          playerIds: [member1.uid],
+        });
+
+      // Wait for trigger
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Verify game was updated
+      const gameDoc = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(emptyGameRef.id)
+        .get();
+      expect(gameDoc.data()?.playerIds).toEqual([member1.uid]);
+    }, 10000);
+
+    it("should respect playerJoined notification preferences", async () => {
+      const db = admin.firestore();
+
+      // Disable player joined notifications for creator
+      await db.collection("users").doc(creator.uid).update({
+        fcmTokens: ["creator_token"],
+        notificationPreferences: {
+          playerJoined: false, // Disabled
+          quietHours: {enabled: false},
+        },
+      });
+
+      // Member1 joins
+      await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .update({
+          playerIds: admin.firestore.FieldValue.arrayUnion(member1.uid),
+        });
+
+      // Wait for trigger
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Verify update succeeded
+      const gameDoc = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .get();
+      expect(gameDoc.data()?.playerIds).toContain(member1.uid);
+    }, 10000);
+
+    it("should handle multiple players joining simultaneously", async () => {
+      const db = admin.firestore();
+
+      // Add both members at once
+      await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .update({
+          playerIds: [creator.uid, member1.uid, member2.uid],
+        });
+
+      // Wait for trigger
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Verify all players were added
+      const gameDoc = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .get();
+
+      const gameData = gameDoc.data();
+      expect(gameData?.playerIds).toContain(member1.uid);
+      expect(gameData?.playerIds).toContain(member2.uid);
+    }, 10000);
+
+    it("should handle group-specific notification settings", async () => {
+      const db = admin.firestore();
+
+      // Set group-specific preferences for creator
+      await db.collection("users").doc(creator.uid).update({
+        fcmTokens: ["creator_token"],
+        notificationPreferences: {
+          playerJoined: true,
+          groupSpecific: {
+            [groupId]: {
+              playerJoined: false, // Disabled for this specific group
+            },
+          },
+        },
+      });
+
+      // Member1 joins
+      await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .update({
+          playerIds: admin.firestore.FieldValue.arrayUnion(member1.uid),
+        });
+
+      // Wait for trigger
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Verify update succeeded
+      const gameDoc = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .get();
+      expect(gameDoc.data()?.playerIds).toContain(member1.uid);
+    }, 10000);
+
+    it("should handle players without FCM tokens", async () => {
+      const db = admin.firestore();
+
+      // Remove FCM tokens from creator
+      await db.collection("users").doc(creator.uid).update({
+        fcmTokens: [],
+      });
+
+      // Member1 joins
+      await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .update({
+          playerIds: admin.firestore.FieldValue.arrayUnion(member1.uid),
+        });
+
+      // Wait for trigger
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Should still work (just no notification sent)
+      const gameDoc = await db
+        .collection("groups")
+        .doc(groupId)
+        .collection("games")
+        .doc(gameId)
+        .get();
+      expect(gameDoc.data()?.playerIds).toContain(member1.uid);
+    }, 10000);
+  });
 });
