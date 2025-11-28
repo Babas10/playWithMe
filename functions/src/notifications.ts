@@ -1340,12 +1340,13 @@ export const onFriendRemoved = functions.firestore
  * Notifies all current players except the one who just joined
  */
 export const onPlayerJoinedGame = functions.firestore
-  .document("groups/{groupId}/games/{gameId}")
+  .document("games/{gameId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
     const after = change.after.data();
-    const groupId = context.params.groupId;
     const gameId = context.params.gameId;
+    const gameData = after;
+    const groupId = gameData.groupId; // Get groupId from game document
 
     const beforePlayers = before.playerIds || [];
     const afterPlayers = after.playerIds || [];
