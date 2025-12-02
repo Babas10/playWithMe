@@ -310,11 +310,11 @@ export const onInvitationAccepted = functions.firestore
  * Notifies all group members except the creator
  */
 export const onGameCreated = functions.firestore
-  .document("groups/{groupId}/games/{gameId}")
+  .document("games/{gameId}")
   .onCreate(async (snapshot, context) => {
     const game = snapshot.data();
-    const groupId = context.params.groupId;
     const gameId = context.params.gameId;
+    const groupId = game.groupId; // Get groupId from game document
 
     functions.logger.info("Game created, processing notifications", {
       groupId,
@@ -355,7 +355,18 @@ export const onGameCreated = functions.firestore
         .get();
 
       const creatorData = creatorDoc.data();
-      const creatorName = creatorData?.displayName || "Someone";
+
+      // Try to get creator name in order of preference
+      let creatorName = "Someone";
+      if (creatorData) {
+        if (creatorData.firstName && creatorData.lastName) {
+          creatorName = `${creatorData.firstName} ${creatorData.lastName}`;
+        } else if (creatorData.displayName) {
+          creatorName = creatorData.displayName;
+        } else if (creatorData.email) {
+          creatorName = creatorData.email;
+        }
+      }
 
       // Track notifications sent per user for cleanup
       const userTokenMap = new Map<string, string[]>();
@@ -424,17 +435,35 @@ export const onGameCreated = functions.firestore
         return null;
       }
 
+      // Format the game date
+      const gameDate = game.scheduledAt?.toDate();
+      let dateStr = "";
+      if (gameDate) {
+        const options: Intl.DateTimeFormatOptions = {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        };
+        dateStr = ` on ${gameDate.toLocaleDateString("en-US", options)}`;
+      }
+
+      // Format the location
+      const location = game.location?.name || "TBD";
+
       // Send notification
       const message: admin.messaging.MulticastMessage = {
         tokens: allTokens,
         notification: {
-          title: `New Game in ${groupData.name}`,
-          body: `${creatorName} created a new game${game.title ? `: ${game.title}` : ""}`,
+          title: `New Game: ${game.title || "Game"}`,
+          body: `${creatorName} created a game${dateStr} at ${location}`,
         },
         data: {
           type: "game_created",
           groupId: groupId,
-          gameId: snapshot.id,
+          gameId: gameId,
+          creatorId: game.createdBy,
+          scheduledAt: gameDate?.toISOString() || "",
         },
         android: {
           priority: "high",

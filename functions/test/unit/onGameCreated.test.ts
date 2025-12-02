@@ -148,17 +148,23 @@ describe("onGameCreated Cloud Function", () => {
 
   describe("Notification sending", () => {
     it("should send notification to all group members except creator", async () => {
+      const mockScheduledAt = {
+        toDate: () => new Date("2025-12-01T14:00:00Z"),
+      };
+
       const snapshot = {
         data: () => ({
           title: "Beach Volleyball",
           createdBy: "creator123",
           groupId: "group123",
+          scheduledAt: mockScheduledAt,
+          location: {name: "Sunset Beach"},
         }),
         id: "game123",
       };
 
       const context = {
-        params: {groupId: "group123", gameId: "game123"},
+        params: {gameId: "game123"},
       };
 
       await onGameCreatedHandler(snapshot, context);
@@ -168,9 +174,9 @@ describe("onGameCreated Cloud Function", () => {
 
       const callArgs = mockMessaging.sendEachForMulticast.mock.calls[0][0];
       expect(callArgs.tokens).toEqual(["token1", "token2", "token3"]);
-      expect(callArgs.notification.title).toBe("New Game in Test Group");
-      expect(callArgs.notification.body).toContain("Creator User created a new game");
-      expect(callArgs.notification.body).toContain("Beach Volleyball");
+      expect(callArgs.notification.title).toBe("New Game: Beach Volleyball");
+      expect(callArgs.notification.body).toContain("Creator User created a game");
+      expect(callArgs.notification.body).toContain("Sunset Beach");
       expect(callArgs.data.type).toBe("game_created");
       expect(callArgs.data.gameId).toBe("game123");
     });
@@ -199,19 +205,21 @@ describe("onGameCreated Cloud Function", () => {
       const snapshot = {
         data: () => ({
           createdBy: "creator123",
+          groupId: "group123",
           // No title
         }),
         id: "game123",
       };
 
       const context = {
-        params: {groupId: "group123", gameId: "game123"},
+        params: {gameId: "game123"},
       };
 
       await onGameCreatedHandler(snapshot, context);
 
       const callArgs = mockMessaging.sendEachForMulticast.mock.calls[0][0];
-      expect(callArgs.notification.body).toBe("Creator User created a new game");
+      expect(callArgs.notification.title).toBe("New Game: Game");
+      expect(callArgs.notification.body).toContain("Creator User created a game at TBD");
     });
   });
 
@@ -260,12 +268,13 @@ describe("onGameCreated Cloud Function", () => {
       const snapshot = {
         data: () => ({
           createdBy: "creator123",
+          groupId: "group123",
         }),
         id: "game123",
       };
 
       const context = {
-        params: {groupId: "group123", gameId: "game123"},
+        params: {gameId: "game123"},
       };
 
       await onGameCreatedHandler(snapshot, context);
@@ -396,18 +405,19 @@ describe("onGameCreated Cloud Function", () => {
       const snapshot = {
         data: () => ({
           createdBy: "nonexistent",
+          groupId: "group123",
         }),
         id: "game123",
       };
 
       const context = {
-        params: {groupId: "group123", gameId: "game123"},
+        params: {gameId: "game123"},
       };
 
       await onGameCreatedHandler(snapshot, context);
 
       const callArgs = mockMessaging.sendEachForMulticast.mock.calls[0][0];
-      expect(callArgs.notification.body).toContain("Someone created a new game");
+      expect(callArgs.notification.body).toContain("Someone created a game at TBD");
     });
   });
 
