@@ -112,7 +112,6 @@ export const onInvitationCreated = functions.firestore
         notification: {
           title: "Group Invitation",
           body: `${invitation.inviterName} invited you to join ${groupData.name}`,
-          imageUrl: groupData.photoUrl,
         },
         data: {
           type: "invitation",
@@ -280,7 +279,6 @@ export const onInvitationAccepted = functions.firestore
         notification: {
           title: "Invitation Accepted",
           body: `${accepterName} accepted your invitation to ${groupName}`,
-          imageUrl: accepterData?.photoUrl,
         },
         data: {
           type: "invitation_accepted",
@@ -432,7 +430,6 @@ export const onGameCreated = functions.firestore
         notification: {
           title: `New Game in ${groupData.name}`,
           body: `${creatorName} created a new game${game.title ? `: ${game.title}` : ""}`,
-          imageUrl: groupData.photoUrl,
         },
         data: {
           type: "game_created",
@@ -607,7 +604,6 @@ export const onMemberJoined = functions.firestore
             notification: {
               title: "New Member Joined",
               body: `${memberName} joined ${after.name}`,
-              imageUrl: newMemberData?.photoUrl,
             },
             data: {
               type: "member_joined",
@@ -973,7 +969,6 @@ export const onFriendRequestSent = functions.firestore
         notification: {
           title: "Friend Request",
           body: `${initiatorName} sent you a friend request`,
-          imageUrl: initiatorData?.photoUrl,
         },
         data: {
           type: "friend_request",
@@ -1157,7 +1152,6 @@ export const onFriendRequestAccepted = functions.firestore
         notification: {
           title: "Friend Request Accepted",
           body: `${recipientName} accepted your friend request`,
-          imageUrl: recipientData?.photoUrl,
         },
         data: {
           type: "friend_accepted",
@@ -1328,6 +1322,272 @@ export const onFriendRemoved = functions.firestore
         friendshipId,
         initiatorId,
         recipientId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return null;
+    }
+  });
+
+/**
+ * Send notification when a player joins a game
+ * Notifies all current players except the one who just joined
+ */
+export const onPlayerJoinedGame = functions.firestore
+  .document("games/{gameId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const gameId = context.params.gameId;
+    const gameData = after;
+    const groupId = gameData.groupId; // Get groupId from game document
+
+    const beforePlayers = before.playerIds || [];
+    const afterPlayers = after.playerIds || [];
+
+    // Find new players (users who weren't in playerIds before but are now)
+    const newPlayers = afterPlayers.filter((id: string) => !beforePlayers.includes(id));
+
+    if (newPlayers.length === 0) {
+      return null;
+    }
+
+    functions.logger.info("Player(s) joined game, processing notifications", {
+      groupId,
+      gameId,
+      newPlayerCount: newPlayers.length,
+      newPlayers,
+    });
+
+    try {
+      // Get existing players (excluding the new joiner(s))
+      const existingPlayers = afterPlayers.filter(
+        (id: string) => !newPlayers.includes(id)
+      );
+
+      if (existingPlayers.length === 0) {
+        functions.logger.info("No existing players to notify (first player joined)", {
+          groupId,
+          gameId,
+        });
+        return null;
+      }
+
+      // Process each new player
+      for (const newPlayerId of newPlayers) {
+        // Get new player's details
+        const newPlayerDoc = await admin
+          .firestore()
+          .collection("users")
+          .doc(newPlayerId)
+          .get();
+
+        const newPlayerData = newPlayerDoc.data();
+
+        // Try to get player name in order of preference: firstName + lastName, displayName, email, or "Someone"
+        let playerName = "Someone";
+        if (newPlayerData) {
+          if (newPlayerData.firstName && newPlayerData.lastName) {
+            playerName = `${newPlayerData.firstName} ${newPlayerData.lastName}`;
+          } else if (newPlayerData.displayName) {
+            playerName = newPlayerData.displayName;
+          } else if (newPlayerData.email) {
+            playerName = newPlayerData.email;
+          }
+        }
+
+        // Track tokens per user for cleanup
+        const userTokenMap = new Map<string, string[]>();
+        const allTokens: string[] = [];
+
+        // Collect FCM tokens from existing players
+        for (const existingPlayerId of existingPlayers) {
+          const playerDoc = await admin
+            .firestore()
+            .collection("users")
+            .doc(existingPlayerId)
+            .get();
+
+          const playerData = playerDoc.data();
+          if (!playerData) {
+            functions.logger.debug("Player not found", {
+              existingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          const fcmTokens = playerData.fcmTokens || [];
+          if (fcmTokens.length === 0) {
+            functions.logger.debug("Player has no FCM tokens", {
+              existingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          const prefs = playerData.notificationPreferences || {};
+
+          // Check global and group-specific preferences
+          const groupPrefs = prefs.groupSpecific?.[groupId];
+          const shouldNotify =
+            groupPrefs?.playerJoined !== false && prefs.playerJoined !== false;
+
+          if (!shouldNotify) {
+            functions.logger.debug("Player has disabled player joined notifications", {
+              existingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          // Check quiet hours
+          if (isQuietHours(prefs.quietHours)) {
+            functions.logger.debug("Player is in quiet hours", {
+              existingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          // Add tokens to map for later cleanup if needed
+          userTokenMap.set(existingPlayerId, fcmTokens);
+          allTokens.push(...fcmTokens);
+        }
+
+        if (allTokens.length === 0) {
+          functions.logger.info("No existing players to notify for this joiner", {
+            groupId,
+            gameId,
+            newPlayerId,
+          });
+          continue;
+        }
+
+        // Format the game date
+        const gameDate = after.scheduledAt?.toDate();
+        let dateStr = "";
+        if (gameDate) {
+          const options: Intl.DateTimeFormatOptions = {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          };
+          dateStr = ` for ${gameDate.toLocaleDateString("en-US", options)}`;
+        }
+
+        // Send notification
+        const message: admin.messaging.MulticastMessage = {
+          tokens: allTokens,
+          notification: {
+            title: "New Player Joined!",
+            body: `${playerName} joined ${after.title || "the game"}${dateStr}`,
+          },
+          data: {
+            type: "player_joined",
+            groupId: groupId,
+            gameId: gameId,
+            playerId: newPlayerId,
+            playerName: playerName,
+          },
+          android: {
+            priority: "high",
+            notification: {
+              channelId: "high_importance_channel",
+              clickAction: "FLUTTER_NOTIFICATION_CLICK",
+            },
+          },
+          apns: {
+            payload: {
+              aps: {
+                badge: 1,
+                sound: "default",
+              },
+            },
+          },
+        };
+
+        const response = await admin.messaging().sendEachForMulticast(message);
+
+        functions.logger.info("Player joined notification sent successfully", {
+          groupId,
+          gameId,
+          newPlayerId,
+          successCount: response.successCount,
+          failureCount: response.failureCount,
+        });
+
+        // Log failures for debugging
+        if (response.failureCount > 0) {
+          response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+              functions.logger.error("Failed to send notification to token", {
+                groupId,
+                gameId,
+                newPlayerId,
+                tokenIndex: idx,
+                error: resp.error?.code,
+                errorMessage: resp.error?.message,
+              });
+            }
+          });
+        }
+
+        // Remove invalid tokens
+        if (response.failureCount > 0) {
+          const invalidTokensByUser = new Map<string, string[]>();
+
+          response.responses.forEach((resp, idx) => {
+            if (
+              !resp.success &&
+              (resp.error?.code === "messaging/invalid-registration-token" ||
+                resp.error?.code === "messaging/registration-token-not-registered")
+            ) {
+              const invalidToken = allTokens[idx];
+
+              // Find which user this token belongs to
+              for (const [userId, tokens] of userTokenMap.entries()) {
+                if (tokens.includes(invalidToken)) {
+                  if (!invalidTokensByUser.has(userId)) {
+                    invalidTokensByUser.set(userId, []);
+                  }
+                  invalidTokensByUser.get(userId)!.push(invalidToken);
+                  break;
+                }
+              }
+            }
+          });
+
+          // Clean up invalid tokens per user
+          for (const [userId, tokensToRemove] of invalidTokensByUser.entries()) {
+            await admin
+              .firestore()
+              .collection("users")
+              .doc(userId)
+              .update({
+                fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+              });
+
+            functions.logger.info("Removed invalid FCM tokens", {
+              userId,
+              groupId,
+              gameId,
+              removedCount: tokensToRemove.length,
+            });
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      functions.logger.error("Error sending player joined notification", {
+        groupId,
+        gameId,
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       });
