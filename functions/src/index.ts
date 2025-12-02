@@ -53,4 +53,5 @@ export {
   onFriendRemoved,
   onPlayerJoinedGame,
   onPlayerLeftGame,
+  onWaitlistPromoted,
 } from "./notifications";
