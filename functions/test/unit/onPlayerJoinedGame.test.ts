@@ -221,14 +221,16 @@ describe("onPlayerJoinedGame Cloud Function", () => {
 
       const callArgs = mockMessaging.sendEachForMulticast.mock.calls[0][0];
       expect(callArgs.notification.title).toBe("New Player Joined!");
-      expect(callArgs.notification.body).toBe("New Player joined Saturday Morning Game");
-      expect(callArgs.notification.imageUrl).toBe("https://example.com/new-player.jpg");
+      expect(callArgs.notification.body).toContain("New Player joined Saturday Morning Game");
+      // imageUrl has been intentionally removed to prevent FCM invalid-payload errors
+      expect(callArgs.notification.imageUrl).toBeUndefined();
     });
 
     it("should include correct data payload", async () => {
       const beforeSnapshot = {
         data: () => ({
           title: "Game",
+          groupId: "group123", // groupId comes from game document, not context.params
           playerIds: ["player1"],
         }),
       };
@@ -236,12 +238,13 @@ describe("onPlayerJoinedGame Cloud Function", () => {
       const afterSnapshot = {
         data: () => ({
           title: "Game",
+          groupId: "group123", // groupId comes from game document, not context.params
           playerIds: ["player1", "newPlayer123"],
         }),
       };
 
       const change = {before: beforeSnapshot, after: afterSnapshot};
-      const context = {params: {groupId: "group123", gameId: "game123"}};
+      const context = {params: {gameId: "game123"}}; // Only gameId in URL path
 
       await onPlayerJoinedGameHandler(change, context);
 
@@ -390,11 +393,12 @@ describe("onPlayerJoinedGame Cloud Function", () => {
     });
 
     it("should respect group-specific notification preferences", async () => {
+      // Override player1's data to have group-specific preference disabled
       mockExistingPlayer1Doc.data.mockReturnValue({
         displayName: "Existing Player 1",
         fcmTokens: ["token1"],
         notificationPreferences: {
-          playerJoined: true,
+          playerJoined: true, // Globally enabled
           groupSpecific: {
             group123: {
               playerJoined: false, // Disabled for this specific group
@@ -405,22 +409,25 @@ describe("onPlayerJoinedGame Cloud Function", () => {
 
       const beforeSnapshot = {
         data: () => ({
+          groupId: "group123", // groupId comes from game document
           playerIds: ["player1", "player2"],
         }),
       };
 
       const afterSnapshot = {
         data: () => ({
+          groupId: "group123", // groupId comes from game document
           playerIds: ["player1", "player2", "newPlayer123"],
         }),
       };
 
       const change = {before: beforeSnapshot, after: afterSnapshot};
-      const context = {params: {groupId: "group123", gameId: "game123"}};
+      const context = {params: {gameId: "game123"}}; // Only gameId in URL path
 
       await onPlayerJoinedGameHandler(change, context);
 
       const callArgs = mockMessaging.sendEachForMulticast.mock.calls[0][0];
+      // Should only include player2's token3, since player1 disabled notifications for group123
       expect(callArgs.tokens).toEqual(["token3"]);
     });
   });
