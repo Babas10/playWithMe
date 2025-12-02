@@ -1889,3 +1889,370 @@ export const onPlayerLeftGame = functions.firestore
       return null;
     }
   });
+
+/**
+ * Send notification when a waitlist user is promoted to player
+ * Notifies the promoted user and all current players
+ */
+export const onWaitlistPromoted = functions.firestore
+  .document("games/{gameId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const gameId = context.params.gameId;
+    const gameData = after;
+    const groupId = gameData.groupId; // Get groupId from game document
+
+    const beforePlayers = before.playerIds || [];
+    const afterPlayers = after.playerIds || [];
+    const beforeWaitlist = before.waitlistIds || [];
+    const afterWaitlist = after.waitlistIds || [];
+
+    // Find users who joined as players
+    const newPlayers = afterPlayers.filter((id: string) => !beforePlayers.includes(id));
+
+    // Find users who left the waitlist
+    const removedFromWaitlist = beforeWaitlist.filter(
+      (id: string) => !afterWaitlist.includes(id)
+    );
+
+    // Find users who were promoted (in both lists - new to players AND removed from waitlist)
+    const promotedUsers = newPlayers.filter(
+      (id: string) => removedFromWaitlist.includes(id)
+    );
+
+    if (promotedUsers.length === 0) {
+      return null;
+    }
+
+    // Don't notify if game is cancelled
+    if (after.status === "cancelled") {
+      functions.logger.info("Game is cancelled, skipping waitlist promotion notifications", {
+        groupId,
+        gameId,
+      });
+      return null;
+    }
+
+    functions.logger.info("User(s) promoted from waitlist, processing notifications", {
+      groupId,
+      gameId,
+      promotedCount: promotedUsers.length,
+      promotedUsers,
+    });
+
+    try {
+      // Process each promoted user
+      for (const promotedId of promotedUsers) {
+        // Get promoted user's details
+        const promotedUserDoc = await admin
+          .firestore()
+          .collection("users")
+          .doc(promotedId)
+          .get();
+
+        const promotedUserData = promotedUserDoc.data();
+
+        // Try to get player name in order of preference: firstName + lastName, displayName, email, or "Someone"
+        let playerName = "Someone";
+        if (promotedUserData) {
+          if (promotedUserData.firstName && promotedUserData.lastName) {
+            playerName = `${promotedUserData.firstName} ${promotedUserData.lastName}`;
+          } else if (promotedUserData.displayName) {
+            playerName = promotedUserData.displayName;
+          } else if (promotedUserData.email) {
+            playerName = promotedUserData.email;
+          }
+        }
+
+        // Calculate current player count
+        const currentPlayers = afterPlayers.length;
+        const maxPlayers = after.maxPlayers || 8;
+
+        // 1. Notify the promoted user with "You's In!" message
+        const promotedUserTokens = promotedUserData?.fcmTokens || [];
+        if (promotedUserTokens.length > 0 && promotedUserData) {
+          const promotedUserPrefs = promotedUserData.notificationPreferences || {};
+
+          // Check global and group-specific preferences for waitlist notifications
+          const groupPrefs = promotedUserPrefs.groupSpecific?.[groupId];
+          const shouldNotifyPromoted =
+            groupPrefs?.waitlistPromoted !== false && promotedUserPrefs.waitlistPromoted !== false;
+
+          if (shouldNotifyPromoted && !isQuietHours(promotedUserPrefs.quietHours)) {
+            const promotedMessage: admin.messaging.MulticastMessage = {
+              tokens: promotedUserTokens,
+              notification: {
+                title: "You're In! 🎉",
+                body: `A spot opened in ${after.title || "the game"}. You've been moved from the waitlist!`,
+              },
+              data: {
+                type: "waitlist_promoted",
+                groupId: groupId,
+                gameId: gameId,
+              },
+              android: {
+                priority: "high",
+                notification: {
+                  channelId: "high_importance_channel",
+                  clickAction: "FLUTTER_NOTIFICATION_CLICK",
+                },
+              },
+              apns: {
+                payload: {
+                  aps: {
+                    badge: 1,
+                    sound: "default",
+                  },
+                },
+              },
+            };
+
+            const promotedResponse = await admin.messaging().sendEachForMulticast(promotedMessage);
+
+            functions.logger.info("Waitlist promotion notification sent to promoted user", {
+              groupId,
+              gameId,
+              promotedId,
+              successCount: promotedResponse.successCount,
+              failureCount: promotedResponse.failureCount,
+            });
+
+            // Remove invalid tokens for promoted user
+            if (promotedResponse.failureCount > 0) {
+              const tokensToRemove: string[] = [];
+              promotedResponse.responses.forEach((resp, idx) => {
+                if (
+                  !resp.success &&
+                  (resp.error?.code === "messaging/invalid-registration-token" ||
+                    resp.error?.code === "messaging/registration-token-not-registered")
+                ) {
+                  tokensToRemove.push(promotedUserTokens[idx]);
+                }
+              });
+
+              if (tokensToRemove.length > 0) {
+                await admin
+                  .firestore()
+                  .collection("users")
+                  .doc(promotedId)
+                  .update({
+                    fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+                  });
+
+                functions.logger.info("Removed invalid FCM tokens from promoted user", {
+                  userId: promotedId,
+                  groupId,
+                  gameId,
+                  removedCount: tokensToRemove.length,
+                });
+              }
+            }
+          } else {
+            functions.logger.debug("Promoted user has disabled waitlist notifications or is in quiet hours", {
+              promotedId,
+              groupId,
+              gameId,
+            });
+          }
+        }
+
+        // 2. Notify existing players (excluding the promoted user)
+        const existingPlayers = afterPlayers.filter((id: string) => id !== promotedId);
+
+        if (existingPlayers.length === 0) {
+          functions.logger.info("No existing players to notify (promoted user is first player)", {
+            groupId,
+            gameId,
+            promotedId,
+          });
+          continue;
+        }
+
+        // Track tokens per user for cleanup
+        const userTokenMap = new Map<string, string[]>();
+        const allTokens: string[] = [];
+
+        // Collect FCM tokens from existing players
+        for (const existingPlayerId of existingPlayers) {
+          const playerDoc = await admin
+            .firestore()
+            .collection("users")
+            .doc(existingPlayerId)
+            .get();
+
+          const playerData = playerDoc.data();
+          if (!playerData) {
+            functions.logger.debug("Player not found", {
+              existingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          const fcmTokens = playerData.fcmTokens || [];
+          if (fcmTokens.length === 0) {
+            functions.logger.debug("Player has no FCM tokens", {
+              existingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          const prefs = playerData.notificationPreferences || {};
+
+          // Check global and group-specific preferences
+          const groupPrefs = prefs.groupSpecific?.[groupId];
+          const shouldNotify =
+            groupPrefs?.waitlistJoined !== false && prefs.waitlistJoined !== false;
+
+          if (!shouldNotify) {
+            functions.logger.debug("Player has disabled waitlist joined notifications", {
+              existingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          // Check quiet hours
+          if (isQuietHours(prefs.quietHours)) {
+            functions.logger.debug("Player is in quiet hours", {
+              existingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          // Add tokens to map for later cleanup if needed
+          userTokenMap.set(existingPlayerId, fcmTokens);
+          allTokens.push(...fcmTokens);
+        }
+
+        if (allTokens.length === 0) {
+          functions.logger.info("No existing players to notify for this promotion", {
+            groupId,
+            gameId,
+            promotedId,
+          });
+          continue;
+        }
+
+        // Send notification to existing players
+        const message: admin.messaging.MulticastMessage = {
+          tokens: allTokens,
+          notification: {
+            title: "Waitlist Player Joined!",
+            body: `${playerName} was moved from waitlist to ${after.title || "the game"} (${currentPlayers}/${maxPlayers} players)`,
+          },
+          data: {
+            type: "waitlist_joined",
+            groupId: groupId,
+            gameId: gameId,
+            playerId: promotedId,
+            playerName: playerName,
+            currentPlayers: currentPlayers.toString(),
+            maxPlayers: maxPlayers.toString(),
+          },
+          android: {
+            priority: "high",
+            notification: {
+              channelId: "high_importance_channel",
+              clickAction: "FLUTTER_NOTIFICATION_CLICK",
+            },
+          },
+          apns: {
+            payload: {
+              aps: {
+                badge: 1,
+                sound: "default",
+              },
+            },
+          },
+        };
+
+        const response = await admin.messaging().sendEachForMulticast(message);
+
+        functions.logger.info("Waitlist promotion notification sent to existing players", {
+          groupId,
+          gameId,
+          promotedId,
+          successCount: response.successCount,
+          failureCount: response.failureCount,
+        });
+
+        // Log failures for debugging
+        if (response.failureCount > 0) {
+          response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+              functions.logger.error("Failed to send notification to token", {
+                groupId,
+                gameId,
+                promotedId,
+                tokenIndex: idx,
+                error: resp.error?.code,
+                errorMessage: resp.error?.message,
+              });
+            }
+          });
+        }
+
+        // Remove invalid tokens
+        if (response.failureCount > 0) {
+          const invalidTokensByUser = new Map<string, string[]>();
+
+          response.responses.forEach((resp, idx) => {
+            if (
+              !resp.success &&
+              (resp.error?.code === "messaging/invalid-registration-token" ||
+                resp.error?.code === "messaging/registration-token-not-registered")
+            ) {
+              const invalidToken = allTokens[idx];
+
+              // Find which user this token belongs to
+              for (const [userId, tokens] of userTokenMap.entries()) {
+                if (tokens.includes(invalidToken)) {
+                  if (!invalidTokensByUser.has(userId)) {
+                    invalidTokensByUser.set(userId, []);
+                  }
+                  invalidTokensByUser.get(userId)!.push(invalidToken);
+                  break;
+                }
+              }
+            }
+          });
+
+          // Clean up invalid tokens per user
+          for (const [userId, tokensToRemove] of invalidTokensByUser.entries()) {
+            await admin
+              .firestore()
+              .collection("users")
+              .doc(userId)
+              .update({
+                fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+              });
+
+            functions.logger.info("Removed invalid FCM tokens", {
+              userId,
+              groupId,
+              gameId,
+              removedCount: tokensToRemove.length,
+            });
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      functions.logger.error("Error sending waitlist promotion notification", {
+        groupId,
+        gameId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return null;
+    }
+  });
