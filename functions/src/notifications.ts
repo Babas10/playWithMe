@@ -112,7 +112,6 @@ export const onInvitationCreated = functions.firestore
         notification: {
           title: "Group Invitation",
           body: `${invitation.inviterName} invited you to join ${groupData.name}`,
-          imageUrl: groupData.photoUrl,
         },
         data: {
           type: "invitation",
@@ -280,7 +279,6 @@ export const onInvitationAccepted = functions.firestore
         notification: {
           title: "Invitation Accepted",
           body: `${accepterName} accepted your invitation to ${groupName}`,
-          imageUrl: accepterData?.photoUrl,
         },
         data: {
           type: "invitation_accepted",
@@ -432,7 +430,6 @@ export const onGameCreated = functions.firestore
         notification: {
           title: `New Game in ${groupData.name}`,
           body: `${creatorName} created a new game${game.title ? `: ${game.title}` : ""}`,
-          imageUrl: groupData.photoUrl,
         },
         data: {
           type: "game_created",
@@ -607,7 +604,6 @@ export const onMemberJoined = functions.firestore
             notification: {
               title: "New Member Joined",
               body: `${memberName} joined ${after.name}`,
-              imageUrl: newMemberData?.photoUrl,
             },
             data: {
               type: "member_joined",
@@ -973,7 +969,6 @@ export const onFriendRequestSent = functions.firestore
         notification: {
           title: "Friend Request",
           body: `${initiatorName} sent you a friend request`,
-          imageUrl: initiatorData?.photoUrl,
         },
         data: {
           type: "friend_request",
@@ -1157,7 +1152,6 @@ export const onFriendRequestAccepted = functions.firestore
         notification: {
           title: "Friend Request Accepted",
           body: `${recipientName} accepted your friend request`,
-          imageUrl: recipientData?.photoUrl,
         },
         data: {
           type: "friend_accepted",
@@ -1389,7 +1383,18 @@ export const onPlayerJoinedGame = functions.firestore
           .get();
 
         const newPlayerData = newPlayerDoc.data();
-        const playerName = newPlayerData?.displayName || "Someone";
+
+        // Try to get player name in order of preference: firstName + lastName, displayName, email, or "Someone"
+        let playerName = "Someone";
+        if (newPlayerData) {
+          if (newPlayerData.firstName && newPlayerData.lastName) {
+            playerName = `${newPlayerData.firstName} ${newPlayerData.lastName}`;
+          } else if (newPlayerData.displayName) {
+            playerName = newPlayerData.displayName;
+          } else if (newPlayerData.email) {
+            playerName = newPlayerData.email;
+          }
+        }
 
         // Track tokens per user for cleanup
         const userTokenMap = new Map<string, string[]>();
@@ -1463,13 +1468,25 @@ export const onPlayerJoinedGame = functions.firestore
           continue;
         }
 
+        // Format the game date
+        const gameDate = after.scheduledAt?.toDate();
+        let dateStr = "";
+        if (gameDate) {
+          const options: Intl.DateTimeFormatOptions = {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          };
+          dateStr = ` for ${gameDate.toLocaleDateString("en-US", options)}`;
+        }
+
         // Send notification
         const message: admin.messaging.MulticastMessage = {
           tokens: allTokens,
           notification: {
             title: "New Player Joined!",
-            body: `${playerName} joined ${after.title || "the game"}`,
-            imageUrl: newPlayerData?.photoUrl,
+            body: `${playerName} joined ${after.title || "the game"}${dateStr}`,
           },
           data: {
             type: "player_joined",
@@ -1504,6 +1521,22 @@ export const onPlayerJoinedGame = functions.firestore
           successCount: response.successCount,
           failureCount: response.failureCount,
         });
+
+        // Log failures for debugging
+        if (response.failureCount > 0) {
+          response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+              functions.logger.error("Failed to send notification to token", {
+                groupId,
+                gameId,
+                newPlayerId,
+                tokenIndex: idx,
+                error: resp.error?.code,
+                errorMessage: resp.error?.message,
+              });
+            }
+          });
+        }
 
         // Remove invalid tokens
         if (response.failureCount > 0) {
