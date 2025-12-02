@@ -51,8 +51,28 @@ class GameModel with _$GameModel {
   /// Factory constructor for creating from Firestore DocumentSnapshot
   factory GameModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
+    // Convert Firestore Timestamps to DateTime strings for JSON deserialization
+    final jsonData = Map<String, dynamic>.from(data);
+
+    if (data['createdAt'] is Timestamp) {
+      jsonData['createdAt'] = (data['createdAt'] as Timestamp).toDate().toIso8601String();
+    }
+    if (data['scheduledAt'] is Timestamp) {
+      jsonData['scheduledAt'] = (data['scheduledAt'] as Timestamp).toDate().toIso8601String();
+    }
+    if (data['updatedAt'] is Timestamp) {
+      jsonData['updatedAt'] = (data['updatedAt'] as Timestamp).toDate().toIso8601String();
+    }
+    if (data['startedAt'] is Timestamp) {
+      jsonData['startedAt'] = (data['startedAt'] as Timestamp).toDate().toIso8601String();
+    }
+    if (data['endedAt'] is Timestamp) {
+      jsonData['endedAt'] = (data['endedAt'] as Timestamp).toDate().toIso8601String();
+    }
+
     return GameModel.fromJson({
-      ...data,
+      ...jsonData,
       'id': doc.id,
     });
   }
