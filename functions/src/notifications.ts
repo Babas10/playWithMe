@@ -1623,3 +1623,269 @@ export const onPlayerJoinedGame = functions.firestore
       return null;
     }
   });
+
+/**
+ * Send notification when a player leaves a game
+ * Notifies all remaining players except the one who left
+ */
+export const onPlayerLeftGame = functions.firestore
+  .document("games/{gameId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const gameId = context.params.gameId;
+    const gameData = after;
+    const groupId = gameData.groupId; // Get groupId from game document
+
+    const beforePlayers = before.playerIds || [];
+    const afterPlayers = after.playerIds || [];
+
+    // Find players who left (users who were in playerIds before but not now)
+    const leftPlayers = beforePlayers.filter((id: string) => !afterPlayers.includes(id));
+
+    if (leftPlayers.length === 0) {
+      return null;
+    }
+
+    // Don't notify if game is cancelled
+    if (after.status === "cancelled") {
+      functions.logger.info("Game is cancelled, skipping player left notifications", {
+        groupId,
+        gameId,
+      });
+      return null;
+    }
+
+    functions.logger.info("Player(s) left game, processing notifications", {
+      groupId,
+      gameId,
+      leftPlayerCount: leftPlayers.length,
+      leftPlayers,
+    });
+
+    try {
+      // Get remaining players (excluding the ones who left)
+      const remainingPlayers = afterPlayers;
+
+      if (remainingPlayers.length === 0) {
+        functions.logger.info("No remaining players to notify (last player left)", {
+          groupId,
+          gameId,
+        });
+        return null;
+      }
+
+      // Process each player who left
+      for (const leftPlayerId of leftPlayers) {
+        // Get left player's details
+        const leftPlayerDoc = await admin
+          .firestore()
+          .collection("users")
+          .doc(leftPlayerId)
+          .get();
+
+        const leftPlayerData = leftPlayerDoc.data();
+
+        // Try to get player name in order of preference: firstName + lastName, displayName, email, or "Someone"
+        let playerName = "Someone";
+        if (leftPlayerData) {
+          if (leftPlayerData.firstName && leftPlayerData.lastName) {
+            playerName = `${leftPlayerData.firstName} ${leftPlayerData.lastName}`;
+          } else if (leftPlayerData.displayName) {
+            playerName = leftPlayerData.displayName;
+          } else if (leftPlayerData.email) {
+            playerName = leftPlayerData.email;
+          }
+        }
+
+        // Calculate current player count
+        const currentPlayers = afterPlayers.length;
+        const maxPlayers = after.maxPlayers || 8;
+
+        // Track tokens per user for cleanup
+        const userTokenMap = new Map<string, string[]>();
+        const allTokens: string[] = [];
+
+        // Collect FCM tokens from remaining players
+        for (const remainingPlayerId of remainingPlayers) {
+          const playerDoc = await admin
+            .firestore()
+            .collection("users")
+            .doc(remainingPlayerId)
+            .get();
+
+          const playerData = playerDoc.data();
+          if (!playerData) {
+            functions.logger.debug("Player not found", {
+              remainingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          const fcmTokens = playerData.fcmTokens || [];
+          if (fcmTokens.length === 0) {
+            functions.logger.debug("Player has no FCM tokens", {
+              remainingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          const prefs = playerData.notificationPreferences || {};
+
+          // Check global and group-specific preferences
+          const groupPrefs = prefs.groupSpecific?.[groupId];
+          const shouldNotify =
+            groupPrefs?.playerLeft !== false && prefs.playerLeft !== false;
+
+          if (!shouldNotify) {
+            functions.logger.debug("Player has disabled player left notifications", {
+              remainingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          // Check quiet hours
+          if (isQuietHours(prefs.quietHours)) {
+            functions.logger.debug("Player is in quiet hours", {
+              remainingPlayerId,
+              groupId,
+              gameId,
+            });
+            continue;
+          }
+
+          // Add tokens to map for later cleanup if needed
+          userTokenMap.set(remainingPlayerId, fcmTokens);
+          allTokens.push(...fcmTokens);
+        }
+
+        if (allTokens.length === 0) {
+          functions.logger.info("No remaining players to notify for this leaver", {
+            groupId,
+            gameId,
+            leftPlayerId,
+          });
+          continue;
+        }
+
+        // Send notification
+        const message: admin.messaging.MulticastMessage = {
+          tokens: allTokens,
+          notification: {
+            title: "Player Left Game",
+            body: `${playerName} left ${after.title || "the game"} (${currentPlayers}/${maxPlayers} players)`,
+          },
+          data: {
+            type: "player_left",
+            groupId: groupId,
+            gameId: gameId,
+            playerId: leftPlayerId,
+            playerName: playerName,
+            currentPlayers: currentPlayers.toString(),
+            maxPlayers: maxPlayers.toString(),
+          },
+          android: {
+            priority: "high",
+            notification: {
+              channelId: "high_importance_channel",
+              clickAction: "FLUTTER_NOTIFICATION_CLICK",
+            },
+          },
+          apns: {
+            payload: {
+              aps: {
+                badge: 1,
+                sound: "default",
+              },
+            },
+          },
+        };
+
+        const response = await admin.messaging().sendEachForMulticast(message);
+
+        functions.logger.info("Player left notification sent successfully", {
+          groupId,
+          gameId,
+          leftPlayerId,
+          successCount: response.successCount,
+          failureCount: response.failureCount,
+        });
+
+        // Log failures for debugging
+        if (response.failureCount > 0) {
+          response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+              functions.logger.error("Failed to send notification to token", {
+                groupId,
+                gameId,
+                leftPlayerId,
+                tokenIndex: idx,
+                error: resp.error?.code,
+                errorMessage: resp.error?.message,
+              });
+            }
+          });
+        }
+
+        // Remove invalid tokens
+        if (response.failureCount > 0) {
+          const invalidTokensByUser = new Map<string, string[]>();
+
+          response.responses.forEach((resp, idx) => {
+            if (
+              !resp.success &&
+              (resp.error?.code === "messaging/invalid-registration-token" ||
+                resp.error?.code === "messaging/registration-token-not-registered")
+            ) {
+              const invalidToken = allTokens[idx];
+
+              // Find which user this token belongs to
+              for (const [userId, tokens] of userTokenMap.entries()) {
+                if (tokens.includes(invalidToken)) {
+                  if (!invalidTokensByUser.has(userId)) {
+                    invalidTokensByUser.set(userId, []);
+                  }
+                  invalidTokensByUser.get(userId)!.push(invalidToken);
+                  break;
+                }
+              }
+            }
+          });
+
+          // Clean up invalid tokens per user
+          for (const [userId, tokensToRemove] of invalidTokensByUser.entries()) {
+            await admin
+              .firestore()
+              .collection("users")
+              .doc(userId)
+              .update({
+                fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+              });
+
+            functions.logger.info("Removed invalid FCM tokens", {
+              userId,
+              groupId,
+              gameId,
+              removedCount: tokensToRemove.length,
+            });
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      functions.logger.error("Error sending player left notification", {
+        groupId,
+        gameId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return null;
+    }
+  });
