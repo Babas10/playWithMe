@@ -57,6 +57,9 @@ _$GameModelImpl _$$GameModelImplFromJson(
   teams: json['teams'] == null
       ? null
       : GameTeams.fromJson(json['teams'] as Map<String, dynamic>),
+  result: json['result'] == null
+      ? null
+      : GameResult.fromJson(json['result'] as Map<String, dynamic>),
   weatherDependent: json['weatherDependent'] as bool? ?? true,
   weatherNotes: json['weatherNotes'] as String?,
 );
@@ -91,6 +94,7 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'scores': instance.scores,
       'winnerId': instance.winnerId,
       'teams': instance.teams,
+      'result': instance.result,
       'weatherDependent': instance.weatherDependent,
       'weatherNotes': instance.weatherNotes,
     };
@@ -181,4 +185,47 @@ Map<String, dynamic> _$$GameScoreImplToJson(_$GameScoreImpl instance) =>
       'sets': instance.sets,
       'gamesWon': instance.gamesWon,
       'additionalStats': instance.additionalStats,
+    };
+
+_$SetScoreImpl _$$SetScoreImplFromJson(Map<String, dynamic> json) =>
+    _$SetScoreImpl(
+      teamAPoints: (json['teamAPoints'] as num).toInt(),
+      teamBPoints: (json['teamBPoints'] as num).toInt(),
+      setNumber: (json['setNumber'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$$SetScoreImplToJson(_$SetScoreImpl instance) =>
+    <String, dynamic>{
+      'teamAPoints': instance.teamAPoints,
+      'teamBPoints': instance.teamBPoints,
+      'setNumber': instance.setNumber,
+    };
+
+_$IndividualGameImpl _$$IndividualGameImplFromJson(Map<String, dynamic> json) =>
+    _$IndividualGameImpl(
+      gameNumber: (json['gameNumber'] as num).toInt(),
+      sets: const SetScoreListConverter().fromJson(json['sets'] as List),
+      winner: json['winner'] as String,
+    );
+
+Map<String, dynamic> _$$IndividualGameImplToJson(
+  _$IndividualGameImpl instance,
+) => <String, dynamic>{
+  'gameNumber': instance.gameNumber,
+  'sets': const SetScoreListConverter().toJson(instance.sets),
+  'winner': instance.winner,
+};
+
+_$GameResultImpl _$$GameResultImplFromJson(Map<String, dynamic> json) =>
+    _$GameResultImpl(
+      games: const IndividualGameListConverter().fromJson(
+        json['games'] as List,
+      ),
+      overallWinner: json['overallWinner'] as String,
+    );
+
+Map<String, dynamic> _$$GameResultImplToJson(_$GameResultImpl instance) =>
+    <String, dynamic>{
+      'games': const IndividualGameListConverter().toJson(instance.games),
+      'overallWinner': instance.overallWinner,
     };

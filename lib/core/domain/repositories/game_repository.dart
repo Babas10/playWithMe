@@ -76,6 +76,9 @@ abstract class GameRepository {
   /// Update game teams (for completed games)
   Future<void> updateGameTeams(String gameId, String userId, GameTeams teams);
 
+  /// Update game result with final scores (for completed games)
+  Future<void> updateGameResult(String gameId, String userId, GameResult result);
+
   /// Update game scores
   Future<void> updateScores(String gameId, List<GameScore> scores);
 

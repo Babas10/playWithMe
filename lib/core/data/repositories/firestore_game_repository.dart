@@ -427,6 +427,63 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Future<void> updateGameResult(String gameId, String userId, GameResult result) async {
+    try {
+      final currentGame = await getGameById(gameId);
+      if (currentGame == null) {
+        throw Exception('Game not found');
+      }
+
+      // Check if user has permission (creator only for now)
+      if (!currentGame.isCreator(userId)) {
+        throw Exception('Only the game creator can update game result');
+      }
+
+      // Check if game is completed
+      if (currentGame.status != GameStatus.completed) {
+        throw Exception('Can only add result to completed games');
+      }
+
+      // Check if teams are assigned
+      if (currentGame.teams == null) {
+        throw Exception('Teams must be assigned before entering scores');
+      }
+
+      // Validate result
+      if (!result.isValid()) {
+        throw Exception('Invalid game result. Check that all sets are valid and winner is correct.');
+      }
+
+      // Determine winner team and update winnerId
+      String? winnerId;
+      if (currentGame.teams != null) {
+        final winningTeam = currentGame.teams!;
+        if (result.overallWinner == 'teamA' && winningTeam.teamAPlayerIds.isNotEmpty) {
+          // For simplicity, we can set the first player as the "winning team representative"
+          // In a real app, you might want to handle this differently
+          winnerId = result.overallWinner;
+        } else if (result.overallWinner == 'teamB' && winningTeam.teamBPlayerIds.isNotEmpty) {
+          winnerId = result.overallWinner;
+        }
+      }
+
+      // Update game with result
+      final updatedGame = currentGame.copyWith(
+        result: result,
+        winnerId: winnerId,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection(_collection)
+          .doc(gameId)
+          .set(updatedGame.toFirestore(), SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('Failed to update game result: $e');
+    }
+  }
+
+  @override
   Future<void> updateScores(String gameId, List<GameScore> scores) async {
     try {
       final currentGame = await getGameById(gameId);
