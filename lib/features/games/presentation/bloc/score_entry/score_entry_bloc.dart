@@ -153,13 +153,11 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
       return;
     }
 
-    // Update the specific set score
+    // Update the specific set score with both values
     final updatedSets = List<SetScoreData>.from(currentGame.sets);
-    updatedSets[event.setIndex] = updatedSets[event.setIndex].copyWith(
+    updatedSets[event.setIndex] = SetScoreData(
       teamAPoints: event.teamAPoints,
       teamBPoints: event.teamBPoints,
-      clearTeamA: event.teamAPoints == null,
-      clearTeamB: event.teamBPoints == null,
     );
 
     updatedGames[event.gameIndex] = currentGame.copyWith(sets: updatedSets);
