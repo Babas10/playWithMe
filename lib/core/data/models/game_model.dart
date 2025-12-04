@@ -40,6 +40,8 @@ class GameModel with _$GameModel {
     String? winnerId,
     // Teams (for completed games)
     GameTeams? teams,
+    // Game result (for completed games with entered scores)
+    GameResult? result,
     // Weather considerations
     @Default(true) bool weatherDependent,
     String? weatherNotes,
@@ -116,6 +118,11 @@ class GameModel with _$GameModel {
     // Ensure teams is properly serialized
     if (json['teams'] is GameTeams) {
       json['teams'] = (json['teams'] as GameTeams).toJson();
+    }
+
+    // Ensure result is properly serialized
+    if (json['result'] is GameResult) {
+      json['result'] = (json['result'] as GameResult).toJson();
     }
 
     return json;
@@ -422,6 +429,179 @@ class GameScore with _$GameScore {
       _$GameScoreFromJson(json);
 }
 
+/// Represents a single set in a volleyball game
+@freezed
+class SetScore with _$SetScore {
+  const factory SetScore({
+    required int teamAPoints,
+    required int teamBPoints,
+    required int setNumber, // 1, 2, 3, etc.
+  }) = _SetScore;
+
+  const SetScore._();
+
+  factory SetScore.fromJson(Map<String, dynamic> json) =>
+      _$SetScoreFromJson(json);
+
+  /// Validate if the set score is valid for beach volleyball
+  /// Standard rule: First to 21, win by 2
+  bool isValid() {
+    final maxPoints = teamAPoints > teamBPoints ? teamAPoints : teamBPoints;
+    final minPoints = teamAPoints < teamBPoints ? teamAPoints : teamBPoints;
+
+    // Must have a winner
+    if (maxPoints < 21) return false;
+
+    // Win by 2 rule
+    if (maxPoints == 21) {
+      return minPoints <= 19;
+    }
+
+    // Extended set (e.g., 22-20, 23-21, etc.)
+    return (maxPoints - minPoints) == 2;
+  }
+
+  /// Get the winner of this set (teamA or teamB)
+  String? get winner {
+    if (!isValid()) return null;
+    return teamAPoints > teamBPoints ? 'teamA' : 'teamB';
+  }
+}
+
+/// Represents a single game played during a session
+/// Most commonly a single set (first to 21), but can be best-of format
+@freezed
+class IndividualGame with _$IndividualGame {
+  const factory IndividualGame({
+    required int gameNumber, // 1, 2, 3, etc. within the session
+    @SetScoreListConverter() required List<SetScore> sets,
+    required String winner, // 'teamA' or 'teamB'
+  }) = _IndividualGame;
+
+  const IndividualGame._();
+
+  factory IndividualGame.fromJson(Map<String, dynamic> json) =>
+      _$IndividualGameFromJson(json);
+
+  /// Validate the individual game
+  bool isValid() {
+    // Must have at least 1 set
+    if (sets.isEmpty) return false;
+
+    // All sets must be valid
+    if (!sets.every((set) => set.isValid())) return false;
+
+    // Verify set numbers are sequential
+    for (int i = 0; i < sets.length; i++) {
+      if (sets[i].setNumber != i + 1) return false;
+    }
+
+    // Count wins for each team
+    int teamAWins = 0;
+    int teamBWins = 0;
+
+    for (final set in sets) {
+      if (set.winner == 'teamA') {
+        teamAWins++;
+      } else if (set.winner == 'teamB') {
+        teamBWins++;
+      }
+    }
+
+    // Winner must have won the majority of sets
+    final requiredWins = (sets.length / 2).ceil();
+    if (winner == 'teamA') {
+      return teamAWins >= requiredWins;
+    } else if (winner == 'teamB') {
+      return teamBWins >= requiredWins;
+    }
+
+    return false;
+  }
+
+  /// Get the number of sets won by each team
+  Map<String, int> get setsWon {
+    int teamAWins = 0;
+    int teamBWins = 0;
+
+    for (final set in sets) {
+      if (set.winner == 'teamA') {
+        teamAWins++;
+      } else if (set.winner == 'teamB') {
+        teamBWins++;
+      }
+    }
+
+    return {'teamA': teamAWins, 'teamB': teamBWins};
+  }
+}
+
+/// Represents the complete result of a play session
+/// Contains all individual games played during the session
+@freezed
+class GameResult with _$GameResult {
+  const factory GameResult({
+    @IndividualGameListConverter() required List<IndividualGame> games,
+    required String overallWinner, // 'teamA' or 'teamB' - who won more games
+  }) = _GameResult;
+
+  const GameResult._();
+
+  factory GameResult.fromJson(Map<String, dynamic> json) =>
+      _$GameResultFromJson(json);
+
+  /// Validate the entire session result
+  bool isValid() {
+    // Must have at least 1 game
+    if (games.isEmpty) return false;
+
+    // All games must be valid
+    if (!games.every((game) => game.isValid())) return false;
+
+    // Verify game numbers are sequential
+    for (int i = 0; i < games.length; i++) {
+      if (games[i].gameNumber != i + 1) return false;
+    }
+
+    // Count wins for each team
+    final wins = gamesWon;
+
+    // Overall winner must have won more games
+    if (overallWinner == 'teamA') {
+      return wins['teamA']! > wins['teamB']!;
+    } else if (overallWinner == 'teamB') {
+      return wins['teamB']! > wins['teamA']!;
+    }
+
+    return false;
+  }
+
+  /// Get the number of games won by each team
+  Map<String, int> get gamesWon {
+    int teamAWins = 0;
+    int teamBWins = 0;
+
+    for (final game in games) {
+      if (game.winner == 'teamA') {
+        teamAWins++;
+      } else if (game.winner == 'teamB') {
+        teamBWins++;
+      }
+    }
+
+    return {'teamA': teamAWins, 'teamB': teamBWins};
+  }
+
+  /// Get total number of games played
+  int get totalGames => games.length;
+
+  /// Get the score summary (e.g., "4-2" for Team A winning 4-2)
+  String get scoreDescription {
+    final wins = gamesWon;
+    return '${wins['teamA']}-${wins['teamB']}';
+  }
+}
+
 enum GameStatus {
   @JsonValue('scheduled')
   scheduled,
@@ -483,5 +663,35 @@ class TimestampConverter implements JsonConverter<DateTime?, Object?> {
   Object? toJson(DateTime? object) {
     if (object == null) return null;
     return Timestamp.fromDate(object);
+  }
+}
+
+/// Custom converter for List<SetScore> to handle proper JSON serialization
+class SetScoreListConverter implements JsonConverter<List<SetScore>, List<dynamic>> {
+  const SetScoreListConverter();
+
+  @override
+  List<SetScore> fromJson(List<dynamic> json) {
+    return json.map((e) => SetScore.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  List<dynamic> toJson(List<SetScore> object) {
+    return object.map((e) => e.toJson()).toList();
+  }
+}
+
+/// Custom converter for List<IndividualGame> to handle proper JSON serialization
+class IndividualGameListConverter implements JsonConverter<List<IndividualGame>, List<dynamic>> {
+  const IndividualGameListConverter();
+
+  @override
+  List<IndividualGame> fromJson(List<dynamic> json) {
+    return json.map((e) => IndividualGame.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  List<dynamic> toJson(List<IndividualGame> object) {
+    return object.map((e) => e.toJson()).toList();
   }
 }

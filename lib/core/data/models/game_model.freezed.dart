@@ -59,6 +59,8 @@ mixin _$GameModel {
   String? get winnerId =>
       throw _privateConstructorUsedError; // Teams (for completed games)
   GameTeams? get teams =>
+      throw _privateConstructorUsedError; // Game result (for completed games with entered scores)
+  GameResult? get result =>
       throw _privateConstructorUsedError; // Weather considerations
   bool get weatherDependent => throw _privateConstructorUsedError;
   String? get weatherNotes => throw _privateConstructorUsedError;
@@ -107,12 +109,14 @@ abstract class $GameModelCopyWith<$Res> {
     List<GameScore> scores,
     String? winnerId,
     GameTeams? teams,
+    GameResult? result,
     bool weatherDependent,
     String? weatherNotes,
   });
 
   $GameLocationCopyWith<$Res> get location;
   $GameTeamsCopyWith<$Res>? get teams;
+  $GameResultCopyWith<$Res>? get result;
 }
 
 /// @nodoc
@@ -158,6 +162,7 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? scores = null,
     Object? winnerId = freezed,
     Object? teams = freezed,
+    Object? result = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
   }) {
@@ -275,6 +280,10 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.teams
                 : teams // ignore: cast_nullable_to_non_nullable
                       as GameTeams?,
+            result: freezed == result
+                ? _value.result
+                : result // ignore: cast_nullable_to_non_nullable
+                      as GameResult?,
             weatherDependent: null == weatherDependent
                 ? _value.weatherDependent
                 : weatherDependent // ignore: cast_nullable_to_non_nullable
@@ -309,6 +318,20 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
 
     return $GameTeamsCopyWith<$Res>(_value.teams!, (value) {
       return _then(_value.copyWith(teams: value) as $Val);
+    });
+  }
+
+  /// Create a copy of GameModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GameResultCopyWith<$Res>? get result {
+    if (_value.result == null) {
+      return null;
+    }
+
+    return $GameResultCopyWith<$Res>(_value.result!, (value) {
+      return _then(_value.copyWith(result: value) as $Val);
     });
   }
 }
@@ -351,6 +374,7 @@ abstract class _$$GameModelImplCopyWith<$Res>
     List<GameScore> scores,
     String? winnerId,
     GameTeams? teams,
+    GameResult? result,
     bool weatherDependent,
     String? weatherNotes,
   });
@@ -359,6 +383,8 @@ abstract class _$$GameModelImplCopyWith<$Res>
   $GameLocationCopyWith<$Res> get location;
   @override
   $GameTeamsCopyWith<$Res>? get teams;
+  @override
+  $GameResultCopyWith<$Res>? get result;
 }
 
 /// @nodoc
@@ -403,6 +429,7 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? scores = null,
     Object? winnerId = freezed,
     Object? teams = freezed,
+    Object? result = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
   }) {
@@ -520,6 +547,10 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.teams
             : teams // ignore: cast_nullable_to_non_nullable
                   as GameTeams?,
+        result: freezed == result
+            ? _value.result
+            : result // ignore: cast_nullable_to_non_nullable
+                  as GameResult?,
         weatherDependent: null == weatherDependent
             ? _value.weatherDependent
             : weatherDependent // ignore: cast_nullable_to_non_nullable
@@ -565,6 +596,7 @@ class _$GameModelImpl extends _GameModel {
     final List<GameScore> scores = const [],
     this.winnerId,
     this.teams,
+    this.result,
     this.weatherDependent = true,
     this.weatherNotes,
   }) : _playerIds = playerIds,
@@ -677,6 +709,9 @@ class _$GameModelImpl extends _GameModel {
   // Teams (for completed games)
   @override
   final GameTeams? teams;
+  // Game result (for completed games with entered scores)
+  @override
+  final GameResult? result;
   // Weather considerations
   @override
   @JsonKey()
@@ -686,7 +721,7 @@ class _$GameModelImpl extends _GameModel {
 
   @override
   String toString() {
-    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
+    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
   }
 
   @override
@@ -748,6 +783,7 @@ class _$GameModelImpl extends _GameModel {
             (identical(other.winnerId, winnerId) ||
                 other.winnerId == winnerId) &&
             (identical(other.teams, teams) || other.teams == teams) &&
+            (identical(other.result, result) || other.result == result) &&
             (identical(other.weatherDependent, weatherDependent) ||
                 other.weatherDependent == weatherDependent) &&
             (identical(other.weatherNotes, weatherNotes) ||
@@ -786,6 +822,7 @@ class _$GameModelImpl extends _GameModel {
     const DeepCollectionEquality().hash(_scores),
     winnerId,
     teams,
+    result,
     weatherDependent,
     weatherNotes,
   ]);
@@ -834,6 +871,7 @@ abstract class _GameModel extends GameModel {
     final List<GameScore> scores,
     final String? winnerId,
     final GameTeams? teams,
+    final GameResult? result,
     final bool weatherDependent,
     final String? weatherNotes,
   }) = _$GameModelImpl;
@@ -902,7 +940,9 @@ abstract class _GameModel extends GameModel {
   @override
   String? get winnerId; // Teams (for completed games)
   @override
-  GameTeams? get teams; // Weather considerations
+  GameTeams? get teams; // Game result (for completed games with entered scores)
+  @override
+  GameResult? get result; // Weather considerations
   @override
   bool get weatherDependent;
   @override
@@ -1668,5 +1708,622 @@ abstract class _GameScore implements GameScore {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GameScoreImplCopyWith<_$GameScoreImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+SetScore _$SetScoreFromJson(Map<String, dynamic> json) {
+  return _SetScore.fromJson(json);
+}
+
+/// @nodoc
+mixin _$SetScore {
+  int get teamAPoints => throw _privateConstructorUsedError;
+  int get teamBPoints => throw _privateConstructorUsedError;
+  int get setNumber => throw _privateConstructorUsedError;
+
+  /// Serializes this SetScore to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of SetScore
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SetScoreCopyWith<SetScore> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SetScoreCopyWith<$Res> {
+  factory $SetScoreCopyWith(SetScore value, $Res Function(SetScore) then) =
+      _$SetScoreCopyWithImpl<$Res, SetScore>;
+  @useResult
+  $Res call({int teamAPoints, int teamBPoints, int setNumber});
+}
+
+/// @nodoc
+class _$SetScoreCopyWithImpl<$Res, $Val extends SetScore>
+    implements $SetScoreCopyWith<$Res> {
+  _$SetScoreCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of SetScore
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? teamAPoints = null,
+    Object? teamBPoints = null,
+    Object? setNumber = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            teamAPoints: null == teamAPoints
+                ? _value.teamAPoints
+                : teamAPoints // ignore: cast_nullable_to_non_nullable
+                      as int,
+            teamBPoints: null == teamBPoints
+                ? _value.teamBPoints
+                : teamBPoints // ignore: cast_nullable_to_non_nullable
+                      as int,
+            setNumber: null == setNumber
+                ? _value.setNumber
+                : setNumber // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$SetScoreImplCopyWith<$Res>
+    implements $SetScoreCopyWith<$Res> {
+  factory _$$SetScoreImplCopyWith(
+    _$SetScoreImpl value,
+    $Res Function(_$SetScoreImpl) then,
+  ) = __$$SetScoreImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int teamAPoints, int teamBPoints, int setNumber});
+}
+
+/// @nodoc
+class __$$SetScoreImplCopyWithImpl<$Res>
+    extends _$SetScoreCopyWithImpl<$Res, _$SetScoreImpl>
+    implements _$$SetScoreImplCopyWith<$Res> {
+  __$$SetScoreImplCopyWithImpl(
+    _$SetScoreImpl _value,
+    $Res Function(_$SetScoreImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of SetScore
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? teamAPoints = null,
+    Object? teamBPoints = null,
+    Object? setNumber = null,
+  }) {
+    return _then(
+      _$SetScoreImpl(
+        teamAPoints: null == teamAPoints
+            ? _value.teamAPoints
+            : teamAPoints // ignore: cast_nullable_to_non_nullable
+                  as int,
+        teamBPoints: null == teamBPoints
+            ? _value.teamBPoints
+            : teamBPoints // ignore: cast_nullable_to_non_nullable
+                  as int,
+        setNumber: null == setNumber
+            ? _value.setNumber
+            : setNumber // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$SetScoreImpl extends _SetScore {
+  const _$SetScoreImpl({
+    required this.teamAPoints,
+    required this.teamBPoints,
+    required this.setNumber,
+  }) : super._();
+
+  factory _$SetScoreImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SetScoreImplFromJson(json);
+
+  @override
+  final int teamAPoints;
+  @override
+  final int teamBPoints;
+  @override
+  final int setNumber;
+
+  @override
+  String toString() {
+    return 'SetScore(teamAPoints: $teamAPoints, teamBPoints: $teamBPoints, setNumber: $setNumber)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SetScoreImpl &&
+            (identical(other.teamAPoints, teamAPoints) ||
+                other.teamAPoints == teamAPoints) &&
+            (identical(other.teamBPoints, teamBPoints) ||
+                other.teamBPoints == teamBPoints) &&
+            (identical(other.setNumber, setNumber) ||
+                other.setNumber == setNumber));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, teamAPoints, teamBPoints, setNumber);
+
+  /// Create a copy of SetScore
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SetScoreImplCopyWith<_$SetScoreImpl> get copyWith =>
+      __$$SetScoreImplCopyWithImpl<_$SetScoreImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$SetScoreImplToJson(this);
+  }
+}
+
+abstract class _SetScore extends SetScore {
+  const factory _SetScore({
+    required final int teamAPoints,
+    required final int teamBPoints,
+    required final int setNumber,
+  }) = _$SetScoreImpl;
+  const _SetScore._() : super._();
+
+  factory _SetScore.fromJson(Map<String, dynamic> json) =
+      _$SetScoreImpl.fromJson;
+
+  @override
+  int get teamAPoints;
+  @override
+  int get teamBPoints;
+  @override
+  int get setNumber;
+
+  /// Create a copy of SetScore
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SetScoreImplCopyWith<_$SetScoreImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+IndividualGame _$IndividualGameFromJson(Map<String, dynamic> json) {
+  return _IndividualGame.fromJson(json);
+}
+
+/// @nodoc
+mixin _$IndividualGame {
+  int get gameNumber =>
+      throw _privateConstructorUsedError; // 1, 2, 3, etc. within the session
+  @SetScoreListConverter()
+  List<SetScore> get sets => throw _privateConstructorUsedError;
+  String get winner => throw _privateConstructorUsedError;
+
+  /// Serializes this IndividualGame to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of IndividualGame
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $IndividualGameCopyWith<IndividualGame> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $IndividualGameCopyWith<$Res> {
+  factory $IndividualGameCopyWith(
+    IndividualGame value,
+    $Res Function(IndividualGame) then,
+  ) = _$IndividualGameCopyWithImpl<$Res, IndividualGame>;
+  @useResult
+  $Res call({
+    int gameNumber,
+    @SetScoreListConverter() List<SetScore> sets,
+    String winner,
+  });
+}
+
+/// @nodoc
+class _$IndividualGameCopyWithImpl<$Res, $Val extends IndividualGame>
+    implements $IndividualGameCopyWith<$Res> {
+  _$IndividualGameCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of IndividualGame
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? gameNumber = null,
+    Object? sets = null,
+    Object? winner = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            gameNumber: null == gameNumber
+                ? _value.gameNumber
+                : gameNumber // ignore: cast_nullable_to_non_nullable
+                      as int,
+            sets: null == sets
+                ? _value.sets
+                : sets // ignore: cast_nullable_to_non_nullable
+                      as List<SetScore>,
+            winner: null == winner
+                ? _value.winner
+                : winner // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$IndividualGameImplCopyWith<$Res>
+    implements $IndividualGameCopyWith<$Res> {
+  factory _$$IndividualGameImplCopyWith(
+    _$IndividualGameImpl value,
+    $Res Function(_$IndividualGameImpl) then,
+  ) = __$$IndividualGameImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    int gameNumber,
+    @SetScoreListConverter() List<SetScore> sets,
+    String winner,
+  });
+}
+
+/// @nodoc
+class __$$IndividualGameImplCopyWithImpl<$Res>
+    extends _$IndividualGameCopyWithImpl<$Res, _$IndividualGameImpl>
+    implements _$$IndividualGameImplCopyWith<$Res> {
+  __$$IndividualGameImplCopyWithImpl(
+    _$IndividualGameImpl _value,
+    $Res Function(_$IndividualGameImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of IndividualGame
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? gameNumber = null,
+    Object? sets = null,
+    Object? winner = null,
+  }) {
+    return _then(
+      _$IndividualGameImpl(
+        gameNumber: null == gameNumber
+            ? _value.gameNumber
+            : gameNumber // ignore: cast_nullable_to_non_nullable
+                  as int,
+        sets: null == sets
+            ? _value._sets
+            : sets // ignore: cast_nullable_to_non_nullable
+                  as List<SetScore>,
+        winner: null == winner
+            ? _value.winner
+            : winner // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$IndividualGameImpl extends _IndividualGame {
+  const _$IndividualGameImpl({
+    required this.gameNumber,
+    @SetScoreListConverter() required final List<SetScore> sets,
+    required this.winner,
+  }) : _sets = sets,
+       super._();
+
+  factory _$IndividualGameImpl.fromJson(Map<String, dynamic> json) =>
+      _$$IndividualGameImplFromJson(json);
+
+  @override
+  final int gameNumber;
+  // 1, 2, 3, etc. within the session
+  final List<SetScore> _sets;
+  // 1, 2, 3, etc. within the session
+  @override
+  @SetScoreListConverter()
+  List<SetScore> get sets {
+    if (_sets is EqualUnmodifiableListView) return _sets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sets);
+  }
+
+  @override
+  final String winner;
+
+  @override
+  String toString() {
+    return 'IndividualGame(gameNumber: $gameNumber, sets: $sets, winner: $winner)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$IndividualGameImpl &&
+            (identical(other.gameNumber, gameNumber) ||
+                other.gameNumber == gameNumber) &&
+            const DeepCollectionEquality().equals(other._sets, _sets) &&
+            (identical(other.winner, winner) || other.winner == winner));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    gameNumber,
+    const DeepCollectionEquality().hash(_sets),
+    winner,
+  );
+
+  /// Create a copy of IndividualGame
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$IndividualGameImplCopyWith<_$IndividualGameImpl> get copyWith =>
+      __$$IndividualGameImplCopyWithImpl<_$IndividualGameImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$IndividualGameImplToJson(this);
+  }
+}
+
+abstract class _IndividualGame extends IndividualGame {
+  const factory _IndividualGame({
+    required final int gameNumber,
+    @SetScoreListConverter() required final List<SetScore> sets,
+    required final String winner,
+  }) = _$IndividualGameImpl;
+  const _IndividualGame._() : super._();
+
+  factory _IndividualGame.fromJson(Map<String, dynamic> json) =
+      _$IndividualGameImpl.fromJson;
+
+  @override
+  int get gameNumber; // 1, 2, 3, etc. within the session
+  @override
+  @SetScoreListConverter()
+  List<SetScore> get sets;
+  @override
+  String get winner;
+
+  /// Create a copy of IndividualGame
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$IndividualGameImplCopyWith<_$IndividualGameImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+GameResult _$GameResultFromJson(Map<String, dynamic> json) {
+  return _GameResult.fromJson(json);
+}
+
+/// @nodoc
+mixin _$GameResult {
+  @IndividualGameListConverter()
+  List<IndividualGame> get games => throw _privateConstructorUsedError;
+  String get overallWinner => throw _privateConstructorUsedError;
+
+  /// Serializes this GameResult to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of GameResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $GameResultCopyWith<GameResult> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $GameResultCopyWith<$Res> {
+  factory $GameResultCopyWith(
+    GameResult value,
+    $Res Function(GameResult) then,
+  ) = _$GameResultCopyWithImpl<$Res, GameResult>;
+  @useResult
+  $Res call({
+    @IndividualGameListConverter() List<IndividualGame> games,
+    String overallWinner,
+  });
+}
+
+/// @nodoc
+class _$GameResultCopyWithImpl<$Res, $Val extends GameResult>
+    implements $GameResultCopyWith<$Res> {
+  _$GameResultCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of GameResult
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? games = null, Object? overallWinner = null}) {
+    return _then(
+      _value.copyWith(
+            games: null == games
+                ? _value.games
+                : games // ignore: cast_nullable_to_non_nullable
+                      as List<IndividualGame>,
+            overallWinner: null == overallWinner
+                ? _value.overallWinner
+                : overallWinner // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$GameResultImplCopyWith<$Res>
+    implements $GameResultCopyWith<$Res> {
+  factory _$$GameResultImplCopyWith(
+    _$GameResultImpl value,
+    $Res Function(_$GameResultImpl) then,
+  ) = __$$GameResultImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    @IndividualGameListConverter() List<IndividualGame> games,
+    String overallWinner,
+  });
+}
+
+/// @nodoc
+class __$$GameResultImplCopyWithImpl<$Res>
+    extends _$GameResultCopyWithImpl<$Res, _$GameResultImpl>
+    implements _$$GameResultImplCopyWith<$Res> {
+  __$$GameResultImplCopyWithImpl(
+    _$GameResultImpl _value,
+    $Res Function(_$GameResultImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of GameResult
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? games = null, Object? overallWinner = null}) {
+    return _then(
+      _$GameResultImpl(
+        games: null == games
+            ? _value._games
+            : games // ignore: cast_nullable_to_non_nullable
+                  as List<IndividualGame>,
+        overallWinner: null == overallWinner
+            ? _value.overallWinner
+            : overallWinner // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$GameResultImpl extends _GameResult {
+  const _$GameResultImpl({
+    @IndividualGameListConverter() required final List<IndividualGame> games,
+    required this.overallWinner,
+  }) : _games = games,
+       super._();
+
+  factory _$GameResultImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GameResultImplFromJson(json);
+
+  final List<IndividualGame> _games;
+  @override
+  @IndividualGameListConverter()
+  List<IndividualGame> get games {
+    if (_games is EqualUnmodifiableListView) return _games;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_games);
+  }
+
+  @override
+  final String overallWinner;
+
+  @override
+  String toString() {
+    return 'GameResult(games: $games, overallWinner: $overallWinner)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$GameResultImpl &&
+            const DeepCollectionEquality().equals(other._games, _games) &&
+            (identical(other.overallWinner, overallWinner) ||
+                other.overallWinner == overallWinner));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    const DeepCollectionEquality().hash(_games),
+    overallWinner,
+  );
+
+  /// Create a copy of GameResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$GameResultImplCopyWith<_$GameResultImpl> get copyWith =>
+      __$$GameResultImplCopyWithImpl<_$GameResultImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$GameResultImplToJson(this);
+  }
+}
+
+abstract class _GameResult extends GameResult {
+  const factory _GameResult({
+    @IndividualGameListConverter() required final List<IndividualGame> games,
+    required final String overallWinner,
+  }) = _$GameResultImpl;
+  const _GameResult._() : super._();
+
+  factory _GameResult.fromJson(Map<String, dynamic> json) =
+      _$GameResultImpl.fromJson;
+
+  @override
+  @IndividualGameListConverter()
+  List<IndividualGame> get games;
+  @override
+  String get overallWinner;
+
+  /// Create a copy of GameResult
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$GameResultImplCopyWith<_$GameResultImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

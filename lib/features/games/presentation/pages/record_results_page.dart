@@ -8,6 +8,7 @@ import '../../../auth/presentation/bloc/authentication/authentication_state.dart
 import '../bloc/record_results/record_results_bloc.dart';
 import '../bloc/record_results/record_results_event.dart';
 import '../bloc/record_results/record_results_state.dart';
+import 'score_entry_page.dart';
 
 class RecordResultsPage extends StatelessWidget {
   final String gameId;
@@ -49,7 +50,12 @@ class _RecordResultsView extends StatelessWidget {
                 backgroundColor: Colors.green,
               ),
             );
-            Navigator.of(context).pop();
+            // Navigate to score entry page
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => ScoreEntryPage(gameId: state.game.id),
+              ),
+            );
           } else if (state is RecordResultsError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
