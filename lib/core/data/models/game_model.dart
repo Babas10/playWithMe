@@ -113,6 +113,11 @@ class GameModel with _$GameModel {
           .toList();
     }
 
+    // Ensure teams is properly serialized
+    if (json['teams'] is GameTeams) {
+      json['teams'] = (json['teams'] as GameTeams).toJson();
+    }
+
     return json;
   }
 
