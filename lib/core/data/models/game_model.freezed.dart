@@ -57,6 +57,8 @@ mixin _$GameModel {
       throw _privateConstructorUsedError; // Scoring
   List<GameScore> get scores => throw _privateConstructorUsedError;
   String? get winnerId =>
+      throw _privateConstructorUsedError; // Teams (for completed games)
+  GameTeams? get teams =>
       throw _privateConstructorUsedError; // Weather considerations
   bool get weatherDependent => throw _privateConstructorUsedError;
   String? get weatherNotes => throw _privateConstructorUsedError;
@@ -104,11 +106,13 @@ abstract class $GameModelCopyWith<$Res> {
     GameSkillLevel? skillLevel,
     List<GameScore> scores,
     String? winnerId,
+    GameTeams? teams,
     bool weatherDependent,
     String? weatherNotes,
   });
 
   $GameLocationCopyWith<$Res> get location;
+  $GameTeamsCopyWith<$Res>? get teams;
 }
 
 /// @nodoc
@@ -153,6 +157,7 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? skillLevel = freezed,
     Object? scores = null,
     Object? winnerId = freezed,
+    Object? teams = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
   }) {
@@ -266,6 +271,10 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.winnerId
                 : winnerId // ignore: cast_nullable_to_non_nullable
                       as String?,
+            teams: freezed == teams
+                ? _value.teams
+                : teams // ignore: cast_nullable_to_non_nullable
+                      as GameTeams?,
             weatherDependent: null == weatherDependent
                 ? _value.weatherDependent
                 : weatherDependent // ignore: cast_nullable_to_non_nullable
@@ -286,6 +295,20 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
   $GameLocationCopyWith<$Res> get location {
     return $GameLocationCopyWith<$Res>(_value.location, (value) {
       return _then(_value.copyWith(location: value) as $Val);
+    });
+  }
+
+  /// Create a copy of GameModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GameTeamsCopyWith<$Res>? get teams {
+    if (_value.teams == null) {
+      return null;
+    }
+
+    return $GameTeamsCopyWith<$Res>(_value.teams!, (value) {
+      return _then(_value.copyWith(teams: value) as $Val);
     });
   }
 }
@@ -327,12 +350,15 @@ abstract class _$$GameModelImplCopyWith<$Res>
     GameSkillLevel? skillLevel,
     List<GameScore> scores,
     String? winnerId,
+    GameTeams? teams,
     bool weatherDependent,
     String? weatherNotes,
   });
 
   @override
   $GameLocationCopyWith<$Res> get location;
+  @override
+  $GameTeamsCopyWith<$Res>? get teams;
 }
 
 /// @nodoc
@@ -376,6 +402,7 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? skillLevel = freezed,
     Object? scores = null,
     Object? winnerId = freezed,
+    Object? teams = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
   }) {
@@ -489,6 +516,10 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.winnerId
             : winnerId // ignore: cast_nullable_to_non_nullable
                   as String?,
+        teams: freezed == teams
+            ? _value.teams
+            : teams // ignore: cast_nullable_to_non_nullable
+                  as GameTeams?,
         weatherDependent: null == weatherDependent
             ? _value.weatherDependent
             : weatherDependent // ignore: cast_nullable_to_non_nullable
@@ -533,6 +564,7 @@ class _$GameModelImpl extends _GameModel {
     this.skillLevel,
     final List<GameScore> scores = const [],
     this.winnerId,
+    this.teams,
     this.weatherDependent = true,
     this.weatherNotes,
   }) : _playerIds = playerIds,
@@ -642,6 +674,9 @@ class _$GameModelImpl extends _GameModel {
 
   @override
   final String? winnerId;
+  // Teams (for completed games)
+  @override
+  final GameTeams? teams;
   // Weather considerations
   @override
   @JsonKey()
@@ -651,7 +686,7 @@ class _$GameModelImpl extends _GameModel {
 
   @override
   String toString() {
-    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
+    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
   }
 
   @override
@@ -712,6 +747,7 @@ class _$GameModelImpl extends _GameModel {
             const DeepCollectionEquality().equals(other._scores, _scores) &&
             (identical(other.winnerId, winnerId) ||
                 other.winnerId == winnerId) &&
+            (identical(other.teams, teams) || other.teams == teams) &&
             (identical(other.weatherDependent, weatherDependent) ||
                 other.weatherDependent == weatherDependent) &&
             (identical(other.weatherNotes, weatherNotes) ||
@@ -749,6 +785,7 @@ class _$GameModelImpl extends _GameModel {
     skillLevel,
     const DeepCollectionEquality().hash(_scores),
     winnerId,
+    teams,
     weatherDependent,
     weatherNotes,
   ]);
@@ -796,6 +833,7 @@ abstract class _GameModel extends GameModel {
     final GameSkillLevel? skillLevel,
     final List<GameScore> scores,
     final String? winnerId,
+    final GameTeams? teams,
     final bool weatherDependent,
     final String? weatherNotes,
   }) = _$GameModelImpl;
@@ -862,7 +900,9 @@ abstract class _GameModel extends GameModel {
   @override
   List<GameScore> get scores;
   @override
-  String? get winnerId; // Weather considerations
+  String? get winnerId; // Teams (for completed games)
+  @override
+  GameTeams? get teams; // Weather considerations
   @override
   bool get weatherDependent;
   @override
@@ -873,6 +913,201 @@ abstract class _GameModel extends GameModel {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GameModelImplCopyWith<_$GameModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+GameTeams _$GameTeamsFromJson(Map<String, dynamic> json) {
+  return _GameTeams.fromJson(json);
+}
+
+/// @nodoc
+mixin _$GameTeams {
+  List<String> get teamAPlayerIds => throw _privateConstructorUsedError;
+  List<String> get teamBPlayerIds => throw _privateConstructorUsedError;
+
+  /// Serializes this GameTeams to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of GameTeams
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $GameTeamsCopyWith<GameTeams> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $GameTeamsCopyWith<$Res> {
+  factory $GameTeamsCopyWith(GameTeams value, $Res Function(GameTeams) then) =
+      _$GameTeamsCopyWithImpl<$Res, GameTeams>;
+  @useResult
+  $Res call({List<String> teamAPlayerIds, List<String> teamBPlayerIds});
+}
+
+/// @nodoc
+class _$GameTeamsCopyWithImpl<$Res, $Val extends GameTeams>
+    implements $GameTeamsCopyWith<$Res> {
+  _$GameTeamsCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of GameTeams
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? teamAPlayerIds = null, Object? teamBPlayerIds = null}) {
+    return _then(
+      _value.copyWith(
+            teamAPlayerIds: null == teamAPlayerIds
+                ? _value.teamAPlayerIds
+                : teamAPlayerIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            teamBPlayerIds: null == teamBPlayerIds
+                ? _value.teamBPlayerIds
+                : teamBPlayerIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$GameTeamsImplCopyWith<$Res>
+    implements $GameTeamsCopyWith<$Res> {
+  factory _$$GameTeamsImplCopyWith(
+    _$GameTeamsImpl value,
+    $Res Function(_$GameTeamsImpl) then,
+  ) = __$$GameTeamsImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<String> teamAPlayerIds, List<String> teamBPlayerIds});
+}
+
+/// @nodoc
+class __$$GameTeamsImplCopyWithImpl<$Res>
+    extends _$GameTeamsCopyWithImpl<$Res, _$GameTeamsImpl>
+    implements _$$GameTeamsImplCopyWith<$Res> {
+  __$$GameTeamsImplCopyWithImpl(
+    _$GameTeamsImpl _value,
+    $Res Function(_$GameTeamsImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of GameTeams
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? teamAPlayerIds = null, Object? teamBPlayerIds = null}) {
+    return _then(
+      _$GameTeamsImpl(
+        teamAPlayerIds: null == teamAPlayerIds
+            ? _value._teamAPlayerIds
+            : teamAPlayerIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        teamBPlayerIds: null == teamBPlayerIds
+            ? _value._teamBPlayerIds
+            : teamBPlayerIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$GameTeamsImpl extends _GameTeams {
+  const _$GameTeamsImpl({
+    final List<String> teamAPlayerIds = const [],
+    final List<String> teamBPlayerIds = const [],
+  }) : _teamAPlayerIds = teamAPlayerIds,
+       _teamBPlayerIds = teamBPlayerIds,
+       super._();
+
+  factory _$GameTeamsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GameTeamsImplFromJson(json);
+
+  final List<String> _teamAPlayerIds;
+  @override
+  @JsonKey()
+  List<String> get teamAPlayerIds {
+    if (_teamAPlayerIds is EqualUnmodifiableListView) return _teamAPlayerIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_teamAPlayerIds);
+  }
+
+  final List<String> _teamBPlayerIds;
+  @override
+  @JsonKey()
+  List<String> get teamBPlayerIds {
+    if (_teamBPlayerIds is EqualUnmodifiableListView) return _teamBPlayerIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_teamBPlayerIds);
+  }
+
+  @override
+  String toString() {
+    return 'GameTeams(teamAPlayerIds: $teamAPlayerIds, teamBPlayerIds: $teamBPlayerIds)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$GameTeamsImpl &&
+            const DeepCollectionEquality().equals(
+              other._teamAPlayerIds,
+              _teamAPlayerIds,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._teamBPlayerIds,
+              _teamBPlayerIds,
+            ));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    const DeepCollectionEquality().hash(_teamAPlayerIds),
+    const DeepCollectionEquality().hash(_teamBPlayerIds),
+  );
+
+  /// Create a copy of GameTeams
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$GameTeamsImplCopyWith<_$GameTeamsImpl> get copyWith =>
+      __$$GameTeamsImplCopyWithImpl<_$GameTeamsImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$GameTeamsImplToJson(this);
+  }
+}
+
+abstract class _GameTeams extends GameTeams {
+  const factory _GameTeams({
+    final List<String> teamAPlayerIds,
+    final List<String> teamBPlayerIds,
+  }) = _$GameTeamsImpl;
+  const _GameTeams._() : super._();
+
+  factory _GameTeams.fromJson(Map<String, dynamic> json) =
+      _$GameTeamsImpl.fromJson;
+
+  @override
+  List<String> get teamAPlayerIds;
+  @override
+  List<String> get teamBPlayerIds;
+
+  /// Create a copy of GameTeams
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$GameTeamsImplCopyWith<_$GameTeamsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

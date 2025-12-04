@@ -384,6 +384,49 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Future<void> updateGameTeams(String gameId, String userId, GameTeams teams) async {
+    try {
+      final currentGame = await getGameById(gameId);
+      if (currentGame == null) {
+        throw Exception('Game not found');
+      }
+
+      // Check if user has permission (creator only for now)
+      if (!currentGame.isCreator(userId)) {
+        throw Exception('Only the game creator can update teams');
+      }
+
+      // Check if game is completed
+      if (currentGame.status != GameStatus.completed) {
+        throw Exception('Can only assign teams to completed games');
+      }
+
+      // Validate teams
+      if (teams.hasPlayerOnBothTeams()) {
+        throw Exception('A player cannot be on both teams');
+      }
+
+      if (!teams.areAllPlayersAssigned(currentGame.playerIds)) {
+        final unassigned = teams.getUnassignedPlayers(currentGame.playerIds);
+        throw Exception('All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}');
+      }
+
+      // Update game with teams
+      final updatedGame = currentGame.copyWith(
+        teams: teams,
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection(_collection)
+          .doc(gameId)
+          .set(updatedGame.toFirestore(), SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('Failed to update game teams: $e');
+    }
+  }
+
+  @override
   Future<void> updateScores(String gameId, List<GameScore> scores) async {
     try {
       final currentGame = await getGameById(gameId);
