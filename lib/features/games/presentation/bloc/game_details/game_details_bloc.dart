@@ -16,6 +16,7 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     on<GameDetailsUpdated>(_onGameDetailsUpdated);
     on<JoinGameDetails>(_onJoinGameDetails);
     on<LeaveGameDetails>(_onLeaveGameDetails);
+    on<MarkGameCompleted>(_onMarkGameCompleted);
   }
 
   Future<void> _onLoadGameDetails(
@@ -101,6 +102,37 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       emit(GameDetailsError(
         message: 'Failed to leave game: ${e.toString()}',
         errorCode: 'LEAVE_GAME_ERROR',
+      ));
+    }
+  }
+
+  Future<void> _onMarkGameCompleted(
+    MarkGameCompleted event,
+    Emitter<GameDetailsState> emit,
+  ) async {
+    try {
+      // Keep showing current game while operation is in progress
+      if (state is GameDetailsLoaded) {
+        final currentGame = (state as GameDetailsLoaded).game;
+        emit(GameDetailsOperationInProgress(
+          game: currentGame,
+          operation: 'mark_completed',
+        ));
+      }
+
+      await _gameRepository.markGameAsCompleted(event.gameId, event.userId);
+
+      // Fetch the updated game to emit the success state
+      final updatedGame = await _gameRepository.getGameById(event.gameId);
+      if (updatedGame != null) {
+        emit(GameCompletedSuccessfully(game: updatedGame));
+      }
+
+      // The stream will automatically update with the new state
+    } catch (e) {
+      emit(GameDetailsError(
+        message: 'Failed to mark game as completed: ${e.toString()}',
+        errorCode: 'MARK_COMPLETED_ERROR',
       ));
     }
   }

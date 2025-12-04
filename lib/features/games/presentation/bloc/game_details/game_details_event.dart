@@ -47,3 +47,16 @@ class LeaveGameDetails extends GameDetailsEvent {
   @override
   List<Object?> get props => [gameId, userId];
 }
+
+class MarkGameCompleted extends GameDetailsEvent {
+  final String gameId;
+  final String userId;
+
+  const MarkGameCompleted({
+    required this.gameId,
+    required this.userId,
+  });
+
+  @override
+  List<Object?> get props => [gameId, userId];
+}

@@ -70,6 +70,9 @@ abstract class GameRepository {
   /// Cancel game
   Future<void> cancelGame(String gameId);
 
+  /// Mark game as completed
+  Future<void> markGameAsCompleted(String gameId, String userId);
+
   /// Update game scores
   Future<void> updateScores(String gameId, List<GameScore> scores);
 
