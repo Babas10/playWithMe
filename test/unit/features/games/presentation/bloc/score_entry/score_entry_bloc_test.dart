@@ -290,6 +290,37 @@ void main() {
               .having((state) => state.games[0].sets[1].teamBPoints, 'set 1 teamB', 21),
         ],
       );
+
+      blocTest<ScoreEntryBloc, ScoreEntryState>(
+        'preserves existing values when updating one field',
+        build: () => ScoreEntryBloc(gameRepository: mockGameRepository),
+        seed: () => ScoreEntryLoaded(
+          game: TestGameData.testGame.copyWith(
+            status: GameStatus.completed,
+            teams: const GameTeams(
+              teamAPlayerIds: ['p1'],
+              teamBPlayerIds: ['p2'],
+            ),
+          ),
+          gameCount: 1,
+          games: [
+            GameData(numberOfSets: 1, sets: [const SetScoreData()]),
+          ],
+        ),
+        act: (bloc) => bloc
+          // First, set Team A score (Team B is null)
+          ..add(const UpdateSetScore(gameIndex: 0, setIndex: 0, teamAPoints: 21, teamBPoints: null))
+          // Then, set Team B score (must preserve Team A)
+          ..add(const UpdateSetScore(gameIndex: 0, setIndex: 0, teamAPoints: 21, teamBPoints: 19)),
+        expect: () => [
+          isA<ScoreEntryLoaded>()
+              .having((state) => state.games[0].sets[0].teamAPoints, 'first update teamA', 21)
+              .having((state) => state.games[0].sets[0].teamBPoints, 'first update teamB', null),
+          isA<ScoreEntryLoaded>()
+              .having((state) => state.games[0].sets[0].teamAPoints, 'second update teamA preserved', 21)
+              .having((state) => state.games[0].sets[0].teamBPoints, 'second update teamB', 19),
+        ],
+      );
     });
 
     group('SaveScores', () {

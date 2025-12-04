@@ -13,6 +13,7 @@ import '../bloc/game_details/game_details_bloc.dart';
 import '../bloc/game_details/game_details_event.dart';
 import '../bloc/game_details/game_details_state.dart';
 import 'record_results_page.dart';
+import 'game_result_view_page.dart';
 
 class GameDetailsPage extends StatelessWidget {
   final String gameId;
@@ -143,6 +144,11 @@ class _GameDetailsView extends StatelessWidget {
                       children: [
                         _GameInfoCard(game: game),
                         const SizedBox(height: 16),
+                        // Show results card if game has results
+                        if (game.result != null) ...[
+                          _ViewResultsCard(game: game),
+                          const SizedBox(height: 16),
+                        ],
                         _LocationCard(location: game.location),
                         const SizedBox(height: 16),
                         _PlayersCard(game: game),
@@ -657,6 +663,145 @@ class _RsvpButtons extends StatelessWidget {
         );
         },
       ),
+    );
+  }
+}
+
+class _ViewResultsCard extends StatelessWidget {
+  final GameModel game;
+
+  const _ViewResultsCard({required this.game});
+
+  @override
+  Widget build(BuildContext context) {
+    final result = game.result!;
+    final gamesWon = result.gamesWon;
+    final winnerColor = result.overallWinner == 'teamA' ? Colors.blue : Colors.red;
+
+    return Card(
+      elevation: 2,
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => GameResultViewPage(game: game),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.emoji_events,
+                    color: winnerColor,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Game Results',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.arrow_forward_ios, size: 16),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _QuickScoreDisplay(
+                    teamName: 'Team A',
+                    score: gamesWon['teamA'] ?? 0,
+                    isWinner: result.overallWinner == 'teamA',
+                    color: Colors.blue,
+                  ),
+                  Text(
+                    'vs',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.grey,
+                        ),
+                  ),
+                  _QuickScoreDisplay(
+                    teamName: 'Team B',
+                    score: gamesWon['teamB'] ?? 0,
+                    isWinner: result.overallWinner == 'teamB',
+                    color: Colors.red,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Center(
+                child: Text(
+                  'Tap to view detailed results',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickScoreDisplay extends StatelessWidget {
+  final String teamName;
+  final int score;
+  final bool isWinner;
+  final Color color;
+
+  const _QuickScoreDisplay({
+    required this.teamName,
+    required this.score,
+    required this.isWinner,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: isWinner ? color : color.withOpacity(0.3),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: color,
+              width: isWinner ? 2 : 1,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              score.toString(),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isWinner ? Colors.white : color,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          teamName,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
+                color: isWinner ? color : Colors.grey,
+              ),
+        ),
+      ],
     );
   }
 }

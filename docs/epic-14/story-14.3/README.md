@@ -123,9 +123,11 @@ class GameResult {
 - Prevents saving until all games complete and have winner
 
 ### 4. UI Layer
+
+#### Score Entry Page
 **File**: `lib/features/games/presentation/pages/score_entry_page.dart`
 
-#### Multi-Step Flow
+**Multi-Step Flow:**
 
 **Step 1: Game Count Selection**
 - Grid of buttons (1-10) to select number of games played
@@ -144,24 +146,62 @@ class GameResult {
 - Save button enabled only when all games valid
 - Progress indicator shows games completed
 
-#### UI Components
+**UI Components:**
 - `_GameCountSelector`: Initial selection screen
 - `_ScoreEntryForm`: Main form with all games
 - `_GameCard`: Individual game with format selector and sets
 - `_GameFormatSelector`: Segmented button for 1/2/3 sets
-- `_SetScoreInput`: Score input fields with validation icons
+- `_SetScoreInput`: StatefulWidget with persistent TextEditingControllers for reliable input
 - `_SaveButton`: Bottom save bar with winner display
 
-#### Validation Feedback
+**Validation Feedback:**
 - Green checkmark: Valid set/game
 - Red error icon: Invalid score (not win by 2, etc.)
 - Disabled save button: Not all games complete
 - Live winner calculation displayed
 
+#### Game Result View Page
+**File**: `lib/features/games/presentation/pages/game_result_view_page.dart`
+
+**Purpose:** Display completed game scores to all users in a clear, visually appealing format
+
+**Features:**
+- Overall score display with winner highlighting
+- Team roster (if assigned)
+- Individual game breakdown with:
+  - Game number and winner
+  - Sets won summary
+  - Detailed set-by-set scores
+- Color-coded teams (blue/red)
+- Trophy icon and winner badge
+- Responsive layout for all screen sizes
+
+**UI Components:**
+- `_OverallResultCard`: Final score with gradient background and trophy
+- `_TeamScore`: Circular score display with winner highlighting
+- `_TeamNamesCard`: Side-by-side team rosters
+- `_IndividualGameCard`: Detailed breakdown per game
+- `_TeamList`: Player list for each team
+- `_QuickScoreDisplay`: Compact score preview (used in game details)
+
+**Navigation:**
+- Accessible from game details page when result exists
+- Shows preview card with quick score and "View Results" CTA
+- No authentication required to view (group members only)
+
 ### 5. Navigation
+
+**Score Entry Flow:**
 **File**: `lib/features/games/presentation/pages/record_results_page.dart`
 - After saving teams, automatically navigates to `ScoreEntryPage`
 - Uses `pushReplacement` to prevent back navigation issues
+
+**Result Viewing:**
+**File**: `lib/features/games/presentation/pages/game_details_page.dart`
+- Added `_ViewResultsCard` widget that displays when `game.result != null`
+- Shows quick preview with overall score
+- Tappable card navigates to `GameResultViewPage` for full details
+- Positioned between game info and location cards for visibility
 
 ### 6. Testing
 **File**: `test/unit/core/data/models/game_result_test.dart` (28 tests)
@@ -186,6 +226,8 @@ class GameResult {
 ## User Flow
 
 ### Complete Flow Example
+
+**Entering Scores (Game Creator):**
 1. User marks game as completed → Teams assigned (Story 14.2)
 2. App navigates to Score Entry page
 3. User selects "How many games did you play?" → Selects 6
@@ -196,7 +238,18 @@ class GameResult {
 5. Once all 6 games complete, see overall winner displayed
 6. Tap "Save Scores"
 7. Scores persist to Firestore
-8. Each game will count toward ELO calculation (future story)
+8. Returns to game details page
+
+**Viewing Results (Any Group Member):**
+1. User opens game details page
+2. If game has results, sees "Game Results" preview card with quick score
+3. Taps card to view full details
+4. Views comprehensive breakdown:
+   - Overall winner with trophy
+   - Team rosters
+   - Individual game results
+   - Set-by-set scores with winner highlighting
+5. Can navigate back to game details or share results (future enhancement)
 
 ## Validation Rules
 
@@ -268,6 +321,7 @@ class GameResult {
 - `lib/features/games/presentation/bloc/score_entry/score_entry_state.dart`
 - `lib/features/games/presentation/bloc/score_entry/score_entry_bloc.dart`
 - `lib/features/games/presentation/pages/score_entry_page.dart`
+- `lib/features/games/presentation/pages/game_result_view_page.dart` ⭐ NEW
 - `test/unit/core/data/models/game_result_test.dart`
 - `test/unit/features/games/presentation/bloc/score_entry/score_entry_bloc_test.dart`
 
@@ -277,7 +331,9 @@ class GameResult {
 - `lib/core/data/models/game_model.g.dart` - Generated code
 - `lib/core/domain/repositories/game_repository.dart` - Added updateGameResult method
 - `lib/core/data/repositories/firestore_game_repository.dart` - Implemented updateGameResult
-- `lib/features/games/presentation/pages/record_results_page.dart` - Added navigation
+- `lib/features/games/presentation/pages/record_results_page.dart` - Added navigation to score entry
+- `lib/features/games/presentation/pages/game_details_page.dart` - Added result preview card and navigation ⭐ NEW
+- `lib/features/games/presentation/pages/score_entry_page.dart` - Fixed TextField and overflow issues ⭐ UPDATED
 - `test/unit/core/data/repositories/mock_game_repository.dart` - Added updateGameResult
 
 ## Dependencies

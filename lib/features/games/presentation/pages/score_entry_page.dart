@@ -280,28 +280,30 @@ class _GameFormatSelector extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(width: 12),
-        SegmentedButton<int>(
-          segments: const [
-            ButtonSegment(value: 1, label: Text('1 Set')),
-            ButtonSegment(value: 2, label: Text('Best of 2')),
-            ButtonSegment(value: 3, label: Text('Best of 3')),
-          ],
-          selected: {currentFormat},
-          onSelectionChanged: (selected) {
-            context.read<ScoreEntryBloc>().add(
-                  SetGameFormat(
-                    gameIndex: gameIndex,
-                    numberOfSets: selected.first,
-                  ),
-                );
-          },
+        Expanded(
+          child: SegmentedButton<int>(
+            segments: const [
+              ButtonSegment(value: 1, label: Text('1 Set')),
+              ButtonSegment(value: 2, label: Text('Best of 2')),
+              ButtonSegment(value: 3, label: Text('Best of 3')),
+            ],
+            selected: {currentFormat},
+            onSelectionChanged: (selected) {
+              context.read<ScoreEntryBloc>().add(
+                    SetGameFormat(
+                      gameIndex: gameIndex,
+                      numberOfSets: selected.first,
+                    ),
+                  );
+            },
+          ),
         ),
       ],
     );
   }
 }
 
-class _SetScoreInput extends StatelessWidget {
+class _SetScoreInput extends StatefulWidget {
   final int gameIndex;
   final int setIndex;
   final SetScoreData setData;
@@ -313,15 +315,64 @@ class _SetScoreInput extends StatelessWidget {
   });
 
   @override
+  State<_SetScoreInput> createState() => _SetScoreInputState();
+}
+
+class _SetScoreInputState extends State<_SetScoreInput> {
+  late final TextEditingController _teamAController;
+  late final TextEditingController _teamBController;
+
+  @override
+  void initState() {
+    super.initState();
+    _teamAController = TextEditingController(
+      text: widget.setData.teamAPoints?.toString() ?? '',
+    );
+    _teamBController = TextEditingController(
+      text: widget.setData.teamBPoints?.toString() ?? '',
+    );
+  }
+
+  @override
+  void didUpdateWidget(_SetScoreInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update controllers only if the data actually changed from the previous widget
+    // Don't update if the controller already has the correct value (user is typing)
+    final newTeamAText = widget.setData.teamAPoints?.toString() ?? '';
+    final newTeamBText = widget.setData.teamBPoints?.toString() ?? '';
+
+    // Only update if the widget's data changed AND it differs from controller
+    if (oldWidget.setData.teamAPoints != widget.setData.teamAPoints) {
+      if (newTeamAText != _teamAController.text) {
+        _teamAController.text = newTeamAText;
+      }
+    }
+
+    if (oldWidget.setData.teamBPoints != widget.setData.teamBPoints) {
+      if (newTeamBText != _teamBController.text) {
+        _teamBController.text = newTeamBText;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _teamAController.dispose();
+    _teamBController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
-            width: 70,
+            width: 60,
             child: Text(
-              'Set ${setIndex + 1}:',
+              'Set ${widget.setIndex + 1}:',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
@@ -333,51 +384,51 @@ class _SetScoreInput extends StatelessWidget {
                     decoration: const InputDecoration(
                       labelText: 'Team A',
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    controller: TextEditingController(
-                      text: setData.teamAPoints?.toString() ?? '',
-                    )..selection = TextSelection.fromPosition(
-                        TextPosition(offset: setData.teamAPoints?.toString().length ?? 0),
-                      ),
+                    controller: _teamAController,
                     onChanged: (value) {
-                      final points = value.isEmpty ? null : int.tryParse(value);
+                      final teamAPoints = value.isEmpty ? null : int.tryParse(value);
+                      final teamBPoints = _teamBController.text.isEmpty
+                          ? null
+                          : int.tryParse(_teamBController.text);
                       context.read<ScoreEntryBloc>().add(
                             UpdateSetScore(
-                              gameIndex: gameIndex,
-                              setIndex: setIndex,
-                              teamAPoints: points,
+                              gameIndex: widget.gameIndex,
+                              setIndex: widget.setIndex,
+                              teamAPoints: teamAPoints,
+                              teamBPoints: teamBPoints,
                             ),
                           );
                     },
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 4),
                 const Text('-', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(width: 8),
+                const SizedBox(width: 4),
                 Expanded(
                   child: TextField(
                     decoration: const InputDecoration(
                       labelText: 'Team B',
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    controller: TextEditingController(
-                      text: setData.teamBPoints?.toString() ?? '',
-                    )..selection = TextSelection.fromPosition(
-                        TextPosition(offset: setData.teamBPoints?.toString().length ?? 0),
-                      ),
+                    controller: _teamBController,
                     onChanged: (value) {
-                      final points = value.isEmpty ? null : int.tryParse(value);
+                      final teamAPoints = _teamAController.text.isEmpty
+                          ? null
+                          : int.tryParse(_teamAController.text);
+                      final teamBPoints = value.isEmpty ? null : int.tryParse(value);
                       context.read<ScoreEntryBloc>().add(
                             UpdateSetScore(
-                              gameIndex: gameIndex,
-                              setIndex: setIndex,
-                              teamBPoints: points,
+                              gameIndex: widget.gameIndex,
+                              setIndex: widget.setIndex,
+                              teamAPoints: teamAPoints,
+                              teamBPoints: teamBPoints,
                             ),
                           );
                     },
@@ -386,12 +437,12 @@ class _SetScoreInput extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           SizedBox(
-            width: 30,
-            child: setData.isValid
-                ? const Icon(Icons.check, color: Colors.green)
-                : setData.isComplete
+            width: 24,
+            child: widget.setData.isValid
+                ? const Icon(Icons.check, color: Colors.green, size: 20)
+                : widget.setData.isComplete
                     ? const Icon(Icons.error, color: Colors.red, size: 20)
                     : null,
           ),

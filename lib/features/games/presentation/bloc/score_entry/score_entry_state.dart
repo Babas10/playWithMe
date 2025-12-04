@@ -54,6 +54,17 @@ class SetScoreData {
     if (!isValid) return null;
     return teamAPoints! > teamBPoints! ? 'teamA' : 'teamB';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SetScoreData &&
+          runtimeType == other.runtimeType &&
+          teamAPoints == other.teamAPoints &&
+          teamBPoints == other.teamBPoints;
+
+  @override
+  int get hashCode => teamAPoints.hashCode ^ teamBPoints.hashCode;
 }
 
 /// Helper class to store data for a single game
