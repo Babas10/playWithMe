@@ -12,6 +12,7 @@ import '../../../auth/presentation/bloc/authentication/authentication_state.dart
 import '../bloc/game_details/game_details_bloc.dart';
 import '../bloc/game_details/game_details_event.dart';
 import '../bloc/game_details/game_details_state.dart';
+import 'record_results_page.dart';
 
 class GameDetailsPage extends StatelessWidget {
   final String gameId;
@@ -487,11 +488,10 @@ class _RsvpButtons extends StatelessWidget {
     return BlocListener<GameDetailsBloc, GameDetailsState>(
       listener: (context, state) {
         if (state is GameCompletedSuccessfully) {
-          // TODO: Navigate to Record Results screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Theme.of(context).colorScheme.primary,
+          // Navigate to Record Results screen
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => RecordResultsPage(gameId: state.game.id),
             ),
           );
         }
