@@ -54,6 +54,9 @@ _$GameModelImpl _$$GameModelImplFromJson(
           .toList() ??
       const [],
   winnerId: json['winnerId'] as String?,
+  teams: json['teams'] == null
+      ? null
+      : GameTeams.fromJson(json['teams'] as Map<String, dynamic>),
   weatherDependent: json['weatherDependent'] as bool? ?? true,
   weatherNotes: json['weatherNotes'] as String?,
 );
@@ -87,6 +90,7 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'skillLevel': _$GameSkillLevelEnumMap[instance.skillLevel],
       'scores': instance.scores,
       'winnerId': instance.winnerId,
+      'teams': instance.teams,
       'weatherDependent': instance.weatherDependent,
       'weatherNotes': instance.weatherNotes,
     };
@@ -118,6 +122,26 @@ const _$GameSkillLevelEnumMap = {
   GameSkillLevel.advanced: 'advanced',
   GameSkillLevel.mixed: 'mixed',
 };
+
+_$GameTeamsImpl _$$GameTeamsImplFromJson(Map<String, dynamic> json) =>
+    _$GameTeamsImpl(
+      teamAPlayerIds:
+          (json['teamAPlayerIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      teamBPlayerIds:
+          (json['teamBPlayerIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$$GameTeamsImplToJson(_$GameTeamsImpl instance) =>
+    <String, dynamic>{
+      'teamAPlayerIds': instance.teamAPlayerIds,
+      'teamBPlayerIds': instance.teamBPlayerIds,
+    };
 
 _$GameLocationImpl _$$GameLocationImplFromJson(Map<String, dynamic> json) =>
     _$GameLocationImpl(

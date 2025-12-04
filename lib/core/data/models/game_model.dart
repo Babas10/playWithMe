@@ -38,6 +38,8 @@ class GameModel with _$GameModel {
     // Scoring
     @Default([]) List<GameScore> scores,
     String? winnerId,
+    // Teams (for completed games)
+    GameTeams? teams,
     // Weather considerations
     @Default(true) bool weatherDependent,
     String? weatherNotes,
@@ -345,6 +347,43 @@ class GameModel with _$GameModel {
     } else {
       return '${difference.inMinutes}m';
     }
+  }
+}
+
+@freezed
+class GameTeams with _$GameTeams {
+  const factory GameTeams({
+    @Default([]) List<String> teamAPlayerIds,
+    @Default([]) List<String> teamBPlayerIds,
+  }) = _GameTeams;
+
+  const GameTeams._();
+
+  factory GameTeams.fromJson(Map<String, dynamic> json) =>
+      _$GameTeamsFromJson(json);
+
+  /// Check if all players from the game are assigned to a team
+  bool areAllPlayersAssigned(List<String> allPlayerIds) {
+    final assignedPlayers = {...teamAPlayerIds, ...teamBPlayerIds};
+    return allPlayerIds.every((playerId) => assignedPlayers.contains(playerId));
+  }
+
+  /// Check if a player is on both teams (validation error)
+  bool hasPlayerOnBothTeams() {
+    final teamASet = teamAPlayerIds.toSet();
+    final teamBSet = teamBPlayerIds.toSet();
+    return teamASet.intersection(teamBSet).isNotEmpty;
+  }
+
+  /// Get list of unassigned players
+  List<String> getUnassignedPlayers(List<String> allPlayerIds) {
+    final assignedPlayers = {...teamAPlayerIds, ...teamBPlayerIds};
+    return allPlayerIds.where((playerId) => !assignedPlayers.contains(playerId)).toList();
+  }
+
+  /// Check if teams are valid (no duplicates, all players assigned)
+  bool isValid(List<String> allPlayerIds) {
+    return !hasPlayerOnBothTeams() && areAllPlayersAssigned(allPlayerIds);
   }
 }
 
