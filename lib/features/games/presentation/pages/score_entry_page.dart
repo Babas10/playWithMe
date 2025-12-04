@@ -1,0 +1,471 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/domain/repositories/game_repository.dart';
+import '../../../../core/services/service_locator.dart';
+import '../../../auth/presentation/bloc/authentication/authentication_bloc.dart';
+import '../../../auth/presentation/bloc/authentication/authentication_state.dart';
+import '../bloc/score_entry/score_entry_bloc.dart';
+import '../bloc/score_entry/score_entry_event.dart';
+import '../bloc/score_entry/score_entry_state.dart';
+
+class ScoreEntryPage extends StatelessWidget {
+  final String gameId;
+  final GameRepository? gameRepository;
+
+  const ScoreEntryPage({
+    super.key,
+    required this.gameId,
+    this.gameRepository,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => ScoreEntryBloc(
+        gameRepository: gameRepository ?? sl<GameRepository>(),
+      )..add(LoadGameForScoreEntry(gameId: gameId)),
+      child: const _ScoreEntryView(),
+    );
+  }
+}
+
+class _ScoreEntryView extends StatelessWidget {
+  const _ScoreEntryView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Enter Scores'),
+        elevation: 0,
+      ),
+      body: BlocConsumer<ScoreEntryBloc, ScoreEntryState>(
+        listener: (context, state) {
+          if (state is ScoreEntrySaved) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Scores saved successfully!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Navigator.of(context).pop();
+          } else if (state is ScoreEntryError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is ScoreEntryLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is ScoreEntryError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message,
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if (state is ScoreEntryLoaded) {
+            if (state.gameCount == null) {
+              return _GameCountSelector(
+                onGameCountSelected: (count) {
+                  context.read<ScoreEntryBloc>().add(SetGameCount(count: count));
+                },
+              );
+            }
+
+            return _ScoreEntryForm(state: state);
+          }
+
+          if (state is ScoreEntrySaving) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Saving scores...'),
+                ],
+              ),
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+}
+
+class _GameCountSelector extends StatelessWidget {
+  final Function(int) onGameCountSelected;
+
+  const _GameCountSelector({required this.onGameCountSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'How many games did you play?',
+            style: Theme.of(context).textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
+            children: List.generate(10, (index) {
+              final count = index + 1;
+              return SizedBox(
+                width: 70,
+                height: 70,
+                child: ElevatedButton(
+                  onPressed: () => onGameCountSelected(count),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    '$count',
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScoreEntryForm extends StatelessWidget {
+  final ScoreEntryLoaded state;
+
+  const _ScoreEntryForm({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: state.games.length,
+            itemBuilder: (context, index) {
+              return _GameCard(
+                gameIndex: index,
+                gameData: state.games[index],
+                totalGames: state.games.length,
+              );
+            },
+          ),
+        ),
+        _SaveButton(
+          canSave: state.canSave,
+          overallWinner: state.overallWinner,
+          gamesWon: state.games.where((g) => g.isComplete).length,
+          totalGames: state.games.length,
+          onSave: () {
+            final authState = context.read<AuthenticationBloc>().state;
+            if (authState is AuthenticationAuthenticated) {
+              context.read<ScoreEntryBloc>().add(
+                    SaveScores(userId: authState.user.uid),
+                  );
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _GameCard extends StatelessWidget {
+  final int gameIndex;
+  final GameData gameData;
+  final int totalGames;
+
+  const _GameCard({
+    required this.gameIndex,
+    required this.gameData,
+    required this.totalGames,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Game ${gameIndex + 1}',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                if (gameData.isComplete)
+                  const Icon(Icons.check_circle, color: Colors.green),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _GameFormatSelector(
+              gameIndex: gameIndex,
+              currentFormat: gameData.numberOfSets,
+            ),
+            const SizedBox(height: 16),
+            ...List.generate(gameData.numberOfSets, (setIndex) {
+              return _SetScoreInput(
+                gameIndex: gameIndex,
+                setIndex: setIndex,
+                setData: setIndex < gameData.sets.length
+                    ? gameData.sets[setIndex]
+                    : const SetScoreData(),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GameFormatSelector extends StatelessWidget {
+  final int gameIndex;
+  final int currentFormat;
+
+  const _GameFormatSelector({
+    required this.gameIndex,
+    required this.currentFormat,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          'Format:',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(width: 12),
+        SegmentedButton<int>(
+          segments: const [
+            ButtonSegment(value: 1, label: Text('1 Set')),
+            ButtonSegment(value: 2, label: Text('Best of 2')),
+            ButtonSegment(value: 3, label: Text('Best of 3')),
+          ],
+          selected: {currentFormat},
+          onSelectionChanged: (selected) {
+            context.read<ScoreEntryBloc>().add(
+                  SetGameFormat(
+                    gameIndex: gameIndex,
+                    numberOfSets: selected.first,
+                  ),
+                );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _SetScoreInput extends StatelessWidget {
+  final int gameIndex;
+  final int setIndex;
+  final SetScoreData setData;
+
+  const _SetScoreInput({
+    required this.gameIndex,
+    required this.setIndex,
+    required this.setData,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(
+              'Set ${setIndex + 1}:',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Team A',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    controller: TextEditingController(
+                      text: setData.teamAPoints?.toString() ?? '',
+                    )..selection = TextSelection.fromPosition(
+                        TextPosition(offset: setData.teamAPoints?.toString().length ?? 0),
+                      ),
+                    onChanged: (value) {
+                      final points = value.isEmpty ? null : int.tryParse(value);
+                      context.read<ScoreEntryBloc>().add(
+                            UpdateSetScore(
+                              gameIndex: gameIndex,
+                              setIndex: setIndex,
+                              teamAPoints: points,
+                            ),
+                          );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text('-', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Team B',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    controller: TextEditingController(
+                      text: setData.teamBPoints?.toString() ?? '',
+                    )..selection = TextSelection.fromPosition(
+                        TextPosition(offset: setData.teamBPoints?.toString().length ?? 0),
+                      ),
+                    onChanged: (value) {
+                      final points = value.isEmpty ? null : int.tryParse(value);
+                      context.read<ScoreEntryBloc>().add(
+                            UpdateSetScore(
+                              gameIndex: gameIndex,
+                              setIndex: setIndex,
+                              teamBPoints: points,
+                            ),
+                          );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 30,
+            child: setData.isValid
+                ? const Icon(Icons.check, color: Colors.green)
+                : setData.isComplete
+                    ? const Icon(Icons.error, color: Colors.red, size: 20)
+                    : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SaveButton extends StatelessWidget {
+  final bool canSave;
+  final String? overallWinner;
+  final int gamesWon;
+  final int totalGames;
+  final VoidCallback onSave;
+
+  const _SaveButton({
+    required this.canSave,
+    required this.overallWinner,
+    required this.gamesWon,
+    required this.totalGames,
+    required this.onSave,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (canSave && overallWinner != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  'Overall Winner: ${overallWinner == "teamA" ? "Team A" : "Team B"}',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                ),
+              ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: canSave ? onSave : null,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: Colors.grey.shade300,
+                ),
+                child: Text(
+                  canSave
+                      ? 'Save Scores'
+                      : 'Complete $gamesWon/$totalGames games to continue',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
