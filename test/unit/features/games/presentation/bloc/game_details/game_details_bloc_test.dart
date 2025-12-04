@@ -305,6 +305,153 @@ void main() {
       );
     });
 
+    group('MarkGameCompleted', () {
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits [operation in progress, success] when mark completed succeeds',
+        build: () {
+          mockGameRepository.addGame(TestGameData.testGame);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          // Establish stream subscription before test
+          bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
+          return bloc;
+        },
+        skip: 1, // Skip the initial loading state
+        act: (bloc) async {
+          // Wait for stream to be established
+          await Future.delayed(Duration.zero);
+          // Then mark game as completed
+          bloc.add(
+            const MarkGameCompleted(gameId: 'test-game-123', userId: 'test-uid-123'),
+          );
+        },
+        expect: () => [
+          GameDetailsLoaded(game: TestGameData.testGame), // Initial load
+          GameDetailsOperationInProgress(
+            game: TestGameData.testGame,
+            operation: 'mark_completed',
+          ),
+          isA<GameDetailsLoaded>().having(
+            (state) => state.game.status,
+            'stream updates with completed status',
+            GameStatus.completed,
+          ),
+          isA<GameCompletedSuccessfully>().having(
+            (state) => state.game.status,
+            'game status is completed',
+            GameStatus.completed,
+          ),
+        ],
+      );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits error when user is not creator',
+        build: () {
+          mockGameRepository.addGame(TestGameData.testGame);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
+          return bloc;
+        },
+        skip: 1,
+        act: (bloc) async {
+          await Future.delayed(Duration.zero);
+          bloc.add(
+            const MarkGameCompleted(gameId: 'test-game-123', userId: 'different-user'),
+          );
+        },
+        expect: () => [
+          GameDetailsLoaded(game: TestGameData.testGame),
+          GameDetailsOperationInProgress(
+            game: TestGameData.testGame,
+            operation: 'mark_completed',
+          ),
+          isA<GameDetailsError>().having(
+            (state) => state.message,
+            'error message',
+            contains('Only the game creator can mark the game as completed'),
+          ),
+        ],
+      );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits error when game is already completed',
+        build: () {
+          final completedGame = TestGameData.testGame.copyWith(
+            status: GameStatus.completed,
+            endedAt: DateTime.now(),
+          );
+          mockGameRepository.addGame(completedGame);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
+          return bloc;
+        },
+        skip: 1,
+        act: (bloc) async {
+          await Future.delayed(Duration.zero);
+          bloc.add(
+            const MarkGameCompleted(gameId: 'test-game-123', userId: 'test-uid-123'),
+          );
+        },
+        expect: () => [
+          isA<GameDetailsLoaded>(),
+          isA<GameDetailsOperationInProgress>(),
+          isA<GameDetailsError>().having(
+            (state) => state.message,
+            'error message',
+            contains('Game is already completed'),
+          ),
+        ],
+      );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits error when game is cancelled',
+        build: () {
+          final cancelledGame = TestGameData.testGame.copyWith(
+            status: GameStatus.cancelled,
+          );
+          mockGameRepository.addGame(cancelledGame);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
+          return bloc;
+        },
+        skip: 1,
+        act: (bloc) async {
+          await Future.delayed(Duration.zero);
+          bloc.add(
+            const MarkGameCompleted(gameId: 'test-game-123', userId: 'test-uid-123'),
+          );
+        },
+        expect: () => [
+          isA<GameDetailsLoaded>(),
+          isA<GameDetailsOperationInProgress>(),
+          isA<GameDetailsError>().having(
+            (state) => state.message,
+            'error message',
+            contains('Cannot complete a cancelled game'),
+          ),
+        ],
+      );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits error when game does not exist',
+        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        seed: () => GameDetailsLoaded(game: TestGameData.testGame),
+        act: (bloc) => bloc.add(
+          const MarkGameCompleted(gameId: 'non-existent', userId: 'test-uid-123'),
+        ),
+        expect: () => [
+          GameDetailsOperationInProgress(
+            game: TestGameData.testGame,
+            operation: 'mark_completed',
+          ),
+          isA<GameDetailsError>().having(
+            (state) => state.message,
+            'error message',
+            contains('Failed to mark game as completed'),
+          ),
+        ],
+      );
+    });
+
     group('Edge cases', () {
       test('handles multiple LoadGameDetails calls correctly', () async {
         // Skip: Complex async stream timing test - covered by integration tests

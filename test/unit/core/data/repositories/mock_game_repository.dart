@@ -275,6 +275,37 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Future<void> markGameAsCompleted(String gameId, String userId) async {
+    final game = _games[gameId];
+    if (game == null) throw Exception('Game not found');
+
+    // Check if user has permission (creator only)
+    if (!game.isCreator(userId)) {
+      throw Exception('Only the game creator can mark the game as completed');
+    }
+
+    // Check if game can be marked as completed
+    if (game.status == GameStatus.completed) {
+      throw Exception('Game is already completed');
+    }
+
+    if (game.status == GameStatus.cancelled) {
+      throw Exception('Cannot complete a cancelled game');
+    }
+
+    // Update game status to completed
+    final updatedGame = game.copyWith(
+      status: GameStatus.completed,
+      endedAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    _games[gameId] = updatedGame;
+    _emitGames();
+    _emitGameUpdate(gameId);
+  }
+
+  @override
   Future<void> updateScores(String gameId, List<GameScore> scores) async {
     final game = _games[gameId];
     if (game == null) throw Exception('Game not found');
