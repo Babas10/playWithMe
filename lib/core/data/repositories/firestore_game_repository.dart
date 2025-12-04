@@ -346,6 +346,44 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Future<void> markGameAsCompleted(String gameId, String userId) async {
+    try {
+      final currentGame = await getGameById(gameId);
+      if (currentGame == null) {
+        throw Exception('Game not found');
+      }
+
+      // Check if user has permission (creator only for now)
+      if (!currentGame.isCreator(userId)) {
+        throw Exception('Only the game creator can mark the game as completed');
+      }
+
+      // Check if game can be marked as completed
+      if (currentGame.status == GameStatus.completed) {
+        throw Exception('Game is already completed');
+      }
+
+      if (currentGame.status == GameStatus.cancelled) {
+        throw Exception('Cannot complete a cancelled game');
+      }
+
+      // Update game status to completed
+      final updatedGame = currentGame.copyWith(
+        status: GameStatus.completed,
+        endedAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      await _firestore
+          .collection(_collection)
+          .doc(gameId)
+          .set(updatedGame.toFirestore(), SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('Failed to mark game as completed: $e');
+    }
+  }
+
+  @override
   Future<void> updateScores(String gameId, List<GameScore> scores) async {
     try {
       final currentGame = await getGameById(gameId);
