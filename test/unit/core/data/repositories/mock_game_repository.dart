@@ -306,6 +306,42 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Future<void> updateGameTeams(String gameId, String userId, GameTeams teams) async {
+    final game = _games[gameId];
+    if (game == null) throw Exception('Game not found');
+
+    // Check if user has permission (creator only)
+    if (!game.isCreator(userId)) {
+      throw Exception('Only the game creator can update teams');
+    }
+
+    // Check if game is completed
+    if (game.status != GameStatus.completed) {
+      throw Exception('Can only assign teams to completed games');
+    }
+
+    // Validate teams
+    if (teams.hasPlayerOnBothTeams()) {
+      throw Exception('A player cannot be on both teams');
+    }
+
+    if (!teams.areAllPlayersAssigned(game.playerIds)) {
+      final unassigned = teams.getUnassignedPlayers(game.playerIds);
+      throw Exception('All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}');
+    }
+
+    // Update game with teams
+    final updatedGame = game.copyWith(
+      teams: teams,
+      updatedAt: DateTime.now(),
+    );
+
+    _games[gameId] = updatedGame;
+    _emitGames();
+    _emitGameUpdate(gameId);
+  }
+
+  @override
   Future<void> updateScores(String gameId, List<GameScore> scores) async {
     final game = _games[gameId];
     if (game == null) throw Exception('Game not found');
