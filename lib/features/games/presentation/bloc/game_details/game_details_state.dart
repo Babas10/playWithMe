@@ -71,3 +71,16 @@ class GameDetailsNotFound extends GameDetailsState implements ErrorState {
   @override
   List<Object?> get props => [message, errorCode, isRetryable];
 }
+
+class GameCompletedSuccessfully extends GameDetailsState implements SuccessState {
+  final GameModel game;
+  final String message;
+
+  const GameCompletedSuccessfully({
+    required this.game,
+    this.message = 'Game marked as completed',
+  });
+
+  @override
+  List<Object?> get props => [game, message];
+}

@@ -446,20 +446,72 @@ class _RsvpButtons extends StatelessWidget {
     required this.isOperationInProgress,
   });
 
+  Future<void> _showCompletionConfirmationDialog(
+    BuildContext context,
+    String gameId,
+    String userId,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Mark Game as Completed'),
+        content: const Text(
+          'Are you sure you want to mark this game as completed? '
+          'You will be able to enter teams and scores next.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      context.read<GameDetailsBloc>().add(
+            MarkGameCompleted(
+              gameId: gameId,
+              userId: userId,
+            ),
+          );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
-      builder: (context, authState) {
-        if (authState is! AuthenticationAuthenticated) {
-          return const SizedBox.shrink();
+    return BlocListener<GameDetailsBloc, GameDetailsState>(
+      listener: (context, state) {
+        if (state is GameCompletedSuccessfully) {
+          // TODO: Navigate to Record Results screen
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
         }
+      },
+      child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+        builder: (context, authState) {
+          if (authState is! AuthenticationAuthenticated) {
+            return const SizedBox.shrink();
+          }
 
-        final userId = authState.user.uid;
-        final isPlaying = game.isPlayer(userId);
-        final isOnWaitlist = game.isOnWaitlist(userId);
-        final canJoin = game.canUserJoin(userId);
+          final userId = authState.user.uid;
+          final isPlaying = game.isPlayer(userId);
+          final isOnWaitlist = game.isOnWaitlist(userId);
+          final canJoin = game.canUserJoin(userId);
+          final isCreator = game.isCreator(userId);
+          final canMarkCompleted = isCreator &&
+              (game.status == GameStatus.scheduled ||
+                  game.status == GameStatus.inProgress);
 
-        return Container(
+          return Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
@@ -472,94 +524,139 @@ class _RsvpButtons extends StatelessWidget {
             ],
           ),
           child: SafeArea(
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                if (isPlaying || isOnWaitlist) ...[
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: isOperationInProgress
-                          ? null
-                          : () {
-                              context.read<GameDetailsBloc>().add(
-                                    LeaveGameDetails(
-                                      gameId: game.id,
-                                      userId: userId,
-                                    ),
-                                  );
-                            },
-                      icon: isOperationInProgress
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.remove_circle_outline),
-                      label: Text(isOnWaitlist ? 'Leave Waitlist' : 'I\'m Out'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.error,
+                // Mark as Completed button (for creator only)
+                if (canMarkCompleted) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: isOperationInProgress
+                            ? null
+                            : () => _showCompletionConfirmationDialog(
+                                  context,
+                                  game.id,
+                                  userId,
+                                ),
+                        icon: isOperationInProgress
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.check_circle),
+                        label: const Text('Mark as Completed'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.secondary,
+                          foregroundColor: Colors.white,
                         ),
-                        foregroundColor: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ),
-                ] else if (canJoin) ...[
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: isOperationInProgress
-                          ? null
-                          : () {
-                              context.read<GameDetailsBloc>().add(
-                                    JoinGameDetails(
-                                      gameId: game.id,
-                                      userId: userId,
-                                    ),
-                                  );
-                            },
-                      icon: isOperationInProgress
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.add_circle_outline),
-                      label: Text(game.isFull ? 'Join Waitlist' : 'I\'m In'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      alignment: Alignment.center,
-                      child: Text(
-                        game.isPast
-                            ? 'Game has ended'
-                            : 'Game is full and waitlist is disabled',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.6),
-                            ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
                 ],
+                // RSVP buttons
+                Row(
+                  children: [
+                    if (isPlaying || isOnWaitlist) ...[
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: isOperationInProgress
+                              ? null
+                              : () {
+                                  context.read<GameDetailsBloc>().add(
+                                        LeaveGameDetails(
+                                          gameId: game.id,
+                                          userId: userId,
+                                        ),
+                                      );
+                                },
+                          icon: isOperationInProgress
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Icon(Icons.remove_circle_outline),
+                          label:
+                              Text(isOnWaitlist ? 'Leave Waitlist' : 'I\'m Out'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            side: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                            foregroundColor: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ),
+                    ] else if (canJoin) ...[
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: isOperationInProgress
+                              ? null
+                              : () {
+                                  context.read<GameDetailsBloc>().add(
+                                        JoinGameDetails(
+                                          gameId: game.id,
+                                          userId: userId,
+                                        ),
+                                      );
+                                },
+                          icon: isOperationInProgress
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.add_circle_outline),
+                          label: Text(game.isFull ? 'Join Waitlist' : 'I\'m In'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          alignment: Alignment.center,
+                          child: Text(
+                            game.isPast
+                                ? 'Game has ended'
+                                : 'Game is full and waitlist is disabled',
+                            style:
+                                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withOpacity(0.6),
+                                    ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
           ),
         );
-      },
+        },
+      ),
     );
   }
 }
