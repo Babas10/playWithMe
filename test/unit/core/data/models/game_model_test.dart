@@ -307,6 +307,7 @@ void main() {
             ],
             overallWinner: 'teamA',
           ),
+          winnerId: 'teamA',
           eloCalculated: false,
           completedAt: completedTime,
         );
