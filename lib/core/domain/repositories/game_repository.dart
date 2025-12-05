@@ -79,6 +79,15 @@ abstract class GameRepository {
   /// Update game result with final scores (for completed games)
   Future<void> updateGameResult(String gameId, String userId, GameResult result);
 
+  /// Save complete game result (teams + scores) atomically with transaction
+  /// Sets eloCalculated = false and completedAt timestamp
+  Future<void> saveGameResult({
+    required String gameId,
+    required String userId,
+    required GameTeams teams,
+    required GameResult result,
+  });
+
   /// Update game scores
   Future<void> updateScores(String gameId, List<GameScore> scores);
 

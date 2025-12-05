@@ -484,6 +484,78 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Future<void> saveGameResult({
+    required String gameId,
+    required String userId,
+    required GameTeams teams,
+    required GameResult result,
+  }) async {
+    try {
+      // Use a transaction to ensure atomic update
+      await _firestore.runTransaction((transaction) async {
+        final docRef = _firestore.collection(_collection).doc(gameId);
+        final snapshot = await transaction.get(docRef);
+
+        if (!snapshot.exists) {
+          throw Exception('Game not found');
+        }
+
+        final currentGame = GameModel.fromFirestore(snapshot);
+
+        // Check if user has permission (creator only for now)
+        if (!currentGame.isCreator(userId)) {
+          throw Exception('Only the game creator can save game result');
+        }
+
+        // Check if game is completed
+        if (currentGame.status != GameStatus.completed) {
+          throw Exception('Can only save result to completed games');
+        }
+
+        // Validate teams
+        if (teams.hasPlayerOnBothTeams()) {
+          throw Exception('A player cannot be on both teams');
+        }
+
+        if (!teams.areAllPlayersAssigned(currentGame.playerIds)) {
+          final unassigned = teams.getUnassignedPlayers(currentGame.playerIds);
+          throw Exception('All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}');
+        }
+
+        // Validate result
+        if (!result.isValid()) {
+          throw Exception('Invalid game result. Check that all sets are valid and winner is correct.');
+        }
+
+        // Determine winner team
+        String? winnerId;
+        if (result.overallWinner == 'teamA' || result.overallWinner == 'teamB') {
+          winnerId = result.overallWinner;
+        }
+
+        // Update game with teams, result, eloCalculated flag, and completedAt timestamp
+        final updatedGame = currentGame.copyWith(
+          teams: teams,
+          result: result,
+          winnerId: winnerId,
+          eloCalculated: false, // Flag for Python function to process
+          completedAt: DateTime.now(), // Mark when result was entered
+          updatedAt: DateTime.now(),
+        );
+
+        // Perform atomic write
+        transaction.set(
+          docRef,
+          updatedGame.toFirestore(),
+          SetOptions(merge: true),
+        );
+      });
+    } catch (e) {
+      throw Exception('Failed to save game result: $e');
+    }
+  }
+
+  @override
   Future<void> updateScores(String gameId, List<GameScore> scores) async {
     try {
       final currentGame = await getGameById(gameId);

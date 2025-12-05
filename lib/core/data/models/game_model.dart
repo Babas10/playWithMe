@@ -42,6 +42,10 @@ class GameModel with _$GameModel {
     GameTeams? teams,
     // Game result (for completed games with entered scores)
     GameResult? result,
+    // ELO calculation flag (set to false when result is saved, true after Python function processes)
+    @Default(false) bool eloCalculated,
+    // Timestamp when the game result was entered and completed
+    @TimestampConverter() DateTime? completedAt,
     // Weather considerations
     @Default(true) bool weatherDependent,
     String? weatherNotes,
@@ -74,6 +78,9 @@ class GameModel with _$GameModel {
     if (data['endedAt'] is Timestamp) {
       jsonData['endedAt'] = (data['endedAt'] as Timestamp).toDate().toIso8601String();
     }
+    if (data['completedAt'] is Timestamp) {
+      jsonData['completedAt'] = (data['completedAt'] as Timestamp).toDate().toIso8601String();
+    }
 
     return GameModel.fromJson({
       ...jsonData,
@@ -101,6 +108,9 @@ class GameModel with _$GameModel {
     }
     if (endedAt != null && json['endedAt'] is String) {
       json['endedAt'] = Timestamp.fromDate(endedAt!);
+    }
+    if (completedAt != null && json['completedAt'] is String) {
+      json['completedAt'] = Timestamp.fromDate(completedAt!);
     }
 
     // Ensure nested objects are properly serialized

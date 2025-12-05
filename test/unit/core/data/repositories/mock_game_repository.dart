@@ -379,6 +379,56 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Future<void> saveGameResult({
+    required String gameId,
+    required String userId,
+    required GameTeams teams,
+    required GameResult result,
+  }) async {
+    final game = _games[gameId];
+    if (game == null) throw Exception('Game not found');
+
+    // Check if user has permission (creator only)
+    if (!game.isCreator(userId)) {
+      throw Exception('Only the game creator can save game result');
+    }
+
+    // Check if game is completed
+    if (game.status != GameStatus.completed) {
+      throw Exception('Can only save result to completed games');
+    }
+
+    // Validate teams
+    if (teams.hasPlayerOnBothTeams()) {
+      throw Exception('A player cannot be on both teams');
+    }
+
+    if (!teams.areAllPlayersAssigned(game.playerIds)) {
+      final unassigned = teams.getUnassignedPlayers(game.playerIds);
+      throw Exception('All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}');
+    }
+
+    // Validate result
+    if (!result.isValid()) {
+      throw Exception('Invalid game result. Check that all sets are valid and winner is correct.');
+    }
+
+    // Update game with teams, result, eloCalculated flag, and completedAt timestamp
+    final updatedGame = game.copyWith(
+      teams: teams,
+      result: result,
+      winnerId: result.overallWinner,
+      eloCalculated: false,
+      completedAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    _games[gameId] = updatedGame;
+    _emitGames();
+    _emitGameUpdate(gameId);
+  }
+
+  @override
   Future<void> updateScores(String gameId, List<GameScore> scores) async {
     final game = _games[gameId];
     if (game == null) throw Exception('Game not found');
