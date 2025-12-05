@@ -82,3 +82,15 @@ lib/core/config/firebase_config_prod.dart
 # Node modules
 node_modules/
 infrastructure/terraform/.terraform/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
