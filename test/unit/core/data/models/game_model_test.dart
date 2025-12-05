@@ -147,6 +147,180 @@ void main() {
         expect(firestoreData['maxPlayers'], 8);
         expect(firestoreData['minPlayers'], 4);
       });
+
+      test('properly serializes GameTeams object', () {
+        // Arrange
+        final game = GameModel(
+          id: 'test-game-303',
+          title: 'Test Game with Teams',
+          groupId: 'group-123',
+          createdBy: 'user-123',
+          createdAt: DateTime.now(),
+          scheduledAt: DateTime.now(),
+          location: const GameLocation(name: 'Court'),
+          status: GameStatus.completed,
+          playerIds: const ['player1', 'player2', 'player3', 'player4'],
+          teams: const GameTeams(
+            teamAPlayerIds: ['player1', 'player2'],
+            teamBPlayerIds: ['player3', 'player4'],
+          ),
+        );
+
+        // Act
+        final firestoreData = game.toFirestore();
+
+        // Assert
+        expect(firestoreData['teams'], isA<Map>());
+        final teams = firestoreData['teams'] as Map;
+        expect(teams['teamAPlayerIds'], ['player1', 'player2']);
+        expect(teams['teamBPlayerIds'], ['player3', 'player4']);
+      });
+
+      test('properly serializes GameResult with sets and games', () {
+        // Arrange
+        final result = GameResult(
+          games: const [
+            IndividualGame(
+              gameNumber: 1,
+              sets: [
+                SetScore(teamAPoints: 21, teamBPoints: 15, setNumber: 1),
+              ],
+              winner: 'teamA',
+            ),
+            IndividualGame(
+              gameNumber: 2,
+              sets: [
+                SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1),
+              ],
+              winner: 'teamB',
+            ),
+            IndividualGame(
+              gameNumber: 3,
+              sets: [
+                SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1),
+              ],
+              winner: 'teamA',
+            ),
+          ],
+          overallWinner: 'teamA',
+        );
+
+        final game = GameModel(
+          id: 'test-game-404',
+          title: 'Test Game with Result',
+          groupId: 'group-123',
+          createdBy: 'user-123',
+          createdAt: DateTime.now(),
+          scheduledAt: DateTime.now(),
+          location: const GameLocation(name: 'Court'),
+          status: GameStatus.completed,
+          result: result,
+        );
+
+        // Act
+        final firestoreData = game.toFirestore();
+
+        // Assert
+        expect(firestoreData['result'], isA<Map>());
+        final resultMap = firestoreData['result'] as Map;
+        expect(resultMap['overallWinner'], 'teamA');
+        expect(resultMap['games'], isA<List>());
+        final games = resultMap['games'] as List;
+        expect(games.length, 3);
+        expect(games[0]['gameNumber'], 1);
+        expect(games[0]['winner'], 'teamA');
+      });
+
+      test('includes eloCalculated flag defaulting to false', () {
+        // Arrange
+        final game = GameModel(
+          id: 'test-game-505',
+          title: 'Test Game',
+          groupId: 'group-123',
+          createdBy: 'user-123',
+          createdAt: DateTime.now(),
+          scheduledAt: DateTime.now(),
+          location: const GameLocation(name: 'Court'),
+        );
+
+        // Act
+        final firestoreData = game.toFirestore();
+
+        // Assert
+        expect(firestoreData['eloCalculated'], false);
+      });
+
+      test('converts completedAt DateTime to Timestamp when present', () {
+        // Arrange
+        final now = DateTime.now();
+        final completedTime = now.add(const Duration(hours: 2));
+
+        final game = GameModel(
+          id: 'test-game-606',
+          title: 'Test Game with Completion Time',
+          groupId: 'group-123',
+          createdBy: 'user-123',
+          createdAt: now,
+          scheduledAt: now,
+          location: const GameLocation(name: 'Court'),
+          status: GameStatus.completed,
+          completedAt: completedTime,
+          eloCalculated: false,
+        );
+
+        // Act
+        final firestoreData = game.toFirestore();
+
+        // Assert
+        expect(firestoreData['completedAt'], isA<Timestamp>());
+        final completedAtTimestamp = firestoreData['completedAt'] as Timestamp;
+        expect(completedAtTimestamp.toDate(), equals(completedTime));
+        expect(firestoreData['eloCalculated'], false);
+      });
+
+      test('serializes complete game with teams, result, and elo flag', () {
+        // Arrange
+        final now = DateTime.now();
+        final completedTime = now.add(const Duration(hours: 2));
+
+        final game = GameModel(
+          id: 'test-game-707',
+          title: 'Complete Game Test',
+          groupId: 'group-123',
+          createdBy: 'user-123',
+          createdAt: now,
+          scheduledAt: now,
+          location: const GameLocation(name: 'Court'),
+          status: GameStatus.completed,
+          playerIds: const ['p1', 'p2', 'p3', 'p4'],
+          teams: const GameTeams(
+            teamAPlayerIds: ['p1', 'p2'],
+            teamBPlayerIds: ['p3', 'p4'],
+          ),
+          result: const GameResult(
+            games: [
+              IndividualGame(
+                gameNumber: 1,
+                sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+                winner: 'teamA',
+              ),
+            ],
+            overallWinner: 'teamA',
+          ),
+          eloCalculated: false,
+          completedAt: completedTime,
+        );
+
+        // Act
+        final firestoreData = game.toFirestore();
+
+        // Assert - Verify all result-related fields are present
+        expect(firestoreData['teams'], isA<Map>());
+        expect(firestoreData['result'], isA<Map>());
+        expect(firestoreData['eloCalculated'], false);
+        expect(firestoreData['completedAt'], isA<Timestamp>());
+        expect(firestoreData['winnerId'], 'teamA');
+      });
     });
 
     group('fromFirestore', () {
