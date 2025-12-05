@@ -61,7 +61,11 @@ mixin _$GameModel {
   GameTeams? get teams =>
       throw _privateConstructorUsedError; // Game result (for completed games with entered scores)
   GameResult? get result =>
-      throw _privateConstructorUsedError; // Weather considerations
+      throw _privateConstructorUsedError; // ELO calculation flag (set to false when result is saved, true after Python function processes)
+  bool get eloCalculated =>
+      throw _privateConstructorUsedError; // Timestamp when the game result was entered and completed
+  @TimestampConverter()
+  DateTime? get completedAt => throw _privateConstructorUsedError; // Weather considerations
   bool get weatherDependent => throw _privateConstructorUsedError;
   String? get weatherNotes => throw _privateConstructorUsedError;
 
@@ -110,6 +114,8 @@ abstract class $GameModelCopyWith<$Res> {
     String? winnerId,
     GameTeams? teams,
     GameResult? result,
+    bool eloCalculated,
+    @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
     String? weatherNotes,
   });
@@ -163,6 +169,8 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? winnerId = freezed,
     Object? teams = freezed,
     Object? result = freezed,
+    Object? eloCalculated = null,
+    Object? completedAt = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
   }) {
@@ -284,6 +292,14 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.result
                 : result // ignore: cast_nullable_to_non_nullable
                       as GameResult?,
+            eloCalculated: null == eloCalculated
+                ? _value.eloCalculated
+                : eloCalculated // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            completedAt: freezed == completedAt
+                ? _value.completedAt
+                : completedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             weatherDependent: null == weatherDependent
                 ? _value.weatherDependent
                 : weatherDependent // ignore: cast_nullable_to_non_nullable
@@ -375,6 +391,8 @@ abstract class _$$GameModelImplCopyWith<$Res>
     String? winnerId,
     GameTeams? teams,
     GameResult? result,
+    bool eloCalculated,
+    @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
     String? weatherNotes,
   });
@@ -430,6 +448,8 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? winnerId = freezed,
     Object? teams = freezed,
     Object? result = freezed,
+    Object? eloCalculated = null,
+    Object? completedAt = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
   }) {
@@ -551,6 +571,14 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.result
             : result // ignore: cast_nullable_to_non_nullable
                   as GameResult?,
+        eloCalculated: null == eloCalculated
+            ? _value.eloCalculated
+            : eloCalculated // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        completedAt: freezed == completedAt
+            ? _value.completedAt
+            : completedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         weatherDependent: null == weatherDependent
             ? _value.weatherDependent
             : weatherDependent // ignore: cast_nullable_to_non_nullable
@@ -597,6 +625,8 @@ class _$GameModelImpl extends _GameModel {
     this.winnerId,
     this.teams,
     this.result,
+    this.eloCalculated = false,
+    @TimestampConverter() this.completedAt,
     this.weatherDependent = true,
     this.weatherNotes,
   }) : _playerIds = playerIds,
@@ -712,6 +742,14 @@ class _$GameModelImpl extends _GameModel {
   // Game result (for completed games with entered scores)
   @override
   final GameResult? result;
+  // ELO calculation flag (set to false when result is saved, true after Python function processes)
+  @override
+  @JsonKey()
+  final bool eloCalculated;
+  // Timestamp when the game result was entered and completed
+  @override
+  @TimestampConverter()
+  final DateTime? completedAt;
   // Weather considerations
   @override
   @JsonKey()
@@ -721,7 +759,7 @@ class _$GameModelImpl extends _GameModel {
 
   @override
   String toString() {
-    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
+    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, eloCalculated: $eloCalculated, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
   }
 
   @override
@@ -784,6 +822,10 @@ class _$GameModelImpl extends _GameModel {
                 other.winnerId == winnerId) &&
             (identical(other.teams, teams) || other.teams == teams) &&
             (identical(other.result, result) || other.result == result) &&
+            (identical(other.eloCalculated, eloCalculated) ||
+                other.eloCalculated == eloCalculated) &&
+            (identical(other.completedAt, completedAt) ||
+                other.completedAt == completedAt) &&
             (identical(other.weatherDependent, weatherDependent) ||
                 other.weatherDependent == weatherDependent) &&
             (identical(other.weatherNotes, weatherNotes) ||
@@ -823,6 +865,8 @@ class _$GameModelImpl extends _GameModel {
     winnerId,
     teams,
     result,
+    eloCalculated,
+    completedAt,
     weatherDependent,
     weatherNotes,
   ]);
@@ -872,6 +916,8 @@ abstract class _GameModel extends GameModel {
     final String? winnerId,
     final GameTeams? teams,
     final GameResult? result,
+    final bool eloCalculated,
+    @TimestampConverter() final DateTime? completedAt,
     final bool weatherDependent,
     final String? weatherNotes,
   }) = _$GameModelImpl;
@@ -942,7 +988,12 @@ abstract class _GameModel extends GameModel {
   @override
   GameTeams? get teams; // Game result (for completed games with entered scores)
   @override
-  GameResult? get result; // Weather considerations
+  GameResult? get result; // ELO calculation flag (set to false when result is saved, true after Python function processes)
+  @override
+  bool get eloCalculated; // Timestamp when the game result was entered and completed
+  @override
+  @TimestampConverter()
+  DateTime? get completedAt; // Weather considerations
   @override
   bool get weatherDependent;
   @override
