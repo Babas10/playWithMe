@@ -1,0 +1,194 @@
+playWithMe/
+├── CLAUDE.md                                    # 🎯 PRIMARY: Complete project brief, architecture, and standards
+├── README.md                                    # Project overview and setup instructions
+│
+├── docs/                                        # 📚 Complete documentation organized by Epic
+│   ├── security/
+│   │   ├── FIREBASE_CONFIG_SECURITY.md         # 🔒 CRITICAL: Firebase security guidelines
+│   │   └── PRE_COMMIT_SECURITY_CHECKLIST.md    # 🔒 MANDATORY: Security checklist before every commit
+│   ├── testing/
+│   │   └── LOCAL_TESTING_GUIDE.md              # Testing workflows and best practices
+│   └── epic-0/                                  # Foundation documentation
+│       └── story-*/                             # Per-story implementation docs
+│
+├── lib/
+│   ├── main_dev.dart                           # Development environment entry point
+│   ├── main_stg.dart                           # Staging environment entry point
+│   ├── main_prod.dart                          # Production environment entry point
+│   │
+│   ├── app/
+│   │   ├── app.dart                            # Root MaterialApp widget
+│   │   └── router/                             # App-wide navigation
+│   │
+│   ├── core/
+│   │   ├── config/
+│   │   │   └── firebase_options_*.dart         # 🔥 Environment-specific Firebase configs
+│   │   ├── di/
+│   │   │   └── injection.dart                  # 💉 Dependency injection setup (GetIt)
+│   │   ├── errors/
+│   │   │   └── failures.dart                   # Error handling models
+│   │   └── utils/
+│   │       └── constants.dart                  # App-wide constants
+│   │
+│   └── features/
+│       ├── auth/                               # 🔐 Authentication feature
+│       │   ├── data/
+│       │   │   ├── models/
+│       │   │   │   └── user_model.dart         # Freezed user data model
+│       │   │   └── repositories/
+│       │   │       └── auth_repository.dart    # Auth data layer (Firebase Auth)
+│       │   ├── domain/
+│       │   │   ├── entities/
+│       │   │   │   └── user_entity.dart        # Domain user entity
+│       │   │   └── repositories/
+│       │   │       └── auth_repository.dart    # Repository interface
+│       │   └── presentation/
+│       │       ├── bloc/
+│       │       │   ├── auth_bloc.dart          # 🎯 Authentication business logic
+│       │       │   ├── auth_event.dart
+│       │       │   └── auth_state.dart
+│       │       └── pages/
+│       │           └── login_screen.dart       # Login UI
+│       │
+│       ├── groups/                             # 👥 Groups feature
+│       │   ├── data/
+│       │   │   ├── models/
+│       │   │   │   └── group_model.dart
+│       │   │   └── repositories/
+│       │   │       └── firestore_group_repository.dart
+│       │   ├── domain/
+│       │   │   ├── entities/
+│       │   │   │   └── group_entity.dart
+│       │   │   └── repositories/
+│       │   │       └── group_repository.dart
+│       │   └── presentation/
+│       │       ├── bloc/
+│       │       │   └── group_bloc.dart
+│       │       └── pages/
+│       │           └── group_list_screen.dart
+│       │
+│       └── games/                              # 🏐 Games feature
+│           ├── data/
+│           │   ├── models/
+│           │   │   └── game_model.dart
+│           │   └── repositories/
+│           │       └── firestore_game_repository.dart
+│           ├── domain/
+│           │   ├── entities/
+│           │   │   └── game_entity.dart
+│           │   └── repositories/
+│           │       └── game_repository.dart
+│           └── presentation/
+│               ├── bloc/
+│               │   └── game_bloc.dart
+│               └── pages/
+│                   └── game_list_screen.dart
+│
+├── functions/                                   # ☁️ Firebase Cloud Functions (TypeScript)
+│   ├── src/
+│   │   ├── index.ts                            # Functions entry point
+│   │   ├── sendFriendRequest.ts                # Example: Friend request logic
+│   │   ├── onGameCreated.ts                    # Example: Game creation trigger
+│   │   └── utils/
+│   │       └── validation.ts                   # Shared validation utilities
+│   ├── package.json                            # Node.js dependencies
+│   └── tsconfig.json                           # TypeScript configuration
+│
+├── test/
+│   ├── unit/                                   # 🧪 Fast unit tests (mocked dependencies)
+│   │   ├── features/
+│   │   │   ├── auth/
+│   │   │   │   ├── auth_bloc_test.dart         # BLoC logic tests
+│   │   │   │   └── auth_repository_test.dart   # Repository interface tests
+│   │   │   ├── groups/
+│   │   │   │   └── group_bloc_test.dart
+│   │   │   └── games/
+│   │   │       └── game_bloc_test.dart
+│   │   └── helpers/
+│   │       ├── mock_auth_repository.dart       # Mocktail mocks
+│   │       └── fake_user_entity.dart           # Test fakes
+│   │
+│   └── widget/                                 # 🎨 Widget rendering tests
+│       ├── auth/
+│       │   └── login_screen_test.dart
+│       └── groups/
+│           └── group_list_screen_test.dart
+│
+├── integration_test/                           # 🔥 End-to-end tests (Firebase Emulator)
+│   ├── helpers/
+│   │   └── firebase_emulator_helper.dart       # Emulator test utilities
+│   ├── auth_flow_test.dart                     # Complete authentication flow
+│   └── game_creation_flow_test.dart            # Multi-step game creation
+│
+├── test_driver/
+│   └── integration_test.dart                   # Driver for flutter drive
+│
+├── android/
+│   └── app/
+│       └── build.gradle                        # 🤖 Android app-level config (flavors, app IDs)
+│
+├── ios/
+│   └── Runner/
+│       └── Info.plist                          # 🍎 iOS app configuration
+│
+├── web/
+│   └── index.html                              # 🌐 Web entry point
+│
+├── firestore.rules                             # 🔒 CRITICAL: Firestore security rules
+├── firestore.indexes.json                      # Firestore composite indexes
+├── storage.rules                               # Firebase Storage security rules
+│
+├── .gitignore                                  # 🔒 CRITICAL: Prevents committing secrets
+├── .env.example                                # Template for environment variables (NEVER commit real .env)
+│
+├── pubspec.yaml                                # 📦 Flutter dependencies and configuration
+├── analysis_options.yaml                       # Dart linter rules
+│
+├── firebase.json                               # Firebase project configuration
+└── .firebaserc                                 # Firebase environment aliases
+
+KEY PATTERNS TO UNDERSTAND:
+========================
+
+1. 🏗️ ARCHITECTURE (BLoC + Repository Pattern):
+   - UI Layer (presentation/pages) → "Dumb" widgets, display state only
+   - BLoC Layer (presentation/bloc) → State management, event handling
+   - Repository Layer (data/repositories) → Data source abstraction
+   - Domain Layer (domain/entities) → Business models and interfaces
+
+2. 🔥 FIREBASE INTEGRATION:
+   - Firestore: Primary database (users, groups, games collections)
+   - Cloud Functions: Server-side logic for cross-user operations
+   - Firebase Auth: User authentication
+   - Security Rules: firestore.rules enforces data access
+
+3. 🧪 TESTING STRATEGY:
+   - Unit tests: Fast, mocked dependencies (Mocktail)
+   - Widget tests: UI rendering with fake data
+   - Integration tests: E2E flows with Firebase Emulator
+
+4. 🌍 MULTI-ENVIRONMENT:
+   - dev: Local development (playwithme-dev)
+   - stg: Staging (playwithme-stg)
+   - prod: Production (playwithme-prod)
+   - Controlled via flavors: main_dev.dart, main_stg.dart, main_prod.dart
+
+5. 🔒 SECURITY CRITICAL FILES:
+   - .gitignore: Blocks secrets
+   - firestore.rules: Data access control
+   - PRE_COMMIT_SECURITY_CHECKLIST.md: Mandatory review
+   - FIREBASE_CONFIG_SECURITY.md: Configuration guidelines
+
+6. ☁️ CLOUD FUNCTIONS (Backend Logic):
+   - TypeScript functions in functions/src/
+   - Handle cross-user queries (search users, list members)
+   - Firestore triggers (onGameCreated, onInvitationAccepted)
+   - Callable functions (sendFriendRequest, acceptFriendRequest)
+   - See section 11 in CLAUDE.md for standards
+
+DEPENDENCY FLOW:
+===============
+Users → My Community (Social Graph) → Groups → Games
+- Each layer only queries the layer below
+- No cyclic dependencies
+- Cloud Functions expose social graph APIs to groups

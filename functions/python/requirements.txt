@@ -1,0 +1,10 @@
+# Firebase Cloud Functions dependencies
+firebase-functions==0.4.0
+firebase-admin==6.3.0
+
+# Data validation and models (updated for Python 3.13 compatibility)
+pydantic==2.10.4
+
+# Testing dependencies
+pytest==8.3.4
+pytest-cov==6.0.0
