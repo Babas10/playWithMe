@@ -48,6 +48,14 @@ service cloud.firestore {
         allow read, write: if isAuthenticated() && request.auth.uid == userId;
       }
 
+      // Rating history subcollection (Story 14.5.2)
+      // Users can only read their own rating history
+      // Write access is restricted to Cloud Functions (Admin SDK)
+      match /ratingHistory/{entryId} {
+        allow read: if isAuthenticated() && request.auth.uid == userId;
+        allow write: if false;  // Cloud Functions only via Admin SDK
+      }
+
       // User invitations subcollection (Story 2.3)
       match /invitations/{invitationId} {
         // Only group admins can create invitations
