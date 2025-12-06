@@ -76,9 +76,9 @@ jobs:
           name: PlayWithMe Coverage
           fail_ci_if_error: false
 
-  # Job 2: Cloud Functions Tests
+  # Job 2: Cloud Functions Tests (TypeScript)
   cloud_functions_tests:
-    name: ☁️ Cloud Functions Tests
+    name: ☁️ Cloud Functions Tests (TypeScript)
     runs-on: ubuntu-latest
 
     steps:
@@ -107,7 +107,76 @@ jobs:
         working-directory: functions
         run: npm test
 
-  # Job 3: Security and Dependency Audit
+  # Job 3: Python Cloud Functions Tests
+  python_functions_tests:
+    name: 🐍 Python Cloud Functions Tests
+    runs-on: ubuntu-latest
+    # Only run if Python files changed
+    if: |
+      github.event_name == 'pull_request' && (
+        contains(github.event.pull_request.changed_files, 'functions/python/') ||
+        github.event.pull_request.changed_files == null
+      )
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Step 2: Check if Python files changed
+      - name: 🔍 Check for Python Changes
+        id: python_changes
+        run: |
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q "^functions/python/"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Python files changed, running tests..."
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No Python files changed, skipping tests..."
+          fi
+
+      # Step 3: Setup Python environment
+      - name: 🔧 Setup Python
+        if: steps.python_changes.outputs.changed == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: functions/python/requirements.txt
+
+      # Step 4: Install dependencies
+      - name: 📦 Install Dependencies
+        if: steps.python_changes.outputs.changed == 'true'
+        working-directory: functions/python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 5: Run Python tests with coverage
+      - name: 🧪 Run Python Tests
+        if: steps.python_changes.outputs.changed == 'true'
+        working-directory: functions/python
+        run: |
+          python -m pytest tests/ -v --cov=rating --cov=shared --cov-report=xml --cov-report=term-missing
+
+      # Step 6: Upload Python coverage to Codecov
+      - name: 📈 Upload Python Coverage to Codecov
+        if: steps.python_changes.outputs.changed == 'true' && success()
+        uses: codecov/codecov-action@v3
+        with:
+          file: functions/python/coverage.xml
+          flags: python-functions
+          name: Python Cloud Functions Coverage
+          fail_ci_if_error: false
+
+      # Step 7: Skip message if no changes
+      - name: ⏭️ Skip Message
+        if: steps.python_changes.outputs.changed == 'false'
+        run: echo "✅ No Python changes detected, skipping Python tests"
+
+  # Job 4: Security and Dependency Audit
   security_audit:
     name: 🔒 Security Audit
     runs-on: ubuntu-latest
@@ -154,21 +223,26 @@ jobs:
           fi
           echo "✅ No Firebase config files found in repository"
 
-  # Job 4: Final Status Check
+  # Job 5: Final Status Check
   ci_success:
     name: ✅ CI Success
     runs-on: ubuntu-latest
-    needs: [analyze_and_test, cloud_functions_tests, security_audit]
+    needs: [analyze_and_test, cloud_functions_tests, python_functions_tests, security_audit]
     if: always()
 
     steps:
       - name: 🎉 All Checks Passed
-        if: needs.analyze_and_test.result == 'success' && needs.cloud_functions_tests.result == 'success' && needs.security_audit.result == 'success'
+        if: |
+          needs.analyze_and_test.result == 'success' &&
+          needs.cloud_functions_tests.result == 'success' &&
+          (needs.python_functions_tests.result == 'success' || needs.python_functions_tests.result == 'skipped') &&
+          needs.security_audit.result == 'success'
         run: |
           echo "🎉 All CI/CD checks passed successfully!"
           echo "✅ Static Analysis: Passed"
           echo "✅ Flutter Tests: Passed"
-          echo "✅ Cloud Functions Tests: Passed"
+          echo "✅ TypeScript Cloud Functions Tests: Passed"
+          echo "🐍 Python Cloud Functions Tests: ${{ needs.python_functions_tests.result }}"
           echo "✅ Security Audit: Passed"
           echo ""
           echo "🚀 Ready for review!"
@@ -176,11 +250,16 @@ jobs:
           echo "ℹ️ Note: Platform builds are available via build-verification.yml workflow"
 
       - name: ❌ CI Failed
-        if: needs.analyze_and_test.result != 'success' || needs.cloud_functions_tests.result != 'success' || needs.security_audit.result != 'success'
+        if: |
+          needs.analyze_and_test.result != 'success' ||
+          needs.cloud_functions_tests.result != 'success' ||
+          (needs.python_functions_tests.result != 'success' && needs.python_functions_tests.result != 'skipped') ||
+          needs.security_audit.result != 'success'
         run: |
           echo "❌ CI/CD pipeline failed!"
           echo "📊 Flutter Analysis & Tests: ${{ needs.analyze_and_test.result }}"
-          echo "☁️ Cloud Functions Tests: ${{ needs.cloud_functions_tests.result }}"
+          echo "☁️ TypeScript Cloud Functions Tests: ${{ needs.cloud_functions_tests.result }}"
+          echo "🐍 Python Cloud Functions Tests: ${{ needs.python_functions_tests.result }}"
           echo "🔒 Security Audit: ${{ needs.security_audit.result }}"
           echo ""
           echo "🛑 Please fix the failing checks before merging."
