@@ -41,6 +41,12 @@ class UserModel with _$UserModel {
     @Default(0) int gamesPlayed,
     @Default(0) int gamesWon,
     @Default(0) int totalScore,
+    // ELO Rating fields (Story 14.5.3)
+    @Default(1600.0) double eloRating,
+    @TimestampConverter() DateTime? eloLastUpdated,
+    @Default(1600.0) double eloPeak,
+    @TimestampConverter() DateTime? eloPeakDate,
+    @Default(0) int eloGamesPlayed,
   }) = _UserModel;
 
   const UserModel._();
@@ -232,7 +238,7 @@ enum UserPrivacyLevel {
   private,
 }
 
-/// Custom converter for Firestore Timestamp to DateTime
+/// Custom converter for Firestore Timestamp to DateTime (nullable)
 class TimestampConverter implements JsonConverter<DateTime?, Object?> {
   const TimestampConverter();
 
@@ -248,6 +254,24 @@ class TimestampConverter implements JsonConverter<DateTime?, Object?> {
   @override
   Object? toJson(DateTime? object) {
     if (object == null) return null;
+    return Timestamp.fromDate(object);
+  }
+}
+
+/// Custom converter for Firestore Timestamp to DateTime (required/non-nullable)
+class RequiredTimestampConverter implements JsonConverter<DateTime, Object> {
+  const RequiredTimestampConverter();
+
+  @override
+  DateTime fromJson(Object json) {
+    if (json is Timestamp) return json.toDate();
+    if (json is String) return DateTime.parse(json);
+    if (json is int) return DateTime.fromMillisecondsSinceEpoch(json);
+    throw ArgumentError('Cannot convert $json to DateTime');
+  }
+
+  @override
+  Object toJson(DateTime object) {
     return Timestamp.fromDate(object);
   }
 }
