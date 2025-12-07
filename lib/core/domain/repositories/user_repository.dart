@@ -1,3 +1,4 @@
+import '../../data/models/rating_history_entry.dart';
 import '../../data/models/user_model.dart';
 
 abstract class UserRepository {
@@ -61,4 +62,8 @@ abstract class UserRepository {
 
   /// Check if user exists
   Future<bool> userExists(String uid);
+
+  /// Get user's ELO rating history (Story 14.5.3)
+  /// Returns a stream of rating history entries ordered by timestamp descending
+  Stream<List<RatingHistoryEntry>> getRatingHistory(String userId, {int limit});
 }

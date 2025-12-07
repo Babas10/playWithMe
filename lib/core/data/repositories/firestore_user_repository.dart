@@ -5,6 +5,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../domain/repositories/user_repository.dart';
+import '../models/rating_history_entry.dart';
 import '../models/user_model.dart';
 
 class FirestoreUserRepository implements UserRepository {
@@ -299,5 +300,23 @@ class FirestoreUserRepository implements UserRepository {
     } catch (e) {
       throw Exception('Failed to check if user exists: $e');
     }
+  }
+
+  @override
+  Stream<List<RatingHistoryEntry>> getRatingHistory(
+    String userId, {
+    int limit = 20,
+  }) {
+    return _firestore
+        .collection(_collection)
+        .doc(userId)
+        .collection('ratingHistory')
+        .orderBy('timestamp', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .where((doc) => doc.exists)
+            .map((doc) => RatingHistoryEntry.fromFirestore(doc))
+            .toList());
   }
 }
