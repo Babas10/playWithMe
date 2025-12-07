@@ -1,6 +1,7 @@
 // Mock repository for UserRepository used in testing
 import 'dart:async';
 
+import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 
@@ -191,6 +192,15 @@ class MockUserRepository implements UserRepository {
   @override
   Future<bool> userExists(String uid) async {
     return _users.containsKey(uid);
+  }
+
+  @override
+  Stream<List<RatingHistoryEntry>> getRatingHistory(
+    String userId, {
+    int limit = 20,
+  }) {
+    // Return an empty stream for testing - can be customized per test if needed
+    return Stream.value([]);
   }
 }
 
