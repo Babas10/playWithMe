@@ -1,13 +1,13 @@
 // Firebase Emulator test helper for integration tests
 import * as admin from "firebase-admin";
-import * as functions from "firebase-functions-test";
+import functionsTest from "firebase-functions-test";
 
 // Emulator configuration
 const FIRESTORE_EMULATOR_HOST = "localhost:8080";
 const AUTH_EMULATOR_HOST = "localhost:9099";
 
 export class EmulatorHelper {
-  private static testEnv: ReturnType<typeof functions> | null = null;
+  private static testEnv: ReturnType<typeof functionsTest> | null = null;
   private static isInitialized = false;
 
   /**
@@ -30,7 +30,7 @@ export class EmulatorHelper {
     }
 
     // Initialize firebase-functions-test
-    this.testEnv = functions({
+    this.testEnv = functionsTest({
       projectId: "playwithme-dev",
     });
 
@@ -44,7 +44,7 @@ export class EmulatorHelper {
     const db = admin.firestore();
 
     // Delete all collections
-    const collections = ["users", "groups"];
+    const collections = ["users", "groups", "games"];
 
     for (const collectionName of collections) {
       const snapshot = await db.collection(collectionName).get();
@@ -54,14 +54,17 @@ export class EmulatorHelper {
 
       for (const doc of snapshot.docs) {
         // Delete subcollections first
-        const invitationsSnapshot = await doc.ref.collection("invitations").get();
-        for (const invDoc of invitationsSnapshot.docs) {
-          batch.delete(invDoc.ref);
-          batchCount++;
+        const subcollections = ["invitations", "ratingHistory"];
+        for (const subcollectionName of subcollections) {
+          const subSnapshot = await doc.ref.collection(subcollectionName).get();
+          for (const subDoc of subSnapshot.docs) {
+            batch.delete(subDoc.ref);
+            batchCount++;
 
-          if (batchCount >= 500) {
-            await batch.commit();
-            batchCount = 0;
+            if (batchCount >= 500) {
+              await batch.commit();
+              batchCount = 0;
+            }
           }
         }
 
