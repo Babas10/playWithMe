@@ -658,6 +658,166 @@ void main() {
         expect(user.needsFriendCacheRefresh, false);
       });
     });
+
+    // Story 14.5.3: Tests for ELO rating fields
+    group('ELO rating fields (Story 14.5.3)', () {
+      test('has default ELO rating of 1600', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'email@test.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+        );
+
+        expect(user.eloRating, 1600.0);
+        expect(user.eloPeak, 1600.0);
+        expect(user.eloGamesPlayed, 0);
+        expect(user.eloLastUpdated, null);
+        expect(user.eloPeakDate, null);
+      });
+
+      test('serializes ELO fields to JSON', () {
+        final eloDate = DateTime(2024, 12, 6, 10, 30, 0);
+        final user = testUser.copyWith(
+          eloRating: 1650.5,
+          eloPeak: 1700.0,
+          eloGamesPlayed: 15,
+          eloLastUpdated: eloDate,
+          eloPeakDate: eloDate,
+        );
+
+        final json = user.toJson();
+
+        expect(json['eloRating'], 1650.5);
+        expect(json['eloPeak'], 1700.0);
+        expect(json['eloGamesPlayed'], 15);
+        expect(json['eloLastUpdated'], isA<Timestamp>());
+        expect(json['eloPeakDate'], isA<Timestamp>());
+      });
+
+      test('deserializes ELO fields from JSON with Timestamp', () {
+        final eloDate = DateTime(2024, 12, 6, 10, 30, 0);
+        final json = {
+          'uid': 'test-uid',
+          'email': 'test@example.com',
+          'isEmailVerified': true,
+          'isAnonymous': false,
+          'eloRating': 1725.0,
+          'eloPeak': 1800.0,
+          'eloGamesPlayed': 25,
+          'eloLastUpdated': Timestamp.fromDate(eloDate),
+          'eloPeakDate': Timestamp.fromDate(eloDate),
+        };
+
+        final user = UserModel.fromJson(json);
+
+        expect(user.eloRating, 1725.0);
+        expect(user.eloPeak, 1800.0);
+        expect(user.eloGamesPlayed, 25);
+        expect(user.eloLastUpdated, eloDate);
+        expect(user.eloPeakDate, eloDate);
+      });
+
+      test('backward compatibility - missing ELO fields default correctly', () {
+        // Simulates a user document created before ELO was implemented
+        final json = {
+          'uid': 'legacy-user',
+          'email': 'legacy@test.com',
+          'isEmailVerified': true,
+          'isAnonymous': false,
+          // No ELO fields
+        };
+
+        final user = UserModel.fromJson(json);
+
+        expect(user.eloRating, 1600.0);
+        expect(user.eloPeak, 1600.0);
+        expect(user.eloGamesPlayed, 0);
+        expect(user.eloLastUpdated, null);
+        expect(user.eloPeakDate, null);
+      });
+
+      test('toFirestore includes ELO fields', () {
+        final eloDate = DateTime(2024, 12, 6, 10, 30, 0);
+        final user = testUser.copyWith(
+          eloRating: 1550.0,
+          eloPeak: 1600.0,
+          eloGamesPlayed: 3,
+          eloLastUpdated: eloDate,
+          eloPeakDate: eloDate,
+        );
+
+        final firestoreData = user.toFirestore();
+
+        expect(firestoreData['eloRating'], 1550.0);
+        expect(firestoreData['eloPeak'], 1600.0);
+        expect(firestoreData['eloGamesPlayed'], 3);
+        expect(firestoreData['eloLastUpdated'], isA<Timestamp>());
+        expect(firestoreData['eloPeakDate'], isA<Timestamp>());
+        expect(firestoreData.containsKey('uid'), false);
+      });
+
+      test('fromFirestore parses ELO fields correctly', () {
+        final eloDate = DateTime(2024, 12, 6, 10, 30, 0);
+        final data = {
+          'email': 'elo@test.com',
+          'displayName': 'ELO Test User',
+          'isEmailVerified': true,
+          'isAnonymous': false,
+          'eloRating': 1850.0,
+          'eloPeak': 1900.0,
+          'eloGamesPlayed': 42,
+          'eloLastUpdated': Timestamp.fromDate(eloDate),
+          'eloPeakDate': Timestamp.fromDate(eloDate),
+        };
+
+        final mockDoc = MockDocumentSnapshot('elo-test-uid', data);
+        final user = UserModel.fromFirestore(mockDoc);
+
+        expect(user.uid, 'elo-test-uid');
+        expect(user.eloRating, 1850.0);
+        expect(user.eloPeak, 1900.0);
+        expect(user.eloGamesPlayed, 42);
+        expect(user.eloLastUpdated, eloDate);
+        expect(user.eloPeakDate, eloDate);
+      });
+
+      test('copyWith updates ELO fields correctly', () {
+        final newDate = DateTime(2024, 12, 7, 14, 0, 0);
+        final updatedUser = testUser.copyWith(
+          eloRating: 1680.0,
+          eloPeak: 1680.0,
+          eloGamesPlayed: 10,
+          eloLastUpdated: newDate,
+          eloPeakDate: newDate,
+        );
+
+        expect(updatedUser.eloRating, 1680.0);
+        expect(updatedUser.eloPeak, 1680.0);
+        expect(updatedUser.eloGamesPlayed, 10);
+        expect(updatedUser.eloLastUpdated, newDate);
+        expect(updatedUser.eloPeakDate, newDate);
+        // Other fields unchanged
+        expect(updatedUser.uid, testUser.uid);
+        expect(updatedUser.email, testUser.email);
+      });
+
+      test('handles decimal ELO ratings', () {
+        final user = testUser.copyWith(
+          eloRating: 1632.567,
+          eloPeak: 1700.123,
+        );
+
+        expect(user.eloRating, 1632.567);
+        expect(user.eloPeak, 1700.123);
+
+        final json = user.toJson();
+        final restored = UserModel.fromJson(json);
+
+        expect(restored.eloRating, 1632.567);
+        expect(restored.eloPeak, 1700.123);
+      });
+    });
   });
 }
 

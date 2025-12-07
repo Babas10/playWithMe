@@ -56,7 +56,15 @@ mixin _$UserModel {
   bool get showPhoneNumber => throw _privateConstructorUsedError; // Stats
   int get gamesPlayed => throw _privateConstructorUsedError;
   int get gamesWon => throw _privateConstructorUsedError;
-  int get totalScore => throw _privateConstructorUsedError;
+  int get totalScore =>
+      throw _privateConstructorUsedError; // ELO Rating fields (Story 14.5.3)
+  double get eloRating => throw _privateConstructorUsedError;
+  @TimestampConverter()
+  DateTime? get eloLastUpdated => throw _privateConstructorUsedError;
+  double get eloPeak => throw _privateConstructorUsedError;
+  @TimestampConverter()
+  DateTime? get eloPeakDate => throw _privateConstructorUsedError;
+  int get eloGamesPlayed => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -103,6 +111,11 @@ abstract class $UserModelCopyWith<$Res> {
     int gamesPlayed,
     int gamesWon,
     int totalScore,
+    double eloRating,
+    @TimestampConverter() DateTime? eloLastUpdated,
+    double eloPeak,
+    @TimestampConverter() DateTime? eloPeakDate,
+    int eloGamesPlayed,
   });
 }
 
@@ -150,6 +163,11 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? gamesPlayed = null,
     Object? gamesWon = null,
     Object? totalScore = null,
+    Object? eloRating = null,
+    Object? eloLastUpdated = freezed,
+    Object? eloPeak = null,
+    Object? eloPeakDate = freezed,
+    Object? eloGamesPlayed = null,
   }) {
     return _then(
       _value.copyWith(
@@ -269,6 +287,26 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.totalScore
                 : totalScore // ignore: cast_nullable_to_non_nullable
                       as int,
+            eloRating: null == eloRating
+                ? _value.eloRating
+                : eloRating // ignore: cast_nullable_to_non_nullable
+                      as double,
+            eloLastUpdated: freezed == eloLastUpdated
+                ? _value.eloLastUpdated
+                : eloLastUpdated // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            eloPeak: null == eloPeak
+                ? _value.eloPeak
+                : eloPeak // ignore: cast_nullable_to_non_nullable
+                      as double,
+            eloPeakDate: freezed == eloPeakDate
+                ? _value.eloPeakDate
+                : eloPeakDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            eloGamesPlayed: null == eloGamesPlayed
+                ? _value.eloGamesPlayed
+                : eloGamesPlayed // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -314,6 +352,11 @@ abstract class _$$UserModelImplCopyWith<$Res>
     int gamesPlayed,
     int gamesWon,
     int totalScore,
+    double eloRating,
+    @TimestampConverter() DateTime? eloLastUpdated,
+    double eloPeak,
+    @TimestampConverter() DateTime? eloPeakDate,
+    int eloGamesPlayed,
   });
 }
 
@@ -360,6 +403,11 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? gamesPlayed = null,
     Object? gamesWon = null,
     Object? totalScore = null,
+    Object? eloRating = null,
+    Object? eloLastUpdated = freezed,
+    Object? eloPeak = null,
+    Object? eloPeakDate = freezed,
+    Object? eloGamesPlayed = null,
   }) {
     return _then(
       _$UserModelImpl(
@@ -479,6 +527,26 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.totalScore
             : totalScore // ignore: cast_nullable_to_non_nullable
                   as int,
+        eloRating: null == eloRating
+            ? _value.eloRating
+            : eloRating // ignore: cast_nullable_to_non_nullable
+                  as double,
+        eloLastUpdated: freezed == eloLastUpdated
+            ? _value.eloLastUpdated
+            : eloLastUpdated // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        eloPeak: null == eloPeak
+            ? _value.eloPeak
+            : eloPeak // ignore: cast_nullable_to_non_nullable
+                  as double,
+        eloPeakDate: freezed == eloPeakDate
+            ? _value.eloPeakDate
+            : eloPeakDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        eloGamesPlayed: null == eloGamesPlayed
+            ? _value.eloGamesPlayed
+            : eloGamesPlayed // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -517,6 +585,11 @@ class _$UserModelImpl extends _UserModel {
     this.gamesPlayed = 0,
     this.gamesWon = 0,
     this.totalScore = 0,
+    this.eloRating = 1600.0,
+    @TimestampConverter() this.eloLastUpdated,
+    this.eloPeak = 1600.0,
+    @TimestampConverter() this.eloPeakDate,
+    this.eloGamesPlayed = 0,
   }) : _groupIds = groupIds,
        _gameIds = gameIds,
        _friendIds = friendIds,
@@ -624,10 +697,26 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey()
   final int totalScore;
+  // ELO Rating fields (Story 14.5.3)
+  @override
+  @JsonKey()
+  final double eloRating;
+  @override
+  @TimestampConverter()
+  final DateTime? eloLastUpdated;
+  @override
+  @JsonKey()
+  final double eloPeak;
+  @override
+  @TimestampConverter()
+  final DateTime? eloPeakDate;
+  @override
+  @JsonKey()
+  final int eloGamesPlayed;
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, totalScore: $totalScore)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, totalScore: $totalScore, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed)';
   }
 
   @override
@@ -689,7 +778,16 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.gamesWon, gamesWon) ||
                 other.gamesWon == gamesWon) &&
             (identical(other.totalScore, totalScore) ||
-                other.totalScore == totalScore));
+                other.totalScore == totalScore) &&
+            (identical(other.eloRating, eloRating) ||
+                other.eloRating == eloRating) &&
+            (identical(other.eloLastUpdated, eloLastUpdated) ||
+                other.eloLastUpdated == eloLastUpdated) &&
+            (identical(other.eloPeak, eloPeak) || other.eloPeak == eloPeak) &&
+            (identical(other.eloPeakDate, eloPeakDate) ||
+                other.eloPeakDate == eloPeakDate) &&
+            (identical(other.eloGamesPlayed, eloGamesPlayed) ||
+                other.eloGamesPlayed == eloGamesPlayed));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -725,6 +823,11 @@ class _$UserModelImpl extends _UserModel {
     gamesPlayed,
     gamesWon,
     totalScore,
+    eloRating,
+    eloLastUpdated,
+    eloPeak,
+    eloPeakDate,
+    eloGamesPlayed,
   ]);
 
   /// Create a copy of UserModel
@@ -772,6 +875,11 @@ abstract class _UserModel extends UserModel {
     final int gamesPlayed,
     final int gamesWon,
     final int totalScore,
+    final double eloRating,
+    @TimestampConverter() final DateTime? eloLastUpdated,
+    final double eloPeak,
+    @TimestampConverter() final DateTime? eloPeakDate,
+    final int eloGamesPlayed,
   }) = _$UserModelImpl;
   const _UserModel._() : super._();
 
@@ -839,7 +947,19 @@ abstract class _UserModel extends UserModel {
   @override
   int get gamesWon;
   @override
-  int get totalScore;
+  int get totalScore; // ELO Rating fields (Story 14.5.3)
+  @override
+  double get eloRating;
+  @override
+  @TimestampConverter()
+  DateTime? get eloLastUpdated;
+  @override
+  double get eloPeak;
+  @override
+  @TimestampConverter()
+  DateTime? get eloPeakDate;
+  @override
+  int get eloGamesPlayed;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
