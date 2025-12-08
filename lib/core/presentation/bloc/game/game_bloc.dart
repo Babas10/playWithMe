@@ -33,6 +33,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<SearchGames>(_onSearchGames);
     on<LoadGameStats>(_onLoadGameStats);
     on<DeleteGame>(_onDeleteGame);
+    on<SaveGameResult>(_onSaveGameResult);
   }
 
   Future<void> _onLoadGameById(
@@ -560,6 +561,39 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       emit(GameError(
         message: 'Failed to delete game: ${e.toString()}',
         errorCode: 'DELETE_GAME_ERROR',
+      ));
+    }
+  }
+
+  Future<void> _onSaveGameResult(
+    SaveGameResult event,
+    Emitter<GameState> emit,
+  ) async {
+    try {
+      emit(const GameLoading());
+
+      await _gameRepository.saveGameResult(
+        gameId: event.gameId,
+        userId: event.userId,
+        teams: event.teams,
+        result: event.result,
+      );
+
+      final updatedGame = await _gameRepository.getGameById(event.gameId);
+      if (updatedGame != null) {
+        emit(GameUpdated(
+          game: updatedGame,
+          message: 'Game result saved successfully',
+        ));
+      } else {
+        emit(const GameOperationSuccess(
+          message: 'Game result saved successfully',
+        ));
+      }
+    } catch (e) {
+      emit(GameError(
+        message: 'Failed to save game result: ${e.toString()}',
+        errorCode: 'SAVE_GAME_RESULT_ERROR',
       ));
     }
   }

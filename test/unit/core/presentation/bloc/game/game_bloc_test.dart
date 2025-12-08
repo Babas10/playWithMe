@@ -132,18 +132,130 @@ void main() {
         startedAt: DateTime.now(),
       );
 
-      blocTest<GameBloc, GameState>(
-        'emits GameUpdated when start succeeds',
-        build: () {
-          mockGameRepository.addGame(startedGame);
-          return gameBloc;
-        },
-        act: (bloc) => bloc.add(const StartGame(gameId: 'game-1')),
-        expect: () => [
-          const GameLoading(),
-          isA<GameUpdated>(),
-        ],
-      );
-    });
-  });
-}
+            blocTest<GameBloc, GameState>(
+
+              'emits GameUpdated when start succeeds',
+
+              build: () {
+
+                mockGameRepository.addGame(startedGame);
+
+                return gameBloc;
+
+              },
+
+              act: (bloc) => bloc.add(const StartGame(gameId: 'game-1')),
+
+              expect: () => [
+
+                const GameLoading(),
+
+                isA<GameUpdated>(),
+
+              ],
+
+            );
+
+          });
+
+      
+
+          group('SaveGameResult', () {
+
+            final game = GameModel(
+
+              id: 'game-1',
+
+              title: 'Test Game',
+
+              groupId: 'group-1',
+
+              createdBy: 'user-1',
+
+              createdAt: DateTime.now(),
+
+              scheduledAt: DateTime.now().add(const Duration(hours: 1)),
+
+              location: const GameLocation(name: 'Test Court'),
+
+              status: GameStatus.completed,
+
+              playerIds: ['user-1', 'user-2', 'user-3', 'user-4'],
+
+            );
+
+            final teams = GameTeams(
+
+              teamAPlayerIds: ['user-1', 'user-3'],
+
+              teamBPlayerIds: ['user-2', 'user-4'],
+
+            );
+
+            final result = GameResult(
+
+              games: [
+
+                IndividualGame(
+
+                  gameNumber: 1,
+
+                  sets: [
+
+                    SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1),
+
+                  ],
+
+                  winner: 'teamA',
+
+                )
+
+              ],
+
+              overallWinner: 'teamA',
+
+            );
+
+      
+
+            blocTest<GameBloc, GameState>(
+
+              'emits GameUpdated when saving game result succeeds',
+
+              build: () {
+
+                mockGameRepository.addGame(game);
+
+                return gameBloc;
+
+              },
+
+              act: (bloc) => bloc.add(SaveGameResult(
+
+                gameId: 'game-1',
+
+                userId: 'user-1',
+
+                teams: teams,
+
+                result: result,
+
+              )),
+
+              expect: () => [
+
+                const GameLoading(),
+
+                isA<GameUpdated>(),
+
+              ],
+
+            );
+
+          });
+
+        });
+
+      }
+
+      

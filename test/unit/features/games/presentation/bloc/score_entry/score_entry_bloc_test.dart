@@ -330,6 +330,7 @@ void main() {
           final game = TestGameData.testGame.copyWith(
             status: GameStatus.completed,
             endedAt: DateTime.now(),
+            playerIds: ['p1', 'p2'],
             teams: const GameTeams(
               teamAPlayerIds: ['p1'],
               teamBPlayerIds: ['p2'],
@@ -341,6 +342,7 @@ void main() {
         seed: () => ScoreEntryLoaded(
           game: TestGameData.testGame.copyWith(
             status: GameStatus.completed,
+            playerIds: ['p1', 'p2'],
             teams: const GameTeams(
               teamAPlayerIds: ['p1'],
               teamBPlayerIds: ['p2'],
@@ -369,6 +371,7 @@ void main() {
           final game = TestGameData.testGame.copyWith(
             status: GameStatus.completed,
             endedAt: DateTime.now(),
+            playerIds: ['p1', 'p2'],
             teams: const GameTeams(
               teamAPlayerIds: ['p1'],
               teamBPlayerIds: ['p2'],
@@ -380,6 +383,7 @@ void main() {
         seed: () => ScoreEntryLoaded(
           game: TestGameData.testGame.copyWith(
             status: GameStatus.completed,
+            playerIds: ['p1', 'p2'],
             teams: const GameTeams(
               teamAPlayerIds: ['p1'],
               teamBPlayerIds: ['p2'],
