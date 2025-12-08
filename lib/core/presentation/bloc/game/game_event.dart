@@ -270,10 +270,51 @@ class LoadGameStats extends GameEvent {
 }
 
 class DeleteGame extends GameEvent {
+
   final String gameId;
+
+
 
   const DeleteGame({required this.gameId});
 
+
+
   @override
+
   List<Object?> get props => [gameId];
+
+}
+
+
+
+class SaveGameResult extends GameEvent {
+
+  final String gameId;
+
+  final String userId;
+
+  final GameTeams teams;
+
+  final GameResult result;
+
+
+
+  const SaveGameResult({
+
+    required this.gameId,
+
+    required this.userId,
+
+    required this.teams,
+
+    required this.result,
+
+  });
+
+
+
+  @override
+
+  List<Object?> get props => [gameId, userId, teams, result];
+
 }
