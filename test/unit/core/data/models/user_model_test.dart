@@ -818,6 +818,226 @@ void main() {
         expect(restored.eloPeak, 1700.123);
       });
     });
+
+    // Story 14.6: Tests for new player stats fields
+    group('Player stats fields (Story 14.6)', () {
+      test('has default values for new stats fields', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'email@test.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+        );
+
+        expect(user.gamesLost, 0);
+        expect(user.currentStreak, 0);
+        expect(user.recentGameIds, []);
+        expect(user.lastGameDate, null);
+        expect(user.teammateStats, {});
+      });
+
+      test('lossRate calculates correctly', () {
+        final user = testUser.copyWith(gamesPlayed: 10, gamesLost: 3);
+        expect(user.lossRate, 0.3);
+      });
+
+      test('lossRate returns 0 when no games played', () {
+        final user = testUser.copyWith(gamesPlayed: 0, gamesLost: 0);
+        expect(user.lossRate, 0.0);
+      });
+
+      test('isOnWinningStreak returns true for positive streak', () {
+        final user = testUser.copyWith(currentStreak: 5);
+        expect(user.isOnWinningStreak, true);
+        expect(user.isOnLosingStreak, false);
+        expect(user.streakValue, 5);
+      });
+
+      test('isOnLosingStreak returns true for negative streak', () {
+        final user = testUser.copyWith(currentStreak: -3);
+        expect(user.isOnWinningStreak, false);
+        expect(user.isOnLosingStreak, true);
+        expect(user.streakValue, 3);
+      });
+
+      test('streak is zero for no streak', () {
+        final user = testUser.copyWith(currentStreak: 0);
+        expect(user.isOnWinningStreak, false);
+        expect(user.isOnLosingStreak, false);
+        expect(user.streakValue, 0);
+      });
+
+      test('serializes new stats fields to JSON', () {
+        final lastGame = DateTime(2024, 12, 8, 10, 0, 0);
+        final user = testUser.copyWith(
+          gamesLost: 3,
+          currentStreak: 5,
+          recentGameIds: ['game1', 'game2', 'game3'],
+          lastGameDate: lastGame,
+          teammateStats: {
+            'player1': {'gamesPlayed': 10, 'gamesWon': 7},
+            'player2': {'gamesPlayed': 5, 'gamesWon': 3}
+          },
+        );
+
+        final json = user.toJson();
+
+        expect(json['gamesLost'], 3);
+        expect(json['currentStreak'], 5);
+        expect(json['recentGameIds'], ['game1', 'game2', 'game3']);
+        expect(json['lastGameDate'], isA<Timestamp>());
+        expect(json['teammateStats'], {
+          'player1': {'gamesPlayed': 10, 'gamesWon': 7},
+          'player2': {'gamesPlayed': 5, 'gamesWon': 3}
+        });
+      });
+
+      test('deserializes new stats fields from JSON', () {
+        final lastGame = DateTime(2024, 12, 8, 10, 0, 0);
+        final json = {
+          'uid': 'test-uid',
+          'email': 'test@example.com',
+          'isEmailVerified': true,
+          'isAnonymous': false,
+          'gamesLost': 2,
+          'currentStreak': -2,
+          'recentGameIds': ['game5', 'game4', 'game3'],
+          'lastGameDate': Timestamp.fromDate(lastGame),
+          'teammateStats': {
+            'teammate1': {'gamesPlayed': 8, 'gamesWon': 6}
+          },
+        };
+
+        final user = UserModel.fromJson(json);
+
+        expect(user.gamesLost, 2);
+        expect(user.currentStreak, -2);
+        expect(user.recentGameIds, ['game5', 'game4', 'game3']);
+        expect(user.lastGameDate, lastGame);
+        expect(user.teammateStats, {
+          'teammate1': {'gamesPlayed': 8, 'gamesWon': 6}
+        });
+      });
+
+      test('backward compatibility - missing new stats fields default correctly', () {
+        final json = {
+          'uid': 'legacy-user',
+          'email': 'legacy@test.com',
+          'isEmailVerified': true,
+          'isAnonymous': false,
+          'gamesPlayed': 5,
+          'gamesWon': 3,
+          // No new stats fields
+        };
+
+        final user = UserModel.fromJson(json);
+
+        expect(user.gamesPlayed, 5);
+        expect(user.gamesWon, 3);
+        expect(user.gamesLost, 0);
+        expect(user.currentStreak, 0);
+        expect(user.recentGameIds, []);
+        expect(user.lastGameDate, null);
+        expect(user.teammateStats, {});
+      });
+
+      test('toFirestore includes new stats fields', () {
+        final lastGame = DateTime(2024, 12, 8, 10, 0, 0);
+        final user = testUser.copyWith(
+          gamesLost: 4,
+          currentStreak: 3,
+          recentGameIds: ['g1', 'g2'],
+          lastGameDate: lastGame,
+          teammateStats: {'p1': {'gamesPlayed': 2, 'gamesWon': 1}},
+        );
+
+        final firestoreData = user.toFirestore();
+
+        expect(firestoreData['gamesLost'], 4);
+        expect(firestoreData['currentStreak'], 3);
+        expect(firestoreData['recentGameIds'], ['g1', 'g2']);
+        expect(firestoreData['lastGameDate'], isA<Timestamp>());
+        expect(firestoreData['teammateStats'], {'p1': {'gamesPlayed': 2, 'gamesWon': 1}});
+        expect(firestoreData.containsKey('uid'), false);
+      });
+
+      test('fromFirestore parses new stats fields correctly', () {
+        final lastGame = DateTime(2024, 12, 8, 15, 30, 0);
+        final data = {
+          'email': 'stats@test.com',
+          'displayName': 'Stats Test User',
+          'isEmailVerified': true,
+          'isAnonymous': false,
+          'gamesLost': 6,
+          'currentStreak': -1,
+          'recentGameIds': ['game-a', 'game-b', 'game-c'],
+          'lastGameDate': Timestamp.fromDate(lastGame),
+          'teammateStats': {
+            'mate1': {'gamesPlayed': 15, 'gamesWon': 10},
+            'mate2': {'gamesPlayed': 8, 'gamesWon': 8}
+          },
+        };
+
+        final mockDoc = MockDocumentSnapshot('stats-test-uid', data);
+        final user = UserModel.fromFirestore(mockDoc);
+
+        expect(user.uid, 'stats-test-uid');
+        expect(user.gamesLost, 6);
+        expect(user.currentStreak, -1);
+        expect(user.recentGameIds, ['game-a', 'game-b', 'game-c']);
+        expect(user.lastGameDate, lastGame);
+        expect(user.teammateStats, {
+          'mate1': {'gamesPlayed': 15, 'gamesWon': 10},
+          'mate2': {'gamesPlayed': 8, 'gamesWon': 8}
+        });
+      });
+
+      test('copyWith updates new stats fields correctly', () {
+        final newDate = DateTime(2024, 12, 9, 14, 0, 0);
+        final updatedUser = testUser.copyWith(
+          gamesLost: 5,
+          currentStreak: 7,
+          recentGameIds: ['new-g1', 'new-g2'],
+          lastGameDate: newDate,
+          teammateStats: {'new-mate': {'gamesPlayed': 1, 'gamesWon': 1}},
+        );
+
+        expect(updatedUser.gamesLost, 5);
+        expect(updatedUser.currentStreak, 7);
+        expect(updatedUser.recentGameIds, ['new-g1', 'new-g2']);
+        expect(updatedUser.lastGameDate, newDate);
+        expect(updatedUser.teammateStats, {'new-mate': {'gamesPlayed': 1, 'gamesWon': 1}});
+        // Other fields unchanged
+        expect(updatedUser.uid, testUser.uid);
+        expect(updatedUser.email, testUser.email);
+      });
+
+      test('handles empty teammateStats map', () {
+        final user = testUser.copyWith(teammateStats: {});
+        expect(user.teammateStats, {});
+
+        final json = user.toJson();
+        final restored = UserModel.fromJson(json);
+
+        expect(restored.teammateStats, {});
+      });
+
+      test('handles complex teammateStats structure', () {
+        final stats = {
+          'player-1': {'gamesPlayed': 20, 'gamesWon': 15},
+          'player-2': {'gamesPlayed': 10, 'gamesWon': 8},
+          'player-3': {'gamesPlayed': 5, 'gamesWon': 2}
+        };
+
+        final user = testUser.copyWith(teammateStats: stats);
+        expect(user.teammateStats, stats);
+
+        final json = user.toJson();
+        final restored = UserModel.fromJson(json);
+
+        expect(restored.teammateStats, stats);
+      });
+    });
   });
 }
 
