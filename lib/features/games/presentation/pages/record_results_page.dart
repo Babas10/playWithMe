@@ -12,20 +12,22 @@ import 'score_entry_page.dart';
 
 class RecordResultsPage extends StatelessWidget {
   final String gameId;
-  final GameRepository? gameRepository;
+  final RecordResultsBloc? recordResultsBloc;
 
   const RecordResultsPage({
     super.key,
     required this.gameId,
-    this.gameRepository,
+    this.recordResultsBloc,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => RecordResultsBloc(
-        gameRepository: gameRepository ?? sl<GameRepository>(),
-      )..add(LoadGameForResults(gameId: gameId)),
+      create: (context) =>
+          recordResultsBloc ??
+          RecordResultsBloc(
+            gameRepository: sl<GameRepository>(),
+          )..add(LoadGameForResults(gameId: gameId)),
       child: const _RecordResultsView(),
     );
   }
@@ -115,6 +117,7 @@ class _RecordResultsView extends StatelessWidget {
                         const SizedBox(height: 24),
                         if (state is RecordResultsLoaded) ...[
                           _TeamSection(
+                            key: const Key('team_a_section'),
                             title: 'Team A',
                             playerIds: state.teamAPlayerIds,
                             color: Colors.blue,
@@ -126,6 +129,7 @@ class _RecordResultsView extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           _TeamSection(
+                            key: const Key('team_b_section'),
                             title: 'Team B',
                             playerIds: state.teamBPlayerIds,
                             color: Colors.red,
@@ -137,6 +141,7 @@ class _RecordResultsView extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           _UnassignedPlayersSection(
+                            key: const Key('unassigned_section'),
                             unassignedPlayerIds: state.unassignedPlayerIds,
                             onAssignToTeamA: (playerId) {
                               context.read<RecordResultsBloc>().add(
@@ -184,6 +189,7 @@ class _TeamSection extends StatelessWidget {
   final Function(String) onRemove;
 
   const _TeamSection({
+    super.key,
     required this.title,
     required this.playerIds,
     required this.color,
@@ -256,6 +262,7 @@ class _UnassignedPlayersSection extends StatelessWidget {
   final Function(String) onAssignToTeamB;
 
   const _UnassignedPlayersSection({
+    super.key,
     required this.unassignedPlayerIds,
     required this.onAssignToTeamA,
     required this.onAssignToTeamB,
@@ -400,6 +407,7 @@ class _UnassignedPlayerItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
+                key: Key('assign_team_A_button_$playerId'),
                 onPressed: onAssignToTeamA,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -410,6 +418,7 @@ class _UnassignedPlayerItem extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               ElevatedButton(
+                key: Key('assign_team_B_button_$playerId'),
                 onPressed: onAssignToTeamB,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
