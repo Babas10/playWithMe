@@ -40,7 +40,12 @@ class UserModel with _$UserModel {
     // Stats
     @Default(0) int gamesPlayed,
     @Default(0) int gamesWon,
+    @Default(0) int gamesLost,
     @Default(0) int totalScore,
+    @Default(0) int currentStreak,
+    @Default([]) List<String> recentGameIds,
+    @TimestampConverter() DateTime? lastGameDate,
+    @Default({}) Map<String, dynamic> teammateStats,
     // ELO Rating fields (Story 14.5.3)
     @Default(1600.0) double eloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
@@ -97,6 +102,18 @@ class UserModel with _$UserModel {
 
   /// Calculate win rate
   double get winRate => gamesPlayed > 0 ? gamesWon / gamesPlayed : 0.0;
+
+  /// Calculate loss rate
+  double get lossRate => gamesPlayed > 0 ? gamesLost / gamesPlayed : 0.0;
+
+  /// Check if currently on a winning streak
+  bool get isOnWinningStreak => currentStreak > 0;
+
+  /// Check if currently on a losing streak
+  bool get isOnLosingStreak => currentStreak < 0;
+
+  /// Get absolute streak value
+  int get streakValue => currentStreak.abs();
 
   /// Calculate average score per game
   double get averageScore => gamesPlayed > 0 ? totalScore / gamesPlayed : 0.0;
