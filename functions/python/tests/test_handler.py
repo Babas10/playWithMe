@@ -18,6 +18,8 @@ from rating.handler import (
     on_game_result_updated,
     RatingHistoryEntry,
     get_opponent_team_string,
+    calculate_new_streak,
+    get_teammate_ids,
     DEFAULT_RATING,
 )
 
@@ -435,3 +437,125 @@ class TestEdgeCases:
 
         assert result["status"] == "skipped"
         assert result["reason"] == "not_completed"
+
+
+# Story 14.6: Tests for new player stats calculation functions
+class TestCalculateNewStreak:
+    """Tests for the calculate_new_streak function (Story 14.6)."""
+
+    def test_start_winning_streak_from_zero(self):
+        """Test starting a winning streak from zero."""
+        result = calculate_new_streak(current_streak=0, won=True)
+        assert result == 1
+
+    def test_continue_winning_streak(self):
+        """Test continuing an existing winning streak."""
+        result = calculate_new_streak(current_streak=3, won=True)
+        assert result == 4
+
+    def test_break_losing_streak_with_win(self):
+        """Test breaking a losing streak with a win."""
+        result = calculate_new_streak(current_streak=-2, won=True)
+        assert result == 1
+
+    def test_start_losing_streak_from_zero(self):
+        """Test starting a losing streak from zero."""
+        result = calculate_new_streak(current_streak=0, won=False)
+        assert result == -1
+
+    def test_continue_losing_streak(self):
+        """Test continuing an existing losing streak."""
+        result = calculate_new_streak(current_streak=-4, won=False)
+        assert result == -5
+
+    def test_break_winning_streak_with_loss(self):
+        """Test breaking a winning streak with a loss."""
+        result = calculate_new_streak(current_streak=5, won=False)
+        assert result == -1
+
+    def test_long_winning_streak(self):
+        """Test a very long winning streak."""
+        result = calculate_new_streak(current_streak=20, won=True)
+        assert result == 21
+
+    def test_long_losing_streak(self):
+        """Test a very long losing streak."""
+        result = calculate_new_streak(current_streak=-15, won=False)
+        assert result == -16
+
+
+class TestGetTeammateIds:
+    """Tests for the get_teammate_ids function (Story 14.6)."""
+
+    def test_get_teammate_from_two_player_team(self):
+        """Test getting teammate from a 2-player team."""
+        team_ids = ["player1", "player2"]
+        result = get_teammate_ids(team_ids, "player1")
+        assert result == ["player2"]
+
+    def test_get_teammate_returns_other_player(self):
+        """Test that the player themselves is excluded."""
+        team_ids = ["alice", "bob"]
+        result = get_teammate_ids(team_ids, "bob")
+        assert result == ["alice"]
+
+    def test_get_teammates_preserves_order(self):
+        """Test that teammate order is preserved."""
+        team_ids = ["player1", "player2"]
+        result = get_teammate_ids(team_ids, "player1")
+        assert result == ["player2"]
+
+    def test_get_teammate_with_different_ids(self):
+        """Test with actual user ID strings."""
+        team_ids = ["uid-123-abc", "uid-456-def"]
+        result = get_teammate_ids(team_ids, "uid-123-abc")
+        assert result == ["uid-456-def"]
+
+
+class TestRatingHistoryEntryStory146:
+    """Tests for RatingHistoryEntry dataclass (Story 14.6 - validation)."""
+
+    def test_rating_history_entry_to_dict(self):
+        """Test converting rating history entry to dict."""
+        timestamp = datetime(2024, 12, 8, 10, 30, 0)
+        entry = RatingHistoryEntry(
+            game_id="game-123",
+            old_rating=1600.0,
+            new_rating=1625.0,
+            rating_change=25.0,
+            opponent_team="Alice & Bob",
+            won=True,
+            timestamp=timestamp,
+        )
+
+        result = entry.to_dict()
+
+        assert result["gameId"] == "game-123"
+        assert result["oldRating"] == 1600.0
+        assert result["newRating"] == 1625.0
+        assert result["ratingChange"] == 25.0
+        assert result["opponentTeam"] == "Alice & Bob"
+        assert result["won"] is True
+        assert result["timestamp"] == timestamp
+
+    def test_rating_history_entry_loss(self):
+        """Test rating history entry for a loss."""
+        timestamp = datetime(2024, 12, 8, 15, 0, 0)
+        entry = RatingHistoryEntry(
+            game_id="game-456",
+            old_rating=1650.0,
+            new_rating=1630.0,
+            rating_change=-20.0,
+            opponent_team="Charlie & Dana",
+            won=False,
+            timestamp=timestamp,
+        )
+
+        result = entry.to_dict()
+
+        assert result["gameId"] == "game-456"
+        assert result["oldRating"] == 1650.0
+        assert result["newRating"] == 1630.0
+        assert result["ratingChange"] == -20.0
+        assert result["opponentTeam"] == "Charlie & Dana"
+        assert result["won"] is False

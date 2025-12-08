@@ -56,7 +56,13 @@ mixin _$UserModel {
   bool get showPhoneNumber => throw _privateConstructorUsedError; // Stats
   int get gamesPlayed => throw _privateConstructorUsedError;
   int get gamesWon => throw _privateConstructorUsedError;
-  int get totalScore =>
+  int get gamesLost => throw _privateConstructorUsedError;
+  int get totalScore => throw _privateConstructorUsedError;
+  int get currentStreak => throw _privateConstructorUsedError;
+  List<String> get recentGameIds => throw _privateConstructorUsedError;
+  @TimestampConverter()
+  DateTime? get lastGameDate => throw _privateConstructorUsedError;
+  Map<String, dynamic> get teammateStats =>
       throw _privateConstructorUsedError; // ELO Rating fields (Story 14.5.3)
   double get eloRating => throw _privateConstructorUsedError;
   @TimestampConverter()
@@ -110,7 +116,12 @@ abstract class $UserModelCopyWith<$Res> {
     bool showPhoneNumber,
     int gamesPlayed,
     int gamesWon,
+    int gamesLost,
     int totalScore,
+    int currentStreak,
+    List<String> recentGameIds,
+    @TimestampConverter() DateTime? lastGameDate,
+    Map<String, dynamic> teammateStats,
     double eloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
     double eloPeak,
@@ -162,7 +173,12 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? showPhoneNumber = null,
     Object? gamesPlayed = null,
     Object? gamesWon = null,
+    Object? gamesLost = null,
     Object? totalScore = null,
+    Object? currentStreak = null,
+    Object? recentGameIds = null,
+    Object? lastGameDate = freezed,
+    Object? teammateStats = null,
     Object? eloRating = null,
     Object? eloLastUpdated = freezed,
     Object? eloPeak = null,
@@ -283,10 +299,30 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.gamesWon
                 : gamesWon // ignore: cast_nullable_to_non_nullable
                       as int,
+            gamesLost: null == gamesLost
+                ? _value.gamesLost
+                : gamesLost // ignore: cast_nullable_to_non_nullable
+                      as int,
             totalScore: null == totalScore
                 ? _value.totalScore
                 : totalScore // ignore: cast_nullable_to_non_nullable
                       as int,
+            currentStreak: null == currentStreak
+                ? _value.currentStreak
+                : currentStreak // ignore: cast_nullable_to_non_nullable
+                      as int,
+            recentGameIds: null == recentGameIds
+                ? _value.recentGameIds
+                : recentGameIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            lastGameDate: freezed == lastGameDate
+                ? _value.lastGameDate
+                : lastGameDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            teammateStats: null == teammateStats
+                ? _value.teammateStats
+                : teammateStats // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>,
             eloRating: null == eloRating
                 ? _value.eloRating
                 : eloRating // ignore: cast_nullable_to_non_nullable
@@ -351,7 +387,12 @@ abstract class _$$UserModelImplCopyWith<$Res>
     bool showPhoneNumber,
     int gamesPlayed,
     int gamesWon,
+    int gamesLost,
     int totalScore,
+    int currentStreak,
+    List<String> recentGameIds,
+    @TimestampConverter() DateTime? lastGameDate,
+    Map<String, dynamic> teammateStats,
     double eloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
     double eloPeak,
@@ -402,7 +443,12 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? showPhoneNumber = null,
     Object? gamesPlayed = null,
     Object? gamesWon = null,
+    Object? gamesLost = null,
     Object? totalScore = null,
+    Object? currentStreak = null,
+    Object? recentGameIds = null,
+    Object? lastGameDate = freezed,
+    Object? teammateStats = null,
     Object? eloRating = null,
     Object? eloLastUpdated = freezed,
     Object? eloPeak = null,
@@ -523,10 +569,30 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.gamesWon
             : gamesWon // ignore: cast_nullable_to_non_nullable
                   as int,
+        gamesLost: null == gamesLost
+            ? _value.gamesLost
+            : gamesLost // ignore: cast_nullable_to_non_nullable
+                  as int,
         totalScore: null == totalScore
             ? _value.totalScore
             : totalScore // ignore: cast_nullable_to_non_nullable
                   as int,
+        currentStreak: null == currentStreak
+            ? _value.currentStreak
+            : currentStreak // ignore: cast_nullable_to_non_nullable
+                  as int,
+        recentGameIds: null == recentGameIds
+            ? _value._recentGameIds
+            : recentGameIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        lastGameDate: freezed == lastGameDate
+            ? _value.lastGameDate
+            : lastGameDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        teammateStats: null == teammateStats
+            ? _value._teammateStats
+            : teammateStats // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>,
         eloRating: null == eloRating
             ? _value.eloRating
             : eloRating // ignore: cast_nullable_to_non_nullable
@@ -584,7 +650,12 @@ class _$UserModelImpl extends _UserModel {
     this.showPhoneNumber = true,
     this.gamesPlayed = 0,
     this.gamesWon = 0,
+    this.gamesLost = 0,
     this.totalScore = 0,
+    this.currentStreak = 0,
+    final List<String> recentGameIds = const [],
+    @TimestampConverter() this.lastGameDate,
+    final Map<String, dynamic> teammateStats = const {},
     this.eloRating = 1600.0,
     @TimestampConverter() this.eloLastUpdated,
     this.eloPeak = 1600.0,
@@ -593,6 +664,8 @@ class _$UserModelImpl extends _UserModel {
   }) : _groupIds = groupIds,
        _gameIds = gameIds,
        _friendIds = friendIds,
+       _recentGameIds = recentGameIds,
+       _teammateStats = teammateStats,
        super._();
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -696,7 +769,34 @@ class _$UserModelImpl extends _UserModel {
   final int gamesWon;
   @override
   @JsonKey()
+  final int gamesLost;
+  @override
+  @JsonKey()
   final int totalScore;
+  @override
+  @JsonKey()
+  final int currentStreak;
+  final List<String> _recentGameIds;
+  @override
+  @JsonKey()
+  List<String> get recentGameIds {
+    if (_recentGameIds is EqualUnmodifiableListView) return _recentGameIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_recentGameIds);
+  }
+
+  @override
+  @TimestampConverter()
+  final DateTime? lastGameDate;
+  final Map<String, dynamic> _teammateStats;
+  @override
+  @JsonKey()
+  Map<String, dynamic> get teammateStats {
+    if (_teammateStats is EqualUnmodifiableMapView) return _teammateStats;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_teammateStats);
+  }
+
   // ELO Rating fields (Story 14.5.3)
   @override
   @JsonKey()
@@ -716,7 +816,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, totalScore: $totalScore, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed)';
   }
 
   @override
@@ -777,8 +877,22 @@ class _$UserModelImpl extends _UserModel {
                 other.gamesPlayed == gamesPlayed) &&
             (identical(other.gamesWon, gamesWon) ||
                 other.gamesWon == gamesWon) &&
+            (identical(other.gamesLost, gamesLost) ||
+                other.gamesLost == gamesLost) &&
             (identical(other.totalScore, totalScore) ||
                 other.totalScore == totalScore) &&
+            (identical(other.currentStreak, currentStreak) ||
+                other.currentStreak == currentStreak) &&
+            const DeepCollectionEquality().equals(
+              other._recentGameIds,
+              _recentGameIds,
+            ) &&
+            (identical(other.lastGameDate, lastGameDate) ||
+                other.lastGameDate == lastGameDate) &&
+            const DeepCollectionEquality().equals(
+              other._teammateStats,
+              _teammateStats,
+            ) &&
             (identical(other.eloRating, eloRating) ||
                 other.eloRating == eloRating) &&
             (identical(other.eloLastUpdated, eloLastUpdated) ||
@@ -822,7 +936,12 @@ class _$UserModelImpl extends _UserModel {
     showPhoneNumber,
     gamesPlayed,
     gamesWon,
+    gamesLost,
     totalScore,
+    currentStreak,
+    const DeepCollectionEquality().hash(_recentGameIds),
+    lastGameDate,
+    const DeepCollectionEquality().hash(_teammateStats),
     eloRating,
     eloLastUpdated,
     eloPeak,
@@ -874,7 +993,12 @@ abstract class _UserModel extends UserModel {
     final bool showPhoneNumber,
     final int gamesPlayed,
     final int gamesWon,
+    final int gamesLost,
     final int totalScore,
+    final int currentStreak,
+    final List<String> recentGameIds,
+    @TimestampConverter() final DateTime? lastGameDate,
+    final Map<String, dynamic> teammateStats,
     final double eloRating,
     @TimestampConverter() final DateTime? eloLastUpdated,
     final double eloPeak,
@@ -947,7 +1071,18 @@ abstract class _UserModel extends UserModel {
   @override
   int get gamesWon;
   @override
-  int get totalScore; // ELO Rating fields (Story 14.5.3)
+  int get gamesLost;
+  @override
+  int get totalScore;
+  @override
+  int get currentStreak;
+  @override
+  List<String> get recentGameIds;
+  @override
+  @TimestampConverter()
+  DateTime? get lastGameDate;
+  @override
+  Map<String, dynamic> get teammateStats; // ELO Rating fields (Story 14.5.3)
   @override
   double get eloRating;
   @override

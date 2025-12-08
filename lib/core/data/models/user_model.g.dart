@@ -49,7 +49,16 @@ _$UserModelImpl _$$UserModelImplFromJson(
   showPhoneNumber: json['showPhoneNumber'] as bool? ?? true,
   gamesPlayed: (json['gamesPlayed'] as num?)?.toInt() ?? 0,
   gamesWon: (json['gamesWon'] as num?)?.toInt() ?? 0,
+  gamesLost: (json['gamesLost'] as num?)?.toInt() ?? 0,
   totalScore: (json['totalScore'] as num?)?.toInt() ?? 0,
+  currentStreak: (json['currentStreak'] as num?)?.toInt() ?? 0,
+  recentGameIds:
+      (json['recentGameIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  lastGameDate: const TimestampConverter().fromJson(json['lastGameDate']),
+  teammateStats: json['teammateStats'] as Map<String, dynamic>? ?? const {},
   eloRating: (json['eloRating'] as num?)?.toDouble() ?? 1600.0,
   eloLastUpdated: const TimestampConverter().fromJson(json['eloLastUpdated']),
   eloPeak: (json['eloPeak'] as num?)?.toDouble() ?? 1600.0,
@@ -90,7 +99,12 @@ Map<String, dynamic> _$$UserModelImplToJson(
   'showPhoneNumber': instance.showPhoneNumber,
   'gamesPlayed': instance.gamesPlayed,
   'gamesWon': instance.gamesWon,
+  'gamesLost': instance.gamesLost,
   'totalScore': instance.totalScore,
+  'currentStreak': instance.currentStreak,
+  'recentGameIds': instance.recentGameIds,
+  'lastGameDate': const TimestampConverter().toJson(instance.lastGameDate),
+  'teammateStats': instance.teammateStats,
   'eloRating': instance.eloRating,
   'eloLastUpdated': const TimestampConverter().toJson(instance.eloLastUpdated),
   'eloPeak': instance.eloPeak,
