@@ -130,6 +130,79 @@ def get_opponent_team_string(
     return " & ".join(names)
 
 
+def calculate_new_streak(current_streak: int, won: bool) -> int:
+    """
+    Calculate new streak value based on current streak and game result.
+
+    Positive streak = winning streak
+    Negative streak = losing streak
+
+    Args:
+        current_streak: Current streak value (positive for wins, negative for losses)
+        won: Whether the player won this game
+
+    Returns:
+        New streak value
+    """
+    if won:
+        # Won the game
+        if current_streak >= 0:
+            # Continue or start winning streak
+            return current_streak + 1
+        else:
+            # Break losing streak, start new winning streak
+            return 1
+    else:
+        # Lost the game
+        if current_streak <= 0:
+            # Continue or start losing streak
+            return current_streak - 1
+        else:
+            # Break winning streak, start new losing streak
+            return -1
+
+
+def get_teammate_ids(team_ids: List[str], player_id: str) -> List[str]:
+    """Get the IDs of teammates (excluding the player)."""
+    return [pid for pid in team_ids if pid != player_id]
+
+
+def update_teammate_stats(
+    transaction: Transaction,
+    user_ref: DocumentReference,
+    teammate_ids: List[str],
+    won: bool,
+) -> None:
+    """
+    Update teammate statistics in user document.
+
+    Tracks games played and wins with each teammate.
+
+    Args:
+        transaction: Firestore transaction
+        user_ref: Reference to user document
+        teammate_ids: List of teammate IDs
+        won: Whether the team won
+    """
+    user_doc = transaction.get(user_ref)
+    if not user_doc.exists:
+        return
+
+    data = user_doc.to_dict()
+    teammate_stats = data.get("teammateStats", {})
+
+    # Update stats for each teammate
+    for teammate_id in teammate_ids:
+        if teammate_id not in teammate_stats:
+            teammate_stats[teammate_id] = {"gamesPlayed": 0, "gamesWon": 0}
+
+        teammate_stats[teammate_id]["gamesPlayed"] += 1
+        if won:
+            teammate_stats[teammate_id]["gamesWon"] += 1
+
+    transaction.update(user_ref, {"teammateStats": teammate_stats})
+
+
 def update_ratings_transaction(
     transaction: Transaction,
     db: firestore.firestore.Client,
@@ -243,17 +316,31 @@ def update_ratings_transaction(
         new_rating = team_a_result.new_ratings[player_id]
         user_ref = user_refs[player_id]
 
-        # Determine new peak rating
+        # Determine new peak rating and current streak
         user_doc = transaction.get(user_ref)
         current_peak = old_rating
         current_peak_date = None
+        current_streak = 0
+        recent_game_ids = []
         if user_doc.exists:
             data = user_doc.to_dict()
             current_peak = data.get("eloPeak", old_rating)
             current_peak_date = data.get("eloPeakDate")
+            current_streak = data.get("currentStreak", 0)
+            recent_game_ids = data.get("recentGameIds", [])
 
         new_peak = max(current_peak, new_rating)
         peak_date = now if new_rating > current_peak else current_peak_date
+
+        # Calculate new streak
+        new_streak = calculate_new_streak(current_streak, team_a_won)
+
+        # Update recent game IDs (keep last 10 games)
+        new_recent_games = [game_id] + recent_game_ids
+        new_recent_games = new_recent_games[:10]
+
+        # Get teammate IDs for this player
+        teammate_ids = get_teammate_ids(team_a_ids, player_id)
 
         # Update user document
         update_data = {
@@ -261,11 +348,20 @@ def update_ratings_transaction(
             "eloLastUpdated": now,
             "eloPeak": new_peak,
             "eloGamesPlayed": firestore.firestore.Increment(1),
+            "gamesPlayed": firestore.firestore.Increment(1),
+            "gamesWon": firestore.firestore.Increment(1 if team_a_won else 0),
+            "gamesLost": firestore.firestore.Increment(0 if team_a_won else 1),
+            "currentStreak": new_streak,
+            "recentGameIds": new_recent_games,
+            "lastGameDate": now,
         }
         if peak_date:
             update_data["eloPeakDate"] = peak_date
 
         transaction.update(user_ref, update_data)
+
+        # Update teammate stats
+        update_teammate_stats(transaction, user_ref, teammate_ids, team_a_won)
 
         # Create rating history entry
         history_entry = RatingHistoryEntry(
@@ -296,17 +392,32 @@ def update_ratings_transaction(
         new_rating = team_b_result.new_ratings[player_id]
         user_ref = user_refs[player_id]
 
-        # Determine new peak rating
+        # Determine new peak rating and current streak
         user_doc = transaction.get(user_ref)
         current_peak = old_rating
         current_peak_date = None
+        current_streak = 0
+        recent_game_ids = []
         if user_doc.exists:
             data = user_doc.to_dict()
             current_peak = data.get("eloPeak", old_rating)
             current_peak_date = data.get("eloPeakDate")
+            current_streak = data.get("currentStreak", 0)
+            recent_game_ids = data.get("recentGameIds", [])
 
         new_peak = max(current_peak, new_rating)
         peak_date = now if new_rating > current_peak else current_peak_date
+
+        # Calculate new streak (Team B lost if team_a_won, won otherwise)
+        team_b_won = not team_a_won
+        new_streak = calculate_new_streak(current_streak, team_b_won)
+
+        # Update recent game IDs (keep last 10 games)
+        new_recent_games = [game_id] + recent_game_ids
+        new_recent_games = new_recent_games[:10]
+
+        # Get teammate IDs for this player
+        teammate_ids = get_teammate_ids(team_b_ids, player_id)
 
         # Update user document
         update_data = {
@@ -314,11 +425,20 @@ def update_ratings_transaction(
             "eloLastUpdated": now,
             "eloPeak": new_peak,
             "eloGamesPlayed": firestore.firestore.Increment(1),
+            "gamesPlayed": firestore.firestore.Increment(1),
+            "gamesWon": firestore.firestore.Increment(1 if team_b_won else 0),
+            "gamesLost": firestore.firestore.Increment(0 if team_b_won else 1),
+            "currentStreak": new_streak,
+            "recentGameIds": new_recent_games,
+            "lastGameDate": now,
         }
         if peak_date:
             update_data["eloPeakDate"] = peak_date
 
         transaction.update(user_ref, update_data)
+
+        # Update teammate stats
+        update_teammate_stats(transaction, user_ref, teammate_ids, team_b_won)
 
         # Create rating history entry
         history_entry = RatingHistoryEntry(
