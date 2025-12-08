@@ -220,10 +220,11 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
     emit(ScoreEntrySaving(game: currentState.game, result: result));
 
     try {
-      await gameRepository.updateGameResult(
-        currentState.game.id,
-        event.userId,
-        result,
+      await gameRepository.saveGameResult(
+        gameId: currentState.game.id,
+        userId: event.userId,
+        teams: currentState.game.teams!,
+        result: result,
       );
 
       emit(ScoreEntrySaved(game: currentState.game, result: result));

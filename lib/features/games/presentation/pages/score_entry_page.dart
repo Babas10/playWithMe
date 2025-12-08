@@ -12,20 +12,22 @@ import '../bloc/score_entry/score_entry_state.dart';
 
 class ScoreEntryPage extends StatelessWidget {
   final String gameId;
-  final GameRepository? gameRepository;
+  final ScoreEntryBloc? scoreEntryBloc;
 
   const ScoreEntryPage({
     super.key,
     required this.gameId,
-    this.gameRepository,
+    this.scoreEntryBloc,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ScoreEntryBloc(
-        gameRepository: gameRepository ?? sl<GameRepository>(),
-      )..add(LoadGameForScoreEntry(gameId: gameId)),
+      create: (context) =>
+          scoreEntryBloc ??
+          ScoreEntryBloc(
+            gameRepository: sl<GameRepository>(),
+          )..add(LoadGameForScoreEntry(gameId: gameId)),
       child: const _ScoreEntryView(),
     );
   }
@@ -381,6 +383,7 @@ class _SetScoreInputState extends State<_SetScoreInput> {
               children: [
                 Expanded(
                   child: TextField(
+                    key: Key('team_a_score_${widget.gameIndex}_${widget.setIndex}'),
                     decoration: const InputDecoration(
                       labelText: 'Team A',
                       border: OutlineInputBorder(),
@@ -410,6 +413,7 @@ class _SetScoreInputState extends State<_SetScoreInput> {
                 const SizedBox(width: 4),
                 Expanded(
                   child: TextField(
+                    key: Key('team_b_score_${widget.gameIndex}_${widget.setIndex}'),
                     decoration: const InputDecoration(
                       labelText: 'Team B',
                       border: OutlineInputBorder(),
