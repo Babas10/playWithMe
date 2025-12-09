@@ -61,6 +61,11 @@ class MockUserRepository implements UserRepository {
   }
 
   @override
+  Stream<UserModel?> getUserStream(String uid) {
+    return Stream.value(_users[uid]);
+  }
+
+  @override
   Future<List<UserModel>> getUsersByIds(List<String> uids) async {
     return uids
         .map((uid) => _users[uid])
