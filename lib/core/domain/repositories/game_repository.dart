@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../data/models/game_model.dart';
 
 abstract class GameRepository {
@@ -131,4 +133,34 @@ abstract class GameRepository {
 
   /// Get game statistics
   Future<Map<String, dynamic>> getGameStats(String gameId);
+
+  /// Get completed games for a group with pagination (Story 14.7)
+  /// Returns a stream of completed games with pagination support
+  /// [groupId] - Optional group to fetch games for (null = all groups)
+  /// [limit] - Number of games per page (default: 20)
+  /// [userId] - Optional user ID to filter games (null = all games)
+  /// [startDate] - Optional start date filter
+  /// [endDate] - Optional end date filter
+  /// [lastDocument] - Last document from previous page (for pagination)
+  Stream<GameHistoryPage> getCompletedGames({
+    String? groupId,
+    int limit = 20,
+    String? userId,
+    DateTime? startDate,
+    DateTime? endDate,
+    DocumentSnapshot? lastDocument,
+  });
+}
+
+/// Container for paginated game history results
+class GameHistoryPage {
+  final List<GameModel> games;
+  final DocumentSnapshot? lastDocument;
+  final bool hasMore;
+
+  const GameHistoryPage({
+    required this.games,
+    this.lastDocument,
+    required this.hasMore,
+  });
 }
