@@ -17,6 +17,7 @@ export {getUsersByIds} from "./getUsersByIds";
 export {leaveGroup} from "./leaveGroup";
 export {inviteToGroup} from "./inviteToGroup"; // Story 11.16
 export {getGamesForGroup} from "./getGamesForGroup"; // Story 3.5
+export {getCompletedGames} from "./getCompletedGames"; // Story 14.7
 
 // Export friendship functions (callable functions)
 export {

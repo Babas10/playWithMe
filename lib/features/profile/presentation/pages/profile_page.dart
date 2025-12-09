@@ -18,6 +18,9 @@ import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/player_stats_section.dart';
+import 'package:play_with_me/features/games/presentation/pages/game_history_screen.dart';
+import 'package:play_with_me/features/games/presentation/bloc/game_history/game_history_bloc.dart';
+import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 
 /// Profile page displaying user information and account details
 class ProfilePage extends StatelessWidget {
@@ -116,6 +119,21 @@ class _ProfileContent extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const NotificationSettingsPage(),
+                ),
+              );
+            },
+            onGameHistory: () {
+              final gameRepository = sl<GameRepository>();
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (newContext) => RepositoryProvider.value(
+                    value: gameRepository,
+                    child: GameHistoryScreen(
+                      userId: state.user.uid,
+                      groupId: null, // null = all groups
+                    ),
+                  ),
                 ),
               );
             },

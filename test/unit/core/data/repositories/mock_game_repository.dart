@@ -1,6 +1,7 @@
 // Mock repository for GameRepository used in testing
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 
@@ -548,6 +549,50 @@ class MockGameRepository implements GameRepository {
       'createdAt': game.createdAt.toIso8601String(),
       'scheduledAt': game.scheduledAt.toIso8601String(),
     };
+  }
+
+  @override
+  Stream<GameHistoryPage> getCompletedGames({
+    String? groupId,
+    int limit = 20,
+    String? userId,
+    DateTime? startDate,
+    DateTime? endDate,
+    cloud_firestore.DocumentSnapshot? lastDocument,
+  }) {
+    final controller = StreamController<GameHistoryPage>();
+
+    var games = _games.values.where((game) {
+      if (groupId != null && game.groupId != groupId) return false;
+      if (game.status != GameStatus.completed) return false;
+      if (userId != null && !game.playerIds.contains(userId)) return false;
+      if (startDate != null && game.completedAt != null && game.completedAt!.isBefore(startDate)) {
+        return false;
+      }
+      if (endDate != null && game.completedAt != null && game.completedAt!.isAfter(endDate)) {
+        return false;
+      }
+      return true;
+    }).toList();
+
+    games.sort((a, b) {
+      final aDate = a.completedAt ?? a.endedAt ?? a.scheduledAt;
+      final bDate = b.completedAt ?? b.endedAt ?? b.scheduledAt;
+      return bDate.compareTo(aDate);
+    });
+
+    final hasMore = games.length > limit;
+    if (hasMore) {
+      games = games.sublist(0, limit);
+    }
+
+    controller.add(GameHistoryPage(
+      games: games,
+      lastDocument: null,
+      hasMore: hasMore,
+    ));
+
+    return controller.stream;
   }
 }
 
