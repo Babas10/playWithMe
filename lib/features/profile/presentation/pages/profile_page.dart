@@ -14,6 +14,10 @@ import 'package:play_with_me/features/profile/presentation/widgets/profile_heade
 import 'package:play_with_me/features/profile/presentation/widgets/profile_info_card.dart';
 import 'package:play_with_me/features/notifications/presentation/pages/notification_settings_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/player_stats_section.dart';
 
 /// Profile page displaying user information and account details
 class ProfilePage extends StatelessWidget {
@@ -29,7 +33,12 @@ class ProfilePage extends StatelessWidget {
       body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {
           if (state is AuthenticationAuthenticated) {
-            return _ProfileContent(state: state);
+            return BlocProvider(
+              create: (context) => PlayerStatsBloc(
+                userRepository: sl<UserRepository>(),
+              )..add(LoadPlayerStats(state.user.uid)),
+              child: _ProfileContent(state: state),
+            );
           }
 
           if (state is AuthenticationUnknown) {
@@ -69,6 +78,13 @@ class _ProfileContent extends StatelessWidget {
             user: state.user,
             onVerificationTap: () => _navigateToEmailVerification(context),
           ),
+          
+          const SizedBox(height: 16),
+          
+          // Player Stats
+          const PlayerStatsSection(),
+
+          const SizedBox(height: 16),
 
           // Action buttons
           ProfileActions(

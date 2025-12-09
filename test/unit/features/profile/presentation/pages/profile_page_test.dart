@@ -16,6 +16,10 @@ import 'package:play_with_me/features/profile/presentation/widgets/profile_info_
 import 'package:play_with_me/features/profile/presentation/widgets/profile_actions.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
+import 'package:get_it/get_it.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import '../../../../core/data/repositories/mock_user_repository.dart';
+
 // Fake AuthenticationBloc for testing
 class FakeAuthenticationBloc extends Fake implements AuthenticationBloc {
   final _controller = StreamController<AuthenticationState>.broadcast();
@@ -41,6 +45,17 @@ class FakeAuthenticationBloc extends Fake implements AuthenticationBloc {
 }
 
 void main() {
+  setUp(() {
+    if (GetIt.I.isRegistered<UserRepository>()) {
+      GetIt.I.unregister<UserRepository>();
+    }
+    GetIt.I.registerSingleton<UserRepository>(MockUserRepository());
+  });
+
+  tearDown(() {
+    GetIt.I.reset();
+  });
+
   Widget createWidgetUnderTest({required AuthenticationState state}) {
     final fakeBloc = FakeAuthenticationBloc(state);
 

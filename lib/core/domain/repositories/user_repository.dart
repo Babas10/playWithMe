@@ -8,6 +8,9 @@ abstract class UserRepository {
   /// Get user by ID
   Future<UserModel?> getUserById(String uid);
 
+  /// Stream user by ID
+  Stream<UserModel?> getUserStream(String uid);
+
   /// Get multiple users by IDs
   Future<List<UserModel>> getUsersByIds(List<String> uids);
 

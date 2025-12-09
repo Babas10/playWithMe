@@ -46,6 +46,15 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
+  Stream<UserModel?> getUserStream(String uid) {
+    return _firestore
+        .collection(_collection)
+        .doc(uid)
+        .snapshots()
+        .map((doc) => doc.exists ? UserModel.fromFirestore(doc) : null);
+  }
+
+  @override
   Future<List<UserModel>> getUsersByIds(List<String> uids) async {
     if (uids.isEmpty) return [];
 
