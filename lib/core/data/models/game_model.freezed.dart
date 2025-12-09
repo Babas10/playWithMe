@@ -61,6 +61,9 @@ mixin _$GameModel {
   GameTeams? get teams =>
       throw _privateConstructorUsedError; // Game result (for completed games with entered scores)
   GameResult? get result =>
+      throw _privateConstructorUsedError; // Verification fields
+  String? get resultSubmittedBy => throw _privateConstructorUsedError;
+  List<String> get confirmedBy =>
       throw _privateConstructorUsedError; // ELO calculation flag (set to false when result is saved, true after Python function processes)
   bool get eloCalculated =>
       throw _privateConstructorUsedError; // Timestamp when the game result was entered and completed
@@ -114,6 +117,8 @@ abstract class $GameModelCopyWith<$Res> {
     String? winnerId,
     GameTeams? teams,
     GameResult? result,
+    String? resultSubmittedBy,
+    List<String> confirmedBy,
     bool eloCalculated,
     @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
@@ -169,6 +174,8 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? winnerId = freezed,
     Object? teams = freezed,
     Object? result = freezed,
+    Object? resultSubmittedBy = freezed,
+    Object? confirmedBy = null,
     Object? eloCalculated = null,
     Object? completedAt = freezed,
     Object? weatherDependent = null,
@@ -292,6 +299,14 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.result
                 : result // ignore: cast_nullable_to_non_nullable
                       as GameResult?,
+            resultSubmittedBy: freezed == resultSubmittedBy
+                ? _value.resultSubmittedBy
+                : resultSubmittedBy // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            confirmedBy: null == confirmedBy
+                ? _value.confirmedBy
+                : confirmedBy // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
             eloCalculated: null == eloCalculated
                 ? _value.eloCalculated
                 : eloCalculated // ignore: cast_nullable_to_non_nullable
@@ -391,6 +406,8 @@ abstract class _$$GameModelImplCopyWith<$Res>
     String? winnerId,
     GameTeams? teams,
     GameResult? result,
+    String? resultSubmittedBy,
+    List<String> confirmedBy,
     bool eloCalculated,
     @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
@@ -448,6 +465,8 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? winnerId = freezed,
     Object? teams = freezed,
     Object? result = freezed,
+    Object? resultSubmittedBy = freezed,
+    Object? confirmedBy = null,
     Object? eloCalculated = null,
     Object? completedAt = freezed,
     Object? weatherDependent = null,
@@ -571,6 +590,14 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.result
             : result // ignore: cast_nullable_to_non_nullable
                   as GameResult?,
+        resultSubmittedBy: freezed == resultSubmittedBy
+            ? _value.resultSubmittedBy
+            : resultSubmittedBy // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        confirmedBy: null == confirmedBy
+            ? _value._confirmedBy
+            : confirmedBy // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
         eloCalculated: null == eloCalculated
             ? _value.eloCalculated
             : eloCalculated // ignore: cast_nullable_to_non_nullable
@@ -625,6 +652,8 @@ class _$GameModelImpl extends _GameModel {
     this.winnerId,
     this.teams,
     this.result,
+    this.resultSubmittedBy,
+    final List<String> confirmedBy = const [],
     this.eloCalculated = false,
     @TimestampConverter() this.completedAt,
     this.weatherDependent = true,
@@ -633,6 +662,7 @@ class _$GameModelImpl extends _GameModel {
        _waitlistIds = waitlistIds,
        _equipment = equipment,
        _scores = scores,
+       _confirmedBy = confirmedBy,
        super._();
 
   factory _$GameModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -742,6 +772,18 @@ class _$GameModelImpl extends _GameModel {
   // Game result (for completed games with entered scores)
   @override
   final GameResult? result;
+  // Verification fields
+  @override
+  final String? resultSubmittedBy;
+  final List<String> _confirmedBy;
+  @override
+  @JsonKey()
+  List<String> get confirmedBy {
+    if (_confirmedBy is EqualUnmodifiableListView) return _confirmedBy;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_confirmedBy);
+  }
+
   // ELO calculation flag (set to false when result is saved, true after Python function processes)
   @override
   @JsonKey()
@@ -759,7 +801,7 @@ class _$GameModelImpl extends _GameModel {
 
   @override
   String toString() {
-    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, eloCalculated: $eloCalculated, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
+    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
   }
 
   @override
@@ -822,6 +864,12 @@ class _$GameModelImpl extends _GameModel {
                 other.winnerId == winnerId) &&
             (identical(other.teams, teams) || other.teams == teams) &&
             (identical(other.result, result) || other.result == result) &&
+            (identical(other.resultSubmittedBy, resultSubmittedBy) ||
+                other.resultSubmittedBy == resultSubmittedBy) &&
+            const DeepCollectionEquality().equals(
+              other._confirmedBy,
+              _confirmedBy,
+            ) &&
             (identical(other.eloCalculated, eloCalculated) ||
                 other.eloCalculated == eloCalculated) &&
             (identical(other.completedAt, completedAt) ||
@@ -865,6 +913,8 @@ class _$GameModelImpl extends _GameModel {
     winnerId,
     teams,
     result,
+    resultSubmittedBy,
+    const DeepCollectionEquality().hash(_confirmedBy),
     eloCalculated,
     completedAt,
     weatherDependent,
@@ -916,6 +966,8 @@ abstract class _GameModel extends GameModel {
     final String? winnerId,
     final GameTeams? teams,
     final GameResult? result,
+    final String? resultSubmittedBy,
+    final List<String> confirmedBy,
     final bool eloCalculated,
     @TimestampConverter() final DateTime? completedAt,
     final bool weatherDependent,
@@ -988,7 +1040,11 @@ abstract class _GameModel extends GameModel {
   @override
   GameTeams? get teams; // Game result (for completed games with entered scores)
   @override
-  GameResult? get result; // ELO calculation flag (set to false when result is saved, true after Python function processes)
+  GameResult? get result; // Verification fields
+  @override
+  String? get resultSubmittedBy;
+  @override
+  List<String> get confirmedBy; // ELO calculation flag (set to false when result is saved, true after Python function processes)
   @override
   bool get eloCalculated; // Timestamp when the game result was entered and completed
   @override

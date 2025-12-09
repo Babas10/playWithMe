@@ -452,6 +452,62 @@ void main() {
       );
     });
 
+    group('ConfirmGameResult', () {
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits [operation in progress, loaded] when confirmation succeeds',
+        build: () {
+          final verificationGame = TestGameData.testGame.copyWith(
+            status: GameStatus.verification,
+            resultSubmittedBy: 'submitter-id',
+          );
+          mockGameRepository.addGame(verificationGame);
+          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
+          return bloc;
+        },
+        skip: 1,
+        act: (bloc) async {
+          await Future.delayed(Duration.zero);
+          bloc.add(
+            const ConfirmGameResult(gameId: 'test-game-123', userId: 'verifier-id'),
+          );
+        },
+        expect: () => [
+          isA<GameDetailsLoaded>(), // Initial load
+          isA<GameDetailsOperationInProgress>().having(
+            (state) => state.operation,
+            'operation',
+            'confirm_result',
+          ),
+          isA<GameDetailsLoaded>().having(
+            (state) => state.game.status,
+            'game becomes completed',
+            GameStatus.completed,
+          ),
+        ],
+      );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits error when confirmation fails',
+        build: () {
+          mockGameRepository.addGame(TestGameData.testGame);
+          return GameDetailsBloc(gameRepository: mockGameRepository);
+        },
+        seed: () => GameDetailsLoaded(game: TestGameData.testGame), // Scheduled status
+        act: (bloc) => bloc.add(
+          const ConfirmGameResult(gameId: 'test-game-123', userId: 'user-1'),
+        ),
+        expect: () => [
+          isA<GameDetailsOperationInProgress>(),
+          isA<GameDetailsError>().having(
+            (state) => state.message,
+            'error message',
+            contains('Game is not in verification state'),
+          ),
+        ],
+      );
+    });
+
     group('Edge cases', () {
       test('handles multiple LoadGameDetails calls correctly', () async {
         // Skip: Complex async stream timing test - covered by integration tests
