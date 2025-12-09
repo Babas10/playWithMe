@@ -357,10 +357,9 @@ void main() {
       expect(find.text('Past Test Game'), findsOneWidget);
 
       // Since the test user IS playing the past game (test-uid-123 in playerIds),
-      // the "I'm Out" button shows. The user can't actually leave since status is
-      // completed, but the button renders based on isPlaying check.
-      // Non-playing users would see "Game has ended" message instead.
-      expect(find.text('I\'m Out'), findsOneWidget);
+      // previously the "I'm Out" button showed. Now with Verification flow,
+      // RSVP buttons are hidden for completed games.
+      expect(find.text('I\'m Out'), findsNothing);
     });
 
     testWidgets('scrolls to reveal all game details', (tester) async {

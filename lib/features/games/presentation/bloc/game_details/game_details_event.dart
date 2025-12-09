@@ -60,3 +60,16 @@ class MarkGameCompleted extends GameDetailsEvent {
   @override
   List<Object?> get props => [gameId, userId];
 }
+
+class ConfirmGameResult extends GameDetailsEvent {
+  final String gameId;
+  final String userId;
+
+  const ConfirmGameResult({
+    required this.gameId,
+    required this.userId,
+  });
+
+  @override
+  List<Object?> get props => [gameId, userId];
+}

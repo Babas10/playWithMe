@@ -534,11 +534,14 @@ class FirestoreGameRepository implements GameRepository {
           winnerId = result.overallWinner;
         }
 
-        // Update game with teams, result, eloCalculated flag, and completedAt timestamp
+        // Update game with teams, result, and set to verification
         final updatedGame = currentGame.copyWith(
           teams: teams,
           result: result,
           winnerId: winnerId,
+          status: GameStatus.verification,
+          resultSubmittedBy: userId,
+          confirmedBy: [], // Reset confirmations on new submission
           eloCalculated: false, // Flag for Python function to process
           completedAt: DateTime.now(), // Mark when result was entered
           updatedAt: DateTime.now(),
@@ -553,6 +556,53 @@ class FirestoreGameRepository implements GameRepository {
       });
     } catch (e) {
       throw Exception('Failed to save game result: $e');
+    }
+  }
+
+  @override
+  Future<void> confirmGameResult(String gameId, String userId) async {
+    try {
+      await _firestore.runTransaction((transaction) async {
+        final docRef = _firestore.collection(_collection).doc(gameId);
+        final snapshot = await transaction.get(docRef);
+
+        if (!snapshot.exists) {
+          throw Exception('Game not found');
+        }
+
+        final currentGame = GameModel.fromFirestore(snapshot);
+
+        if (currentGame.status != GameStatus.verification) {
+          throw Exception('Game is not in verification state');
+        }
+
+        if (currentGame.resultSubmittedBy == userId) {
+          throw Exception('You cannot confirm your own result');
+        }
+
+        if (currentGame.confirmedBy.contains(userId)) {
+          throw Exception('You have already confirmed this result');
+        }
+
+        final updatedConfirmedBy = [...currentGame.confirmedBy, userId];
+        // 1 confirmation is sufficient to complete the game
+        final newStatus = GameStatus.completed;
+
+        final updatedGame = currentGame.copyWith(
+          confirmedBy: updatedConfirmedBy,
+          status: newStatus,
+          eloCalculated: false,
+          updatedAt: DateTime.now(),
+        );
+
+        transaction.set(
+          docRef,
+          updatedGame.toFirestore(),
+          SetOptions(merge: true),
+        );
+      });
+    } catch (e) {
+      throw Exception('Failed to confirm game result: $e');
     }
   }
 

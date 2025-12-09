@@ -102,6 +102,8 @@ This document lists all user-facing actions available in the **PlayWithMe** appl
 - [ ] **Cancel Game**: Tap "Cancel Game" (Creator/Admin).
 - [ ] **Navigate to Record Results**: Tap "Record Results" (after game started).
 - [ ] **Navigate to View Result**: Tap "View Result" (completed game).
+- [ ] **Confirm Result**: Tap "Confirm" (during verification).
+- [ ] **Dispute/Edit Result**: Tap "Edit / Dispute" (during verification).
 
 ### Record Results Screen (`RecordResultsPage`)
 - [ ] **Assign Teams**: Drag/Drop or Select players for Team A/B.
@@ -109,7 +111,7 @@ This document lists all user-facing actions available in the **PlayWithMe** appl
 
 ### Score Entry Screen (`ScoreEntryPage`)
 - [ ] **Enter Score**: Input scores for sets.
-- [ ] **Save Result**: Tap "Finish Game" -> Triggers ELO calc.
+- [ ] **Save Result**: Tap "Finish Game" -> Moves game to `Verification` state.
 
 ### Game History Screen (`GameHistoryScreen`)
 - [ ] **View Completed Games**: Scroll list of globally completed games (or user specific).
