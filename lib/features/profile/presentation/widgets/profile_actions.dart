@@ -7,11 +7,13 @@ class ProfileActions extends StatelessWidget {
     required this.onEditProfile,
     required this.onSignOut,
     this.onNotificationSettings,
+    this.onGameHistory,
   });
 
   final VoidCallback onEditProfile;
   final VoidCallback onSignOut;
   final VoidCallback? onNotificationSettings;
+  final VoidCallback? onGameHistory;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,16 @@ class ProfileActions extends StatelessWidget {
               icon: const Icon(Icons.notifications_outlined),
               label: const Text('Notification Settings'),
             ),
+
+          // Game History button
+          if (onGameHistory != null) ...[
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: onGameHistory,
+              icon: const Icon(Icons.history),
+              label: const Text('Game History'),
+            ),
+          ],
           const SizedBox(height: 24),
 
           // Sign Out button

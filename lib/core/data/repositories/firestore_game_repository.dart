@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 import '../../domain/repositories/game_repository.dart';
 import '../models/game_model.dart';
@@ -812,5 +813,70 @@ class FirestoreGameRepository implements GameRepository {
     final double c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
     return earthRadiusKm * c;
+  }
+
+  @override
+  Stream<GameHistoryPage> getCompletedGames({
+    String? groupId,
+    int limit = 20,
+    String? userId,
+    DateTime? startDate,
+    DateTime? endDate,
+    DocumentSnapshot? lastDocument,
+  }) async* {
+    try {
+      // Call Cloud Function to fetch completed games
+      final callable = FirebaseFunctions.instance.httpsCallable('getCompletedGames');
+
+      final result = await callable.call({
+        if (groupId != null) 'groupId': groupId,
+        if (userId != null) 'userId': userId,
+        if (startDate != null) 'startDate': startDate.toIso8601String(),
+        if (endDate != null) 'endDate': endDate.toIso8601String(),
+        'limit': limit,
+        if (lastDocument != null) 'lastGameId': lastDocument.id,
+      });
+
+      final data = result.data as Map<String, dynamic>;
+      final gamesData = data['games'] as List<dynamic>;
+      final hasMore = data['hasMore'] as bool;
+
+      final games = gamesData.map<GameModel>((gameData) {
+        // Convert Cloud Function response to GameModel
+        final Map<String, dynamic> gameMap = Map<String, dynamic>.from(gameData);
+
+        // Convert Firestore Timestamps to ISO strings for fromJson
+        if (gameMap['createdAt'] is Map) {
+          final ts = gameMap['createdAt'] as Map;
+          final timestamp = Timestamp(ts['_seconds'] as int, ts['_nanoseconds'] as int);
+          gameMap['createdAt'] = timestamp.toDate().toIso8601String();
+        }
+        if (gameMap['updatedAt'] is Map) {
+          final ts = gameMap['updatedAt'] as Map;
+          final timestamp = Timestamp(ts['_seconds'] as int, ts['_nanoseconds'] as int);
+          gameMap['updatedAt'] = timestamp.toDate().toIso8601String();
+        }
+        if (gameMap['scheduledAt'] is Map) {
+          final ts = gameMap['scheduledAt'] as Map;
+          final timestamp = Timestamp(ts['_seconds'] as int, ts['_nanoseconds'] as int);
+          gameMap['scheduledAt'] = timestamp.toDate().toIso8601String();
+        }
+        if (gameMap['completedAt'] != null && gameMap['completedAt'] is Map) {
+          final ts = gameMap['completedAt'] as Map;
+          final timestamp = Timestamp(ts['_seconds'] as int, ts['_nanoseconds'] as int);
+          gameMap['completedAt'] = timestamp.toDate().toIso8601String();
+        }
+
+        return GameModel.fromJson(gameMap);
+      }).toList();
+
+      yield GameHistoryPage(
+        games: games,
+        lastDocument: null, // Cloud Function uses game ID for pagination
+        hasMore: hasMore,
+      );
+    } catch (e) {
+      throw Exception('Failed to get completed games: $e');
+    }
   }
 }
