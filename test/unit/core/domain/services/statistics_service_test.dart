@@ -93,6 +93,266 @@ void main() {
       expect(result.getRatingChange('a1'), lessThan(0)); // Negative for losers
       expect(result.getRatingChange('b1'), greaterThan(0)); // Positive for winners
     });
+
+    test('calculateElo handles expected win (Strong beats Weak)', () {
+      final teamAP1 = const PlayerRating(playerId: 'a1', rating: 2000);
+      final teamAP2 = const PlayerRating(playerId: 'a2', rating: 2000);
+      final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1200);
+      final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1200);
+
+      final result = service.calculateElo(
+        teamAPlayer1: teamAP1,
+        teamAPlayer2: teamAP2,
+        teamBPlayer1: teamBP1,
+        teamBPlayer2: teamBP2,
+        teamAWon: true, // Strong team wins
+      );
+
+      // Delta should be small because outcome was expected
+      expect(result.ratingDelta, lessThan(5.0));
+    });
+
+    test('calculateElo handles Team B winning correctly', () {
+      final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1600);
+      final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1600);
+      final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1600);
+      final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1600);
+
+      final result = service.calculateElo(
+        teamAPlayer1: teamAP1,
+        teamAPlayer2: teamAP2,
+        teamBPlayer1: teamBP1,
+        teamBPlayer2: teamBP2,
+        teamAWon: false, // Team B wins
+      );
+
+      expect(result.ratingDelta, 16.0); // Absolute change
+      expect(result.getRatingChange('a1'), -16.0); // Team A loses
+      expect(result.getRatingChange('b1'), 16.0); // Team B wins
+    });
+
+    test('calculateElo respects custom K-factor', () {
+      final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1600);
+      final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1600);
+      final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1600);
+      final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1600);
+
+      final result = service.calculateElo(
+        teamAPlayer1: teamAP1,
+        teamAPlayer2: teamAP2,
+        teamBPlayer1: teamBP1,
+        teamBPlayer2: teamBP2,
+        teamAWon: true,
+        customKFactor: 64.0, // Double normal K
+      );
+
+      // Delta = 64 * (1 - 0.5) = 32.0
+      expect(result.ratingDelta, 32.0);
+    });
+  });
+
+  group('EloResult - Helper Methods', () {
+    late EloResult result;
+
+    setUp(() {
+      result = service.calculateElo(
+        teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1600),
+        teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1650),
+        teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1700),
+        teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1750),
+        teamAWon: true,
+      );
+    });
+
+    test('getNewRating returns correct rating for all Team A players', () {
+      final delta = result.ratingDelta;
+      expect(result.getNewRating('a1'), closeTo(1600 + delta, 0.01));
+      expect(result.getNewRating('a2'), closeTo(1650 + delta, 0.01));
+    });
+
+    test('getNewRating returns correct rating for all Team B players', () {
+      final delta = result.ratingDelta;
+      expect(result.getNewRating('b1'), closeTo(1700 - delta, 0.01));
+      expect(result.getNewRating('b2'), closeTo(1750 - delta, 0.01));
+    });
+
+    test('getNewRating throws ArgumentError for invalid player ID', () {
+      expect(
+        () => result.getNewRating('invalid-id'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('getRatingChange returns positive for winning team players', () {
+      expect(result.getRatingChange('a1'), greaterThan(0));
+      expect(result.getRatingChange('a2'), greaterThan(0));
+    });
+
+    test('getRatingChange returns negative for losing team players', () {
+      expect(result.getRatingChange('b1'), lessThan(0));
+      expect(result.getRatingChange('b2'), lessThan(0));
+    });
+
+    test('getRatingChange returns same absolute value for all players', () {
+      final changeA1 = result.getRatingChange('a1');
+      final changeA2 = result.getRatingChange('a2');
+      final changeB1 = result.getRatingChange('b1');
+      final changeB2 = result.getRatingChange('b2');
+
+      expect(changeA1, changeA2); // Same team, same change
+      expect(changeA1.abs(), changeB1.abs()); // Opposite teams, same magnitude
+      expect(changeA2.abs(), changeB2.abs());
+    });
+
+    test('getRatingChange throws ArgumentError for invalid player ID', () {
+      expect(
+        () => result.getRatingChange('invalid-id'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+  });
+
+  group('TeammateStats - Getters', () {
+    test('hasWinningRecord returns true for win rate > 50%', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Alice',
+        gamesPlayed: 10,
+        gamesWon: 6,
+        gamesLost: 4,
+        winRate: 0.6,
+        averageRatingChange: 5.0,
+      );
+
+      expect(stats.hasWinningRecord, true);
+    });
+
+    test('hasWinningRecord returns false for win rate = 50%', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Bob',
+        gamesPlayed: 10,
+        gamesWon: 5,
+        gamesLost: 5,
+        winRate: 0.5,
+        averageRatingChange: 0.0,
+      );
+
+      expect(stats.hasWinningRecord, false);
+    });
+
+    test('hasWinningRecord returns false for win rate < 50%', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Charlie',
+        gamesPlayed: 10,
+        gamesWon: 4,
+        gamesLost: 6,
+        winRate: 0.4,
+        averageRatingChange: -2.0,
+      );
+
+      expect(stats.hasWinningRecord, false);
+    });
+
+    test('isFrequentTeammate returns true for 5+ games', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Alice',
+        gamesPlayed: 5,
+        gamesWon: 3,
+        gamesLost: 2,
+        winRate: 0.6,
+        averageRatingChange: 5.0,
+      );
+
+      expect(stats.isFrequentTeammate, true);
+    });
+
+    test('isFrequentTeammate returns true for more than 5 games', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Bob',
+        gamesPlayed: 10,
+        gamesWon: 7,
+        gamesLost: 3,
+        winRate: 0.7,
+        averageRatingChange: 8.0,
+      );
+
+      expect(stats.isFrequentTeammate, true);
+    });
+
+    test('isFrequentTeammate returns false for < 5 games', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Charlie',
+        gamesPlayed: 4,
+        gamesWon: 3,
+        gamesLost: 1,
+        winRate: 0.75,
+        averageRatingChange: 10.0,
+      );
+
+      expect(stats.isFrequentTeammate, false);
+    });
+
+    test('formattedWinRate returns percentage string with 1 decimal', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Alice',
+        gamesPlayed: 10,
+        gamesWon: 7,
+        gamesLost: 3,
+        winRate: 0.7,
+        averageRatingChange: 5.0,
+      );
+
+      expect(stats.formattedWinRate, '70.0%');
+    });
+
+    test('formattedWinRate handles 100% correctly', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Bob',
+        gamesPlayed: 5,
+        gamesWon: 5,
+        gamesLost: 0,
+        winRate: 1.0,
+        averageRatingChange: 15.0,
+      );
+
+      expect(stats.formattedWinRate, '100.0%');
+    });
+
+    test('formattedWinRate handles 0% correctly', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Charlie',
+        gamesPlayed: 5,
+        gamesWon: 0,
+        gamesLost: 5,
+        winRate: 0.0,
+        averageRatingChange: -10.0,
+      );
+
+      expect(stats.formattedWinRate, '0.0%');
+    });
+
+    test('formattedWinRate handles decimal win rates correctly', () {
+      final stats = const TeammateStats(
+        playerId: '1',
+        displayName: 'Dave',
+        gamesPlayed: 9,
+        gamesWon: 5,
+        gamesLost: 4,
+        winRate: 0.5555,
+        averageRatingChange: 2.5,
+      );
+
+      // 0.5555 * 100 = 55.55, toStringAsFixed(1) = '55.5'
+      expect(stats.formattedWinRate, '55.5%');
+    });
   });
 
   group('StatisticsService - Win Percentage', () {
@@ -104,6 +364,10 @@ void main() {
 
     test('calculateWinPercentage handles zero games played', () {
       expect(service.calculateWinPercentage(gamesWon: 0, gamesPlayed: 0), 0.0);
+    });
+
+    test('calculateWinPercentage handles negative games played gracefully', () {
+      expect(service.calculateWinPercentage(gamesWon: 5, gamesPlayed: -1), 0.0);
     });
   });
 
@@ -158,10 +422,25 @@ void main() {
       expect(best.length, 1);
       expect(best.first.playerId, '1');
     });
+
+    test('getBestTeammates handles empty list', () {
+      final best = service.getBestTeammates([], minGames: 3);
+      expect(best, isEmpty);
+    });
+
+    test('getBestTeammates breaks ties with games played', () {
+      final tTie1 = const TeammateStats(playerId: 't1', displayName: 'T1', gamesPlayed: 10, gamesWon: 5, gamesLost: 5, winRate: 0.5, averageRatingChange: 0);
+      final tTie2 = const TeammateStats(playerId: 't2', displayName: 'T2', gamesPlayed: 20, gamesWon: 10, gamesLost: 10, winRate: 0.5, averageRatingChange: 0);
+      
+      final best = service.getBestTeammates([tTie1, tTie2], minGames: 1);
+      
+      expect(best.first.playerId, 't2'); // More games played comes first
+      expect(best.last.playerId, 't1');
+    });
   });
 
   group('StatisticsService - Game Summary', () {
-    test('summarizeGame identifies winner and loser correctly', () {
+    test('summarizeGame identifies winner and loser correctly (Team A)', () {
       final summary = service.summarizeGame(
         teamAScore: 21,
         teamBScore: 19,
@@ -170,10 +449,26 @@ void main() {
       );
 
       expect(summary['winner'], 'teamA');
+      expect(summary['loser'], 'teamB');
       expect(summary['score'], '21-19');
       expect(summary['margin'], 2);
       expect(summary['close'], true);
       expect(summary['winnerPlayerIds'], ['a1']);
+      expect(summary['loserPlayerIds'], ['b1']);
+    });
+
+    test('summarizeGame identifies winner and loser correctly (Team B)', () {
+      final summary = service.summarizeGame(
+        teamAScore: 15,
+        teamBScore: 21,
+        teamAPlayerIds: ['a1'],
+        teamBPlayerIds: ['b1'],
+      );
+
+      expect(summary['winner'], 'teamB');
+      expect(summary['loser'], 'teamA');
+      expect(summary['score'], '15-21');
+      expect(summary['winnerPlayerIds'], ['b1']);
     });
 
     test('summarizeGame identifies close game correctly', () {
@@ -186,6 +481,52 @@ void main() {
 
       expect(summary['margin'], 11);
       expect(summary['close'], false);
+    });
+
+    test('summarizeGame returns all required fields', () {
+      final summary = service.summarizeGame(
+        teamAScore: 21,
+        teamBScore: 19,
+        teamAPlayerIds: ['a1', 'a2'],
+        teamBPlayerIds: ['b1', 'b2'],
+      );
+
+      // Verify all required fields are present
+      expect(summary, containsPair('winner', 'teamA'));
+      expect(summary, containsPair('loser', 'teamB'));
+      expect(summary, containsPair('score', '21-19'));
+      expect(summary, containsPair('teamAScore', 21));
+      expect(summary, containsPair('teamBScore', 19));
+      expect(summary, containsPair('margin', 2));
+      expect(summary, containsPair('close', true));
+      expect(summary['teamAPlayerIds'], ['a1', 'a2']);
+      expect(summary['teamBPlayerIds'], ['b1', 'b2']);
+      expect(summary['winnerPlayerIds'], ['a1', 'a2']);
+      expect(summary['loserPlayerIds'], ['b1', 'b2']);
+    });
+
+    test('summarizeGame handles edge case of 2-point margin (close)', () {
+      final summary = service.summarizeGame(
+        teamAScore: 21,
+        teamBScore: 19,
+        teamAPlayerIds: ['a1'],
+        teamBPlayerIds: ['b1'],
+      );
+
+      expect(summary['margin'], 2);
+      expect(summary['close'], true); // Exactly 2 points = close
+    });
+
+    test('summarizeGame handles edge case of 3-point margin (not close)', () {
+      final summary = service.summarizeGame(
+        teamAScore: 21,
+        teamBScore: 18,
+        teamAPlayerIds: ['a1'],
+        teamBPlayerIds: ['b1'],
+      );
+
+      expect(summary['margin'], 3);
+      expect(summary['close'], false); // 3 points = not close
     });
   });
 
@@ -212,6 +553,46 @@ void main() {
         won: false,
       );
 
+      expect(updated['currentStreak'], -1);
+    });
+
+    test('updatePlayerStats continues negative streak', () {
+      final updated = service.updatePlayerStats(
+        currentGamesPlayed: 10,
+        currentGamesWon: 5,
+        currentStreak: -2,
+        won: false,
+      );
+      expect(updated['currentStreak'], -3);
+    });
+
+    test('updatePlayerStats breaks negative streak with win', () {
+      final updated = service.updatePlayerStats(
+        currentGamesPlayed: 10,
+        currentGamesWon: 5,
+        currentStreak: -5,
+        won: true,
+      );
+      expect(updated['currentStreak'], 1);
+    });
+
+    test('updatePlayerStats starts streak from zero (win)', () {
+      final updated = service.updatePlayerStats(
+        currentGamesPlayed: 0,
+        currentGamesWon: 0,
+        currentStreak: 0,
+        won: true,
+      );
+      expect(updated['currentStreak'], 1);
+    });
+
+    test('updatePlayerStats starts streak from zero (loss)', () {
+      final updated = service.updatePlayerStats(
+        currentGamesPlayed: 0,
+        currentGamesWon: 0,
+        currentStreak: 0,
+        won: false,
+      );
       expect(updated['currentStreak'], -1);
     });
   });
