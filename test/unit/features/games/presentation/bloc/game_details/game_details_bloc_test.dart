@@ -506,6 +506,86 @@ void main() {
           ),
         ],
       );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits error when user tries to confirm their own result',
+        build: () {
+          final verificationGame = TestGameData.testGame.copyWith(
+            status: GameStatus.verification,
+            resultSubmittedBy: 'submitter-id',
+          );
+          mockGameRepository.addGame(verificationGame);
+          return GameDetailsBloc(gameRepository: mockGameRepository);
+        },
+        seed: () => GameDetailsLoaded(
+          game: TestGameData.testGame.copyWith(
+            status: GameStatus.verification,
+            resultSubmittedBy: 'submitter-id',
+          ),
+        ),
+        act: (bloc) => bloc.add(
+          const ConfirmGameResult(gameId: 'test-game-123', userId: 'submitter-id'),
+        ),
+        expect: () => [
+          isA<GameDetailsOperationInProgress>(),
+          isA<GameDetailsError>().having(
+            (state) => state.message,
+            'error message',
+            contains('You cannot confirm your own result'),
+          ),
+        ],
+      );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits error when user tries to confirm twice',
+        build: () {
+          final verificationGame = TestGameData.testGame.copyWith(
+            status: GameStatus.verification,
+            resultSubmittedBy: 'submitter-id',
+            confirmedBy: ['verifier-id'], // Already confirmed
+          );
+          mockGameRepository.addGame(verificationGame);
+          return GameDetailsBloc(gameRepository: mockGameRepository);
+        },
+        seed: () => GameDetailsLoaded(
+          game: TestGameData.testGame.copyWith(
+            status: GameStatus.verification,
+            resultSubmittedBy: 'submitter-id',
+            confirmedBy: ['verifier-id'],
+          ),
+        ),
+        act: (bloc) => bloc.add(
+          const ConfirmGameResult(gameId: 'test-game-123', userId: 'verifier-id'),
+        ),
+        expect: () => [
+          isA<GameDetailsOperationInProgress>(),
+          isA<GameDetailsError>().having(
+            (state) => state.message,
+            'error message',
+            contains('You have already confirmed this result'),
+          ),
+        ],
+      );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits error when game not found',
+        build: () {
+          // Don't add any game to repository
+          return GameDetailsBloc(gameRepository: mockGameRepository);
+        },
+        seed: () => GameDetailsLoaded(game: TestGameData.testGame),
+        act: (bloc) => bloc.add(
+          const ConfirmGameResult(gameId: 'non-existent-game', userId: 'user-1'),
+        ),
+        expect: () => [
+          isA<GameDetailsOperationInProgress>(),
+          isA<GameDetailsError>().having(
+            (state) => state.message,
+            'error message',
+            contains('Game not found'),
+          ),
+        ],
+      );
     });
 
     group('Edge cases', () {
