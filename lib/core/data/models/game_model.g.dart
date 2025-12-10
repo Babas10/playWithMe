@@ -60,6 +60,12 @@ _$GameModelImpl _$$GameModelImplFromJson(
   result: json['result'] == null
       ? null
       : GameResult.fromJson(json['result'] as Map<String, dynamic>),
+  resultSubmittedBy: json['resultSubmittedBy'] as String?,
+  confirmedBy:
+      (json['confirmedBy'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
   eloCalculated: json['eloCalculated'] as bool? ?? false,
   completedAt: const TimestampConverter().fromJson(json['completedAt']),
   weatherDependent: json['weatherDependent'] as bool? ?? true,
@@ -97,6 +103,8 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'winnerId': instance.winnerId,
       'teams': instance.teams,
       'result': instance.result,
+      'resultSubmittedBy': instance.resultSubmittedBy,
+      'confirmedBy': instance.confirmedBy,
       'eloCalculated': instance.eloCalculated,
       'completedAt': const TimestampConverter().toJson(instance.completedAt),
       'weatherDependent': instance.weatherDependent,
@@ -106,6 +114,7 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
 const _$GameStatusEnumMap = {
   GameStatus.scheduled: 'scheduled',
   GameStatus.inProgress: 'in_progress',
+  GameStatus.verification: 'verification',
   GameStatus.completed: 'completed',
   GameStatus.cancelled: 'cancelled',
 };

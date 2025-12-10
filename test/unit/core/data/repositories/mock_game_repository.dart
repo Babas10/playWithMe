@@ -430,6 +430,38 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Future<void> confirmGameResult(String gameId, String userId) async {
+    final game = _games[gameId];
+    if (game == null) throw Exception('Game not found');
+
+    if (game.status != GameStatus.verification) {
+      throw Exception('Game is not in verification state');
+    }
+
+    if (game.resultSubmittedBy == userId) {
+      throw Exception('You cannot confirm your own result');
+    }
+
+    if (game.confirmedBy.contains(userId)) {
+      throw Exception('You have already confirmed this result');
+    }
+
+    final updatedConfirmedBy = [...game.confirmedBy, userId];
+    final newStatus = GameStatus.completed;
+
+    final updatedGame = game.copyWith(
+      confirmedBy: updatedConfirmedBy,
+      status: newStatus,
+      eloCalculated: false,
+      updatedAt: DateTime.now(),
+    );
+
+    _games[gameId] = updatedGame;
+    _emitGames();
+    _emitGameUpdate(gameId);
+  }
+
+  @override
   Future<void> updateScores(String gameId, List<GameScore> scores) async {
     final game = _games[gameId];
     if (game == null) throw Exception('Game not found');

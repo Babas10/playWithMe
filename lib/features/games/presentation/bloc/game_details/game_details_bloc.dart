@@ -17,6 +17,7 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     on<JoinGameDetails>(_onJoinGameDetails);
     on<LeaveGameDetails>(_onLeaveGameDetails);
     on<MarkGameCompleted>(_onMarkGameCompleted);
+    on<ConfirmGameResult>(_onConfirmGameResult);
   }
 
   Future<void> _onLoadGameDetails(
@@ -133,6 +134,29 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       emit(GameDetailsError(
         message: 'Failed to mark game as completed: ${e.toString()}',
         errorCode: 'MARK_COMPLETED_ERROR',
+      ));
+    }
+  }
+
+  Future<void> _onConfirmGameResult(
+    ConfirmGameResult event,
+    Emitter<GameDetailsState> emit,
+  ) async {
+    try {
+      if (state is GameDetailsLoaded) {
+        final currentGame = (state as GameDetailsLoaded).game;
+        emit(GameDetailsOperationInProgress(
+          game: currentGame,
+          operation: 'confirm_result',
+        ));
+      }
+
+      await _gameRepository.confirmGameResult(event.gameId, event.userId);
+      // Stream updates state
+    } catch (e) {
+      emit(GameDetailsError(
+        message: 'Failed to confirm result: ${e.toString()}',
+        errorCode: 'CONFIRM_RESULT_ERROR',
       ));
     }
   }
