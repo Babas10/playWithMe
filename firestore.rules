@@ -173,9 +173,20 @@ service cloud.firestore {
                        request.auth.uid in get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.memberIds;
 
       // Game updates allowed for creator or group members (for RSVP, scores, etc.)
+      // Special validation for result confirmation (Story 14.11)
       allow update: if isAuthenticated() &&
                        (request.auth.uid == resource.data.createdBy ||
-                        request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds);
+                        request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds) &&
+                       // CRITICAL: Result confirmation security validation
+                       (
+                         // Normal updates (not changing status from verification to completed)
+                         !(resource.data.status == 'verification' && request.resource.data.status == 'completed') ||
+                         // Confirmation validation: user cannot confirm their own result
+                         (resource.data.status == 'verification' &&
+                          request.resource.data.status == 'completed' &&
+                          request.auth.uid != resource.data.resultSubmittedBy &&
+                          !(request.auth.uid in resource.data.confirmedBy))
+                       );
 
       // Only creator can delete games
       allow delete: if isAuthenticated() &&
