@@ -42,6 +42,9 @@ class GameModel with _$GameModel {
     GameTeams? teams,
     // Game result (for completed games with entered scores)
     GameResult? result,
+    // Verification fields
+    String? resultSubmittedBy,
+    @Default([]) List<String> confirmedBy,
     // ELO calculation flag (set to false when result is saved, true after Python function processes)
     @Default(false) bool eloCalculated,
     // Timestamp when the game result was entered and completed
@@ -617,6 +620,8 @@ enum GameStatus {
   scheduled,
   @JsonValue('in_progress')
   inProgress,
+  @JsonValue('verification')
+  verification,
   @JsonValue('completed')
   completed,
   @JsonValue('cancelled')

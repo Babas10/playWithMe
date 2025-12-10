@@ -144,6 +144,14 @@ class _GameDetailsView extends StatelessWidget {
                       children: [
                         _GameInfoCard(game: game),
                         const SizedBox(height: 16),
+                        // Verification Section
+                        if (game.status == GameStatus.verification) ...[
+                          _VerificationSection(
+                            game: game,
+                            isOperationInProgress: isOperationInProgress,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                         // Show results card if game has results
                         if (game.result != null) ...[
                           _ViewResultsCard(game: game),
@@ -569,9 +577,10 @@ class _RsvpButtons extends StatelessWidget {
                   ),
                 ],
                 // RSVP buttons
-                Row(
-                  children: [
-                    if (isPlaying || isOnWaitlist) ...[
+                if (game.status == GameStatus.scheduled)
+                  Row(
+                    children: [
+                      if (isPlaying || isOnWaitlist) ...[
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: isOperationInProgress
@@ -603,7 +612,8 @@ class _RsvpButtons extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ] else if (canJoin) ...[
+                    ]
+                    else if (canJoin) ...[
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: isOperationInProgress
@@ -634,7 +644,8 @@ class _RsvpButtons extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ] else ...[
+                    ]
+                    else ...[
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -798,10 +809,129 @@ class _QuickScoreDisplay extends StatelessWidget {
           teamName,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
-                color: isWinner ? color : Colors.grey,
+                color: isWinner ? Colors.white : Colors.grey,
               ),
         ),
       ],
+    );
+  }
+}
+
+class _VerificationSection extends StatelessWidget {
+  final GameModel game;
+  final bool isOperationInProgress;
+
+  const _VerificationSection({
+    required this.game,
+    required this.isOperationInProgress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, authState) {
+        if (authState is! AuthenticationAuthenticated) {
+          return const SizedBox.shrink();
+        }
+
+        final userId = authState.user.uid;
+        final isSubmitter = game.resultSubmittedBy == userId;
+        final hasConfirmed = game.confirmedBy.contains(userId);
+        final isParticipant = game.isPlayer(userId);
+
+        if (!isParticipant) return const SizedBox.shrink();
+
+        Color bannerColor = Colors.orange;
+        String title = 'Result Verification Pending';
+        String message = 'Please verify the game results.';
+        IconData icon = Icons.warning_amber_rounded;
+
+        if (isSubmitter) {
+          bannerColor = Colors.blue;
+          title = 'Result Submitted';
+          message = 'Waiting for other players to confirm.';
+          icon = Icons.info_outline;
+        } else if (hasConfirmed) {
+          bannerColor = Colors.green;
+          title = 'Confirmed';
+          message = 'You have confirmed this result.';
+          icon = Icons.check_circle_outline;
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: bannerColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: bannerColor),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, color: bannerColor),
+                  const SizedBox(width: 12),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: bannerColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(message),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  if (!isSubmitter && !hasConfirmed)
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: isOperationInProgress
+                            ? null
+                            : () {
+                                context.read<GameDetailsBloc>().add(
+                                      ConfirmGameResult(
+                                        gameId: game.id,
+                                        userId: userId,
+                                      ),
+                                    );
+                              },
+                        icon: const Icon(Icons.check),
+                        label: const Text('Confirm'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  if (!isSubmitter && !hasConfirmed) const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: isOperationInProgress
+                          ? null
+                          : () {
+                              // Navigate to RecordResultsPage to edit
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      RecordResultsPage(gameId: game.id),
+                                ),
+                              );
+                            },
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Edit / Dispute'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

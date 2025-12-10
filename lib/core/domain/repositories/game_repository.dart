@@ -90,6 +90,10 @@ abstract class GameRepository {
     required GameResult result,
   });
 
+  /// Confirm game result
+  /// Adds user to confirmedBy list. If confirmed, status changes to completed.
+  Future<void> confirmGameResult(String gameId, String userId);
+
   /// Update game scores
   Future<void> updateScores(String gameId, List<GameScore> scores);
 
