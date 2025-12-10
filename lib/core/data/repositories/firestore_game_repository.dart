@@ -392,14 +392,14 @@ class FirestoreGameRepository implements GameRepository {
         throw Exception('Game not found');
       }
 
-      // Check if user has permission (creator only for now)
-      if (!currentGame.isCreator(userId)) {
-        throw Exception('Only the game creator can update teams');
+      // Check if user has permission (participant or creator)
+      if (!currentGame.isPlayer(userId) && !currentGame.isCreator(userId)) {
+        throw Exception('Only participants can update teams');
       }
 
-      // Check if game is completed
-      if (currentGame.status != GameStatus.completed) {
-        throw Exception('Can only assign teams to completed games');
+      // Check if game is active
+      if (currentGame.status == GameStatus.cancelled) {
+        throw Exception('Cannot update teams for a cancelled game');
       }
 
       // Validate teams
@@ -435,14 +435,14 @@ class FirestoreGameRepository implements GameRepository {
         throw Exception('Game not found');
       }
 
-      // Check if user has permission (creator only for now)
-      if (!currentGame.isCreator(userId)) {
-        throw Exception('Only the game creator can update game result');
+      // Check if user has permission (participant or creator)
+      if (!currentGame.isPlayer(userId) && !currentGame.isCreator(userId)) {
+        throw Exception('Only participants can update game result');
       }
 
-      // Check if game is completed
-      if (currentGame.status != GameStatus.completed) {
-        throw Exception('Can only add result to completed games');
+      // Check if game is active
+      if (currentGame.status == GameStatus.cancelled) {
+        throw Exception('Cannot update result of a cancelled game');
       }
 
       // Check if teams are assigned
@@ -503,14 +503,14 @@ class FirestoreGameRepository implements GameRepository {
 
         final currentGame = GameModel.fromFirestore(snapshot);
 
-        // Check if user has permission (creator only for now)
-        if (!currentGame.isCreator(userId)) {
-          throw Exception('Only the game creator can save game result');
+        // Check if user has permission (participant or creator)
+        if (!currentGame.isPlayer(userId) && !currentGame.isCreator(userId)) {
+          throw Exception('Only participants can save game result');
         }
 
-        // Check if game is completed
-        if (currentGame.status != GameStatus.completed) {
-          throw Exception('Can only save result to completed games');
+        // Check if game is active
+        if (currentGame.status == GameStatus.cancelled) {
+          throw Exception('Cannot save result to a cancelled game');
         }
 
         // Validate teams

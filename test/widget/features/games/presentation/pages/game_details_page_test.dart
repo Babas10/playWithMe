@@ -360,6 +360,10 @@ void main() {
       // previously the "I'm Out" button showed. Now with Verification flow,
       // RSVP buttons are hidden for completed games.
       expect(find.text('I\'m Out'), findsNothing);
+      
+      // With Democratized Entry (Story 14.14), participants can enter results
+      // for past/completed games if no result exists yet.
+      expect(find.text('Enter Results'), findsOneWidget);
     });
 
     testWidgets('scrolls to reveal all game details', (tester) async {
