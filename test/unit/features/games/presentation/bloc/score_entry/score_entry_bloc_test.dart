@@ -102,15 +102,19 @@ void main() {
       );
 
       blocTest<ScoreEntryBloc, ScoreEntryState>(
-        'emits error when game not completed',
+        'emits loaded when game is scheduled (implicitly completing)',
         build: () {
-          mockGameRepository.addGame(TestGameData.testGame); // scheduled game
+          final scheduledGame = TestGameData.testGame.copyWith(
+            status: GameStatus.scheduled,
+            teams: const GameTeams(teamAPlayerIds: ['p1'], teamBPlayerIds: ['p2']),
+          );
+          mockGameRepository.addGame(scheduledGame); // scheduled game
           return ScoreEntryBloc(gameRepository: mockGameRepository);
         },
         act: (bloc) => bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
         expect: () => [
           const ScoreEntryLoading(),
-          const ScoreEntryError(message: 'Game must be completed before entering scores'),
+          isA<ScoreEntryLoaded>(),
         ],
       );
 

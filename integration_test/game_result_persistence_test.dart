@@ -190,7 +190,7 @@ void main() {
     );
 
     test(
-      'saveGameResult fails when user is not the game creator',
+      'saveGameResult succeeds when user is a participant (even if not creator)',
       () async {
         // 1. Create two users
         final creator = await FirebaseEmulatorHelper.createCompleteTestUser(
@@ -199,16 +199,16 @@ void main() {
           displayName: 'Game Creator',
         );
 
-        final otherUser = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'other@test.com',
+        final participant = await FirebaseEmulatorHelper.createCompleteTestUser(
+          email: 'participant@test.com',
           password: 'password123',
-          displayName: 'Other User',
+          displayName: 'Participant User',
         );
 
-        // 2. Sign in as creator
+        // 2. Sign in as participant
         await FirebaseEmulatorHelper.signOut();
         await FirebaseEmulatorHelper.signIn(
-          email: 'creator@test.com',
+          email: 'participant@test.com',
           password: 'password123',
         );
 
@@ -218,7 +218,7 @@ void main() {
           createdBy: creator.uid,
         );
 
-        // 4. Create a completed game
+        // 4. Create a completed game where participant is a player
         final gameModel = GameModel(
           id: 'test-game-456',
           title: 'Test Game',
@@ -228,7 +228,7 @@ void main() {
           scheduledAt: DateTime.now(),
           location: const GameLocation(name: 'Court'),
           status: GameStatus.completed,
-          playerIds: ['p1', 'p2', 'p3', 'p4'],
+          playerIds: [creator.uid, participant.uid, 'p3', 'p4'],
         );
 
         final firestore = FirebaseFirestore.instance;
@@ -237,41 +237,95 @@ void main() {
             .doc(gameModel.id)
             .set(gameModel.toFirestore());
 
-        // 5. Try to save result as non-creator
+        // 5. Save result as participant
         final repository = FirestoreGameRepository(firestore: firestore);
 
+        await repository.saveGameResult(
+          gameId: gameModel.id,
+          userId: participant.uid,
+          teams: GameTeams(
+            teamAPlayerIds: [creator.uid, participant.uid],
+            teamBPlayerIds: ['p3', 'p4'],
+          ),
+          result: const GameResult(
+            games: [
+              IndividualGame(
+                gameNumber: 1,
+                sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+                winner: 'teamA',
+              ),
+            ],
+            overallWinner: 'teamA',
+          ),
+        );
+
+        // 6. Verify result was saved
+        final updatedGameDoc = await firestore.collection('games').doc(gameModel.id).get();
+        final updatedGame = GameModel.fromFirestore(updatedGameDoc);
+        expect(updatedGame.result, isNotNull);
+        expect(updatedGame.resultSubmittedBy, participant.uid);
+      },
+    );
+
+    test(
+      'saveGameResult fails when user is not a participant',
+      () async {
+        // 1. Create users
+        final creator = await FirebaseEmulatorHelper.createCompleteTestUser(
+          email: 'creator@test.com',
+          password: 'password123',
+          displayName: 'Game Creator',
+        );
+        final outsider = await FirebaseEmulatorHelper.createCompleteTestUser(
+          email: 'outsider@test.com',
+          password: 'password123',
+          displayName: 'Outsider',
+        );
+
+        // 2. Sign in as outsider
+        await FirebaseEmulatorHelper.signOut();
+        await FirebaseEmulatorHelper.signIn(
+          email: 'outsider@test.com',
+          password: 'password123',
+        );
+
+        // 3. Create group/game
+        final groupId = await FirebaseEmulatorHelper.createTestGroup(
+          name: 'Test Group',
+          createdBy: creator.uid,
+        );
+        final gameModel = GameModel(
+          id: 'test-game-outsider',
+          title: 'Test Game',
+          groupId: groupId,
+          createdBy: creator.uid,
+          createdAt: DateTime.now(),
+          scheduledAt: DateTime.now(),
+          location: const GameLocation(name: 'Court'),
+          status: GameStatus.completed,
+          playerIds: [creator.uid, 'p2'],
+        );
+        final firestore = FirebaseFirestore.instance;
+        await firestore.collection('games').doc(gameModel.id).set(gameModel.toFirestore());
+
+        // 4. Try to save result as outsider
+        final repository = FirestoreGameRepository(firestore: firestore);
         expect(
           () => repository.saveGameResult(
             gameId: gameModel.id,
-            userId: otherUser.uid,
-            teams: const GameTeams(
-              teamAPlayerIds: ['p1', 'p2'],
-              teamBPlayerIds: ['p3', 'p4'],
-            ),
+            userId: outsider.uid,
+            teams: GameTeams(teamAPlayerIds: [creator.uid], teamBPlayerIds: ['p2']),
             result: const GameResult(
-              games: [
-                IndividualGame(
-                  gameNumber: 1,
-                  sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
-                  winner: 'teamA',
-                ),
-              ],
-              overallWinner: 'teamA',
+              games: [], overallWinner: 'teamA'
             ),
           ),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Only the game creator can save game result'),
-            ),
-          ),
+          throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Only participants can save game result'))),
         );
       },
     );
 
     test(
-      'saveGameResult fails when game is not completed',
+      'saveGameResult succeeds when game is not completed (implicitly completes it)',
       () async {
         // 1. Create test user
         final user = await FirebaseEmulatorHelper.createCompleteTestUser(
@@ -303,7 +357,7 @@ void main() {
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
           location: const GameLocation(name: 'Court'),
           status: GameStatus.scheduled, // Not completed!
-          playerIds: ['p1', 'p2', 'p3', 'p4'],
+          playerIds: [user.uid, 'p2', 'p3', 'p4'],
         );
 
         final firestore = FirebaseFirestore.instance;
@@ -312,35 +366,70 @@ void main() {
             .doc(gameModel.id)
             .set(gameModel.toFirestore());
 
-        // 5. Try to save result for non-completed game
+        // 5. Save result
         final repository = FirestoreGameRepository(firestore: firestore);
 
+        await repository.saveGameResult(
+          gameId: gameModel.id,
+          userId: user.uid,
+          teams: GameTeams(
+            teamAPlayerIds: [user.uid, 'p2'],
+            teamBPlayerIds: ['p3', 'p4'],
+          ),
+          result: const GameResult(
+            games: [
+              IndividualGame(
+                gameNumber: 1,
+                sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+                winner: 'teamA',
+              ),
+            ],
+            overallWinner: 'teamA',
+          ),
+        );
+
+        // 6. Verify game status transitioned to verification
+        final updatedGameDoc = await firestore.collection('games').doc(gameModel.id).get();
+        final updatedGame = GameModel.fromFirestore(updatedGameDoc);
+        expect(updatedGame.status, GameStatus.verification);
+      },
+    );
+
+    test(
+      'saveGameResult fails when game is cancelled',
+      () async {
+        // 1. Setup cancelled game
+        final user = await FirebaseEmulatorHelper.createCompleteTestUser(
+          email: 'creator@test.com',
+          password: 'password123',
+          displayName: 'Creator',
+        );
+        await FirebaseEmulatorHelper.signIn(email: 'creator@test.com', password: 'password123');
+        final groupId = await FirebaseEmulatorHelper.createTestGroup(name: 'Group', createdBy: user.uid);
+        final gameModel = GameModel(
+          id: 'test-game-cancelled',
+          title: 'Cancelled Game',
+          groupId: groupId,
+          createdBy: user.uid,
+          createdAt: DateTime.now(),
+          scheduledAt: DateTime.now(),
+          location: const GameLocation(name: 'Court'),
+          status: GameStatus.cancelled,
+          playerIds: [user.uid, 'p2'],
+        );
+        final firestore = FirebaseFirestore.instance;
+        await firestore.collection('games').doc(gameModel.id).set(gameModel.toFirestore());
+
+        // 2. Try to save result
+        final repository = FirestoreGameRepository(firestore: firestore);
         expect(
           () => repository.saveGameResult(
             gameId: gameModel.id,
             userId: user.uid,
-            teams: const GameTeams(
-              teamAPlayerIds: ['p1', 'p2'],
-              teamBPlayerIds: ['p3', 'p4'],
-            ),
-            result: const GameResult(
-              games: [
-                IndividualGame(
-                  gameNumber: 1,
-                  sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
-                  winner: 'teamA',
-                ),
-              ],
-              overallWinner: 'teamA',
-            ),
+            teams: GameTeams(teamAPlayerIds: [user.uid], teamBPlayerIds: ['p2']),
+            result: const GameResult(games: [], overallWinner: 'teamA'),
           ),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Can only save result to completed games'),
-            ),
-          ),
+          throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Cannot save result to a cancelled game'))),
         );
       },
     );

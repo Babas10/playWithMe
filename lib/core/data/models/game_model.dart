@@ -218,6 +218,27 @@ class GameModel with _$GameModel {
            status == GameStatus.scheduled;
   }
 
+  /// Check if user can enter/record results for the game
+  /// Allows participants (or creator) to enter results if the game is ready
+  /// (completed, in-progress, or past scheduled time)
+  bool canUserEnterResults(String userId) {
+    final isParticipant = isPlayer(userId) || isCreator(userId);
+    final hasExistingResult = result != null;
+    final isCancelled = status == GameStatus.cancelled;
+    final isVerification = status == GameStatus.verification;
+    
+    final isReady = status == GameStatus.completed || 
+                    status == GameStatus.inProgress || 
+                    isPast || 
+                    isCreator(userId);
+
+    return isParticipant && 
+           !isCancelled && 
+           !isVerification && 
+           !hasExistingResult && 
+           isReady;
+  }
+
   /// Validation methods
 
   /// Validate game timing
