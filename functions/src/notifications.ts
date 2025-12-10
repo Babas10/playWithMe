@@ -2256,3 +2256,238 @@ export const onWaitlistPromoted = functions.firestore
       return null;
     }
   });
+
+/**
+ * Send notification when a game result is submitted for verification
+ * Notifies all confirmed participants except the user who submitted the result
+ * Story 14.15: Notifications for Game Result Verification
+ */
+export const onGameResultSubmitted = functions.firestore
+  .document("games/{gameId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const gameId = context.params.gameId;
+
+    // Only trigger if status changed to 'verification'
+    if (before.status === "verification" || after.status !== "verification") {
+      return null;
+    }
+
+    const gameData = after;
+    const groupId = gameData.groupId;
+    const submitterId = gameData.resultSubmittedBy;
+
+    functions.logger.info("Game result submitted for verification, processing notifications", {
+      groupId,
+      gameId,
+      submitterId,
+      gameTitle: gameData.title,
+    });
+
+    try {
+      // Get all confirmed participants (players in the game)
+      const playerIds: string[] = gameData.playerIds || [];
+
+      if (playerIds.length === 0) {
+        functions.logger.warn("No players found for game result notification", {
+          groupId,
+          gameId,
+        });
+        return null;
+      }
+
+      // Get submitter details for notification message
+      const submitterDoc = await admin
+        .firestore()
+        .collection("users")
+        .doc(submitterId)
+        .get();
+
+      const submitterData = submitterDoc.data();
+
+      // Try to get submitter name in order of preference
+      let submitterName = "Someone";
+      if (submitterData) {
+        if (submitterData.firstName && submitterData.lastName) {
+          submitterName = `${submitterData.firstName} ${submitterData.lastName}`;
+        } else if (submitterData.displayName) {
+          submitterName = submitterData.displayName;
+        } else if (submitterData.email) {
+          submitterName = submitterData.email;
+        }
+      }
+
+      // Track tokens per user for cleanup
+      const userTokenMap = new Map<string, string[]>();
+      const allTokens: string[] = [];
+
+      // Collect FCM tokens from all participants except the submitter
+      for (const playerId of playerIds) {
+        // Skip the user who submitted the result
+        if (playerId === submitterId) {
+          continue;
+        }
+
+        const playerDoc = await admin
+          .firestore()
+          .collection("users")
+          .doc(playerId)
+          .get();
+
+        const playerData = playerDoc.data();
+        if (!playerData) {
+          functions.logger.debug("Player not found", {
+            playerId,
+            groupId,
+            gameId,
+          });
+          continue;
+        }
+
+        const fcmTokens = playerData.fcmTokens || [];
+        if (fcmTokens.length === 0) {
+          functions.logger.debug("Player has no FCM tokens", {
+            playerId,
+            groupId,
+            gameId,
+          });
+          continue;
+        }
+
+        const prefs = playerData.notificationPreferences || {};
+
+        // Check global and group-specific preferences
+        const groupPrefs = prefs.groupSpecific?.[groupId];
+        const shouldNotify =
+          groupPrefs?.gameResultSubmitted !== false && prefs.gameResultSubmitted !== false;
+
+        if (!shouldNotify) {
+          functions.logger.debug("Player has disabled game result notifications", {
+            playerId,
+            groupId,
+            gameId,
+          });
+          continue;
+        }
+
+        // Check quiet hours
+        if (isQuietHours(prefs.quietHours)) {
+          functions.logger.debug("Player is in quiet hours", {
+            playerId,
+            groupId,
+            gameId,
+          });
+          continue;
+        }
+
+        // Add tokens to map for later cleanup if needed
+        userTokenMap.set(playerId, fcmTokens);
+        allTokens.push(...fcmTokens);
+      }
+
+      if (allTokens.length === 0) {
+        functions.logger.info("No players to notify for game result submission", {
+          groupId,
+          gameId,
+          submitterId,
+        });
+        return null;
+      }
+
+      // Send notification
+      const message: admin.messaging.MulticastMessage = {
+        tokens: allTokens,
+        notification: {
+          title: "Game Result Posted",
+          body: `${submitterName} posted the score for ${gameData.title || "the game"}. Please confirm the result.`,
+        },
+        data: {
+          type: "game_result_submitted",
+          groupId: groupId,
+          gameId: gameId,
+          submitterId: submitterId,
+          submitterName: submitterName,
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "high_importance_channel",
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              badge: 1,
+              sound: "default",
+            },
+          },
+        },
+      };
+
+      const response = await admin.messaging().sendEachForMulticast(message);
+
+      functions.logger.info("Game result verification notification sent successfully", {
+        groupId,
+        gameId,
+        submitterId,
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+      });
+
+      // Remove invalid tokens
+      if (response.failureCount > 0) {
+        const invalidTokensByUser = new Map<string, string[]>();
+
+        response.responses.forEach((resp, idx) => {
+          if (
+            !resp.success &&
+            (resp.error?.code === "messaging/invalid-registration-token" ||
+              resp.error?.code === "messaging/registration-token-not-registered")
+          ) {
+            const invalidToken = allTokens[idx];
+
+            // Find which user this token belongs to
+            for (const [userId, tokens] of userTokenMap.entries()) {
+              if (tokens.includes(invalidToken)) {
+                if (!invalidTokensByUser.has(userId)) {
+                  invalidTokensByUser.set(userId, []);
+                }
+                invalidTokensByUser.get(userId)!.push(invalidToken);
+                break;
+              }
+            }
+          }
+        });
+
+        // Clean up invalid tokens per user
+        for (const [userId, tokensToRemove] of invalidTokensByUser.entries()) {
+          await admin
+            .firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+              fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+            });
+
+          functions.logger.info("Removed invalid FCM tokens", {
+            userId,
+            groupId,
+            gameId,
+            removedCount: tokensToRemove.length,
+          });
+        }
+      }
+
+      return null;
+    } catch (error) {
+      functions.logger.error("Error sending game result verification notification", {
+        groupId,
+        gameId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return null;
+    }
+  });
