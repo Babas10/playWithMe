@@ -55,4 +55,5 @@ export {
   onPlayerJoinedGame,
   onPlayerLeftGame,
   onWaitlistPromoted,
+  onGameResultSubmitted, // Story 14.15
 } from "./notifications";
