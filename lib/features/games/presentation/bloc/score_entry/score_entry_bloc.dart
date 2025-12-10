@@ -33,8 +33,8 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
       }
 
       // Validate game state
-      if (game.status != GameStatus.completed) {
-        emit(const ScoreEntryError(message: 'Game must be completed before entering scores'));
+      if (game.status == GameStatus.cancelled) {
+        emit(const ScoreEntryError(message: 'Cannot enter scores for a cancelled game'));
         return;
       }
 

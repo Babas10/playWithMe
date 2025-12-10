@@ -58,7 +58,7 @@ void main() {
       );
 
       blocTest<RecordResultsBloc, RecordResultsState>(
-        'emits [loading, error] when game is not completed',
+        'emits [loading, loaded] when game is scheduled (implicitly completing)',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame); // scheduled game
           return RecordResultsBloc(gameRepository: mockGameRepository);
@@ -66,7 +66,7 @@ void main() {
         act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
         expect: () => [
           const RecordResultsLoading(),
-          const RecordResultsError(message: 'Game must be completed before assigning teams'),
+          isA<RecordResultsLoaded>(),
         ],
       );
 

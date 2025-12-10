@@ -34,8 +34,8 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
         return;
       }
 
-      if (game.status != GameStatus.completed) {
-        emit(const RecordResultsError(message: 'Game must be completed before assigning teams'));
+      if (game.status == GameStatus.cancelled) {
+        emit(const RecordResultsError(message: 'Cannot record results for a cancelled game'));
         return;
       }
 

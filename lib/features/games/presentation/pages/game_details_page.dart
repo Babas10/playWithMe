@@ -461,42 +461,6 @@ class _RsvpButtons extends StatelessWidget {
     required this.isOperationInProgress,
   });
 
-  Future<void> _showCompletionConfirmationDialog(
-    BuildContext context,
-    String gameId,
-    String userId,
-  ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Mark Game as Completed'),
-        content: const Text(
-          'Are you sure you want to mark this game as completed? '
-          'You will be able to enter teams and scores next.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirm'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      context.read<GameDetailsBloc>().add(
-            MarkGameCompleted(
-              gameId: gameId,
-              userId: userId,
-            ),
-          );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<GameDetailsBloc, GameDetailsState>(
@@ -521,9 +485,13 @@ class _RsvpButtons extends StatelessWidget {
           final isOnWaitlist = game.isOnWaitlist(userId);
           final canJoin = game.canUserJoin(userId);
           final isCreator = game.isCreator(userId);
+          
           final canMarkCompleted = isCreator &&
               (game.status == GameStatus.scheduled ||
                   game.status == GameStatus.inProgress);
+
+          // Democratized Result Entry Logic (Story 14.14)
+          final canEnterResults = game.canUserEnterResults(userId);
 
           return Container(
           padding: const EdgeInsets.all(16.0),
@@ -541,8 +509,8 @@ class _RsvpButtons extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Mark as Completed button (for creator only)
-                if (canMarkCompleted) ...[
+                // Enter Results button (for participants when ready)
+                if (canEnterResults) ...[
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: SizedBox(
@@ -550,11 +518,14 @@ class _RsvpButtons extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: isOperationInProgress
                             ? null
-                            : () => _showCompletionConfirmationDialog(
-                                  context,
-                                  game.id,
-                                  userId,
-                                ),
+                            : () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        RecordResultsPage(gameId: game.id),
+                                  ),
+                                );
+                              },
                         icon: isOperationInProgress
                             ? const SizedBox(
                                 width: 16,
@@ -564,8 +535,8 @@ class _RsvpButtons extends StatelessWidget {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Icon(Icons.check_circle),
-                        label: const Text('Mark as Completed'),
+                            : const Icon(Icons.scoreboard),
+                        label: const Text('Enter Results'),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           backgroundColor:
