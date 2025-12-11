@@ -3,20 +3,35 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_state.dart';
 
-// Mocktail mock for AuthRepository
+// Mocktail mocks
 class MockAuthRepository extends Mock implements AuthRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
+
+// Fake for testing
+class FakeUserEntity extends Fake implements UserEntity {
+  @override
+  final String uid;
+  @override
+  final String email;
+
+  FakeUserEntity({required this.uid, required this.email});
+}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
+  late MockUserRepository mockUserRepository;
   late ProfileEditBloc profileEditBloc;
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
+    mockUserRepository = MockUserRepository();
   });
 
   tearDown(() {
@@ -25,14 +40,20 @@ void main() {
 
   group('ProfileEditBloc', () {
     test('initial state is ProfileEditInitial', () {
-      profileEditBloc = ProfileEditBloc(authRepository: mockAuthRepository);
+      profileEditBloc = ProfileEditBloc(
+        authRepository: mockAuthRepository,
+        userRepository: mockUserRepository,
+      );
       expect(profileEditBloc.state, const ProfileEditState.initial());
     });
 
     group('ProfileEditStarted', () {
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits [loading, loaded] when started with valid data',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) => bloc.add(
           const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -51,7 +72,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits [loading, loaded] when started without photoUrl',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) => bloc.add(
           const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -72,7 +96,10 @@ void main() {
     group('ProfileEditDisplayNameChanged', () {
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded with valid displayName and hasUnsavedChanges=true',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           // Initialize with original values
           bloc.add(const ProfileEditEvent.started(
@@ -99,7 +126,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded with error when displayName is too short',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -125,7 +155,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded with error when displayName is empty',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -151,7 +184,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded with error when displayName is too long',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -177,7 +213,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded with error when displayName contains invalid characters',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -205,7 +244,10 @@ void main() {
     group('ProfileEditPhotoUrlChanged', () {
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded with valid photoUrl and hasUnsavedChanges=true',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -232,7 +274,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded with null when photoUrl is empty string',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -257,7 +302,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded with error when photoUrl is invalid',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -283,7 +331,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits loaded without error for valid https URL',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -314,13 +365,23 @@ void main() {
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits [saving, success] when save is successful',
         setUp: () {
+          when(() => mockAuthRepository.currentUser).thenReturn(
+            FakeUserEntity(uid: 'user123', email: 'test@example.com'),
+          );
+          when(() => mockUserRepository.updateUserProfile(
+                any(),
+                displayName: any(named: 'displayName'),
+              )).thenAnswer((_) async {});
           when(() => mockAuthRepository.updateUserProfile(
                 displayName: any(named: 'displayName'),
                 photoUrl: any(named: 'photoUrl'),
               )).thenAnswer((_) async {});
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
         },
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -348,6 +409,10 @@ void main() {
           const ProfileEditState.success(),
         ],
         verify: (_) {
+          verify(() => mockUserRepository.updateUserProfile(
+                'user123',
+                displayName: 'Jane Smith',
+              )).called(1);
           verify(() => mockAuthRepository.updateUserProfile(
                 displayName: 'Jane Smith',
                 photoUrl: null,
@@ -358,7 +423,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits success immediately when no changes to save',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -385,7 +453,10 @@ void main() {
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'does not save when validation errors exist',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -422,12 +493,18 @@ void main() {
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits [saving, error] when repository throws exception',
         setUp: () {
-          when(() => mockAuthRepository.updateUserProfile(
+          when(() => mockAuthRepository.currentUser).thenReturn(
+            FakeUserEntity(uid: 'user123', email: 'test@example.com'),
+          );
+          when(() => mockUserRepository.updateUserProfile(
+                any(),
                 displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
               )).thenThrow(Exception('Network error'));
         },
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) {
           bloc.add(const ProfileEditEvent.started(
             currentDisplayName: 'John Doe',
@@ -459,10 +536,15 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockAuthRepository.updateUserProfile(
+          verify(() => mockUserRepository.updateUserProfile(
+                'user123',
                 displayName: 'Jane Smith',
-                photoUrl: null,
               )).called(1);
+          // authRepository.updateUserProfile should never be called since userRepository fails first
+          verifyNever(() => mockAuthRepository.updateUserProfile(
+                displayName: any(named: 'displayName'),
+                photoUrl: any(named: 'photoUrl'),
+              ));
         },
       );
     });
@@ -470,7 +552,10 @@ void main() {
     group('ProfileEditCancelled', () {
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits success when cancelled',
-        build: () => ProfileEditBloc(authRepository: mockAuthRepository),
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => const ProfileEditState.loaded(
           displayName: 'John Doe',
           photoUrl: null,
