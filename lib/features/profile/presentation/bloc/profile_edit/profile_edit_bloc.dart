@@ -127,6 +127,7 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
       await _userRepository.updateUserProfile(
         user.uid,
         displayName: _currentDisplayName,
+        photoUrl: _currentPhotoUrl,
       );
 
       // Also update Auth profile to keep them in sync
