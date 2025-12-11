@@ -412,10 +412,78 @@ void main() {
           verify(() => mockUserRepository.updateUserProfile(
                 'user123',
                 displayName: 'Jane Smith',
+                photoUrl: null,
               )).called(1);
           verify(() => mockAuthRepository.updateUserProfile(
                 displayName: 'Jane Smith',
                 photoUrl: null,
+              )).called(1);
+          verify(() => mockAuthRepository.reloadUser()).called(1);
+        },
+      );
+
+      blocTest<ProfileEditBloc, ProfileEditState>(
+        'emits [saving, success] when save is successful with photoUrl',
+        setUp: () {
+          when(() => mockAuthRepository.currentUser).thenReturn(
+            FakeUserEntity(uid: 'user123', email: 'test@example.com'),
+          );
+          when(() => mockUserRepository.updateUserProfile(
+                any(),
+                displayName: any(named: 'displayName'),
+                photoUrl: any(named: 'photoUrl'),
+              )).thenAnswer((_) async {});
+          when(() => mockAuthRepository.updateUserProfile(
+                displayName: any(named: 'displayName'),
+                photoUrl: any(named: 'photoUrl'),
+              )).thenAnswer((_) async {});
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
+        },
+        build: () => ProfileEditBloc(
+          authRepository: mockAuthRepository,
+          userRepository: mockUserRepository,
+        ),
+        act: (bloc) {
+          bloc.add(const ProfileEditEvent.started(
+            currentDisplayName: 'John Doe',
+            currentPhotoUrl: null,
+          ));
+          bloc.add(const ProfileEditEvent.displayNameChanged('Jane Smith'));
+          bloc.add(const ProfileEditEvent.photoUrlChanged('https://example.com/photo.jpg'));
+          bloc.add(const ProfileEditEvent.saveRequested());
+        },
+        expect: () => [
+          const ProfileEditState.loading(),
+          const ProfileEditState.loaded(
+            displayName: 'John Doe',
+            photoUrl: null,
+            hasUnsavedChanges: false,
+          ),
+          const ProfileEditState.loaded(
+            displayName: 'Jane Smith',
+            photoUrl: null,
+            hasUnsavedChanges: true,
+          ),
+          const ProfileEditState.loaded(
+            displayName: 'Jane Smith',
+            photoUrl: 'https://example.com/photo.jpg',
+            hasUnsavedChanges: true,
+          ),
+          const ProfileEditState.saving(
+            displayName: 'Jane Smith',
+            photoUrl: 'https://example.com/photo.jpg',
+          ),
+          const ProfileEditState.success(),
+        ],
+        verify: (_) {
+          verify(() => mockUserRepository.updateUserProfile(
+                'user123',
+                displayName: 'Jane Smith',
+                photoUrl: 'https://example.com/photo.jpg',
+              )).called(1);
+          verify(() => mockAuthRepository.updateUserProfile(
+                displayName: 'Jane Smith',
+                photoUrl: 'https://example.com/photo.jpg',
               )).called(1);
           verify(() => mockAuthRepository.reloadUser()).called(1);
         },

@@ -103,6 +103,7 @@ class FirestoreUserRepository implements UserRepository {
   @override
   Future<void> updateUserProfile(String uid, {
     String? displayName,
+    String? photoUrl,
     String? firstName,
     String? lastName,
     String? phoneNumber,
@@ -118,6 +119,7 @@ class FirestoreUserRepository implements UserRepository {
 
       final updatedUser = currentUser.updateProfile(
         displayName: displayName,
+        photoUrl: photoUrl,
         firstName: firstName,
         lastName: lastName,
         phoneNumber: phoneNumber,
