@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/services/image_picker_service.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
@@ -21,6 +22,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 
 // Mocktail mocks
 class MockAuthRepository extends Mock implements AuthRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 class MockImageStorageRepository extends Mock implements ImageStorageRepository {}
 class MockImagePickerService extends Mock implements ImagePickerService {}
@@ -44,6 +46,8 @@ void main() {
     registerFallbackValue(FakeLocalePreferencesState());
 
     // Create mock instances that will be reused
+    final mockAuthRepo = MockAuthRepository();
+    final mockUserRepo = MockUserRepository();
     final mockImageStorage = MockImageStorageRepository();
     final mockImagePicker = MockImagePickerService();
     final mockLocalePrefs = MockLocalePreferencesRepository();
@@ -63,7 +67,17 @@ void main() {
     );
     when(() => mockLocalePrefs.getDeviceTimeZone()).thenReturn('UTC');
 
-    // Register GetIt services for AvatarUploadWidget and LocalePreferences
+    // Register GetIt services for ProfileEditPage, AvatarUploadWidget and LocalePreferences
+    if (!sl.isRegistered<AuthRepository>()) {
+      sl.registerLazySingleton<AuthRepository>(
+        () => mockAuthRepo,
+      );
+    }
+    if (!sl.isRegistered<UserRepository>()) {
+      sl.registerLazySingleton<UserRepository>(
+        () => mockUserRepo,
+      );
+    }
     if (!sl.isRegistered<ImageStorageRepository>()) {
       sl.registerLazySingleton<ImageStorageRepository>(
         () => mockImageStorage,

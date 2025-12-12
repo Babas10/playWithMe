@@ -82,6 +82,7 @@ class MockUserRepository implements UserRepository {
   @override
   Future<void> updateUserProfile(String uid, {
     String? displayName,
+    String? photoUrl,
     String? firstName,
     String? lastName,
     String? phoneNumber,
@@ -94,6 +95,7 @@ class MockUserRepository implements UserRepository {
 
     final updatedUser = user.updateProfile(
       displayName: displayName,
+      photoUrl: photoUrl,
       firstName: firstName,
       lastName: lastName,
       phoneNumber: phoneNumber,

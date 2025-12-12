@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/core/utils/countries.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
@@ -28,7 +30,8 @@ class ProfileEditPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ProfileEditBloc(
-        authRepository: context.read<AuthRepository>(),
+        authRepository: sl<AuthRepository>(),
+        userRepository: sl<UserRepository>(),
       )..add(ProfileEditEvent.started(
           currentDisplayName: user.displayName ?? user.email,
           currentPhotoUrl: user.photoUrl,
