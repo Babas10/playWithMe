@@ -20,6 +20,7 @@ abstract class UserRepository {
   /// Update user profile
   Future<void> updateUserProfile(String uid, {
     String? displayName,
+    String? photoUrl,
     String? firstName,
     String? lastName,
     String? phoneNumber,

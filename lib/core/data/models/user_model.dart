@@ -135,6 +135,7 @@ class UserModel with _$UserModel {
   /// Update basic profile information
   UserModel updateProfile({
     String? displayName,
+    String? photoUrl,
     String? firstName,
     String? lastName,
     String? phoneNumber,
@@ -144,6 +145,7 @@ class UserModel with _$UserModel {
   }) {
     return copyWith(
       displayName: displayName ?? this.displayName,
+      photoUrl: photoUrl ?? this.photoUrl,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       phoneNumber: phoneNumber ?? this.phoneNumber,

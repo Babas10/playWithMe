@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_state.dart';
@@ -6,6 +7,7 @@ import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/pro
 /// BLoC for managing profile editing with validation and state management
 class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
   final AuthRepository _authRepository;
+  final UserRepository _userRepository;
 
   // Store original values to detect changes
   String _originalDisplayName = '';
@@ -17,7 +19,9 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
 
   ProfileEditBloc({
     required AuthRepository authRepository,
+    required UserRepository userRepository,
   })  : _authRepository = authRepository,
+        _userRepository = userRepository,
         super(const ProfileEditState.initial()) {
     on<ProfileEditStarted>(_onStarted);
     on<ProfileEditDisplayNameChanged>(_onDisplayNameChanged);
@@ -114,6 +118,19 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
     ));
 
     try {
+      final user = _authRepository.currentUser;
+      if (user == null) {
+        throw Exception('No user found');
+      }
+
+      // Update Firestore (source of truth)
+      await _userRepository.updateUserProfile(
+        user.uid,
+        displayName: _currentDisplayName,
+        photoUrl: _currentPhotoUrl,
+      );
+
+      // Also update Auth profile to keep them in sync
       await _authRepository.updateUserProfile(
         displayName: _currentDisplayName,
         photoUrl: _currentPhotoUrl,
