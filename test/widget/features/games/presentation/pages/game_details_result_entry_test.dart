@@ -14,12 +14,14 @@ import 'package:play_with_me/features/games/presentation/pages/game_details_page
 import 'package:play_with_me/features/games/presentation/pages/record_results_page.dart';
 
 import '../../../../../unit/core/data/repositories/mock_game_repository.dart';
+import '../../../../../unit/core/data/repositories/mock_user_repository.dart';
 
 class MockAuthenticationBloc extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
 void main() {
   late MockGameRepository mockGameRepository;
+  late MockUserRepository mockUserRepository;
   late MockAuthenticationBloc mockAuthBloc;
   final sl = GetIt.instance;
 
@@ -37,6 +39,7 @@ void main() {
 
   setUp(() {
     mockGameRepository = MockGameRepository();
+    mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
     
     if (sl.isRegistered<GameRepository>()) {
@@ -53,7 +56,11 @@ void main() {
     return MaterialApp(
       home: BlocProvider<AuthenticationBloc>.value(
         value: mockAuthBloc,
-        child: GameDetailsPage(gameId: gameId),
+        child: GameDetailsPage(
+          gameId: gameId,
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
       ),
     );
   }

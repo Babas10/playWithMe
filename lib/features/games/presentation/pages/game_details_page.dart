@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/domain/repositories/game_repository.dart';
+import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/data/models/game_model.dart';
 import '../../../../core/services/service_locator.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_bloc.dart';
@@ -18,11 +19,13 @@ import 'game_result_view_page.dart';
 class GameDetailsPage extends StatelessWidget {
   final String gameId;
   final GameRepository? gameRepository;
+  final UserRepository? userRepository;
 
   const GameDetailsPage({
     super.key,
     required this.gameId,
     this.gameRepository,
+    this.userRepository,
   });
 
   @override
@@ -30,6 +33,7 @@ class GameDetailsPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => GameDetailsBloc(
         gameRepository: gameRepository ?? sl<GameRepository>(),
+        userRepository: userRepository ?? sl<UserRepository>(),
       )..add(LoadGameDetails(gameId: gameId)),
       child: const _GameDetailsView(),
     );
@@ -345,109 +349,131 @@ class _PlayersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<GameDetailsBloc, GameDetailsState>(
+      builder: (context, state) {
+        final players = (state is GameDetailsLoaded)
+            ? state.players
+            : (state is GameDetailsOperationInProgress)
+                ? state.players
+                : <String, dynamic>{};
+
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Confirmed Players',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Confirmed Players',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    Chip(
+                      label: Text(
+                        '${game.currentPlayerCount}/${game.maxPlayers}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      backgroundColor: game.isFull
+                          ? Theme.of(context).colorScheme.error.withOpacity(0.2)
+                          : Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                    ),
+                  ],
                 ),
-                Chip(
-                  label: Text(
-                    '${game.currentPlayerCount}/${game.maxPlayers}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                const SizedBox(height: 12),
+                if (game.playerIds.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text(
+                        'No players yet. Be the first to join!',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.6),
+                            ),
+                      ),
+                    ),
+                  )
+                else
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: game.playerIds.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final playerId = game.playerIds[index];
+                      final isCreator = playerId == game.createdBy;
+                      final player = players[playerId];
+
+                      // Get display name with fallback
+                      final displayName = player?.displayName ?? player?.email ?? 'Player';
+
+                      return ListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        leading: CircleAvatar(
+                          child: Text('${index + 1}'),
+                        ),
+                        title: Text(
+                          displayName,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        subtitle: player != null && player.displayName != null
+                            ? Text(player.email)
+                            : null,
+                        trailing: isCreator
+                            ? Chip(
+                                label: const Text('Organizer'),
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .secondary
+                                    .withOpacity(0.2),
+                              )
+                            : null,
+                      );
+                    },
                   ),
-                  backgroundColor: game.isFull
-                      ? Theme.of(context).colorScheme.error.withOpacity(0.2)
-                      : Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (game.playerIds.isEmpty)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Text(
-                    'No players yet. Be the first to join!',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.6),
+                if (game.waitlistIds.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Waitlist (${game.waitlistIds.length})',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                   ),
-                ),
-              )
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: game.playerIds.length,
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final playerId = game.playerIds[index];
-                  final isCreator = playerId == game.createdBy;
+                  const SizedBox(height: 8),
+                  ...game.waitlistIds.asMap().entries.map((entry) {
+                    final playerId = entry.value;
+                    final player = players[playerId];
+                    final displayName = player?.displayName ?? player?.email ?? 'Player';
 
-                  return ListTile(
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    leading: CircleAvatar(
-                      child: Text('${index + 1}'),
-                    ),
-                    title: Text(
-                      'Player ${index + 1}',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    subtitle: Text(playerId),
-                    trailing: isCreator
-                        ? Chip(
-                            label: const Text('Organizer'),
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .secondary
-                                .withOpacity(0.2),
-                          )
-                        : null,
-                  );
-                },
-              ),
-            if (game.waitlistIds.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 8),
-              Text(
-                'Waitlist (${game.waitlistIds.length})',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              ...game.waitlistIds.asMap().entries.map((entry) {
-                return ListTile(
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.surface.withOpacity(0.5),
-                    child: Text('${entry.key + 1}'),
-                  ),
-                  title: Text('Waitlist ${entry.key + 1}'),
-                  subtitle: Text(entry.value),
-                );
-              }),
-            ],
-          ],
-        ),
-      ),
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.surface.withOpacity(0.5),
+                        child: Text('${entry.key + 1}'),
+                      ),
+                      title: Text(displayName),
+                      subtitle: player != null && player.displayName != null
+                          ? Text(player.email)
+                          : null,
+                    );
+                  }),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
