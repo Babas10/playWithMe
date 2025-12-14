@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -15,12 +16,14 @@ import 'package:play_with_me/features/games/presentation/pages/game_details_page
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 import '../../../../../unit/core/data/repositories/mock_game_repository.dart';
+import '../../../../../unit/core/data/repositories/mock_user_repository.dart';
 
 // Mock classes
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 void main() {
   late MockGameRepository mockGameRepository;
+  late MockUserRepository mockUserRepository;
   late MockAuthenticationBloc mockAuthBloc;
   late GameDetailsBloc gameDetailsBloc;
 
@@ -29,7 +32,23 @@ void main() {
 
   setUp(() {
     mockGameRepository = MockGameRepository();
+    mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
+
+    // Add test users to mock repository
+    mockUserRepository.addUser(TestUserData.testUser);
+    mockUserRepository.addUser(TestUserData.anotherUser);
+    // Add waitlist user for fullGame test
+    mockUserRepository.addUser(UserModel(
+      uid: 'another-uid-101',
+      email: 'waitlist@example.com',
+      displayName: 'Waitlist User',
+      isEmailVerified: true,
+      createdAt: DateTime.now(),
+      lastSignInAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      isAnonymous: false,
+    ));
 
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
@@ -45,12 +64,16 @@ void main() {
     );
     when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
 
-    gameDetailsBloc = GameDetailsBloc(gameRepository: mockGameRepository);
+    gameDetailsBloc = GameDetailsBloc(
+      gameRepository: mockGameRepository,
+      userRepository: mockUserRepository,
+    );
   });
 
   tearDown(() {
     gameDetailsBloc.close();
     mockGameRepository.dispose();
+    mockUserRepository.dispose();
   });
 
   Widget createApp({required String gameId}) {
@@ -69,6 +92,7 @@ void main() {
         child: GameDetailsPage(
           gameId: gameId,
           gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
         ),
       ),
     );
@@ -116,8 +140,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Confirmed Players'), findsOneWidget);
-      expect(find.text('Player 1'), findsOneWidget);
-      expect(find.text('Player 2'), findsOneWidget);
+      expect(find.text('Test User'), findsOneWidget);
+      expect(find.text('Another User'), findsOneWidget);
       expect(find.text('Organizer'), findsOneWidget);
     });
 
@@ -176,7 +200,7 @@ void main() {
       await tester.pumpAndSettle(); // Wait for all frames
 
       expect(find.textContaining('Waitlist'), findsWidgets);
-      expect(find.text('Waitlist 1'), findsOneWidget);
+      expect(find.text('Waitlist User'), findsOneWidget);
     });
 
     testWidgets('tapping "I\'m In" button triggers join event', (tester) async {

@@ -2,15 +2,21 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/data/models/user_model.dart';
 import 'game_details_event.dart';
 import 'game_details_state.dart';
 
 class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
   final GameRepository _gameRepository;
+  final UserRepository _userRepository;
   StreamSubscription<dynamic>? _gameSubscription;
 
-  GameDetailsBloc({required GameRepository gameRepository})
-      : _gameRepository = gameRepository,
+  GameDetailsBloc({
+    required GameRepository gameRepository,
+    required UserRepository userRepository,
+  })  : _gameRepository = gameRepository,
+        _userRepository = userRepository,
         super(const GameDetailsInitial()) {
     on<LoadGameDetails>(_onLoadGameDetails);
     on<GameDetailsUpdated>(_onGameDetailsUpdated);
@@ -49,7 +55,29 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     Emitter<GameDetailsState> emit,
   ) async {
     if (event.game != null) {
-      emit(GameDetailsLoaded(game: event.game));
+      // Fetch player data for all players and waitlisted users
+      final allPlayerIds = <String>{
+        ...event.game.playerIds,
+        ...event.game.waitlistIds,
+        event.game.createdBy, // Include creator
+      }.toList();
+
+      Map<String, UserModel> players = {};
+
+      if (allPlayerIds.isNotEmpty) {
+        try {
+          final userList = await _userRepository.getUsersByIds(allPlayerIds);
+          for (final user in userList) {
+            players[user.uid] = user;
+          }
+        } catch (e) {
+          // If fetching users fails, emit state without user data
+          // This ensures the game details still load
+          print('Failed to load user data: $e');
+        }
+      }
+
+      emit(GameDetailsLoaded(game: event.game, players: players));
     } else {
       emit(const GameDetailsNotFound(
         message: 'Game not found or has been deleted',
@@ -64,10 +92,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     try {
       // Keep showing current game while operation is in progress
       if (state is GameDetailsLoaded) {
-        final currentGame = (state as GameDetailsLoaded).game;
+        final currentState = state as GameDetailsLoaded;
         emit(GameDetailsOperationInProgress(
-          game: currentGame,
+          game: currentState.game,
           operation: 'join',
+          players: currentState.players,
         ));
       }
 
@@ -89,10 +118,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     try {
       // Keep showing current game while operation is in progress
       if (state is GameDetailsLoaded) {
-        final currentGame = (state as GameDetailsLoaded).game;
+        final currentState = state as GameDetailsLoaded;
         emit(GameDetailsOperationInProgress(
-          game: currentGame,
+          game: currentState.game,
           operation: 'leave',
+          players: currentState.players,
         ));
       }
 
@@ -114,10 +144,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     try {
       // Keep showing current game while operation is in progress
       if (state is GameDetailsLoaded) {
-        final currentGame = (state as GameDetailsLoaded).game;
+        final currentState = state as GameDetailsLoaded;
         emit(GameDetailsOperationInProgress(
-          game: currentGame,
+          game: currentState.game,
           operation: 'mark_completed',
+          players: currentState.players,
         ));
       }
 
@@ -144,10 +175,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
   ) async {
     try {
       if (state is GameDetailsLoaded) {
-        final currentGame = (state as GameDetailsLoaded).game;
+        final currentState = state as GameDetailsLoaded;
         emit(GameDetailsOperationInProgress(
-          game: currentGame,
+          game: currentState.game,
           operation: 'confirm_result',
+          players: currentState.players,
         ));
       }
 

@@ -1,4 +1,5 @@
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/presentation/bloc/base_bloc_state.dart';
 
 abstract class GameDetailsState extends BaseBlocState {
@@ -15,25 +16,31 @@ class GameDetailsLoading extends GameDetailsState implements LoadingState {
 
 class GameDetailsLoaded extends GameDetailsState implements SuccessState {
   final GameModel game;
+  final Map<String, UserModel> players;
 
-  const GameDetailsLoaded({required this.game});
+  const GameDetailsLoaded({
+    required this.game,
+    this.players = const {},
+  });
 
   @override
-  List<Object?> get props => [game];
+  List<Object?> get props => [game, players];
 }
 
 class GameDetailsOperationInProgress extends GameDetailsState
     implements LoadingState {
   final GameModel game;
   final String operation;
+  final Map<String, UserModel> players;
 
   const GameDetailsOperationInProgress({
     required this.game,
     required this.operation,
+    this.players = const {},
   });
 
   @override
-  List<Object?> get props => [game, operation];
+  List<Object?> get props => [game, operation, players];
 }
 
 class GameDetailsError extends GameDetailsState implements ErrorState {

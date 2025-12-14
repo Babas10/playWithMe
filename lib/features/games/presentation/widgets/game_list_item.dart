@@ -54,7 +54,10 @@ class GameListItem extends StatelessWidget {
                     ),
                   ),
                   if (isCompletedWithResult)
-                    GameResultBadge(result: game.result!)
+                    GameResultBadge(
+                      result: game.result!,
+                      teams: game.teams,
+                    )
                   else if (isVerification)
                     _buildVerificationBadge(context)
                   else if (!isCancelled)

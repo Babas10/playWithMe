@@ -10,19 +10,26 @@ import 'package:play_with_me/features/games/presentation/bloc/game_details/game_
 import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_state.dart';
 
 import '../../../../../../unit/core/data/repositories/mock_game_repository.dart';
+import '../../../../../../unit/core/data/repositories/mock_user_repository.dart';
 
 void main() {
   late MockGameRepository mockGameRepository;
+  late MockUserRepository mockUserRepository;
   late GameDetailsBloc gameDetailsBloc;
 
   setUp(() {
     mockGameRepository = MockGameRepository();
-    gameDetailsBloc = GameDetailsBloc(gameRepository: mockGameRepository);
+    mockUserRepository = MockUserRepository();
+    gameDetailsBloc = GameDetailsBloc(
+      gameRepository: mockGameRepository,
+      userRepository: mockUserRepository,
+    );
   });
 
   tearDown(() {
     gameDetailsBloc.close();
     mockGameRepository.dispose();
+    mockUserRepository.dispose();
   });
 
   group('GameDetailsBloc', () {
@@ -35,18 +42,29 @@ void main() {
         'emits [loading, loaded] when game exists',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame);
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          // Add test users for the players
+          mockUserRepository.addUser(TestUserData.testUser);
+          mockUserRepository.addUser(TestUserData.anotherUser);
+          return GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         act: (bloc) => bloc.add(const LoadGameDetails(gameId: 'test-game-123')),
         expect: () => [
           const GameDetailsLoading(),
-          GameDetailsLoaded(game: TestGameData.testGame),
+          isA<GameDetailsLoaded>()
+              .having((state) => state.game, 'game', TestGameData.testGame)
+              .having((state) => state.players, 'players', isNotEmpty),
         ],
       );
 
       blocTest<GameDetailsBloc, GameDetailsState>(
         'emits [loading, not found] when game does not exist',
-        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        build: () => GameDetailsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) => bloc.add(const LoadGameDetails(gameId: 'non-existent-game')),
         expect: () => [
           const GameDetailsLoading(),
@@ -64,7 +82,11 @@ void main() {
         'emits [operation in progress, loaded] when join succeeds',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          mockUserRepository.addUser(TestUserData.testUser);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
@@ -79,11 +101,9 @@ void main() {
           );
         },
         expect: () => [
-          GameDetailsLoaded(game: TestGameData.testGame), // Initial load
-          GameDetailsOperationInProgress(
-            game: TestGameData.testGame,
-            operation: 'join',
-          ),
+          isA<GameDetailsLoaded>(), // Initial load
+          isA<GameDetailsOperationInProgress>()
+              .having((state) => state.operation, 'operation', 'join'),
           isA<GameDetailsLoaded>().having(
             (state) => state.game.playerIds.contains('new-user-456'),
             'contains new player',
@@ -94,16 +114,17 @@ void main() {
 
       blocTest<GameDetailsBloc, GameDetailsState>(
         'emits error when repository throws',
-        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        build: () => GameDetailsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => GameDetailsLoaded(game: TestGameData.testGame),
         act: (bloc) => bloc.add(
           const JoinGameDetails(gameId: 'non-existent', userId: 'user-123'),
         ),
         expect: () => [
-          GameDetailsOperationInProgress(
-            game: TestGameData.testGame,
-            operation: 'join',
-          ),
+          isA<GameDetailsOperationInProgress>()
+              .having((state) => state.operation, 'operation', 'join'),
           isA<GameDetailsError>().having(
             (state) => state.message,
             'error message',
@@ -116,7 +137,11 @@ void main() {
         'handles user joining full game to waitlist',
         build: () {
           mockGameRepository.addGame(TestGameData.fullGame);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          mockUserRepository.addUser(TestUserData.testUser);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'full-game-101'));
           return bloc;
@@ -131,11 +156,9 @@ void main() {
           );
         },
         expect: () => [
-          GameDetailsLoaded(game: TestGameData.fullGame), // Initial load
-          GameDetailsOperationInProgress(
-            game: TestGameData.fullGame,
-            operation: 'join',
-          ),
+          isA<GameDetailsLoaded>(), // Initial load
+          isA<GameDetailsOperationInProgress>()
+              .having((state) => state.operation, 'operation', 'join'),
           isA<GameDetailsLoaded>().having(
             (state) => state.game.waitlistIds.contains('new-user-789'),
             'contains new user in waitlist',
@@ -150,7 +173,10 @@ void main() {
         'emits [operation in progress, loaded] when leave succeeds',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
@@ -180,7 +206,10 @@ void main() {
 
       blocTest<GameDetailsBloc, GameDetailsState>(
         'emits error when repository throws',
-        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        build: () => GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          ),
         seed: () => GameDetailsLoaded(game: TestGameData.testGame),
         act: (bloc) => bloc.add(
           const LeaveGameDetails(gameId: 'non-existent', userId: 'user-123'),
@@ -207,7 +236,10 @@ void main() {
             waitlistIds: ['waitlist-1', 'waitlist-2'],
           );
           mockGameRepository.addGame(gameWithWaitlist);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'full-game-101'));
           return bloc;
@@ -247,7 +279,10 @@ void main() {
       test('stream subscription is created on LoadGameDetails', () async {
         mockGameRepository.addGame(TestGameData.testGame);
 
-        final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+        final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
 
         bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
 
@@ -265,7 +300,10 @@ void main() {
       test('stream subscription is cancelled on close', () async {
         mockGameRepository.addGame(TestGameData.testGame);
 
-        final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+        final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
 
         await Future.delayed(const Duration(milliseconds: 100));
@@ -288,7 +326,10 @@ void main() {
     group('GameDetailsUpdated', () {
       blocTest<GameDetailsBloc, GameDetailsState>(
         'emits loaded when game is not null',
-        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        build: () => GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          ),
         act: (bloc) => bloc.add(GameDetailsUpdated(game: TestGameData.testGame)),
         expect: () => [
           GameDetailsLoaded(game: TestGameData.testGame),
@@ -297,7 +338,10 @@ void main() {
 
       blocTest<GameDetailsBloc, GameDetailsState>(
         'emits not found when game is null',
-        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        build: () => GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          ),
         act: (bloc) => bloc.add(const GameDetailsUpdated(game: null)),
         expect: () => [
           const GameDetailsNotFound(message: 'Game not found or has been deleted'),
@@ -310,7 +354,10 @@ void main() {
         'emits [operation in progress, success] when mark completed succeeds',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
@@ -325,19 +372,17 @@ void main() {
           );
         },
         expect: () => [
-          GameDetailsLoaded(game: TestGameData.testGame), // Initial load
-          GameDetailsOperationInProgress(
-            game: TestGameData.testGame,
-            operation: 'mark_completed',
+          isA<GameDetailsLoaded>(), // Initial load
+          isA<GameDetailsOperationInProgress>()
+              .having((state) => state.operation, 'operation', 'mark_completed'),
+          isA<GameCompletedSuccessfully>().having(
+            (state) => state.game.status,
+            'game status is completed',
+            GameStatus.completed,
           ),
           isA<GameDetailsLoaded>().having(
             (state) => state.game.status,
             'stream updates with completed status',
-            GameStatus.completed,
-          ),
-          isA<GameCompletedSuccessfully>().having(
-            (state) => state.game.status,
-            'game status is completed',
             GameStatus.completed,
           ),
         ],
@@ -347,7 +392,10 @@ void main() {
         'emits error when user is not creator',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
         },
@@ -380,7 +428,10 @@ void main() {
             endedAt: DateTime.now(),
           );
           mockGameRepository.addGame(completedGame);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
         },
@@ -409,7 +460,10 @@ void main() {
             status: GameStatus.cancelled,
           );
           mockGameRepository.addGame(cancelledGame);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
         },
@@ -433,7 +487,10 @@ void main() {
 
       blocTest<GameDetailsBloc, GameDetailsState>(
         'emits error when game does not exist',
-        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        build: () => GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          ),
         seed: () => GameDetailsLoaded(game: TestGameData.testGame),
         act: (bloc) => bloc.add(
           const MarkGameCompleted(gameId: 'non-existent', userId: 'test-uid-123'),
@@ -461,7 +518,10 @@ void main() {
             resultSubmittedBy: 'submitter-id',
           );
           mockGameRepository.addGame(verificationGame);
-          final bloc = GameDetailsBloc(gameRepository: mockGameRepository);
+          final bloc = GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
         },
@@ -491,7 +551,10 @@ void main() {
         'emits error when confirmation fails',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame);
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          return GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         seed: () => GameDetailsLoaded(game: TestGameData.testGame), // Scheduled status
         act: (bloc) => bloc.add(
@@ -515,7 +578,10 @@ void main() {
             resultSubmittedBy: 'submitter-id',
           );
           mockGameRepository.addGame(verificationGame);
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          return GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         seed: () => GameDetailsLoaded(
           game: TestGameData.testGame.copyWith(
@@ -545,7 +611,10 @@ void main() {
             confirmedBy: ['verifier-id'], // Already confirmed
           );
           mockGameRepository.addGame(verificationGame);
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          return GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         seed: () => GameDetailsLoaded(
           game: TestGameData.testGame.copyWith(
@@ -571,7 +640,10 @@ void main() {
         'emits error when game not found',
         build: () {
           // Don't add any game to repository
-          return GameDetailsBloc(gameRepository: mockGameRepository);
+          return GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         seed: () => GameDetailsLoaded(game: TestGameData.testGame),
         act: (bloc) => bloc.add(
@@ -595,7 +667,10 @@ void main() {
 
       blocTest<GameDetailsBloc, GameDetailsState>(
         'handles join when not in loaded state',
-        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        build: () => GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          ),
         act: (bloc) => bloc.add(
           const JoinGameDetails(gameId: 'test-game-123', userId: 'user-123'),
         ),
@@ -606,7 +681,10 @@ void main() {
 
       blocTest<GameDetailsBloc, GameDetailsState>(
         'handles leave when not in loaded state',
-        build: () => GameDetailsBloc(gameRepository: mockGameRepository),
+        build: () => GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          ),
         act: (bloc) => bloc.add(
           const LeaveGameDetails(gameId: 'test-game-123', userId: 'user-123'),
         ),
