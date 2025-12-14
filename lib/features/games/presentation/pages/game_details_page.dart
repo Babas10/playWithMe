@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/data/models/game_model.dart';
+import '../../../../core/data/models/user_model.dart';
 import '../../../../core/services/service_locator.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_bloc.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_state.dart';
@@ -136,6 +137,10 @@ class _GameDetailsView extends StatelessWidget {
                 ? state.game
                 : (state as GameDetailsOperationInProgress).game;
 
+            final players = state is GameDetailsLoaded
+                ? state.players
+                : (state as GameDetailsOperationInProgress).players;
+
             final isOperationInProgress = state is GameDetailsOperationInProgress;
 
             return Column(
@@ -158,7 +163,10 @@ class _GameDetailsView extends StatelessWidget {
                         ],
                         // Show results card if game has results
                         if (game.result != null) ...[
-                          _ViewResultsCard(game: game),
+                          _ViewResultsCard(
+                            game: game,
+                            players: players,
+                          ),
                           const SizedBox(height: 16),
                         ],
                         _LocationCard(location: game.location),
@@ -677,8 +685,12 @@ class _RsvpButtons extends StatelessWidget {
 
 class _ViewResultsCard extends StatelessWidget {
   final GameModel game;
+  final Map<String, UserModel> players;
 
-  const _ViewResultsCard({required this.game});
+  const _ViewResultsCard({
+    required this.game,
+    required this.players,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -692,7 +704,10 @@ class _ViewResultsCard extends StatelessWidget {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => GameResultViewPage(game: game),
+              builder: (context) => GameResultViewPage(
+                game: game,
+                players: players,
+              ),
             ),
           );
         },
