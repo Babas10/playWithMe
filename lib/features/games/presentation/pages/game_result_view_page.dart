@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/data/models/game_model.dart';
+import '../../../../core/data/models/user_model.dart';
 
 class GameResultViewPage extends StatelessWidget {
   final GameModel game;
+  final Map<String, UserModel>? players;
 
   const GameResultViewPage({
     super.key,
     required this.game,
+    this.players,
   });
 
   @override
@@ -63,7 +66,11 @@ class GameResultViewPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             // Team Names Card (if teams are assigned)
-            if (teams != null) _TeamNamesCard(teams: teams),
+            if (teams != null)
+              _TeamNamesCard(
+                teams: teams,
+                players: players,
+              ),
             if (teams != null) const SizedBox(height: 16),
             // Individual Games List
             Text(
@@ -248,8 +255,12 @@ class _TeamScore extends StatelessWidget {
 
 class _TeamNamesCard extends StatelessWidget {
   final GameTeams teams;
+  final Map<String, UserModel>? players;
 
-  const _TeamNamesCard({required this.teams});
+  const _TeamNamesCard({
+    required this.teams,
+    this.players,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -272,6 +283,7 @@ class _TeamNamesCard extends StatelessWidget {
                   child: _TeamList(
                     teamName: 'Team A',
                     playerIds: teams.teamAPlayerIds,
+                    players: players,
                     color: Colors.blue,
                   ),
                 ),
@@ -280,6 +292,7 @@ class _TeamNamesCard extends StatelessWidget {
                   child: _TeamList(
                     teamName: 'Team B',
                     playerIds: teams.teamBPlayerIds,
+                    players: players,
                     color: Colors.red,
                   ),
                 ),
@@ -295,13 +308,29 @@ class _TeamNamesCard extends StatelessWidget {
 class _TeamList extends StatelessWidget {
   final String teamName;
   final List<String> playerIds;
+  final Map<String, UserModel>? players;
   final Color color;
 
   const _TeamList({
     required this.teamName,
     required this.playerIds,
+    this.players,
     required this.color,
   });
+
+  String _getPlayerName(String playerId) {
+    if (players == null) {
+      // Fallback to showing truncated ID if no player data available
+      return playerId.length > 20 ? '${playerId.substring(0, 20)}...' : playerId;
+    }
+
+    final player = players![playerId];
+    if (player == null) {
+      return 'Player';
+    }
+
+    return player.displayName ?? player.email.split('@').first;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -332,7 +361,7 @@ class _TeamList extends StatelessWidget {
         ...playerIds.map((playerId) => Padding(
               padding: const EdgeInsets.only(bottom: 4.0),
               child: Text(
-                '• ${playerId.length > 20 ? '${playerId.substring(0, 20)}...' : playerId}',
+                '• ${_getPlayerName(playerId)}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             )),
