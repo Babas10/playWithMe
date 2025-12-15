@@ -692,11 +692,42 @@ class _ViewResultsCard extends StatelessWidget {
     required this.players,
   });
 
+  /// Generate team name from player IDs (e.g., "Alice & Bob" or "Team A")
+  String _getTeamName(List<String> playerIds, String fallbackName) {
+    if (players.isEmpty || playerIds.isEmpty) {
+      return fallbackName;
+    }
+
+    // Get up to 2 player names
+    final names = playerIds
+        .take(2)
+        .map((id) {
+          final player = players[id];
+          if (player == null) return null;
+          return player.displayName ?? player.email.split('@').first;
+        })
+        .where((name) => name != null)
+        .toList();
+
+    if (names.isEmpty) return fallbackName;
+    if (names.length == 1) return names[0]!;
+    return '${names[0]} & ${names[1]}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final result = game.result!;
     final gamesWon = result.gamesWon;
     final winnerColor = result.overallWinner == 'teamA' ? Colors.blue : Colors.red;
+
+    // Generate team names
+    final teams = game.teams;
+    final teamAName = teams != null
+        ? _getTeamName(teams.teamAPlayerIds, 'Team A')
+        : 'Team A';
+    final teamBName = teams != null
+        ? _getTeamName(teams.teamBPlayerIds, 'Team B')
+        : 'Team B';
 
     return Card(
       elevation: 2,
@@ -740,7 +771,7 @@ class _ViewResultsCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _QuickScoreDisplay(
-                    teamName: 'Team A',
+                    teamName: teamAName,
                     score: gamesWon['teamA'] ?? 0,
                     isWinner: result.overallWinner == 'teamA',
                     color: Colors.blue,
@@ -752,7 +783,7 @@ class _ViewResultsCard extends StatelessWidget {
                         ),
                   ),
                   _QuickScoreDisplay(
-                    teamName: 'Team B',
+                    teamName: teamBName,
                     score: gamesWon['teamB'] ?? 0,
                     isWinner: result.overallWinner == 'teamB',
                     color: Colors.red,

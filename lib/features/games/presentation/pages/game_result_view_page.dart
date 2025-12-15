@@ -105,7 +105,7 @@ class GameResultViewPage extends StatelessWidget {
                 teamAName: teamAName,
                 teamBName: teamBName,
               ),
-            if (teams != null) const SizedBox(height: 16),
+            if (teams != null) const SizedBox(height: 20),
             // Individual Games List
             Text(
               'Individual Games',
@@ -113,7 +113,7 @@ class GameResultViewPage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             ...result.games.asMap().entries.map((entry) {
               final index = entry.key;
               final game = entry.value;
@@ -149,27 +149,27 @@ class _OverallResultCard extends StatelessWidget {
     final winnerColor = result.overallWinner == 'teamA' ? Colors.blue : Colors.red;
 
     return Card(
-      elevation: 4,
+      elevation: 3,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           gradient: LinearGradient(
             colors: [
-              winnerColor.withOpacity(0.1),
-              winnerColor.withOpacity(0.05),
+              winnerColor.withOpacity(0.08),
+              winnerColor.withOpacity(0.03),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
               Row(
                 children: [
-                  Icon(Icons.emoji_events, color: winnerColor, size: 32),
-                  const SizedBox(width: 12),
+                  Icon(Icons.emoji_events, color: winnerColor, size: 28),
+                  const SizedBox(width: 10),
                   Text(
                     'Final Score',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -178,38 +178,26 @@ class _OverallResultCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _TeamScore(
-                    teamName: teamAName,
-                    score: gamesWon['teamA'] ?? 0,
-                    isWinner: result.overallWinner == 'teamA',
-                    color: Colors.blue,
+                  Expanded(
+                    child: _TeamScore(
+                      teamName: teamAName,
+                      score: gamesWon['teamA'] ?? 0,
+                      isWinner: result.overallWinner == 'teamA',
+                      winnerColor: Colors.blue,
+                    ),
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        'vs',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Colors.grey,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${result.totalGames} ${result.totalGames == 1 ? 'game' : 'games'}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
-                            ),
-                      ),
-                    ],
-                  ),
-                  _TeamScore(
-                    teamName: teamBName,
-                    score: gamesWon['teamB'] ?? 0,
-                    isWinner: result.overallWinner == 'teamB',
-                    color: Colors.red,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _TeamScore(
+                      teamName: teamBName,
+                      score: gamesWon['teamB'] ?? 0,
+                      isWinner: result.overallWinner == 'teamB',
+                      winnerColor: Colors.red,
+                    ),
                   ),
                 ],
               ),
@@ -225,67 +213,57 @@ class _TeamScore extends StatelessWidget {
   final String teamName;
   final int score;
   final bool isWinner;
-  final Color color;
+  final Color winnerColor;
 
   const _TeamScore({
     required this.teamName,
     required this.score,
     required this.isWinner,
-    required this.color,
+    required this.winnerColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Use winner color for winner, neutral grey for loser
+    final displayColor = isWinner ? winnerColor : Colors.grey.shade600;
+    final backgroundColor = isWinner ? winnerColor : Colors.grey.shade300;
+
     return Column(
       children: [
         Container(
-          width: 80,
-          height: 80,
+          width: 60,
+          height: 60,
           decoration: BoxDecoration(
-            color: isWinner ? color : color.withOpacity(0.3),
+            color: backgroundColor,
             shape: BoxShape.circle,
             border: Border.all(
-              color: color,
-              width: isWinner ? 3 : 2,
+              color: displayColor,
+              width: isWinner ? 2.5 : 1.5,
             ),
           ),
           child: Center(
             child: Text(
               score.toString(),
               style: TextStyle(
-                fontSize: 36,
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: isWinner ? Colors.white : color,
+                color: isWinner ? Colors.white : displayColor,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Text(
           teamName,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
-                color: isWinner ? color : Colors.grey,
+                fontWeight: isWinner ? FontWeight.bold : FontWeight.w500,
+                color: displayColor,
+                height: 1.2,
               ),
         ),
-        if (isWinner) ...[
-          const SizedBox(height: 4),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Text(
-              'WINNER',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -308,7 +286,7 @@ class _TeamNamesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(18.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -318,7 +296,7 @@ class _TeamNamesCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -399,12 +377,14 @@ class _TeamList extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         ...playerIds.map((playerId) => Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
+              padding: const EdgeInsets.only(bottom: 6.0),
               child: Text(
                 '• ${_getPlayerName(playerId)}',
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1.4,
+                    ),
               ),
             )),
       ],
@@ -436,51 +416,31 @@ class _IndividualGameCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: winnerColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$gameNumber',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: winnerColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Game $gameNumber',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
-                    color: winnerColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: winnerColor),
+                    color: winnerColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(
-                    'Winner: ${game.winner == 'teamA' ? 'Team A' : 'Team B'}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: winnerColor,
-                      fontSize: 12,
+                  child: Center(
+                    child: Text(
+                      '$gameNumber',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: winnerColor,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Game $gameNumber',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
