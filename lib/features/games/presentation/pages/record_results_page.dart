@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/data/models/user_model.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
+import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/services/service_locator.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_bloc.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_state.dart';
@@ -27,6 +29,7 @@ class RecordResultsPage extends StatelessWidget {
           recordResultsBloc ??
           RecordResultsBloc(
             gameRepository: sl<GameRepository>(),
+            userRepository: sl<UserRepository>(),
           )..add(LoadGameForResults(gameId: gameId)),
       child: const _RecordResultsView(),
     );
@@ -120,6 +123,7 @@ class _RecordResultsView extends StatelessWidget {
                             key: const Key('team_a_section'),
                             title: 'Team A',
                             playerIds: state.teamAPlayerIds,
+                            players: state.players,
                             color: Colors.blue,
                             onRemove: (playerId) {
                               context.read<RecordResultsBloc>().add(
@@ -132,6 +136,7 @@ class _RecordResultsView extends StatelessWidget {
                             key: const Key('team_b_section'),
                             title: 'Team B',
                             playerIds: state.teamBPlayerIds,
+                            players: state.players,
                             color: Colors.red,
                             onRemove: (playerId) {
                               context.read<RecordResultsBloc>().add(
@@ -143,6 +148,7 @@ class _RecordResultsView extends StatelessWidget {
                           _UnassignedPlayersSection(
                             key: const Key('unassigned_section'),
                             unassignedPlayerIds: state.unassignedPlayerIds,
+                            players: state.players,
                             onAssignToTeamA: (playerId) {
                               context.read<RecordResultsBloc>().add(
                                     AssignPlayerToTeamA(playerId: playerId),
@@ -185,6 +191,7 @@ class _RecordResultsView extends StatelessWidget {
 class _TeamSection extends StatelessWidget {
   final String title;
   final List<String> playerIds;
+  final Map<String, UserModel> players;
   final Color color;
   final Function(String) onRemove;
 
@@ -192,6 +199,7 @@ class _TeamSection extends StatelessWidget {
     super.key,
     required this.title,
     required this.playerIds,
+    required this.players,
     required this.color,
     required this.onRemove,
   });
@@ -245,6 +253,7 @@ class _TeamSection extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: _PlayerChip(
                       playerId: playerId,
+                      players: players,
                       color: color,
                       onRemove: () => onRemove(playerId),
                     ),
@@ -258,12 +267,14 @@ class _TeamSection extends StatelessWidget {
 
 class _UnassignedPlayersSection extends StatelessWidget {
   final List<String> unassignedPlayerIds;
+  final Map<String, UserModel> players;
   final Function(String) onAssignToTeamA;
   final Function(String) onAssignToTeamB;
 
   const _UnassignedPlayersSection({
     super.key,
     required this.unassignedPlayerIds,
+    required this.players,
     required this.onAssignToTeamA,
     required this.onAssignToTeamB,
   });
@@ -307,6 +318,7 @@ class _UnassignedPlayersSection extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: _UnassignedPlayerItem(
                       playerId: playerId,
+                      players: players,
                       onAssignToTeamA: () => onAssignToTeamA(playerId),
                       onAssignToTeamB: () => onAssignToTeamB(playerId),
                     ),
@@ -320,17 +332,27 @@ class _UnassignedPlayersSection extends StatelessWidget {
 
 class _PlayerChip extends StatelessWidget {
   final String playerId;
+  final Map<String, UserModel> players;
   final Color color;
   final VoidCallback onRemove;
 
   const _PlayerChip({
     required this.playerId,
+    required this.players,
     required this.color,
     required this.onRemove,
   });
 
+  String _getPlayerName() {
+    final player = players[playerId];
+    if (player == null) return playerId;
+    return player.displayName ?? player.email.split('@').first;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final playerName = _getPlayerName();
+
     return Container(
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -344,14 +366,14 @@ class _PlayerChip extends StatelessWidget {
             radius: 16,
             backgroundColor: color,
             child: Text(
-              playerId.substring(0, 1).toUpperCase(),
+              playerName.substring(0, 1).toUpperCase(),
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              playerId,
+              playerName,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
@@ -368,17 +390,27 @@ class _PlayerChip extends StatelessWidget {
 
 class _UnassignedPlayerItem extends StatelessWidget {
   final String playerId;
+  final Map<String, UserModel> players;
   final VoidCallback onAssignToTeamA;
   final VoidCallback onAssignToTeamB;
 
   const _UnassignedPlayerItem({
     required this.playerId,
+    required this.players,
     required this.onAssignToTeamA,
     required this.onAssignToTeamB,
   });
 
+  String _getPlayerName() {
+    final player = players[playerId];
+    if (player == null) return playerId;
+    return player.displayName ?? player.email.split('@').first;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final playerName = _getPlayerName();
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
@@ -392,14 +424,14 @@ class _UnassignedPlayerItem extends StatelessWidget {
             radius: 16,
             backgroundColor: Colors.grey,
             child: Text(
-              playerId.substring(0, 1).toUpperCase(),
+              playerName.substring(0, 1).toUpperCase(),
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              playerId,
+              playerName,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),

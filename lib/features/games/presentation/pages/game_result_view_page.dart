@@ -13,6 +13,28 @@ class GameResultViewPage extends StatelessWidget {
     this.players,
   });
 
+  /// Generate team name from player IDs (e.g., "Alice & Bob" or "Team A")
+  String _getTeamName(List<String> playerIds, String fallbackName) {
+    if (players == null || players!.isEmpty || playerIds.isEmpty) {
+      return fallbackName;
+    }
+
+    // Get up to 2 player names
+    final names = playerIds
+        .take(2)
+        .map((id) {
+          final player = players![id];
+          if (player == null) return null;
+          return player.displayName ?? player.email.split('@').first;
+        })
+        .where((name) => name != null)
+        .toList();
+
+    if (names.isEmpty) return fallbackName;
+    if (names.length == 1) return names[0]!;
+    return '${names[0]} & ${names[1]}';
+  }
+
   @override
   Widget build(BuildContext context) {
     if (game.result == null) {
@@ -49,6 +71,14 @@ class GameResultViewPage extends StatelessWidget {
     final result = game.result!;
     final teams = game.teams;
 
+    // Generate team names
+    final teamAName = teams != null
+        ? _getTeamName(teams.teamAPlayerIds, 'Team A')
+        : 'Team A';
+    final teamBName = teams != null
+        ? _getTeamName(teams.teamBPlayerIds, 'Team B')
+        : 'Team B';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Game Results'),
@@ -63,6 +93,8 @@ class GameResultViewPage extends StatelessWidget {
             _OverallResultCard(
               result: result,
               teams: teams,
+              teamAName: teamAName,
+              teamBName: teamBName,
             ),
             const SizedBox(height: 16),
             // Team Names Card (if teams are assigned)
@@ -70,6 +102,8 @@ class GameResultViewPage extends StatelessWidget {
               _TeamNamesCard(
                 teams: teams,
                 players: players,
+                teamAName: teamAName,
+                teamBName: teamBName,
               ),
             if (teams != null) const SizedBox(height: 16),
             // Individual Games List
@@ -99,10 +133,14 @@ class GameResultViewPage extends StatelessWidget {
 class _OverallResultCard extends StatelessWidget {
   final GameResult result;
   final GameTeams? teams;
+  final String teamAName;
+  final String teamBName;
 
   const _OverallResultCard({
     required this.result,
     required this.teams,
+    required this.teamAName,
+    required this.teamBName,
   });
 
   @override
@@ -145,7 +183,7 @@ class _OverallResultCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _TeamScore(
-                    teamName: 'Team A',
+                    teamName: teamAName,
                     score: gamesWon['teamA'] ?? 0,
                     isWinner: result.overallWinner == 'teamA',
                     color: Colors.blue,
@@ -168,7 +206,7 @@ class _OverallResultCard extends StatelessWidget {
                     ],
                   ),
                   _TeamScore(
-                    teamName: 'Team B',
+                    teamName: teamBName,
                     score: gamesWon['teamB'] ?? 0,
                     isWinner: result.overallWinner == 'teamB',
                     color: Colors.red,
@@ -256,10 +294,14 @@ class _TeamScore extends StatelessWidget {
 class _TeamNamesCard extends StatelessWidget {
   final GameTeams teams;
   final Map<String, UserModel>? players;
+  final String teamAName;
+  final String teamBName;
 
   const _TeamNamesCard({
     required this.teams,
     this.players,
+    required this.teamAName,
+    required this.teamBName,
   });
 
   @override
@@ -281,7 +323,7 @@ class _TeamNamesCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _TeamList(
-                    teamName: 'Team A',
+                    teamName: teamAName,
                     playerIds: teams.teamAPlayerIds,
                     players: players,
                     color: Colors.blue,
@@ -290,7 +332,7 @@ class _TeamNamesCard extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: _TeamList(
-                    teamName: 'Team B',
+                    teamName: teamBName,
                     playerIds: teams.teamBPlayerIds,
                     players: players,
                     color: Colors.red,
