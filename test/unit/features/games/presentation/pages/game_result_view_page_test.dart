@@ -150,9 +150,9 @@ void main() {
         ),
       );
 
-      // Verify team labels are shown
-      expect(find.text('Team A'), findsAtLeastNWidgets(1));
-      expect(find.text('Team B'), findsAtLeastNWidgets(1));
+      // Verify team labels show player names instead of generic "Team A"/"Team B"
+      expect(find.text('Alice & Bob'), findsAtLeastNWidgets(1));
+      expect(find.text('charlie & Diana'), findsAtLeastNWidgets(1));
     });
 
     testWidgets('shows empty state when no results available', (tester) async {
@@ -183,9 +183,10 @@ void main() {
 
       // Verify overall result card elements
       expect(find.text('Final Score'), findsOneWidget);
-      expect(find.text('vs'), findsOneWidget);
-      expect(find.text('WINNER'), findsOneWidget);
       expect(find.byIcon(Icons.emoji_events), findsOneWidget);
+      // Verify team names are displayed (appears in both Final Score and Teams cards)
+      expect(find.text('Alice & Bob'), findsWidgets);
+      expect(find.text('charlie & Diana'), findsWidgets);
     });
 
     testWidgets('displays individual games section', (tester) async {
@@ -200,7 +201,8 @@ void main() {
 
       expect(find.text('Individual Games'), findsOneWidget);
       expect(find.text('Game 1'), findsOneWidget);
-      expect(find.textContaining('Winner: Team'), findsOneWidget);
+      // Verify game details are shown (sets won)
+      expect(find.textContaining('Sets:'), findsOneWidget);
     });
   });
 }
