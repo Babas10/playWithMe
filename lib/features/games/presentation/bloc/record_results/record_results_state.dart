@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/user_model.dart';
 
 abstract class RecordResultsState extends Equatable {
   const RecordResultsState();
@@ -21,28 +22,32 @@ class RecordResultsLoaded extends RecordResultsState {
   final List<String> teamAPlayerIds;
   final List<String> teamBPlayerIds;
   final List<String> unassignedPlayerIds;
+  final Map<String, UserModel> players;
 
   const RecordResultsLoaded({
     required this.game,
     required this.teamAPlayerIds,
     required this.teamBPlayerIds,
     required this.unassignedPlayerIds,
+    this.players = const {},
   });
 
   @override
-  List<Object?> get props => [game, teamAPlayerIds, teamBPlayerIds, unassignedPlayerIds];
+  List<Object?> get props => [game, teamAPlayerIds, teamBPlayerIds, unassignedPlayerIds, players];
 
   RecordResultsLoaded copyWith({
     GameModel? game,
     List<String>? teamAPlayerIds,
     List<String>? teamBPlayerIds,
     List<String>? unassignedPlayerIds,
+    Map<String, UserModel>? players,
   }) {
     return RecordResultsLoaded(
       game: game ?? this.game,
       teamAPlayerIds: teamAPlayerIds ?? this.teamAPlayerIds,
       teamBPlayerIds: teamBPlayerIds ?? this.teamBPlayerIds,
       unassignedPlayerIds: unassignedPlayerIds ?? this.unassignedPlayerIds,
+      players: players ?? this.players,
     );
   }
 

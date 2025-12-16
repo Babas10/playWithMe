@@ -8,12 +8,15 @@ import 'package:play_with_me/features/games/presentation/bloc/record_results/rec
 import 'package:play_with_me/features/games/presentation/bloc/record_results/record_results_state.dart';
 
 import '../../../../../../unit/core/data/repositories/mock_game_repository.dart';
+import '../../../../../../unit/core/data/repositories/mock_user_repository.dart';
 
 void main() {
   late MockGameRepository mockGameRepository;
+  late MockUserRepository mockUserRepository;
 
   setUp(() {
     mockGameRepository = MockGameRepository();
+    mockUserRepository = MockUserRepository();
   });
 
   tearDown(() {
@@ -22,7 +25,10 @@ void main() {
 
   group('RecordResultsBloc', () {
     test('initial state is RecordResultsInitial', () {
-      final bloc = RecordResultsBloc(gameRepository: mockGameRepository);
+      final bloc = RecordResultsBloc(
+        gameRepository: mockGameRepository,
+        userRepository: mockUserRepository,
+      );
       expect(bloc.state, equals(const RecordResultsInitial()));
       bloc.close();
     });
@@ -36,7 +42,10 @@ void main() {
             endedAt: DateTime.now(),
           );
           mockGameRepository.addGame(completedGame);
-          return RecordResultsBloc(gameRepository: mockGameRepository);
+          return RecordResultsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
         expect: () => [
@@ -49,7 +58,10 @@ void main() {
 
       blocTest<RecordResultsBloc, RecordResultsState>(
         'emits [loading, error] when game does not exist',
-        build: () => RecordResultsBloc(gameRepository: mockGameRepository),
+        build: () => RecordResultsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'non-existent')),
         expect: () => [
           const RecordResultsLoading(),
@@ -61,7 +73,10 @@ void main() {
         'emits [loading, loaded] when game is scheduled (implicitly completing)',
         build: () {
           mockGameRepository.addGame(TestGameData.testGame); // scheduled game
-          return RecordResultsBloc(gameRepository: mockGameRepository);
+          return RecordResultsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
         expect: () => [
@@ -82,7 +97,10 @@ void main() {
             ),
           );
           mockGameRepository.addGame(completedGameWithTeams);
-          return RecordResultsBloc(gameRepository: mockGameRepository);
+          return RecordResultsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
         expect: () => [
@@ -98,7 +116,10 @@ void main() {
     group('AssignPlayerToTeamA', () {
       blocTest<RecordResultsBloc, RecordResultsState>(
         'assigns unassigned player to team A',
-        build: () => RecordResultsBloc(gameRepository: mockGameRepository),
+        build: () => RecordResultsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame,
           teamAPlayerIds: const [],
@@ -115,7 +136,10 @@ void main() {
 
       blocTest<RecordResultsBloc, RecordResultsState>(
         'moves player from team B to team A',
-        build: () => RecordResultsBloc(gameRepository: mockGameRepository),
+        build: () => RecordResultsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame,
           teamAPlayerIds: const [],
@@ -134,7 +158,10 @@ void main() {
     group('AssignPlayerToTeamB', () {
       blocTest<RecordResultsBloc, RecordResultsState>(
         'assigns unassigned player to team B',
-        build: () => RecordResultsBloc(gameRepository: mockGameRepository),
+        build: () => RecordResultsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame,
           teamAPlayerIds: const [],
@@ -151,7 +178,10 @@ void main() {
 
       blocTest<RecordResultsBloc, RecordResultsState>(
         'moves player from team A to team B',
-        build: () => RecordResultsBloc(gameRepository: mockGameRepository),
+        build: () => RecordResultsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame,
           teamAPlayerIds: const ['player1'],
@@ -170,7 +200,10 @@ void main() {
     group('RemovePlayerFromTeam', () {
       blocTest<RecordResultsBloc, RecordResultsState>(
         'removes player from team A to unassigned',
-        build: () => RecordResultsBloc(gameRepository: mockGameRepository),
+        build: () => RecordResultsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame,
           teamAPlayerIds: const ['player1', 'player2'],
@@ -187,7 +220,10 @@ void main() {
 
       blocTest<RecordResultsBloc, RecordResultsState>(
         'removes player from team B to unassigned',
-        build: () => RecordResultsBloc(gameRepository: mockGameRepository),
+        build: () => RecordResultsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame,
           teamAPlayerIds: const [],
@@ -212,7 +248,10 @@ void main() {
             endedAt: DateTime.now(),
           );
           mockGameRepository.addGame(completedGame);
-          return RecordResultsBloc(gameRepository: mockGameRepository);
+          return RecordResultsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame.copyWith(
@@ -232,7 +271,10 @@ void main() {
 
       blocTest<RecordResultsBloc, RecordResultsState>(
         'emits error when not all players assigned',
-        build: () => RecordResultsBloc(gameRepository: mockGameRepository),
+        build: () => RecordResultsBloc(
+          gameRepository: mockGameRepository,
+          userRepository: mockUserRepository,
+        ),
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame.copyWith(status: GameStatus.completed),
           teamAPlayerIds: const ['player1'],
@@ -254,7 +296,10 @@ void main() {
             endedAt: DateTime.now(),
           );
           mockGameRepository.addGame(completedGame);
-          return RecordResultsBloc(gameRepository: mockGameRepository);
+          return RecordResultsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
         },
         seed: () => RecordResultsLoaded(
           game: TestGameData.testGame.copyWith(

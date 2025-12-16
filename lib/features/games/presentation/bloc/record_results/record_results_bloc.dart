@@ -2,16 +2,22 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 
 import 'record_results_event.dart';
 import 'record_results_state.dart';
 
 class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
   final GameRepository _gameRepository;
+  final UserRepository _userRepository;
 
-  RecordResultsBloc({required GameRepository gameRepository})
-      : _gameRepository = gameRepository,
+  RecordResultsBloc({
+    required GameRepository gameRepository,
+    required UserRepository userRepository,
+  })  : _gameRepository = gameRepository,
+        _userRepository = userRepository,
         super(const RecordResultsInitial()) {
     on<LoadGameForResults>(_onLoadGameForResults);
     on<AssignPlayerToTeamA>(_onAssignPlayerToTeamA);
@@ -47,11 +53,26 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
           .where((playerId) => !assignedPlayers.contains(playerId))
           .toList();
 
+      // Load player data
+      Map<String, UserModel> players = {};
+      if (game.playerIds.isNotEmpty) {
+        try {
+          final userList = await _userRepository.getUsersByIds(game.playerIds);
+          for (final user in userList) {
+            players[user.uid] = user;
+          }
+        } catch (e) {
+          // If fetching users fails, continue without user data
+          print('Failed to load user data: $e');
+        }
+      }
+
       emit(RecordResultsLoaded(
         game: game,
         teamAPlayerIds: teamAPlayerIds,
         teamBPlayerIds: teamBPlayerIds,
         unassignedPlayerIds: unassignedPlayerIds,
+        players: players,
       ));
     } catch (e) {
       emit(RecordResultsError(message: 'Failed to load game: ${e.toString()}'));
