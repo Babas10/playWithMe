@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
@@ -41,11 +42,16 @@ void main() {
     mockGameRepository = MockGameRepository();
     mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
-    
+
     if (sl.isRegistered<GameRepository>()) {
       sl.unregister<GameRepository>();
     }
     sl.registerSingleton<GameRepository>(mockGameRepository);
+
+    if (sl.isRegistered<UserRepository>()) {
+      sl.unregister<UserRepository>();
+    }
+    sl.registerSingleton<UserRepository>(mockUserRepository);
   });
 
   tearDown(() {

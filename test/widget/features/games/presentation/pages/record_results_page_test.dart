@@ -16,10 +16,13 @@ import 'package:play_with_me/features/games/presentation/pages/record_results_pa
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/games/presentation/pages/score_entry_page.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 
 // Mock classes
 class MockGameRepository extends Mock implements GameRepository {}
+
+class MockUserRepository extends Mock implements UserRepository {}
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
@@ -35,6 +38,7 @@ class FakeRoute extends Fake implements Route<dynamic> {}
 
 void main() {
   late MockGameRepository mockGameRepository;
+  late MockUserRepository mockUserRepository;
   late MockAuthenticationBloc mockAuthBloc;
 
   const testUserId = 'test-uid-123';
@@ -68,13 +72,16 @@ void main() {
 
   setUp(() {
     mockGameRepository = MockGameRepository();
+    mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
     sl.registerSingleton<AuthenticationBloc>(mockAuthBloc);
     sl.registerSingleton<GameRepository>(mockGameRepository);
+    sl.registerSingleton<UserRepository>(mockUserRepository);
 
     when(() => mockGameRepository.getGameById(any()))
         .thenAnswer((_) async => testGame);
     when(() => mockGameRepository.updateGameTeams(any(), any(), any())).thenAnswer((_) async {});
+    when(() => mockUserRepository.getUsersByIds(any())).thenAnswer((_) async => []);
     when(() => mockAuthBloc.state).thenReturn(const AuthenticationAuthenticated(testUser));
     when(() => mockAuthBloc.stream).thenAnswer((_) => Stream.value(const AuthenticationAuthenticated(testUser)));
   });

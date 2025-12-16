@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/data/models/game_model.dart';
+import '../../../../core/data/models/user_model.dart';
 import '../../../../core/services/service_locator.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_bloc.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_state.dart';
@@ -136,6 +137,10 @@ class _GameDetailsView extends StatelessWidget {
                 ? state.game
                 : (state as GameDetailsOperationInProgress).game;
 
+            final players = state is GameDetailsLoaded
+                ? state.players
+                : (state as GameDetailsOperationInProgress).players;
+
             final isOperationInProgress = state is GameDetailsOperationInProgress;
 
             return Column(
@@ -158,7 +163,10 @@ class _GameDetailsView extends StatelessWidget {
                         ],
                         // Show results card if game has results
                         if (game.result != null) ...[
-                          _ViewResultsCard(game: game),
+                          _ViewResultsCard(
+                            game: game,
+                            players: players,
+                          ),
                           const SizedBox(height: 16),
                         ],
                         _LocationCard(location: game.location),
@@ -677,8 +685,34 @@ class _RsvpButtons extends StatelessWidget {
 
 class _ViewResultsCard extends StatelessWidget {
   final GameModel game;
+  final Map<String, UserModel> players;
 
-  const _ViewResultsCard({required this.game});
+  const _ViewResultsCard({
+    required this.game,
+    required this.players,
+  });
+
+  /// Generate team name from player IDs (e.g., "Alice & Bob" or "Team A")
+  String _getTeamName(List<String> playerIds, String fallbackName) {
+    if (players.isEmpty || playerIds.isEmpty) {
+      return fallbackName;
+    }
+
+    // Get up to 2 player names
+    final names = playerIds
+        .take(2)
+        .map((id) {
+          final player = players[id];
+          if (player == null) return null;
+          return player.displayName ?? player.email.split('@').first;
+        })
+        .where((name) => name != null)
+        .toList();
+
+    if (names.isEmpty) return fallbackName;
+    if (names.length == 1) return names[0]!;
+    return '${names[0]} & ${names[1]}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -686,13 +720,25 @@ class _ViewResultsCard extends StatelessWidget {
     final gamesWon = result.gamesWon;
     final winnerColor = result.overallWinner == 'teamA' ? Colors.blue : Colors.red;
 
+    // Generate team names
+    final teams = game.teams;
+    final teamAName = teams != null
+        ? _getTeamName(teams.teamAPlayerIds, 'Team A')
+        : 'Team A';
+    final teamBName = teams != null
+        ? _getTeamName(teams.teamBPlayerIds, 'Team B')
+        : 'Team B';
+
     return Card(
       elevation: 2,
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => GameResultViewPage(game: game),
+              builder: (context) => GameResultViewPage(
+                game: game,
+                players: players,
+              ),
             ),
           );
         },
@@ -725,7 +771,7 @@ class _ViewResultsCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _QuickScoreDisplay(
-                    teamName: 'Team A',
+                    teamName: teamAName,
                     score: gamesWon['teamA'] ?? 0,
                     isWinner: result.overallWinner == 'teamA',
                     color: Colors.blue,
@@ -737,7 +783,7 @@ class _ViewResultsCard extends StatelessWidget {
                         ),
                   ),
                   _QuickScoreDisplay(
-                    teamName: 'Team B',
+                    teamName: teamBName,
                     score: gamesWon['teamB'] ?? 0,
                     isWinner: result.overallWinner == 'teamB',
                     color: Colors.red,
@@ -804,9 +850,12 @@ class _QuickScoreDisplay extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           teamName,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
-                color: isWinner ? Colors.white : Colors.grey,
+                color: isWinner ? Colors.black87 : Colors.grey.shade600,
               ),
         ),
       ],
