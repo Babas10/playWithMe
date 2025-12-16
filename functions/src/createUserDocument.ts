@@ -62,6 +62,12 @@ export const createUserDocument = functions.auth.user().onCreate(async (user) =>
       // Note: These arrays are managed by Cloud Functions for friends/groups features
       friendIds: [],
       groupIds: [],
+
+      // Stats
+      eloRating: 1200,
+      gamesPlayed: 0,
+      wins: 0,
+      losses: 0,
     };
 
     await userRef.set(userData);

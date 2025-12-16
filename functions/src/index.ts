@@ -57,3 +57,8 @@ export {
   onWaitlistPromoted,
   onGameResultSubmitted, // Story 14.15
 } from "./notifications";
+
+// Export game update triggers
+export {
+  onGameStatusChanged, // Story 14.16 (ELO updates)
+} from "./gameUpdates";
