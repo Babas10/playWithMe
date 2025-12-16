@@ -368,12 +368,16 @@ class _TeamList extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              teamName,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
+            Expanded(
+              child: Text(
+                teamName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+              ),
             ),
           ],
         ),
