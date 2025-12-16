@@ -850,9 +850,12 @@ class _QuickScoreDisplay extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           teamName,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
-                color: isWinner ? Colors.white : Colors.grey,
+                color: isWinner ? Colors.black87 : Colors.grey.shade600,
               ),
         ),
       ],
