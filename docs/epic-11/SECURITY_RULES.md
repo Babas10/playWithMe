@@ -1,9 +1,47 @@
 # Security Rules Documentation - Epic 11: Friendship System
 
-**Version:** 1.0
-**Last Updated:** 2025-11-05
+**Version:** 2.0
+**Last Updated:** 2025-12-17
 **Part of:** Epic 11 - Friendship Management
-**Related Stories:** Story 11.2, Story 11.3, Story 11.7
+**Related Stories:** Story 11.2, Story 11.3, **Story 11.7 (Cloud Function-First Architecture)**
+
+---
+
+## 🆕 Story 11.7: Cloud Function-First Architecture
+
+**Breaking Change:** As of Story 11.7, direct list queries on `/friendships` and `/users` collections are **DENIED**. All list/query operations must use Cloud Functions.
+
+### What Changed?
+
+| Collection | Before | After |
+|------------|--------|-------|
+| `/friendships` | `allow read` (includes list) | `allow list: if false`, `allow get` only |
+| `/users` | `allow read` | `allow list: if false`, `allow get` only |
+
+### Why?
+
+- **Security**: Prevents unauthorized collection scans and data exposure
+- **Performance**: Forces use of optimized, indexed Cloud Functions
+- **Cost**: Reduces expensive Firestore reads
+- **Control**: All queries go through validated, logged Cloud Functions
+
+### Migration Required
+
+Client code must be updated:
+
+```dart
+// ❌ OLD: Direct Firestore query (now fails with permission-denied)
+final snapshot = await FirebaseFirestore.instance
+  .collection('friendships')
+  .where('initiatorId', isEqualTo: userId)
+  .get();
+
+// ✅ NEW: Use Cloud Function
+final callable = FirebaseFunctions.instance.httpsCallable('getFriendships');
+final result = await callable.call({'status': 'accepted'});
+```
+
+See [Cloud Function-First Architecture](#cloud-function-first-architecture-story-117) below for details.
 
 ---
 
@@ -55,26 +93,31 @@ interface Friendship {
 
 ### Read Access
 
-**Rule:**
+**Rule (Updated in Story 11.7):**
 ```javascript
-allow read: if isAuthenticated() &&
-               (request.auth.uid == resource.data.initiatorId ||
-                request.auth.uid == resource.data.recipientId);
+// ❌ DENY all list/where queries - must use Cloud Functions
+allow list: if false;
+
+// ✅ ALLOW get only for friendships user is part of
+allow get: if isAuthenticated() &&
+              (request.auth.uid == resource.data.initiatorId ||
+               request.auth.uid == resource.data.recipientId);
 ```
 
 **Rationale:**
-- Users can only read friendships where they are either the initiator or recipient
-- Prevents users from discovering other users' friend connections
-- Supports both direct document reads and queries
+- **Get operations allowed**: Users can read specific friendship documents they're part of
+- **List queries denied**: All `.where()` and collection queries must use Cloud Functions
+- Prevents users from discovering other users' friend connections via collection scans
+- Enforces Cloud Function-first architecture for all list operations
 
 **Allowed Operations:**
 - ✅ `friendships/{friendshipId}.get()` where user is initiator or recipient
-- ✅ `.where('initiatorId', '==', currentUserId)` queries
-- ✅ `.where('recipientId', '==', currentUserId)` queries
 
 **Denied Operations:**
+- ❌ `.where('initiatorId', '==', currentUserId)` queries (must use `getFriendships()` Cloud Function)
+- ❌ `.where('recipientId', '==', currentUserId)` queries (must use `getFriendships()` Cloud Function)
+- ❌ `.get()` on collection (must use Cloud Function)
 - ❌ Reading another user's friendship document
-- ❌ Listing all friendships without filtering
 - ❌ Unauthenticated access
 
 ### Create Access
