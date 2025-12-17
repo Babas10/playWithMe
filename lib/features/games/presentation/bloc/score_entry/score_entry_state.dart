@@ -50,6 +50,32 @@ class SetScoreData {
     return (maxPoints - minPoints) == 2;
   }
 
+  /// Get a user-friendly error message if the score is invalid
+  String? get validationError {
+    if (!isComplete) return null;
+    
+    final maxPoints = teamAPoints! > teamBPoints! ? teamAPoints! : teamBPoints!;
+    final minPoints = teamAPoints! < teamBPoints! ? teamAPoints! : teamBPoints!;
+
+    if (maxPoints < 21) {
+      return 'Winning team must reach at least 21 points';
+    }
+    
+    if (maxPoints == 21) {
+      if (minPoints > 19) {
+        return 'Must win by at least 2 points (e.g., 21-19)';
+      }
+    }
+    
+    if (maxPoints > 21) {
+      if ((maxPoints - minPoints) != 2) {
+        return 'In extra points, must win by exactly 2 points';
+      }
+    }
+
+    return isValid ? null : 'Invalid score';
+  }
+
   String? get winner {
     if (!isValid) return null;
     return teamAPoints! > teamBPoints! ? 'teamA' : 'teamB';
