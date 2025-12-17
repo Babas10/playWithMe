@@ -121,6 +121,35 @@ Users ⇄ My Community ⇄ Groups ⇄ Games
 * **No cyclic dependencies** — My Community never queries Groups or Games.
 * This approach allows independent scaling and simpler evolution of the social graph into a richer network later (e.g., followers, blocking, activity feeds).
 
+#### **5. Architectural Enforcement (Critical)**
+
+**Rule: Games Never Import Friendships**
+
+```dart
+// ❌ FORBIDDEN in lib/features/games/
+import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
+
+// ✅ ALLOWED in lib/features/games/
+import 'package:play_with_me/core/domain/repositories/group_repository.dart';
+import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+```
+
+**Enforcement Mechanisms:**
+1. **Architecture Tests** (`test/architecture/dependency_test.dart`) - Fails CI if violations found
+2. **Code Review Checklist** - Reviewers verify no cross-layer imports
+3. **Documentation** - See [`docs/architecture/LAYERED_DEPENDENCIES.md`](./docs/architecture/LAYERED_DEPENDENCIES.md)
+
+**Common Anti-Patterns to Avoid:**
+- ❌ Games querying `friendships` collection
+- ❌ Games calling friendship Cloud Functions
+- ❌ Games importing `FriendRepository`
+- ✅ Games access players via `group.memberIds` only
+
+**Related Documentation:**
+- [`docs/architecture/LAYERED_DEPENDENCIES.md`](./docs/architecture/LAYERED_DEPENDENCIES.md) - Detailed dependency rules
+- [`docs/architecture/DEPENDENCY_DIAGRAM.md`](./docs/architecture/DEPENDENCY_DIAGRAM.md) - Visual architecture diagrams
+- [`integration_test/game_player_access_via_groups_test.dart`](../integration_test/game_player_access_via_groups_test.dart) - Architecture validation tests
+
 ---
 
 
