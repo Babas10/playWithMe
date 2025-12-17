@@ -74,6 +74,27 @@ describe("User Security Rules", () => {
       const db = testEnv.unauthenticatedContext().firestore();
       await testing.assertFails(db.collection("users").doc("user1").get());
     });
+
+    // Story 11.7: Cloud Function-First Architecture
+    // List queries are DENIED - clients must use searchUsers() Cloud Function
+    it("should DENY querying users by email (must use Cloud Function)", async () => {
+      const db = testEnv.authenticatedContext("user1").firestore();
+      await testing.assertFails(
+        db.collection("users").where("email", "==", "user2@test.com").get()
+      );
+    });
+
+    it("should DENY querying users by displayName (must use Cloud Function)", async () => {
+      const db = testEnv.authenticatedContext("user1").firestore();
+      await testing.assertFails(
+        db.collection("users").where("displayName", "==", "User 2").get()
+      );
+    });
+
+    it("should DENY any list/collection query on users", async () => {
+      const db = testEnv.authenticatedContext("user1").firestore();
+      await testing.assertFails(db.collection("users").get());
+    });
   });
 
   describe("Create Access", () => {
