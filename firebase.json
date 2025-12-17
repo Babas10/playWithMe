@@ -7,17 +7,6 @@
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
-    },
-    {
-      "source": "functions/python",
-      "codebase": "python-functions",
-      "runtime": "python311",
-      "ignore": [
-        "venv",
-        ".pytest_cache",
-        "__pycache__",
-        "tests"
-      ]
     }
   ],
   "firestore": {
