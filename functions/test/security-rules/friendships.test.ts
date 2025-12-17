@@ -100,9 +100,11 @@ describe("Friendship Security Rules", () => {
       );
     });
 
-    it("should allow initiator to query their own friendships", async () => {
+    // Story 11.7: Cloud Function-First Architecture
+    // List queries are DENIED - clients must use getFriendships() Cloud Function
+    it("should DENY initiator from querying friendships (must use Cloud Function)", async () => {
       const db = testEnv.authenticatedContext("user1").firestore();
-      await testing.assertSucceeds(
+      await testing.assertFails(
         db
           .collection("friendships")
           .where("initiatorId", "==", "user1")
@@ -110,13 +112,20 @@ describe("Friendship Security Rules", () => {
       );
     });
 
-    it("should allow recipient to query their own friendships", async () => {
+    it("should DENY recipient from querying friendships (must use Cloud Function)", async () => {
       const db = testEnv.authenticatedContext("user2").firestore();
-      await testing.assertSucceeds(
+      await testing.assertFails(
         db
           .collection("friendships")
           .where("recipientId", "==", "user2")
           .get()
+      );
+    });
+
+    it("should DENY any list/collection query on friendships", async () => {
+      const db = testEnv.authenticatedContext("user1").firestore();
+      await testing.assertFails(
+        db.collection("friendships").get()
       );
     });
   });

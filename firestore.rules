@@ -29,8 +29,12 @@ service cloud.firestore {
 
     // Users can read and write their own user document
     match /users/{userId} {
-      // Users can read their own document
-      allow read: if isAuthenticated() && request.auth.uid == userId;
+      // ❌ DENY list queries - must use searchUsers() Cloud Function (Story 11.7)
+      // Forces all user searches to go through validated Cloud Functions
+      allow list: if false;
+
+      // ✅ ALLOW get only for own user document
+      allow get: if isAuthenticated() && request.auth.uid == userId;
 
       // Users can create their own document
       allow create: if isAuthenticated() && request.auth.uid == userId;
@@ -88,10 +92,14 @@ service cloud.firestore {
     // ============================================
 
     match /friendships/{friendshipId} {
-      // Users can only read friendships they're part of
-      allow read: if isAuthenticated() &&
-                     (request.auth.uid == resource.data.initiatorId ||
-                      request.auth.uid == resource.data.recipientId);
+      // ❌ DENY all list/where queries - must use Cloud Functions (Story 11.7)
+      // Client apps must use getFriendships() Cloud Function for queries
+      allow list: if false;
+
+      // ✅ ALLOW get only for friendships user is part of
+      allow get: if isAuthenticated() &&
+                    (request.auth.uid == resource.data.initiatorId ||
+                     request.auth.uid == resource.data.recipientId);
 
       // Only initiator can create a friend request
       // Must be pending status, cannot friend yourself, and recipient must exist
