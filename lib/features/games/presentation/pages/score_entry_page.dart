@@ -447,7 +447,11 @@ class _SetScoreInputState extends State<_SetScoreInput> {
             child: widget.setData.isValid
                 ? const Icon(Icons.check, color: Colors.green, size: 20)
                 : widget.setData.isComplete
-                    ? const Icon(Icons.error, color: Colors.red, size: 20)
+                    ? Tooltip(
+                        message: widget.setData.validationError ?? 'Invalid score',
+                        triggerMode: TooltipTriggerMode.tap,
+                        child: const Icon(Icons.error, color: Colors.red, size: 20),
+                      )
                     : null,
           ),
         ],
