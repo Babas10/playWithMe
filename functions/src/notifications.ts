@@ -2482,11 +2482,168 @@ export const onGameResultSubmitted = functions.firestore
 
       return null;
     } catch (error) {
-      functions.logger.error("Error sending game result verification notification", {
+      functions.logger.error("Error sending game result submitted notification", {
         groupId,
         gameId,
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
+      });
+      return null;
+    }
+  });
+
+/**
+ * Send notification when a game is cancelled (e.g. auto-aborted due to insufficient players)
+ */
+export const onGameCancelled = functions.firestore
+  .document("games/{gameId}")
+  .onUpdate(async (change, context) => {
+    const before = change.before.data();
+    const after = change.after.data();
+    const gameId = context.params.gameId;
+    const groupId = after.groupId;
+
+    // Only trigger if status changed to 'cancelled'
+    if (before.status === "cancelled" || after.status !== "cancelled") {
+      return null;
+    }
+
+    functions.logger.info("Game cancelled, processing notifications", {
+      groupId,
+      gameId,
+      reason: after.notes,
+    });
+
+    try {
+      // Get all players and waitlist users to notify
+      const playerIds = after.playerIds || [];
+      const waitlistIds = after.waitlistIds || [];
+      // Combine and deduplicate
+      const usersToNotify = [...new Set([...playerIds, ...waitlistIds])] as string[];
+
+      if (usersToNotify.length === 0) {
+        functions.logger.info("No users to notify for cancelled game", {
+          groupId,
+          gameId,
+        });
+        return null;
+      }
+
+      // Prepare notification message
+      const isAutoAborted = after.notes && after.notes.includes("auto-aborted");
+      const title = isAutoAborted ? "Game Aborted" : "Game Cancelled";
+      const body = isAutoAborted 
+        ? `The game ${after.title || ""} was aborted due to insufficient players.`
+        : `The game ${after.title || ""} has been cancelled.`;
+
+      // Track tokens per user for cleanup
+      const userTokenMap = new Map<string, string[]>();
+      const allTokens: string[] = [];
+
+      for (const userId of usersToNotify) {
+        const userDoc = await admin
+          .firestore()
+          .collection("users")
+          .doc(userId)
+          .get();
+
+        const userData = userDoc.data();
+        if (!userData) continue;
+
+        const fcmTokens = userData.fcmTokens || [];
+        if (fcmTokens.length === 0) continue;
+
+        const prefs = userData.notificationPreferences || {};
+        // Use a generic 'gameUpdates' preference if specific 'gameCancelled' doesn't exist
+        // or just default to true as cancellation is important
+        if (prefs.gameUpdates === false) continue;
+
+        if (isQuietHours(prefs.quietHours)) continue;
+
+        userTokenMap.set(userId, fcmTokens);
+        allTokens.push(...fcmTokens);
+      }
+
+      if (allTokens.length === 0) {
+        return null;
+      }
+
+      const message: admin.messaging.MulticastMessage = {
+        tokens: allTokens,
+        notification: {
+          title: title,
+          body: body,
+        },
+        data: {
+          type: "game_cancelled",
+          groupId: groupId,
+          gameId: gameId,
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "high_importance_channel",
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              badge: 1,
+              sound: "default",
+            },
+          },
+        },
+      };
+
+      const response = await admin.messaging().sendEachForMulticast(message);
+
+      functions.logger.info("Game cancelled notification sent", {
+        groupId,
+        gameId,
+        successCount: response.successCount,
+      });
+
+      // Cleanup invalid tokens
+      if (response.failureCount > 0) {
+          const invalidTokensByUser = new Map<string, string[]>();
+
+          response.responses.forEach((resp, idx) => {
+            if (
+              !resp.success &&
+              (resp.error?.code === "messaging/invalid-registration-token" ||
+                resp.error?.code === "messaging/registration-token-not-registered")
+            ) {
+              const invalidToken = allTokens[idx];
+
+              for (const [userId, tokens] of userTokenMap.entries()) {
+                if (tokens.includes(invalidToken)) {
+                  if (!invalidTokensByUser.has(userId)) {
+                    invalidTokensByUser.set(userId, []);
+                  }
+                  invalidTokensByUser.get(userId)!.push(invalidToken);
+                  break;
+                }
+              }
+            }
+          });
+
+          for (const [userId, tokensToRemove] of invalidTokensByUser.entries()) {
+            await admin
+              .firestore()
+              .collection("users")
+              .doc(userId)
+              .update({
+                fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+              });
+          }
+      }
+
+      return null;
+    } catch (error) {
+      functions.logger.error("Error sending game cancelled notification", {
+        gameId,
+        error: error instanceof Error ? error.message : String(error),
       });
       return null;
     }
