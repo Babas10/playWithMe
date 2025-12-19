@@ -56,9 +56,14 @@ export {
   onPlayerLeftGame,
   onWaitlistPromoted,
   onGameResultSubmitted, // Story 14.15
+  onGameCancelled,
 } from "./notifications";
 
 // Export game update triggers
 export {
   onGameStatusChanged, // Story 14.16 (ELO updates)
 } from "./gameUpdates";
+
+// Export scheduled functions for game auto-abort
+export {autoAbortGames} from "./autoAbortGames";
+
