@@ -896,7 +896,7 @@ describe("onGameResultSubmitted Cloud Function", () => {
 
       expect(result).toBeNull();
       expect(functions.logger.error).toHaveBeenCalledWith(
-        "Error sending game result verification notification",
+        "Error sending game result submitted notification",
         expect.objectContaining({
           error: "Firestore error",
         })
