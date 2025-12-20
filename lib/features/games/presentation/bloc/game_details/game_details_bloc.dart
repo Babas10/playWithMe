@@ -1,8 +1,10 @@
 // Manages game details screen state with real-time updates and RSVP actions.
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'game_details_event.dart';
 import 'game_details_state.dart';
@@ -55,14 +57,16 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     Emitter<GameDetailsState> emit,
   ) async {
     if (event.game != null) {
+      final game = event.game!;
       // Fetch player data for all players and waitlisted users
       final allPlayerIds = <String>{
-        ...event.game.playerIds,
-        ...event.game.waitlistIds,
-        event.game.createdBy, // Include creator
+        ...game.playerIds,
+        ...game.waitlistIds,
+        game.createdBy, // Include creator
       }.toList();
 
       Map<String, UserModel> players = {};
+      Map<String, RatingHistoryEntry?> playerEloUpdates = {};
 
       if (allPlayerIds.isNotEmpty) {
         try {
@@ -70,14 +74,46 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
           for (final user in userList) {
             players[user.uid] = user;
           }
+
+          // If ELO is calculated, extract updates from game document
+          if (game.eloCalculated && game.eloUpdates.isNotEmpty) {
+            for (final playerId in game.playerIds) {
+              try {
+                final eloUpdate = game.eloUpdates[playerId];
+                if (eloUpdate != null && eloUpdate is Map) {
+                  // Convert the eloUpdates map to RatingHistoryEntry for UI display
+                  final previousRating = (eloUpdate['previousRating'] as num?)?.toDouble() ?? 0.0;
+                  final newRating = (eloUpdate['newRating'] as num?)?.toDouble() ?? 0.0;
+                  final change = (eloUpdate['change'] as num?)?.toDouble() ?? 0.0;
+
+                  playerEloUpdates[playerId] = RatingHistoryEntry(
+                    entryId: '', // Not needed for display purposes
+                    gameId: game.id,
+                    oldRating: previousRating,
+                    newRating: newRating,
+                    ratingChange: change,
+                    opponentTeam: '', // Not needed for this display
+                    won: change > 0,
+                    timestamp: game.completedAt ?? DateTime.now(),
+                  );
+                }
+              } catch (e) {
+                debugPrint('Failed to parse ELO update for player $playerId: $e');
+              }
+            }
+          }
         } catch (e) {
           // If fetching users fails, emit state without user data
           // This ensures the game details still load
-          print('Failed to load user data: $e');
+          debugPrint('Failed to load user data: $e');
         }
       }
 
-      emit(GameDetailsLoaded(game: event.game, players: players));
+      emit(GameDetailsLoaded(
+        game: game, 
+        players: players,
+        playerEloUpdates: playerEloUpdates,
+      ));
     } else {
       emit(const GameDetailsNotFound(
         message: 'Game not found or has been deleted',
@@ -97,6 +133,7 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
           game: currentState.game,
           operation: 'join',
           players: currentState.players,
+          playerEloUpdates: currentState.playerEloUpdates,
         ));
       }
 
@@ -123,6 +160,7 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
           game: currentState.game,
           operation: 'leave',
           players: currentState.players,
+          playerEloUpdates: currentState.playerEloUpdates,
         ));
       }
 
@@ -149,6 +187,7 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
           game: currentState.game,
           operation: 'mark_completed',
           players: currentState.players,
+          playerEloUpdates: currentState.playerEloUpdates,
         ));
       }
 
@@ -180,6 +219,7 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
           game: currentState.game,
           operation: 'confirm_result',
           players: currentState.players,
+          playerEloUpdates: currentState.playerEloUpdates,
         ));
       }
 

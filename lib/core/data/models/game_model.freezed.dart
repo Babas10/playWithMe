@@ -66,6 +66,9 @@ mixin _$GameModel {
   List<String> get confirmedBy =>
       throw _privateConstructorUsedError; // ELO calculation flag (set to false when result is saved, true after Python function processes)
   bool get eloCalculated =>
+      throw _privateConstructorUsedError; // ELO updates per player (populated by Cloud Function after calculation)
+  // Map<playerId, {previousRating, newRating, change}>
+  Map<String, dynamic> get eloUpdates =>
       throw _privateConstructorUsedError; // Timestamp when the game result was entered and completed
   @TimestampConverter()
   DateTime? get completedAt => throw _privateConstructorUsedError; // Weather considerations
@@ -120,6 +123,7 @@ abstract class $GameModelCopyWith<$Res> {
     String? resultSubmittedBy,
     List<String> confirmedBy,
     bool eloCalculated,
+    Map<String, dynamic> eloUpdates,
     @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
     String? weatherNotes,
@@ -177,6 +181,7 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? resultSubmittedBy = freezed,
     Object? confirmedBy = null,
     Object? eloCalculated = null,
+    Object? eloUpdates = null,
     Object? completedAt = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
@@ -311,6 +316,10 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.eloCalculated
                 : eloCalculated // ignore: cast_nullable_to_non_nullable
                       as bool,
+            eloUpdates: null == eloUpdates
+                ? _value.eloUpdates
+                : eloUpdates // ignore: cast_nullable_to_non_nullable
+                      as Map<String, dynamic>,
             completedAt: freezed == completedAt
                 ? _value.completedAt
                 : completedAt // ignore: cast_nullable_to_non_nullable
@@ -409,6 +418,7 @@ abstract class _$$GameModelImplCopyWith<$Res>
     String? resultSubmittedBy,
     List<String> confirmedBy,
     bool eloCalculated,
+    Map<String, dynamic> eloUpdates,
     @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
     String? weatherNotes,
@@ -468,6 +478,7 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? resultSubmittedBy = freezed,
     Object? confirmedBy = null,
     Object? eloCalculated = null,
+    Object? eloUpdates = null,
     Object? completedAt = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
@@ -602,6 +613,10 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.eloCalculated
             : eloCalculated // ignore: cast_nullable_to_non_nullable
                   as bool,
+        eloUpdates: null == eloUpdates
+            ? _value._eloUpdates
+            : eloUpdates // ignore: cast_nullable_to_non_nullable
+                  as Map<String, dynamic>,
         completedAt: freezed == completedAt
             ? _value.completedAt
             : completedAt // ignore: cast_nullable_to_non_nullable
@@ -655,6 +670,7 @@ class _$GameModelImpl extends _GameModel {
     this.resultSubmittedBy,
     final List<String> confirmedBy = const [],
     this.eloCalculated = false,
+    final Map<String, dynamic> eloUpdates = const {},
     @TimestampConverter() this.completedAt,
     this.weatherDependent = true,
     this.weatherNotes,
@@ -663,6 +679,7 @@ class _$GameModelImpl extends _GameModel {
        _equipment = equipment,
        _scores = scores,
        _confirmedBy = confirmedBy,
+       _eloUpdates = eloUpdates,
        super._();
 
   factory _$GameModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -788,6 +805,19 @@ class _$GameModelImpl extends _GameModel {
   @override
   @JsonKey()
   final bool eloCalculated;
+  // ELO updates per player (populated by Cloud Function after calculation)
+  // Map<playerId, {previousRating, newRating, change}>
+  final Map<String, dynamic> _eloUpdates;
+  // ELO updates per player (populated by Cloud Function after calculation)
+  // Map<playerId, {previousRating, newRating, change}>
+  @override
+  @JsonKey()
+  Map<String, dynamic> get eloUpdates {
+    if (_eloUpdates is EqualUnmodifiableMapView) return _eloUpdates;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_eloUpdates);
+  }
+
   // Timestamp when the game result was entered and completed
   @override
   @TimestampConverter()
@@ -801,7 +831,7 @@ class _$GameModelImpl extends _GameModel {
 
   @override
   String toString() {
-    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
+    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, eloUpdates: $eloUpdates, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
   }
 
   @override
@@ -872,6 +902,10 @@ class _$GameModelImpl extends _GameModel {
             ) &&
             (identical(other.eloCalculated, eloCalculated) ||
                 other.eloCalculated == eloCalculated) &&
+            const DeepCollectionEquality().equals(
+              other._eloUpdates,
+              _eloUpdates,
+            ) &&
             (identical(other.completedAt, completedAt) ||
                 other.completedAt == completedAt) &&
             (identical(other.weatherDependent, weatherDependent) ||
@@ -916,6 +950,7 @@ class _$GameModelImpl extends _GameModel {
     resultSubmittedBy,
     const DeepCollectionEquality().hash(_confirmedBy),
     eloCalculated,
+    const DeepCollectionEquality().hash(_eloUpdates),
     completedAt,
     weatherDependent,
     weatherNotes,
@@ -969,6 +1004,7 @@ abstract class _GameModel extends GameModel {
     final String? resultSubmittedBy,
     final List<String> confirmedBy,
     final bool eloCalculated,
+    final Map<String, dynamic> eloUpdates,
     @TimestampConverter() final DateTime? completedAt,
     final bool weatherDependent,
     final String? weatherNotes,
@@ -1046,7 +1082,10 @@ abstract class _GameModel extends GameModel {
   @override
   List<String> get confirmedBy; // ELO calculation flag (set to false when result is saved, true after Python function processes)
   @override
-  bool get eloCalculated; // Timestamp when the game result was entered and completed
+  bool get eloCalculated; // ELO updates per player (populated by Cloud Function after calculation)
+  // Map<playerId, {previousRating, newRating, change}>
+  @override
+  Map<String, dynamic> get eloUpdates; // Timestamp when the game result was entered and completed
   @override
   @TimestampConverter()
   DateTime? get completedAt; // Weather considerations

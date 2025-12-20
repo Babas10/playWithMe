@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_event.dart';
@@ -56,6 +57,38 @@ void main() {
           isA<GameDetailsLoaded>()
               .having((state) => state.game, 'game', TestGameData.testGame)
               .having((state) => state.players, 'players', isNotEmpty),
+        ],
+      );
+
+      blocTest<GameDetailsBloc, GameDetailsState>(
+        'emits [loading, loaded] with ELO updates when available',
+        build: () {
+          final eloGame = TestGameData.testGame.copyWith(
+            eloCalculated: true,
+            result: const GameResult(games: [], overallWinner: 'teamA'),
+            playerIds: ['test-uid-123'],
+            eloUpdates: {
+              'test-uid-123': {
+                'previousRating': 1500.0,
+                'newRating': 1515.0,
+                'change': 15.0,
+              }
+            },
+          );
+          mockGameRepository.addGame(eloGame);
+          mockUserRepository.addUser(TestUserData.testUser);
+
+          return GameDetailsBloc(
+            gameRepository: mockGameRepository,
+            userRepository: mockUserRepository,
+          );
+        },
+        act: (bloc) => bloc.add(const LoadGameDetails(gameId: 'test-game-123')),
+        expect: () => [
+          const GameDetailsLoading(),
+          isA<GameDetailsLoaded>()
+              .having((state) => state.playerEloUpdates, 'has ELO updates', isNotEmpty)
+              .having((state) => state.playerEloUpdates['test-uid-123']?.ratingChange, 'correct change', 15.0),
         ],
       );
 

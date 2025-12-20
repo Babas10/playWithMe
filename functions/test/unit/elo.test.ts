@@ -64,6 +64,13 @@ describe("processGameEloUpdates", () => {
       },
       result: {
         overallWinner: "teamA",
+        games: [
+          {
+            gameNumber: 1,
+            sets: [{ teamAPoints: 21, teamBPoints: 19, setNumber: 1 }],
+            winner: "teamA",
+          },
+        ],
       },
     };
 
