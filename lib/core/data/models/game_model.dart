@@ -47,6 +47,9 @@ class GameModel with _$GameModel {
     @Default([]) List<String> confirmedBy,
     // ELO calculation flag (set to false when result is saved, true after Python function processes)
     @Default(false) bool eloCalculated,
+    // ELO updates per player (populated by Cloud Function after calculation)
+    // Map<playerId, {previousRating, newRating, change}>
+    @Default({}) Map<String, dynamic> eloUpdates,
     // Timestamp when the game result was entered and completed
     @TimestampConverter() DateTime? completedAt,
     // Weather considerations
