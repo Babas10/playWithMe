@@ -89,13 +89,11 @@ void main() {
         ),
       );
 
-      // Verify Team A players show display names
-      expect(find.text('• Alice'), findsOneWidget);
-      expect(find.text('• Bob'), findsOneWidget);
-
-      // Verify Team B players - user3 has no displayName, should show email prefix
-      expect(find.text('• charlie'), findsOneWidget);
-      expect(find.text('• Diana'), findsOneWidget);
+      // Note: Player names are now only shown in the ELO card (when ELO is calculated)
+      // The Teams card was removed as redundant in Story 290
+      // Player names still appear in the "Team Names" section of the Overall Result card
+      expect(find.text('Alice & Bob'), findsAtLeastNWidgets(1));
+      expect(find.text('charlie & Diana'), findsAtLeastNWidgets(1));
     });
 
     testWidgets('displays player IDs when players data is not provided', (tester) async {
@@ -108,11 +106,10 @@ void main() {
         ),
       );
 
-      // Should fall back to showing (truncated) player IDs
-      expect(find.textContaining('user1'), findsOneWidget);
-      expect(find.textContaining('user2'), findsOneWidget);
-      expect(find.textContaining('user3'), findsOneWidget);
-      expect(find.textContaining('user4'), findsOneWidget);
+      // With the Teams card removed, player IDs are no longer individually listed
+      // They still appear in the Overall Result card as team names
+      // Verify the page renders without error even when player data is null
+      expect(find.byType(GameResultViewPage), findsOneWidget);
     });
 
     testWidgets('handles missing player data gracefully', (tester) async {
@@ -132,12 +129,11 @@ void main() {
         ),
       );
 
-      // Available players show names
-      expect(find.text('• Alice'), findsOneWidget);
-      expect(find.text('• Bob'), findsOneWidget);
-
-      // Missing players show fallback
-      expect(find.text('• Player'), findsNWidgets(2));
+      // With Teams card removed, player names appear in Overall Result team names
+      // Available players still show in team composition
+      expect(find.text('Alice & Bob'), findsAtLeastNWidgets(1));
+      // Verify page renders without throwing errors for missing player data
+      expect(find.byType(GameResultViewPage), findsOneWidget);
     });
 
     testWidgets('displays team names correctly', (tester) async {

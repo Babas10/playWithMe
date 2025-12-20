@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/data/models/game_model.dart';
@@ -141,6 +142,10 @@ class _GameDetailsView extends StatelessWidget {
                 ? state.players
                 : (state as GameDetailsOperationInProgress).players;
 
+            final playerEloUpdates = state is GameDetailsLoaded
+                ? state.playerEloUpdates
+                : (state as GameDetailsOperationInProgress).playerEloUpdates;
+
             final isOperationInProgress = state is GameDetailsOperationInProgress;
 
             return Column(
@@ -166,6 +171,7 @@ class _GameDetailsView extends StatelessWidget {
                           _ViewResultsCard(
                             game: game,
                             players: players,
+                            playerEloUpdates: playerEloUpdates,
                           ),
                           const SizedBox(height: 16),
                         ],
@@ -686,10 +692,12 @@ class _RsvpButtons extends StatelessWidget {
 class _ViewResultsCard extends StatelessWidget {
   final GameModel game;
   final Map<String, UserModel> players;
+  final Map<String, RatingHistoryEntry?> playerEloUpdates;
 
   const _ViewResultsCard({
     required this.game,
     required this.players,
+    this.playerEloUpdates = const {},
   });
 
   /// Generate team name from player IDs (e.g., "Alice & Bob" or "Team A")
@@ -738,6 +746,7 @@ class _ViewResultsCard extends StatelessWidget {
               builder: (context) => GameResultViewPage(
                 game: game,
                 players: players,
+                playerEloUpdates: playerEloUpdates,
               ),
             ),
           );
