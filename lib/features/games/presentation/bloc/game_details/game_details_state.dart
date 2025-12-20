@@ -1,4 +1,5 @@
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/presentation/bloc/base_bloc_state.dart';
 
@@ -17,14 +18,16 @@ class GameDetailsLoading extends GameDetailsState implements LoadingState {
 class GameDetailsLoaded extends GameDetailsState implements SuccessState {
   final GameModel game;
   final Map<String, UserModel> players;
+  final Map<String, RatingHistoryEntry?> playerEloUpdates;
 
   const GameDetailsLoaded({
     required this.game,
     this.players = const {},
+    this.playerEloUpdates = const {},
   });
 
   @override
-  List<Object?> get props => [game, players];
+  List<Object?> get props => [game, players, playerEloUpdates];
 }
 
 class GameDetailsOperationInProgress extends GameDetailsState
@@ -32,15 +35,17 @@ class GameDetailsOperationInProgress extends GameDetailsState
   final GameModel game;
   final String operation;
   final Map<String, UserModel> players;
+  final Map<String, RatingHistoryEntry?> playerEloUpdates;
 
   const GameDetailsOperationInProgress({
     required this.game,
     required this.operation,
     this.players = const {},
+    this.playerEloUpdates = const {},
   });
 
   @override
-  List<Object?> get props => [game, operation, players];
+  List<Object?> get props => [game, operation, players, playerEloUpdates];
 }
 
 class GameDetailsError extends GameDetailsState implements ErrorState {

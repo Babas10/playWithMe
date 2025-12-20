@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/data/models/game_model.dart';
+import '../../../../core/data/models/rating_history_entry.dart';
 import '../../../../core/data/models/user_model.dart';
 
 class GameResultViewPage extends StatelessWidget {
   final GameModel game;
   final Map<String, UserModel>? players;
+  final Map<String, RatingHistoryEntry?> playerEloUpdates;
 
   const GameResultViewPage({
     super.key,
     required this.game,
     this.players,
+    this.playerEloUpdates = const {},
   });
 
   /// Generate team name from player IDs (e.g., "Alice & Bob" or "Team A")
@@ -97,15 +100,14 @@ class GameResultViewPage extends StatelessWidget {
               teamBName: teamBName,
             ),
             const SizedBox(height: 16),
-            // Team Names Card (if teams are assigned)
-            if (teams != null)
-              _TeamNamesCard(
-                teams: teams,
+            // ELO Updates Card (if ELO is calculated)
+            if (playerEloUpdates.isNotEmpty)
+              _EloUpdatesCard(
+                playerIds: [...teams?.teamAPlayerIds ?? [], ...teams?.teamBPlayerIds ?? []],
                 players: players,
-                teamAName: teamAName,
-                teamBName: teamBName,
+                playerEloUpdates: playerEloUpdates,
               ),
-            if (teams != null) const SizedBox(height: 20),
+            if (playerEloUpdates.isNotEmpty) const SizedBox(height: 20),
             // Individual Games List
             Text(
               'Individual Games',
@@ -269,129 +271,131 @@ class _TeamScore extends StatelessWidget {
   }
 }
 
-class _TeamNamesCard extends StatelessWidget {
-  final GameTeams teams;
+class _EloUpdatesCard extends StatelessWidget {
+  final List<String> playerIds;
   final Map<String, UserModel>? players;
-  final String teamAName;
-  final String teamBName;
+  final Map<String, RatingHistoryEntry?> playerEloUpdates;
 
-  const _TeamNamesCard({
-    required this.teams,
+  const _EloUpdatesCard({
+    required this.playerIds,
     this.players,
-    required this.teamAName,
-    required this.teamBName,
+    this.playerEloUpdates = const {},
   });
+
+  String _getPlayerName(String playerId) {
+    return players?[playerId]?.displayName ??
+           players?[playerId]?.email ??
+           'Unknown Player';
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Filter to only players with ELO updates
+    final playersWithElo = playerIds.where((id) => playerEloUpdates[id] != null).toList();
+
+    if (playersWithElo.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Teams',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(
-                  child: _TeamList(
-                    teamName: teamAName,
-                    playerIds: teams.teamAPlayerIds,
-                    players: players,
-                    color: Colors.blue,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _TeamList(
-                    teamName: teamBName,
-                    playerIds: teams.teamBPlayerIds,
-                    players: players,
-                    color: Colors.red,
-                  ),
+                const Icon(Icons.trending_up, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'ELO Rating Changes',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            ...playersWithElo.map((playerId) {
+              final eloEntry = playerEloUpdates[playerId];
+              if (eloEntry == null) return const SizedBox.shrink();
+
+              final playerName = _getPlayerName(playerId);
+              final oldRating = eloEntry.oldRating.toInt();
+              final newRating = eloEntry.newRating.toInt();
+              final change = eloEntry.ratingChange;
+              final isGain = eloEntry.isGain;
+              final isLoss = eloEntry.isLoss;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Row(
+                  children: [
+                    // Player name
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        playerName,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Previous ELO
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        '$oldRating',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                    // Arrow
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Icon(
+                        isGain ? Icons.arrow_forward : Icons.arrow_forward,
+                        size: 16,
+                        color: isGain ? Colors.green : (isLoss ? Colors.red : Colors.grey),
+                      ),
+                    ),
+                    // New ELO
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        '$newRating',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isGain ? Colors.green : (isLoss ? Colors.red : Colors.grey),
+                            ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Change delta
+                    SizedBox(
+                      width: 60,
+                      child: Text(
+                        eloEntry.formattedChange,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: isGain ? Colors.green : (isLoss ? Colors.red : Colors.grey),
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _TeamList extends StatelessWidget {
-  final String teamName;
-  final List<String> playerIds;
-  final Map<String, UserModel>? players;
-  final Color color;
-
-  const _TeamList({
-    required this.teamName,
-    required this.playerIds,
-    this.players,
-    required this.color,
-  });
-
-  String _getPlayerName(String playerId) {
-    if (players == null) {
-      // Fallback to showing truncated ID if no player data available
-      return playerId.length > 20 ? '${playerId.substring(0, 20)}...' : playerId;
-    }
-
-    final player = players![playerId];
-    if (player == null) {
-      return 'Player';
-    }
-
-    return player.displayName ?? player.email.split('@').first;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 16,
-              height: 16,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                teamName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        ...playerIds.map((playerId) => Padding(
-              padding: const EdgeInsets.only(bottom: 6.0),
-              child: Text(
-                '• ${_getPlayerName(playerId)}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.4,
-                    ),
-              ),
-            )),
-      ],
     );
   }
 }

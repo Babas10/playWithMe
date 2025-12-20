@@ -67,6 +67,7 @@ _$GameModelImpl _$$GameModelImplFromJson(
           .toList() ??
       const [],
   eloCalculated: json['eloCalculated'] as bool? ?? false,
+  eloUpdates: json['eloUpdates'] as Map<String, dynamic>? ?? const {},
   completedAt: const TimestampConverter().fromJson(json['completedAt']),
   weatherDependent: json['weatherDependent'] as bool? ?? true,
   weatherNotes: json['weatherNotes'] as String?,
@@ -106,6 +107,7 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'resultSubmittedBy': instance.resultSubmittedBy,
       'confirmedBy': instance.confirmedBy,
       'eloCalculated': instance.eloCalculated,
+      'eloUpdates': instance.eloUpdates,
       'completedAt': const TimestampConverter().toJson(instance.completedAt),
       'weatherDependent': instance.weatherDependent,
       'weatherNotes': instance.weatherNotes,
