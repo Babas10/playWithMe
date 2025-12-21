@@ -75,6 +75,11 @@ Future<void> initializeTestDependencies({
   // Register mock UserRepository
   _globalMockUserRepo = MockUserRepository();
   when(() => _globalMockUserRepo!.createOrUpdateUser(any())).thenAnswer((_) async {});
+  // Stub getUserStream to return an empty stream (for PlayerStatsBloc)
+  when(() => _globalMockUserRepo!.getUserStream(any())).thenAnswer((_) => Stream.value(null));
+  // Stub getRatingHistory to return an empty stream (for PlayerStatsBloc)
+  when(() => _globalMockUserRepo!.getRatingHistory(any(), limit: any(named: 'limit')))
+      .thenAnswer((_) => Stream.value([]));
   sl.registerLazySingleton<UserRepository>(
     () => _globalMockUserRepo!,
   );
