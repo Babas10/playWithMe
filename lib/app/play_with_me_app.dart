@@ -426,93 +426,9 @@ class _HomeTab extends StatelessWidget {
         if (state is PlayerStatsLoaded) {
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Welcome message
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.welcomeMessage,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        AppLocalizations.of(context)!.beachVolleyballOrganizer,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Home stats section
-                HomeStatsSection(
-                  user: state.user,
-                  ratingHistory: state.history,
-                ),
-                const SizedBox(height: 24),
-                // Environment status (kept for development visibility)
-                if (EnvironmentConfig.isDevelopment ||
-                    EnvironmentConfig.isStaging)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: EnvironmentConfig.isDevelopment
-                            ? Colors.red.withValues(alpha: 0.1)
-                            : Colors.orange.withValues(alpha: 0.1),
-                        border: Border.all(
-                          color: EnvironmentConfig.isDevelopment
-                              ? Colors.red
-                              : Colors.orange,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                FirebaseService.isInitialized
-                                    ? Icons.cloud_done
-                                    : Icons.cloud_off,
-                                size: 16,
-                                color: FirebaseService.isInitialized
-                                    ? Colors.green
-                                    : Colors.red,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${AppLocalizations.of(context)!.firebase}: ${FirebaseService.isInitialized ? AppLocalizations.of(context)!.firebaseConnected : AppLocalizations.of(context)!.firebaseDisconnected}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${AppLocalizations.of(context)!.environment}: ${EnvironmentConfig.environmentName}',
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${AppLocalizations.of(context)!.project}: ${EnvironmentConfig.firebaseProjectId}',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
+            child: HomeStatsSection(
+              user: state.user,
+              ratingHistory: state.history,
             ),
           );
         }
