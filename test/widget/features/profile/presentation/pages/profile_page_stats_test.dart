@@ -107,23 +107,22 @@ void main() {
     await tester.pumpAndSettle(); // Wait for async blocs to load
 
     // Check if section title is present
-    expect(find.text('Performance Stats'), findsOneWidget);
+    // New stats layout uses ExpandedStatsSection with different structure
+    expect(find.text('Performance Overview'), findsOneWidget);
 
-    // Check if ELO StatCard is present and has correct value
-    expect(find.text('ELO Rating'), findsOneWidget);
+    // Check if Current ELO is present
+    expect(find.text('Current ELO'), findsOneWidget);
     expect(find.text('1650'), findsOneWidget);
 
-    // Check if Win Rate StatCard is present
+    // Check if Win Rate is present
     expect(find.text('Win Rate'), findsOneWidget);
     expect(find.text('60.0%'), findsOneWidget); // 6/10
 
-    // Check if Streak StatCard is present
-    expect(find.text('Streak'), findsOneWidget);
-    expect(find.text('2'), findsOneWidget);
-    expect(find.text('Winning'), findsOneWidget);
-
-    // Check if Games Played StatCard is present
+    // Check if Games Played is present
     expect(find.text('Games Played'), findsOneWidget);
     expect(find.text('10'), findsOneWidget);
+
+    // Check for Momentum & Consistency section
+    expect(find.text('Momentum & Consistency'), findsOneWidget);
   });
 }
