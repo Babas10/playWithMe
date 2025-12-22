@@ -33,6 +33,11 @@ import 'package:play_with_me/features/friends/presentation/pages/my_community_pa
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_event.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_state.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/home_stats_section.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -122,16 +127,20 @@ class _HomePageState extends State<HomePage> {
   late final GroupBloc _groupBloc;
   late final InvitationBloc _invitationBloc;
   late final FriendRequestCountBloc _friendRequestCountBloc;
+  late final PlayerStatsBloc _playerStatsBloc;
 
   @override
   void initState() {
     super.initState();
 
-    // Create GroupBloc, InvitationBloc, and FriendRequestCountBloc and initialize them with the current user
+    // Create GroupBloc, InvitationBloc, FriendRequestCountBloc, and PlayerStatsBloc and initialize them with the current user
     final authState = context.read<AuthenticationBloc>().state;
     _groupBloc = sl<GroupBloc>();
     _invitationBloc = sl<InvitationBloc>();
     _friendRequestCountBloc = sl<FriendRequestCountBloc>();
+    _playerStatsBloc = PlayerStatsBloc(
+      userRepository: sl<UserRepository>(),
+    );
 
     if (authState is AuthenticationAuthenticated) {
       _groupBloc.add(LoadGroupsForUser(userId: authState.user.uid));
@@ -139,6 +148,7 @@ class _HomePageState extends State<HomePage> {
       _friendRequestCountBloc.add(
         FriendRequestCountEvent.startListening(userId: authState.user.uid),
       );
+      _playerStatsBloc.add(LoadPlayerStats(authState.user.uid));
 
       // Initialize notification service
       _initializeNotifications();
@@ -204,6 +214,7 @@ class _HomePageState extends State<HomePage> {
     _groupBloc.close();
     _invitationBloc.close();
     _friendRequestCountBloc.close();
+    _playerStatsBloc.close();
     super.dispose();
   }
 
@@ -219,6 +230,7 @@ class _HomePageState extends State<HomePage> {
       providers: [
         BlocProvider<InvitationBloc>.value(value: _invitationBloc),
         BlocProvider<FriendRequestCountBloc>.value(value: _friendRequestCountBloc),
+        BlocProvider<PlayerStatsBloc>.value(value: _playerStatsBloc),
       ],
       child: Scaffold(
         body: Stack(
@@ -382,79 +394,53 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Home tab content (original HomePage content)
+// Home tab content with player statistics
 class _HomeTab extends StatelessWidget {
   const _HomeTab();
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            AppLocalizations.of(context)!.welcomeMessage,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            AppLocalizations.of(context)!.beachVolleyballOrganizer,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 32),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: EnvironmentConfig.isDevelopment
-                  ? Colors.red.withValues(alpha: 0.1)
-                  : EnvironmentConfig.isStaging
-                      ? Colors.orange.withValues(alpha: 0.1)
-                      : Colors.green.withValues(alpha: 0.1),
-              border: Border.all(
-                color: EnvironmentConfig.isDevelopment
-                    ? Colors.red
-                    : EnvironmentConfig.isStaging
-                        ? Colors.orange
-                        : Colors.green,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
+    return BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
+      builder: (context, state) {
+        if (state is PlayerStatsLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is PlayerStatsError) {
+          return Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      FirebaseService.isInitialized
-                          ? Icons.cloud_done
-                          : Icons.cloud_off,
-                      size: 16,
-                      color: FirebaseService.isInitialized
-                          ? Colors.green
-                          : Colors.red,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${AppLocalizations.of(context)!.firebase}: ${FirebaseService.isInitialized ? AppLocalizations.of(context)!.firebaseConnected : AppLocalizations.of(context)!.firebaseDisconnected}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
                 Text(
-                  '${AppLocalizations.of(context)!.environment}: ${EnvironmentConfig.environmentName}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${AppLocalizations.of(context)!.project}: ${EnvironmentConfig.firebaseProjectId}',
-                  style: const TextStyle(fontSize: 12),
+                  'Error loading stats: ${state.message}',
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
+          );
+        }
+
+        if (state is PlayerStatsLoaded) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: HomeStatsSection(
+              user: state.user,
+              ratingHistory: state.history,
+            ),
+          );
+        }
+
+        // Initial state
+        return Center(
+          child: Text(
+            AppLocalizations.of(context)!.welcomeMessage,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -17,7 +17,8 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/player_stats_section.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/expanded_stats_section.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_history_screen.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_history/game_history_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
@@ -83,9 +84,60 @@ class _ProfileContent extends StatelessWidget {
           ),
           
           const SizedBox(height: 16),
-          
-          // Player Stats
-          const PlayerStatsSection(),
+
+          // Player Stats (Expanded)
+          BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
+            builder: (context, statsState) {
+              if (statsState is PlayerStatsLoading) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+
+              if (statsState is PlayerStatsError) {
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 48,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error loading stats',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            statsState.message,
+                            style: Theme.of(context).textTheme.bodySmall,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              if (statsState is PlayerStatsLoaded) {
+                return ExpandedStatsSection(
+                  user: statsState.user,
+                  ratingHistory: statsState.history,
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
+          ),
 
           const SizedBox(height: 16),
 
