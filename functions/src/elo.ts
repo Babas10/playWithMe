@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import { processStatsTracking } from "./statsTracking";
 
 // Constants
 const K_FACTOR = 32;
@@ -219,6 +220,17 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
       // Update all players
       teamAPlayerIds.forEach((id: string) => updatePlayer(id, true));
       teamBPlayerIds.forEach((id: string) => updatePlayer(id, false));
+
+      // 5. Process teammate and head-to-head stats tracking
+      await processStatsTracking(
+        transaction,
+        gameId,
+        teamAPlayerIds,
+        teamBPlayerIds,
+        overallTeamAWon,
+        individualGames,
+        cumulativeChanges
+      );
 
       // 6. Record ELO changes in the game document
       transaction.update(db.collection("games").doc(gameId), {
