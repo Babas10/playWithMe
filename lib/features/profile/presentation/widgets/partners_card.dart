@@ -1,6 +1,7 @@
 // Partners card showing best partner statistics.
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/features/profile/presentation/pages/partner_detail_page.dart';
 
 /// A card widget displaying best partner statistics.
 ///
@@ -8,12 +9,10 @@ import 'package:play_with_me/core/data/models/user_model.dart';
 /// Tap opens PartnerDetailPage for full breakdown (Phase 3).
 class PartnersCard extends StatelessWidget {
   final UserModel user;
-  final VoidCallback? onTap;
 
   const PartnersCard({
     super.key,
     required this.user,
-    this.onTap,
   });
 
   @override
@@ -24,7 +23,18 @@ class PartnersCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.all(16.0),
       child: InkWell(
-        onTap: bestPartner != null ? onTap : null,
+        onTap: bestPartner != null
+            ? () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => PartnerDetailPage(
+                      userId: user.uid,
+                      partnerId: bestPartner.userId,
+                    ),
+                  ),
+                );
+              }
+            : null,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
