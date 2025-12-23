@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../models/rating_history_entry.dart';
 import '../models/user_model.dart';
+import '../models/teammate_stats.dart';
+import '../models/head_to_head_stats.dart';
 
 class FirestoreUserRepository implements UserRepository {
   final FirebaseFirestore _firestore;
@@ -328,6 +330,106 @@ class FirestoreUserRepository implements UserRepository {
         .map((snapshot) => snapshot.docs
             .where((doc) => doc.exists)
             .map((doc) => RatingHistoryEntry.fromFirestore(doc))
+            .toList());
+  }
+
+  @override
+  Future<TeammateStats?> getTeammateStats(
+    String userId,
+    String teammateId,
+  ) async {
+    try {
+      final userDoc = await _firestore.collection(_collection).doc(userId).get();
+      if (!userDoc.exists) return null;
+
+      final userData = userDoc.data();
+      if (userData == null) return null;
+
+      final teammateStatsMap =
+          userData['teammateStats'] as Map<String, dynamic>?;
+      if (teammateStatsMap == null || !teammateStatsMap.containsKey(teammateId)) {
+        return null;
+      }
+
+      final statsData =
+          teammateStatsMap[teammateId] as Map<String, dynamic>;
+      return TeammateStats.fromFirestore(teammateId, statsData);
+    } catch (e) {
+      throw Exception('Failed to get teammate stats: $e');
+    }
+  }
+
+  @override
+  Stream<List<TeammateStats>> getAllTeammateStats(String userId) {
+    return _firestore
+        .collection(_collection)
+        .doc(userId)
+        .snapshots()
+        .map((doc) {
+      if (!doc.exists) return <TeammateStats>[];
+
+      final userData = doc.data();
+      if (userData == null) return <TeammateStats>[];
+
+      final teammateStatsMap =
+          userData['teammateStats'] as Map<String, dynamic>?;
+      if (teammateStatsMap == null || teammateStatsMap.isEmpty) {
+        return <TeammateStats>[];
+      }
+
+      final statsList = teammateStatsMap.entries
+          .map((entry) {
+            try {
+              return TeammateStats.fromFirestore(
+                entry.key,
+                entry.value as Map<String, dynamic>,
+              );
+            } catch (e) {
+              // Skip invalid entries
+              return null;
+            }
+          })
+          .whereType<TeammateStats>()
+          .toList();
+
+      // Sort by games played descending
+      statsList.sort((a, b) => b.gamesPlayed.compareTo(a.gamesPlayed));
+      return statsList;
+    });
+  }
+
+  @override
+  Future<HeadToHeadStats?> getHeadToHeadStats(
+    String userId,
+    String opponentId,
+  ) async {
+    try {
+      final h2hDoc = await _firestore
+          .collection(_collection)
+          .doc(userId)
+          .collection('headToHead')
+          .doc(opponentId)
+          .get();
+
+      if (!h2hDoc.exists) return null;
+
+      return HeadToHeadStats.fromFirestore(h2hDoc);
+    } catch (e) {
+      throw Exception('Failed to get head-to-head stats: $e');
+    }
+  }
+
+  @override
+  Stream<List<HeadToHeadStats>> getAllHeadToHeadStats(String userId) {
+    return _firestore
+        .collection(_collection)
+        .doc(userId)
+        .collection('headToHead')
+        .orderBy('gamesPlayed', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .where((doc) => doc.exists)
+            .map((doc) => HeadToHeadStats.fromFirestore(doc))
             .toList());
   }
 }

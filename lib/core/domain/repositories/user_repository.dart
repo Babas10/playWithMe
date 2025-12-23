@@ -1,5 +1,7 @@
 import '../../data/models/rating_history_entry.dart';
 import '../../data/models/user_model.dart';
+import '../../data/models/teammate_stats.dart';
+import '../../data/models/head_to_head_stats.dart';
 
 abstract class UserRepository {
   /// Get current authenticated user
@@ -70,4 +72,18 @@ abstract class UserRepository {
   /// Get user's ELO rating history (Story 14.5.3)
   /// Returns a stream of rating history entries ordered by timestamp descending
   Stream<List<RatingHistoryEntry>> getRatingHistory(String userId, {int limit});
+
+  /// Get teammate statistics for a specific partner (Story 304)
+  Future<TeammateStats?> getTeammateStats(String userId, String teammateId);
+
+  /// Get all teammate statistics for a user (Story 304)
+  /// Returns a stream of teammate stats ordered by games played descending
+  Stream<List<TeammateStats>> getAllTeammateStats(String userId);
+
+  /// Get head-to-head statistics against a specific opponent (Story 304)
+  Future<HeadToHeadStats?> getHeadToHeadStats(String userId, String opponentId);
+
+  /// Get all head-to-head statistics for a user (Story 304)
+  /// Returns a stream of H2H stats ordered by games played descending
+  Stream<List<HeadToHeadStats>> getAllHeadToHeadStats(String userId);
 }
