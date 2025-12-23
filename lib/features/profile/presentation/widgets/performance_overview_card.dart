@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
 
 /// A card widget displaying comprehensive performance statistics.
 ///
@@ -12,6 +13,8 @@ import 'package:play_with_me/core/data/models/user_model.dart';
 /// - Win Rate
 /// - Best Win (future: highest-rated opponent team defeated)
 /// - Average Point Differential (future: avg points won - points conceded)
+///
+/// Shows an empty state if the user hasn't played any games yet.
 class PerformanceOverviewCard extends StatelessWidget {
   final UserModel user;
 
@@ -23,6 +26,16 @@ class PerformanceOverviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    // Show empty state for new users with no games
+    if (user.gamesPlayed == 0) {
+      return const EmptyStatsPlaceholder(
+        title: 'No Performance Data',
+        message: 'Play your first game to see your performance statistics!',
+        unlockMessage: 'Play at least 1 game to unlock',
+        icon: Icons.show_chart,
+      );
+    }
 
     return Card(
       margin: const EdgeInsets.all(16.0),
