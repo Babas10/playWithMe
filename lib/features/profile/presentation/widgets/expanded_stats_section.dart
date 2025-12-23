@@ -43,22 +43,10 @@ class ExpandedStatsSection extends StatelessWidget {
         ),
 
         // Partners Card
-        PartnersCard(
-          user: user,
-          onTap: () {
-            // TODO: Navigate to PartnerDetailPage (Phase 3)
-            debugPrint('Navigate to partner details');
-          },
-        ),
+        PartnersCard(user: user),
 
         // Rivals Card
-        RivalsCard(
-          user: user,
-          onTap: () {
-            // TODO: Navigate to HeadToHeadPage (Phase 3)
-            debugPrint('Navigate to head-to-head');
-          },
-        ),
+        RivalsCard(user: user),
 
         // Role-Based Performance Card (Advanced, Collapsible)
         RoleBasedPerformanceCard(user: user),

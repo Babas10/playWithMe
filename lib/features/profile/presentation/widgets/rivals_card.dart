@@ -1,22 +1,20 @@
 // Rivals card showing nemesis statistics.
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/features/profile/presentation/pages/head_to_head_page.dart';
 
 /// A card widget displaying rival/nemesis statistics.
 ///
 /// Shows the opponent you lost to most often.
 /// Tap opens HeadToHeadPage for full rivalry breakdown (Phase 3).
-///
-/// TODO: Implement nemesis tracking in backend.
-/// For now, shows "Coming Soon" placeholder.
 class RivalsCard extends StatelessWidget {
   final UserModel user;
-  final VoidCallback? onTap;
 
   const RivalsCard({
     super.key,
     required this.user,
-    this.onTap,
   });
 
   @override
@@ -26,7 +24,7 @@ class RivalsCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.all(16.0),
       child: InkWell(
-        onTap: onTap,
+        onTap: () => _loadTopRival(context),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -105,5 +103,52 @@ class RivalsCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _loadTopRival(BuildContext context) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Fetch top rival (most games played against)
+      final userRepo = sl<UserRepository>();
+      final h2hStats = await userRepo.getAllHeadToHeadStats(user.uid).first;
+
+      if (!context.mounted) return;
+
+      // Dismiss loading
+      Navigator.of(context).pop();
+
+      if (h2hStats.isEmpty) {
+        // Show "no rivals yet" message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No rivalry data yet. Play more games!')),
+        );
+        return;
+      }
+
+      // Navigate to top rival
+      final topRival = h2hStats.first;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => HeadToHeadPage(
+            userId: user.uid,
+            opponentId: topRival.opponentId,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      // Dismiss loading if still showing
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading rival: $e')),
+      );
+    }
   }
 }

@@ -3,6 +3,8 @@ import 'dart:async';
 
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/data/models/teammate_stats.dart';
+import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 
 class MockUserRepository implements UserRepository {
@@ -207,6 +209,36 @@ class MockUserRepository implements UserRepository {
     int limit = 20,
   }) {
     // Return an empty stream for testing - can be customized per test if needed
+    return Stream.value([]);
+  }
+
+  @override
+  Future<TeammateStats?> getTeammateStats(
+    String userId,
+    String teammateId,
+  ) async {
+    // Return null for testing - can be customized per test if needed
+    return null;
+  }
+
+  @override
+  Stream<List<TeammateStats>> getAllTeammateStats(String userId) {
+    // Return empty list for testing - can be customized per test if needed
+    return Stream.value([]);
+  }
+
+  @override
+  Future<HeadToHeadStats?> getHeadToHeadStats(
+    String userId,
+    String opponentId,
+  ) async {
+    // Return null for testing - can be customized per test if needed
+    return null;
+  }
+
+  @override
+  Stream<List<HeadToHeadStats>> getAllHeadToHeadStats(String userId) {
+    // Return empty list for testing - can be customized per test if needed
     return Stream.value([]);
   }
 }
