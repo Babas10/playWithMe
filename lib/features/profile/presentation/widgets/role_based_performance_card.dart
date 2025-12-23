@@ -49,20 +49,25 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.psychology,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Role-Based Performance',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.psychology,
+                          color: theme.colorScheme.primary,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: Text(
+                            'Role-Based Performance',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Row(
                     mainAxisSize: MainAxisSize.min,
