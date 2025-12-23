@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
 
 /// A chart widget showing monthly ELO improvement over time.
 ///
@@ -39,35 +40,10 @@ class MonthlyImprovementChart extends StatelessWidget {
   }
 
   Widget _buildPlaceholder(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      height: 200,
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.timeline,
-              size: 48,
-              color: theme.colorScheme.onSurface.withOpacity(0.3),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Play more games to unlock monthly progress',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return const InsufficientDataPlaceholder(
+      featureName: 'Monthly Progress Chart',
+      requirement: 'Play games for at least 2 months',
+      icon: Icons.timeline,
     );
   }
 
