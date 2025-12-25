@@ -279,7 +279,127 @@ export async function processStatsTracking(
     }
   }
 
+  // Update nemesis for all players (Story 301.8)
+  const allPlayerIds = [...teamAPlayerIds, ...teamBPlayerIds];
+  for (const playerId of allPlayerIds) {
+    await updateNemesis(transaction, playerId);
+  }
+
   functions.logger.info(
     `Successfully processed teammate and head-to-head stats for game ${gameId}`
   );
+}
+
+/**
+ * Update nemesis record for a player.
+ * Identifies the opponent the player has lost to most often (minimum 3 games).
+ */
+export async function updateNemesis(
+  transaction: admin.firestore.Transaction,
+  userId: string
+): Promise<void> {
+  const db = admin.firestore();
+  const userRef = db.collection("users").doc(userId);
+
+  // Fetch all head-to-head records for this user
+  const h2hSnapshot = await db
+    .collection("users")
+    .doc(userId)
+    .collection("headToHead")
+    .get();
+
+  if (h2hSnapshot.empty) {
+    // No head-to-head stats, clear nemesis
+    transaction.update(userRef, {
+      nemesis: null,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    functions.logger.info(`Cleared nemesis for ${userId} (no h2h stats)`);
+    return;
+  }
+
+  // Find opponent with most losses (minimum 3 games threshold)
+  let nemesis: {
+    opponentId: string;
+    opponentName: string;
+    gamesLost: number;
+    gamesWon: number;
+    gamesPlayed: number;
+    winRate: number;
+  } | null = null;
+  let maxLosses = 0;
+
+  for (const doc of h2hSnapshot.docs) {
+    const stats = doc.data();
+    const gamesPlayed = stats.gamesPlayed || 0;
+    const gamesLost = stats.gamesLost || 0;
+    const gamesWon = stats.gamesWon || 0;
+
+    // Minimum threshold: at least 3 matchups
+    if (gamesPlayed >= 3) {
+      // Check if this opponent has caused more losses
+      if (gamesLost > maxLosses) {
+        maxLosses = gamesLost;
+
+        // Fetch opponent name from user document
+        const opponentDoc = await db.collection("users").doc(doc.id).get();
+        const opponentData = opponentDoc.data();
+        const opponentName = opponentData?.displayName ||
+                             opponentData?.firstName && opponentData?.lastName
+                               ? `${opponentData.firstName} ${opponentData.lastName}`
+                               : opponentData?.email || "Unknown";
+
+        const winRate = gamesPlayed > 0 ? (gamesWon / gamesPlayed) * 100 : 0.0;
+
+        nemesis = {
+          opponentId: doc.id,
+          opponentName: opponentName,
+          gamesLost: gamesLost,
+          gamesWon: gamesWon,
+          gamesPlayed: gamesPlayed,
+          winRate: winRate,
+        };
+      } else if (gamesLost === maxLosses && gamesLost > 0) {
+        // Tiebreaker: if tied on losses, choose opponent with most total matchups
+        if (nemesis === null || gamesPlayed > nemesis.gamesPlayed) {
+          // Fetch opponent name
+          const opponentDoc = await db.collection("users").doc(doc.id).get();
+          const opponentData = opponentDoc.data();
+          const opponentName = opponentData?.displayName ||
+                               opponentData?.firstName && opponentData?.lastName
+                                 ? `${opponentData.firstName} ${opponentData.lastName}`
+                                 : opponentData?.email || "Unknown";
+
+          const winRate = gamesPlayed > 0 ? (gamesWon / gamesPlayed) * 100 : 0.0;
+
+          nemesis = {
+            opponentId: doc.id,
+            opponentName: opponentName,
+            gamesLost: gamesLost,
+            gamesWon: gamesWon,
+            gamesPlayed: gamesPlayed,
+            winRate: winRate,
+          };
+        }
+      }
+    }
+  }
+
+  // Update user's nemesis field
+  transaction.update(userRef, {
+    nemesis: nemesis,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  if (nemesis) {
+    functions.logger.info(
+      `Updated nemesis for ${userId}: ${nemesis.opponentName} ` +
+      `(${nemesis.gamesWon}W-${nemesis.gamesLost}L, ` +
+      `Win Rate: ${nemesis.winRate.toFixed(1)}%)`
+    );
+  } else {
+    functions.logger.info(
+      `No nemesis found for ${userId} (no opponents with 3+ games)`
+    );
+  }
 }

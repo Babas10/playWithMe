@@ -64,6 +64,9 @@ _$UserModelImpl _$$UserModelImplFromJson(
   eloPeak: (json['eloPeak'] as num?)?.toDouble() ?? 1600.0,
   eloPeakDate: const TimestampConverter().fromJson(json['eloPeakDate']),
   eloGamesPlayed: (json['eloGamesPlayed'] as num?)?.toInt() ?? 0,
+  nemesis: json['nemesis'] == null
+      ? null
+      : NemesisRecord.fromJson(json['nemesis'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$$UserModelImplToJson(
@@ -110,6 +113,7 @@ Map<String, dynamic> _$$UserModelImplToJson(
   'eloPeak': instance.eloPeak,
   'eloPeakDate': const TimestampConverter().toJson(instance.eloPeakDate),
   'eloGamesPlayed': instance.eloGamesPlayed,
+  'nemesis': instance.nemesis,
 };
 
 const _$UserPrivacyLevelEnumMap = {
@@ -117,3 +121,23 @@ const _$UserPrivacyLevelEnumMap = {
   UserPrivacyLevel.friends: 'friends',
   UserPrivacyLevel.private: 'private',
 };
+
+_$NemesisRecordImpl _$$NemesisRecordImplFromJson(Map<String, dynamic> json) =>
+    _$NemesisRecordImpl(
+      opponentId: json['opponentId'] as String,
+      opponentName: json['opponentName'] as String,
+      gamesLost: (json['gamesLost'] as num).toInt(),
+      gamesWon: (json['gamesWon'] as num).toInt(),
+      gamesPlayed: (json['gamesPlayed'] as num).toInt(),
+      winRate: (json['winRate'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$$NemesisRecordImplToJson(_$NemesisRecordImpl instance) =>
+    <String, dynamic>{
+      'opponentId': instance.opponentId,
+      'opponentName': instance.opponentName,
+      'gamesLost': instance.gamesLost,
+      'gamesWon': instance.gamesWon,
+      'gamesPlayed': instance.gamesPlayed,
+      'winRate': instance.winRate,
+    };
