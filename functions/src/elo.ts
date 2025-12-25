@@ -229,7 +229,8 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
         teamBPlayerIds,
         overallTeamAWon,
         individualGames,
-        cumulativeChanges
+        cumulativeChanges,
+        playerMap // Pass the player data map
       );
 
       // 6. Record ELO changes in the game document

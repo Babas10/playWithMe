@@ -4,6 +4,9 @@ import * as functions from "firebase-functions";
 /**
  * Update teammate statistics after a game completes.
  * Tracks performance metrics for players who played together on the same team.
+ *
+ * NOTE: This function only does WRITES. The caller must pass in the current
+ * teammate stats data (read beforehand to satisfy Firestore transaction rules).
  */
 export async function updateTeammateStats(
   transaction: admin.firestore.Transaction,
@@ -13,15 +16,14 @@ export async function updateTeammateStats(
   pointsScored: number,
   pointsAllowed: number,
   eloChange: number,
-  gameId: string
+  gameId: string,
+  currentTeammateStats: any // ← NEW: Pass in the current stats
 ): Promise<void> {
   const db = admin.firestore();
   const userRef = db.collection("users").doc(playerId);
 
-  // Fetch current teammate stats
-  const userDoc = await transaction.get(userRef);
-  const userData = userDoc.data();
-  const teammateStats = userData?.teammateStats || {};
+  // Use the passed-in teammate stats (already read)
+  const teammateStats = currentTeammateStats || {};
   const currentStats = teammateStats[teammateId] || {
     gamesPlayed: 0,
     gamesWon: 0,
@@ -48,7 +50,7 @@ export async function updateTeammateStats(
         pointsScored,
         pointsAllowed,
         eloChange,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        timestamp: new Date(), // Cannot use serverTimestamp() inside arrays
       },
       ...(currentStats.recentGames || []).slice(0, 9), // Keep last 10 games
     ],
@@ -71,9 +73,11 @@ export async function updateTeammateStats(
 /**
  * Update head-to-head statistics after a game completes.
  * Tracks rivalry performance when players are on opposing teams.
+ *
+ * NOTE: This function runs OUTSIDE the main transaction to avoid
+ * Firestore's "all reads before writes" rule. It uses its own transaction.
  */
 export async function updateHeadToHeadStats(
-  transaction: admin.firestore.Transaction,
   playerId: string,
   opponentId: string,
   won: boolean,
@@ -91,9 +95,11 @@ export async function updateHeadToHeadStats(
     .collection("headToHead")
     .doc(opponentId);
 
-  // Fetch current head-to-head stats
-  const h2hDoc = await transaction.get(h2hRef);
-  const h2hData = h2hDoc.data();
+  // Use a separate transaction for h2h stats
+  await db.runTransaction(async (transaction) => {
+    // Fetch current head-to-head stats
+    const h2hDoc = await transaction.get(h2hRef);
+    const h2hData = h2hDoc.data();
 
   const pointDiff = pointsScored - pointsAllowed;
 
@@ -137,26 +143,35 @@ export async function updateHeadToHeadStats(
         eloChange,
         partnerId: partnerId || null,
         opponentPartnerId: opponentPartnerId || null,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        timestamp: new Date(), // Cannot use serverTimestamp() inside arrays
       },
       ...(currentStats.recentMatchups || []).slice(0, 9), // Keep last 10 matchups
     ],
     lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
   };
 
-  // Set or update the document
-  transaction.set(h2hRef, updatedStats, {merge: true});
+    // Set or update the document
+    transaction.set(h2hRef, updatedStats, {merge: true});
+  }); // End of transaction
 
-  functions.logger.info(
-    `Updated head-to-head stats for ${playerId} vs ${opponentId}: ` +
-    `${updatedStats.gamesWon}W-${updatedStats.gamesLost}L, ` +
-    `Win Rate: ${((updatedStats.gamesWon / updatedStats.gamesPlayed) * 100).toFixed(1)}%`
-  );
+  // Log after transaction completes
+  const finalDoc = await h2hRef.get();
+  const finalStats = finalDoc.data();
+  if (finalStats) {
+    functions.logger.info(
+      `Updated head-to-head stats for ${playerId} vs ${opponentId}: ` +
+      `${finalStats.gamesWon}W-${finalStats.gamesLost}L, ` +
+      `Win Rate: ${((finalStats.gamesWon / finalStats.gamesPlayed) * 100).toFixed(1)}%`
+    );
+  }
 }
 
 /**
  * Process all teammate and head-to-head stats updates for a completed game.
  * Called from the main ELO processing transaction.
+ *
+ * NOTE: To satisfy Firestore transaction rules (all reads before writes),
+ * this function now accepts pre-read user data.
  */
 export async function processStatsTracking(
   transaction: admin.firestore.Transaction,
@@ -165,7 +180,8 @@ export async function processStatsTracking(
   teamBPlayerIds: string[],
   teamAWon: boolean,
   individualGames: any[],
-  playerEloChanges: Map<string, number>
+  playerEloChanges: Map<string, number>,
+  playerDataMap: Map<string, any> // ← NEW: Pass in pre-read player data
 ): Promise<void> {
   // Calculate total points for each team across all individual games
   let teamAPoints = 0;
@@ -184,6 +200,9 @@ export async function processStatsTracking(
       const teammateId = teamAPlayerIds[j];
       const eloChange = playerEloChanges.get(playerId) || 0;
 
+      const playerData = playerDataMap.get(playerId);
+      const teammateData = playerDataMap.get(teammateId);
+
       await updateTeammateStats(
         transaction,
         playerId,
@@ -192,7 +211,8 @@ export async function processStatsTracking(
         teamAPoints,
         teamBPoints,
         eloChange,
-        gameId
+        gameId,
+        playerData?.teammateStats || {} // ← Pass current stats
       );
 
       await updateTeammateStats(
@@ -203,7 +223,8 @@ export async function processStatsTracking(
         teamAPoints,
         teamBPoints,
         playerEloChanges.get(teammateId) || 0,
-        gameId
+        gameId,
+        teammateData?.teammateStats || {} // ← Pass current stats
       );
     }
   }
@@ -215,6 +236,9 @@ export async function processStatsTracking(
       const teammateId = teamBPlayerIds[j];
       const eloChange = playerEloChanges.get(playerId) || 0;
 
+      const playerData = playerDataMap.get(playerId);
+      const teammateData = playerDataMap.get(teammateId);
+
       await updateTeammateStats(
         transaction,
         playerId,
@@ -223,7 +247,8 @@ export async function processStatsTracking(
         teamBPoints,
         teamAPoints,
         eloChange,
-        gameId
+        gameId,
+        playerData?.teammateStats || {} // ← Pass current stats
       );
 
       await updateTeammateStats(
@@ -234,7 +259,8 @@ export async function processStatsTracking(
         teamBPoints,
         teamAPoints,
         playerEloChanges.get(teammateId) || 0,
-        gameId
+        gameId,
+        teammateData?.teammateStats || {} // ← Pass current stats
       );
     }
   }
@@ -251,7 +277,6 @@ export async function processStatsTracking(
 
       // Update from Team A player's perspective
       await updateHeadToHeadStats(
-        transaction,
         teamAPlayerId,
         teamBPlayerId,
         teamAWon,
@@ -265,7 +290,6 @@ export async function processStatsTracking(
 
       // Update from Team B player's perspective
       await updateHeadToHeadStats(
-        transaction,
         teamBPlayerId,
         teamAPlayerId,
         !teamAWon,
@@ -282,7 +306,7 @@ export async function processStatsTracking(
   // Update nemesis for all players (Story 301.8)
   const allPlayerIds = [...teamAPlayerIds, ...teamBPlayerIds];
   for (const playerId of allPlayerIds) {
-    await updateNemesis(transaction, playerId);
+    await updateNemesis(playerId);
   }
 
   functions.logger.info(
@@ -295,7 +319,6 @@ export async function processStatsTracking(
  * Identifies the opponent the player has lost to most often (minimum 3 games).
  */
 export async function updateNemesis(
-  transaction: admin.firestore.Transaction,
   userId: string
 ): Promise<void> {
   const db = admin.firestore();
@@ -310,7 +333,7 @@ export async function updateNemesis(
 
   if (h2hSnapshot.empty) {
     // No head-to-head stats, clear nemesis
-    transaction.update(userRef, {
+    await userRef.update({
       nemesis: null,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -386,7 +409,7 @@ export async function updateNemesis(
   }
 
   // Update user's nemesis field
-  transaction.update(userRef, {
+  await userRef.update({
     nemesis: nemesis,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
