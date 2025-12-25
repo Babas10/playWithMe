@@ -37,7 +37,7 @@ export async function createAndCompleteGame(
     groupId: gameData.groupId,
     createdBy: gameData.createdBy,
     status: "scheduled",
-    scheduledAt: admin.firestore.Timestamp.fromMillis(now.toMillis() + (60 * 60 * 1000)), // 1 hour from now
+    scheduledAt: now, // ✅ FIXED: Schedule at NOW, not 1 hour from now
     createdAt: now,
     updatedAt: now,
     location: {
