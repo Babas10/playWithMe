@@ -57,27 +57,10 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
         }
       }
 
-      // Create Firestore user document
-      try {
-        debugPrint('🔄 RegistrationBloc: Creating Firestore document for ${user.uid}...');
-        final userModel = UserModel(
-          uid: user.uid,
-          email: user.email,
-          displayName: displayName ?? user.displayName,
-          photoUrl: user.photoUrl,
-          isEmailVerified: user.isEmailVerified,
-          isAnonymous: user.isAnonymous,
-        );
-        debugPrint('🔄 RegistrationBloc: UserModel created: ${userModel.email}');
-        await _userRepository.createOrUpdateUser(userModel);
-        debugPrint('✅ RegistrationBloc: Firestore user document created successfully!');
-      } catch (e, stackTrace) {
-        debugPrint('❌ RegistrationBloc: FAILED to create Firestore document!');
-        debugPrint('❌ Error: $e');
-        debugPrint('❌ Stack trace: $stackTrace');
-        // Don't fail registration if Firestore creation fails
-        // The user can still use the app, document will be created on next login
-      }
+      // NOTE: Firestore user document is automatically created by the Cloud Function
+      // createUserDocument (functions/src/createUserDocument.ts) when the Auth user is created.
+      // No manual client-side creation needed to avoid permission conflicts.
+      debugPrint('ℹ️ RegistrationBloc: Firestore document will be created by Cloud Function');
 
       // Send email verification
       try {

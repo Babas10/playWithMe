@@ -68,7 +68,8 @@ mixin _$GameModel {
   bool get eloCalculated =>
       throw _privateConstructorUsedError; // ELO updates per player (populated by Cloud Function after calculation)
   // Map<playerId, {previousRating, newRating, change}>
-  Map<String, dynamic> get eloUpdates =>
+  // NOTE: Must be nullable (no default) so Cloud Function can detect unprocessed games
+  Map<String, dynamic>? get eloUpdates =>
       throw _privateConstructorUsedError; // Timestamp when the game result was entered and completed
   @TimestampConverter()
   DateTime? get completedAt => throw _privateConstructorUsedError; // Weather considerations
@@ -123,7 +124,7 @@ abstract class $GameModelCopyWith<$Res> {
     String? resultSubmittedBy,
     List<String> confirmedBy,
     bool eloCalculated,
-    Map<String, dynamic> eloUpdates,
+    Map<String, dynamic>? eloUpdates,
     @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
     String? weatherNotes,
@@ -181,7 +182,7 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? resultSubmittedBy = freezed,
     Object? confirmedBy = null,
     Object? eloCalculated = null,
-    Object? eloUpdates = null,
+    Object? eloUpdates = freezed,
     Object? completedAt = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
@@ -316,10 +317,10 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.eloCalculated
                 : eloCalculated // ignore: cast_nullable_to_non_nullable
                       as bool,
-            eloUpdates: null == eloUpdates
+            eloUpdates: freezed == eloUpdates
                 ? _value.eloUpdates
                 : eloUpdates // ignore: cast_nullable_to_non_nullable
-                      as Map<String, dynamic>,
+                      as Map<String, dynamic>?,
             completedAt: freezed == completedAt
                 ? _value.completedAt
                 : completedAt // ignore: cast_nullable_to_non_nullable
@@ -418,7 +419,7 @@ abstract class _$$GameModelImplCopyWith<$Res>
     String? resultSubmittedBy,
     List<String> confirmedBy,
     bool eloCalculated,
-    Map<String, dynamic> eloUpdates,
+    Map<String, dynamic>? eloUpdates,
     @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
     String? weatherNotes,
@@ -478,7 +479,7 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? resultSubmittedBy = freezed,
     Object? confirmedBy = null,
     Object? eloCalculated = null,
-    Object? eloUpdates = null,
+    Object? eloUpdates = freezed,
     Object? completedAt = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
@@ -613,10 +614,10 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.eloCalculated
             : eloCalculated // ignore: cast_nullable_to_non_nullable
                   as bool,
-        eloUpdates: null == eloUpdates
+        eloUpdates: freezed == eloUpdates
             ? _value._eloUpdates
             : eloUpdates // ignore: cast_nullable_to_non_nullable
-                  as Map<String, dynamic>,
+                  as Map<String, dynamic>?,
         completedAt: freezed == completedAt
             ? _value.completedAt
             : completedAt // ignore: cast_nullable_to_non_nullable
@@ -670,7 +671,7 @@ class _$GameModelImpl extends _GameModel {
     this.resultSubmittedBy,
     final List<String> confirmedBy = const [],
     this.eloCalculated = false,
-    final Map<String, dynamic> eloUpdates = const {},
+    final Map<String, dynamic>? eloUpdates,
     @TimestampConverter() this.completedAt,
     this.weatherDependent = true,
     this.weatherNotes,
@@ -807,15 +808,18 @@ class _$GameModelImpl extends _GameModel {
   final bool eloCalculated;
   // ELO updates per player (populated by Cloud Function after calculation)
   // Map<playerId, {previousRating, newRating, change}>
-  final Map<String, dynamic> _eloUpdates;
+  // NOTE: Must be nullable (no default) so Cloud Function can detect unprocessed games
+  final Map<String, dynamic>? _eloUpdates;
   // ELO updates per player (populated by Cloud Function after calculation)
   // Map<playerId, {previousRating, newRating, change}>
+  // NOTE: Must be nullable (no default) so Cloud Function can detect unprocessed games
   @override
-  @JsonKey()
-  Map<String, dynamic> get eloUpdates {
+  Map<String, dynamic>? get eloUpdates {
+    final value = _eloUpdates;
+    if (value == null) return null;
     if (_eloUpdates is EqualUnmodifiableMapView) return _eloUpdates;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_eloUpdates);
+    return EqualUnmodifiableMapView(value);
   }
 
   // Timestamp when the game result was entered and completed
@@ -1004,7 +1008,7 @@ abstract class _GameModel extends GameModel {
     final String? resultSubmittedBy,
     final List<String> confirmedBy,
     final bool eloCalculated,
-    final Map<String, dynamic> eloUpdates,
+    final Map<String, dynamic>? eloUpdates,
     @TimestampConverter() final DateTime? completedAt,
     final bool weatherDependent,
     final String? weatherNotes,
@@ -1084,8 +1088,9 @@ abstract class _GameModel extends GameModel {
   @override
   bool get eloCalculated; // ELO updates per player (populated by Cloud Function after calculation)
   // Map<playerId, {previousRating, newRating, change}>
+  // NOTE: Must be nullable (no default) so Cloud Function can detect unprocessed games
   @override
-  Map<String, dynamic> get eloUpdates; // Timestamp when the game result was entered and completed
+  Map<String, dynamic>? get eloUpdates; // Timestamp when the game result was entered and completed
   @override
   @TimestampConverter()
   DateTime? get completedAt; // Weather considerations

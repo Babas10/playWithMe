@@ -14,8 +14,8 @@ _$GroupModelImpl _$$GroupModelImplFromJson(
   description: json['description'] as String?,
   photoUrl: json['photoUrl'] as String?,
   createdBy: json['createdBy'] as String,
-  createdAt: DateTime.parse(json['createdAt'] as String),
-  updatedAt: const TimestampConverter().fromJson(json['updatedAt']),
+  createdAt: _timestampFromJson(json['createdAt']),
+  updatedAt: _timestampFromJsonNullable(json['updatedAt']),
   memberIds:
       (json['memberIds'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
@@ -36,7 +36,7 @@ _$GroupModelImpl _$$GroupModelImplFromJson(
       json['allowMembersToInviteOthers'] as bool? ?? true,
   notifyMembersOfNewGames: json['notifyMembersOfNewGames'] as bool? ?? true,
   totalGamesPlayed: (json['totalGamesPlayed'] as num?)?.toInt() ?? 0,
-  lastActivity: const TimestampConverter().fromJson(json['lastActivity']),
+  lastActivity: _timestampFromJsonNullable(json['lastActivity']),
 );
 
 Map<String, dynamic> _$$GroupModelImplToJson(_$GroupModelImpl instance) =>
@@ -46,8 +46,8 @@ Map<String, dynamic> _$$GroupModelImplToJson(_$GroupModelImpl instance) =>
       'description': instance.description,
       'photoUrl': instance.photoUrl,
       'createdBy': instance.createdBy,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': const TimestampConverter().toJson(instance.updatedAt),
+      'createdAt': _timestampToJson(instance.createdAt),
+      'updatedAt': _timestampToJsonNullable(instance.updatedAt),
       'memberIds': instance.memberIds,
       'adminIds': instance.adminIds,
       'gameIds': instance.gameIds,
@@ -59,7 +59,7 @@ Map<String, dynamic> _$$GroupModelImplToJson(_$GroupModelImpl instance) =>
       'allowMembersToInviteOthers': instance.allowMembersToInviteOthers,
       'notifyMembersOfNewGames': instance.notifyMembersOfNewGames,
       'totalGamesPlayed': instance.totalGamesPlayed,
-      'lastActivity': const TimestampConverter().toJson(instance.lastActivity),
+      'lastActivity': _timestampToJsonNullable(instance.lastActivity),
     };
 
 const _$GroupPrivacyEnumMap = {

@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { getTestGroupId } from "./testConfigLoader";
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -7,7 +8,16 @@ if (!admin.apps.length) {
     });
 }
 
-const TARGET_GROUP_ID = "9RScLpdoeiG5UHKMD8tB"; // "test2" group ID
+// Load group ID from test config (or specify manually if needed)
+let TARGET_GROUP_ID: string;
+try {
+  TARGET_GROUP_ID = getTestGroupId();
+  console.log("✅ Loaded group ID from testConfig.json");
+} catch (error) {
+  // Fallback: you can specify a group ID manually if testConfig.json doesn't exist
+  TARGET_GROUP_ID = "SPECIFY_YOUR_GROUP_ID_HERE";
+  console.log("⚠️  Using manually specified group ID (testConfig.json not found)");
+}
 
 async function deleteGroupGames() {
   const db = admin.firestore();

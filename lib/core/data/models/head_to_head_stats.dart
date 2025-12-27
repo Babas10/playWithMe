@@ -16,6 +16,15 @@ class HeadToHeadStats with _$HeadToHeadStats {
     /// Opponent user ID
     required String opponentId,
 
+    /// Opponent's display name (cached for performance and privacy)
+    String? opponentName,
+
+    /// Opponent's email (cached for performance and privacy)
+    String? opponentEmail,
+
+    /// Opponent's photo URL (cached for performance and privacy)
+    String? opponentPhotoUrl,
+
     /// Total games played against this opponent
     required int gamesPlayed,
 
@@ -140,6 +149,9 @@ class HeadToHeadStats with _$HeadToHeadStats {
     if (gamesPlayed < 20) return 'Active rivalry';
     return 'Intense rivalry';
   }
+
+  /// Get opponent's display name or email as fallback
+  String get opponentDisplayName => opponentName ?? opponentEmail ?? 'Unknown';
 }
 
 /// Represents a single head-to-head matchup result.

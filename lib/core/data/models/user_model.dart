@@ -52,6 +52,8 @@ class UserModel with _$UserModel {
     @Default(1600.0) double eloPeak,
     @TimestampConverter() DateTime? eloPeakDate,
     @Default(0) int eloGamesPlayed,
+    // Nemesis/Rival tracking (Story 301.8)
+    NemesisRecord? nemesis,
   }) = _UserModel;
 
   const UserModel._();
@@ -292,5 +294,48 @@ class RequiredTimestampConverter implements JsonConverter<DateTime, Object> {
   @override
   Object toJson(DateTime object) {
     return Timestamp.fromDate(object);
+  }
+}
+
+/// Nemesis record tracking the opponent a player has lost to most often.
+/// This record is automatically updated by Cloud Functions after each game.
+@freezed
+class NemesisRecord with _$NemesisRecord {
+  const factory NemesisRecord({
+    /// Opponent user ID
+    required String opponentId,
+
+    /// Opponent display name (cached for quick display)
+    required String opponentName,
+
+    /// Total games lost against this opponent
+    required int gamesLost,
+
+    /// Total games won against this opponent
+    required int gamesWon,
+
+    /// Total games played against this opponent (gamesWon + gamesLost)
+    required int gamesPlayed,
+
+    /// Win rate as percentage (0-100)
+    required double winRate,
+  }) = _NemesisRecord;
+
+  const NemesisRecord._();
+
+  factory NemesisRecord.fromJson(Map<String, dynamic> json) =>
+      _$NemesisRecordFromJson(json);
+
+  /// Format win-loss record as string (e.g., "3W - 7L")
+  String get recordString => '${gamesWon}W - ${gamesLost}L';
+
+  /// Check if this is a true nemesis (win rate < 50%)
+  bool get isTrueNemesis => winRate < 50.0;
+
+  /// Get rivalry level based on games played
+  String get rivalryLevel {
+    if (gamesPlayed >= 10) return 'Intense Rivalry';
+    if (gamesPlayed >= 5) return 'Developing Rivalry';
+    return 'New Matchup';
   }
 }
