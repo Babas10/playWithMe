@@ -1,8 +1,6 @@
 // Unit Test: statsTracking (Story 301.8 - Regression Tests)
 // Verifies that h2h stats are NO LONGER processed in processStatsTracking
 
-import * as admin from "firebase-admin";
-
 // Mock updateTeammateStats to track calls
 const mockUpdateTeammateStats = jest.fn();
 

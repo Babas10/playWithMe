@@ -20,7 +20,6 @@ jest.mock("firebase-admin", () => ({
 }));
 
 // Import after mocking
-const admin = require("firebase-admin");
 const { getHeadToHeadStats } = require("../../src/getHeadToHeadStats");
 
 // Initialize Firebase Functions test environment
