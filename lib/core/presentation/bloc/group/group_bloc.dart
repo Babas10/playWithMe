@@ -61,25 +61,32 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroupsForUser event,
     Emitter<GroupState> emit,
   ) async {
+    print('🎯 [GroupBloc] LoadGroupsForUser event received for userId: ${event.userId}');
 
     // Cancel existing subscription
     await _groupsSubscription?.cancel();
 
     try {
+      print('📡 [GroupBloc] Getting stream from repository...');
       final stream = _groupRepository.getGroupsForUser(event.userId);
 
       // Use emit.forEach to keep the emitter alive and automatically emit states
       await emit.forEach<List<GroupModel>>(
         stream,
         onData: (groups) {
+          print('✅ [GroupBloc] onData received with ${groups.length} groups');
           for (var i = 0; i < groups.length; i++) {
           }
+          print('✅ [GroupBloc] Emitting GroupsLoaded state');
           return GroupsLoaded(groups: groups);
         },
         onError: (error, stackTrace) {
+          print('❌ [GroupBloc] onError received: $error');
+          print('📚 [GroupBloc] Stack trace: $stackTrace');
           final (message, isRetryable) = error is Exception
               ? GroupErrorMessages.getErrorMessage(error)
               : ('Failed to load user groups', true);
+          print('❌ [GroupBloc] Emitting GroupError with message: $message');
           return GroupError(
             message: message,
             errorCode: 'LOAD_USER_GROUPS_ERROR',
@@ -87,7 +94,9 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
           );
         },
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ [GroupBloc] Exception caught: $e');
+      print('📚 [GroupBloc] Stack trace: $stackTrace');
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to load user groups', true);

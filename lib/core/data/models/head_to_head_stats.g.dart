@@ -11,6 +11,9 @@ _$HeadToHeadStatsImpl _$$HeadToHeadStatsImplFromJson(
 ) => _$HeadToHeadStatsImpl(
   userId: json['userId'] as String,
   opponentId: json['opponentId'] as String,
+  opponentName: json['opponentName'] as String?,
+  opponentEmail: json['opponentEmail'] as String?,
+  opponentPhotoUrl: json['opponentPhotoUrl'] as String?,
   gamesPlayed: (json['gamesPlayed'] as num).toInt(),
   gamesWon: (json['gamesWon'] as num).toInt(),
   gamesLost: (json['gamesLost'] as num).toInt(),
@@ -32,6 +35,9 @@ Map<String, dynamic> _$$HeadToHeadStatsImplToJson(
 ) => <String, dynamic>{
   'userId': instance.userId,
   'opponentId': instance.opponentId,
+  'opponentName': instance.opponentName,
+  'opponentEmail': instance.opponentEmail,
+  'opponentPhotoUrl': instance.opponentPhotoUrl,
   'gamesPlayed': instance.gamesPlayed,
   'gamesWon': instance.gamesWon,
   'gamesLost': instance.gamesLost,

@@ -23,14 +23,11 @@ class HeadToHeadBloc extends Bloc<HeadToHeadEvent, HeadToHeadState> {
     emit(const HeadToHeadState.loading());
 
     try {
-      // Fetch head-to-head stats and opponent profile in parallel
-      final results = await Future.wait([
-        userRepository.getHeadToHeadStats(event.userId, event.opponentId),
-        userRepository.getUserById(event.opponentId),
-      ]);
-
-      final stats = results[0] as HeadToHeadStats?;
-      final opponentProfile = results[1] as UserModel?;
+      // Fetch head-to-head stats (opponent info is cached in the stats document)
+      final stats = await userRepository.getHeadToHeadStats(
+        event.userId,
+        event.opponentId,
+      );
 
       if (stats == null) {
         emit(const HeadToHeadState.error(
@@ -39,17 +36,7 @@ class HeadToHeadBloc extends Bloc<HeadToHeadEvent, HeadToHeadState> {
         return;
       }
 
-      if (opponentProfile == null) {
-        emit(const HeadToHeadState.error(
-          message: 'Opponent profile not found',
-        ));
-        return;
-      }
-
-      emit(HeadToHeadState.loaded(
-        stats: stats,
-        opponentProfile: opponentProfile,
-      ));
+      emit(HeadToHeadState.loaded(stats: stats));
     } catch (e) {
       emit(HeadToHeadState.error(
         message: 'Failed to load head-to-head details: ${e.toString()}',

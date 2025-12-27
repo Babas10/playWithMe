@@ -37,7 +37,7 @@ class HeadToHeadPage extends StatelessWidget {
             return state.when(
               initial: () => const SizedBox.shrink(),
               loading: () => const Center(child: CircularProgressIndicator()),
-              loaded: (stats, opponent) => _buildLoadedView(context, stats, opponent),
+              loaded: (stats) => _buildLoadedView(context, stats),
               error: (message) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -58,7 +58,6 @@ class HeadToHeadPage extends StatelessWidget {
   Widget _buildLoadedView(
     BuildContext context,
     HeadToHeadStats stats,
-    UserModel opponent,
   ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -66,7 +65,7 @@ class HeadToHeadPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Opponent header
-          _buildOpponentHeader(context, opponent),
+          _buildOpponentHeader(context, stats),
           const SizedBox(height: 24),
 
           // Rivalry intensity
@@ -92,7 +91,7 @@ class HeadToHeadPage extends StatelessWidget {
     );
   }
 
-  Widget _buildOpponentHeader(BuildContext context, UserModel opponent) {
+  Widget _buildOpponentHeader(BuildContext context, HeadToHeadStats stats) {
     final theme = Theme.of(context);
 
     return Card(
@@ -106,8 +105,8 @@ class HeadToHeadPage extends StatelessWidget {
                   radius: 40,
                   backgroundColor: theme.colorScheme.errorContainer,
                   backgroundImage:
-                      opponent.photoUrl != null ? NetworkImage(opponent.photoUrl!) : null,
-                  child: opponent.photoUrl == null
+                      stats.opponentPhotoUrl != null ? NetworkImage(stats.opponentPhotoUrl!) : null,
+                  child: stats.opponentPhotoUrl == null
                       ? Icon(Icons.person, size: 40, color: theme.colorScheme.onErrorContainer)
                       : null,
                 ),
@@ -132,14 +131,14 @@ class HeadToHeadPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    opponent.displayNameOrEmail,
+                    stats.opponentDisplayName,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (opponent.displayName != null)
+                  if (stats.opponentName != null && stats.opponentEmail != null)
                     Text(
-                      opponent.email,
+                      stats.opponentEmail!,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
