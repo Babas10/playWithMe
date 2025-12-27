@@ -97,9 +97,31 @@ export async function updateHeadToHeadStats(
 
   // Use a separate transaction for h2h stats
   await db.runTransaction(async (transaction) => {
-    // Fetch current head-to-head stats
-    const h2hDoc = await transaction.get(h2hRef);
+    // Fetch current head-to-head stats and opponent profile in parallel
+    const [h2hDoc, opponentDoc] = await Promise.all([
+      transaction.get(h2hRef),
+      transaction.get(db.collection("users").doc(opponentId)),
+    ]);
+
     const h2hData = h2hDoc.data();
+    const opponentData = opponentDoc.data();
+
+    // Determine opponent name with proper fallback logic
+    let opponentName = "Unknown";
+    let opponentEmail: string | null = null;
+    let opponentPhotoUrl: string | null = null;
+
+    if (opponentData) {
+      if (opponentData.displayName) {
+        opponentName = opponentData.displayName;
+      } else if (opponentData.firstName && opponentData.lastName) {
+        opponentName = `${opponentData.firstName} ${opponentData.lastName}`;
+      } else if (opponentData.email) {
+        opponentName = opponentData.email;
+      }
+      opponentEmail = opponentData.email || null;
+      opponentPhotoUrl = opponentData.photoUrl || null;
+    }
 
   const pointDiff = pointsScored - pointsAllowed;
 
@@ -122,6 +144,9 @@ export async function updateHeadToHeadStats(
   const updatedStats = {
     userId: playerId,
     opponentId: opponentId,
+    opponentName: opponentName, // Cache opponent's display name
+    opponentEmail: opponentEmail, // Cache opponent's email
+    opponentPhotoUrl: opponentPhotoUrl, // Cache opponent's photo URL
     gamesPlayed: currentStats.gamesPlayed + 1,
     gamesWon: won ? currentStats.gamesWon + 1 : currentStats.gamesWon,
     gamesLost: won ? currentStats.gamesLost : currentStats.gamesLost + 1,
@@ -167,11 +192,14 @@ export async function updateHeadToHeadStats(
 }
 
 /**
- * Process all teammate and head-to-head stats updates for a completed game.
+ * Process ONLY teammate stats updates for a completed game.
  * Called from the main ELO processing transaction.
  *
+ * NOTE: Head-to-head stats are processed separately by onEloCalculationComplete
+ * to avoid transaction timeouts and improve performance.
+ *
  * NOTE: To satisfy Firestore transaction rules (all reads before writes),
- * this function now accepts pre-read user data.
+ * this function accepts pre-read user data.
  */
 export async function processStatsTracking(
   transaction: admin.firestore.Transaction,
@@ -181,7 +209,7 @@ export async function processStatsTracking(
   teamAWon: boolean,
   individualGames: any[],
   playerEloChanges: Map<string, number>,
-  playerDataMap: Map<string, any> // ← NEW: Pass in pre-read player data
+  playerDataMap: Map<string, any> // ← Pass in pre-read player data
 ): Promise<void> {
   // Calculate total points for each team across all individual games
   let teamAPoints = 0;
@@ -265,52 +293,17 @@ export async function processStatsTracking(
     }
   }
 
-  // Update head-to-head stats for all cross-team matchups
-  for (const teamAPlayerId of teamAPlayerIds) {
-    for (const teamBPlayerId of teamBPlayerIds) {
-      const teamAEloChange = playerEloChanges.get(teamAPlayerId) || 0;
-      const teamBEloChange = playerEloChanges.get(teamBPlayerId) || 0;
+  // NOTE: Head-to-head stats are processed by a separate Cloud Function
+  // (onEloCalculationComplete in headToHeadGameUpdates.ts) which triggers
+  // after ELO calculation completes. This decouples h2h updates from the
+  // main transaction to avoid timeouts and improve performance.
 
-      // Get partner IDs (if applicable)
-      const teamAPartnerId = teamAPlayerIds.find((id) => id !== teamAPlayerId) || undefined;
-      const teamBPartnerId = teamBPlayerIds.find((id) => id !== teamBPlayerId) || undefined;
-
-      // Update from Team A player's perspective
-      await updateHeadToHeadStats(
-        teamAPlayerId,
-        teamBPlayerId,
-        teamAWon,
-        teamAPoints,
-        teamBPoints,
-        teamAEloChange,
-        gameId,
-        teamAPartnerId,
-        teamBPartnerId
-      );
-
-      // Update from Team B player's perspective
-      await updateHeadToHeadStats(
-        teamBPlayerId,
-        teamAPlayerId,
-        !teamAWon,
-        teamBPoints,
-        teamAPoints,
-        teamBEloChange,
-        gameId,
-        teamBPartnerId,
-        teamAPartnerId
-      );
-    }
-  }
-
-  // Update nemesis for all players (Story 301.8)
-  const allPlayerIds = [...teamAPlayerIds, ...teamBPlayerIds];
-  for (const playerId of allPlayerIds) {
-    await updateNemesis(playerId);
-  }
+  // NOTE: Nemesis updates are handled by another separate Cloud Function
+  // (onHeadToHeadStatsUpdated in headToHeadUpdates.ts) which triggers
+  // automatically when head-to-head stats change.
 
   functions.logger.info(
-    `Successfully processed teammate and head-to-head stats for game ${gameId}`
+    `Successfully processed teammate stats for game ${gameId}`
   );
 }
 
@@ -367,10 +360,18 @@ export async function updateNemesis(
         // Fetch opponent name from user document
         const opponentDoc = await db.collection("users").doc(doc.id).get();
         const opponentData = opponentDoc.data();
-        const opponentName = opponentData?.displayName ||
-                             opponentData?.firstName && opponentData?.lastName
-                               ? `${opponentData.firstName} ${opponentData.lastName}`
-                               : opponentData?.email || "Unknown";
+
+        // Determine opponent name with proper fallback logic
+        let opponentName = "Unknown";
+        if (opponentData) {
+          if (opponentData.displayName) {
+            opponentName = opponentData.displayName;
+          } else if (opponentData.firstName && opponentData.lastName) {
+            opponentName = `${opponentData.firstName} ${opponentData.lastName}`;
+          } else if (opponentData.email) {
+            opponentName = opponentData.email;
+          }
+        }
 
         const winRate = gamesPlayed > 0 ? (gamesWon / gamesPlayed) * 100 : 0.0;
 
@@ -388,10 +389,18 @@ export async function updateNemesis(
           // Fetch opponent name
           const opponentDoc = await db.collection("users").doc(doc.id).get();
           const opponentData = opponentDoc.data();
-          const opponentName = opponentData?.displayName ||
-                               opponentData?.firstName && opponentData?.lastName
-                                 ? `${opponentData.firstName} ${opponentData.lastName}`
-                                 : opponentData?.email || "Unknown";
+
+          // Determine opponent name with proper fallback logic
+          let opponentName = "Unknown";
+          if (opponentData) {
+            if (opponentData.displayName) {
+              opponentName = opponentData.displayName;
+            } else if (opponentData.firstName && opponentData.lastName) {
+              opponentName = `${opponentData.firstName} ${opponentData.lastName}`;
+            } else if (opponentData.email) {
+              opponentName = opponentData.email;
+            }
+          }
 
           const winRate = gamesPlayed > 0 ? (gamesWon / gamesPlayed) * 100 : 0.0;
 

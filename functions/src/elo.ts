@@ -221,7 +221,8 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
       teamAPlayerIds.forEach((id: string) => updatePlayer(id, true));
       teamBPlayerIds.forEach((id: string) => updatePlayer(id, false));
 
-      // 5. Process teammate and head-to-head stats tracking
+      // 5. Process teammate stats tracking
+      // NOTE: Head-to-head stats are processed by onEloCalculationComplete (separate Cloud Function)
       await processStatsTracking(
         transaction,
         gameId,
@@ -234,6 +235,7 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
       );
 
       // 6. Record ELO changes in the game document
+      // Setting eloCalculated to true triggers onEloCalculationComplete
       transaction.update(db.collection("games").doc(gameId), {
         eloUpdates: updates,
         eloCalculated: true,
@@ -241,7 +243,12 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
       });
     });
 
-    functions.logger.info(`Successfully updated ELO ratings for game ${gameId}`);
+    // NOTE: Fully decoupled architecture (Story 301.8):
+    // 1. This function: ELO + teammate stats (fast, <5 seconds)
+    // 2. onEloCalculationComplete: H2H stats updates (triggered by eloCalculated=true)
+    // 3. onHeadToHeadStatsUpdated: Nemesis calculation (triggered by h2h doc changes)
+
+    functions.logger.info(`Successfully updated ELO ratings and teammate stats for game ${gameId}`);
 
   } catch (error) {
     functions.logger.error(`Error updating ELO ratings for game ${gameId}`, error);

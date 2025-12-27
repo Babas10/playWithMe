@@ -60,6 +60,14 @@ service cloud.firestore {
         allow write: if false;  // Cloud Functions only via Admin SDK
       }
 
+      // Head-to-head stats subcollection (Story 301.8)
+      // Users can only read their own head-to-head stats
+      // Write access is restricted to Cloud Functions (Admin SDK)
+      match /headToHead/{opponentId} {
+        allow read: if isAuthenticated() && request.auth.uid == userId;
+        allow write: if false;  // Cloud Functions only via Admin SDK
+      }
+
       // User invitations subcollection (Story 2.3)
       match /invitations/{invitationId} {
         // Only group admins can create invitations
