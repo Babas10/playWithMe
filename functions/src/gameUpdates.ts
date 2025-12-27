@@ -4,8 +4,18 @@ import { processGameEloUpdates } from "./elo";
 /**
  * Trigger ELO updates when a game is completed.
  * This function listens for status changes to "completed".
+ *
+ * Fully Decoupled Architecture (Story 301.8):
+ * - This function: ONLY ELO + teammate stats (fast)
+ * - onEloCalculationComplete: H2H stats (triggered by eloCalculated=true)
+ * - onHeadToHeadStatsUpdated: Nemesis (triggered by h2h doc changes)
  */
-export const onGameStatusChanged = functions.firestore
+export const onGameStatusChanged = functions
+  .runWith({
+    timeoutSeconds: 60, // Fast now - only ELO + teammate stats
+    memory: "512MB",
+  })
+  .firestore
   .document("games/{gameId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();

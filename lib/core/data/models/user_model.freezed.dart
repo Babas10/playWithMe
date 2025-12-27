@@ -70,7 +70,9 @@ mixin _$UserModel {
   double get eloPeak => throw _privateConstructorUsedError;
   @TimestampConverter()
   DateTime? get eloPeakDate => throw _privateConstructorUsedError;
-  int get eloGamesPlayed => throw _privateConstructorUsedError;
+  int get eloGamesPlayed =>
+      throw _privateConstructorUsedError; // Nemesis/Rival tracking (Story 301.8)
+  NemesisRecord? get nemesis => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -127,7 +129,10 @@ abstract class $UserModelCopyWith<$Res> {
     double eloPeak,
     @TimestampConverter() DateTime? eloPeakDate,
     int eloGamesPlayed,
+    NemesisRecord? nemesis,
   });
+
+  $NemesisRecordCopyWith<$Res>? get nemesis;
 }
 
 /// @nodoc
@@ -184,6 +189,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? eloPeak = null,
     Object? eloPeakDate = freezed,
     Object? eloGamesPlayed = null,
+    Object? nemesis = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -343,9 +349,27 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.eloGamesPlayed
                 : eloGamesPlayed // ignore: cast_nullable_to_non_nullable
                       as int,
+            nemesis: freezed == nemesis
+                ? _value.nemesis
+                : nemesis // ignore: cast_nullable_to_non_nullable
+                      as NemesisRecord?,
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $NemesisRecordCopyWith<$Res>? get nemesis {
+    if (_value.nemesis == null) {
+      return null;
+    }
+
+    return $NemesisRecordCopyWith<$Res>(_value.nemesis!, (value) {
+      return _then(_value.copyWith(nemesis: value) as $Val);
+    });
   }
 }
 
@@ -398,7 +422,11 @@ abstract class _$$UserModelImplCopyWith<$Res>
     double eloPeak,
     @TimestampConverter() DateTime? eloPeakDate,
     int eloGamesPlayed,
+    NemesisRecord? nemesis,
   });
+
+  @override
+  $NemesisRecordCopyWith<$Res>? get nemesis;
 }
 
 /// @nodoc
@@ -454,6 +482,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? eloPeak = null,
     Object? eloPeakDate = freezed,
     Object? eloGamesPlayed = null,
+    Object? nemesis = freezed,
   }) {
     return _then(
       _$UserModelImpl(
@@ -613,6 +642,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.eloGamesPlayed
             : eloGamesPlayed // ignore: cast_nullable_to_non_nullable
                   as int,
+        nemesis: freezed == nemesis
+            ? _value.nemesis
+            : nemesis // ignore: cast_nullable_to_non_nullable
+                  as NemesisRecord?,
       ),
     );
   }
@@ -661,6 +694,7 @@ class _$UserModelImpl extends _UserModel {
     this.eloPeak = 1600.0,
     @TimestampConverter() this.eloPeakDate,
     this.eloGamesPlayed = 0,
+    this.nemesis,
   }) : _groupIds = groupIds,
        _gameIds = gameIds,
        _friendIds = friendIds,
@@ -813,10 +847,13 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey()
   final int eloGamesPlayed;
+  // Nemesis/Rival tracking (Story 301.8)
+  @override
+  final NemesisRecord? nemesis;
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis)';
   }
 
   @override
@@ -901,7 +938,8 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.eloPeakDate, eloPeakDate) ||
                 other.eloPeakDate == eloPeakDate) &&
             (identical(other.eloGamesPlayed, eloGamesPlayed) ||
-                other.eloGamesPlayed == eloGamesPlayed));
+                other.eloGamesPlayed == eloGamesPlayed) &&
+            (identical(other.nemesis, nemesis) || other.nemesis == nemesis));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -947,6 +985,7 @@ class _$UserModelImpl extends _UserModel {
     eloPeak,
     eloPeakDate,
     eloGamesPlayed,
+    nemesis,
   ]);
 
   /// Create a copy of UserModel
@@ -1004,6 +1043,7 @@ abstract class _UserModel extends UserModel {
     final double eloPeak,
     @TimestampConverter() final DateTime? eloPeakDate,
     final int eloGamesPlayed,
+    final NemesisRecord? nemesis,
   }) = _$UserModelImpl;
   const _UserModel._() : super._();
 
@@ -1094,12 +1134,324 @@ abstract class _UserModel extends UserModel {
   @TimestampConverter()
   DateTime? get eloPeakDate;
   @override
-  int get eloGamesPlayed;
+  int get eloGamesPlayed; // Nemesis/Rival tracking (Story 301.8)
+  @override
+  NemesisRecord? get nemesis;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UserModelImplCopyWith<_$UserModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+NemesisRecord _$NemesisRecordFromJson(Map<String, dynamic> json) {
+  return _NemesisRecord.fromJson(json);
+}
+
+/// @nodoc
+mixin _$NemesisRecord {
+  /// Opponent user ID
+  String get opponentId => throw _privateConstructorUsedError;
+
+  /// Opponent display name (cached for quick display)
+  String get opponentName => throw _privateConstructorUsedError;
+
+  /// Total games lost against this opponent
+  int get gamesLost => throw _privateConstructorUsedError;
+
+  /// Total games won against this opponent
+  int get gamesWon => throw _privateConstructorUsedError;
+
+  /// Total games played against this opponent (gamesWon + gamesLost)
+  int get gamesPlayed => throw _privateConstructorUsedError;
+
+  /// Win rate as percentage (0-100)
+  double get winRate => throw _privateConstructorUsedError;
+
+  /// Serializes this NemesisRecord to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of NemesisRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $NemesisRecordCopyWith<NemesisRecord> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $NemesisRecordCopyWith<$Res> {
+  factory $NemesisRecordCopyWith(
+    NemesisRecord value,
+    $Res Function(NemesisRecord) then,
+  ) = _$NemesisRecordCopyWithImpl<$Res, NemesisRecord>;
+  @useResult
+  $Res call({
+    String opponentId,
+    String opponentName,
+    int gamesLost,
+    int gamesWon,
+    int gamesPlayed,
+    double winRate,
+  });
+}
+
+/// @nodoc
+class _$NemesisRecordCopyWithImpl<$Res, $Val extends NemesisRecord>
+    implements $NemesisRecordCopyWith<$Res> {
+  _$NemesisRecordCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of NemesisRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? opponentId = null,
+    Object? opponentName = null,
+    Object? gamesLost = null,
+    Object? gamesWon = null,
+    Object? gamesPlayed = null,
+    Object? winRate = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            opponentId: null == opponentId
+                ? _value.opponentId
+                : opponentId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            opponentName: null == opponentName
+                ? _value.opponentName
+                : opponentName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            gamesLost: null == gamesLost
+                ? _value.gamesLost
+                : gamesLost // ignore: cast_nullable_to_non_nullable
+                      as int,
+            gamesWon: null == gamesWon
+                ? _value.gamesWon
+                : gamesWon // ignore: cast_nullable_to_non_nullable
+                      as int,
+            gamesPlayed: null == gamesPlayed
+                ? _value.gamesPlayed
+                : gamesPlayed // ignore: cast_nullable_to_non_nullable
+                      as int,
+            winRate: null == winRate
+                ? _value.winRate
+                : winRate // ignore: cast_nullable_to_non_nullable
+                      as double,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$NemesisRecordImplCopyWith<$Res>
+    implements $NemesisRecordCopyWith<$Res> {
+  factory _$$NemesisRecordImplCopyWith(
+    _$NemesisRecordImpl value,
+    $Res Function(_$NemesisRecordImpl) then,
+  ) = __$$NemesisRecordImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    String opponentId,
+    String opponentName,
+    int gamesLost,
+    int gamesWon,
+    int gamesPlayed,
+    double winRate,
+  });
+}
+
+/// @nodoc
+class __$$NemesisRecordImplCopyWithImpl<$Res>
+    extends _$NemesisRecordCopyWithImpl<$Res, _$NemesisRecordImpl>
+    implements _$$NemesisRecordImplCopyWith<$Res> {
+  __$$NemesisRecordImplCopyWithImpl(
+    _$NemesisRecordImpl _value,
+    $Res Function(_$NemesisRecordImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of NemesisRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? opponentId = null,
+    Object? opponentName = null,
+    Object? gamesLost = null,
+    Object? gamesWon = null,
+    Object? gamesPlayed = null,
+    Object? winRate = null,
+  }) {
+    return _then(
+      _$NemesisRecordImpl(
+        opponentId: null == opponentId
+            ? _value.opponentId
+            : opponentId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        opponentName: null == opponentName
+            ? _value.opponentName
+            : opponentName // ignore: cast_nullable_to_non_nullable
+                  as String,
+        gamesLost: null == gamesLost
+            ? _value.gamesLost
+            : gamesLost // ignore: cast_nullable_to_non_nullable
+                  as int,
+        gamesWon: null == gamesWon
+            ? _value.gamesWon
+            : gamesWon // ignore: cast_nullable_to_non_nullable
+                  as int,
+        gamesPlayed: null == gamesPlayed
+            ? _value.gamesPlayed
+            : gamesPlayed // ignore: cast_nullable_to_non_nullable
+                  as int,
+        winRate: null == winRate
+            ? _value.winRate
+            : winRate // ignore: cast_nullable_to_non_nullable
+                  as double,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$NemesisRecordImpl extends _NemesisRecord {
+  const _$NemesisRecordImpl({
+    required this.opponentId,
+    required this.opponentName,
+    required this.gamesLost,
+    required this.gamesWon,
+    required this.gamesPlayed,
+    required this.winRate,
+  }) : super._();
+
+  factory _$NemesisRecordImpl.fromJson(Map<String, dynamic> json) =>
+      _$$NemesisRecordImplFromJson(json);
+
+  /// Opponent user ID
+  @override
+  final String opponentId;
+
+  /// Opponent display name (cached for quick display)
+  @override
+  final String opponentName;
+
+  /// Total games lost against this opponent
+  @override
+  final int gamesLost;
+
+  /// Total games won against this opponent
+  @override
+  final int gamesWon;
+
+  /// Total games played against this opponent (gamesWon + gamesLost)
+  @override
+  final int gamesPlayed;
+
+  /// Win rate as percentage (0-100)
+  @override
+  final double winRate;
+
+  @override
+  String toString() {
+    return 'NemesisRecord(opponentId: $opponentId, opponentName: $opponentName, gamesLost: $gamesLost, gamesWon: $gamesWon, gamesPlayed: $gamesPlayed, winRate: $winRate)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$NemesisRecordImpl &&
+            (identical(other.opponentId, opponentId) ||
+                other.opponentId == opponentId) &&
+            (identical(other.opponentName, opponentName) ||
+                other.opponentName == opponentName) &&
+            (identical(other.gamesLost, gamesLost) ||
+                other.gamesLost == gamesLost) &&
+            (identical(other.gamesWon, gamesWon) ||
+                other.gamesWon == gamesWon) &&
+            (identical(other.gamesPlayed, gamesPlayed) ||
+                other.gamesPlayed == gamesPlayed) &&
+            (identical(other.winRate, winRate) || other.winRate == winRate));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    opponentId,
+    opponentName,
+    gamesLost,
+    gamesWon,
+    gamesPlayed,
+    winRate,
+  );
+
+  /// Create a copy of NemesisRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$NemesisRecordImplCopyWith<_$NemesisRecordImpl> get copyWith =>
+      __$$NemesisRecordImplCopyWithImpl<_$NemesisRecordImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$NemesisRecordImplToJson(this);
+  }
+}
+
+abstract class _NemesisRecord extends NemesisRecord {
+  const factory _NemesisRecord({
+    required final String opponentId,
+    required final String opponentName,
+    required final int gamesLost,
+    required final int gamesWon,
+    required final int gamesPlayed,
+    required final double winRate,
+  }) = _$NemesisRecordImpl;
+  const _NemesisRecord._() : super._();
+
+  factory _NemesisRecord.fromJson(Map<String, dynamic> json) =
+      _$NemesisRecordImpl.fromJson;
+
+  /// Opponent user ID
+  @override
+  String get opponentId;
+
+  /// Opponent display name (cached for quick display)
+  @override
+  String get opponentName;
+
+  /// Total games lost against this opponent
+  @override
+  int get gamesLost;
+
+  /// Total games won against this opponent
+  @override
+  int get gamesWon;
+
+  /// Total games played against this opponent (gamesWon + gamesLost)
+  @override
+  int get gamesPlayed;
+
+  /// Win rate as percentage (0-100)
+  @override
+  double get winRate;
+
+  /// Create a copy of NemesisRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$NemesisRecordImplCopyWith<_$NemesisRecordImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

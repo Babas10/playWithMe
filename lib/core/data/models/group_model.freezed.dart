@@ -26,9 +26,12 @@ mixin _$GroupModel {
   String? get description => throw _privateConstructorUsedError;
   String? get photoUrl => throw _privateConstructorUsedError;
   String get createdBy => throw _privateConstructorUsedError;
-  @TimestampConverter()
+  @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
   DateTime get createdAt => throw _privateConstructorUsedError;
-  @TimestampConverter()
+  @JsonKey(
+    fromJson: _timestampFromJsonNullable,
+    toJson: _timestampToJsonNullable,
+  )
   DateTime? get updatedAt => throw _privateConstructorUsedError;
   List<String> get memberIds => throw _privateConstructorUsedError;
   List<String> get adminIds => throw _privateConstructorUsedError;
@@ -42,7 +45,10 @@ mixin _$GroupModel {
   bool get notifyMembersOfNewGames =>
       throw _privateConstructorUsedError; // Group stats
   int get totalGamesPlayed => throw _privateConstructorUsedError;
-  @TimestampConverter()
+  @JsonKey(
+    fromJson: _timestampFromJsonNullable,
+    toJson: _timestampToJsonNullable,
+  )
   DateTime? get lastActivity => throw _privateConstructorUsedError;
 
   /// Serializes this GroupModel to a JSON map.
@@ -68,8 +74,13 @@ abstract class $GroupModelCopyWith<$Res> {
     String? description,
     String? photoUrl,
     String createdBy,
-    @TimestampConverter() DateTime createdAt,
-    @TimestampConverter() DateTime? updatedAt,
+    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
+    DateTime createdAt,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    DateTime? updatedAt,
     List<String> memberIds,
     List<String> adminIds,
     List<String> gameIds,
@@ -81,7 +92,11 @@ abstract class $GroupModelCopyWith<$Res> {
     bool allowMembersToInviteOthers,
     bool notifyMembersOfNewGames,
     int totalGamesPlayed,
-    @TimestampConverter() DateTime? lastActivity,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    DateTime? lastActivity,
   });
 }
 
@@ -219,8 +234,13 @@ abstract class _$$GroupModelImplCopyWith<$Res>
     String? description,
     String? photoUrl,
     String createdBy,
-    @TimestampConverter() DateTime createdAt,
-    @TimestampConverter() DateTime? updatedAt,
+    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
+    DateTime createdAt,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    DateTime? updatedAt,
     List<String> memberIds,
     List<String> adminIds,
     List<String> gameIds,
@@ -232,7 +252,11 @@ abstract class _$$GroupModelImplCopyWith<$Res>
     bool allowMembersToInviteOthers,
     bool notifyMembersOfNewGames,
     int totalGamesPlayed,
-    @TimestampConverter() DateTime? lastActivity,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    DateTime? lastActivity,
   });
 }
 
@@ -362,8 +386,13 @@ class _$GroupModelImpl extends _GroupModel {
     this.description,
     this.photoUrl,
     required this.createdBy,
-    @TimestampConverter() required this.createdAt,
-    @TimestampConverter() this.updatedAt,
+    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
+    required this.createdAt,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    this.updatedAt,
     final List<String> memberIds = const [],
     final List<String> adminIds = const [],
     final List<String> gameIds = const [],
@@ -375,7 +404,11 @@ class _$GroupModelImpl extends _GroupModel {
     this.allowMembersToInviteOthers = true,
     this.notifyMembersOfNewGames = true,
     this.totalGamesPlayed = 0,
-    @TimestampConverter() this.lastActivity,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    this.lastActivity,
   }) : _memberIds = memberIds,
        _adminIds = adminIds,
        _gameIds = gameIds,
@@ -395,10 +428,13 @@ class _$GroupModelImpl extends _GroupModel {
   @override
   final String createdBy;
   @override
-  @TimestampConverter()
+  @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
   final DateTime createdAt;
   @override
-  @TimestampConverter()
+  @JsonKey(
+    fromJson: _timestampFromJsonNullable,
+    toJson: _timestampToJsonNullable,
+  )
   final DateTime? updatedAt;
   final List<String> _memberIds;
   @override
@@ -453,7 +489,10 @@ class _$GroupModelImpl extends _GroupModel {
   @JsonKey()
   final int totalGamesPlayed;
   @override
-  @TimestampConverter()
+  @JsonKey(
+    fromJson: _timestampFromJsonNullable,
+    toJson: _timestampToJsonNullable,
+  )
   final DateTime? lastActivity;
 
   @override
@@ -559,8 +598,13 @@ abstract class _GroupModel extends GroupModel {
     final String? description,
     final String? photoUrl,
     required final String createdBy,
-    @TimestampConverter() required final DateTime createdAt,
-    @TimestampConverter() final DateTime? updatedAt,
+    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
+    required final DateTime createdAt,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    final DateTime? updatedAt,
     final List<String> memberIds,
     final List<String> adminIds,
     final List<String> gameIds,
@@ -572,7 +616,11 @@ abstract class _GroupModel extends GroupModel {
     final bool allowMembersToInviteOthers,
     final bool notifyMembersOfNewGames,
     final int totalGamesPlayed,
-    @TimestampConverter() final DateTime? lastActivity,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    final DateTime? lastActivity,
   }) = _$GroupModelImpl;
   const _GroupModel._() : super._();
 
@@ -590,10 +638,13 @@ abstract class _GroupModel extends GroupModel {
   @override
   String get createdBy;
   @override
-  @TimestampConverter()
+  @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
   DateTime get createdAt;
   @override
-  @TimestampConverter()
+  @JsonKey(
+    fromJson: _timestampFromJsonNullable,
+    toJson: _timestampToJsonNullable,
+  )
   DateTime? get updatedAt;
   @override
   List<String> get memberIds;
@@ -618,7 +669,10 @@ abstract class _GroupModel extends GroupModel {
   @override
   int get totalGamesPlayed;
   @override
-  @TimestampConverter()
+  @JsonKey(
+    fromJson: _timestampFromJsonNullable,
+    toJson: _timestampToJsonNullable,
+  )
   DateTime? get lastActivity;
 
   /// Create a copy of GroupModel

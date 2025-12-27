@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { getTestUser, getTestGroupId } from "./testConfigLoader";
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
@@ -37,7 +38,7 @@ export async function createAndCompleteGame(
     groupId: gameData.groupId,
     createdBy: gameData.createdBy,
     status: "scheduled",
-    scheduledAt: admin.firestore.Timestamp.fromMillis(now.toMillis() + (60 * 60 * 1000)), // 1 hour from now
+    scheduledAt: now, // ✅ FIXED: Schedule at NOW, not 1 hour from now
     createdAt: now,
     updatedAt: now,
     location: {
@@ -57,7 +58,9 @@ export async function createAndCompleteGame(
   const gameRef = await db.collection("games").add(scheduledGame);
   console.log(`Created Scheduled Game: ${gameRef.id}`);
 
-  // Simulate a small delay or just update immediately
+  // Wait for the document to be fully created before updating (ensures Cloud Function triggers)
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
   // 2. Update to Completed with Results
   await gameRef.update({
     status: "completed",
@@ -76,17 +79,31 @@ if (require.main === module) {
   (async () => {
     try {
       const db = admin.firestore();
-      console.log("Connected to Project ID:", admin.app().options.projectId || "Unknown");
+      console.log("\n🔥 Connected to Project ID:", admin.app().options.projectId || "Unknown");
+      console.log("📊 Creating Test Game Scenarios...\n");
 
-      const user1_uid = "I1rVhwkQTyXL1iyBLSDNQPPiFnY2"; 
-      const user2_uid = "UqxXx3SdnGSMxUehOtuwMJaglvM2"; 
-      const user3_uid = "tdIxTUx9V0Z9gYGuOovsrsr8MMJ3"; 
-      const user4_uid = "xauayf2DGXcGlASNhZDhBVGR7Rr1"; 
-      const specifiedGroupId = "9RScLpdoeiG5UHKMD8tB";
+      // Load test users from config
+      const user1 = getTestUser(0); // Alice
+      const user2 = getTestUser(1); // Bob
+      const user3 = getTestUser(2); // Charlie
+      const user4 = getTestUser(3); // Diana
+      const specifiedGroupId = getTestGroupId();
+
+      const user1_uid = user1.uid;
+      const user2_uid = user2.uid;
+      const user3_uid = user3.uid;
+      const user4_uid = user4.uid;
 
       const playerUids = [user1_uid, user2_uid, user3_uid, user4_uid];
       const teamAPlayers = [user1_uid, user2_uid];
       const teamBPlayers = [user3_uid, user4_uid];
+
+      console.log("👥 Players (loaded from testConfig.json):");
+      console.log(`  ${user1.displayName}: ${user1_uid}`);
+      console.log(`  ${user2.displayName}: ${user2_uid}`);
+      console.log(`  ${user3.displayName}: ${user3_uid}`);
+      console.log(`  ${user4.displayName}: ${user4_uid}`);
+      console.log(`  Group: ${specifiedGroupId}\n`);
 
       // --- Scenario A: 1 Game, 1 Set, 1 Result (Standard) ---
       console.log("\n--- Running Scenario A ---");
@@ -101,12 +118,18 @@ if (require.main === module) {
           games: [
             {
               gameNumber: 1,
+              teamAScore: 21,
+              teamBScore: 19,
               sets: [{ teamAPoints: 21, teamBPoints: 19, setNumber: 1 }],
               winner: "teamA"
             }
           ],
         },
       });
+
+      // Wait for Cloud Function to complete ELO calculation (same players)
+      console.log("⏳ Waiting 10 seconds for Cloud Function to complete...");
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       // --- Scenario B: Best of 3 (2-1 sets) ---
       console.log("\n--- Running Scenario B ---");
@@ -121,6 +144,8 @@ if (require.main === module) {
           games: [
             {
               gameNumber: 1,
+              teamAScore: 54, // 21 + 18 + 15
+              teamBScore: 48, // 15 + 21 + 12
               sets: [
                 { teamAPoints: 21, teamBPoints: 15, setNumber: 1 }, // A wins
                 { teamAPoints: 18, teamBPoints: 21, setNumber: 2 }, // B wins
@@ -131,6 +156,10 @@ if (require.main === module) {
           ],
         },
       });
+
+      // Wait for Cloud Function to complete ELO calculation (same players)
+      console.log("⏳ Waiting 10 seconds for Cloud Function to complete...");
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       // --- Scenario C: 5 Games of 1 Set (Play Session) ---
       console.log("\n--- Running Scenario C ---");
@@ -143,14 +172,18 @@ if (require.main === module) {
         result: {
           overallWinner: "teamA", // A wins 3-2
           games: [
-            { gameNumber: 1, sets: [{ teamAPoints: 21, teamBPoints: 19, setNumber: 1 }], winner: "teamA" },
-            { gameNumber: 2, sets: [{ teamAPoints: 15, teamBPoints: 21, setNumber: 1 }], winner: "teamB" },
-            { gameNumber: 3, sets: [{ teamAPoints: 21, teamBPoints: 10, setNumber: 1 }], winner: "teamA" },
-            { gameNumber: 4, sets: [{ teamAPoints: 20, teamBPoints: 22, setNumber: 1 }], winner: "teamB" },
-            { gameNumber: 5, sets: [{ teamAPoints: 21, teamBPoints: 18, setNumber: 1 }], winner: "teamA" },
+            { gameNumber: 1, teamAScore: 21, teamBScore: 19, sets: [{ teamAPoints: 21, teamBPoints: 19, setNumber: 1 }], winner: "teamA" },
+            { gameNumber: 2, teamAScore: 15, teamBScore: 21, sets: [{ teamAPoints: 15, teamBPoints: 21, setNumber: 1 }], winner: "teamB" },
+            { gameNumber: 3, teamAScore: 21, teamBScore: 10, sets: [{ teamAPoints: 21, teamBPoints: 10, setNumber: 1 }], winner: "teamA" },
+            { gameNumber: 4, teamAScore: 20, teamBScore: 22, sets: [{ teamAPoints: 20, teamBPoints: 22, setNumber: 1 }], winner: "teamB" },
+            { gameNumber: 5, teamAScore: 21, teamBScore: 18, sets: [{ teamAPoints: 21, teamBPoints: 18, setNumber: 1 }], winner: "teamA" },
           ],
         },
       });
+
+      // Wait for Cloud Function to complete ELO calculation (same players)
+      console.log("⏳ Waiting 10 seconds for Cloud Function to complete...");
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       // --- Scenario D: 2 Games, Each Best of 3 (2-1 sets) ---
       console.log("\n--- Running Scenario D ---");
@@ -161,13 +194,12 @@ if (require.main === module) {
         playerIds: playerUids,
         teams: { teamAPlayerIds: teamAPlayers, teamBPlayerIds: teamBPlayers },
         result: {
-          overallWinner: "teamB", // B wins 2-0 in matches (or 1-1 tied? let's say tied 1-1, but overallWinner field forces one)
-          // Wait, 'overallWinner' in GameResult usually implies who won more games.
-          // If we have 2 games, and it's 1-1, 'overallWinner' logic might be ambiguous in the model or just whoever won last?
-          // Let's make Team B win both matches for clarity.
+          overallWinner: "teamB", // B wins 2-0 in matches
           games: [
             {
               gameNumber: 1,
+              teamAScore: 46, // 21 + 15 + 10
+              teamBScore: 55, // 19 + 21 + 15
               sets: [
                 { teamAPoints: 21, teamBPoints: 19, setNumber: 1 },
                 { teamAPoints: 15, teamBPoints: 21, setNumber: 2 },
@@ -177,6 +209,8 @@ if (require.main === module) {
             },
             {
               gameNumber: 2,
+              teamAScore: 51, // 18 + 21 + 12
+              teamBScore: 55, // 21 + 19 + 15
               sets: [
                 { teamAPoints: 18, teamBPoints: 21, setNumber: 1 },
                 { teamAPoints: 21, teamBPoints: 19, setNumber: 2 },
@@ -188,8 +222,17 @@ if (require.main === module) {
         },
       });
 
-    } catch (error) {
-      console.error("Error creating test games:", error);
+      console.log("\n✅ All Test Game Scenarios Created!\n");
+
+    } catch (error: any) {
+      if (error.message?.includes("Test config not found")) {
+        console.error("\n❌ Error:", error.message);
+        console.log("\n💡 Run this first:");
+        console.log("   cd functions");
+        console.log("   npx ts-node scripts/setupTestEnvironment.ts\n");
+      } else {
+        console.error("❌ Error creating test games:", error);
+      }
     } finally {
       process.exit();
     }

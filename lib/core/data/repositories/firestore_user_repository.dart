@@ -13,14 +13,17 @@ import '../models/head_to_head_stats.dart';
 class FirestoreUserRepository implements UserRepository {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final FirebaseFunctions _functions;
 
   static const String _collection = 'users';
 
   FirestoreUserRepository({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
+    FirebaseFunctions? functions,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+        _auth = auth ?? FirebaseAuth.instance,
+        _functions = functions ?? FirebaseFunctions.instance;
 
   @override
   Stream<UserModel?> get currentUser {
@@ -404,16 +407,39 @@ class FirestoreUserRepository implements UserRepository {
     String opponentId,
   ) async {
     try {
-      final h2hDoc = await _firestore
-          .collection(_collection)
-          .doc(userId)
-          .collection('headToHead')
-          .doc(opponentId)
-          .get();
+      // Call Cloud Function to get head-to-head stats
+      // Security: Function validates that the caller is requesting their own stats
+      final callable = _functions.httpsCallable('getHeadToHeadStats');
+      final result = await callable.call({
+        'opponentId': opponentId,
+      });
 
-      if (!h2hDoc.exists) return null;
+      if (result.data == null) return null;
 
-      return HeadToHeadStats.fromFirestore(h2hDoc);
+      // Convert Cloud Function result to HeadToHeadStats model
+      // Cloud Function returns JSON-serializable data with ISO string timestamps
+      final data = Map<String, dynamic>.from(result.data as Map);
+
+      // Convert nested recentMatchups list
+      if (data['recentMatchups'] != null) {
+        data['recentMatchups'] = (data['recentMatchups'] as List)
+            .map((matchup) => Map<String, dynamic>.from(matchup as Map))
+            .toList();
+      }
+
+      return HeadToHeadStats.fromJson(data);
+    } on FirebaseFunctionsException catch (e) {
+      // Handle specific Cloud Function errors
+      switch (e.code) {
+        case 'unauthenticated':
+          throw Exception('You must be logged in to view head-to-head statistics');
+        case 'permission-denied':
+          throw Exception('You don\'t have permission to view these statistics');
+        case 'not-found':
+          return null;
+        default:
+          throw Exception('Failed to get head-to-head stats: ${e.message}');
+      }
     } catch (e) {
       throw Exception('Failed to get head-to-head stats: $e');
     }

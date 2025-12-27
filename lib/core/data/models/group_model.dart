@@ -12,8 +12,8 @@ class GroupModel with _$GroupModel {
     String? description,
     String? photoUrl,
     required String createdBy,
-    @TimestampConverter() required DateTime createdAt,
-    @TimestampConverter() DateTime? updatedAt,
+    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required DateTime createdAt,
+    @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? updatedAt,
     @Default([]) List<String> memberIds,
     @Default([]) List<String> adminIds,
     @Default([]) List<String> gameIds,
@@ -27,7 +27,7 @@ class GroupModel with _$GroupModel {
     @Default(true) bool notifyMembersOfNewGames,
     // Group stats
     @Default(0) int totalGamesPlayed,
-    @TimestampConverter() DateTime? lastActivity,
+    @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? lastActivity,
   }) = _GroupModel;
 
   const GroupModel._();
@@ -220,7 +220,34 @@ enum GroupPrivacy {
   inviteOnly,
 }
 
+/// Helper functions for timestamp conversion
+DateTime _timestampFromJson(Object? json) {
+  if (json == null) throw ArgumentError('createdAt cannot be null');
+  if (json is Timestamp) return json.toDate();
+  if (json is String) return DateTime.parse(json);
+  if (json is int) return DateTime.fromMillisecondsSinceEpoch(json);
+  throw ArgumentError('Invalid timestamp format: $json');
+}
+
+DateTime? _timestampFromJsonNullable(Object? json) {
+  if (json == null) return null;
+  if (json is Timestamp) return json.toDate();
+  if (json is String) return DateTime.parse(json);
+  if (json is int) return DateTime.fromMillisecondsSinceEpoch(json);
+  return null;
+}
+
+Object _timestampToJson(DateTime dateTime) {
+  return Timestamp.fromDate(dateTime);
+}
+
+Object? _timestampToJsonNullable(DateTime? dateTime) {
+  if (dateTime == null) return null;
+  return Timestamp.fromDate(dateTime);
+}
+
 /// Custom converter for Firestore Timestamp to DateTime
+/// Note: This is kept for backwards compatibility but use JsonKey with helper functions instead
 class TimestampConverter implements JsonConverter<DateTime?, Object?> {
   const TimestampConverter();
 

@@ -27,6 +27,15 @@ mixin _$HeadToHeadStats {
   /// Opponent user ID
   String get opponentId => throw _privateConstructorUsedError;
 
+  /// Opponent's display name (cached for performance and privacy)
+  String? get opponentName => throw _privateConstructorUsedError;
+
+  /// Opponent's email (cached for performance and privacy)
+  String? get opponentEmail => throw _privateConstructorUsedError;
+
+  /// Opponent's photo URL (cached for performance and privacy)
+  String? get opponentPhotoUrl => throw _privateConstructorUsedError;
+
   /// Total games played against this opponent
   int get gamesPlayed => throw _privateConstructorUsedError;
 
@@ -79,6 +88,9 @@ abstract class $HeadToHeadStatsCopyWith<$Res> {
   $Res call({
     String userId,
     String opponentId,
+    String? opponentName,
+    String? opponentEmail,
+    String? opponentPhotoUrl,
     int gamesPlayed,
     int gamesWon,
     int gamesLost,
@@ -109,6 +121,9 @@ class _$HeadToHeadStatsCopyWithImpl<$Res, $Val extends HeadToHeadStats>
   $Res call({
     Object? userId = null,
     Object? opponentId = null,
+    Object? opponentName = freezed,
+    Object? opponentEmail = freezed,
+    Object? opponentPhotoUrl = freezed,
     Object? gamesPlayed = null,
     Object? gamesWon = null,
     Object? gamesLost = null,
@@ -130,6 +145,18 @@ class _$HeadToHeadStatsCopyWithImpl<$Res, $Val extends HeadToHeadStats>
                 ? _value.opponentId
                 : opponentId // ignore: cast_nullable_to_non_nullable
                       as String,
+            opponentName: freezed == opponentName
+                ? _value.opponentName
+                : opponentName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            opponentEmail: freezed == opponentEmail
+                ? _value.opponentEmail
+                : opponentEmail // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            opponentPhotoUrl: freezed == opponentPhotoUrl
+                ? _value.opponentPhotoUrl
+                : opponentPhotoUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
             gamesPlayed: null == gamesPlayed
                 ? _value.gamesPlayed
                 : gamesPlayed // ignore: cast_nullable_to_non_nullable
@@ -188,6 +215,9 @@ abstract class _$$HeadToHeadStatsImplCopyWith<$Res>
   $Res call({
     String userId,
     String opponentId,
+    String? opponentName,
+    String? opponentEmail,
+    String? opponentPhotoUrl,
     int gamesPlayed,
     int gamesWon,
     int gamesLost,
@@ -217,6 +247,9 @@ class __$$HeadToHeadStatsImplCopyWithImpl<$Res>
   $Res call({
     Object? userId = null,
     Object? opponentId = null,
+    Object? opponentName = freezed,
+    Object? opponentEmail = freezed,
+    Object? opponentPhotoUrl = freezed,
     Object? gamesPlayed = null,
     Object? gamesWon = null,
     Object? gamesLost = null,
@@ -238,6 +271,18 @@ class __$$HeadToHeadStatsImplCopyWithImpl<$Res>
             ? _value.opponentId
             : opponentId // ignore: cast_nullable_to_non_nullable
                   as String,
+        opponentName: freezed == opponentName
+            ? _value.opponentName
+            : opponentName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        opponentEmail: freezed == opponentEmail
+            ? _value.opponentEmail
+            : opponentEmail // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        opponentPhotoUrl: freezed == opponentPhotoUrl
+            ? _value.opponentPhotoUrl
+            : opponentPhotoUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
         gamesPlayed: null == gamesPlayed
             ? _value.gamesPlayed
             : gamesPlayed // ignore: cast_nullable_to_non_nullable
@@ -289,6 +334,9 @@ class _$HeadToHeadStatsImpl extends _HeadToHeadStats {
   const _$HeadToHeadStatsImpl({
     required this.userId,
     required this.opponentId,
+    this.opponentName,
+    this.opponentEmail,
+    this.opponentPhotoUrl,
     required this.gamesPlayed,
     required this.gamesWon,
     required this.gamesLost,
@@ -312,6 +360,18 @@ class _$HeadToHeadStatsImpl extends _HeadToHeadStats {
   /// Opponent user ID
   @override
   final String opponentId;
+
+  /// Opponent's display name (cached for performance and privacy)
+  @override
+  final String? opponentName;
+
+  /// Opponent's email (cached for performance and privacy)
+  @override
+  final String? opponentEmail;
+
+  /// Opponent's photo URL (cached for performance and privacy)
+  @override
+  final String? opponentPhotoUrl;
 
   /// Total games played against this opponent
   @override
@@ -369,7 +429,7 @@ class _$HeadToHeadStatsImpl extends _HeadToHeadStats {
 
   @override
   String toString() {
-    return 'HeadToHeadStats(userId: $userId, opponentId: $opponentId, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, pointsScored: $pointsScored, pointsAllowed: $pointsAllowed, eloChange: $eloChange, largestVictoryMargin: $largestVictoryMargin, largestDefeatMargin: $largestDefeatMargin, recentMatchups: $recentMatchups, lastUpdated: $lastUpdated)';
+    return 'HeadToHeadStats(userId: $userId, opponentId: $opponentId, opponentName: $opponentName, opponentEmail: $opponentEmail, opponentPhotoUrl: $opponentPhotoUrl, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, pointsScored: $pointsScored, pointsAllowed: $pointsAllowed, eloChange: $eloChange, largestVictoryMargin: $largestVictoryMargin, largestDefeatMargin: $largestDefeatMargin, recentMatchups: $recentMatchups, lastUpdated: $lastUpdated)';
   }
 
   @override
@@ -380,6 +440,12 @@ class _$HeadToHeadStatsImpl extends _HeadToHeadStats {
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.opponentId, opponentId) ||
                 other.opponentId == opponentId) &&
+            (identical(other.opponentName, opponentName) ||
+                other.opponentName == opponentName) &&
+            (identical(other.opponentEmail, opponentEmail) ||
+                other.opponentEmail == opponentEmail) &&
+            (identical(other.opponentPhotoUrl, opponentPhotoUrl) ||
+                other.opponentPhotoUrl == opponentPhotoUrl) &&
             (identical(other.gamesPlayed, gamesPlayed) ||
                 other.gamesPlayed == gamesPlayed) &&
             (identical(other.gamesWon, gamesWon) ||
@@ -410,6 +476,9 @@ class _$HeadToHeadStatsImpl extends _HeadToHeadStats {
     runtimeType,
     userId,
     opponentId,
+    opponentName,
+    opponentEmail,
+    opponentPhotoUrl,
     gamesPlayed,
     gamesWon,
     gamesLost,
@@ -443,6 +512,9 @@ abstract class _HeadToHeadStats extends HeadToHeadStats {
   const factory _HeadToHeadStats({
     required final String userId,
     required final String opponentId,
+    final String? opponentName,
+    final String? opponentEmail,
+    final String? opponentPhotoUrl,
     required final int gamesPlayed,
     required final int gamesWon,
     required final int gamesLost,
@@ -466,6 +538,18 @@ abstract class _HeadToHeadStats extends HeadToHeadStats {
   /// Opponent user ID
   @override
   String get opponentId;
+
+  /// Opponent's display name (cached for performance and privacy)
+  @override
+  String? get opponentName;
+
+  /// Opponent's email (cached for performance and privacy)
+  @override
+  String? get opponentEmail;
+
+  /// Opponent's photo URL (cached for performance and privacy)
+  @override
+  String? get opponentPhotoUrl;
 
   /// Total games played against this opponent
   @override

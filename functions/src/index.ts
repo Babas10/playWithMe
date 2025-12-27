@@ -18,6 +18,7 @@ export {leaveGroup} from "./leaveGroup";
 export {inviteToGroup} from "./inviteToGroup"; // Story 11.16
 export {getGamesForGroup} from "./getGamesForGroup"; // Story 3.5
 export {getCompletedGames} from "./getCompletedGames"; // Story 14.7
+export {getHeadToHeadStats} from "./getHeadToHeadStats"; // Story 301.8
 
 // Export friendship functions (callable functions)
 export {
@@ -61,8 +62,17 @@ export {
 
 // Export game update triggers
 export {
-  onGameStatusChanged, // Story 14.16 (ELO updates)
+  onGameStatusChanged, // Story 14.16 (ELO + teammate stats)
 } from "./gameUpdates";
+
+// Export head-to-head update triggers
+export {
+  onEloCalculationComplete, // Story 301.8 (H2H stats - triggers after ELO)
+} from "./headToHeadGameUpdates";
+
+export {
+  onHeadToHeadStatsUpdated, // Story 301.8 (Nemesis - triggers after H2H update)
+} from "./headToHeadUpdates";
 
 // Export scheduled functions for game auto-abort
 export {autoAbortGames} from "./autoAbortGames";

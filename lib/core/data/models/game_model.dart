@@ -49,7 +49,8 @@ class GameModel with _$GameModel {
     @Default(false) bool eloCalculated,
     // ELO updates per player (populated by Cloud Function after calculation)
     // Map<playerId, {previousRating, newRating, change}>
-    @Default({}) Map<String, dynamic> eloUpdates,
+    // NOTE: Must be nullable (no default) so Cloud Function can detect unprocessed games
+    Map<String, dynamic>? eloUpdates,
     // Timestamp when the game result was entered and completed
     @TimestampConverter() DateTime? completedAt,
     // Weather considerations
@@ -139,6 +140,13 @@ class GameModel with _$GameModel {
     // Ensure result is properly serialized
     if (json['result'] is GameResult) {
       json['result'] = (json['result'] as GameResult).toJson();
+    }
+
+    // CRITICAL: Remove eloUpdates if null or empty to prevent Cloud Function from skipping processing
+    // The Cloud Function checks `if (eloUpdates)` which is truthy for empty objects {}
+    if (json['eloUpdates'] == null ||
+        (json['eloUpdates'] is Map && (json['eloUpdates'] as Map).isEmpty)) {
+      json.remove('eloUpdates');
     }
 
     return json;
