@@ -21,22 +21,21 @@ mixin _$HeadToHeadState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(HeadToHeadStats stats, UserModel opponentProfile)
-    loaded,
+    required TResult Function(HeadToHeadStats stats) loaded,
     required TResult Function(String message) error,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult? Function(HeadToHeadStats stats)? loaded,
     TResult? Function(String message)? error,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult Function(HeadToHeadStats stats)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
@@ -131,8 +130,7 @@ class _$HeadToHeadInitialImpl implements HeadToHeadInitial {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(HeadToHeadStats stats, UserModel opponentProfile)
-    loaded,
+    required TResult Function(HeadToHeadStats stats) loaded,
     required TResult Function(String message) error,
   }) {
     return initial();
@@ -143,7 +141,7 @@ class _$HeadToHeadInitialImpl implements HeadToHeadInitial {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult? Function(HeadToHeadStats stats)? loaded,
     TResult? Function(String message)? error,
   }) {
     return initial?.call();
@@ -154,7 +152,7 @@ class _$HeadToHeadInitialImpl implements HeadToHeadInitial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult Function(HeadToHeadStats stats)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -251,8 +249,7 @@ class _$HeadToHeadLoadingImpl implements HeadToHeadLoading {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(HeadToHeadStats stats, UserModel opponentProfile)
-    loaded,
+    required TResult Function(HeadToHeadStats stats) loaded,
     required TResult Function(String message) error,
   }) {
     return loading();
@@ -263,7 +260,7 @@ class _$HeadToHeadLoadingImpl implements HeadToHeadLoading {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult? Function(HeadToHeadStats stats)? loaded,
     TResult? Function(String message)? error,
   }) {
     return loading?.call();
@@ -274,7 +271,7 @@ class _$HeadToHeadLoadingImpl implements HeadToHeadLoading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult Function(HeadToHeadStats stats)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -333,10 +330,9 @@ abstract class _$$HeadToHeadLoadedImplCopyWith<$Res> {
     $Res Function(_$HeadToHeadLoadedImpl) then,
   ) = __$$HeadToHeadLoadedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({HeadToHeadStats stats, UserModel opponentProfile});
+  $Res call({HeadToHeadStats stats});
 
   $HeadToHeadStatsCopyWith<$Res> get stats;
-  $UserModelCopyWith<$Res> get opponentProfile;
 }
 
 /// @nodoc
@@ -352,17 +348,13 @@ class __$$HeadToHeadLoadedImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? stats = null, Object? opponentProfile = null}) {
+  $Res call({Object? stats = null}) {
     return _then(
       _$HeadToHeadLoadedImpl(
         stats: null == stats
             ? _value.stats
             : stats // ignore: cast_nullable_to_non_nullable
                   as HeadToHeadStats,
-        opponentProfile: null == opponentProfile
-            ? _value.opponentProfile
-            : opponentProfile // ignore: cast_nullable_to_non_nullable
-                  as UserModel,
       ),
     );
   }
@@ -376,34 +368,19 @@ class __$$HeadToHeadLoadedImplCopyWithImpl<$Res>
       return _then(_value.copyWith(stats: value));
     });
   }
-
-  /// Create a copy of HeadToHeadState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UserModelCopyWith<$Res> get opponentProfile {
-    return $UserModelCopyWith<$Res>(_value.opponentProfile, (value) {
-      return _then(_value.copyWith(opponentProfile: value));
-    });
-  }
 }
 
 /// @nodoc
 
 class _$HeadToHeadLoadedImpl implements HeadToHeadLoaded {
-  const _$HeadToHeadLoadedImpl({
-    required this.stats,
-    required this.opponentProfile,
-  });
+  const _$HeadToHeadLoadedImpl({required this.stats});
 
   @override
   final HeadToHeadStats stats;
-  @override
-  final UserModel opponentProfile;
 
   @override
   String toString() {
-    return 'HeadToHeadState.loaded(stats: $stats, opponentProfile: $opponentProfile)';
+    return 'HeadToHeadState.loaded(stats: $stats)';
   }
 
   @override
@@ -411,13 +388,11 @@ class _$HeadToHeadLoadedImpl implements HeadToHeadLoaded {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$HeadToHeadLoadedImpl &&
-            (identical(other.stats, stats) || other.stats == stats) &&
-            (identical(other.opponentProfile, opponentProfile) ||
-                other.opponentProfile == opponentProfile));
+            (identical(other.stats, stats) || other.stats == stats));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, stats, opponentProfile);
+  int get hashCode => Object.hash(runtimeType, stats);
 
   /// Create a copy of HeadToHeadState
   /// with the given fields replaced by the non-null parameter values.
@@ -435,11 +410,10 @@ class _$HeadToHeadLoadedImpl implements HeadToHeadLoaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(HeadToHeadStats stats, UserModel opponentProfile)
-    loaded,
+    required TResult Function(HeadToHeadStats stats) loaded,
     required TResult Function(String message) error,
   }) {
-    return loaded(stats, opponentProfile);
+    return loaded(stats);
   }
 
   @override
@@ -447,10 +421,10 @@ class _$HeadToHeadLoadedImpl implements HeadToHeadLoaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult? Function(HeadToHeadStats stats)? loaded,
     TResult? Function(String message)? error,
   }) {
-    return loaded?.call(stats, opponentProfile);
+    return loaded?.call(stats);
   }
 
   @override
@@ -458,12 +432,12 @@ class _$HeadToHeadLoadedImpl implements HeadToHeadLoaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult Function(HeadToHeadStats stats)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(stats, opponentProfile);
+      return loaded(stats);
     }
     return orElse();
   }
@@ -507,13 +481,10 @@ class _$HeadToHeadLoadedImpl implements HeadToHeadLoaded {
 }
 
 abstract class HeadToHeadLoaded implements HeadToHeadState {
-  const factory HeadToHeadLoaded({
-    required final HeadToHeadStats stats,
-    required final UserModel opponentProfile,
-  }) = _$HeadToHeadLoadedImpl;
+  const factory HeadToHeadLoaded({required final HeadToHeadStats stats}) =
+      _$HeadToHeadLoadedImpl;
 
   HeadToHeadStats get stats;
-  UserModel get opponentProfile;
 
   /// Create a copy of HeadToHeadState
   /// with the given fields replaced by the non-null parameter values.
@@ -597,8 +568,7 @@ class _$HeadToHeadErrorImpl implements HeadToHeadError {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(HeadToHeadStats stats, UserModel opponentProfile)
-    loaded,
+    required TResult Function(HeadToHeadStats stats) loaded,
     required TResult Function(String message) error,
   }) {
     return error(message);
@@ -609,7 +579,7 @@ class _$HeadToHeadErrorImpl implements HeadToHeadError {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult? Function(HeadToHeadStats stats)? loaded,
     TResult? Function(String message)? error,
   }) {
     return error?.call(message);
@@ -620,7 +590,7 @@ class _$HeadToHeadErrorImpl implements HeadToHeadError {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(HeadToHeadStats stats, UserModel opponentProfile)? loaded,
+    TResult Function(HeadToHeadStats stats)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {

@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
-import 'package:play_with_me/core/data/models/user_model.dart';
 
 part 'head_to_head_state.freezed.dart';
 
@@ -12,7 +11,6 @@ class HeadToHeadState with _$HeadToHeadState {
 
   const factory HeadToHeadState.loaded({
     required HeadToHeadStats stats,
-    required UserModel opponentProfile,
   }) = HeadToHeadLoaded;
 
   const factory HeadToHeadState.error({

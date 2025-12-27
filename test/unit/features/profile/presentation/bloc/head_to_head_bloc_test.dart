@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
-import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/head_to_head/head_to_head_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/head_to_head/head_to_head_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/head_to_head/head_to_head_state.dart';
@@ -26,11 +25,13 @@ void main() {
     });
 
     blocTest<HeadToHeadBloc, HeadToHeadState>(
-      'emits [loading, loaded] when stats and opponent profile are found',
+      'emits [loading, loaded] when stats are found',
       build: () {
         final testStats = HeadToHeadStats(
           userId: 'user-123',
           opponentId: 'opponent-123',
+          opponentName: 'Opponent User',
+          opponentEmail: 'opponent@example.com',
           gamesPlayed: 8,
           gamesWon: 5,
           gamesLost: 3,
@@ -40,18 +41,8 @@ void main() {
           recentMatchups: [],
         );
 
-        final testOpponent = UserModel(
-          uid: 'opponent-123',
-          email: 'opponent@example.com',
-          displayName: 'Opponent User',
-          isEmailVerified: true,
-          isAnonymous: false,
-        );
-
         when(() => mockUserRepository.getHeadToHeadStats('user-123', 'opponent-123'))
             .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById('opponent-123'))
-            .thenAnswer((_) async => testOpponent);
 
         return HeadToHeadBloc(userRepository: mockUserRepository);
       },
@@ -64,7 +55,7 @@ void main() {
         isA<HeadToHeadLoaded>()
             .having((s) => s.stats.opponentId, 'opponent id', 'opponent-123')
             .having((s) => s.stats.gamesPlayed, 'games played', 8)
-            .having((s) => s.opponentProfile.uid, 'opponent uid', 'opponent-123'),
+            .having((s) => s.stats.opponentDisplayName, 'opponent name', 'Opponent User'),
       ],
     );
 
@@ -73,13 +64,6 @@ void main() {
       build: () {
         when(() => mockUserRepository.getHeadToHeadStats('user-123', 'opponent-123'))
             .thenAnswer((_) async => null);
-        when(() => mockUserRepository.getUserById('opponent-123'))
-            .thenAnswer((_) async => UserModel(
-                  uid: 'opponent-123',
-                  email: 'opponent@example.com',
-                  isEmailVerified: true,
-                  isAnonymous: false,
-                ));
 
         return HeadToHeadBloc(userRepository: mockUserRepository);
       },
@@ -91,34 +75,6 @@ void main() {
         const HeadToHeadState.loading(),
         const HeadToHeadState.error(
           message: 'No head-to-head statistics found for this opponent',
-        ),
-      ],
-    );
-
-    blocTest<HeadToHeadBloc, HeadToHeadState>(
-      'emits [loading, error] when opponent profile is not found',
-      build: () {
-        when(() => mockUserRepository.getHeadToHeadStats('user-123', 'opponent-123'))
-            .thenAnswer((_) async => HeadToHeadStats(
-                  userId: 'user-123',
-                  opponentId: 'opponent-123',
-                  gamesPlayed: 5,
-                  gamesWon: 3,
-                  gamesLost: 2,
-                ));
-        when(() => mockUserRepository.getUserById('opponent-123'))
-            .thenAnswer((_) async => null);
-
-        return HeadToHeadBloc(userRepository: mockUserRepository);
-      },
-      act: (bloc) => bloc.add(const HeadToHeadEvent.loadHeadToHead(
-        userId: 'user-123',
-        opponentId: 'opponent-123',
-      )),
-      expect: () => [
-        const HeadToHeadState.loading(),
-        const HeadToHeadState.error(
-          message: 'Opponent profile not found',
         ),
       ],
     );
