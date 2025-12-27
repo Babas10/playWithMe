@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { getTestUser, getTestGroupId, printTestConfig } from "./testConfigLoader";
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
@@ -57,6 +58,9 @@ async function createAndCompleteGame(
   const gameRef = await db.collection("games").add(scheduledGame);
   console.log(`✅ Created Scheduled Game: ${gameRef.id}`);
 
+  // Wait for the document to be fully created before updating (ensures Cloud Function triggers)
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
   // 2. Update to Completed with Results
   await gameRef.update({
     status: "completed",
@@ -92,23 +96,28 @@ if (require.main === module) {
       console.log("📊 Creating Nemesis Test Games...\n");
 
       // ==========================================
-      // CONFIGURE YOUR USER IDS HERE
+      // LOAD USER IDS FROM TEST CONFIG
       // ==========================================
-      const user1_uid = "I1rVhwkQTyXL1iyBLSDNQPPiFnY2"; // You (will have nemesis)
-      const user2_uid = "UqxXx3SdnGSMxUehOtuwMJaglvM2"; // Your teammate
-      const user3_uid = "tdIxTUx9V0Z9gYGuOovsrsr8MMJ3"; // Your nemesis (most losses)
-      const user4_uid = "xauayf2DGXcGlASNhZDhBVGR7Rr1"; // Another opponent (fewer losses)
-      const groupId = "9RScLpdoeiG5UHKMD8tB"; // Your group
+      const user1 = getTestUser(0); // Alice (will have nemesis)
+      const user2 = getTestUser(1); // Bob (teammate)
+      const user3 = getTestUser(2); // Charlie (nemesis - most losses)
+      const user4 = getTestUser(3); // Diana (opponent - fewer losses)
+      const groupId = getTestGroupId();
+
+      const user1_uid = user1.uid;
+      const user2_uid = user2.uid;
+      const user3_uid = user3.uid;
+      const user4_uid = user4.uid;
 
       const playerUids = [user1_uid, user2_uid, user3_uid, user4_uid];
       const teamA = [user1_uid, user2_uid]; // You and your teammate
       const teamB_Nemesis = [user3_uid, user4_uid]; // Opponents (User3 will be nemesis)
 
-      console.log("👥 Players:");
-      console.log(`  User1 (you):       ${user1_uid}`);
-      console.log(`  User2 (teammate):  ${user2_uid}`);
-      console.log(`  User3 (nemesis):   ${user3_uid}`);
-      console.log(`  User4 (opponent):  ${user4_uid}`);
+      console.log("👥 Players (loaded from testConfig.json):");
+      console.log(`  User1 (you):       ${user1.displayName} (${user1_uid})`);
+      console.log(`  User2 (teammate):  ${user2.displayName} (${user2_uid})`);
+      console.log(`  User3 (nemesis):   ${user3.displayName} (${user3_uid})`);
+      console.log(`  User4 (opponent):  ${user4.displayName} (${user4_uid})`);
       console.log(`  Group:             ${groupId}\n`);
 
       // ==========================================
@@ -127,12 +136,18 @@ if (require.main === module) {
           games: [
             {
               gameNumber: 1,
+              teamAScore: 15,
+              teamBScore: 21,
               sets: [{ teamAPoints: 15, teamBPoints: 21, setNumber: 1 }],
               winner: "teamB",
             },
           ],
         },
       });
+
+      // Wait for Cloud Function to complete ELO calculation (same players)
+      console.log("⏳ Waiting 10 seconds for Cloud Function to complete...");
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       // ==========================================
       // GAME 2: Team A LOSES to Team B
@@ -150,12 +165,18 @@ if (require.main === module) {
           games: [
             {
               gameNumber: 1,
+              teamAScore: 18,
+              teamBScore: 21,
               sets: [{ teamAPoints: 18, teamBPoints: 21, setNumber: 1 }],
               winner: "teamB",
             },
           ],
         },
       });
+
+      // Wait for Cloud Function to complete ELO calculation (same players)
+      console.log("⏳ Waiting 10 seconds for Cloud Function to complete...");
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       // ==========================================
       // GAME 3: Team A LOSES to Team B
@@ -173,12 +194,18 @@ if (require.main === module) {
           games: [
             {
               gameNumber: 1,
+              teamAScore: 19,
+              teamBScore: 21,
               sets: [{ teamAPoints: 19, teamBPoints: 21, setNumber: 1 }],
               winner: "teamB",
             },
           ],
         },
       });
+
+      // Wait for Cloud Function to complete ELO calculation (same players)
+      console.log("⏳ Waiting 10 seconds for Cloud Function to complete...");
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       // ==========================================
       // GAME 4: Team A WINS against Team B
@@ -196,12 +223,18 @@ if (require.main === module) {
           games: [
             {
               gameNumber: 1,
+              teamAScore: 21,
+              teamBScore: 15,
               sets: [{ teamAPoints: 21, teamBPoints: 15, setNumber: 1 }],
               winner: "teamA",
             },
           ],
         },
       });
+
+      // Wait for Cloud Function to complete ELO calculation (same players)
+      console.log("⏳ Waiting 10 seconds for Cloud Function to complete...");
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       // ==========================================
       // GAME 5: Team A LOSES to Team B
@@ -219,12 +252,18 @@ if (require.main === module) {
           games: [
             {
               gameNumber: 1,
+              teamAScore: 17,
+              teamBScore: 21,
               sets: [{ teamAPoints: 17, teamBPoints: 21, setNumber: 1 }],
               winner: "teamB",
             },
           ],
         },
       });
+
+      // Wait for Cloud Function to complete ELO calculation (same players)
+      console.log("⏳ Waiting 10 seconds for Cloud Function to complete...");
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       // ==========================================
       // GAME 6: Team A LOSES to Team B
@@ -242,6 +281,8 @@ if (require.main === module) {
           games: [
             {
               gameNumber: 1,
+              teamAScore: 16,
+              teamBScore: 21,
               sets: [{ teamAPoints: 16, teamBPoints: 21, setNumber: 1 }],
               winner: "teamB",
             },
@@ -251,12 +292,22 @@ if (require.main === module) {
 
       console.log("\n✅ All Nemesis Test Games Created!\n");
       console.log("📊 Expected Results:");
-      console.log(`  User1 record vs User3: 1W - 5L (6 matchups, 16.7% win rate)`);
-      console.log(`  User3 should be User1's nemesis ✅`);
-      console.log("\n🔍 Check the RivalsCard in User1's profile to see the nemesis!");
+      console.log(`  ${user1.displayName} record vs ${user3.displayName}: 1W - 5L (6 matchups, 16.7% win rate)`);
+      console.log(`  ${user3.displayName} should be ${user1.displayName}'s nemesis ✅`);
+      console.log(`\n🔍 Check the RivalsCard in ${user1.displayName}'s profile to see the nemesis!`);
+      console.log(`\n💡 Login credentials:`);
+      console.log(`  Email: ${user1.email}`);
+      console.log(`  Password: ${user1.password}\n`);
 
-    } catch (error) {
-      console.error("❌ Error creating test games:", error);
+    } catch (error: any) {
+      if (error.message?.includes("Test config not found")) {
+        console.error("\n❌ Error:", error.message);
+        console.log("\n💡 Run this first:");
+        console.log("   cd functions");
+        console.log("   npx ts-node scripts/setupTestEnvironment.ts\n");
+      } else {
+        console.error("❌ Error creating test games:", error);
+      }
     } finally {
       process.exit();
     }
