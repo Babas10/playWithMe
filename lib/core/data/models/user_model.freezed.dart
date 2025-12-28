@@ -72,7 +72,9 @@ mixin _$UserModel {
   DateTime? get eloPeakDate => throw _privateConstructorUsedError;
   int get eloGamesPlayed =>
       throw _privateConstructorUsedError; // Nemesis/Rival tracking (Story 301.8)
-  NemesisRecord? get nemesis => throw _privateConstructorUsedError;
+  NemesisRecord? get nemesis =>
+      throw _privateConstructorUsedError; // Best Win tracking (Story 301.6)
+  BestWinRecord? get bestWin => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -130,9 +132,11 @@ abstract class $UserModelCopyWith<$Res> {
     @TimestampConverter() DateTime? eloPeakDate,
     int eloGamesPlayed,
     NemesisRecord? nemesis,
+    BestWinRecord? bestWin,
   });
 
   $NemesisRecordCopyWith<$Res>? get nemesis;
+  $BestWinRecordCopyWith<$Res>? get bestWin;
 }
 
 /// @nodoc
@@ -190,6 +194,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? eloPeakDate = freezed,
     Object? eloGamesPlayed = null,
     Object? nemesis = freezed,
+    Object? bestWin = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -353,6 +358,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.nemesis
                 : nemesis // ignore: cast_nullable_to_non_nullable
                       as NemesisRecord?,
+            bestWin: freezed == bestWin
+                ? _value.bestWin
+                : bestWin // ignore: cast_nullable_to_non_nullable
+                      as BestWinRecord?,
           )
           as $Val,
     );
@@ -369,6 +378,20 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
 
     return $NemesisRecordCopyWith<$Res>(_value.nemesis!, (value) {
       return _then(_value.copyWith(nemesis: value) as $Val);
+    });
+  }
+
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BestWinRecordCopyWith<$Res>? get bestWin {
+    if (_value.bestWin == null) {
+      return null;
+    }
+
+    return $BestWinRecordCopyWith<$Res>(_value.bestWin!, (value) {
+      return _then(_value.copyWith(bestWin: value) as $Val);
     });
   }
 }
@@ -423,10 +446,13 @@ abstract class _$$UserModelImplCopyWith<$Res>
     @TimestampConverter() DateTime? eloPeakDate,
     int eloGamesPlayed,
     NemesisRecord? nemesis,
+    BestWinRecord? bestWin,
   });
 
   @override
   $NemesisRecordCopyWith<$Res>? get nemesis;
+  @override
+  $BestWinRecordCopyWith<$Res>? get bestWin;
 }
 
 /// @nodoc
@@ -483,6 +509,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? eloPeakDate = freezed,
     Object? eloGamesPlayed = null,
     Object? nemesis = freezed,
+    Object? bestWin = freezed,
   }) {
     return _then(
       _$UserModelImpl(
@@ -646,6 +673,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.nemesis
             : nemesis // ignore: cast_nullable_to_non_nullable
                   as NemesisRecord?,
+        bestWin: freezed == bestWin
+            ? _value.bestWin
+            : bestWin // ignore: cast_nullable_to_non_nullable
+                  as BestWinRecord?,
       ),
     );
   }
@@ -695,6 +726,7 @@ class _$UserModelImpl extends _UserModel {
     @TimestampConverter() this.eloPeakDate,
     this.eloGamesPlayed = 0,
     this.nemesis,
+    this.bestWin,
   }) : _groupIds = groupIds,
        _gameIds = gameIds,
        _friendIds = friendIds,
@@ -850,10 +882,13 @@ class _$UserModelImpl extends _UserModel {
   // Nemesis/Rival tracking (Story 301.8)
   @override
   final NemesisRecord? nemesis;
+  // Best Win tracking (Story 301.6)
+  @override
+  final BestWinRecord? bestWin;
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin)';
   }
 
   @override
@@ -939,7 +974,8 @@ class _$UserModelImpl extends _UserModel {
                 other.eloPeakDate == eloPeakDate) &&
             (identical(other.eloGamesPlayed, eloGamesPlayed) ||
                 other.eloGamesPlayed == eloGamesPlayed) &&
-            (identical(other.nemesis, nemesis) || other.nemesis == nemesis));
+            (identical(other.nemesis, nemesis) || other.nemesis == nemesis) &&
+            (identical(other.bestWin, bestWin) || other.bestWin == bestWin));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -986,6 +1022,7 @@ class _$UserModelImpl extends _UserModel {
     eloPeakDate,
     eloGamesPlayed,
     nemesis,
+    bestWin,
   ]);
 
   /// Create a copy of UserModel
@@ -1044,6 +1081,7 @@ abstract class _UserModel extends UserModel {
     @TimestampConverter() final DateTime? eloPeakDate,
     final int eloGamesPlayed,
     final NemesisRecord? nemesis,
+    final BestWinRecord? bestWin,
   }) = _$UserModelImpl;
   const _UserModel._() : super._();
 
@@ -1136,7 +1174,9 @@ abstract class _UserModel extends UserModel {
   @override
   int get eloGamesPlayed; // Nemesis/Rival tracking (Story 301.8)
   @override
-  NemesisRecord? get nemesis;
+  NemesisRecord? get nemesis; // Best Win tracking (Story 301.6)
+  @override
+  BestWinRecord? get bestWin;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1453,5 +1493,318 @@ abstract class _NemesisRecord extends NemesisRecord {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$NemesisRecordImplCopyWith<_$NemesisRecordImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+BestWinRecord _$BestWinRecordFromJson(Map<String, dynamic> json) {
+  return _BestWinRecord.fromJson(json);
+}
+
+/// @nodoc
+mixin _$BestWinRecord {
+  /// Game ID where this best win occurred
+  String get gameId => throw _privateConstructorUsedError;
+
+  /// Combined opponent team ELO at time of game
+  double get opponentTeamElo => throw _privateConstructorUsedError;
+
+  /// Average opponent team ELO at time of game
+  double get opponentTeamAvgElo => throw _privateConstructorUsedError;
+
+  /// ELO gained from this specific win
+  double get eloGained => throw _privateConstructorUsedError;
+
+  /// Date when this win occurred
+  @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
+  DateTime get date => throw _privateConstructorUsedError;
+
+  /// Game title or description for display
+  String get gameTitle => throw _privateConstructorUsedError;
+
+  /// Serializes this BestWinRecord to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of BestWinRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $BestWinRecordCopyWith<BestWinRecord> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BestWinRecordCopyWith<$Res> {
+  factory $BestWinRecordCopyWith(
+    BestWinRecord value,
+    $Res Function(BestWinRecord) then,
+  ) = _$BestWinRecordCopyWithImpl<$Res, BestWinRecord>;
+  @useResult
+  $Res call({
+    String gameId,
+    double opponentTeamElo,
+    double opponentTeamAvgElo,
+    double eloGained,
+    @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) DateTime date,
+    String gameTitle,
+  });
+}
+
+/// @nodoc
+class _$BestWinRecordCopyWithImpl<$Res, $Val extends BestWinRecord>
+    implements $BestWinRecordCopyWith<$Res> {
+  _$BestWinRecordCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of BestWinRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? gameId = null,
+    Object? opponentTeamElo = null,
+    Object? opponentTeamAvgElo = null,
+    Object? eloGained = null,
+    Object? date = null,
+    Object? gameTitle = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            gameId: null == gameId
+                ? _value.gameId
+                : gameId // ignore: cast_nullable_to_non_nullable
+                      as String,
+            opponentTeamElo: null == opponentTeamElo
+                ? _value.opponentTeamElo
+                : opponentTeamElo // ignore: cast_nullable_to_non_nullable
+                      as double,
+            opponentTeamAvgElo: null == opponentTeamAvgElo
+                ? _value.opponentTeamAvgElo
+                : opponentTeamAvgElo // ignore: cast_nullable_to_non_nullable
+                      as double,
+            eloGained: null == eloGained
+                ? _value.eloGained
+                : eloGained // ignore: cast_nullable_to_non_nullable
+                      as double,
+            date: null == date
+                ? _value.date
+                : date // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            gameTitle: null == gameTitle
+                ? _value.gameTitle
+                : gameTitle // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$BestWinRecordImplCopyWith<$Res>
+    implements $BestWinRecordCopyWith<$Res> {
+  factory _$$BestWinRecordImplCopyWith(
+    _$BestWinRecordImpl value,
+    $Res Function(_$BestWinRecordImpl) then,
+  ) = __$$BestWinRecordImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    String gameId,
+    double opponentTeamElo,
+    double opponentTeamAvgElo,
+    double eloGained,
+    @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) DateTime date,
+    String gameTitle,
+  });
+}
+
+/// @nodoc
+class __$$BestWinRecordImplCopyWithImpl<$Res>
+    extends _$BestWinRecordCopyWithImpl<$Res, _$BestWinRecordImpl>
+    implements _$$BestWinRecordImplCopyWith<$Res> {
+  __$$BestWinRecordImplCopyWithImpl(
+    _$BestWinRecordImpl _value,
+    $Res Function(_$BestWinRecordImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of BestWinRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? gameId = null,
+    Object? opponentTeamElo = null,
+    Object? opponentTeamAvgElo = null,
+    Object? eloGained = null,
+    Object? date = null,
+    Object? gameTitle = null,
+  }) {
+    return _then(
+      _$BestWinRecordImpl(
+        gameId: null == gameId
+            ? _value.gameId
+            : gameId // ignore: cast_nullable_to_non_nullable
+                  as String,
+        opponentTeamElo: null == opponentTeamElo
+            ? _value.opponentTeamElo
+            : opponentTeamElo // ignore: cast_nullable_to_non_nullable
+                  as double,
+        opponentTeamAvgElo: null == opponentTeamAvgElo
+            ? _value.opponentTeamAvgElo
+            : opponentTeamAvgElo // ignore: cast_nullable_to_non_nullable
+                  as double,
+        eloGained: null == eloGained
+            ? _value.eloGained
+            : eloGained // ignore: cast_nullable_to_non_nullable
+                  as double,
+        date: null == date
+            ? _value.date
+            : date // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        gameTitle: null == gameTitle
+            ? _value.gameTitle
+            : gameTitle // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$BestWinRecordImpl extends _BestWinRecord {
+  const _$BestWinRecordImpl({
+    required this.gameId,
+    required this.opponentTeamElo,
+    required this.opponentTeamAvgElo,
+    required this.eloGained,
+    @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) required this.date,
+    required this.gameTitle,
+  }) : super._();
+
+  factory _$BestWinRecordImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BestWinRecordImplFromJson(json);
+
+  /// Game ID where this best win occurred
+  @override
+  final String gameId;
+
+  /// Combined opponent team ELO at time of game
+  @override
+  final double opponentTeamElo;
+
+  /// Average opponent team ELO at time of game
+  @override
+  final double opponentTeamAvgElo;
+
+  /// ELO gained from this specific win
+  @override
+  final double eloGained;
+
+  /// Date when this win occurred
+  @override
+  @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
+  final DateTime date;
+
+  /// Game title or description for display
+  @override
+  final String gameTitle;
+
+  @override
+  String toString() {
+    return 'BestWinRecord(gameId: $gameId, opponentTeamElo: $opponentTeamElo, opponentTeamAvgElo: $opponentTeamAvgElo, eloGained: $eloGained, date: $date, gameTitle: $gameTitle)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BestWinRecordImpl &&
+            (identical(other.gameId, gameId) || other.gameId == gameId) &&
+            (identical(other.opponentTeamElo, opponentTeamElo) ||
+                other.opponentTeamElo == opponentTeamElo) &&
+            (identical(other.opponentTeamAvgElo, opponentTeamAvgElo) ||
+                other.opponentTeamAvgElo == opponentTeamAvgElo) &&
+            (identical(other.eloGained, eloGained) ||
+                other.eloGained == eloGained) &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.gameTitle, gameTitle) ||
+                other.gameTitle == gameTitle));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    gameId,
+    opponentTeamElo,
+    opponentTeamAvgElo,
+    eloGained,
+    date,
+    gameTitle,
+  );
+
+  /// Create a copy of BestWinRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BestWinRecordImplCopyWith<_$BestWinRecordImpl> get copyWith =>
+      __$$BestWinRecordImplCopyWithImpl<_$BestWinRecordImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BestWinRecordImplToJson(this);
+  }
+}
+
+abstract class _BestWinRecord extends BestWinRecord {
+  const factory _BestWinRecord({
+    required final String gameId,
+    required final double opponentTeamElo,
+    required final double opponentTeamAvgElo,
+    required final double eloGained,
+    @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
+    required final DateTime date,
+    required final String gameTitle,
+  }) = _$BestWinRecordImpl;
+  const _BestWinRecord._() : super._();
+
+  factory _BestWinRecord.fromJson(Map<String, dynamic> json) =
+      _$BestWinRecordImpl.fromJson;
+
+  /// Game ID where this best win occurred
+  @override
+  String get gameId;
+
+  /// Combined opponent team ELO at time of game
+  @override
+  double get opponentTeamElo;
+
+  /// Average opponent team ELO at time of game
+  @override
+  double get opponentTeamAvgElo;
+
+  /// ELO gained from this specific win
+  @override
+  double get eloGained;
+
+  /// Date when this win occurred
+  @override
+  @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
+  DateTime get date;
+
+  /// Game title or description for display
+  @override
+  String get gameTitle;
+
+  /// Create a copy of BestWinRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$BestWinRecordImplCopyWith<_$BestWinRecordImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

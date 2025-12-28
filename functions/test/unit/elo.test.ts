@@ -115,4 +115,222 @@ describe("processGameEloUpdates", () => {
     expect(transaction.update).toHaveBeenCalled();
     expect(transaction.set).toHaveBeenCalled(); // History entries
   });
+
+  test("sets bestWin after first victory", async () => {
+    const gameId = "game1";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1"],
+        teamBPlayerIds: ["p2"],
+      },
+      result: {
+        games: [{ winner: "teamA" }],
+      },
+    };
+
+    const playerMap: {[key: string]: any} = {
+      p1: { eloRating: 1200, displayName: "P1" }, // Winner, no bestWin yet
+      p2: { eloRating: 1300, displayName: "P2" }, // Loser with higher rating
+    };
+
+    const docMock = (id: string) => ({
+      id,
+      exists: true,
+      data: () => playerMap[id],
+    });
+
+    const subCollectionMock = {
+      doc: jest.fn(() => ({ id: "historyId" })),
+    };
+
+    const docRefMock = {
+      collection: jest.fn(() => subCollectionMock),
+    };
+
+    const collectionMock = {
+      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+    };
+    db.collection.mockReturnValue(collectionMock);
+
+    transaction.get.mockImplementation((ref: any) => Promise.resolve({
+      exists: true,
+      id: ref.id,
+      data: () => playerMap[ref.id] || {},
+    }));
+
+    await processGameEloUpdates(gameId, gameData);
+
+    // Check that transaction.update was called for p1 with bestWin
+    const p1UpdateCall = transaction.update.mock.calls.find(
+      (call: any) => call[0]?.id === "p1"
+    );
+    expect(p1UpdateCall).toBeDefined();
+    expect(p1UpdateCall[1]).toHaveProperty("bestWin");
+    expect(p1UpdateCall[1].bestWin).toMatchObject({
+      gameId: "game1",
+      opponentTeamElo: 1300,
+      opponentTeamAvgElo: 1300,
+    });
+  });
+
+  test("updates bestWin when beating higher-rated team", async () => {
+    const gameId = "game2";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1"],
+        teamBPlayerIds: ["p2"],
+      },
+      result: {
+        games: [{ winner: "teamA" }],
+      },
+    };
+
+    const playerMap: {[key: string]: any} = {
+      p1: {
+        eloRating: 1200,
+        displayName: "P1",
+        bestWin: { opponentTeamElo: 1250 }, // Previous best
+      },
+      p2: { eloRating: 1400, displayName: "P2" }, // Higher rated opponent
+    };
+
+    const docMock = (id: string) => ({
+      id,
+      exists: true,
+      data: () => playerMap[id],
+    });
+
+    const subCollectionMock = {
+      doc: jest.fn(() => ({ id: "historyId" })),
+    };
+
+    const docRefMock = {
+      collection: jest.fn(() => subCollectionMock),
+    };
+
+    const collectionMock = {
+      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+    };
+    db.collection.mockReturnValue(collectionMock);
+
+    transaction.get.mockImplementation((ref: any) => Promise.resolve({
+      exists: true,
+      id: ref.id,
+      data: () => playerMap[ref.id] || {},
+    }));
+
+    await processGameEloUpdates(gameId, gameData);
+
+    const p1UpdateCall = transaction.update.mock.calls.find(
+      (call: any) => call[0]?.id === "p1"
+    );
+    expect(p1UpdateCall[1]).toHaveProperty("bestWin");
+    expect(p1UpdateCall[1].bestWin.opponentTeamElo).toBe(1400);
+  });
+
+  test("does NOT update bestWin when beating lower-rated team", async () => {
+    const gameId = "game3";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1"],
+        teamBPlayerIds: ["p2"],
+      },
+      result: {
+        games: [{ winner: "teamA" }],
+      },
+    };
+
+    const playerMap: {[key: string]: any} = {
+      p1: {
+        eloRating: 1400,
+        displayName: "P1",
+        bestWin: { opponentTeamElo: 1500 }, // Previous best is higher
+      },
+      p2: { eloRating: 1200, displayName: "P2" }, // Lower rated opponent
+    };
+
+    const docMock = (id: string) => ({
+      id,
+      exists: true,
+      data: () => playerMap[id],
+    });
+
+    const subCollectionMock = {
+      doc: jest.fn(() => ({ id: "historyId" })),
+    };
+
+    const docRefMock = {
+      collection: jest.fn(() => subCollectionMock),
+    };
+
+    const collectionMock = {
+      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+    };
+    db.collection.mockReturnValue(collectionMock);
+
+    transaction.get.mockImplementation((ref: any) => Promise.resolve({
+      exists: true,
+      id: ref.id,
+      data: () => playerMap[ref.id] || {},
+    }));
+
+    await processGameEloUpdates(gameId, gameData);
+
+    const p1UpdateCall = transaction.update.mock.calls.find(
+      (call: any) => call[0]?.id === "p1"
+    );
+    // bestWin should not be in the update (should be undefined, not included)
+    expect(p1UpdateCall[1].bestWin).toBeUndefined();
+  });
+
+  test("does NOT set bestWin when losing", async () => {
+    const gameId = "game4";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1"],
+        teamBPlayerIds: ["p2"],
+      },
+      result: {
+        games: [{ winner: "teamB" }], // p1 loses
+      },
+    };
+
+    const playerMap: {[key: string]: any} = {
+      p1: { eloRating: 1200, displayName: "P1" },
+      p2: { eloRating: 1400, displayName: "P2" },
+    };
+
+    const docMock = (id: string) => ({
+      id,
+      exists: true,
+      data: () => playerMap[id],
+    });
+
+    const subCollectionMock = {
+      doc: jest.fn(() => ({ id: "historyId" })),
+    };
+
+    const docRefMock = {
+      collection: jest.fn(() => subCollectionMock),
+    };
+
+    const collectionMock = {
+      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+    };
+    db.collection.mockReturnValue(collectionMock);
+
+    transaction.get.mockImplementation((ref: any) => Promise.resolve({
+      exists: true,
+      id: ref.id,
+      data: () => playerMap[ref.id] || {},
+    }));
+
+    await processGameEloUpdates(gameId, gameData);
+
+    const p1UpdateCall = transaction.update.mock.calls.find(
+      (call: any) => call[0]?.id === "p1"
+    );
+    // bestWin should not be set for loser
+    expect(p1UpdateCall[1].bestWin).toBeUndefined();
+  });
 });

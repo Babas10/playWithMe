@@ -115,14 +115,23 @@ class PerformanceOverviewCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        // Row 3: Best Win (placeholder for now)
-        _StatItem(
-          label: 'Best Win',
-          value: 'Coming Soon',
-          icon: Icons.emoji_events,
-          iconColor: Colors.amber,
-          subLabel: 'Track your biggest victories',
-        ),
+        // Row 3: Best Win
+        if (user.bestWin != null)
+          _StatItem(
+            label: 'Best Win',
+            value: 'vs ${user.bestWin!.avgEloString} ELO',
+            icon: Icons.emoji_events,
+            iconColor: Colors.amber,
+            subLabel: '${user.bestWin!.eloGainString} ELO gained',
+          )
+        else
+          _StatItem(
+            label: 'Best Win',
+            value: 'Win a game to unlock',
+            icon: Icons.emoji_events_outlined,
+            iconColor: Colors.amber.withOpacity(0.5),
+            subLabel: 'Beat opponents to track your best victory',
+          ),
         const SizedBox(height: 12),
         // Row 4: Average Point Differential (placeholder for now)
         _StatItem(
