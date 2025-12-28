@@ -24,39 +24,40 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
   ) async {
     emit(PlayerStatsLoading());
 
-    await _userSubscription?.cancel();
-    _userSubscription = _userRepository.getUserStream(event.userId).listen(
-      (user) {
-        if (user != null) {
-          add(UpdateUserStats(user));
-        }
-      },
-      onError: (error) {
-        // We can't easily emit from here, but the error will be handled locally or logged.
-        // For now, we assume the stream might have transient errors or the bloc will error on initial fetch if needed.
-        // But UpdateUserStats is the main way to update state.
-      },
-    );
-
     try {
-      // Fetch history initially.
-      // Note: We wait for the first stream event to actually emit "Loaded",
-      // but we can fetch history in parallel or inside the listener.
-      // However, since we need BOTH to be Loaded, it's better to fetch history here
-      // and maybe store it, but UpdateUserStats is what drives the UI.
-      // Actually, let's fetch history and emit it when we get the user.
-      // Or better: The stream gives us the user. We need to pair it with history.
-      // Since history doesn't change as often (only on game complete), maybe we fetch it once?
-      // Or we should reload history when user stats change (e.g. gamesPlayed increments).
+      // Fetch user immediately to ensure we don't hang forever
+      final initialUser = await _userRepository
+          .getUserStream(event.userId)
+          .timeout(
+            const Duration(seconds: 5),
+            onTimeout: (sink) {
+              sink.addError(TimeoutException('Failed to load user data'));
+            },
+          )
+          .first;
 
-      // For simplicity, let's just fetch history once on load.
-      // Real-time history updates might require a stream for history too, but that's expensive.
-      // The user model has 'recentGameIds', so if that changes, we could re-fetch history.
+      if (initialUser != null) {
+        // Trigger the update with the initial user
+        add(UpdateUserStats(initialUser));
 
-      // We'll rely on the stream listener to trigger updates, but we need to hold the history.
-      // The state object holds both.
+        // Set up stream for future updates
+        await _userSubscription?.cancel();
+        _userSubscription = _userRepository.getUserStream(event.userId).listen(
+          (user) {
+            if (user != null) {
+              add(UpdateUserStats(user));
+            }
+          },
+          onError: (error) {
+            // Log error but don't crash
+            print('PlayerStatsBloc: Error in user stream: $error');
+          },
+        );
+      } else {
+        emit(PlayerStatsError('User not found'));
+      }
     } catch (e) {
-      emit(PlayerStatsError(e.toString()));
+      emit(PlayerStatsError('Failed to load player stats: ${e.toString()}'));
     }
   }
 
@@ -74,13 +75,21 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
       // If history is empty (first load) or we want to refresh (e.g. gamesPlayed changed), fetch it.
       // For now, let's fetch if empty.
       if (history.isEmpty) {
-        history = await _userRepository.getRatingHistory(event.user.uid).first;
+        history = await _userRepository
+            .getRatingHistory(event.user.uid)
+            .timeout(const Duration(seconds: 5), onTimeout: (sink) {
+          sink.add([]); // Return empty list on timeout
+        }).first;
       } else {
         // Check if we need to refresh history (simple check: gamesPlayed count)
         // If state.user.gamesPlayed < event.user.gamesPlayed, then a new game finished.
         if (state is PlayerStatsLoaded &&
             (state as PlayerStatsLoaded).user.gamesPlayed < event.user.gamesPlayed) {
-             history = await _userRepository.getRatingHistory(event.user.uid).first;
+          history = await _userRepository
+              .getRatingHistory(event.user.uid)
+              .timeout(const Duration(seconds: 5), onTimeout: (sink) {
+            sink.add([]); // Return empty list on timeout
+          }).first;
         }
       }
 
