@@ -54,6 +54,8 @@ class UserModel with _$UserModel {
     @Default(0) int eloGamesPlayed,
     // Nemesis/Rival tracking (Story 301.8)
     NemesisRecord? nemesis,
+    // Best Win tracking (Story 301.6)
+    BestWinRecord? bestWin,
   }) = _UserModel;
 
   const UserModel._();
@@ -338,4 +340,56 @@ class NemesisRecord with _$NemesisRecord {
     if (gamesPlayed >= 5) return 'Developing Rivalry';
     return 'New Matchup';
   }
+}
+
+/// Best win record tracking the highest-rated opponent team defeated.
+/// This record is automatically updated by Cloud Functions after each game win.
+@freezed
+class BestWinRecord with _$BestWinRecord {
+  const factory BestWinRecord({
+    /// Game ID where this best win occurred
+    required String gameId,
+
+    /// Combined opponent team ELO at time of game
+    required double opponentTeamElo,
+
+    /// Average opponent team ELO at time of game
+    required double opponentTeamAvgElo,
+
+    /// ELO gained from this specific win
+    required double eloGained,
+
+    /// Date when this win occurred
+    @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) required DateTime date,
+
+    /// Game title or description for display
+    required String gameTitle,
+  }) = _BestWinRecord;
+
+  const BestWinRecord._();
+
+  factory BestWinRecord.fromJson(Map<String, dynamic> json) =>
+      _$BestWinRecordFromJson(json);
+
+  /// Format ELO gain as string with sign (e.g., "+24")
+  String get eloGainString => '+${eloGained.toStringAsFixed(0)}';
+
+  /// Get formatted average opponent ELO (rounded)
+  String get avgEloString => opponentTeamAvgElo.toStringAsFixed(0);
+
+  /// Get formatted team ELO (rounded)
+  String get teamEloString => opponentTeamElo.toStringAsFixed(0);
+}
+
+// Helper functions for BestWinRecord date field
+DateTime _dateFromJson(dynamic value) {
+  final result = const TimestampConverter().fromJson(value);
+  if (result == null) {
+    throw ArgumentError('BestWinRecord date cannot be null');
+  }
+  return result;
+}
+
+dynamic _dateToJson(DateTime date) {
+  return const TimestampConverter().toJson(date);
 }

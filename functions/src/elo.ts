@@ -96,7 +96,8 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
       playerIds.forEach(id => cumulativeChanges.set(id, 0));
 
       const updates: any = {};
-      const now = admin.firestore.FieldValue.serverTimestamp();
+      const now = admin.firestore.FieldValue.serverTimestamp(); // For top-level document fields
+      const timestampNow = admin.firestore.Timestamp.now(); // For nested objects like bestWin
 
       // 2. Process each individual game sequentially
       for (let i = 0; i < individualGames.length; i++) {
@@ -178,9 +179,39 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
         const newStreak = calculateNewStreak(currentStreak, won);
         const newRecentGames = [gameId, ...recentGameIds].slice(0, 10);
 
+        // Calculate best win tracking (Story 301.6)
+        let bestWinUpdate: any = undefined;
+        if (won && cumulativeChange > 0) {
+          // Get opponent team ratings at the time of the game
+          const opponentRatings = opponentIds.map((oid: string) => {
+            const oppData = playerMap.get(oid);
+            return oppData?.eloRating || DEFAULT_ELO;
+          });
+
+          // Calculate opponent team ELO (using same formula as team rating)
+          const opponentTeamElo = calculateTeamRating(opponentRatings);
+          const opponentTeamAvgElo = opponentRatings.reduce((sum: number, r: number) => sum + r, 0) / opponentRatings.length;
+
+          // Check if this is a better win than current best
+          const currentBestWin = data.bestWin;
+          const shouldUpdateBestWin = !currentBestWin || opponentTeamElo > (currentBestWin.opponentTeamElo || 0);
+
+          if (shouldUpdateBestWin) {
+            const opponentNames = opponentIds.map((oid: string) => displayNames.get(oid) || "Unknown").join(" & ");
+            bestWinUpdate = {
+              gameId: gameId,
+              opponentTeamElo: opponentTeamElo,
+              opponentTeamAvgElo: opponentTeamAvgElo,
+              eloGained: cumulativeChange,
+              date: timestampNow, // Use actual Timestamp for nested object
+              gameTitle: `vs ${opponentNames}`,
+            };
+          }
+        }
+
         // Update User Doc
         const userRef = db.collection("users").doc(playerId);
-        transaction.update(userRef, {
+        const updateData: any = {
           eloRating: finalRating,
           eloLastUpdated: now,
           eloPeak: newPeak,
@@ -195,7 +226,14 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
           recentGameIds: newRecentGames,
           lastGameDate: now,
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        };
+
+        // Add bestWin update if this is a new best win
+        if (bestWinUpdate) {
+          updateData.bestWin = bestWinUpdate;
+        }
+
+        transaction.update(userRef, updateData);
 
         updates[playerId] = {
           previousRating: originalRating,
