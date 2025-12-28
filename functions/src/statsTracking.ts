@@ -12,12 +12,13 @@ export async function updateTeammateStats(
   transaction: admin.firestore.Transaction,
   playerId: string,
   teammateId: string,
+  teammateName: string,
   won: boolean,
   pointsScored: number,
   pointsAllowed: number,
   eloChange: number,
   gameId: string,
-  currentTeammateStats: any // ← NEW: Pass in the current stats
+  currentTeammateStats: any // ← Pass in the current stats
 ): Promise<void> {
   const db = admin.firestore();
   const userRef = db.collection("users").doc(playerId);
@@ -35,8 +36,9 @@ export async function updateTeammateStats(
     lastUpdated: null,
   };
 
-  // Update stats
+  // Update stats (include teammate name)
   const updatedStats = {
+    teammateName: teammateName, // Cache teammate's display name for UI
     gamesPlayed: currentStats.gamesPlayed + 1,
     gamesWon: won ? currentStats.gamesWon + 1 : currentStats.gamesWon,
     gamesLost: won ? currentStats.gamesLost : currentStats.gamesLost + 1,
@@ -64,7 +66,7 @@ export async function updateTeammateStats(
   });
 
   functions.logger.info(
-    `Updated teammate stats for ${playerId} with partner ${teammateId}: ` +
+    `Updated teammate stats for ${playerId} with partner ${teammateId} (${teammateName}): ` +
     `${updatedStats.gamesWon}W-${updatedStats.gamesLost}L, ` +
     `Win Rate: ${((updatedStats.gamesWon / updatedStats.gamesPlayed) * 100).toFixed(1)}%`
   );
@@ -220,6 +222,17 @@ export async function processStatsTracking(
     teamBPoints += game.teamBScore || 0;
   });
 
+  // Helper function to determine display name with fallback logic
+  const getDisplayName = (playerData: any): string => {
+    if (!playerData) return "Unknown";
+    if (playerData.displayName) return playerData.displayName;
+    if (playerData.firstName && playerData.lastName) {
+      return `${playerData.firstName} ${playerData.lastName}`;
+    }
+    if (playerData.email) return playerData.email;
+    return "Unknown";
+  };
+
   // Update teammate stats for each team
   // Team A partnerships
   for (let i = 0; i < teamAPlayerIds.length; i++) {
@@ -235,6 +248,7 @@ export async function processStatsTracking(
         transaction,
         playerId,
         teammateId,
+        getDisplayName(teammateData), // Pass teammate display name
         teamAWon,
         teamAPoints,
         teamBPoints,
@@ -247,6 +261,7 @@ export async function processStatsTracking(
         transaction,
         teammateId,
         playerId,
+        getDisplayName(playerData), // Pass teammate display name
         teamAWon,
         teamAPoints,
         teamBPoints,
@@ -271,6 +286,7 @@ export async function processStatsTracking(
         transaction,
         playerId,
         teammateId,
+        getDisplayName(teammateData), // Pass teammate display name
         !teamAWon, // Team B won if Team A didn't win
         teamBPoints,
         teamAPoints,
@@ -283,6 +299,7 @@ export async function processStatsTracking(
         transaction,
         teammateId,
         playerId,
+        getDisplayName(playerData), // Pass teammate display name
         !teamAWon,
         teamBPoints,
         teamAPoints,
