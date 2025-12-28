@@ -76,10 +76,11 @@ void main() {
     sl.registerSingleton<UserRepository>(mockUserRepository);
 
     when(() => mockAuthBloc.state).thenReturn(const AuthenticationAuthenticated(testUserEntity));
+    // Use broadcast stream to allow multiple subscriptions
     when(() => mockUserRepository.getUserStream(userId))
-        .thenAnswer((_) => Stream.value(testUserModel));
+        .thenAnswer((_) => Stream.value(testUserModel).asBroadcastStream());
     when(() => mockUserRepository.getRatingHistory(userId))
-        .thenAnswer((_) => Stream.value(testHistory));
+        .thenAnswer((_) => Stream.value(testHistory).asBroadcastStream());
   });
 
   tearDown(() {
