@@ -43,8 +43,39 @@ class FirestoreUserRepository implements UserRepository {
   @override
   Future<UserModel?> getUserById(String uid) async {
     try {
-      final doc = await _firestore.collection(_collection).doc(uid).get();
-      return doc.exists ? UserModel.fromFirestore(doc) : null;
+      final currentUser = _auth.currentUser;
+
+      // If fetching own user data, read directly from Firestore
+      // (user has permission to read their own document)
+      if (currentUser != null && currentUser.uid == uid) {
+        final doc = await _firestore.collection(_collection).doc(uid).get();
+        return doc.exists ? UserModel.fromFirestore(doc) : null;
+      }
+
+      // If fetching another user's data, use Cloud Function to get public profile
+      // (bypasses Firestore security rules)
+      final callable = _functions.httpsCallable('getPublicUserProfile');
+      final result = await callable.call({'userId': uid});
+
+      final userData = result.data['user'];
+      if (userData == null) {
+        return null;
+      }
+
+      // Convert public profile data to UserModel
+      // Only include fields returned by the Cloud Function
+      return UserModel(
+        uid: userData['uid'] as String,
+        email: userData['email'] as String,
+        displayName: userData['displayName'] as String?,
+        photoUrl: userData['photoUrl'] as String?,
+        firstName: userData['firstName'] as String?,
+        lastName: userData['lastName'] as String?,
+        isEmailVerified: false, // Not returned by public profile
+        isAnonymous: false, // Not returned by public profile
+      );
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception('Failed to get user: ${e.code} - ${e.message}');
     } catch (e) {
       throw Exception('Failed to get user: $e');
     }

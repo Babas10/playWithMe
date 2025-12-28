@@ -14,6 +14,7 @@ export {checkPendingInvitation} from "./checkPendingInvitation";
 export {acceptInvitation} from "./acceptInvitation";
 export {declineInvitation} from "./declineInvitation";
 export {getUsersByIds} from "./getUsersByIds";
+export {getPublicUserProfile} from "./getPublicUserProfile"; // Issue #317
 export {leaveGroup} from "./leaveGroup";
 export {inviteToGroup} from "./inviteToGroup"; // Story 11.16
 export {getGamesForGroup} from "./getGamesForGroup"; // Story 3.5
