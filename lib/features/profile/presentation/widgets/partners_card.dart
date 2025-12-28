@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/pages/partner_detail_page.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
 
 /// A card widget displaying best partner statistics.
 ///
@@ -104,10 +103,11 @@ class PartnersCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'User ID: ${partner.userId.substring(0, 8)}...',
+                partner.displayName,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
               Text(
@@ -236,6 +236,7 @@ class PartnersCard extends StatelessWidget {
       final stats = entry.value as Map<String, dynamic>;
       final gamesWon = stats['gamesWon'] as int? ?? 0;
       final gamesPlayed = stats['gamesPlayed'] as int? ?? 0;
+      final displayName = stats['teammateName'] as String? ?? 'Unknown Player';
 
       if (gamesPlayed < minGames) continue;
 
@@ -246,6 +247,7 @@ class PartnersCard extends StatelessWidget {
         bestWinRate = winRate;
         best = _PartnerData(
           userId: userId,
+          displayName: displayName,
           gamesWon: gamesWon,
           gamesPlayed: gamesPlayed,
         );
@@ -259,11 +261,13 @@ class PartnersCard extends StatelessWidget {
 /// Internal data class for partner information.
 class _PartnerData {
   final String userId;
+  final String displayName;
   final int gamesWon;
   final int gamesPlayed;
 
   _PartnerData({
     required this.userId,
+    required this.displayName,
     required this.gamesWon,
     required this.gamesPlayed,
   });

@@ -37,6 +37,12 @@ describe("processStatsTracking (Story 301.8 - Decoupled)", () => {
     expect(processStatsTracking.length).toBe(8);
   });
 
+  it("should have updateTeammateStats accept correct number of parameters", () => {
+    const { updateTeammateStats } = require("../../src/statsTracking");
+    // Function should accept 10 parameters (transaction, playerId, teammateId, teammateName, won, scored, allowed, eloChange, gameId, currentStats)
+    expect(updateTeammateStats.length).toBe(10);
+  });
+
   it("should have updateHeadToHeadStats accept correct number of parameters", () => {
     const { updateHeadToHeadStats } = require("../../src/statsTracking");
     // Function should accept 9 parameters (playerId, opponentId, won, scored, allowed, eloChange, gameId, partnerId, oppPartnerId)
