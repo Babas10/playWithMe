@@ -117,18 +117,8 @@ class PerformanceOverviewCard extends StatelessWidget {
         const SizedBox(height: 12),
         // Row 3: Best Win
         if (user.bestWin != null)
-          _StatItem(
-            label: 'Best Win',
-            // Primary: Who you beat (team composition)
-            value: user.bestWin!.opponentNames != null
-                ? 'vs ${user.bestWin!.opponentNames}'
-                : 'vs ${user.bestWin!.avgEloString} ELO',
-            icon: Icons.emoji_events,
-            iconColor: Colors.amber,
-            // Secondary: Team strength + ELO gained
-            subLabel: user.bestWin!.opponentNames != null
-                ? '${user.bestWin!.avgEloString} ELO • ${user.bestWin!.eloGainString} gained'
-                : '${user.bestWin!.eloGainString} ELO gained',
+          _BestWinStatItem(
+            bestWin: user.bestWin!,
           )
         else
           _StatItem(
@@ -222,6 +212,79 @@ class _StatItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Best Win stat item with structured multi-line layout.
+class _BestWinStatItem extends StatelessWidget {
+  final BestWinRecord bestWin;
+
+  const _BestWinStatItem({
+    required this.bestWin,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Label and icon
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Best Win',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Icon(
+                Icons.emoji_events,
+                size: 18,
+                color: Colors.amber,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Team composition (if available)
+          if (bestWin.opponentNames != null) ...[
+            Text(
+              'Team: ${bestWin.opponentNames!.replaceAll(' & ', ' · ')}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+          ],
+          // Team ELO
+          Text(
+            'Team ELO: ${bestWin.avgEloString}',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 4),
+          // ELO gained
+          Text(
+            '${bestWin.eloGainString} ELO gained',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ),
         ],
       ),
     );
