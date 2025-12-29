@@ -1,17 +1,15 @@
-// Role-based performance card showing weak-link and carry win rates.
+// Role-based performance card showing adaptability stats across different team contexts.
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 
 /// A collapsible card widget displaying role-based performance metrics.
 ///
-/// Shows:
-/// - Weak-Link Win Rate: Matches where player was lowest ELO on their team
-/// - Carry Win Rate: Matches where player was highest ELO on their team
+/// Shows win rates when player is:
+/// - Weak-Link: Lowest ELO on team (playing with stronger teammates)
+/// - Carry: Highest ELO on team (leading/carrying the team)
+/// - Balanced: Middle or tied ELO (balanced team composition)
 ///
-/// Purpose: Show adaptability and resilience, not shame weaker players.
-///
-/// TODO: Implement role-based tracking in backend.
-/// For now, shows "Coming Soon" placeholder.
+/// Purpose: Show adaptability and resilience with positive framing.
 class RoleBasedPerformanceCard extends StatefulWidget {
   final UserModel user;
 
@@ -31,6 +29,10 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final stats = widget.user.roleBasedStats;
+
+    // Check if there's any role-based data
+    final hasData = stats != null && stats.hasData;
 
     return Card(
       margin: const EdgeInsets.all(16.0),
@@ -59,7 +61,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
                         const SizedBox(width: 12),
                         Flexible(
                           child: Text(
-                            'Role-Based Performance',
+                            'Adaptability Stats',
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -107,7 +109,9 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
             const Divider(height: 1),
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: _buildContent(context),
+              child: hasData
+                  ? _buildStatsContent(context, stats as RoleBasedStats)
+                  : _buildEmptyState(context),
             ),
           ],
         ],
@@ -115,7 +119,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildStatsContent(BuildContext context, RoleBasedStats stats) {
     final theme = Theme.of(context);
 
     return Column(
@@ -129,7 +133,64 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
           ),
         ),
         const SizedBox(height: 20),
-        // Coming soon placeholder
+
+        // Carry Stats (if available)
+        if (stats.carry.games > 0) ...  [
+          _RoleStatRow(
+            role: 'Leading the Team',
+            icon: Icons.emoji_events,
+            color: Colors.amber,
+            stats: stats.carry,
+            description: 'When you\'re the highest-rated player',
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // Weak Link Stats (reframed positively)
+        if (stats.weakLink.games > 0) ...[
+          _RoleStatRow(
+            role: 'Playing with Stronger Partners',
+            icon: Icons.people,
+            color: Colors.blue,
+            stats: stats.weakLink,
+            description: 'When playing with more experienced teammates',
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // Balanced Stats
+        if (stats.balanced.games > 0) ...[
+          _RoleStatRow(
+            role: 'Balanced Teams',
+            icon: Icons.balance,
+            color: Colors.green,
+            stats: stats.balanced,
+            description: 'When playing with similarly-rated teammates',
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // Insight Message
+        _InsightMessage(insight: stats.getInsight()),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Description
+        Text(
+          'See how you perform in different team roles',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+        const SizedBox(height: 20),
+        // Empty state placeholder
         Container(
           padding: const EdgeInsets.all(24.0),
           decoration: BoxDecoration(
@@ -146,7 +207,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Coming Soon',
+                  'Adaptability Stats Locked',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.6),
                     fontWeight: FontWeight.w600,
@@ -154,15 +215,12 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Track your performance as the weak link or carry player on your team',
+                  'Play more games to see how you perform in different team roles',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.5),
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16),
-                // Preview of what will be shown
-                _buildPreviewMetrics(context),
               ],
             ),
           ),
@@ -170,29 +228,51 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
       ],
     );
   }
+}
 
-  Widget _buildPreviewMetrics(BuildContext context) {
-    final theme = Theme.of(context);
+/// Display row for a single role's statistics.
+class _RoleStatRow extends StatelessWidget {
+  final String role;
+  final IconData icon;
+  final Color color;
+  final RoleStats stats;
+  final String description;
 
+  const _RoleStatRow({
+    required this.role,
+    required this.icon,
+    required this.color,
+    required this.stats,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Expanded(
-              child: _MetricPreview(
-                icon: Icons.trending_down,
-                label: 'Weak-Link',
-                description: 'Win rate when lowest ELO',
-                color: Colors.blue,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _MetricPreview(
-                icon: Icons.trending_up,
-                label: 'Carry',
-                description: 'Win rate when highest ELO',
-                color: Colors.purple,
+            Icon(icon, color: color, size: 18),
+            const SizedBox(width: 8),
+            Text(role, style: const TextStyle(fontWeight: FontWeight.w600)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          description,
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('${stats.recordString} (${stats.games} games)'),
+            Text(
+              stats.winRateString,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: stats.winRate >= 0.5 ? Colors.green : Colors.orange,
               ),
             ),
           ],
@@ -202,50 +282,33 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
   }
 }
 
-/// Preview metric card for role-based stats.
-class _MetricPreview extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String description;
-  final Color color;
+/// Personalized insight message based on role performance.
+class _InsightMessage extends StatelessWidget {
+  final String insight;
 
-  const _MetricPreview({
-    required this.icon,
-    required this.label,
-    required this.description,
-    required this.color,
-  });
+  const _InsightMessage({required this.insight});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: Colors.blue.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
+          const Icon(
+            Icons.lightbulb_outline,
+            size: 20,
+            color: Colors.blue,
           ),
-          const SizedBox(height: 4),
-          Text(
-            description,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
-              fontSize: 10,
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              insight,
+              style: const TextStyle(fontSize: 13, fontStyle: FontStyle.italic),
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
