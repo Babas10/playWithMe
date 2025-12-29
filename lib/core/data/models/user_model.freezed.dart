@@ -76,7 +76,9 @@ mixin _$UserModel {
       throw _privateConstructorUsedError; // Best Win tracking (Story 301.6)
   BestWinRecord? get bestWin =>
       throw _privateConstructorUsedError; // Point Stats tracking (Story 301.7)
-  PointStats? get pointStats => throw _privateConstructorUsedError;
+  PointStats? get pointStats =>
+      throw _privateConstructorUsedError; // Role-Based Performance tracking (Story 301.9)
+  RoleBasedStats? get roleBasedStats => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -136,11 +138,13 @@ abstract class $UserModelCopyWith<$Res> {
     NemesisRecord? nemesis,
     BestWinRecord? bestWin,
     PointStats? pointStats,
+    RoleBasedStats? roleBasedStats,
   });
 
   $NemesisRecordCopyWith<$Res>? get nemesis;
   $BestWinRecordCopyWith<$Res>? get bestWin;
   $PointStatsCopyWith<$Res>? get pointStats;
+  $RoleBasedStatsCopyWith<$Res>? get roleBasedStats;
 }
 
 /// @nodoc
@@ -200,6 +204,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? nemesis = freezed,
     Object? bestWin = freezed,
     Object? pointStats = freezed,
+    Object? roleBasedStats = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -371,6 +376,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.pointStats
                 : pointStats // ignore: cast_nullable_to_non_nullable
                       as PointStats?,
+            roleBasedStats: freezed == roleBasedStats
+                ? _value.roleBasedStats
+                : roleBasedStats // ignore: cast_nullable_to_non_nullable
+                      as RoleBasedStats?,
           )
           as $Val,
     );
@@ -415,6 +424,20 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
 
     return $PointStatsCopyWith<$Res>(_value.pointStats!, (value) {
       return _then(_value.copyWith(pointStats: value) as $Val);
+    });
+  }
+
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RoleBasedStatsCopyWith<$Res>? get roleBasedStats {
+    if (_value.roleBasedStats == null) {
+      return null;
+    }
+
+    return $RoleBasedStatsCopyWith<$Res>(_value.roleBasedStats!, (value) {
+      return _then(_value.copyWith(roleBasedStats: value) as $Val);
     });
   }
 }
@@ -471,6 +494,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
     NemesisRecord? nemesis,
     BestWinRecord? bestWin,
     PointStats? pointStats,
+    RoleBasedStats? roleBasedStats,
   });
 
   @override
@@ -479,6 +503,8 @@ abstract class _$$UserModelImplCopyWith<$Res>
   $BestWinRecordCopyWith<$Res>? get bestWin;
   @override
   $PointStatsCopyWith<$Res>? get pointStats;
+  @override
+  $RoleBasedStatsCopyWith<$Res>? get roleBasedStats;
 }
 
 /// @nodoc
@@ -537,6 +563,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? nemesis = freezed,
     Object? bestWin = freezed,
     Object? pointStats = freezed,
+    Object? roleBasedStats = freezed,
   }) {
     return _then(
       _$UserModelImpl(
@@ -708,6 +735,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.pointStats
             : pointStats // ignore: cast_nullable_to_non_nullable
                   as PointStats?,
+        roleBasedStats: freezed == roleBasedStats
+            ? _value.roleBasedStats
+            : roleBasedStats // ignore: cast_nullable_to_non_nullable
+                  as RoleBasedStats?,
       ),
     );
   }
@@ -759,6 +790,7 @@ class _$UserModelImpl extends _UserModel {
     this.nemesis,
     this.bestWin,
     this.pointStats,
+    this.roleBasedStats,
   }) : _groupIds = groupIds,
        _gameIds = gameIds,
        _friendIds = friendIds,
@@ -920,10 +952,13 @@ class _$UserModelImpl extends _UserModel {
   // Point Stats tracking (Story 301.7)
   @override
   final PointStats? pointStats;
+  // Role-Based Performance tracking (Story 301.9)
+  @override
+  final RoleBasedStats? roleBasedStats;
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats, roleBasedStats: $roleBasedStats)';
   }
 
   @override
@@ -1012,7 +1047,9 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.nemesis, nemesis) || other.nemesis == nemesis) &&
             (identical(other.bestWin, bestWin) || other.bestWin == bestWin) &&
             (identical(other.pointStats, pointStats) ||
-                other.pointStats == pointStats));
+                other.pointStats == pointStats) &&
+            (identical(other.roleBasedStats, roleBasedStats) ||
+                other.roleBasedStats == roleBasedStats));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1061,6 +1098,7 @@ class _$UserModelImpl extends _UserModel {
     nemesis,
     bestWin,
     pointStats,
+    roleBasedStats,
   ]);
 
   /// Create a copy of UserModel
@@ -1121,6 +1159,7 @@ abstract class _UserModel extends UserModel {
     final NemesisRecord? nemesis,
     final BestWinRecord? bestWin,
     final PointStats? pointStats,
+    final RoleBasedStats? roleBasedStats,
   }) = _$UserModelImpl;
   const _UserModel._() : super._();
 
@@ -1217,7 +1256,9 @@ abstract class _UserModel extends UserModel {
   @override
   BestWinRecord? get bestWin; // Point Stats tracking (Story 301.7)
   @override
-  PointStats? get pointStats;
+  PointStats? get pointStats; // Role-Based Performance tracking (Story 301.9)
+  @override
+  RoleBasedStats? get roleBasedStats;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -2140,5 +2181,474 @@ abstract class _PointStats extends PointStats {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$PointStatsImplCopyWith<_$PointStatsImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+RoleStats _$RoleStatsFromJson(Map<String, dynamic> json) {
+  return _RoleStats.fromJson(json);
+}
+
+/// @nodoc
+mixin _$RoleStats {
+  /// Number of games played in this role
+  int get games => throw _privateConstructorUsedError;
+
+  /// Number of games won in this role
+  int get wins => throw _privateConstructorUsedError;
+
+  /// Win rate as decimal (0.0 - 1.0)
+  double get winRate => throw _privateConstructorUsedError;
+
+  /// Serializes this RoleStats to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of RoleStats
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $RoleStatsCopyWith<RoleStats> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RoleStatsCopyWith<$Res> {
+  factory $RoleStatsCopyWith(RoleStats value, $Res Function(RoleStats) then) =
+      _$RoleStatsCopyWithImpl<$Res, RoleStats>;
+  @useResult
+  $Res call({int games, int wins, double winRate});
+}
+
+/// @nodoc
+class _$RoleStatsCopyWithImpl<$Res, $Val extends RoleStats>
+    implements $RoleStatsCopyWith<$Res> {
+  _$RoleStatsCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of RoleStats
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? games = null,
+    Object? wins = null,
+    Object? winRate = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            games: null == games
+                ? _value.games
+                : games // ignore: cast_nullable_to_non_nullable
+                      as int,
+            wins: null == wins
+                ? _value.wins
+                : wins // ignore: cast_nullable_to_non_nullable
+                      as int,
+            winRate: null == winRate
+                ? _value.winRate
+                : winRate // ignore: cast_nullable_to_non_nullable
+                      as double,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$RoleStatsImplCopyWith<$Res>
+    implements $RoleStatsCopyWith<$Res> {
+  factory _$$RoleStatsImplCopyWith(
+    _$RoleStatsImpl value,
+    $Res Function(_$RoleStatsImpl) then,
+  ) = __$$RoleStatsImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int games, int wins, double winRate});
+}
+
+/// @nodoc
+class __$$RoleStatsImplCopyWithImpl<$Res>
+    extends _$RoleStatsCopyWithImpl<$Res, _$RoleStatsImpl>
+    implements _$$RoleStatsImplCopyWith<$Res> {
+  __$$RoleStatsImplCopyWithImpl(
+    _$RoleStatsImpl _value,
+    $Res Function(_$RoleStatsImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of RoleStats
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? games = null,
+    Object? wins = null,
+    Object? winRate = null,
+  }) {
+    return _then(
+      _$RoleStatsImpl(
+        games: null == games
+            ? _value.games
+            : games // ignore: cast_nullable_to_non_nullable
+                  as int,
+        wins: null == wins
+            ? _value.wins
+            : wins // ignore: cast_nullable_to_non_nullable
+                  as int,
+        winRate: null == winRate
+            ? _value.winRate
+            : winRate // ignore: cast_nullable_to_non_nullable
+                  as double,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$RoleStatsImpl extends _RoleStats {
+  const _$RoleStatsImpl({this.games = 0, this.wins = 0, this.winRate = 0.0})
+    : super._();
+
+  factory _$RoleStatsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RoleStatsImplFromJson(json);
+
+  /// Number of games played in this role
+  @override
+  @JsonKey()
+  final int games;
+
+  /// Number of games won in this role
+  @override
+  @JsonKey()
+  final int wins;
+
+  /// Win rate as decimal (0.0 - 1.0)
+  @override
+  @JsonKey()
+  final double winRate;
+
+  @override
+  String toString() {
+    return 'RoleStats(games: $games, wins: $wins, winRate: $winRate)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RoleStatsImpl &&
+            (identical(other.games, games) || other.games == games) &&
+            (identical(other.wins, wins) || other.wins == wins) &&
+            (identical(other.winRate, winRate) || other.winRate == winRate));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, games, wins, winRate);
+
+  /// Create a copy of RoleStats
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RoleStatsImplCopyWith<_$RoleStatsImpl> get copyWith =>
+      __$$RoleStatsImplCopyWithImpl<_$RoleStatsImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RoleStatsImplToJson(this);
+  }
+}
+
+abstract class _RoleStats extends RoleStats {
+  const factory _RoleStats({
+    final int games,
+    final int wins,
+    final double winRate,
+  }) = _$RoleStatsImpl;
+  const _RoleStats._() : super._();
+
+  factory _RoleStats.fromJson(Map<String, dynamic> json) =
+      _$RoleStatsImpl.fromJson;
+
+  /// Number of games played in this role
+  @override
+  int get games;
+
+  /// Number of games won in this role
+  @override
+  int get wins;
+
+  /// Win rate as decimal (0.0 - 1.0)
+  @override
+  double get winRate;
+
+  /// Create a copy of RoleStats
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$RoleStatsImplCopyWith<_$RoleStatsImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+RoleBasedStats _$RoleBasedStatsFromJson(Map<String, dynamic> json) {
+  return _RoleBasedStats.fromJson(json);
+}
+
+/// @nodoc
+mixin _$RoleBasedStats {
+  /// Stats when player is lowest ELO on their team (playing with stronger teammates)
+  RoleStats get weakLink => throw _privateConstructorUsedError;
+
+  /// Stats when player is highest ELO on their team (leading/carrying the team)
+  RoleStats get carry => throw _privateConstructorUsedError;
+
+  /// Stats when player is middle ELO or tied (balanced team composition)
+  RoleStats get balanced => throw _privateConstructorUsedError;
+
+  /// Serializes this RoleBasedStats to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of RoleBasedStats
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $RoleBasedStatsCopyWith<RoleBasedStats> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RoleBasedStatsCopyWith<$Res> {
+  factory $RoleBasedStatsCopyWith(
+    RoleBasedStats value,
+    $Res Function(RoleBasedStats) then,
+  ) = _$RoleBasedStatsCopyWithImpl<$Res, RoleBasedStats>;
+  @useResult
+  $Res call({RoleStats weakLink, RoleStats carry, RoleStats balanced});
+
+  $RoleStatsCopyWith<$Res> get weakLink;
+  $RoleStatsCopyWith<$Res> get carry;
+  $RoleStatsCopyWith<$Res> get balanced;
+}
+
+/// @nodoc
+class _$RoleBasedStatsCopyWithImpl<$Res, $Val extends RoleBasedStats>
+    implements $RoleBasedStatsCopyWith<$Res> {
+  _$RoleBasedStatsCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of RoleBasedStats
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? weakLink = null,
+    Object? carry = null,
+    Object? balanced = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            weakLink: null == weakLink
+                ? _value.weakLink
+                : weakLink // ignore: cast_nullable_to_non_nullable
+                      as RoleStats,
+            carry: null == carry
+                ? _value.carry
+                : carry // ignore: cast_nullable_to_non_nullable
+                      as RoleStats,
+            balanced: null == balanced
+                ? _value.balanced
+                : balanced // ignore: cast_nullable_to_non_nullable
+                      as RoleStats,
+          )
+          as $Val,
+    );
+  }
+
+  /// Create a copy of RoleBasedStats
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RoleStatsCopyWith<$Res> get weakLink {
+    return $RoleStatsCopyWith<$Res>(_value.weakLink, (value) {
+      return _then(_value.copyWith(weakLink: value) as $Val);
+    });
+  }
+
+  /// Create a copy of RoleBasedStats
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RoleStatsCopyWith<$Res> get carry {
+    return $RoleStatsCopyWith<$Res>(_value.carry, (value) {
+      return _then(_value.copyWith(carry: value) as $Val);
+    });
+  }
+
+  /// Create a copy of RoleBasedStats
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RoleStatsCopyWith<$Res> get balanced {
+    return $RoleStatsCopyWith<$Res>(_value.balanced, (value) {
+      return _then(_value.copyWith(balanced: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$RoleBasedStatsImplCopyWith<$Res>
+    implements $RoleBasedStatsCopyWith<$Res> {
+  factory _$$RoleBasedStatsImplCopyWith(
+    _$RoleBasedStatsImpl value,
+    $Res Function(_$RoleBasedStatsImpl) then,
+  ) = __$$RoleBasedStatsImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({RoleStats weakLink, RoleStats carry, RoleStats balanced});
+
+  @override
+  $RoleStatsCopyWith<$Res> get weakLink;
+  @override
+  $RoleStatsCopyWith<$Res> get carry;
+  @override
+  $RoleStatsCopyWith<$Res> get balanced;
+}
+
+/// @nodoc
+class __$$RoleBasedStatsImplCopyWithImpl<$Res>
+    extends _$RoleBasedStatsCopyWithImpl<$Res, _$RoleBasedStatsImpl>
+    implements _$$RoleBasedStatsImplCopyWith<$Res> {
+  __$$RoleBasedStatsImplCopyWithImpl(
+    _$RoleBasedStatsImpl _value,
+    $Res Function(_$RoleBasedStatsImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of RoleBasedStats
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? weakLink = null,
+    Object? carry = null,
+    Object? balanced = null,
+  }) {
+    return _then(
+      _$RoleBasedStatsImpl(
+        weakLink: null == weakLink
+            ? _value.weakLink
+            : weakLink // ignore: cast_nullable_to_non_nullable
+                  as RoleStats,
+        carry: null == carry
+            ? _value.carry
+            : carry // ignore: cast_nullable_to_non_nullable
+                  as RoleStats,
+        balanced: null == balanced
+            ? _value.balanced
+            : balanced // ignore: cast_nullable_to_non_nullable
+                  as RoleStats,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$RoleBasedStatsImpl extends _RoleBasedStats {
+  const _$RoleBasedStatsImpl({
+    this.weakLink = const RoleStats(),
+    this.carry = const RoleStats(),
+    this.balanced = const RoleStats(),
+  }) : super._();
+
+  factory _$RoleBasedStatsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RoleBasedStatsImplFromJson(json);
+
+  /// Stats when player is lowest ELO on their team (playing with stronger teammates)
+  @override
+  @JsonKey()
+  final RoleStats weakLink;
+
+  /// Stats when player is highest ELO on their team (leading/carrying the team)
+  @override
+  @JsonKey()
+  final RoleStats carry;
+
+  /// Stats when player is middle ELO or tied (balanced team composition)
+  @override
+  @JsonKey()
+  final RoleStats balanced;
+
+  @override
+  String toString() {
+    return 'RoleBasedStats(weakLink: $weakLink, carry: $carry, balanced: $balanced)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RoleBasedStatsImpl &&
+            (identical(other.weakLink, weakLink) ||
+                other.weakLink == weakLink) &&
+            (identical(other.carry, carry) || other.carry == carry) &&
+            (identical(other.balanced, balanced) ||
+                other.balanced == balanced));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, weakLink, carry, balanced);
+
+  /// Create a copy of RoleBasedStats
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RoleBasedStatsImplCopyWith<_$RoleBasedStatsImpl> get copyWith =>
+      __$$RoleBasedStatsImplCopyWithImpl<_$RoleBasedStatsImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RoleBasedStatsImplToJson(this);
+  }
+}
+
+abstract class _RoleBasedStats extends RoleBasedStats {
+  const factory _RoleBasedStats({
+    final RoleStats weakLink,
+    final RoleStats carry,
+    final RoleStats balanced,
+  }) = _$RoleBasedStatsImpl;
+  const _RoleBasedStats._() : super._();
+
+  factory _RoleBasedStats.fromJson(Map<String, dynamic> json) =
+      _$RoleBasedStatsImpl.fromJson;
+
+  /// Stats when player is lowest ELO on their team (playing with stronger teammates)
+  @override
+  RoleStats get weakLink;
+
+  /// Stats when player is highest ELO on their team (leading/carrying the team)
+  @override
+  RoleStats get carry;
+
+  /// Stats when player is middle ELO or tied (balanced team composition)
+  @override
+  RoleStats get balanced;
+
+  /// Create a copy of RoleBasedStats
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$RoleBasedStatsImplCopyWith<_$RoleBasedStatsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

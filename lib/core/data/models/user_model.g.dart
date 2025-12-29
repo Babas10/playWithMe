@@ -73,6 +73,9 @@ _$UserModelImpl _$$UserModelImplFromJson(
   pointStats: json['pointStats'] == null
       ? null
       : PointStats.fromJson(json['pointStats'] as Map<String, dynamic>),
+  roleBasedStats: json['roleBasedStats'] == null
+      ? null
+      : RoleBasedStats.fromJson(json['roleBasedStats'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$$UserModelImplToJson(
@@ -122,6 +125,7 @@ Map<String, dynamic> _$$UserModelImplToJson(
   'nemesis': instance.nemesis,
   'bestWin': instance.bestWin,
   'pointStats': instance.pointStats,
+  'roleBasedStats': instance.roleBasedStats,
 };
 
 const _$UserPrivacyLevelEnumMap = {
@@ -189,3 +193,38 @@ Map<String, dynamic> _$$PointStatsImplToJson(_$PointStatsImpl instance) =>
       'totalDiffInLosingSets': instance.totalDiffInLosingSets,
       'losingSetsCount': instance.losingSetsCount,
     };
+
+_$RoleStatsImpl _$$RoleStatsImplFromJson(Map<String, dynamic> json) =>
+    _$RoleStatsImpl(
+      games: (json['games'] as num?)?.toInt() ?? 0,
+      wins: (json['wins'] as num?)?.toInt() ?? 0,
+      winRate: (json['winRate'] as num?)?.toDouble() ?? 0.0,
+    );
+
+Map<String, dynamic> _$$RoleStatsImplToJson(_$RoleStatsImpl instance) =>
+    <String, dynamic>{
+      'games': instance.games,
+      'wins': instance.wins,
+      'winRate': instance.winRate,
+    };
+
+_$RoleBasedStatsImpl _$$RoleBasedStatsImplFromJson(Map<String, dynamic> json) =>
+    _$RoleBasedStatsImpl(
+      weakLink: json['weakLink'] == null
+          ? const RoleStats()
+          : RoleStats.fromJson(json['weakLink'] as Map<String, dynamic>),
+      carry: json['carry'] == null
+          ? const RoleStats()
+          : RoleStats.fromJson(json['carry'] as Map<String, dynamic>),
+      balanced: json['balanced'] == null
+          ? const RoleStats()
+          : RoleStats.fromJson(json['balanced'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$RoleBasedStatsImplToJson(
+  _$RoleBasedStatsImpl instance,
+) => <String, dynamic>{
+  'weakLink': instance.weakLink,
+  'carry': instance.carry,
+  'balanced': instance.balanced,
+};
