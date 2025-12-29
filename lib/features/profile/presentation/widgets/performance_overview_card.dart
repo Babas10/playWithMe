@@ -119,12 +119,16 @@ class PerformanceOverviewCard extends StatelessWidget {
         if (user.bestWin != null)
           _StatItem(
             label: 'Best Win',
+            // Primary: Who you beat (team composition)
             value: user.bestWin!.opponentNames != null
-                ? 'vs ${user.bestWin!.opponentNames} (${user.bestWin!.avgEloString} ELO)'
+                ? 'vs ${user.bestWin!.opponentNames}'
                 : 'vs ${user.bestWin!.avgEloString} ELO',
             icon: Icons.emoji_events,
             iconColor: Colors.amber,
-            subLabel: '${user.bestWin!.eloGainString} ELO gained',
+            // Secondary: Team strength + ELO gained
+            subLabel: user.bestWin!.opponentNames != null
+                ? '${user.bestWin!.avgEloString} ELO • ${user.bestWin!.eloGainString} gained'
+                : '${user.bestWin!.eloGainString} ELO gained',
           )
         else
           _StatItem(
