@@ -56,6 +56,8 @@ class UserModel with _$UserModel {
     NemesisRecord? nemesis,
     // Best Win tracking (Story 301.6)
     BestWinRecord? bestWin,
+    // Point Stats tracking (Story 301.7)
+    PointStats? pointStats,
   }) = _UserModel;
 
   const UserModel._();
@@ -397,4 +399,67 @@ DateTime _dateFromJson(dynamic value) {
 
 dynamic _dateToJson(DateTime date) {
   return const TimestampConverter().toJson(date);
+}
+
+/// Point statistics tracking average point differential per set.
+/// Separates winning sets from losing sets to show dominance vs competitiveness.
+@freezed
+class PointStats with _$PointStats {
+  const factory PointStats({
+    /// Sum of point differentials in winning sets (always positive)
+    @Default(0) int totalDiffInWinningSets,
+
+    /// Number of sets won by player's team
+    @Default(0) int winningSetsCount,
+
+    /// Sum of point differentials in losing sets (always negative)
+    @Default(0) int totalDiffInLosingSets,
+
+    /// Number of sets lost by player's team
+    @Default(0) int losingSetsCount,
+  }) = _PointStats;
+
+  const PointStats._();
+
+  factory PointStats.fromJson(Map<String, dynamic> json) =>
+      _$PointStatsFromJson(json);
+
+  /// Calculate average point differential in winning sets (shows dominance)
+  /// Example: +5.2 means you win sets by an average of 5.2 points
+  double get avgDiffInWins {
+    if (winningSetsCount == 0) return 0.0;
+    return totalDiffInWinningSets / winningSetsCount;
+  }
+
+  /// Calculate average point differential in losing sets (shows competitiveness)
+  /// Example: -2.1 means you only lose sets by an average of 2.1 points
+  double get avgDiffInLosses {
+    if (losingSetsCount == 0) return 0.0;
+    return totalDiffInLosingSets / losingSetsCount;
+  }
+
+  /// Get formatted string for winning sets average with + prefix
+  String get avgWinsString {
+    if (winningSetsCount == 0) return 'N/A';
+    return '+${avgDiffInWins.toStringAsFixed(1)}';
+  }
+
+  /// Get formatted string for losing sets average (already negative)
+  String get avgLossesString {
+    if (losingSetsCount == 0) return 'N/A';
+    return avgDiffInLosses.toStringAsFixed(1);
+  }
+
+  /// Get subtitle text showing set record
+  String get statsSubtitle =>
+      '$winningSetsCount won, $losingSetsCount lost';
+
+  /// Total sets played
+  int get totalSets => winningSetsCount + losingSetsCount;
+
+  /// Set win percentage
+  double get setWinRate {
+    if (totalSets == 0) return 0.0;
+    return winningSetsCount / totalSets;
+  }
 }

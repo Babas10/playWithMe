@@ -74,7 +74,9 @@ mixin _$UserModel {
       throw _privateConstructorUsedError; // Nemesis/Rival tracking (Story 301.8)
   NemesisRecord? get nemesis =>
       throw _privateConstructorUsedError; // Best Win tracking (Story 301.6)
-  BestWinRecord? get bestWin => throw _privateConstructorUsedError;
+  BestWinRecord? get bestWin =>
+      throw _privateConstructorUsedError; // Point Stats tracking (Story 301.7)
+  PointStats? get pointStats => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -133,10 +135,12 @@ abstract class $UserModelCopyWith<$Res> {
     int eloGamesPlayed,
     NemesisRecord? nemesis,
     BestWinRecord? bestWin,
+    PointStats? pointStats,
   });
 
   $NemesisRecordCopyWith<$Res>? get nemesis;
   $BestWinRecordCopyWith<$Res>? get bestWin;
+  $PointStatsCopyWith<$Res>? get pointStats;
 }
 
 /// @nodoc
@@ -195,6 +199,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? eloGamesPlayed = null,
     Object? nemesis = freezed,
     Object? bestWin = freezed,
+    Object? pointStats = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -362,6 +367,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.bestWin
                 : bestWin // ignore: cast_nullable_to_non_nullable
                       as BestWinRecord?,
+            pointStats: freezed == pointStats
+                ? _value.pointStats
+                : pointStats // ignore: cast_nullable_to_non_nullable
+                      as PointStats?,
           )
           as $Val,
     );
@@ -392,6 +401,20 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
 
     return $BestWinRecordCopyWith<$Res>(_value.bestWin!, (value) {
       return _then(_value.copyWith(bestWin: value) as $Val);
+    });
+  }
+
+  /// Create a copy of UserModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PointStatsCopyWith<$Res>? get pointStats {
+    if (_value.pointStats == null) {
+      return null;
+    }
+
+    return $PointStatsCopyWith<$Res>(_value.pointStats!, (value) {
+      return _then(_value.copyWith(pointStats: value) as $Val);
     });
   }
 }
@@ -447,12 +470,15 @@ abstract class _$$UserModelImplCopyWith<$Res>
     int eloGamesPlayed,
     NemesisRecord? nemesis,
     BestWinRecord? bestWin,
+    PointStats? pointStats,
   });
 
   @override
   $NemesisRecordCopyWith<$Res>? get nemesis;
   @override
   $BestWinRecordCopyWith<$Res>? get bestWin;
+  @override
+  $PointStatsCopyWith<$Res>? get pointStats;
 }
 
 /// @nodoc
@@ -510,6 +536,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? eloGamesPlayed = null,
     Object? nemesis = freezed,
     Object? bestWin = freezed,
+    Object? pointStats = freezed,
   }) {
     return _then(
       _$UserModelImpl(
@@ -677,6 +704,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.bestWin
             : bestWin // ignore: cast_nullable_to_non_nullable
                   as BestWinRecord?,
+        pointStats: freezed == pointStats
+            ? _value.pointStats
+            : pointStats // ignore: cast_nullable_to_non_nullable
+                  as PointStats?,
       ),
     );
   }
@@ -727,6 +758,7 @@ class _$UserModelImpl extends _UserModel {
     this.eloGamesPlayed = 0,
     this.nemesis,
     this.bestWin,
+    this.pointStats,
   }) : _groupIds = groupIds,
        _gameIds = gameIds,
        _friendIds = friendIds,
@@ -885,10 +917,13 @@ class _$UserModelImpl extends _UserModel {
   // Best Win tracking (Story 301.6)
   @override
   final BestWinRecord? bestWin;
+  // Point Stats tracking (Story 301.7)
+  @override
+  final PointStats? pointStats;
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats)';
   }
 
   @override
@@ -975,7 +1010,9 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.eloGamesPlayed, eloGamesPlayed) ||
                 other.eloGamesPlayed == eloGamesPlayed) &&
             (identical(other.nemesis, nemesis) || other.nemesis == nemesis) &&
-            (identical(other.bestWin, bestWin) || other.bestWin == bestWin));
+            (identical(other.bestWin, bestWin) || other.bestWin == bestWin) &&
+            (identical(other.pointStats, pointStats) ||
+                other.pointStats == pointStats));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1023,6 +1060,7 @@ class _$UserModelImpl extends _UserModel {
     eloGamesPlayed,
     nemesis,
     bestWin,
+    pointStats,
   ]);
 
   /// Create a copy of UserModel
@@ -1082,6 +1120,7 @@ abstract class _UserModel extends UserModel {
     final int eloGamesPlayed,
     final NemesisRecord? nemesis,
     final BestWinRecord? bestWin,
+    final PointStats? pointStats,
   }) = _$UserModelImpl;
   const _UserModel._() : super._();
 
@@ -1176,7 +1215,9 @@ abstract class _UserModel extends UserModel {
   @override
   NemesisRecord? get nemesis; // Best Win tracking (Story 301.6)
   @override
-  BestWinRecord? get bestWin;
+  BestWinRecord? get bestWin; // Point Stats tracking (Story 301.7)
+  @override
+  PointStats? get pointStats;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -1840,5 +1881,264 @@ abstract class _BestWinRecord extends BestWinRecord {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$BestWinRecordImplCopyWith<_$BestWinRecordImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PointStats _$PointStatsFromJson(Map<String, dynamic> json) {
+  return _PointStats.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PointStats {
+  /// Sum of point differentials in winning sets (always positive)
+  int get totalDiffInWinningSets => throw _privateConstructorUsedError;
+
+  /// Number of sets won by player's team
+  int get winningSetsCount => throw _privateConstructorUsedError;
+
+  /// Sum of point differentials in losing sets (always negative)
+  int get totalDiffInLosingSets => throw _privateConstructorUsedError;
+
+  /// Number of sets lost by player's team
+  int get losingSetsCount => throw _privateConstructorUsedError;
+
+  /// Serializes this PointStats to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of PointStats
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $PointStatsCopyWith<PointStats> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PointStatsCopyWith<$Res> {
+  factory $PointStatsCopyWith(
+    PointStats value,
+    $Res Function(PointStats) then,
+  ) = _$PointStatsCopyWithImpl<$Res, PointStats>;
+  @useResult
+  $Res call({
+    int totalDiffInWinningSets,
+    int winningSetsCount,
+    int totalDiffInLosingSets,
+    int losingSetsCount,
+  });
+}
+
+/// @nodoc
+class _$PointStatsCopyWithImpl<$Res, $Val extends PointStats>
+    implements $PointStatsCopyWith<$Res> {
+  _$PointStatsCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of PointStats
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? totalDiffInWinningSets = null,
+    Object? winningSetsCount = null,
+    Object? totalDiffInLosingSets = null,
+    Object? losingSetsCount = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            totalDiffInWinningSets: null == totalDiffInWinningSets
+                ? _value.totalDiffInWinningSets
+                : totalDiffInWinningSets // ignore: cast_nullable_to_non_nullable
+                      as int,
+            winningSetsCount: null == winningSetsCount
+                ? _value.winningSetsCount
+                : winningSetsCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+            totalDiffInLosingSets: null == totalDiffInLosingSets
+                ? _value.totalDiffInLosingSets
+                : totalDiffInLosingSets // ignore: cast_nullable_to_non_nullable
+                      as int,
+            losingSetsCount: null == losingSetsCount
+                ? _value.losingSetsCount
+                : losingSetsCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$PointStatsImplCopyWith<$Res>
+    implements $PointStatsCopyWith<$Res> {
+  factory _$$PointStatsImplCopyWith(
+    _$PointStatsImpl value,
+    $Res Function(_$PointStatsImpl) then,
+  ) = __$$PointStatsImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    int totalDiffInWinningSets,
+    int winningSetsCount,
+    int totalDiffInLosingSets,
+    int losingSetsCount,
+  });
+}
+
+/// @nodoc
+class __$$PointStatsImplCopyWithImpl<$Res>
+    extends _$PointStatsCopyWithImpl<$Res, _$PointStatsImpl>
+    implements _$$PointStatsImplCopyWith<$Res> {
+  __$$PointStatsImplCopyWithImpl(
+    _$PointStatsImpl _value,
+    $Res Function(_$PointStatsImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of PointStats
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? totalDiffInWinningSets = null,
+    Object? winningSetsCount = null,
+    Object? totalDiffInLosingSets = null,
+    Object? losingSetsCount = null,
+  }) {
+    return _then(
+      _$PointStatsImpl(
+        totalDiffInWinningSets: null == totalDiffInWinningSets
+            ? _value.totalDiffInWinningSets
+            : totalDiffInWinningSets // ignore: cast_nullable_to_non_nullable
+                  as int,
+        winningSetsCount: null == winningSetsCount
+            ? _value.winningSetsCount
+            : winningSetsCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+        totalDiffInLosingSets: null == totalDiffInLosingSets
+            ? _value.totalDiffInLosingSets
+            : totalDiffInLosingSets // ignore: cast_nullable_to_non_nullable
+                  as int,
+        losingSetsCount: null == losingSetsCount
+            ? _value.losingSetsCount
+            : losingSetsCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PointStatsImpl extends _PointStats {
+  const _$PointStatsImpl({
+    this.totalDiffInWinningSets = 0,
+    this.winningSetsCount = 0,
+    this.totalDiffInLosingSets = 0,
+    this.losingSetsCount = 0,
+  }) : super._();
+
+  factory _$PointStatsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PointStatsImplFromJson(json);
+
+  /// Sum of point differentials in winning sets (always positive)
+  @override
+  @JsonKey()
+  final int totalDiffInWinningSets;
+
+  /// Number of sets won by player's team
+  @override
+  @JsonKey()
+  final int winningSetsCount;
+
+  /// Sum of point differentials in losing sets (always negative)
+  @override
+  @JsonKey()
+  final int totalDiffInLosingSets;
+
+  /// Number of sets lost by player's team
+  @override
+  @JsonKey()
+  final int losingSetsCount;
+
+  @override
+  String toString() {
+    return 'PointStats(totalDiffInWinningSets: $totalDiffInWinningSets, winningSetsCount: $winningSetsCount, totalDiffInLosingSets: $totalDiffInLosingSets, losingSetsCount: $losingSetsCount)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PointStatsImpl &&
+            (identical(other.totalDiffInWinningSets, totalDiffInWinningSets) ||
+                other.totalDiffInWinningSets == totalDiffInWinningSets) &&
+            (identical(other.winningSetsCount, winningSetsCount) ||
+                other.winningSetsCount == winningSetsCount) &&
+            (identical(other.totalDiffInLosingSets, totalDiffInLosingSets) ||
+                other.totalDiffInLosingSets == totalDiffInLosingSets) &&
+            (identical(other.losingSetsCount, losingSetsCount) ||
+                other.losingSetsCount == losingSetsCount));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    totalDiffInWinningSets,
+    winningSetsCount,
+    totalDiffInLosingSets,
+    losingSetsCount,
+  );
+
+  /// Create a copy of PointStats
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PointStatsImplCopyWith<_$PointStatsImpl> get copyWith =>
+      __$$PointStatsImplCopyWithImpl<_$PointStatsImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PointStatsImplToJson(this);
+  }
+}
+
+abstract class _PointStats extends PointStats {
+  const factory _PointStats({
+    final int totalDiffInWinningSets,
+    final int winningSetsCount,
+    final int totalDiffInLosingSets,
+    final int losingSetsCount,
+  }) = _$PointStatsImpl;
+  const _PointStats._() : super._();
+
+  factory _PointStats.fromJson(Map<String, dynamic> json) =
+      _$PointStatsImpl.fromJson;
+
+  /// Sum of point differentials in winning sets (always positive)
+  @override
+  int get totalDiffInWinningSets;
+
+  /// Number of sets won by player's team
+  @override
+  int get winningSetsCount;
+
+  /// Sum of point differentials in losing sets (always negative)
+  @override
+  int get totalDiffInLosingSets;
+
+  /// Number of sets lost by player's team
+  @override
+  int get losingSetsCount;
+
+  /// Create a copy of PointStats
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$PointStatsImplCopyWith<_$PointStatsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
