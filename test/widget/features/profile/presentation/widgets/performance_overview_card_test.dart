@@ -142,10 +142,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should show best win data with opponent names
+      // Should show best win data with separated layout
       expect(find.text('Best Win'), findsOneWidget);
-      expect(find.text('vs Player A & Player B (1650 ELO)'), findsOneWidget);
-      expect(find.text('+24 ELO gained'), findsOneWidget);
+      expect(find.text('vs Player A & Player B'), findsOneWidget); // Team composition
+      expect(find.text('1650 ELO • +24 gained'), findsOneWidget); // Team strength + gain
 
       // Should use trophy icon
       expect(
@@ -268,10 +268,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should show opponent names with rounded ELO values
+      // Should show opponent names with rounded ELO values in separated layout
       expect(find.text('Best Win'), findsOneWidget);
-      expect(find.text('vs Alice & Bob (1826 ELO)'), findsOneWidget); // Names + Rounded ELO
-      expect(find.text('+28 ELO gained'), findsOneWidget); // Rounded with +
+      expect(find.text('vs Alice & Bob'), findsOneWidget); // Team composition
+      expect(find.text('1826 ELO • +28 gained'), findsOneWidget); // Rounded ELO + gain
     });
   });
 }
