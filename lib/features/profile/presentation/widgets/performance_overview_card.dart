@@ -119,7 +119,9 @@ class PerformanceOverviewCard extends StatelessWidget {
         if (user.bestWin != null)
           _StatItem(
             label: 'Best Win',
-            value: 'vs ${user.bestWin!.avgEloString} ELO',
+            value: user.bestWin!.opponentNames != null
+                ? 'vs ${user.bestWin!.opponentNames} (${user.bestWin!.avgEloString} ELO)'
+                : 'vs ${user.bestWin!.avgEloString} ELO',
             icon: Icons.emoji_events,
             iconColor: Colors.amber,
             subLabel: '${user.bestWin!.eloGainString} ELO gained',

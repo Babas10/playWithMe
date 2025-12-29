@@ -116,7 +116,7 @@ describe("processGameEloUpdates", () => {
     expect(transaction.set).toHaveBeenCalled(); // History entries
   });
 
-  test("sets bestWin after first victory", async () => {
+  test("sets bestWin after first victory with opponent names", async () => {
     const gameId = "game1";
     const gameData = {
       teams: {
@@ -170,10 +170,11 @@ describe("processGameEloUpdates", () => {
       gameId: "game1",
       opponentTeamElo: 1300,
       opponentTeamAvgElo: 1300,
+      opponentNames: "P2", // Should include opponent name
     });
   });
 
-  test("updates bestWin when beating higher-rated team", async () => {
+  test("updates bestWin when beating higher-rated team with opponent names", async () => {
     const gameId = "game2";
     const gameData = {
       teams: {
@@ -226,6 +227,7 @@ describe("processGameEloUpdates", () => {
     );
     expect(p1UpdateCall[1]).toHaveProperty("bestWin");
     expect(p1UpdateCall[1].bestWin.opponentTeamElo).toBe(1400);
+    expect(p1UpdateCall[1].bestWin.opponentNames).toBe("P2"); // Should include opponent name
   });
 
   test("does NOT update bestWin when beating lower-rated team", async () => {
@@ -281,6 +283,66 @@ describe("processGameEloUpdates", () => {
     );
     // bestWin should not be in the update (should be undefined, not included)
     expect(p1UpdateCall[1].bestWin).toBeUndefined();
+  });
+
+  test("sets bestWin with multiple opponent names joined by ' & '", async () => {
+    const gameId = "game-2v2";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1", "p2"],
+        teamBPlayerIds: ["p3", "p4"],
+      },
+      result: {
+        games: [{ winner: "teamA" }],
+      },
+    };
+
+    const playerMap: {[key: string]: any} = {
+      p1: { eloRating: 1200, displayName: "Alice" },
+      p2: { eloRating: 1250, displayName: "Bob" },
+      p3: { eloRating: 1500, displayName: "Charlie" }, // Higher rated opponents
+      p4: { eloRating: 1550, displayName: "Diana" },
+    };
+
+    const docMock = (id: string) => ({
+      id,
+      exists: true,
+      data: () => playerMap[id],
+    });
+
+    const subCollectionMock = {
+      doc: jest.fn(() => ({ id: "historyId" })),
+    };
+
+    const docRefMock = {
+      collection: jest.fn(() => subCollectionMock),
+    };
+
+    const collectionMock = {
+      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+    };
+    db.collection.mockReturnValue(collectionMock);
+
+    transaction.get.mockImplementation((ref: any) => Promise.resolve({
+      exists: true,
+      id: ref.id,
+      data: () => playerMap[ref.id] || {},
+    }));
+
+    await processGameEloUpdates(gameId, gameData);
+
+    // Check that both p1 and p2 get bestWin with opponent names joined
+    const p1UpdateCall = transaction.update.mock.calls.find(
+      (call: any) => call[0]?.id === "p1"
+    );
+    expect(p1UpdateCall[1]).toHaveProperty("bestWin");
+    expect(p1UpdateCall[1].bestWin.opponentNames).toBe("Charlie & Diana");
+
+    const p2UpdateCall = transaction.update.mock.calls.find(
+      (call: any) => call[0]?.id === "p2"
+    );
+    expect(p2UpdateCall[1]).toHaveProperty("bestWin");
+    expect(p2UpdateCall[1].bestWin.opponentNames).toBe("Charlie & Diana");
   });
 
   test("does NOT set bestWin when losing", async () => {
