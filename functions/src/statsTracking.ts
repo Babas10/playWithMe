@@ -2,6 +2,117 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
 /**
+ * Team role enumeration for role-based performance tracking.
+ * Determines player's position relative to teammates based on ELO ratings.
+ */
+enum TeamRole {
+  WEAKLINK = "weakLink", // Lowest ELO on team (playing with stronger teammates)
+  CARRY = "carry", // Highest ELO on team (leading/carrying the team)
+  BALANCED = "balanced", // Middle ELO or tied (balanced team composition)
+}
+
+/**
+ * Analyze team composition to determine each player's role based on ELO ratings.
+ * Returns a map of player IDs to their assigned roles.
+ *
+ * Role assignment logic:
+ * - If player has highest ELO and is not tied: CARRY
+ * - If player has lowest ELO and is not tied: WEAKLINK
+ * - Otherwise (middle position or tied): BALANCED
+ *
+ * @param team Array of player objects with playerId and preGameElo
+ * @returns Map of player IDs to their team roles
+ */
+function analyzeTeamComposition(
+  team: { playerId: string; preGameElo: number }[]
+): Map<string, TeamRole> {
+  const roles = new Map<string, TeamRole>();
+
+  // Sort team by ELO (highest to lowest)
+  const sorted = [...team].sort((a, b) => b.preGameElo - a.preGameElo);
+
+  // Handle edge case: single player team (shouldn't happen in 2v2, but be defensive)
+  if (sorted.length === 1) {
+    roles.set(sorted[0].playerId, TeamRole.BALANCED);
+    return roles;
+  }
+
+  const highestElo = sorted[0].preGameElo;
+  const lowestElo = sorted[sorted.length - 1].preGameElo;
+
+  for (let i = 0; i < sorted.length; i++) {
+    const player = sorted[i];
+
+    if (i === 0 && player.preGameElo > lowestElo) {
+      // Highest ELO and not tied with lowest
+      roles.set(player.playerId, TeamRole.CARRY);
+    } else if (i === sorted.length - 1 && player.preGameElo < highestElo) {
+      // Lowest ELO and not tied with highest
+      roles.set(player.playerId, TeamRole.WEAKLINK);
+    } else {
+      // Middle position or tied
+      roles.set(player.playerId, TeamRole.BALANCED);
+    }
+  }
+
+  return roles;
+}
+
+/**
+ * Update role-based statistics for a player after a game.
+ * Tracks win rates when player is weak-link, carry, or in balanced teams.
+ *
+ * NOTE: This function only does WRITES. The caller must pass in the current
+ * role-based stats data (read beforehand to satisfy Firestore transaction rules).
+ */
+async function updateRoleBasedStats(
+  transaction: admin.firestore.Transaction,
+  playerId: string,
+  role: TeamRole,
+  won: boolean,
+  currentRoleBasedStats: any // ← Pass in the current stats
+): Promise<void> {
+  const db = admin.firestore();
+  const userRef = db.collection("users").doc(playerId);
+
+  // Get current stats for this role
+  const roleBasedStats = currentRoleBasedStats || {
+    weakLink: { games: 0, wins: 0, winRate: 0.0 },
+    carry: { games: 0, wins: 0, winRate: 0.0 },
+    balanced: { games: 0, wins: 0, winRate: 0.0 },
+  };
+
+  const roleKey = role as string; // Convert enum to string ("weakLink", "carry", "balanced")
+  const currentRoleStats = roleBasedStats[roleKey] || {
+    games: 0,
+    wins: 0,
+    winRate: 0.0,
+  };
+
+  // Update stats for this role
+  const newGames = currentRoleStats.games + 1;
+  const newWins = won ? currentRoleStats.wins + 1 : currentRoleStats.wins;
+  const newWinRate = newGames > 0 ? newWins / newGames : 0.0;
+
+  const updatedRoleStats = {
+    games: newGames,
+    wins: newWins,
+    winRate: newWinRate,
+  };
+
+  // Update in transaction
+  transaction.update(userRef, {
+    [`roleBasedStats.${roleKey}`]: updatedRoleStats,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  functions.logger.info(
+    `Updated role-based stats for ${playerId} (role: ${role}): ` +
+    `${newWins}W-${newGames - newWins}L, Win Rate: ${(newWinRate * 100).toFixed(1)}%`
+  );
+}
+
+/**
  * Update teammate statistics after a game completes.
  * Tracks performance metrics for players who played together on the same team.
  *
@@ -270,6 +381,28 @@ export async function processStatsTracking(
     return "Unknown";
   };
 
+  // Analyze team composition for role-based performance tracking
+  // Build team arrays with player ELO ratings
+  const teamAWithElo = teamAPlayerIds.map((playerId) => {
+    const playerData = playerDataMap.get(playerId);
+    return {
+      playerId,
+      preGameElo: playerData?.eloRating || 1600, // Default to 1600 if not set
+    };
+  });
+
+  const teamBWithElo = teamBPlayerIds.map((playerId) => {
+    const playerData = playerDataMap.get(playerId);
+    return {
+      playerId,
+      preGameElo: playerData?.eloRating || 1600, // Default to 1600 if not set
+    };
+  });
+
+  // Determine each player's role based on team composition
+  const teamARoles = analyzeTeamComposition(teamAWithElo);
+  const teamBRoles = analyzeTeamComposition(teamBWithElo);
+
   // Update point stats for all players
   const db = admin.firestore();
 
@@ -308,6 +441,18 @@ export async function processStatsTracking(
       `Wins: ${teamA_WinningSetsCount} sets (+${avgWins} avg), ` +
       `Losses: ${teamA_LosingSetsCount} sets (${avgLosses} avg)`
     );
+
+    // Update role-based stats for Team A player
+    const playerRole = teamARoles.get(playerId);
+    if (playerRole) {
+      await updateRoleBasedStats(
+        transaction,
+        playerId,
+        playerRole,
+        teamAWon,
+        playerData?.roleBasedStats || null
+      );
+    }
   }
 
   // Update point stats for Team B players
@@ -345,6 +490,18 @@ export async function processStatsTracking(
       `Wins: ${teamB_WinningSetsCount} sets (+${avgWins} avg), ` +
       `Losses: ${teamB_LosingSetsCount} sets (${avgLosses} avg)`
     );
+
+    // Update role-based stats for Team B player
+    const playerRole = teamBRoles.get(playerId);
+    if (playerRole) {
+      await updateRoleBasedStats(
+        transaction,
+        playerId,
+        playerRole,
+        !teamAWon, // Team B won if Team A didn't win
+        playerData?.roleBasedStats || null
+      );
+    }
   }
 
   // Update teammate stats for each team

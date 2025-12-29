@@ -58,6 +58,8 @@ class UserModel with _$UserModel {
     BestWinRecord? bestWin,
     // Point Stats tracking (Story 301.7)
     PointStats? pointStats,
+    // Role-Based Performance tracking (Story 301.9)
+    RoleBasedStats? roleBasedStats,
   }) = _UserModel;
 
   const UserModel._();
@@ -461,5 +463,114 @@ class PointStats with _$PointStats {
   double get setWinRate {
     if (totalSets == 0) return 0.0;
     return winningSetsCount / totalSets;
+  }
+}
+
+/// Statistics for a specific team role (weak-link, carry, or balanced).
+/// Tracks performance when player is in different positions relative to teammates.
+@freezed
+class RoleStats with _$RoleStats {
+  const factory RoleStats({
+    /// Number of games played in this role
+    @Default(0) int games,
+
+    /// Number of games won in this role
+    @Default(0) int wins,
+
+    /// Win rate as decimal (0.0 - 1.0)
+    @Default(0.0) double winRate,
+  }) = _RoleStats;
+
+  const RoleStats._();
+
+  factory RoleStats.fromJson(Map<String, dynamic> json) =>
+      _$RoleStatsFromJson(json);
+
+  /// Number of games lost in this role
+  int get losses => games - wins;
+
+  /// Win rate as percentage (0-100)
+  double get winRatePercentage => winRate * 100;
+
+  /// Get formatted win-loss record (e.g., "5W - 3L")
+  String get recordString => '${wins}W - ${losses}L';
+
+  /// Get formatted win rate (e.g., "62.5%")
+  String get winRateString => '${winRatePercentage.toStringAsFixed(1)}%';
+
+  /// Check if there's enough data to show meaningful stats (minimum 3 games)
+  bool get hasEnoughData => games >= 3;
+}
+
+/// Role-based performance statistics tracking how a player performs in different team contexts.
+/// Shows adaptability by analyzing win rates when player is weak-link, carry, or in balanced teams.
+@freezed
+class RoleBasedStats with _$RoleBasedStats {
+  const factory RoleBasedStats({
+    /// Stats when player is lowest ELO on their team (playing with stronger teammates)
+    @Default(RoleStats()) RoleStats weakLink,
+
+    /// Stats when player is highest ELO on their team (leading/carrying the team)
+    @Default(RoleStats()) RoleStats carry,
+
+    /// Stats when player is middle ELO or tied (balanced team composition)
+    @Default(RoleStats()) RoleStats balanced,
+  }) = _RoleBasedStats;
+
+  const RoleBasedStats._();
+
+  factory RoleBasedStats.fromJson(Map<String, dynamic> json) =>
+      _$RoleBasedStatsFromJson(json);
+
+  /// Total games across all roles
+  int get totalGames => weakLink.games + carry.games + balanced.games;
+
+  /// Check if there's any role-based data available
+  bool get hasData => totalGames > 0;
+
+  /// Get the role with the best win rate (minimum 3 games)
+  String get bestRole {
+    final roles = <String, double>{};
+
+    if (weakLink.hasEnoughData) {
+      roles['weakLink'] = weakLink.winRate;
+    }
+    if (carry.hasEnoughData) {
+      roles['carry'] = carry.winRate;
+    }
+    if (balanced.hasEnoughData) {
+      roles['balanced'] = balanced.winRate;
+    }
+
+    if (roles.isEmpty) return 'none';
+
+    return roles.entries
+        .reduce((a, b) => a.value > b.value ? a : b)
+        .key;
+  }
+
+  /// Generate personalized insight based on role performance
+  String getInsight() {
+    if (!hasData) {
+      return 'Play more games to see how you perform in different team roles.';
+    }
+
+    // Check carry performance (if enough games)
+    if (carry.hasEnoughData && carry.winRate > 0.6) {
+      return '💪 Strong carry performance! You elevate your teammates.';
+    }
+
+    // Check weak-link performance (if enough games)
+    if (weakLink.hasEnoughData && weakLink.winRate > 0.5) {
+      return '🌟 Great adaptability! You thrive with experienced partners.';
+    }
+
+    // Check if balanced is the dominant category
+    if (balanced.games > carry.games + weakLink.games && balanced.hasEnoughData) {
+      return '⚖️ You play best in balanced matchups.';
+    }
+
+    // Default encouragement
+    return '📊 Keep playing to refine your role-based performance!';
   }
 }
