@@ -129,14 +129,17 @@ class PerformanceOverviewCard extends StatelessWidget {
             subLabel: 'Beat opponents to track your best victory',
           ),
         const SizedBox(height: 12),
-        // Row 4: Average Point Differential (placeholder for now)
-        _StatItem(
-          label: 'Avg Point Differential',
-          value: 'Coming Soon',
-          icon: Icons.compare_arrows,
-          iconColor: Colors.teal,
-          subLabel: 'Points scored vs conceded',
-        ),
+        // Row 4: Average Point Differential (Wins vs Losses)
+        if (user.pointStats != null && user.pointStats!.totalSets > 0)
+          _PointDiffStatItem(pointStats: user.pointStats!)
+        else
+          _StatItem(
+            label: 'Avg Point Diff',
+            value: 'Complete a game to unlock',
+            icon: Icons.trending_up_outlined,
+            iconColor: Colors.teal.withOpacity(0.5),
+            subLabel: 'Win and lose sets to see your margins',
+          ),
       ],
     );
   }
@@ -149,6 +152,7 @@ class _StatItem extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String? subLabel;
+  final Color? valueColor;
 
   const _StatItem({
     required this.label,
@@ -156,6 +160,7 @@ class _StatItem extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     this.subLabel,
+    this.valueColor,
   });
 
   @override
@@ -198,7 +203,7 @@ class _StatItem extends StatelessWidget {
             value,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
+              color: valueColor ?? theme.colorScheme.onSurface,
             ),
           ),
           // Sub-label (optional)
@@ -212,6 +217,152 @@ class _StatItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Point Differential stat item showing winning and losing set averages separately.
+class _PointDiffStatItem extends StatelessWidget {
+  final PointStats pointStats;
+
+  const _PointDiffStatItem({
+    required this.pointStats,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Icon(
+                Icons.compare_arrows,
+                size: 20,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Avg Point Differential',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Two columns: Wins and Losses
+          Row(
+            children: [
+              // Winning sets
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.trending_up,
+                          size: 16,
+                          color: Colors.green,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'In Wins',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      pointStats.avgWinsString,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: pointStats.winningSetsCount > 0
+                            ? Colors.green
+                            : theme.colorScheme.onSurface.withOpacity(0.3),
+                      ),
+                    ),
+                    Text(
+                      '${pointStats.winningSetsCount} sets',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Divider
+              Container(
+                width: 1,
+                height: 60,
+                color: theme.colorScheme.onSurface.withOpacity(0.1),
+              ),
+              const SizedBox(width: 16),
+              // Losing sets
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.trending_down,
+                          size: 16,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'In Losses',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      pointStats.avgLossesString,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: pointStats.losingSetsCount > 0
+                            ? Colors.red
+                            : theme.colorScheme.onSurface.withOpacity(0.3),
+                      ),
+                    ),
+                    Text(
+                      '${pointStats.losingSetsCount} sets',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Footer subtitle
+          Text(
+            pointStats.statsSubtitle,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.5),
+            ),
+          ),
         ],
       ),
     );

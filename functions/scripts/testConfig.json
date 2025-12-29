@@ -1,108 +1,99 @@
 {
-  "timestamp": "2025-12-27T17:05:23.149Z",
+  "timestamp": "2025-12-29T17:09:44.511Z",
   "users": [
     {
       "index": 0,
-      "uid": "KgBSDn7pp0dGAQDHq3NYC2P2nUp1",
+      "uid": "vYaapJNMMnOP5aKx2yaVsBdSR0O2",
       "email": "test1@mysta.com",
       "displayName": "Test1",
       "firstName": "Test",
       "lastName": "One",
-      "password": "test1010"
+      "password": "test1010",
+      "eloRating": 1200
     },
     {
       "index": 1,
-      "uid": "xSouc8R4tReguyPzZvasvAlktBm1",
+      "uid": "DRgrjKaP7UdNifWCCPseicoRL253",
       "email": "test2@mysta.com",
       "displayName": "Test2",
       "firstName": "Test",
       "lastName": "Two",
-      "password": "test1010"
+      "password": "test1010",
+      "eloRating": 1200
     },
     {
       "index": 2,
-      "uid": "5daXaIUeapSTKkE4C5IE8g0xzG82",
+      "uid": "UdRzeqdqlldDjTFiDZGkjIDKwxh1",
       "email": "test3@mysta.com",
       "displayName": "Test3",
       "firstName": "Test",
       "lastName": "Three",
-      "password": "test1010"
+      "password": "test1010",
+      "eloRating": 1300
     },
     {
       "index": 3,
-      "uid": "keM9TON1mQgzRcYM1fxJiquFEuZ2",
+      "uid": "9rzgwbkbsodILTXhhymEtSNSxBG3",
       "email": "test4@mysta.com",
       "displayName": "Test4",
       "firstName": "Test",
       "lastName": "Four",
-      "password": "test1010"
+      "password": "test1010",
+      "eloRating": 1300
     },
     {
       "index": 4,
-      "uid": "s4vMNeNxflT6oyzDPLNOSEJZYZB3",
+      "uid": "BapsuKexVYbaQy5mfOkrXfQ5oUz1",
       "email": "test5@mysta.com",
       "displayName": "Test5",
       "firstName": "Test",
       "lastName": "Five",
-      "password": "test1010"
+      "password": "test1010",
+      "eloRating": 1500
     },
     {
       "index": 5,
-      "uid": "IDIbCCdlolh5jDbWH3YbueMKySo1",
+      "uid": "QOJ57MOlD2YFJj4QU3St5ptwILg2",
       "email": "test6@mysta.com",
       "displayName": "Test6",
       "firstName": "Test",
       "lastName": "Six",
-      "password": "test1010"
+      "password": "test1010",
+      "eloRating": 1500
     },
     {
       "index": 6,
-      "uid": "tJL9wkjzfYVKYxmFPEx68qBIv7G2",
+      "uid": "31kWGIRx40UZ7HElLXvW9JgvY5D3",
       "email": "test7@mysta.com",
       "displayName": "Test7",
       "firstName": "Test",
       "lastName": "Seven",
-      "password": "test1010"
+      "password": "test1010",
+      "eloRating": 1100
     },
     {
       "index": 7,
-      "uid": "Bx0x0Dl0a4a9Xq44OqT2rBycjSv2",
+      "uid": "IsUKZkoMgJYvBR0dT8lpKkIZumD2",
       "email": "test8@mysta.com",
       "displayName": "Test8",
       "firstName": "Test",
       "lastName": "Eight",
-      "password": "test1010"
-    },
-    {
-      "index": 8,
-      "uid": "wWVMMAaSm4cUZpcxmELPJoqNmRO2",
-      "email": "test9@mysta.com",
-      "displayName": "Test9",
-      "firstName": "Test",
-      "lastName": "Nine",
-      "password": "test1010"
-    },
-    {
-      "index": 9,
-      "uid": "NJ4fN9zYoXgNYAPuI3w1AiRBYP42",
-      "email": "test10@mysta.com",
-      "displayName": "Test10",
-      "firstName": "Test",
-      "lastName": "Ten",
-      "password": "test1010"
+      "password": "test1010",
+      "eloRating": 1100
     }
   ],
-  "groupId": "8foJviVjhWkr9xcIGhGi",
+  "groupId": "k7uGWSXQSP6TIWJeH6XJ",
   "gameIds": [
-    "iCoGTwNSbcge3jFxUHra",
-    "BYeHK8ZxDnuzczHifOA8",
-    "3KaRGD6gGCdKrDNiItIM",
-    "FAq2G1pdBR70JM8yDb2g"
+    "mVolj5RsdxjvuEs2v70k",
+    "6HvnJW1seCC5RRmCHUJB",
+    "GkwmQj3pNl8t53UkIi7j",
+    "vM8e48XeY8EXG61EryY7"
   ],
   "notes": {
     "password": "test1010",
     "friendships": "All users are friends with each other",
     "group": "All users are members of the test group",
-    "games": "4 games created (2 completed, 2 scheduled)"
+    "games": "4 games created for best win tracking test",
+    "scenario": "Test1 & Test2 win 3 games (vs 1300, 1500, 1100) and lose 1 game"
   }
 }
