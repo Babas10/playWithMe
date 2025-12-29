@@ -154,6 +154,7 @@ _$BestWinRecordImpl _$$BestWinRecordImplFromJson(Map<String, dynamic> json) =>
       eloGained: (json['eloGained'] as num).toDouble(),
       date: _dateFromJson(json['date']),
       gameTitle: json['gameTitle'] as String,
+      opponentNames: json['opponentNames'] as String?,
     );
 
 Map<String, dynamic> _$$BestWinRecordImplToJson(_$BestWinRecordImpl instance) =>
@@ -164,4 +165,5 @@ Map<String, dynamic> _$$BestWinRecordImplToJson(_$BestWinRecordImpl instance) =>
       'eloGained': instance.eloGained,
       'date': _dateToJson(instance.date),
       'gameTitle': instance.gameTitle,
+      'opponentNames': instance.opponentNames,
     };
