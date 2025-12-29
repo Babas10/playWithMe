@@ -1521,6 +1521,11 @@ mixin _$BestWinRecord {
   /// Game title or description for display
   String get gameTitle => throw _privateConstructorUsedError;
 
+  /// Opponent team member names (cached for display, joined with " & ")
+  /// Example: "Alice & Bob" or "John Doe & Jane Smith"
+  /// Falls back to email if displayName is not available
+  String? get opponentNames => throw _privateConstructorUsedError;
+
   /// Serializes this BestWinRecord to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
@@ -1545,6 +1550,7 @@ abstract class $BestWinRecordCopyWith<$Res> {
     double eloGained,
     @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) DateTime date,
     String gameTitle,
+    String? opponentNames,
   });
 }
 
@@ -1569,6 +1575,7 @@ class _$BestWinRecordCopyWithImpl<$Res, $Val extends BestWinRecord>
     Object? eloGained = null,
     Object? date = null,
     Object? gameTitle = null,
+    Object? opponentNames = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -1596,6 +1603,10 @@ class _$BestWinRecordCopyWithImpl<$Res, $Val extends BestWinRecord>
                 ? _value.gameTitle
                 : gameTitle // ignore: cast_nullable_to_non_nullable
                       as String,
+            opponentNames: freezed == opponentNames
+                ? _value.opponentNames
+                : opponentNames // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -1618,6 +1629,7 @@ abstract class _$$BestWinRecordImplCopyWith<$Res>
     double eloGained,
     @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) DateTime date,
     String gameTitle,
+    String? opponentNames,
   });
 }
 
@@ -1641,6 +1653,7 @@ class __$$BestWinRecordImplCopyWithImpl<$Res>
     Object? eloGained = null,
     Object? date = null,
     Object? gameTitle = null,
+    Object? opponentNames = freezed,
   }) {
     return _then(
       _$BestWinRecordImpl(
@@ -1668,6 +1681,10 @@ class __$$BestWinRecordImplCopyWithImpl<$Res>
             ? _value.gameTitle
             : gameTitle // ignore: cast_nullable_to_non_nullable
                   as String,
+        opponentNames: freezed == opponentNames
+            ? _value.opponentNames
+            : opponentNames // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -1683,6 +1700,7 @@ class _$BestWinRecordImpl extends _BestWinRecord {
     required this.eloGained,
     @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) required this.date,
     required this.gameTitle,
+    this.opponentNames,
   }) : super._();
 
   factory _$BestWinRecordImpl.fromJson(Map<String, dynamic> json) =>
@@ -1713,9 +1731,15 @@ class _$BestWinRecordImpl extends _BestWinRecord {
   @override
   final String gameTitle;
 
+  /// Opponent team member names (cached for display, joined with " & ")
+  /// Example: "Alice & Bob" or "John Doe & Jane Smith"
+  /// Falls back to email if displayName is not available
+  @override
+  final String? opponentNames;
+
   @override
   String toString() {
-    return 'BestWinRecord(gameId: $gameId, opponentTeamElo: $opponentTeamElo, opponentTeamAvgElo: $opponentTeamAvgElo, eloGained: $eloGained, date: $date, gameTitle: $gameTitle)';
+    return 'BestWinRecord(gameId: $gameId, opponentTeamElo: $opponentTeamElo, opponentTeamAvgElo: $opponentTeamAvgElo, eloGained: $eloGained, date: $date, gameTitle: $gameTitle, opponentNames: $opponentNames)';
   }
 
   @override
@@ -1732,7 +1756,9 @@ class _$BestWinRecordImpl extends _BestWinRecord {
                 other.eloGained == eloGained) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.gameTitle, gameTitle) ||
-                other.gameTitle == gameTitle));
+                other.gameTitle == gameTitle) &&
+            (identical(other.opponentNames, opponentNames) ||
+                other.opponentNames == opponentNames));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1745,6 +1771,7 @@ class _$BestWinRecordImpl extends _BestWinRecord {
     eloGained,
     date,
     gameTitle,
+    opponentNames,
   );
 
   /// Create a copy of BestWinRecord
@@ -1770,6 +1797,7 @@ abstract class _BestWinRecord extends BestWinRecord {
     @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
     required final DateTime date,
     required final String gameTitle,
+    final String? opponentNames,
   }) = _$BestWinRecordImpl;
   const _BestWinRecord._() : super._();
 
@@ -1800,6 +1828,12 @@ abstract class _BestWinRecord extends BestWinRecord {
   /// Game title or description for display
   @override
   String get gameTitle;
+
+  /// Opponent team member names (cached for display, joined with " & ")
+  /// Example: "Alice & Bob" or "John Doe & Jane Smith"
+  /// Falls back to email if displayName is not available
+  @override
+  String? get opponentNames;
 
   /// Create a copy of BestWinRecord
   /// with the given fields replaced by the non-null parameter values.

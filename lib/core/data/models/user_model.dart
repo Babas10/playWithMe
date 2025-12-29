@@ -364,6 +364,11 @@ class BestWinRecord with _$BestWinRecord {
 
     /// Game title or description for display
     required String gameTitle,
+
+    /// Opponent team member names (cached for display, joined with " & ")
+    /// Example: "Alice & Bob" or "John Doe & Jane Smith"
+    /// Falls back to email if displayName is not available
+    String? opponentNames,
   }) = _BestWinRecord;
 
   const BestWinRecord._();

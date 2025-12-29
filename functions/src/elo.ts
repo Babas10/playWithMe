@@ -205,6 +205,7 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
               eloGained: cumulativeChange,
               date: timestampNow, // Use actual Timestamp for nested object
               gameTitle: `vs ${opponentNames}`,
+              opponentNames: opponentNames, // Store opponent names for UI display
             };
           }
         }

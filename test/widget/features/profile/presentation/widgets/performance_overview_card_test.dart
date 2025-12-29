@@ -111,7 +111,7 @@ void main() {
       expect(find.text('1'), findsOneWidget);
     });
 
-    testWidgets('shows best win when user has best win data', (tester) async {
+    testWidgets('shows best win with opponent names when available', (tester) async {
       final user = UserModel(
         uid: 'test-uid',
         email: 'test@example.com',
@@ -129,6 +129,7 @@ void main() {
           eloGained: 24.0,
           date: DateTime(2024, 2, 10),
           gameTitle: 'vs Player A & Player B',
+          opponentNames: 'Player A & Player B',
         ),
       );
 
@@ -141,9 +142,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should show best win data
+      // Should show best win data with opponent names
       expect(find.text('Best Win'), findsOneWidget);
-      expect(find.text('vs 1650 ELO'), findsOneWidget);
+      expect(find.text('vs Player A & Player B (1650 ELO)'), findsOneWidget);
       expect(find.text('+24 ELO gained'), findsOneWidget);
 
       // Should use trophy icon
@@ -155,6 +156,43 @@ void main() {
         ),
         findsAtLeastNWidgets(1),
       );
+    });
+
+    testWidgets('shows best win with ELO only when opponent names are null (fallback)', (tester) async {
+      final user = UserModel(
+        uid: 'test-uid',
+        email: 'test@example.com',
+        isEmailVerified: true,
+        isAnonymous: false,
+        gamesPlayed: 5,
+        gamesWon: 3,
+        gamesLost: 2,
+        eloRating: 1550.0,
+        eloPeak: 1600.0,
+        bestWin: BestWinRecord(
+          gameId: 'game123',
+          opponentTeamElo: 1700.0,
+          opponentTeamAvgElo: 1650.0,
+          eloGained: 24.0,
+          date: DateTime(2024, 2, 10),
+          gameTitle: 'vs Opponents',
+          opponentNames: null, // Null for backward compatibility
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PerformanceOverviewCard(user: user),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Should show best win data with ELO only (fallback behavior)
+      expect(find.text('Best Win'), findsOneWidget);
+      expect(find.text('vs 1650 ELO'), findsOneWidget);
+      expect(find.text('+24 ELO gained'), findsOneWidget);
     });
 
     testWidgets('shows placeholder when user has no best win', (tester) async {
@@ -199,7 +237,7 @@ void main() {
       );
     });
 
-    testWidgets('shows correct formatting for best win ELO values', (tester) async {
+    testWidgets('shows correct formatting for best win with opponent names and ELO values', (tester) async {
       final user = UserModel(
         uid: 'test-uid',
         email: 'test@example.com',
@@ -217,6 +255,7 @@ void main() {
           eloGained: 28.3, // Should be rounded with +
           date: DateTime(2024, 3, 1),
           gameTitle: 'vs Strong Team',
+          opponentNames: 'Alice & Bob',
         ),
       );
 
@@ -229,9 +268,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should show rounded values
+      // Should show opponent names with rounded ELO values
       expect(find.text('Best Win'), findsOneWidget);
-      expect(find.text('vs 1826 ELO'), findsOneWidget); // Rounded
+      expect(find.text('vs Alice & Bob (1826 ELO)'), findsOneWidget); // Names + Rounded ELO
       expect(find.text('+28 ELO gained'), findsOneWidget); // Rounded with +
     });
   });
