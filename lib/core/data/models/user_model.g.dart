@@ -70,6 +70,9 @@ _$UserModelImpl _$$UserModelImplFromJson(
   bestWin: json['bestWin'] == null
       ? null
       : BestWinRecord.fromJson(json['bestWin'] as Map<String, dynamic>),
+  pointStats: json['pointStats'] == null
+      ? null
+      : PointStats.fromJson(json['pointStats'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$$UserModelImplToJson(
@@ -118,6 +121,7 @@ Map<String, dynamic> _$$UserModelImplToJson(
   'eloGamesPlayed': instance.eloGamesPlayed,
   'nemesis': instance.nemesis,
   'bestWin': instance.bestWin,
+  'pointStats': instance.pointStats,
 };
 
 const _$UserPrivacyLevelEnumMap = {
@@ -166,4 +170,22 @@ Map<String, dynamic> _$$BestWinRecordImplToJson(_$BestWinRecordImpl instance) =>
       'date': _dateToJson(instance.date),
       'gameTitle': instance.gameTitle,
       'opponentNames': instance.opponentNames,
+    };
+
+_$PointStatsImpl _$$PointStatsImplFromJson(Map<String, dynamic> json) =>
+    _$PointStatsImpl(
+      totalDiffInWinningSets:
+          (json['totalDiffInWinningSets'] as num?)?.toInt() ?? 0,
+      winningSetsCount: (json['winningSetsCount'] as num?)?.toInt() ?? 0,
+      totalDiffInLosingSets:
+          (json['totalDiffInLosingSets'] as num?)?.toInt() ?? 0,
+      losingSetsCount: (json['losingSetsCount'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$$PointStatsImplToJson(_$PointStatsImpl instance) =>
+    <String, dynamic>{
+      'totalDiffInWinningSets': instance.totalDiffInWinningSets,
+      'winningSetsCount': instance.winningSetsCount,
+      'totalDiffInLosingSets': instance.totalDiffInLosingSets,
+      'losingSetsCount': instance.losingSetsCount,
     };

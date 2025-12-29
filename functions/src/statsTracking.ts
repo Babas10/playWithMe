@@ -213,13 +213,50 @@ export async function processStatsTracking(
   playerEloChanges: Map<string, number>,
   playerDataMap: Map<string, any> // ← Pass in pre-read player data
 ): Promise<void> {
-  // Calculate total points for each team across all individual games
-  let teamAPoints = 0;
-  let teamBPoints = 0;
+  // Calculate point differential separately for winning and losing sets
+  // Also track total points for teammate stats
+  let teamA_WinningSetsDiff = 0;
+  let teamA_WinningSetsCount = 0;
+  let teamA_LosingSetsDiff = 0;
+  let teamA_LosingSetsCount = 0;
 
-  individualGames.forEach((game) => {
-    teamAPoints += game.teamAScore || 0;
-    teamBPoints += game.teamBScore || 0;
+  let teamB_WinningSetsDiff = 0;
+  let teamB_WinningSetsCount = 0;
+  let teamB_LosingSetsDiff = 0;
+  let teamB_LosingSetsCount = 0;
+
+  let teamAPoints = 0; // Total points scored by Team A (for teammate stats)
+  let teamBPoints = 0; // Total points scored by Team B (for teammate stats)
+
+  individualGames.forEach((game: any) => {
+    // Each game contains multiple sets
+    if (game.sets && Array.isArray(game.sets)) {
+      game.sets.forEach((set: any) => {
+        const setTeamAPoints = set.teamAPoints || 0;
+        const setTeamBPoints = set.teamBPoints || 0;
+        const differential = setTeamAPoints - setTeamBPoints;
+
+        // Accumulate total points for teammate stats
+        teamAPoints += setTeamAPoints;
+        teamBPoints += setTeamBPoints;
+
+        // Determine which team won this set
+        if (setTeamAPoints > setTeamBPoints) {
+          // Team A won this set
+          teamA_WinningSetsDiff += differential; // positive value
+          teamA_WinningSetsCount++;
+          teamB_LosingSetsDiff += differential; // negative value (from Team B perspective)
+          teamB_LosingSetsCount++;
+        } else if (setTeamBPoints > setTeamAPoints) {
+          // Team B won this set
+          teamB_WinningSetsDiff += (-differential); // positive value
+          teamB_WinningSetsCount++;
+          teamA_LosingSetsDiff += differential; // negative value
+          teamA_LosingSetsCount++;
+        }
+        // Note: We ignore ties (shouldn't happen in volleyball)
+      });
+    }
   });
 
   // Helper function to determine display name with fallback logic
@@ -232,6 +269,83 @@ export async function processStatsTracking(
     if (playerData.email) return playerData.email;
     return "Unknown";
   };
+
+  // Update point stats for all players
+  const db = admin.firestore();
+
+  // Update point stats for Team A players
+  for (const playerId of teamAPlayerIds) {
+    const playerData = playerDataMap.get(playerId);
+    const currentPointStats = playerData?.pointStats || {
+      totalDiffInWinningSets: 0,
+      winningSetsCount: 0,
+      totalDiffInLosingSets: 0,
+      losingSetsCount: 0,
+    };
+
+    const updatedPointStats = {
+      totalDiffInWinningSets: currentPointStats.totalDiffInWinningSets + teamA_WinningSetsDiff,
+      winningSetsCount: currentPointStats.winningSetsCount + teamA_WinningSetsCount,
+      totalDiffInLosingSets: currentPointStats.totalDiffInLosingSets + teamA_LosingSetsDiff,
+      losingSetsCount: currentPointStats.losingSetsCount + teamA_LosingSetsCount,
+    };
+
+    const userRef = db.collection("users").doc(playerId);
+    transaction.update(userRef, {
+      pointStats: updatedPointStats,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const avgWins = updatedPointStats.winningSetsCount > 0
+      ? (updatedPointStats.totalDiffInWinningSets / updatedPointStats.winningSetsCount).toFixed(1)
+      : "N/A";
+    const avgLosses = updatedPointStats.losingSetsCount > 0
+      ? (updatedPointStats.totalDiffInLosingSets / updatedPointStats.losingSetsCount).toFixed(1)
+      : "N/A";
+
+    functions.logger.info(
+      `Updated point stats for ${playerId} (Team A): ` +
+      `Wins: ${teamA_WinningSetsCount} sets (+${avgWins} avg), ` +
+      `Losses: ${teamA_LosingSetsCount} sets (${avgLosses} avg)`
+    );
+  }
+
+  // Update point stats for Team B players
+  for (const playerId of teamBPlayerIds) {
+    const playerData = playerDataMap.get(playerId);
+    const currentPointStats = playerData?.pointStats || {
+      totalDiffInWinningSets: 0,
+      winningSetsCount: 0,
+      totalDiffInLosingSets: 0,
+      losingSetsCount: 0,
+    };
+
+    const updatedPointStats = {
+      totalDiffInWinningSets: currentPointStats.totalDiffInWinningSets + teamB_WinningSetsDiff,
+      winningSetsCount: currentPointStats.winningSetsCount + teamB_WinningSetsCount,
+      totalDiffInLosingSets: currentPointStats.totalDiffInLosingSets + teamB_LosingSetsDiff,
+      losingSetsCount: currentPointStats.losingSetsCount + teamB_LosingSetsCount,
+    };
+
+    const userRef = db.collection("users").doc(playerId);
+    transaction.update(userRef, {
+      pointStats: updatedPointStats,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const avgWins = updatedPointStats.winningSetsCount > 0
+      ? (updatedPointStats.totalDiffInWinningSets / updatedPointStats.winningSetsCount).toFixed(1)
+      : "N/A";
+    const avgLosses = updatedPointStats.losingSetsCount > 0
+      ? (updatedPointStats.totalDiffInLosingSets / updatedPointStats.losingSetsCount).toFixed(1)
+      : "N/A";
+
+    functions.logger.info(
+      `Updated point stats for ${playerId} (Team B): ` +
+      `Wins: ${teamB_WinningSetsCount} sets (+${avgWins} avg), ` +
+      `Losses: ${teamB_LosingSetsCount} sets (${avgLosses} avg)`
+    );
+  }
 
   // Update teammate stats for each team
   // Team A partnerships
