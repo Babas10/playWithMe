@@ -5,6 +5,8 @@ import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/data/models/teammate_stats.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
+import 'package:play_with_me/core/data/models/best_elo_record.dart';
+import 'package:play_with_me/core/domain/entities/time_period.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 
 class MockUserRepository implements UserRepository {
@@ -210,6 +212,24 @@ class MockUserRepository implements UserRepository {
   }) {
     // Return an empty stream for testing - can be customized per test if needed
     return Stream.value([]);
+  }
+
+  @override
+  Stream<List<RatingHistoryEntry>> getRatingHistoryByPeriod(
+    String userId,
+    TimePeriod period,
+  ) {
+    // Return an empty stream for testing - can be customized per test if needed
+    return Stream.value([]);
+  }
+
+  @override
+  Future<BestEloRecord?> getBestEloInPeriod(
+    String userId,
+    TimePeriod period,
+  ) async {
+    // Return null for testing - can be customized per test if needed
+    return null;
   }
 
   @override
