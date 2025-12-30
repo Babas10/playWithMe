@@ -9,6 +9,8 @@ import '../models/rating_history_entry.dart';
 import '../models/user_model.dart';
 import '../models/teammate_stats.dart';
 import '../models/head_to_head_stats.dart';
+import '../models/best_elo_record.dart';
+import '../../domain/entities/time_period.dart';
 
 class FirestoreUserRepository implements UserRepository {
   final FirebaseFirestore _firestore;
@@ -365,6 +367,56 @@ class FirestoreUserRepository implements UserRepository {
             .where((doc) => doc.exists)
             .map((doc) => RatingHistoryEntry.fromFirestore(doc))
             .toList());
+  }
+
+  @override
+  Stream<List<RatingHistoryEntry>> getRatingHistoryByPeriod(
+    String userId,
+    TimePeriod period,
+  ) {
+    final startDate = period.getStartDate();
+
+    return _firestore
+        .collection(_collection)
+        .doc(userId)
+        .collection('ratingHistory')
+        .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .where((doc) => doc.exists)
+            .map((doc) => RatingHistoryEntry.fromFirestore(doc))
+            .toList());
+  }
+
+  @override
+  Future<BestEloRecord?> getBestEloInPeriod(
+    String userId,
+    TimePeriod period,
+  ) async {
+    try {
+      final startDate = period.getStartDate();
+
+      final snapshot = await _firestore
+          .collection(_collection)
+          .doc(userId)
+          .collection('ratingHistory')
+          .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+          .orderBy('newRating', descending: true)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) return null;
+
+      final entry = RatingHistoryEntry.fromFirestore(snapshot.docs.first);
+      return BestEloRecord(
+        elo: entry.newRating,
+        date: entry.timestamp,
+        gameId: entry.gameId,
+      );
+    } catch (e) {
+      throw Exception('Failed to get best ELO in period: $e');
+    }
   }
 
   @override
