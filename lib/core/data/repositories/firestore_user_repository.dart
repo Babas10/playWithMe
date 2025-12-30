@@ -10,6 +10,7 @@ import '../models/user_model.dart';
 import '../models/teammate_stats.dart';
 import '../models/head_to_head_stats.dart';
 import '../models/best_elo_record.dart';
+import '../models/user_ranking.dart';
 import '../../domain/entities/time_period.dart';
 
 class FirestoreUserRepository implements UserRepository {
@@ -540,5 +541,28 @@ class FirestoreUserRepository implements UserRepository {
             .where((doc) => doc.exists)
             .map((doc) => HeadToHeadStats.fromFirestore(doc))
             .toList());
+  }
+
+  @override
+  Future<UserRanking> getUserRanking(String userId) async {
+    try {
+      final callable = _functions.httpsCallable('calculateUserRanking');
+      final result = await callable.call<Map<String, dynamic>>();
+
+      return UserRanking.fromJson(result.data);
+    } on FirebaseFunctionsException catch (e) {
+      switch (e.code) {
+        case 'unauthenticated':
+          throw Exception('You must be logged in to view rankings');
+        case 'not-found':
+          throw Exception('User not found');
+        case 'internal':
+          throw Exception('Failed to calculate ranking. Please try again.');
+        default:
+          throw Exception('Failed to get ranking: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Failed to get ranking: $e');
+    }
   }
 }
