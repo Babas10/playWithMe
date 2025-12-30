@@ -20,6 +20,7 @@ export {inviteToGroup} from "./inviteToGroup"; // Story 11.16
 export {getGamesForGroup} from "./getGamesForGroup"; // Story 3.5
 export {getCompletedGames} from "./getCompletedGames"; // Story 14.7
 export {getHeadToHeadStats} from "./getHeadToHeadStats"; // Story 301.8
+export {calculateUserRanking} from "./calculateUserRanking"; // Story 302.2
 
 // Export friendship functions (callable functions)
 export {
