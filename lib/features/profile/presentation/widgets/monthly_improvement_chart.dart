@@ -1,172 +1,103 @@
-// Monthly improvement chart showing long-term ELO progress.
+// Enhanced ELO progress chart with area fill and adaptive aggregation (Story 302.4).
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
+import 'package:play_with_me/core/domain/entities/time_period.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
 
-/// A chart widget showing monthly ELO improvement over time.
+/// Enhanced area chart showing ELO progress over time with adaptive aggregation.
 ///
-/// Purpose: Show long-term progress rather than short-term volatility.
-/// Answers: "Am I actually getting better over time?"
-///
-/// Features:
-/// - X-axis: Months (e.g., Jan, Feb, Mar)
-/// - Y-axis: ELO rating
-/// - Each point: End-of-month ELO snapshot
-/// - Smooth line chart
-/// - Highlights: Best and worst months
-/// - Only appears if ≥ 2 months of data
+/// Features (Story 302.4):
+/// - Area chart with gradient fill
+/// - Smooth curves
+/// - Adaptive aggregation (daily/weekly/monthly based on time period)
+/// - No grid lines
+/// - Adaptive Y-axis scaling
+/// - Conditional dot display (hidden for large datasets)
 class MonthlyImprovementChart extends StatelessWidget {
   final List<RatingHistoryEntry> ratingHistory;
   final double currentElo;
+  final TimePeriod timePeriod;
 
   const MonthlyImprovementChart({
     super.key,
     required this.ratingHistory,
     required this.currentElo,
+    this.timePeriod = TimePeriod.allTime,
   });
 
   @override
   Widget build(BuildContext context) {
-    final monthlyData = _aggregateByMonth();
+    final aggregatedData = _aggregateByPeriod(timePeriod);
 
-    // Only show if we have at least 2 months of data
-    if (monthlyData.length < 2) {
+    // Minimum data requirement: 2 data points
+    if (aggregatedData.length < 2) {
       return _buildPlaceholder(context);
     }
 
-    return _buildChart(context, monthlyData);
+    return _buildChart(context, aggregatedData);
   }
 
   Widget _buildPlaceholder(BuildContext context) {
     return const InsufficientDataPlaceholder(
-      featureName: 'Monthly Progress Chart',
-      requirement: 'Play games for at least 2 months',
+      featureName: 'ELO Progress Chart',
+      requirement: 'Play games over multiple time periods',
       icon: Icons.timeline,
     );
   }
 
-  Widget _buildChart(BuildContext context, List<MonthlyDataPoint> monthlyData) {
-    final theme = Theme.of(context);
-
-    // Find best and worst months
-    final bestMonth = _findBestMonth(monthlyData);
-    final worstMonth = _findWorstMonth(monthlyData);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Chart
-        SizedBox(
-          height: 200,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 16.0, top: 16.0),
-            child: LineChart(
-              LineChartData(
-                gridData: const FlGridData(show: false),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          value.toInt().toString(),
-                          style: theme.textTheme.bodySmall,
-                        );
-                      },
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 30,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index < 0 || index >= monthlyData.length) {
-                          return const SizedBox.shrink();
-                        }
-                        return Text(
-                          monthlyData[index].monthLabel,
-                          style: theme.textTheme.bodySmall,
-                        );
-                      },
-                    ),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: monthlyData.asMap().entries.map((entry) {
-                      return FlSpot(
-                        entry.key.toDouble(),
-                        entry.value.eloRating,
-                      );
-                    }).toList(),
-                    isCurved: true,
-                    color: theme.colorScheme.primary,
-                    barWidth: 3,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, barData, index) {
-                        return FlDotCirclePainter(
-                          radius: 4,
-                          color: theme.colorScheme.primary,
-                          strokeColor: Colors.white,
-                          strokeWidth: 2,
-                        );
-                      },
-                    ),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: theme.colorScheme.primary.withOpacity(0.1),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        // Best/worst month badges
-        if (bestMonth != null || worstMonth != null)
-          Wrap(
-            spacing: 8,
-            children: [
-              if (bestMonth != null)
-                _MonthBadge(
-                  label: 'Best Month',
-                  month: bestMonth.monthLabel,
-                  delta: bestMonth.delta,
-                  isPositive: true,
-                ),
-              if (worstMonth != null)
-                _MonthBadge(
-                  label: 'Toughest Month',
-                  month: worstMonth.monthLabel,
-                  delta: worstMonth.delta,
-                  isPositive: false,
-                ),
-            ],
-          ),
-      ],
-    );
-  }
-
-  /// Aggregates rating history by month.
-  ///
-  /// Strategy: Use end-of-month ELO snapshot for each month.
-  List<MonthlyDataPoint> _aggregateByMonth() {
+  /// Adaptive aggregation based on time period (Story 302.4)
+  List<ChartDataPoint> _aggregateByPeriod(TimePeriod period) {
     if (ratingHistory.isEmpty) return [];
 
-    // Group entries by month
+    switch (period) {
+      case TimePeriod.fifteenDays:
+      case TimePeriod.thirtyDays:
+        return _aggregateByDay();
+      case TimePeriod.ninetyDays:
+        return _aggregateByWeek();
+      case TimePeriod.oneYear:
+      case TimePeriod.allTime:
+        return _aggregateByMonth();
+    }
+  }
+
+  /// Aggregate by day (for short periods ≤ 30 days)
+  List<ChartDataPoint> _aggregateByDay() {
+    final Map<String, List<RatingHistoryEntry>> dayGroups = {};
+
+    for (final entry in ratingHistory) {
+      final dayKey = DateFormat('yyyy-MM-dd').format(entry.timestamp);
+      dayGroups.putIfAbsent(dayKey, () => []).add(entry);
+    }
+
+    return _buildDataPoints(dayGroups, DateFormat('MMM d'));
+  }
+
+  /// Aggregate by week (for medium periods ~90 days)
+  List<ChartDataPoint> _aggregateByWeek() {
+    final Map<String, List<RatingHistoryEntry>> weekGroups = {};
+
+    for (final entry in ratingHistory) {
+      // ISO week number
+      final weekStart = _getWeekStart(entry.timestamp);
+      final weekKey = DateFormat('yyyy-MM-dd').format(weekStart);
+      weekGroups.putIfAbsent(weekKey, () => []).add(entry);
+    }
+
+    return _buildDataPoints(weekGroups, DateFormat('MMM d'));
+  }
+
+  /// Get the start of the week (Monday) for a given date
+  DateTime _getWeekStart(DateTime date) {
+    final daysFromMonday = date.weekday - 1;
+    return DateTime(date.year, date.month, date.day)
+        .subtract(Duration(days: daysFromMonday));
+  }
+
+  /// Aggregate by month (for long periods ≥ 1 year)
+  List<ChartDataPoint> _aggregateByMonth() {
     final Map<String, List<RatingHistoryEntry>> monthGroups = {};
 
     for (final entry in ratingHistory) {
@@ -174,132 +105,167 @@ class MonthlyImprovementChart extends StatelessWidget {
       monthGroups.putIfAbsent(monthKey, () => []).add(entry);
     }
 
-    // Create data points (use the most recent entry in each month as end-of-month snapshot)
-    final List<MonthlyDataPoint> dataPoints = [];
-    final sortedMonths = monthGroups.keys.toList()..sort();
+    return _buildDataPoints(monthGroups, DateFormat('MMM'));
+  }
 
-    for (int i = 0; i < sortedMonths.length; i++) {
-      final monthKey = sortedMonths[i];
-      final entries = monthGroups[monthKey]!;
+  /// Build data points from grouped entries
+  List<ChartDataPoint> _buildDataPoints(
+    Map<String, List<RatingHistoryEntry>> groups,
+    DateFormat labelFormat,
+  ) {
+    final sortedKeys = groups.keys.toList()..sort();
+    final List<ChartDataPoint> dataPoints = [];
 
-      // Sort entries by timestamp (most recent first)
-      entries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    for (final key in sortedKeys) {
+      final entries = groups[key]!;
 
-      // Use the most recent entry's newRating as end-of-month snapshot
-      final endOfMonthRating = entries.first.newRating;
+      // Sort by timestamp (most recent last)
+      entries.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-      // Calculate delta from previous month
-      double? delta;
-      if (i > 0) {
-        final prevMonthKey = sortedMonths[i - 1];
-        final prevEntries = monthGroups[prevMonthKey]!;
-        prevEntries.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-        final prevRating = prevEntries.first.newRating;
-        delta = endOfMonthRating - prevRating;
-      }
+      // Use last entry's rating as snapshot
+      final snapshotRating = entries.last.newRating;
+      final date = entries.last.timestamp;
 
-      final date = DateTime.parse('$monthKey-01');
-      dataPoints.add(MonthlyDataPoint(
+      dataPoints.add(ChartDataPoint(
         date: date,
-        eloRating: endOfMonthRating,
-        delta: delta,
+        eloRating: snapshotRating,
+        label: labelFormat.format(date),
       ));
     }
 
     return dataPoints;
   }
 
-  MonthlyDataPoint? _findBestMonth(List<MonthlyDataPoint> data) {
-    if (data.length < 2) return null;
-
-    MonthlyDataPoint? best;
-    double maxDelta = double.negativeInfinity;
-
-    for (final point in data) {
-      if (point.delta != null && point.delta! > maxDelta && point.delta! > 0) {
-        maxDelta = point.delta!;
-        best = point;
-      }
-    }
-
-    return best;
-  }
-
-  MonthlyDataPoint? _findWorstMonth(List<MonthlyDataPoint> data) {
-    if (data.length < 2) return null;
-
-    MonthlyDataPoint? worst;
-    double minDelta = double.infinity;
-
-    for (final point in data) {
-      if (point.delta != null && point.delta! < minDelta && point.delta! < 0) {
-        minDelta = point.delta!;
-        worst = point;
-      }
-    }
-
-    return worst;
-  }
-}
-
-/// Data point representing ELO rating for a specific month.
-class MonthlyDataPoint {
-  final DateTime date;
-  final double eloRating;
-  final double? delta; // Change from previous month
-
-  MonthlyDataPoint({
-    required this.date,
-    required this.eloRating,
-    this.delta,
-  });
-
-  String get monthLabel => DateFormat('MMM').format(date);
-}
-
-/// Badge showing best or worst month performance.
-class _MonthBadge extends StatelessWidget {
-  final String label;
-  final String month;
-  final double? delta;
-  final bool isPositive;
-
-  const _MonthBadge({
-    required this.label,
-    required this.month,
-    required this.delta,
-    required this.isPositive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildChart(BuildContext context, List<ChartDataPoint> data) {
     final theme = Theme.of(context);
-    final color = isPositive ? Colors.green : Colors.red;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: color,
+    return SizedBox(
+      height: 220, // Increased height for better visibility
+      child: Padding(
+        padding: const EdgeInsets.only(right: 16.0, top: 16.0),
+        child: LineChart(
+          LineChartData(
+            gridData: const FlGridData(show: false), // No grid (Story 302.4)
+            titlesData: FlTitlesData(
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 45,
+                  interval: _calculateYAxisInterval(data),
+                  getTitlesWidget: (value, meta) {
+                    return Text(
+                      value.toInt().toString(),
+                      style: theme.textTheme.bodySmall,
+                    );
+                  },
+                ),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 32,
+                  interval: _calculateXAxisInterval(data),
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index < 0 || index >= data.length) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        data[index].label,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
             ),
+            borderData: FlBorderData(show: false),
+            lineBarsData: [
+              LineChartBarData(
+                spots: data.asMap().entries.map((entry) {
+                  return FlSpot(
+                    entry.key.toDouble(),
+                    entry.value.eloRating,
+                  );
+                }).toList(),
+                isCurved: true, // Smooth curves (Story 302.4)
+                curveSmoothness: 0.4,
+                color: theme.colorScheme.primary,
+                barWidth: 3,
+                isStrokeCapRound: true,
+                dotData: FlDotData(
+                  show: data.length <= 15, // Conditional dots (Story 302.4)
+                  getDotPainter: (spot, percent, barData, index) {
+                    return FlDotCirclePainter(
+                      radius: 5,
+                      color: theme.colorScheme.primary,
+                      strokeColor: Colors.white,
+                      strokeWidth: 2,
+                    );
+                  },
+                ),
+                belowBarData: BarAreaData(
+                  show: true,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      theme.colorScheme.primary.withOpacity(0.3),
+                      theme.colorScheme.primary.withOpacity(0.05),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            minY: _calculateMinY(data),
+            maxY: _calculateMaxY(data),
           ),
-          const SizedBox(width: 4),
-          Text(
-            '$month: ${delta != null ? '${delta! > 0 ? '+' : ''}${delta!.toStringAsFixed(0)}' : ''}',
-            style: theme.textTheme.bodySmall?.copyWith(color: color),
-          ),
-        ],
+        ),
       ),
     );
   }
+
+  // Helper methods for adaptive scaling (Story 302.4)
+  double _calculateMinY(List<ChartDataPoint> data) {
+    final minElo = data.map((e) => e.eloRating).reduce((a, b) => a < b ? a : b);
+    return (minElo - 50).floorToDouble();
+  }
+
+  double _calculateMaxY(List<ChartDataPoint> data) {
+    final maxElo = data.map((e) => e.eloRating).reduce((a, b) => a > b ? a : b);
+    return (maxElo + 50).ceilToDouble();
+  }
+
+  double _calculateYAxisInterval(List<ChartDataPoint> data) {
+    final range = _calculateMaxY(data) - _calculateMinY(data);
+    return (range / 4).ceilToDouble(); // ~4 labels on Y-axis
+  }
+
+  double _calculateXAxisInterval(List<ChartDataPoint> data) {
+    if (data.length <= 5) return 1;
+    if (data.length <= 10) return 2;
+    if (data.length <= 20) return 4;
+    return (data.length / 5).ceilToDouble();
+  }
+}
+
+/// Data point for chart display with timestamp and label
+class ChartDataPoint {
+  final DateTime date;
+  final double eloRating;
+  final String label;
+
+  ChartDataPoint({
+    required this.date,
+    required this.eloRating,
+    required this.label,
+  });
 }
