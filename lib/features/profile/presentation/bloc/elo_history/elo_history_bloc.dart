@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
+import 'package:play_with_me/core/domain/entities/time_period.dart';
 import 'elo_history_event.dart';
 import 'elo_history_state.dart';
 
@@ -13,6 +14,7 @@ class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
     required this.userRepository,
   }) : super(const EloHistoryState.initial()) {
     on<LoadEloHistory>(_onLoadHistory);
+    on<FilterByPeriod>(_onFilterByPeriod);
     on<FilterByDateRange>(_onFilterByDateRange);
     on<ClearFilter>(_onClearFilter);
   }
@@ -43,6 +45,31 @@ class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
     }
   }
 
+  /// Handle filtering by time period (Story 302.3)
+  void _onFilterByPeriod(
+    FilterByPeriod event,
+    Emitter<EloHistoryState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is! EloHistoryLoaded) return;
+
+    final startDate = event.period.getStartDate();
+    final endDate = DateTime.now();
+
+    final filtered = currentState.history.where((entry) {
+      return entry.timestamp.isAfter(startDate) &&
+          entry.timestamp.isBefore(endDate.add(const Duration(days: 1)));
+    }).toList();
+
+    emit(EloHistoryState.loaded(
+      history: currentState.history,
+      filteredHistory: filtered,
+      filterStartDate: startDate,
+      filterEndDate: endDate,
+      selectedPeriod: event.period,
+    ));
+  }
+
   void _onFilterByDateRange(
     FilterByDateRange event,
     Emitter<EloHistoryState> emit,
@@ -61,6 +88,7 @@ class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
       filteredHistory: filtered,
       filterStartDate: event.startDate,
       filterEndDate: event.endDate,
+      selectedPeriod: currentState.selectedPeriod,
     ));
   }
 
@@ -76,6 +104,7 @@ class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
       filteredHistory: currentState.history,
       filterStartDate: null,
       filterEndDate: null,
+      selectedPeriod: TimePeriod.allTime,
     ));
   }
 }

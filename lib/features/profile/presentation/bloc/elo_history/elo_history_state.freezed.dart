@@ -26,6 +26,7 @@ mixin _$EloHistoryState {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -39,6 +40,7 @@ mixin _$EloHistoryState {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -52,6 +54,7 @@ mixin _$EloHistoryState {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
@@ -153,6 +156,7 @@ class _$EloHistoryInitialImpl implements EloHistoryInitial {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -170,6 +174,7 @@ class _$EloHistoryInitialImpl implements EloHistoryInitial {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -187,6 +192,7 @@ class _$EloHistoryInitialImpl implements EloHistoryInitial {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
@@ -290,6 +296,7 @@ class _$EloHistoryLoadingImpl implements EloHistoryLoading {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -307,6 +314,7 @@ class _$EloHistoryLoadingImpl implements EloHistoryLoading {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -324,6 +332,7 @@ class _$EloHistoryLoadingImpl implements EloHistoryLoading {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
@@ -389,6 +398,7 @@ abstract class _$$EloHistoryLoadedImplCopyWith<$Res> {
     List<RatingHistoryEntry> filteredHistory,
     DateTime? filterStartDate,
     DateTime? filterEndDate,
+    TimePeriod selectedPeriod,
   });
 }
 
@@ -410,6 +420,7 @@ class __$$EloHistoryLoadedImplCopyWithImpl<$Res>
     Object? filteredHistory = null,
     Object? filterStartDate = freezed,
     Object? filterEndDate = freezed,
+    Object? selectedPeriod = null,
   }) {
     return _then(
       _$EloHistoryLoadedImpl(
@@ -429,6 +440,10 @@ class __$$EloHistoryLoadedImplCopyWithImpl<$Res>
             ? _value.filterEndDate
             : filterEndDate // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        selectedPeriod: null == selectedPeriod
+            ? _value.selectedPeriod
+            : selectedPeriod // ignore: cast_nullable_to_non_nullable
+                  as TimePeriod,
       ),
     );
   }
@@ -442,6 +457,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
     required final List<RatingHistoryEntry> filteredHistory,
     this.filterStartDate,
     this.filterEndDate,
+    this.selectedPeriod = TimePeriod.allTime,
   }) : _history = history,
        _filteredHistory = filteredHistory;
 
@@ -465,10 +481,13 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
   final DateTime? filterStartDate;
   @override
   final DateTime? filterEndDate;
+  @override
+  @JsonKey()
+  final TimePeriod selectedPeriod;
 
   @override
   String toString() {
-    return 'EloHistoryState.loaded(history: $history, filteredHistory: $filteredHistory, filterStartDate: $filterStartDate, filterEndDate: $filterEndDate)';
+    return 'EloHistoryState.loaded(history: $history, filteredHistory: $filteredHistory, filterStartDate: $filterStartDate, filterEndDate: $filterEndDate, selectedPeriod: $selectedPeriod)';
   }
 
   @override
@@ -484,7 +503,9 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
             (identical(other.filterStartDate, filterStartDate) ||
                 other.filterStartDate == filterStartDate) &&
             (identical(other.filterEndDate, filterEndDate) ||
-                other.filterEndDate == filterEndDate));
+                other.filterEndDate == filterEndDate) &&
+            (identical(other.selectedPeriod, selectedPeriod) ||
+                other.selectedPeriod == selectedPeriod));
   }
 
   @override
@@ -494,6 +515,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
     const DeepCollectionEquality().hash(_filteredHistory),
     filterStartDate,
     filterEndDate,
+    selectedPeriod,
   );
 
   /// Create a copy of EloHistoryState
@@ -517,11 +539,18 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )
     loaded,
     required TResult Function(String message) error,
   }) {
-    return loaded(history, filteredHistory, filterStartDate, filterEndDate);
+    return loaded(
+      history,
+      filteredHistory,
+      filterStartDate,
+      filterEndDate,
+      selectedPeriod,
+    );
   }
 
   @override
@@ -534,6 +563,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -543,6 +573,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       filteredHistory,
       filterStartDate,
       filterEndDate,
+      selectedPeriod,
     );
   }
 
@@ -556,13 +587,20 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(history, filteredHistory, filterStartDate, filterEndDate);
+      return loaded(
+        history,
+        filteredHistory,
+        filterStartDate,
+        filterEndDate,
+        selectedPeriod,
+      );
     }
     return orElse();
   }
@@ -611,12 +649,14 @@ abstract class EloHistoryLoaded implements EloHistoryState {
     required final List<RatingHistoryEntry> filteredHistory,
     final DateTime? filterStartDate,
     final DateTime? filterEndDate,
+    final TimePeriod selectedPeriod,
   }) = _$EloHistoryLoadedImpl;
 
   List<RatingHistoryEntry> get history;
   List<RatingHistoryEntry> get filteredHistory;
   DateTime? get filterStartDate;
   DateTime? get filterEndDate;
+  TimePeriod get selectedPeriod;
 
   /// Create a copy of EloHistoryState
   /// with the given fields replaced by the non-null parameter values.
@@ -705,6 +745,7 @@ class _$EloHistoryErrorImpl implements EloHistoryError {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -722,6 +763,7 @@ class _$EloHistoryErrorImpl implements EloHistoryError {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -739,6 +781,7 @@ class _$EloHistoryErrorImpl implements EloHistoryError {
       List<RatingHistoryEntry> filteredHistory,
       DateTime? filterStartDate,
       DateTime? filterEndDate,
+      TimePeriod selectedPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
