@@ -3,6 +3,7 @@ import '../../data/models/user_model.dart';
 import '../../data/models/teammate_stats.dart';
 import '../../data/models/head_to_head_stats.dart';
 import '../../data/models/best_elo_record.dart';
+import '../../data/models/user_ranking.dart';
 import '../entities/time_period.dart';
 
 abstract class UserRepository {
@@ -102,4 +103,8 @@ abstract class UserRepository {
   /// Get all head-to-head statistics for a user (Story 304)
   /// Returns a stream of H2H stats ordered by games played descending
   Stream<List<HeadToHeadStats>> getAllHeadToHeadStats(String userId);
+
+  /// Get user's ranking (global, percentile, friends) via Cloud Function (Story 302.2)
+  /// Calls calculateUserRanking Cloud Function which performs cross-user queries
+  Future<UserRanking> getUserRanking(String userId);
 }
