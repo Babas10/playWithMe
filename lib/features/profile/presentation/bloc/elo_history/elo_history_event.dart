@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:play_with_me/core/domain/entities/time_period.dart';
 
 part 'elo_history_event.freezed.dart';
 
@@ -8,6 +9,10 @@ class EloHistoryEvent with _$EloHistoryEvent {
     required String userId,
     @Default(100) int limit,
   }) = LoadEloHistory;
+
+  /// Filter history by time period (Story 302.3)
+  const factory EloHistoryEvent.filterByPeriod(TimePeriod period) =
+      FilterByPeriod;
 
   const factory EloHistoryEvent.filterByDateRange({
     required DateTime startDate,

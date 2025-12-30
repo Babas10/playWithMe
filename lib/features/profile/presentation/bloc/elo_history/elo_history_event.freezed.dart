@@ -20,6 +20,7 @@ mixin _$EloHistoryEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String userId, int limit) loadHistory,
+    required TResult Function(TimePeriod period) filterByPeriod,
     required TResult Function(DateTime startDate, DateTime endDate)
     filterByDateRange,
     required TResult Function() clearFilter,
@@ -27,12 +28,14 @@ mixin _$EloHistoryEvent {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String userId, int limit)? loadHistory,
+    TResult? Function(TimePeriod period)? filterByPeriod,
     TResult? Function(DateTime startDate, DateTime endDate)? filterByDateRange,
     TResult? Function()? clearFilter,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String userId, int limit)? loadHistory,
+    TResult Function(TimePeriod period)? filterByPeriod,
     TResult Function(DateTime startDate, DateTime endDate)? filterByDateRange,
     TResult Function()? clearFilter,
     required TResult orElse(),
@@ -40,18 +43,21 @@ mixin _$EloHistoryEvent {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(LoadEloHistory value) loadHistory,
+    required TResult Function(FilterByPeriod value) filterByPeriod,
     required TResult Function(FilterByDateRange value) filterByDateRange,
     required TResult Function(ClearFilter value) clearFilter,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadEloHistory value)? loadHistory,
+    TResult? Function(FilterByPeriod value)? filterByPeriod,
     TResult? Function(FilterByDateRange value)? filterByDateRange,
     TResult? Function(ClearFilter value)? clearFilter,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadEloHistory value)? loadHistory,
+    TResult Function(FilterByPeriod value)? filterByPeriod,
     TResult Function(FilterByDateRange value)? filterByDateRange,
     TResult Function(ClearFilter value)? clearFilter,
     required TResult orElse(),
@@ -162,6 +168,7 @@ class _$LoadEloHistoryImpl implements LoadEloHistory {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String userId, int limit) loadHistory,
+    required TResult Function(TimePeriod period) filterByPeriod,
     required TResult Function(DateTime startDate, DateTime endDate)
     filterByDateRange,
     required TResult Function() clearFilter,
@@ -173,6 +180,7 @@ class _$LoadEloHistoryImpl implements LoadEloHistory {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String userId, int limit)? loadHistory,
+    TResult? Function(TimePeriod period)? filterByPeriod,
     TResult? Function(DateTime startDate, DateTime endDate)? filterByDateRange,
     TResult? Function()? clearFilter,
   }) {
@@ -183,6 +191,7 @@ class _$LoadEloHistoryImpl implements LoadEloHistory {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String userId, int limit)? loadHistory,
+    TResult Function(TimePeriod period)? filterByPeriod,
     TResult Function(DateTime startDate, DateTime endDate)? filterByDateRange,
     TResult Function()? clearFilter,
     required TResult orElse(),
@@ -197,6 +206,7 @@ class _$LoadEloHistoryImpl implements LoadEloHistory {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(LoadEloHistory value) loadHistory,
+    required TResult Function(FilterByPeriod value) filterByPeriod,
     required TResult Function(FilterByDateRange value) filterByDateRange,
     required TResult Function(ClearFilter value) clearFilter,
   }) {
@@ -207,6 +217,7 @@ class _$LoadEloHistoryImpl implements LoadEloHistory {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadEloHistory value)? loadHistory,
+    TResult? Function(FilterByPeriod value)? filterByPeriod,
     TResult? Function(FilterByDateRange value)? filterByDateRange,
     TResult? Function(ClearFilter value)? clearFilter,
   }) {
@@ -217,6 +228,7 @@ class _$LoadEloHistoryImpl implements LoadEloHistory {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadEloHistory value)? loadHistory,
+    TResult Function(FilterByPeriod value)? filterByPeriod,
     TResult Function(FilterByDateRange value)? filterByDateRange,
     TResult Function(ClearFilter value)? clearFilter,
     required TResult orElse(),
@@ -241,6 +253,164 @@ abstract class LoadEloHistory implements EloHistoryEvent {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$LoadEloHistoryImplCopyWith<_$LoadEloHistoryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$FilterByPeriodImplCopyWith<$Res> {
+  factory _$$FilterByPeriodImplCopyWith(
+    _$FilterByPeriodImpl value,
+    $Res Function(_$FilterByPeriodImpl) then,
+  ) = __$$FilterByPeriodImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({TimePeriod period});
+}
+
+/// @nodoc
+class __$$FilterByPeriodImplCopyWithImpl<$Res>
+    extends _$EloHistoryEventCopyWithImpl<$Res, _$FilterByPeriodImpl>
+    implements _$$FilterByPeriodImplCopyWith<$Res> {
+  __$$FilterByPeriodImplCopyWithImpl(
+    _$FilterByPeriodImpl _value,
+    $Res Function(_$FilterByPeriodImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of EloHistoryEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? period = null}) {
+    return _then(
+      _$FilterByPeriodImpl(
+        null == period
+            ? _value.period
+            : period // ignore: cast_nullable_to_non_nullable
+                  as TimePeriod,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$FilterByPeriodImpl implements FilterByPeriod {
+  const _$FilterByPeriodImpl(this.period);
+
+  @override
+  final TimePeriod period;
+
+  @override
+  String toString() {
+    return 'EloHistoryEvent.filterByPeriod(period: $period)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FilterByPeriodImpl &&
+            (identical(other.period, period) || other.period == period));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, period);
+
+  /// Create a copy of EloHistoryEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FilterByPeriodImplCopyWith<_$FilterByPeriodImpl> get copyWith =>
+      __$$FilterByPeriodImplCopyWithImpl<_$FilterByPeriodImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String userId, int limit) loadHistory,
+    required TResult Function(TimePeriod period) filterByPeriod,
+    required TResult Function(DateTime startDate, DateTime endDate)
+    filterByDateRange,
+    required TResult Function() clearFilter,
+  }) {
+    return filterByPeriod(period);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String userId, int limit)? loadHistory,
+    TResult? Function(TimePeriod period)? filterByPeriod,
+    TResult? Function(DateTime startDate, DateTime endDate)? filterByDateRange,
+    TResult? Function()? clearFilter,
+  }) {
+    return filterByPeriod?.call(period);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String userId, int limit)? loadHistory,
+    TResult Function(TimePeriod period)? filterByPeriod,
+    TResult Function(DateTime startDate, DateTime endDate)? filterByDateRange,
+    TResult Function()? clearFilter,
+    required TResult orElse(),
+  }) {
+    if (filterByPeriod != null) {
+      return filterByPeriod(period);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LoadEloHistory value) loadHistory,
+    required TResult Function(FilterByPeriod value) filterByPeriod,
+    required TResult Function(FilterByDateRange value) filterByDateRange,
+    required TResult Function(ClearFilter value) clearFilter,
+  }) {
+    return filterByPeriod(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LoadEloHistory value)? loadHistory,
+    TResult? Function(FilterByPeriod value)? filterByPeriod,
+    TResult? Function(FilterByDateRange value)? filterByDateRange,
+    TResult? Function(ClearFilter value)? clearFilter,
+  }) {
+    return filterByPeriod?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(LoadEloHistory value)? loadHistory,
+    TResult Function(FilterByPeriod value)? filterByPeriod,
+    TResult Function(FilterByDateRange value)? filterByDateRange,
+    TResult Function(ClearFilter value)? clearFilter,
+    required TResult orElse(),
+  }) {
+    if (filterByPeriod != null) {
+      return filterByPeriod(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class FilterByPeriod implements EloHistoryEvent {
+  const factory FilterByPeriod(final TimePeriod period) = _$FilterByPeriodImpl;
+
+  TimePeriod get period;
+
+  /// Create a copy of EloHistoryEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$FilterByPeriodImplCopyWith<_$FilterByPeriodImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -329,6 +499,7 @@ class _$FilterByDateRangeImpl implements FilterByDateRange {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String userId, int limit) loadHistory,
+    required TResult Function(TimePeriod period) filterByPeriod,
     required TResult Function(DateTime startDate, DateTime endDate)
     filterByDateRange,
     required TResult Function() clearFilter,
@@ -340,6 +511,7 @@ class _$FilterByDateRangeImpl implements FilterByDateRange {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String userId, int limit)? loadHistory,
+    TResult? Function(TimePeriod period)? filterByPeriod,
     TResult? Function(DateTime startDate, DateTime endDate)? filterByDateRange,
     TResult? Function()? clearFilter,
   }) {
@@ -350,6 +522,7 @@ class _$FilterByDateRangeImpl implements FilterByDateRange {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String userId, int limit)? loadHistory,
+    TResult Function(TimePeriod period)? filterByPeriod,
     TResult Function(DateTime startDate, DateTime endDate)? filterByDateRange,
     TResult Function()? clearFilter,
     required TResult orElse(),
@@ -364,6 +537,7 @@ class _$FilterByDateRangeImpl implements FilterByDateRange {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(LoadEloHistory value) loadHistory,
+    required TResult Function(FilterByPeriod value) filterByPeriod,
     required TResult Function(FilterByDateRange value) filterByDateRange,
     required TResult Function(ClearFilter value) clearFilter,
   }) {
@@ -374,6 +548,7 @@ class _$FilterByDateRangeImpl implements FilterByDateRange {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadEloHistory value)? loadHistory,
+    TResult? Function(FilterByPeriod value)? filterByPeriod,
     TResult? Function(FilterByDateRange value)? filterByDateRange,
     TResult? Function(ClearFilter value)? clearFilter,
   }) {
@@ -384,6 +559,7 @@ class _$FilterByDateRangeImpl implements FilterByDateRange {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadEloHistory value)? loadHistory,
+    TResult Function(FilterByPeriod value)? filterByPeriod,
     TResult Function(FilterByDateRange value)? filterByDateRange,
     TResult Function(ClearFilter value)? clearFilter,
     required TResult orElse(),
@@ -455,6 +631,7 @@ class _$ClearFilterImpl implements ClearFilter {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String userId, int limit) loadHistory,
+    required TResult Function(TimePeriod period) filterByPeriod,
     required TResult Function(DateTime startDate, DateTime endDate)
     filterByDateRange,
     required TResult Function() clearFilter,
@@ -466,6 +643,7 @@ class _$ClearFilterImpl implements ClearFilter {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String userId, int limit)? loadHistory,
+    TResult? Function(TimePeriod period)? filterByPeriod,
     TResult? Function(DateTime startDate, DateTime endDate)? filterByDateRange,
     TResult? Function()? clearFilter,
   }) {
@@ -476,6 +654,7 @@ class _$ClearFilterImpl implements ClearFilter {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String userId, int limit)? loadHistory,
+    TResult Function(TimePeriod period)? filterByPeriod,
     TResult Function(DateTime startDate, DateTime endDate)? filterByDateRange,
     TResult Function()? clearFilter,
     required TResult orElse(),
@@ -490,6 +669,7 @@ class _$ClearFilterImpl implements ClearFilter {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(LoadEloHistory value) loadHistory,
+    required TResult Function(FilterByPeriod value) filterByPeriod,
     required TResult Function(FilterByDateRange value) filterByDateRange,
     required TResult Function(ClearFilter value) clearFilter,
   }) {
@@ -500,6 +680,7 @@ class _$ClearFilterImpl implements ClearFilter {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadEloHistory value)? loadHistory,
+    TResult? Function(FilterByPeriod value)? filterByPeriod,
     TResult? Function(FilterByDateRange value)? filterByDateRange,
     TResult? Function(ClearFilter value)? clearFilter,
   }) {
@@ -510,6 +691,7 @@ class _$ClearFilterImpl implements ClearFilter {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadEloHistory value)? loadHistory,
+    TResult Function(FilterByPeriod value)? filterByPeriod,
     TResult Function(FilterByDateRange value)? filterByDateRange,
     TResult Function(ClearFilter value)? clearFilter,
     required TResult orElse(),
