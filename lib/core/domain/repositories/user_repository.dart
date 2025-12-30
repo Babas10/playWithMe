@@ -2,6 +2,8 @@ import '../../data/models/rating_history_entry.dart';
 import '../../data/models/user_model.dart';
 import '../../data/models/teammate_stats.dart';
 import '../../data/models/head_to_head_stats.dart';
+import '../../data/models/best_elo_record.dart';
+import '../entities/time_period.dart';
 
 abstract class UserRepository {
   /// Get current authenticated user
@@ -72,6 +74,20 @@ abstract class UserRepository {
   /// Get user's ELO rating history (Story 14.5.3)
   /// Returns a stream of rating history entries ordered by timestamp descending
   Stream<List<RatingHistoryEntry>> getRatingHistory(String userId, {int limit});
+
+  /// Get ELO history for a specific time period (Story 302.1)
+  /// Returns a stream of rating history entries within the specified time period
+  Stream<List<RatingHistoryEntry>> getRatingHistoryByPeriod(
+    String userId,
+    TimePeriod period,
+  );
+
+  /// Get best ELO within a time period (Story 302.1)
+  /// Returns the highest ELO rating achieved within the specified time period
+  Future<BestEloRecord?> getBestEloInPeriod(
+    String userId,
+    TimePeriod period,
+  );
 
   /// Get teammate statistics for a specific partner (Story 304)
   Future<TeammateStats?> getTeammateStats(String userId, String teammateId);
