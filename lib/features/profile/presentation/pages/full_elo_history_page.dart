@@ -7,6 +7,7 @@ import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_state.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
 import 'package:intl/intl.dart';
 
 class FullEloHistoryPage extends StatelessWidget {
@@ -57,8 +58,10 @@ class FullEloHistoryPage extends StatelessWidget {
             return state.when(
               initial: () => const SizedBox.shrink(),
               loading: () => const Center(child: CircularProgressIndicator()),
-              loaded: (history, filteredHistory, startDate, endDate) =>
-                  _buildLoadedView(context, filteredHistory, startDate, endDate),
+              loaded: (history, filteredHistory, startDate, endDate,
+                      selectedPeriod) =>
+                  _buildLoadedView(
+                      context, filteredHistory, startDate, endDate),
               error: (message) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -185,6 +188,25 @@ class FullEloHistoryPage extends StatelessWidget {
               ),
             ],
           ),
+        ),
+
+        // Time Period Selector (Story 302.3)
+        BlocBuilder<EloHistoryBloc, EloHistoryState>(
+          builder: (context, state) {
+            if (state is! EloHistoryLoaded) return const SizedBox.shrink();
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TimePeriodSelector(
+                selectedPeriod: state.selectedPeriod,
+                onPeriodChanged: (period) {
+                  context.read<EloHistoryBloc>().add(
+                        EloHistoryEvent.filterByPeriod(period),
+                      );
+                },
+              ),
+            );
+          },
         ),
 
         // Filter indicator
