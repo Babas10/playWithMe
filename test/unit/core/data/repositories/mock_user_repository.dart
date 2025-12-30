@@ -6,6 +6,7 @@ import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/data/models/teammate_stats.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
 import 'package:play_with_me/core/data/models/best_elo_record.dart';
+import 'package:play_with_me/core/data/models/user_ranking.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 
@@ -260,6 +261,19 @@ class MockUserRepository implements UserRepository {
   Stream<List<HeadToHeadStats>> getAllHeadToHeadStats(String userId) {
     // Return empty list for testing - can be customized per test if needed
     return Stream.value([]);
+  }
+
+  @override
+  Future<UserRanking> getUserRanking(String userId) async {
+    // Return mock ranking for testing - can be customized per test if needed
+    return UserRanking(
+      globalRank: 42,
+      totalUsers: 1000,
+      percentile: 95.8,
+      friendsRank: 3,
+      totalFriends: 15,
+      calculatedAt: DateTime.now(),
+    );
   }
 }
 
