@@ -1,14 +1,22 @@
 // Momentum and consistency card showing streak and monthly improvement.
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_event.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_state.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/monthly_improvement_chart.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
 
 /// A card widget displaying momentum and consistency metrics.
 ///
 /// Includes:
 /// - Current win streak with longest streak (optional secondary line)
-/// - Monthly improvement chart for long-term progress tracking
+/// - Time period selector for filtering (Story 302.3)
+/// - Monthly improvement chart for long-term progress tracking (Story 302.4)
 class MomentumConsistencyCard extends StatelessWidget {
   final UserModel user;
   final List<RatingHistoryEntry> ratingHistory;
@@ -23,37 +31,64 @@ class MomentumConsistencyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      margin: const EdgeInsets.all(16.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Text(
-              'Momentum & Consistency',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+    return BlocProvider(
+      create: (context) => EloHistoryBloc(
+        userRepository: sl<UserRepository>(),
+      )..add(EloHistoryEvent.loadHistory(userId: user.uid)),
+      child: Card(
+        margin: const EdgeInsets.all(16.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Text(
+                'Momentum & Consistency',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            // Current Streak
-            _buildStreakSection(context),
-            const SizedBox(height: 24),
-            // Monthly Improvement Chart
-            Text(
-              'Monthly Progress',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 16),
+              // Current Streak
+              _buildStreakSection(context),
+              const SizedBox(height: 24),
+              // Monthly Progress with Time Period Selector
+              Text(
+                'ELO Progress',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            MonthlyImprovementChart(
-              ratingHistory: ratingHistory,
-              currentElo: user.eloRating,
-            ),
-          ],
+              const SizedBox(height: 12),
+              // Time Period Selector (Story 302.3)
+              BlocBuilder<EloHistoryBloc, EloHistoryState>(
+                builder: (context, state) {
+                  if (state is! EloHistoryLoaded) return const SizedBox.shrink();
+
+                  return Column(
+                    children: [
+                      TimePeriodSelector(
+                        selectedPeriod: state.selectedPeriod,
+                        onPeriodChanged: (period) {
+                          context.read<EloHistoryBloc>().add(
+                                EloHistoryEvent.filterByPeriod(period),
+                              );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      // Enhanced Chart (Story 302.4)
+                      MonthlyImprovementChart(
+                        ratingHistory: state.filteredHistory,
+                        currentElo: user.eloRating,
+                        timePeriod: state.selectedPeriod,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -125,14 +160,6 @@ class MomentumConsistencyCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                // TODO: Add longest streak when that data is available
-                // const SizedBox(height: 4),
-                // Text(
-                //   'Longest: 12 games',
-                //   style: theme.textTheme.bodySmall?.copyWith(
-                //     color: theme.colorScheme.onSurface.withOpacity(0.6),
-                //   ),
-                // ),
               ],
             ),
           ),
