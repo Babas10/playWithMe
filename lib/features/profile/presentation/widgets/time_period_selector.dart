@@ -3,11 +3,10 @@ import 'package:play_with_me/core/domain/entities/time_period.dart';
 
 /// A horizontal selector for choosing time periods (Story 302.3).
 ///
-/// Displays 5 preset options as chips:
-/// - 15 Days
-/// - 30 Days
-/// - 90 Days
-/// - 1 Year
+/// Displays 4 preset options as chips:
+/// - 30d
+/// - 90d
+/// - 1y
 /// - All Time
 class TimePeriodSelector extends StatelessWidget {
   final TimePeriod selectedPeriod;

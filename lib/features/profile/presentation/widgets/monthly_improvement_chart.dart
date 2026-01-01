@@ -1,4 +1,5 @@
 // Enhanced ELO progress chart with area fill and adaptive aggregation (Story 302.4).
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -52,7 +53,6 @@ class MonthlyImprovementChart extends StatelessWidget {
     if (ratingHistory.isEmpty) return [];
 
     switch (period) {
-      case TimePeriod.fifteenDays:
       case TimePeriod.thirtyDays:
         return _aggregateByDay();
       case TimePeriod.ninetyDays:
@@ -139,22 +139,59 @@ class MonthlyImprovementChart extends StatelessWidget {
   Widget _buildChart(BuildContext context, List<ChartDataPoint> data) {
     final theme = Theme.of(context);
 
+    // Calculate Y-axis bounds and interval (Story 302.4.1)
+    final minElo = data.map((e) => e.eloRating).reduce((a, b) => a < b ? a : b);
+    final maxElo = data.map((e) => e.eloRating).reduce((a, b) => a > b ? a : b);
+
+    var dataMinY = minElo;
+    var dataMaxY = maxElo;
+
+    // Ensure minimal range to avoid single-line chart
+    if (dataMaxY - dataMinY < 1) {
+      dataMinY -= 2;
+      dataMaxY += 2;
+    }
+
+    final range = dataMaxY - dataMinY;
+
+    // Calculate a "nice" interval ensuring max 5 labels (Story 302.4.1)
+    // Start with an interval that would give us about 4-5 labels
+    final rawInterval = range / 4;
+    var interval = _calculateNiceInterval(rawInterval);
+
+    // Round bounds to interval boundaries to get compact, data-focused range
+    var minY = (dataMinY / interval).floor() * interval;
+    var maxY = (dataMaxY / interval).ceil() * interval;
+
+    // Count how many labels we'd have (intervals + 1)
+    var numLabels = ((maxY - minY) / interval).round() + 1;
+
+    // If we have more than 5 labels, increase interval to next nice number
+    while (numLabels > 5) {
+      interval = _getNextNiceInterval(interval);
+      minY = (dataMinY / interval).floor() * interval;
+      maxY = (dataMaxY / interval).ceil() * interval;
+      numLabels = ((maxY - minY) / interval).round() + 1;
+    }
+
     return SizedBox(
-      height: 220, // Increased height for better visibility
+      height: 220,
       child: Padding(
         padding: const EdgeInsets.only(right: 16.0, top: 16.0),
         child: LineChart(
           LineChartData(
-            gridData: const FlGridData(show: false), // No grid (Story 302.4)
+            gridData: const FlGridData(show: false),
             titlesData: FlTitlesData(
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 45,
-                  interval: _calculateYAxisInterval(data),
+                  interval: interval,
                   getTitlesWidget: (value, meta) {
+                    // Simply display the rounded value for every interval tick.
+                    // fl_chart guarantees these are spaced by `interval`.
                     return Text(
-                      value.toInt().toString(),
+                      value.round().toString(),
                       style: theme.textTheme.bodySmall,
                     );
                   },
@@ -188,6 +225,8 @@ class MonthlyImprovementChart extends StatelessWidget {
               ),
             ),
             borderData: FlBorderData(show: false),
+            // Allow drawing outside to prevent line thickness clipping at exact min/max
+            clipData: const FlClipData.none(),
             lineBarsData: [
               LineChartBarData(
                 spots: data.asMap().entries.map((entry) {
@@ -196,13 +235,13 @@ class MonthlyImprovementChart extends StatelessWidget {
                     entry.value.eloRating,
                   );
                 }).toList(),
-                isCurved: true, // Smooth curves (Story 302.4)
+                isCurved: true,
                 curveSmoothness: 0.4,
                 color: theme.colorScheme.primary,
                 barWidth: 3,
                 isStrokeCapRound: true,
                 dotData: FlDotData(
-                  show: data.length <= 15, // Conditional dots (Story 302.4)
+                  show: data.length <= 15,
                   getDotPainter: (spot, percent, barData, index) {
                     return FlDotCirclePainter(
                       radius: 5,
@@ -225,28 +264,12 @@ class MonthlyImprovementChart extends StatelessWidget {
                 ),
               ),
             ],
-            minY: _calculateMinY(data),
-            maxY: _calculateMaxY(data),
+            minY: minY,
+            maxY: maxY,
           ),
         ),
       ),
     );
-  }
-
-  // Helper methods for adaptive scaling (Story 302.4)
-  double _calculateMinY(List<ChartDataPoint> data) {
-    final minElo = data.map((e) => e.eloRating).reduce((a, b) => a < b ? a : b);
-    return (minElo - 50).floorToDouble();
-  }
-
-  double _calculateMaxY(List<ChartDataPoint> data) {
-    final maxElo = data.map((e) => e.eloRating).reduce((a, b) => a > b ? a : b);
-    return (maxElo + 50).ceilToDouble();
-  }
-
-  double _calculateYAxisInterval(List<ChartDataPoint> data) {
-    final range = _calculateMaxY(data) - _calculateMinY(data);
-    return (range / 4).ceilToDouble(); // ~4 labels on Y-axis
   }
 
   double _calculateXAxisInterval(List<ChartDataPoint> data) {
@@ -254,6 +277,67 @@ class MonthlyImprovementChart extends StatelessWidget {
     if (data.length <= 10) return 2;
     if (data.length <= 20) return 4;
     return (data.length / 5).ceilToDouble();
+  }
+
+  /// Calculate a "nice" interval for Y-axis labels (Story 302.4.1)
+  ///
+  /// Rounds the raw interval to friendly numbers like 1, 2, 5, 10, 20, 50, 100, etc.
+  /// This ensures readable labels and prevents overlap.
+  double _calculateNiceInterval(double rawInterval) {
+    if (rawInterval <= 0) return 1;
+
+    // Find the magnitude (power of 10)
+    final exponent = (log(rawInterval) / ln10).floor();
+    final magnitude = pow(10, exponent).toDouble();
+
+    // Normalize to range [1, 10)
+    final normalized = rawInterval / magnitude;
+
+    // Round to nearest nice number: 1, 2, 5, or 10
+    double nice;
+    if (normalized <= 1.5) {
+      nice = 1;
+    } else if (normalized <= 3) {
+      nice = 2;
+    } else if (normalized <= 7) {
+      nice = 5;
+    } else {
+      nice = 10;
+    }
+
+    final result = nice * magnitude;
+
+    // Ensure minimum interval of 1 to avoid fractional ELO labels
+    return result < 1 ? 1 : result;
+  }
+
+  /// Get the next nice interval (Story 302.4.1)
+  ///
+  /// Returns the next value in the sequence: 1, 2, 5, 10, 20, 50, 100, etc.
+  double _getNextNiceInterval(double currentInterval) {
+    if (currentInterval <= 0) return 1;
+
+    // Find the magnitude (power of 10)
+    final exponent = (log(currentInterval) / ln10).floor();
+    final magnitude = pow(10, exponent).toDouble();
+
+    // Normalize to range [1, 10)
+    final normalized = currentInterval / magnitude;
+
+    // Get next nice number in sequence: 1 -> 2 -> 5 -> 10
+    double nextNice;
+    if (normalized < 2) {
+      nextNice = 2;
+    } else if (normalized < 5) {
+      nextNice = 5;
+    } else {
+      nextNice = 10;
+    }
+
+    final result = nextNice * magnitude;
+
+    // Ensure minimum interval of 1
+    return result < 1 ? 1 : result;
   }
 }
 

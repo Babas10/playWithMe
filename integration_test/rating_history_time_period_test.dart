@@ -103,7 +103,7 @@ void main() {
 
       // 4. Test 15-day period - should get 1 entry
       final fifteenDayHistory = await repository
-          .getRatingHistoryByPeriod(user.uid, TimePeriod.fifteenDays)
+          .getRatingHistoryByPeriod(user.uid, TimePeriod.thirtyDays)
           .first;
       expect(fifteenDayHistory.length, equals(1));
       expect(fifteenDayHistory[0].gameId, equals('game-1'));
@@ -173,7 +173,7 @@ void main() {
 
       // 4. Test 15-day period - should be empty
       final history = await repository
-          .getRatingHistoryByPeriod(user.uid, TimePeriod.fifteenDays)
+          .getRatingHistoryByPeriod(user.uid, TimePeriod.thirtyDays)
           .first;
       expect(history, isEmpty);
     });
@@ -285,7 +285,7 @@ void main() {
       // 4. Test 15-day period - should return null
       final bestElo = await repository.getBestEloInPeriod(
         user.uid,
-        TimePeriod.fifteenDays,
+        TimePeriod.thirtyDays,
       );
       expect(bestElo, isNull);
     });
@@ -370,7 +370,7 @@ void main() {
 
       // 4. Get history for 15-day period
       final history = await repository
-          .getRatingHistoryByPeriod(user.uid, TimePeriod.fifteenDays)
+          .getRatingHistoryByPeriod(user.uid, TimePeriod.thirtyDays)
           .first;
 
       // 5. Verify ordering (newest first)

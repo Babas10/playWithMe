@@ -188,56 +188,6 @@ void main() {
     // Story 302.3: FilterByPeriod tests
     group('FilterByPeriod event (Story 302.3)', () {
       blocTest<EloHistoryBloc, EloHistoryState>(
-        'filters history by 15 days period correctly',
-        build: () {
-          return EloHistoryBloc(userRepository: mockUserRepository);
-        },
-        seed: () {
-          final now = DateTime.now();
-          final history = [
-            RatingHistoryEntry(
-              entryId: 'entry-1',
-              gameId: 'game-1',
-              oldRating: 1600,
-              newRating: 1625,
-              ratingChange: 25,
-              opponentTeam: 'Team A',
-              won: true,
-              timestamp: now.subtract(const Duration(days: 5)),
-            ),
-            RatingHistoryEntry(
-              entryId: 'entry-2',
-              gameId: 'game-2',
-              oldRating: 1625,
-              newRating: 1610,
-              ratingChange: -15,
-              opponentTeam: 'Team B',
-              won: false,
-              timestamp: now.subtract(const Duration(days: 20)),
-            ),
-          ];
-          return EloHistoryState.loaded(
-            history: history,
-            filteredHistory: history,
-            filterStartDate: null,
-            filterEndDate: null,
-          );
-        },
-        act: (bloc) => bloc.add(
-          const EloHistoryEvent.filterByPeriod(TimePeriod.fifteenDays),
-        ),
-        expect: () => [
-          isA<EloHistoryLoaded>()
-              .having((s) => s.history.length, 'history length', 2)
-              .having((s) => s.filteredHistory.length, 'filtered length', 1)
-              .having((s) => s.filterStartDate, 'start date', isNotNull)
-              .having((s) => s.filterEndDate, 'end date', isNotNull)
-              .having((s) => s.selectedPeriod, 'selected period',
-                  TimePeriod.fifteenDays),
-        ],
-      );
-
-      blocTest<EloHistoryBloc, EloHistoryState>(
         'filters history by 30 days period correctly',
         build: () {
           return EloHistoryBloc(userRepository: mockUserRepository);
