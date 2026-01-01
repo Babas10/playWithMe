@@ -235,7 +235,7 @@ void main() {
             body: MonthlyImprovementChart(
               ratingHistory: dailyHistory,
               currentElo: 1700.0,
-              timePeriod: TimePeriod.fifteenDays,
+              timePeriod: TimePeriod.thirtyDays,
             ),
           ),
         ),
