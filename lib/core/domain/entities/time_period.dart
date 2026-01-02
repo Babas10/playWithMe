@@ -1,7 +1,6 @@
 /// Time period options for filtering ELO rating history (Story 302.1).
 /// Used to display rating progress over different time ranges.
 enum TimePeriod {
-  fifteenDays,
   thirtyDays,
   ninetyDays,
   oneYear,
@@ -14,8 +13,6 @@ extension TimePeriodExtension on TimePeriod {
   DateTime getStartDate() {
     final now = DateTime.now();
     switch (this) {
-      case TimePeriod.fifteenDays:
-        return now.subtract(const Duration(days: 15));
       case TimePeriod.thirtyDays:
         return now.subtract(const Duration(days: 30));
       case TimePeriod.ninetyDays:
@@ -30,14 +27,12 @@ extension TimePeriodExtension on TimePeriod {
   /// Get human-readable display name for this time period
   String get displayName {
     switch (this) {
-      case TimePeriod.fifteenDays:
-        return '15 Days';
       case TimePeriod.thirtyDays:
-        return '30 Days';
+        return '30d';
       case TimePeriod.ninetyDays:
-        return '90 Days';
+        return '90d';
       case TimePeriod.oneYear:
-        return '1 Year';
+        return '1y';
       case TimePeriod.allTime:
         return 'All Time';
     }

@@ -6,7 +6,7 @@ import 'package:play_with_me/features/profile/presentation/widgets/time_period_s
 
 void main() {
   group('TimePeriodSelector Widget Tests', () {
-    testWidgets('renders all 5 time period chips', (tester) async {
+    testWidgets('renders all 4 time period chips', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
         MaterialApp(
@@ -20,10 +20,9 @@ void main() {
       );
 
       // Assert
-      expect(find.text('15 Days'), findsOneWidget);
-      expect(find.text('30 Days'), findsOneWidget);
-      expect(find.text('90 Days'), findsOneWidget);
-      expect(find.text('1 Year'), findsOneWidget);
+      expect(find.text('30d'), findsOneWidget);
+      expect(find.text('90d'), findsOneWidget);
+      expect(find.text('1y'), findsOneWidget);
       expect(find.text('All Time'), findsOneWidget);
     });
 
@@ -40,8 +39,8 @@ void main() {
         ),
       );
 
-      // Assert - Find the ChoiceChip for "30 Days"
-      final thirtyDaysChip = find.widgetWithText(ChoiceChip, '30 Days');
+      // Assert - Find the ChoiceChip for "30d"
+      final thirtyDaysChip = find.widgetWithText(ChoiceChip, '30d');
       expect(thirtyDaysChip, findsOneWidget);
 
       final choiceChip = tester.widget<ChoiceChip>(thirtyDaysChip);
@@ -61,11 +60,11 @@ void main() {
         ),
       );
 
-      // Assert - Find unselected chip (15 Days)
-      final fifteenDaysChip = find.widgetWithText(ChoiceChip, '15 Days');
-      expect(fifteenDaysChip, findsOneWidget);
+      // Assert - Find unselected chip (30d)
+      final thirtyDaysChip = find.widgetWithText(ChoiceChip, '30d');
+      expect(thirtyDaysChip, findsOneWidget);
 
-      final choiceChip = tester.widget<ChoiceChip>(fifteenDaysChip);
+      final choiceChip = tester.widget<ChoiceChip>(thirtyDaysChip);
       expect(choiceChip.selected, isFalse);
     });
 
@@ -87,8 +86,8 @@ void main() {
         ),
       );
 
-      // Act - Tap on "30 Days" chip
-      await tester.tap(find.text('30 Days'));
+      // Act - Tap on "30d" chip
+      await tester.tap(find.text('30d'));
       await tester.pumpAndSettle();
 
       // Assert
@@ -113,18 +112,18 @@ void main() {
       );
 
       // Act - Tap on different chips
-      await tester.tap(find.text('15 Days'));
+      await tester.tap(find.text('30d'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('90 Days'));
+      await tester.tap(find.text('90d'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('1 Year'));
+      await tester.tap(find.text('1y'));
       await tester.pumpAndSettle();
 
       // Assert
       expect(tappedPeriods.length, 3);
-      expect(tappedPeriods[0], TimePeriod.fifteenDays);
+      expect(tappedPeriods[0], TimePeriod.thirtyDays);
       expect(tappedPeriods[1], TimePeriod.ninetyDays);
       expect(tappedPeriods[2], TimePeriod.oneYear);
     });
@@ -233,7 +232,7 @@ void main() {
       );
 
       // Act - Tap on already selected chip
-      await tester.tap(find.text('30 Days'));
+      await tester.tap(find.text('30d'));
       await tester.pumpAndSettle();
 
       // Assert - Callback should still be triggered
