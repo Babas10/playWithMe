@@ -13,17 +13,6 @@ void main() {
         testNow = DateTime.now();
       });
 
-      test('fifteenDays returns date 15 days ago', () {
-        final startDate = TimePeriod.fifteenDays.getStartDate();
-        final expectedDate = testNow.subtract(const Duration(days: 15));
-
-        // Allow 1 second tolerance for test execution time
-        expect(
-          startDate.difference(expectedDate).abs().inSeconds,
-          lessThan(2),
-        );
-      });
-
       test('thirtyDays returns date 30 days ago', () {
         final startDate = TimePeriod.thirtyDays.getStartDate();
         final expectedDate = testNow.subtract(const Duration(days: 30));
@@ -75,20 +64,16 @@ void main() {
     });
 
     group('displayName', () {
-      test('fifteenDays returns "15 Days"', () {
-        expect(TimePeriod.fifteenDays.displayName, equals('15 Days'));
+      test('thirtyDays returns "30d"', () {
+        expect(TimePeriod.thirtyDays.displayName, equals('30d'));
       });
 
-      test('thirtyDays returns "30 Days"', () {
-        expect(TimePeriod.thirtyDays.displayName, equals('30 Days'));
+      test('ninetyDays returns "90d"', () {
+        expect(TimePeriod.ninetyDays.displayName, equals('90d'));
       });
 
-      test('ninetyDays returns "90 Days"', () {
-        expect(TimePeriod.ninetyDays.displayName, equals('90 Days'));
-      });
-
-      test('oneYear returns "1 Year"', () {
-        expect(TimePeriod.oneYear.displayName, equals('1 Year'));
+      test('oneYear returns "1y"', () {
+        expect(TimePeriod.oneYear.displayName, equals('1y'));
       });
 
       test('allTime returns "All Time"', () {
@@ -116,13 +101,12 @@ void main() {
     });
 
     group('edge cases', () {
-      test('enum has exactly 5 values', () {
-        expect(TimePeriod.values.length, equals(5));
+      test('enum has exactly 4 values', () {
+        expect(TimePeriod.values.length, equals(4));
       });
 
       test('enum values are in expected order', () {
         expect(TimePeriod.values, [
-          TimePeriod.fifteenDays,
           TimePeriod.thirtyDays,
           TimePeriod.ninetyDays,
           TimePeriod.oneYear,
@@ -143,13 +127,11 @@ void main() {
       });
 
       test('periods are ordered from shortest to longest', () {
-        final fifteenDaysStart = TimePeriod.fifteenDays.getStartDate();
         final thirtyDaysStart = TimePeriod.thirtyDays.getStartDate();
         final ninetyDaysStart = TimePeriod.ninetyDays.getStartDate();
         final oneYearStart = TimePeriod.oneYear.getStartDate();
         final allTimeStart = TimePeriod.allTime.getStartDate();
 
-        expect(fifteenDaysStart.isAfter(thirtyDaysStart), isTrue);
         expect(thirtyDaysStart.isAfter(ninetyDaysStart), isTrue);
         expect(ninetyDaysStart.isAfter(oneYearStart), isTrue);
         expect(oneYearStart.isAfter(allTimeStart), isTrue);
