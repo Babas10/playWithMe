@@ -224,7 +224,19 @@ class MonthlyImprovementChart extends StatelessWidget {
                 sideTitles: SideTitles(showTitles: false),
               ),
             ),
-            borderData: FlBorderData(show: false),
+            borderData: FlBorderData(
+              show: true,
+              border: Border(
+                left: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  width: 1,
+                ),
+                bottom: BorderSide(
+                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+            ),
             // Allow drawing outside to prevent line thickness clipping at exact min/max
             clipData: const FlClipData.none(),
             lineBarsData: [
