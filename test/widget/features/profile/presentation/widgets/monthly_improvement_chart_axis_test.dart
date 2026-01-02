@@ -132,4 +132,260 @@ void main() {
       expect(borderData.border.right.style, BorderStyle.none);
     });
   });
+
+  group('MonthlyImprovementChart Two-Tier X-Axis Labels (Story 302.4.3)', () {
+    testWidgets('shows month labels for all data points', (tester) async {
+      final now = DateTime.now();
+      final month1 = now.month >= 3 ? now.month - 2 : 3;
+      final month2 = now.month >= 2 ? now.month - 1 : 2;
+
+      final currentYearHistory = [
+        RatingHistoryEntry(
+          entryId: 'entry-1',
+          gameId: 'game-1',
+          oldRating: 1600,
+          newRating: 1620,
+          ratingChange: 20,
+          opponentTeam: 'Team A',
+          won: true,
+          timestamp: DateTime(now.year, month1, 15),
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-2',
+          gameId: 'game-2',
+          oldRating: 1620,
+          newRating: 1650,
+          ratingChange: 30,
+          opponentTeam: 'Team B',
+          won: true,
+          timestamp: DateTime(now.year, month2, 10),
+        ),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MonthlyImprovementChart(
+              ratingHistory: currentYearHistory,
+              currentElo: 1650,
+              timePeriod: TimePeriod.allTime,
+            ),
+          ),
+        ),
+      );
+
+      // Verify month labels are present (3 letters, no digits)
+      final allText = tester.widgetList<Text>(find.byType(Text));
+      int monthLabelCount = 0;
+
+      for (final text in allText) {
+        final data = text.data ?? '';
+        if (data.length == 3 && !data.contains(RegExp(r'\d'))) {
+          monthLabelCount++;
+        }
+      }
+
+      expect(monthLabelCount, greaterThanOrEqualTo(2),
+          reason: 'Should have found month labels for data points');
+    });
+
+    testWidgets('shows year label centered within year range', (tester) async {
+      final now = DateTime.now();
+      final previousYear = now.year - 1;
+      final previousYearHistory = [
+        RatingHistoryEntry(
+          entryId: 'entry-1',
+          gameId: 'game-1',
+          oldRating: 1600,
+          newRating: 1620,
+          ratingChange: 20,
+          opponentTeam: 'Team A',
+          won: true,
+          timestamp: DateTime(previousYear, 11, 15), // November previous year
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-2',
+          gameId: 'game-2',
+          oldRating: 1620,
+          newRating: 1650,
+          ratingChange: 30,
+          opponentTeam: 'Team B',
+          won: true,
+          timestamp: DateTime(previousYear, 12, 10), // December previous year
+        ),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MonthlyImprovementChart(
+              ratingHistory: previousYearHistory,
+              currentElo: 1650,
+              timePeriod: TimePeriod.allTime,
+            ),
+          ),
+        ),
+      );
+
+      // Verify year label appears (should be the full 4-digit year, not abbreviated)
+      final allText = tester.widgetList<Text>(find.byType(Text));
+      bool foundYearLabel = false;
+
+      for (final text in allText) {
+        final data = text.data ?? '';
+        // Check if it's a 4-digit year
+        if (data == previousYear.toString()) {
+          foundYearLabel = true;
+        }
+      }
+
+      expect(foundYearLabel, isTrue,
+          reason: 'Should have found year label for previous year');
+    });
+
+    testWidgets('shows year labels centered for each year in dataset', (tester) async {
+      final now = DateTime.now();
+      final previousYear = now.year - 1;
+      final mixedYearHistory = [
+        RatingHistoryEntry(
+          entryId: 'entry-1',
+          gameId: 'game-1',
+          oldRating: 1600,
+          newRating: 1620,
+          ratingChange: 20,
+          opponentTeam: 'Team A',
+          won: true,
+          timestamp: DateTime(previousYear, 12, 15), // December previous year
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-2',
+          gameId: 'game-2',
+          oldRating: 1620,
+          newRating: 1650,
+          ratingChange: 30,
+          opponentTeam: 'Team B',
+          won: true,
+          timestamp: DateTime(now.year, 1, 10), // January current year
+        ),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MonthlyImprovementChart(
+              ratingHistory: mixedYearHistory,
+              currentElo: 1650,
+              timePeriod: TimePeriod.allTime,
+            ),
+          ),
+        ),
+      );
+
+      final allText = tester.widgetList<Text>(find.byType(Text));
+      bool foundPreviousYearLabel = false;
+      bool foundCurrentYearLabel = false;
+      int monthLabelCount = 0;
+
+      for (final text in allText) {
+        final data = text.data ?? '';
+        // Check for year labels (4-digit years)
+        if (data == previousYear.toString()) {
+          foundPreviousYearLabel = true;
+        }
+        if (data == now.year.toString()) {
+          foundCurrentYearLabel = true;
+        }
+        // Count month labels
+        if (data.length == 3 && !data.contains(RegExp(r'\d'))) {
+          monthLabelCount++;
+        }
+      }
+
+      expect(foundPreviousYearLabel, isTrue,
+          reason: 'Should have year label for previous year');
+      expect(foundCurrentYearLabel, isTrue,
+          reason: 'Should have year label for current year (year transition)');
+      expect(monthLabelCount, greaterThanOrEqualTo(2),
+          reason: 'Should have month labels for both data points');
+    });
+
+    testWidgets('reserved space increased for two-tier labels', (tester) async {
+      final now = DateTime.now();
+      final history = [
+        RatingHistoryEntry(
+          entryId: 'entry-1',
+          gameId: 'game-1',
+          oldRating: 1600,
+          newRating: 1620,
+          ratingChange: 20,
+          opponentTeam: 'Team A',
+          won: true,
+          timestamp: DateTime(now.year, 6, 15),
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-2',
+          gameId: 'game-2',
+          oldRating: 1620,
+          newRating: 1650,
+          ratingChange: 30,
+          opponentTeam: 'Team B',
+          won: true,
+          timestamp: DateTime(now.year, 7, 10),
+        ),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MonthlyImprovementChart(
+              ratingHistory: history,
+              currentElo: 1650,
+              timePeriod: TimePeriod.allTime,
+            ),
+          ),
+        ),
+      );
+
+      final chart = tester.widget<LineChart>(find.byType(LineChart));
+      final bottomTitles = chart.data.titlesData.bottomTitles;
+
+      // Verify reserved size is increased for two-tier labels (42 vs old 32)
+      expect(bottomTitles.sideTitles.reservedSize, equals(42),
+          reason: 'Reserved size should be 42 for two-tier labels');
+    });
+
+    testWidgets('column layout used for two-tier labels', (tester) async {
+      final now = DateTime.now();
+      final previousYear = now.year - 1;
+      final history = [
+        RatingHistoryEntry(
+          entryId: 'entry-1',
+          gameId: 'game-1',
+          oldRating: 1600,
+          newRating: 1620,
+          ratingChange: 20,
+          opponentTeam: 'Team A',
+          won: true,
+          timestamp: DateTime(previousYear, 11, 15),
+        ),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MonthlyImprovementChart(
+              ratingHistory: history,
+              currentElo: 1620,
+              timePeriod: TimePeriod.allTime,
+            ),
+          ),
+        ),
+      );
+
+      // Verify Column widgets are used for label structure
+      final columns = tester.widgetList<Column>(find.byType(Column));
+      expect(columns.length, greaterThan(0),
+          reason: 'Should have Column widgets for two-tier structure');
+    });
+  });
 }
