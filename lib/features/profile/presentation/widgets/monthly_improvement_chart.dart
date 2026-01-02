@@ -126,10 +126,15 @@ class MonthlyImprovementChart extends StatelessWidget {
       final snapshotRating = entries.last.newRating;
       final date = entries.last.timestamp;
 
+      // Two-tier label system (Story 302.4.3):
+      // - Top tier: Month abbreviation only
+      // - Bottom tier: Year (shown only at first occurrence of each year)
+      final label = labelFormat.format(date);
+
       dataPoints.add(ChartDataPoint(
         date: date,
         eloRating: snapshotRating,
-        label: labelFormat.format(date),
+        label: label,
       ));
     }
 
@@ -200,18 +205,57 @@ class MonthlyImprovementChart extends StatelessWidget {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 32,
-                  interval: _calculateXAxisInterval(data),
+                  reservedSize: 42, // Increased for two-tier labels
+                  interval: 1, // Show all positions to ensure year labels appear
                   getTitlesWidget: (value, meta) {
                     final index = value.toInt();
                     if (index < 0 || index >= data.length) {
                       return const SizedBox.shrink();
                     }
+
+                    final currentPoint = data[index];
+                    final currentYear = currentPoint.date.year;
+
+                    // Determine if we should show month label at this position
+                    final calculatedInterval = _calculateXAxisInterval(data);
+                    final showMonth = index % calculatedInterval.toInt() == 0;
+
+                    // Determine if this is the position to show the year label
+                    final showYear = _shouldShowYearAtIndex(data, index, currentYear);
+
+                    // If neither month nor year should show, return empty space
+                    if (!showMonth && !showYear) {
+                      return const SizedBox.shrink();
+                    }
+
                     return Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        data[index].label,
-                        style: theme.textTheme.bodySmall,
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Top tier: Month label (if this position should show it)
+                          if (showMonth)
+                            Text(
+                              currentPoint.label,
+                              style: theme.textTheme.bodySmall,
+                            )
+                          else
+                            const SizedBox(height: 14), // Placeholder height
+                          // Bottom tier: Year label (if this is the middle of year range)
+                          if (showYear)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2.0),
+                              child: Text(
+                                currentYear.toString(),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontSize: 10,
+                                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                                ),
+                              ),
+                            )
+                          else
+                            const SizedBox(height: 14), // Placeholder for alignment
+                        ],
                       ),
                     );
                   },
@@ -289,6 +333,28 @@ class MonthlyImprovementChart extends StatelessWidget {
     if (data.length <= 10) return 2;
     if (data.length <= 20) return 4;
     return (data.length / 5).ceilToDouble();
+  }
+
+  /// Determine if year label should be shown at this index (Story 302.4.3)
+  ///
+  /// Shows the year label centered among data points for each year.
+  /// Uses a cached map to ensure consistent positioning regardless of render order.
+  bool _shouldShowYearAtIndex(List<ChartDataPoint> data, int index, int year) {
+    // Find all indices for this year
+    final yearIndices = <int>[];
+    for (int i = 0; i < data.length; i++) {
+      if (data[i].date.year == year) {
+        yearIndices.add(i);
+      }
+    }
+
+    if (yearIndices.isEmpty) return false;
+
+    // Calculate the middle index for this year
+    final middleIndex = yearIndices[yearIndices.length ~/ 2];
+
+    // Show year at the middle index
+    return index == middleIndex;
   }
 
   /// Calculate a "nice" interval for Y-axis labels (Story 302.4.1)
