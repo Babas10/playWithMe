@@ -8,7 +8,11 @@ import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_state.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/monthly_improvement_chart.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/ranking_stats_cards.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
 
 /// A card widget displaying momentum and consistency metrics.
@@ -31,10 +35,19 @@ class MomentumConsistencyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return BlocProvider(
-      create: (context) => EloHistoryBloc(
-        userRepository: sl<UserRepository>(),
-      )..add(EloHistoryEvent.loadHistory(userId: user.uid)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => EloHistoryBloc(
+            userRepository: sl<UserRepository>(),
+          )..add(EloHistoryEvent.loadHistory(userId: user.uid)),
+        ),
+        BlocProvider(
+          create: (context) => PlayerStatsBloc(
+            userRepository: sl<UserRepository>(),
+          )..add(LoadPlayerStats(user.uid)), // Story 302.5: Load stats (ranking auto-loads via listener)
+        ),
+      ],
       child: Card(
         margin: const EdgeInsets.all(16.0),
         child: Padding(
@@ -61,6 +74,37 @@ class MomentumConsistencyCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              // Ranking Stats Cards (Story 302.5) - Displayed above time period selector
+              BlocListener<PlayerStatsBloc, PlayerStatsState>(
+                listener: (context, statsState) {
+                  // Auto-load ranking when stats are loaded
+                  if (statsState is PlayerStatsLoaded &&
+                      statsState.ranking == null) {
+                    context
+                        .read<PlayerStatsBloc>()
+                        .add(LoadRanking(user.uid));
+                  }
+                },
+                child: BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
+                  builder: (context, statsState) {
+                    if (statsState is PlayerStatsLoaded) {
+                      return Column(
+                        children: [
+                          RankingStatsCards(
+                            ranking: statsState.ranking,
+                            onAddFriendsTap: () {
+                              // Navigate to friends page
+                              Navigator.pushNamed(context, '/friends');
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
               // Time Period Selector (Story 302.3)
               BlocBuilder<EloHistoryBloc, EloHistoryState>(
                 builder: (context, state) {

@@ -147,6 +147,20 @@
           "order": "ASCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "eloGamesPlayed",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "eloRating",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

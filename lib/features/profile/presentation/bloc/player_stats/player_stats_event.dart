@@ -25,3 +25,13 @@ class UpdateUserStats extends PlayerStatsEvent {
   @override
   List<Object> get props => [user];
 }
+
+/// Load user's ranking stats (Story 302.5)
+class LoadRanking extends PlayerStatsEvent {
+  final String userId;
+
+  const LoadRanking(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+}

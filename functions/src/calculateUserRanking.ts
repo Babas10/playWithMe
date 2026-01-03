@@ -10,7 +10,7 @@ export interface UserRankingResponse {
   percentile: number;
   friendsRank: number | null;
   totalFriends: number | null;
-  calculatedAt: admin.firestore.FieldValue;
+  calculatedAt: number; // Milliseconds since epoch
 }
 
 /**
@@ -19,10 +19,12 @@ export interface UserRankingResponse {
  * Calculates user's global rank, percentile, and friends rank based on ELO rating.
  * Uses cross-user queries which require Admin SDK (cannot be done from client).
  *
+ * @param data - Request data (unused, but required by onCall signature)
  * @param context - Firebase Functions context with auth information
  * @returns Promise resolving to UserRankingResponse
  */
 export async function calculateUserRankingHandler(
+  data: any,
   context: functions.https.CallableContext
 ): Promise<UserRankingResponse> {
   // 1. Authentication check (CRITICAL - per CLAUDE.md Section 11.3)
@@ -155,7 +157,7 @@ export async function calculateUserRankingHandler(
       percentile: parseFloat(percentile.toFixed(2)),
       friendsRank,
       totalFriends,
-      calculatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      calculatedAt: Date.now(), // Milliseconds since epoch (compatible with Flutter DateTime)
     };
 
     functions.logger.info("Ranking calculation complete", {

@@ -16,6 +16,7 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
         super(PlayerStatsInitial()) {
     on<LoadPlayerStats>(_onLoadPlayerStats);
     on<UpdateUserStats>(_onUpdateUserStats);
+    on<LoadRanking>(_onLoadRanking); // Story 302.5
   }
 
   Future<void> _onLoadPlayerStats(
@@ -93,9 +94,35 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
         }
       }
 
-      emit(PlayerStatsLoaded(user: event.user, history: history));
+      // Story 302.5: Preserve ranking from previous state
+      final ranking = state is PlayerStatsLoaded
+          ? (state as PlayerStatsLoaded).ranking
+          : null;
+
+      emit(PlayerStatsLoaded(
+        user: event.user,
+        history: history,
+        ranking: ranking,
+      ));
     } catch (e) {
       emit(PlayerStatsError(e.toString()));
+    }
+  }
+
+  /// Load user's ranking stats (Story 302.5)
+  Future<void> _onLoadRanking(
+    LoadRanking event,
+    Emitter<PlayerStatsState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! PlayerStatsLoaded) return;
+
+    try {
+      final ranking = await _userRepository.getUserRanking(event.userId);
+      emit(currentState.copyWith(ranking: ranking));
+    } catch (e) {
+      // Don't fail entire state, just log error
+      print('PlayerStatsBloc: Failed to load ranking: $e');
     }
   }
 
