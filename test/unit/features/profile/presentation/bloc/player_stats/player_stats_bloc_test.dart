@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/data/models/user_ranking.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
@@ -108,5 +109,112 @@ void main() {
         verify(() => mockUserRepository.getRatingHistory(userId)).called(2);
       },
     );
+
+    // Story 302.5: LoadRanking event tests
+    group('LoadRanking', () {
+      final testRanking = UserRanking(
+        globalRank: 42,
+        totalUsers: 1500,
+        percentile: 97.2,
+        friendsRank: 3,
+        totalFriends: 15,
+        calculatedAt: DateTime(2024, 1, 1),
+      );
+
+      blocTest<PlayerStatsBloc, PlayerStatsState>(
+        'loads ranking when state is PlayerStatsLoaded',
+        setUp: () {
+          when(() => mockUserRepository.getUserRanking(userId))
+              .thenAnswer((_) async => testRanking);
+        },
+        build: () => playerStatsBloc,
+        seed: () => PlayerStatsLoaded(user: testUser, history: testHistory),
+        act: (bloc) => bloc.add(const LoadRanking(userId)),
+        expect: () => [
+          PlayerStatsLoaded(
+            user: testUser,
+            history: testHistory,
+            ranking: testRanking,
+          ),
+        ],
+      );
+
+      blocTest<PlayerStatsBloc, PlayerStatsState>(
+        'does nothing when state is not PlayerStatsLoaded',
+        setUp: () {
+          when(() => mockUserRepository.getUserRanking(userId))
+              .thenAnswer((_) async => testRanking);
+        },
+        build: () => playerStatsBloc,
+        seed: () => PlayerStatsInitial(),
+        act: (bloc) => bloc.add(const LoadRanking(userId)),
+        expect: () => [],
+        verify: (_) {
+          verifyNever(() => mockUserRepository.getUserRanking(userId));
+        },
+      );
+
+      blocTest<PlayerStatsBloc, PlayerStatsState>(
+        'preserves user and history when loading ranking',
+        setUp: () {
+          when(() => mockUserRepository.getUserRanking(userId))
+              .thenAnswer((_) async => testRanking);
+        },
+        build: () => playerStatsBloc,
+        seed: () => PlayerStatsLoaded(user: testUser, history: testHistory),
+        act: (bloc) => bloc.add(const LoadRanking(userId)),
+        verify: (bloc) {
+          final state = bloc.state as PlayerStatsLoaded;
+          expect(state.user, testUser);
+          expect(state.history, testHistory);
+          expect(state.ranking, testRanking);
+        },
+      );
+
+      blocTest<PlayerStatsBloc, PlayerStatsState>(
+        'does not emit error when ranking fetch fails',
+        setUp: () {
+          when(() => mockUserRepository.getUserRanking(userId))
+              .thenThrow(Exception('Network error'));
+        },
+        build: () => playerStatsBloc,
+        seed: () => PlayerStatsLoaded(user: testUser, history: testHistory),
+        act: (bloc) => bloc.add(const LoadRanking(userId)),
+        expect: () => [],
+        verify: (_) {
+          // State should remain unchanged
+          verify(() => mockUserRepository.getUserRanking(userId)).called(1);
+        },
+      );
+    });
+
+    group('UpdateUserStats with ranking', () {
+      final testRanking = UserRanking(
+        globalRank: 42,
+        totalUsers: 1500,
+        percentile: 97.2,
+        calculatedAt: DateTime(2024, 1, 1),
+      );
+
+      blocTest<PlayerStatsBloc, PlayerStatsState>(
+        'preserves ranking when updating user stats',
+        setUp: () {
+          when(() => mockUserRepository.getRatingHistory(userId))
+              .thenAnswer((_) => Stream.value(testHistory));
+        },
+        build: () => playerStatsBloc,
+        seed: () => PlayerStatsLoaded(
+          user: testUser,
+          history: testHistory,
+          ranking: testRanking,
+        ),
+        act: (bloc) => bloc.add(UpdateUserStats(testUser.copyWith(gamesPlayed: 11))),
+        verify: (bloc) {
+          final state = bloc.state as PlayerStatsLoaded;
+          expect(state.ranking, testRanking,
+              reason: 'Ranking should be preserved when user updates');
+        },
+      );
+    });
   });
 }
