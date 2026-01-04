@@ -27,6 +27,7 @@ mixin _$EloHistoryState {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -41,6 +42,7 @@ mixin _$EloHistoryState {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -55,6 +57,7 @@ mixin _$EloHistoryState {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
@@ -157,6 +160,7 @@ class _$EloHistoryInitialImpl implements EloHistoryInitial {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -175,6 +179,7 @@ class _$EloHistoryInitialImpl implements EloHistoryInitial {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -193,6 +198,7 @@ class _$EloHistoryInitialImpl implements EloHistoryInitial {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
@@ -297,6 +303,7 @@ class _$EloHistoryLoadingImpl implements EloHistoryLoading {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -315,6 +322,7 @@ class _$EloHistoryLoadingImpl implements EloHistoryLoading {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -333,6 +341,7 @@ class _$EloHistoryLoadingImpl implements EloHistoryLoading {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
@@ -399,7 +408,10 @@ abstract class _$$EloHistoryLoadedImplCopyWith<$Res> {
     DateTime? filterStartDate,
     DateTime? filterEndDate,
     TimePeriod selectedPeriod,
+    BestEloRecord? bestEloInPeriod,
   });
+
+  $BestEloRecordCopyWith<$Res>? get bestEloInPeriod;
 }
 
 /// @nodoc
@@ -421,6 +433,7 @@ class __$$EloHistoryLoadedImplCopyWithImpl<$Res>
     Object? filterStartDate = freezed,
     Object? filterEndDate = freezed,
     Object? selectedPeriod = null,
+    Object? bestEloInPeriod = freezed,
   }) {
     return _then(
       _$EloHistoryLoadedImpl(
@@ -444,8 +457,26 @@ class __$$EloHistoryLoadedImplCopyWithImpl<$Res>
             ? _value.selectedPeriod
             : selectedPeriod // ignore: cast_nullable_to_non_nullable
                   as TimePeriod,
+        bestEloInPeriod: freezed == bestEloInPeriod
+            ? _value.bestEloInPeriod
+            : bestEloInPeriod // ignore: cast_nullable_to_non_nullable
+                  as BestEloRecord?,
       ),
     );
+  }
+
+  /// Create a copy of EloHistoryState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BestEloRecordCopyWith<$Res>? get bestEloInPeriod {
+    if (_value.bestEloInPeriod == null) {
+      return null;
+    }
+
+    return $BestEloRecordCopyWith<$Res>(_value.bestEloInPeriod!, (value) {
+      return _then(_value.copyWith(bestEloInPeriod: value));
+    });
   }
 }
 
@@ -458,6 +489,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
     this.filterStartDate,
     this.filterEndDate,
     this.selectedPeriod = TimePeriod.allTime,
+    this.bestEloInPeriod,
   }) : _history = history,
        _filteredHistory = filteredHistory;
 
@@ -484,10 +516,12 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
   @override
   @JsonKey()
   final TimePeriod selectedPeriod;
+  @override
+  final BestEloRecord? bestEloInPeriod;
 
   @override
   String toString() {
-    return 'EloHistoryState.loaded(history: $history, filteredHistory: $filteredHistory, filterStartDate: $filterStartDate, filterEndDate: $filterEndDate, selectedPeriod: $selectedPeriod)';
+    return 'EloHistoryState.loaded(history: $history, filteredHistory: $filteredHistory, filterStartDate: $filterStartDate, filterEndDate: $filterEndDate, selectedPeriod: $selectedPeriod, bestEloInPeriod: $bestEloInPeriod)';
   }
 
   @override
@@ -505,7 +539,9 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
             (identical(other.filterEndDate, filterEndDate) ||
                 other.filterEndDate == filterEndDate) &&
             (identical(other.selectedPeriod, selectedPeriod) ||
-                other.selectedPeriod == selectedPeriod));
+                other.selectedPeriod == selectedPeriod) &&
+            (identical(other.bestEloInPeriod, bestEloInPeriod) ||
+                other.bestEloInPeriod == bestEloInPeriod));
   }
 
   @override
@@ -516,6 +552,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
     filterStartDate,
     filterEndDate,
     selectedPeriod,
+    bestEloInPeriod,
   );
 
   /// Create a copy of EloHistoryState
@@ -540,6 +577,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -550,6 +588,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       filterStartDate,
       filterEndDate,
       selectedPeriod,
+      bestEloInPeriod,
     );
   }
 
@@ -564,6 +603,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -574,6 +614,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       filterStartDate,
       filterEndDate,
       selectedPeriod,
+      bestEloInPeriod,
     );
   }
 
@@ -588,6 +629,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult Function(String message)? error,
@@ -600,6 +642,7 @@ class _$EloHistoryLoadedImpl implements EloHistoryLoaded {
         filterStartDate,
         filterEndDate,
         selectedPeriod,
+        bestEloInPeriod,
       );
     }
     return orElse();
@@ -650,6 +693,7 @@ abstract class EloHistoryLoaded implements EloHistoryState {
     final DateTime? filterStartDate,
     final DateTime? filterEndDate,
     final TimePeriod selectedPeriod,
+    final BestEloRecord? bestEloInPeriod,
   }) = _$EloHistoryLoadedImpl;
 
   List<RatingHistoryEntry> get history;
@@ -657,6 +701,7 @@ abstract class EloHistoryLoaded implements EloHistoryState {
   DateTime? get filterStartDate;
   DateTime? get filterEndDate;
   TimePeriod get selectedPeriod;
+  BestEloRecord? get bestEloInPeriod;
 
   /// Create a copy of EloHistoryState
   /// with the given fields replaced by the non-null parameter values.
@@ -746,6 +791,7 @@ class _$EloHistoryErrorImpl implements EloHistoryError {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )
     loaded,
     required TResult Function(String message) error,
@@ -764,6 +810,7 @@ class _$EloHistoryErrorImpl implements EloHistoryError {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult? Function(String message)? error,
@@ -782,6 +829,7 @@ class _$EloHistoryErrorImpl implements EloHistoryError {
       DateTime? filterStartDate,
       DateTime? filterEndDate,
       TimePeriod selectedPeriod,
+      BestEloRecord? bestEloInPeriod,
     )?
     loaded,
     TResult Function(String message)? error,

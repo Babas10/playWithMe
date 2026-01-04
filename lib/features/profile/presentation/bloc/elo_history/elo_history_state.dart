@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:play_with_me/core/data/models/best_elo_record.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
 
@@ -16,6 +17,7 @@ class EloHistoryState with _$EloHistoryState {
     DateTime? filterStartDate,
     DateTime? filterEndDate,
     @Default(TimePeriod.allTime) TimePeriod selectedPeriod,
+    BestEloRecord? bestEloInPeriod,
   }) = EloHistoryLoaded;
 
   const factory EloHistoryState.error({
