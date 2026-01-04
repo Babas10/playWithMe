@@ -11,6 +11,7 @@ import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/best_elo_highlight_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/monthly_improvement_chart.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/ranking_stats_cards.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
@@ -125,6 +126,12 @@ class MomentumConsistencyCard extends StatelessWidget {
                       MonthlyImprovementChart(
                         ratingHistory: state.filteredHistory,
                         currentElo: user.eloRating,
+                        timePeriod: state.selectedPeriod,
+                      ),
+                      const SizedBox(height: 16),
+                      // Best ELO Highlight Card (Story 302.6)
+                      BestEloHighlightCard(
+                        bestElo: state.bestEloInPeriod,
                         timePeriod: state.selectedPeriod,
                       ),
                     ],
