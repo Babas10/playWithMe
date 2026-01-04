@@ -7,6 +7,7 @@ import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/elo_history/elo_history_state.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/best_elo_highlight_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
 import 'package:intl/intl.dart';
 
@@ -59,7 +60,7 @@ class FullEloHistoryPage extends StatelessWidget {
               initial: () => const SizedBox.shrink(),
               loading: () => const Center(child: CircularProgressIndicator()),
               loaded: (history, filteredHistory, startDate, endDate,
-                      selectedPeriod) =>
+                      selectedPeriod, bestEloInPeriod) =>
                   _buildLoadedView(
                       context, filteredHistory, startDate, endDate),
               error: (message) => Center(
@@ -208,6 +209,34 @@ class FullEloHistoryPage extends StatelessWidget {
             );
           },
         ),
+
+        // Best ELO Highlight Card (Story 302.6)
+        BlocBuilder<EloHistoryBloc, EloHistoryState>(
+          builder: (context, state) {
+            if (state is! EloHistoryLoaded) return const SizedBox.shrink();
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: BestEloHighlightCard(
+                bestElo: state.bestEloInPeriod,
+                timePeriod: state.selectedPeriod,
+                onTap: state.bestEloInPeriod != null
+                    ? () {
+                        // TODO: Navigate to game details (future enhancement)
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Game details coming soon!'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    : null,
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 16),
 
         // Filter indicator
         if (filterStartDate != null && filterEndDate != null)
