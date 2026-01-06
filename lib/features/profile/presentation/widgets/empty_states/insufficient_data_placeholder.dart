@@ -103,25 +103,79 @@ class EmptyStatsPlaceholder extends StatelessWidget {
 }
 
 /// Variant for insufficient data scenarios (e.g., "Play more games to unlock").
+///
+/// Enhanced in Story 302.7 to support progress tracking and custom messages.
 class InsufficientDataPlaceholder extends StatelessWidget {
   final String featureName;
   final String requirement;
   final IconData icon;
+  final String? currentProgress;
+  final String? message;
 
   const InsufficientDataPlaceholder({
     super.key,
     required this.featureName,
     required this.requirement,
     this.icon = Icons.info_outline,
+    this.currentProgress,
+    this.message,
   });
 
   @override
   Widget build(BuildContext context) {
-    return EmptyStatsPlaceholder(
-      title: '$featureName Locked',
-      message: 'This feature requires more game data.',
-      unlockMessage: requirement,
-      icon: icon,
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 48, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+          const SizedBox(height: 16),
+          Text(
+            featureName,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            requirement,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (currentProgress != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              currentProgress!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+          if (message != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              message!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontStyle: FontStyle.italic,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

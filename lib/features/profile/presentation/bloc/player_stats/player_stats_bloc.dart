@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
+import 'package:play_with_me/core/data/models/user_model.dart'; // Story 302.7
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 
 import 'player_stats_event.dart';
@@ -55,7 +56,22 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
           },
         );
       } else {
-        emit(PlayerStatsError('User not found'));
+        // Story 302.7: Handle new users gracefully - they have no stats yet
+        // Get current auth user data to create a minimal UserModel
+        final authUser = _userRepository.currentAuthUser;
+        if (authUser != null && authUser.uid == event.userId) {
+          // Create a minimal UserModel for new users from auth data
+          final newUserModel = UserModel.fromFirebaseUser(authUser);
+          emit(PlayerStatsLoaded(
+            user: newUserModel,
+            history: [], // New user has no rating history
+            ranking: null, // No ranking yet
+            rankingLoadFailed: false,
+          ));
+        } else {
+          // Only emit error if we can't find the auth user either
+          emit(PlayerStatsError('User not found'));
+        }
       }
     } catch (e) {
       emit(PlayerStatsError('Failed to load player stats: ${e.toString()}'));
@@ -94,22 +110,26 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
         }
       }
 
-      // Story 302.5: Preserve ranking from previous state
+      // Story 302.5, 302.7: Preserve ranking and error state from previous state
       final ranking = state is PlayerStatsLoaded
           ? (state as PlayerStatsLoaded).ranking
           : null;
+      final rankingLoadFailed = state is PlayerStatsLoaded
+          ? (state as PlayerStatsLoaded).rankingLoadFailed
+          : false;
 
       emit(PlayerStatsLoaded(
         user: event.user,
         history: history,
         ranking: ranking,
+        rankingLoadFailed: rankingLoadFailed,
       ));
     } catch (e) {
       emit(PlayerStatsError(e.toString()));
     }
   }
 
-  /// Load user's ranking stats (Story 302.5)
+  /// Load user's ranking stats (Story 302.5, 302.7)
   Future<void> _onLoadRanking(
     LoadRanking event,
     Emitter<PlayerStatsState> emit,
@@ -119,10 +139,16 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
 
     try {
       final ranking = await _userRepository.getUserRanking(event.userId);
-      emit(currentState.copyWith(ranking: ranking));
+      emit(currentState.copyWith(
+        ranking: ranking,
+        rankingLoadFailed: false, // Story 302.7: Clear error on successful load
+      ));
     } catch (e) {
-      // Don't fail entire state, just log error
+      // Story 302.7: Set error flag instead of silently failing
       print('PlayerStatsBloc: Failed to load ranking: $e');
+      emit(currentState.copyWith(
+        rankingLoadFailed: true,
+      ));
     }
   }
 

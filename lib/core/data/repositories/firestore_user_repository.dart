@@ -44,6 +44,9 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
+  User? get currentAuthUser => _auth.currentUser;
+
+  @override
   Future<UserModel?> getUserById(String uid) async {
     try {
       final currentUser = _auth.currentUser;

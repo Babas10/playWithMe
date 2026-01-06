@@ -1,6 +1,7 @@
 // Mock repository for UserRepository used in testing
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart'; // Story 302.7
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/data/models/teammate_stats.dart';
@@ -18,6 +19,11 @@ class MockUserRepository implements UserRepository {
 
   @override
   Stream<UserModel?> get currentUser => _currentUserController.stream;
+
+  /// Story 302.7: Mock implementation of currentAuthUser
+  /// Returns null by default - tests can override if needed
+  @override
+  User? get currentAuthUser => null;
 
   // Helper methods for testing
   void setCurrentUser(UserModel? user) {

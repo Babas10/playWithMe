@@ -1,7 +1,7 @@
 // Widget tests for EmptyStatsPlaceholder and InsufficientDataPlaceholder.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/empty_states/insufficient_data_placeholder.dart';
 
 void main() {
   group('EmptyStatsPlaceholder Widget Tests', () {
@@ -123,9 +123,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Monthly Progress Chart Locked'), findsOneWidget);
-      expect(find.text('This feature requires more game data.'),
-          findsOneWidget);
+      // Story 302.7: Updated to match new implementation (no "Locked" suffix)
+      expect(find.text('Monthly Progress Chart'), findsOneWidget);
       expect(find.text('Play games for at least 2 months'), findsOneWidget);
       expect(find.byIcon(Icons.info_outline), findsOneWidget);
     });
@@ -144,25 +143,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Best Partner Locked'), findsOneWidget);
+      // Story 302.7: Updated to match new implementation (no "Locked" suffix)
+      expect(find.text('Best Partner'), findsOneWidget);
       expect(find.text('Play 5+ games with a teammate'), findsOneWidget);
       expect(find.byIcon(Icons.people), findsOneWidget);
     });
 
-    testWidgets('includes lock icon in requirement message', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: InsufficientDataPlaceholder(
-              featureName: 'Feature',
-              requirement: 'Requirement text',
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.byIcon(Icons.lock_outline), findsOneWidget);
-    });
+    // Story 302.7: Removed "includes lock icon" test - new implementation uses customizable
+    // icon parameter instead of hardcoded lock icon
   });
 }
