@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart'; // Story 302.7
 import '../../data/models/rating_history_entry.dart';
 import '../../data/models/user_model.dart';
 import '../../data/models/teammate_stats.dart';
@@ -9,6 +10,10 @@ import '../entities/time_period.dart';
 abstract class UserRepository {
   /// Get current authenticated user
   Stream<UserModel?> get currentUser;
+
+  /// Get current Firebase Auth user (Story 302.7)
+  /// Returns the raw Firebase User for cases where Firestore doc doesn't exist yet
+  User? get currentAuthUser;
 
   /// Get user by ID
   Future<UserModel?> getUserById(String uid);
