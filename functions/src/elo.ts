@@ -49,17 +49,41 @@ function calculateNewStreak(currentStreak: number, won: boolean): number {
 
 /**
  * Process game completion and update ELO ratings
+ *
+ * CRITICAL ARCHITECTURE RULE (Story 15.5):
+ * - This function processes ONLY competitive games
+ * - Training sessions are NON-COMPETITIVE and stored in "trainingSessions" collection
+ * - This function is NEVER called for training sessions
  */
 export async function processGameEloUpdates(gameId: string, gameData: any): Promise<void> {
   const db = admin.firestore();
 
-  // Validate game data
+  // DEFENSIVE CHECK (Story 15.5): Verify game data structure
+  // Training sessions don't have teams/results, so this check implicitly rejects them
   if (!gameData.teams || !gameData.teams.teamAPlayerIds || !gameData.teams.teamBPlayerIds) {
     throw new Error("Invalid game data: Missing teams information");
   }
 
   if (!gameData.result || !gameData.result.games || !Array.isArray(gameData.result.games)) {
     throw new Error("Invalid game data: Missing result or games array");
+  }
+
+  // DEFENSIVE CHECK (Story 15.5): Explicitly reject if somehow a training session got here
+  // This should never happen, but defensive programming
+  const gameRef = db.collection("games").doc(gameId);
+  const gameDoc = await gameRef.get();
+  if (!gameDoc.exists) {
+    functions.logger.error(`Game ${gameId} not found in games collection`);
+    throw new Error("Game not found");
+  }
+
+  // Double-check we're in the games collection
+  if (gameDoc.ref.parent.id !== "games") {
+    functions.logger.error(
+      `CRITICAL: Attempted ELO processing for non-game document: ${gameDoc.ref.path}`,
+      {gameId, collection: gameDoc.ref.parent.id}
+    );
+    throw new Error("ELO can only be processed for competitive games, not training sessions");
   }
 
   const teamAPlayerIds = gameData.teams.teamAPlayerIds;
