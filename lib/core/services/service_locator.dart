@@ -280,7 +280,10 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<GamesListBloc>()) {
     sl.registerFactory<GamesListBloc>(
-      () => GamesListBloc(gameRepository: sl()),
+      () => GamesListBloc(
+        gameRepository: sl(),
+        trainingSessionRepository: sl(),
+      ),
     );
   }
 

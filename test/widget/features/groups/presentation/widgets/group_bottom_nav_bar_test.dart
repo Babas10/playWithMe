@@ -13,6 +13,7 @@ void main() {
               isAdmin: true,
               onInviteTap: () {},
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -35,6 +36,7 @@ void main() {
               isAdmin: true,
               onInviteTap: () => inviteTapped = true,
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -61,6 +63,7 @@ void main() {
               isAdmin: false,
               onInviteTap: () => inviteTapped = true,
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -76,17 +79,16 @@ void main() {
       expect(inviteTapped, isFalse);
     });
 
-    testWidgets('calls onCreateGameTap when second item is tapped',
+    testWidgets('shows modal with game and training options when second item is tapped',
         (tester) async {
-      bool createGameTapped = false;
-
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: true,
               onInviteTap: () {},
-              onCreateGameTap: () => createGameTapped = true,
+              onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -98,8 +100,11 @@ void main() {
         find.byType(BottomNavigationBar).first,
       );
       bottomNavBar.onTap!(1);
+      await tester.pumpAndSettle();
 
-      expect(createGameTapped, isTrue);
+      // Verify modal sheet appears with both options
+      expect(find.text('Create Game'), findsOneWidget);
+      expect(find.text('Create Training Session'), findsOneWidget);
     });
 
     testWidgets('calls onGamesListTap when third item is tapped',
@@ -113,6 +118,7 @@ void main() {
               isAdmin: true,
               onInviteTap: () {},
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () => gamesListTapped = true,
             ),
           ),
@@ -136,6 +142,7 @@ void main() {
               isAdmin: false,
               onInviteTap: () {},
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -155,6 +162,7 @@ void main() {
               isAdmin: true,
               onInviteTap: () {},
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -178,6 +186,7 @@ void main() {
               isAdmin: true,
               onInviteTap: () {},
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -201,6 +210,7 @@ void main() {
               isAdmin: false,
               onInviteTap: () {},
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -223,6 +233,7 @@ void main() {
               isAdmin: true,
               onInviteTap: () {},
               onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
               onGamesListTap: () {},
             ),
           ),
@@ -247,6 +258,7 @@ void main() {
                 upcomingGamesCount: 0,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -272,6 +284,7 @@ void main() {
                 upcomingGamesCount: 3,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -300,6 +313,7 @@ void main() {
                 upcomingGamesCount: 15,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -327,6 +341,7 @@ void main() {
                 upcomingGamesCount: 9,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -354,6 +369,7 @@ void main() {
                 upcomingGamesCount: 5,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -379,6 +395,7 @@ void main() {
                 // upcomingGamesCount not specified, should default to 0
                 onInviteTap: () {},
                 onCreateGameTap: () {},
+              onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),

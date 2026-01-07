@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/group_activity_item.dart';
 
 abstract class GamesListEvent extends Equatable {
   const GamesListEvent();
@@ -28,6 +29,15 @@ class GamesListUpdated extends GamesListEvent {
 
   @override
   List<Object?> get props => [games];
+}
+
+class ActivityListUpdated extends GamesListEvent {
+  final List<GroupActivityItem> activities;
+
+  const ActivityListUpdated({required this.activities});
+
+  @override
+  List<Object?> get props => [activities];
 }
 
 class RefreshGamesList extends GamesListEvent {

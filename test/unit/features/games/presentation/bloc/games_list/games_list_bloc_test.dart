@@ -1,11 +1,14 @@
-// Validates GamesListBloc emits correct states during game list operations.
+// Validates GamesListBloc emits correct states for combined activity feed (games + training sessions).
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/training_session_model.dart';
+import 'package:play_with_me/core/data/models/group_activity_item.dart';
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_event.dart';
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_state.dart';
 import '../../../../../core/data/repositories/mock_game_repository.dart';
+import '../../../../../core/data/repositories/mock_training_session_repository.dart';
 
 void main() {
   const testGroupId = 'group-123';
@@ -38,21 +41,60 @@ void main() {
     );
   }
 
+  TrainingSessionModel _createTestTrainingSession({
+    required String id,
+    required String title,
+    required String groupId,
+    required DateTime startTime,
+    List<String> participantIds = const [],
+    TrainingStatus status = TrainingStatus.scheduled,
+  }) {
+    final endTime = startTime.add(const Duration(hours: 2));
+    return TrainingSessionModel(
+      id: id,
+      groupId: groupId,
+      title: title,
+      location: const GameLocation(
+        name: 'Training Court',
+        latitude: 0.0,
+        longitude: 0.0,
+      ),
+      startTime: startTime,
+      endTime: endTime,
+      minParticipants: 2,
+      maxParticipants: 10,
+      createdBy: 'creator-1',
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      participantIds: participantIds,
+      status: status,
+    );
+  }
+
   group('GamesListBloc', () {
     test('initial state is GamesListInitial', () {
       final mockGameRepository = MockGameRepository();
-      final bloc = GamesListBloc(gameRepository: mockGameRepository);
+      final mockTrainingRepository = MockTrainingSessionRepository();
+      final bloc = GamesListBloc(
+        gameRepository: mockGameRepository,
+        trainingSessionRepository: mockTrainingRepository,
+      );
       expect(bloc.state, const GamesListInitial());
       bloc.close();
       mockGameRepository.dispose();
+      mockTrainingRepository.dispose();
     });
 
     blocTest<GamesListBloc, GamesListState>(
-      'emits [Loading, Empty] when no games exist',
+      'emits [Loading, Empty] when no games or training sessions exist',
       build: () {
         final mockGameRepository = MockGameRepository();
+        final mockTrainingRepository = MockTrainingSessionRepository();
         mockGameRepository.clearGames();
-        return GamesListBloc(gameRepository: mockGameRepository);
+        mockTrainingRepository.clearSessions();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
@@ -74,7 +116,11 @@ void main() {
           scheduledAt: DateTime.now().add(const Duration(days: 2)),
         );
         mockGameRepository.addGame(futureGame);
-        return GamesListBloc(gameRepository: mockGameRepository);
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
@@ -99,7 +145,11 @@ void main() {
           scheduledAt: DateTime.now().subtract(const Duration(days: 2)),
         );
         mockGameRepository.addGame(pastGame);
-        return GamesListBloc(gameRepository: mockGameRepository);
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
@@ -146,7 +196,11 @@ void main() {
         mockGameRepository.addGame(pastGame2);
         mockGameRepository.addGame(futureGame1);
         mockGameRepository.addGame(futureGame2);
-        return GamesListBloc(gameRepository: mockGameRepository);
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
@@ -185,7 +239,11 @@ void main() {
         mockGameRepository.addGame(game1);
         mockGameRepository.addGame(game2);
         mockGameRepository.addGame(game3);
-        return GamesListBloc(gameRepository: mockGameRepository);
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
@@ -224,7 +282,11 @@ void main() {
         mockGameRepository.addGame(game1);
         mockGameRepository.addGame(game2);
         mockGameRepository.addGame(game3);
-        return GamesListBloc(gameRepository: mockGameRepository);
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
@@ -263,7 +325,11 @@ void main() {
         mockGameRepository.addGame(game1);
         mockGameRepository.addGame(game2);
         mockGameRepository.addGame(game3);
-        return GamesListBloc(gameRepository: mockGameRepository);
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
@@ -288,7 +354,11 @@ void main() {
           scheduledAt: now,
         );
         mockGameRepository.addGame(gameNow);
-        return GamesListBloc(gameRepository: mockGameRepository);
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
@@ -312,7 +382,11 @@ void main() {
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
         );
         mockGameRepository.addGame(game);
-        return GamesListBloc(gameRepository: mockGameRepository);
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
       },
       act: (bloc) async {
         bloc.add(const LoadGamesForGroup(
@@ -328,6 +402,222 @@ void main() {
         const GamesListLoading(),
       ],
       wait: const Duration(milliseconds: 300),
+    );
+
+
+
+    // Combined Activity Tests (Games + Training Sessions)
+    blocTest<GamesListBloc, GamesListState>(
+      'emits combined activities from games and training sessions',
+      build: () {
+        final mockGameRepository = MockGameRepository();
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        
+        final futureGame = _createTestGame(
+          id: 'game-1',
+          title: 'Future Game',
+          groupId: testGroupId,
+          scheduledAt: DateTime.now().add(const Duration(days: 2)),
+        );
+        
+        final futureTraining = _createTestTrainingSession(
+          id: 'training-1',
+          title: 'Future Training',
+          groupId: testGroupId,
+          startTime: DateTime.now().add(const Duration(days: 1)),
+        );
+        
+        mockGameRepository.addGame(futureGame);
+        mockTrainingRepository.addSession(futureTraining);
+        
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
+      },
+      act: (bloc) => bloc.add(
+        const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
+      ),
+      expect: () => [
+        const GamesListLoading(),
+        isA<GamesListLoaded>()
+            .having((s) => s.upcomingActivities.length, 'upcoming activities count', 2)
+            .having((s) => s.pastActivities.length, 'past activities count', 0)
+            .having((s) => s.userId, 'userId', testUserId),
+      ],
+    );
+
+    blocTest<GamesListBloc, GamesListState>(
+      'sorts combined activities by start time',
+      build: () {
+        final mockGameRepository = MockGameRepository();
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        
+        final farFutureGame = _createTestGame(
+          id: 'game-1',
+          title: 'Far Future Game',
+          groupId: testGroupId,
+          scheduledAt: DateTime.now().add(const Duration(days: 5)),
+        );
+        
+        final nearFutureTraining = _createTestTrainingSession(
+          id: 'training-1',
+          title: 'Near Future Training',
+          groupId: testGroupId,
+          startTime: DateTime.now().add(const Duration(days: 1)),
+        );
+        
+        final midFutureGame = _createTestGame(
+          id: 'game-2',
+          title: 'Mid Future Game',
+          groupId: testGroupId,
+          scheduledAt: DateTime.now().add(const Duration(days: 3)),
+        );
+        
+        mockGameRepository.addGame(farFutureGame);
+        mockGameRepository.addGame(midFutureGame);
+        mockTrainingRepository.addSession(nearFutureTraining);
+        
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
+      },
+      act: (bloc) => bloc.add(
+        const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
+      ),
+      verify: (bloc) {
+        final state = bloc.state as GamesListLoaded;
+        expect(state.upcomingActivities.length, 3);
+        // Should be sorted by start time (nearest first)
+        expect(state.upcomingActivities[0].id, 'training-1'); // Day 1
+        expect(state.upcomingActivities[1].id, 'game-2'); // Day 3
+        expect(state.upcomingActivities[2].id, 'game-1'); // Day 5
+      },
+    );
+
+    blocTest<GamesListBloc, GamesListState>(
+      'separates past and upcoming activities correctly (mixed types)',
+      build: () {
+        final mockGameRepository = MockGameRepository();
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        
+        final pastGame = _createTestGame(
+          id: 'game-past',
+          title: 'Past Game',
+          groupId: testGroupId,
+          scheduledAt: DateTime.now().subtract(const Duration(days: 2)),
+        );
+        
+        final pastTraining = _createTestTrainingSession(
+          id: 'training-past',
+          title: 'Past Training',
+          groupId: testGroupId,
+          startTime: DateTime.now().subtract(const Duration(days: 1)),
+        );
+        
+        final futureGame = _createTestGame(
+          id: 'game-future',
+          title: 'Future Game',
+          groupId: testGroupId,
+          scheduledAt: DateTime.now().add(const Duration(days: 1)),
+        );
+        
+        final futureTraining = _createTestTrainingSession(
+          id: 'training-future',
+          title: 'Future Training',
+          groupId: testGroupId,
+          startTime: DateTime.now().add(const Duration(days: 2)),
+        );
+        
+        mockGameRepository.addGame(pastGame);
+        mockGameRepository.addGame(futureGame);
+        mockTrainingRepository.addSession(pastTraining);
+        mockTrainingRepository.addSession(futureTraining);
+        
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
+      },
+      act: (bloc) => bloc.add(
+        const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
+      ),
+      verify: (bloc) {
+        final state = bloc.state as GamesListLoaded;
+        expect(state.upcomingActivities.length, 2);
+        expect(state.pastActivities.length, 2);
+        
+        // Verify types in upcoming
+        final upcomingGame = state.upcomingActivities.firstWhere((a) => a.id == 'game-future');
+        expect(upcomingGame, isA<GameActivityItem>());
+        
+        final upcomingTraining = state.upcomingActivities.firstWhere((a) => a.id == 'training-future');
+        expect(upcomingTraining, isA<TrainingActivityItem>());
+        
+        // Verify types in past
+        final pastGame = state.pastActivities.firstWhere((a) => a.id == 'game-past');
+        expect(pastGame, isA<GameActivityItem>());
+        
+        final pastTraining = state.pastActivities.firstWhere((a) => a.id == 'training-past');
+        expect(pastTraining, isA<TrainingActivityItem>());
+      },
+    );
+
+    blocTest<GamesListBloc, GamesListState>(
+      'filters activities by groupId (both games and training)',
+      build: () {
+        final mockGameRepository = MockGameRepository();
+        final mockTrainingRepository = MockTrainingSessionRepository();
+        
+        final group123Game = _createTestGame(
+          id: 'game-123',
+          title: 'Group 123 Game',
+          groupId: testGroupId,
+          scheduledAt: DateTime.now().add(const Duration(days: 1)),
+        );
+        
+        final otherGroupGame = _createTestGame(
+          id: 'game-other',
+          title: 'Other Group Game',
+          groupId: 'other-group',
+          scheduledAt: DateTime.now().add(const Duration(days: 1)),
+        );
+        
+        final group123Training = _createTestTrainingSession(
+          id: 'training-123',
+          title: 'Group 123 Training',
+          groupId: testGroupId,
+          startTime: DateTime.now().add(const Duration(days: 1)),
+        );
+        
+        final otherGroupTraining = _createTestTrainingSession(
+          id: 'training-other',
+          title: 'Other Group Training',
+          groupId: 'other-group',
+          startTime: DateTime.now().add(const Duration(days: 1)),
+        );
+        
+        mockGameRepository.addGame(group123Game);
+        mockGameRepository.addGame(otherGroupGame);
+        mockTrainingRepository.addSession(group123Training);
+        mockTrainingRepository.addSession(otherGroupTraining);
+        
+        return GamesListBloc(
+          gameRepository: mockGameRepository,
+          trainingSessionRepository: mockTrainingRepository,
+        );
+      },
+      act: (bloc) => bloc.add(
+        const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
+      ),
+      verify: (bloc) {
+        final state = bloc.state as GamesListLoaded;
+        expect(state.upcomingActivities.length, 2);
+        expect(state.upcomingActivities.every((a) => a.groupId == testGroupId), true);
+        expect(state.upcomingActivities.any((a) => a.id == 'game-123'), true);
+        expect(state.upcomingActivities.any((a) => a.id == 'training-123'), true);
+      },
     );
   });
 }
