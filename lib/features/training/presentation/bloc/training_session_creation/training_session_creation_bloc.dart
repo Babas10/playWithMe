@@ -25,6 +25,8 @@ class TrainingSessionCreationBloc
     on<SetMaxParticipants>(_onSetMaxParticipants);
     on<SetMinParticipants>(_onSetMinParticipants);
     on<SetSessionNotes>(_onSetSessionNotes);
+    on<SetRecurrenceRule>(_onSetRecurrenceRule); // Story 15.2
+    on<GenerateRecurringInstances>(_onGenerateRecurringInstances); // Story 15.2
     on<ValidateTrainingForm>(_onValidateTrainingForm);
     on<SubmitTrainingSession>(_onSubmitTrainingSession);
     on<ResetTrainingForm>(_onResetTrainingForm);
@@ -121,6 +123,39 @@ class TrainingSessionCreationBloc
     emit(formState);
   }
 
+  // Story 15.2: Handle recurrence rule changes
+  void _onSetRecurrenceRule(
+      SetRecurrenceRule event, Emitter<TrainingSessionCreationState> emit) {
+    final formState = _currentFormState.copyWith(
+      recurrenceRule: event.recurrenceRule,
+      recurrenceError: null,
+      clearRecurrenceRule: event.recurrenceRule == null,
+    );
+    emit(_validateAndEmit(formState));
+  }
+
+  // Story 15.2: Generate recurring training session instances
+  Future<void> _onGenerateRecurringInstances(GenerateRecurringInstances event,
+      Emitter<TrainingSessionCreationState> emit) async {
+    try {
+      // Generate instances via repository (calls Cloud Function)
+      await _trainingSessionRepository.generateRecurringInstances(
+        event.parentSessionId,
+      );
+
+      // Success is handled by the existing success state
+      // The UI will navigate away automatically
+    } catch (e) {
+      // If generation fails, we still created the parent session
+      // Just log the error and allow the user to try again later
+      emit(TrainingSessionCreationError(
+        message:
+            'Training session created, but failed to generate recurring instances: ${e.toString()}',
+        errorCode: 'GENERATE_INSTANCES_ERROR',
+      ));
+    }
+  }
+
   void _onValidateTrainingForm(ValidateTrainingForm event,
       Emitter<TrainingSessionCreationState> emit) {
     emit(_validateAndEmit(_currentFormState));
@@ -140,7 +175,7 @@ class TrainingSessionCreationBloc
     try {
       emit(const TrainingSessionCreationSubmitting());
 
-      // Create training session model
+      // Create training session model (Story 15.2: with recurrence rule)
       final session = TrainingSessionModel(
         id: '', // Will be set by Firestore
         groupId: formState.groupId!,
@@ -157,12 +192,30 @@ class TrainingSessionCreationBloc
         createdBy: event.createdBy,
         createdAt: DateTime.now(),
         notes: formState.notes,
+        recurrenceRule: formState.recurrenceRule, // Story 15.2
       );
 
       // Create training session in repository
       final sessionId =
           await _trainingSessionRepository.createTrainingSession(session);
       final createdSession = session.copyWith(id: sessionId);
+
+      // Story 15.2: If this is a recurring session, generate instances
+      if (formState.recurrenceRule != null &&
+          formState.recurrenceRule!.isRecurring) {
+        try {
+          await _trainingSessionRepository.generateRecurringInstances(sessionId);
+        } catch (e) {
+          // Instance generation failed, but parent session was created
+          // Log error but don't fail the creation
+          emit(TrainingSessionCreationError(
+            message:
+                'Training session created, but failed to generate recurring instances. You can try again later.',
+            errorCode: 'GENERATE_INSTANCES_ERROR',
+          ));
+          return;
+        }
+      }
 
       emit(TrainingSessionCreationSuccess(
         sessionId: sessionId,
@@ -205,6 +258,7 @@ class TrainingSessionCreationBloc
     String? locationError;
     String? titleError;
     String? participantsError;
+    String? recurrenceError; // Story 15.2
 
     // Validate group selection
     if (formState.groupId == null || formState.groupId!.isEmpty) {
@@ -254,12 +308,21 @@ class TrainingSessionCreationBloc
       participantsError = 'Maximum participants cannot exceed 30';
     }
 
+    // Story 15.2: Validate recurrence rule if present
+    if (formState.recurrenceRule != null &&
+        formState.recurrenceRule!.isRecurring) {
+      if (!formState.recurrenceRule!.isValid) {
+        recurrenceError = 'Invalid recurrence rule configuration';
+      }
+    }
+
     final isValid = groupError == null &&
         startTimeError == null &&
         endTimeError == null &&
         locationError == null &&
         titleError == null &&
-        participantsError == null;
+        participantsError == null &&
+        recurrenceError == null; // Story 15.2
 
     return formState.copyWith(
       groupError: groupError,
@@ -268,6 +331,7 @@ class TrainingSessionCreationBloc
       locationError: locationError,
       titleError: titleError,
       participantsError: participantsError,
+      recurrenceError: recurrenceError, // Story 15.2
       isValid: isValid,
     );
   }

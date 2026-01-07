@@ -1,5 +1,6 @@
 // Validates CreateTrainingSessionBloc events for managing training session creation form state.
 
+import '../../../../../core/data/models/recurrence_rule_model.dart';
 import '../../../../../core/presentation/bloc/base_bloc_event.dart';
 
 abstract class TrainingSessionCreationEvent extends BaseBlocEvent {
@@ -102,6 +103,27 @@ class SetSessionNotes extends TrainingSessionCreationEvent {
 
   @override
   List<Object?> get props => [notes];
+}
+
+/// Event to set the recurrence rule (Story 15.2)
+class SetRecurrenceRule extends TrainingSessionCreationEvent {
+  final RecurrenceRuleModel? recurrenceRule;
+
+  const SetRecurrenceRule({this.recurrenceRule});
+
+  @override
+  List<Object?> get props => [recurrenceRule];
+}
+
+/// Event to generate recurring training session instances (Story 15.2)
+/// This is called after the parent session is created successfully
+class GenerateRecurringInstances extends TrainingSessionCreationEvent {
+  final String parentSessionId;
+
+  const GenerateRecurringInstances({required this.parentSessionId});
+
+  @override
+  List<Object?> get props => [parentSessionId];
 }
 
 /// Event to validate the form
