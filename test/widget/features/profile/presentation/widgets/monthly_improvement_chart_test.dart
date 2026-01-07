@@ -1,10 +1,10 @@
-// Widget tests for enhanced MonthlyImprovementChart (Story 302.4)
+// Widget tests for enhanced MonthlyImprovementChart (Story 302.4, 302.7)
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/monthly_improvement_chart.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/empty_states/insufficient_data_placeholder.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 void main() {
@@ -23,13 +23,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Story 302.7: Updated text expectations for new placeholder
       expect(find.byType(InsufficientDataPlaceholder), findsOneWidget);
-      expect(find.text('ELO Progress Chart Locked'), findsOneWidget);
-      expect(find.text('Play games over multiple time periods'), findsOneWidget);
+      expect(find.text('Monthly Progress Chart'), findsOneWidget);
+      expect(find.text('Play at least 3 games'), findsOneWidget);
+      expect(find.text('0/3 games'), findsOneWidget);
       expect(find.byIcon(Icons.timeline), findsOneWidget);
     });
 
     testWidgets('shows placeholder when only 1 month of data', (tester) async {
+      // Story 302.7: Need at least 3 games, but all in same month
       final singleMonthHistory = [
         RatingHistoryEntry(
           entryId: 'entry-1',
@@ -51,6 +54,16 @@ void main() {
           won: true,
           timestamp: DateTime(2024, 1, 20),
         ),
+        RatingHistoryEntry(
+          entryId: 'entry-3',
+          gameId: 'game-3',
+          oldRating: 1640,
+          newRating: 1660,
+          ratingChange: 20,
+          opponentTeam: 'Team C',
+          won: true,
+          timestamp: DateTime(2024, 1, 25),
+        ),
       ];
 
       await tester.pumpWidget(
@@ -66,10 +79,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Story 302.7: With 3 games in same month, aggregates to 1 data point (needs 2+)
       expect(find.byType(InsufficientDataPlaceholder), findsOneWidget);
+      expect(find.text('Monthly Progress Chart'), findsOneWidget);
+      expect(find.text('Play games over a longer period'), findsOneWidget);
     });
 
     testWidgets('shows chart when 2 months of data', (tester) async {
+      // Story 302.7: Need at least 3 games
       final twoMonthHistory = [
         RatingHistoryEntry(
           entryId: 'entry-1',
@@ -90,6 +107,16 @@ void main() {
           opponentTeam: 'Team B',
           won: true,
           timestamp: DateTime(2024, 2, 10),
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-3',
+          gameId: 'game-3',
+          oldRating: 1650,
+          newRating: 1670,
+          ratingChange: 20,
+          opponentTeam: 'Team C',
+          won: true,
+          timestamp: DateTime(2024, 2, 20),
         ),
       ];
 
@@ -298,7 +325,7 @@ void main() {
             body: MonthlyImprovementChart(
               ratingHistory: monthlyHistory,
               currentElo: 1720.0,
-              timePeriod: TimePeriod.oneYear,
+              timePeriod: TimePeriod.allTime, // Story 302.7: Use allTime for 2024 test data
             ),
           ),
         ),
@@ -375,6 +402,7 @@ void main() {
     });
 
     testWidgets('chart has proper height (220)', (tester) async {
+      // Story 302.7: Need at least 3 games
       final historyData = [
         RatingHistoryEntry(
           entryId: 'entry-1',
@@ -395,6 +423,16 @@ void main() {
           opponentTeam: 'Team B',
           won: true,
           timestamp: DateTime(2024, 2, 10),
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-3',
+          gameId: 'game-3',
+          oldRating: 1650,
+          newRating: 1670,
+          ratingChange: 20,
+          opponentTeam: 'Team C',
+          won: true,
+          timestamp: DateTime(2024, 3, 5),
         ),
       ];
 

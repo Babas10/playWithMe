@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Story 302.7
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user_model.freezed.dart';
@@ -74,6 +75,22 @@ class UserModel with _$UserModel {
       ...data,
       'uid': doc.id,
     });
+  }
+
+  /// Factory constructor for creating from Firebase Auth User (Story 302.7)
+  /// Used for new users where Firestore document doesn't exist yet
+  factory UserModel.fromFirebaseUser(User firebaseUser) {
+    return UserModel(
+      uid: firebaseUser.uid,
+      email: firebaseUser.email ?? '',
+      displayName: firebaseUser.displayName,
+      photoUrl: firebaseUser.photoURL,
+      isEmailVerified: firebaseUser.emailVerified,
+      createdAt: firebaseUser.metadata.creationTime,
+      lastSignInAt: firebaseUser.metadata.lastSignInTime,
+      isAnonymous: firebaseUser.isAnonymous,
+      // All other fields use default values from factory constructor
+    );
   }
 
   /// Convert to Firestore-compatible map (excludes uid since it's the document ID)

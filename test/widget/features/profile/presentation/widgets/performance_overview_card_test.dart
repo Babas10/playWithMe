@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/performance_overview_card.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/empty_states/insufficient_data_placeholder.dart';
 
 void main() {
   group('PerformanceOverviewCard Widget Tests', () {

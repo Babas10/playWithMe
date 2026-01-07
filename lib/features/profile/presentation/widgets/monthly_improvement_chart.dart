@@ -5,7 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/empty_states/insufficient_data_placeholder.dart';
 
 /// Enhanced area chart showing ELO progress over time with adaptive aggregation.
 ///
@@ -30,44 +30,139 @@ class MonthlyImprovementChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Story 302.7: Check 1 - Minimum 3 games required
+    if (ratingHistory.length < 3) {
+      return InsufficientDataPlaceholder(
+        featureName: 'Monthly Progress Chart',
+        requirement: 'Play at least 3 games',
+        icon: Icons.timeline,
+        currentProgress: '${ratingHistory.length}/3 games',
+        message: ratingHistory.isEmpty
+            ? 'Start playing to track your progress!'
+            : 'Keep playing to unlock this chart!',
+      );
+    }
+
     final aggregatedData = _aggregateByPeriod(timePeriod);
 
-    // Minimum data requirement: 2 data points
-    if (aggregatedData.length < 2) {
-      return _buildPlaceholder(context);
+    // Story 302.7: Check 2 - Empty time period (no games in selected period)
+    if (aggregatedData.isEmpty) {
+      return _buildEmptyPeriodPlaceholder(context);
+    }
+
+    // Story 302.7: Check 3 - At least 2 data points after aggregation
+    // (relaxed for short periods where single-day data is acceptable)
+    if (aggregatedData.length < 2 && !_isSingleDayDataAcceptable(timePeriod)) {
+      return InsufficientDataPlaceholder(
+        featureName: 'Monthly Progress Chart',
+        requirement: 'Play games over a longer period',
+        icon: Icons.timeline,
+        message: 'Keep playing to see your progress!',
+      );
     }
 
     return _buildChart(context, aggregatedData);
   }
 
-  Widget _buildPlaceholder(BuildContext context) {
-    return const InsufficientDataPlaceholder(
-      featureName: 'ELO Progress Chart',
-      requirement: 'Play games over multiple time periods',
-      icon: Icons.timeline,
+  /// Check if single-day data is acceptable for this time period (Story 302.7)
+  bool _isSingleDayDataAcceptable(TimePeriod period) {
+    // For very short periods, allow single data point
+    return period == TimePeriod.thirtyDays;
+  }
+
+  Widget _buildEmptyPeriodPlaceholder(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.calendar_today_outlined,
+            size: 48,
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Games in This Period',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'No games played in the last ${_getPeriodDisplayName(timePeriod)}',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try selecting a longer time period',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
-  /// Adaptive aggregation based on time period (Story 302.4)
+  String _getPeriodDisplayName(TimePeriod period) {
+    switch (period) {
+      case TimePeriod.thirtyDays:
+        return '30 days';
+      case TimePeriod.ninetyDays:
+        return '90 days';
+      case TimePeriod.oneYear:
+        return 'year';
+      case TimePeriod.allTime:
+        return 'all time';
+    }
+  }
+
+  /// Adaptive aggregation based on time period (Story 302.4, 302.7)
   List<ChartDataPoint> _aggregateByPeriod(TimePeriod period) {
     if (ratingHistory.isEmpty) return [];
 
+    // Story 302.7: Filter history by time period first
+    final startDate = period.getStartDate();
+    final filteredHistory = ratingHistory
+        .where((entry) => entry.timestamp.isAfter(startDate))
+        .toList();
+
+    if (filteredHistory.isEmpty) return [];
+
+    // Use filtered history for aggregation
+    final historyToAggregate = filteredHistory;
+
     switch (period) {
       case TimePeriod.thirtyDays:
-        return _aggregateByDay();
+        return _aggregateByDay(historyToAggregate);
       case TimePeriod.ninetyDays:
-        return _aggregateByWeek();
+        return _aggregateByWeek(historyToAggregate);
       case TimePeriod.oneYear:
       case TimePeriod.allTime:
-        return _aggregateByMonth();
+        return _aggregateByMonth(historyToAggregate);
     }
   }
 
   /// Aggregate by day (for short periods ≤ 30 days)
-  List<ChartDataPoint> _aggregateByDay() {
+  List<ChartDataPoint> _aggregateByDay(List<RatingHistoryEntry> history) {
     final Map<String, List<RatingHistoryEntry>> dayGroups = {};
 
-    for (final entry in ratingHistory) {
+    for (final entry in history) {
       final dayKey = DateFormat('yyyy-MM-dd').format(entry.timestamp);
       dayGroups.putIfAbsent(dayKey, () => []).add(entry);
     }
@@ -76,10 +171,10 @@ class MonthlyImprovementChart extends StatelessWidget {
   }
 
   /// Aggregate by week (for medium periods ~90 days)
-  List<ChartDataPoint> _aggregateByWeek() {
+  List<ChartDataPoint> _aggregateByWeek(List<RatingHistoryEntry> history) {
     final Map<String, List<RatingHistoryEntry>> weekGroups = {};
 
-    for (final entry in ratingHistory) {
+    for (final entry in history) {
       // ISO week number
       final weekStart = _getWeekStart(entry.timestamp);
       final weekKey = DateFormat('yyyy-MM-dd').format(weekStart);
@@ -97,10 +192,10 @@ class MonthlyImprovementChart extends StatelessWidget {
   }
 
   /// Aggregate by month (for long periods ≥ 1 year)
-  List<ChartDataPoint> _aggregateByMonth() {
+  List<ChartDataPoint> _aggregateByMonth(List<RatingHistoryEntry> history) {
     final Map<String, List<RatingHistoryEntry>> monthGroups = {};
 
-    for (final entry in ratingHistory) {
+    for (final entry in history) {
       final monthKey = DateFormat('yyyy-MM').format(entry.timestamp);
       monthGroups.putIfAbsent(monthKey, () => []).add(entry);
     }

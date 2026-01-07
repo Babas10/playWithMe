@@ -139,6 +139,7 @@ void main() {
       final month1 = now.month >= 3 ? now.month - 2 : 3;
       final month2 = now.month >= 2 ? now.month - 1 : 2;
 
+      // Story 302.7: Need at least 3 games
       final currentYearHistory = [
         RatingHistoryEntry(
           entryId: 'entry-1',
@@ -159,6 +160,16 @@ void main() {
           opponentTeam: 'Team B',
           won: true,
           timestamp: DateTime(now.year, month2, 10),
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-3',
+          gameId: 'game-3',
+          oldRating: 1650,
+          newRating: 1680,
+          ratingChange: 30,
+          opponentTeam: 'Team C',
+          won: true,
+          timestamp: DateTime(now.year, now.month, 5),
         ),
       ];
 
@@ -192,6 +203,7 @@ void main() {
     testWidgets('shows year label centered within year range', (tester) async {
       final now = DateTime.now();
       final previousYear = now.year - 1;
+      // Story 302.7: Need at least 3 games
       final previousYearHistory = [
         RatingHistoryEntry(
           entryId: 'entry-1',
@@ -201,7 +213,7 @@ void main() {
           ratingChange: 20,
           opponentTeam: 'Team A',
           won: true,
-          timestamp: DateTime(previousYear, 11, 15), // November previous year
+          timestamp: DateTime(previousYear, 10, 15), // October previous year
         ),
         RatingHistoryEntry(
           entryId: 'entry-2',
@@ -211,7 +223,17 @@ void main() {
           ratingChange: 30,
           opponentTeam: 'Team B',
           won: true,
-          timestamp: DateTime(previousYear, 12, 10), // December previous year
+          timestamp: DateTime(previousYear, 11, 10), // November previous year
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-3',
+          gameId: 'game-3',
+          oldRating: 1650,
+          newRating: 1680,
+          ratingChange: 30,
+          opponentTeam: 'Team C',
+          won: true,
+          timestamp: DateTime(previousYear, 12, 5), // December previous year
         ),
       ];
 
@@ -246,6 +268,7 @@ void main() {
     testWidgets('shows year labels centered for each year in dataset', (tester) async {
       final now = DateTime.now();
       final previousYear = now.year - 1;
+      // Story 302.7: Need at least 3 games
       final mixedYearHistory = [
         RatingHistoryEntry(
           entryId: 'entry-1',
@@ -255,7 +278,7 @@ void main() {
           ratingChange: 20,
           opponentTeam: 'Team A',
           won: true,
-          timestamp: DateTime(previousYear, 12, 15), // December previous year
+          timestamp: DateTime(previousYear, 11, 15), // November previous year
         ),
         RatingHistoryEntry(
           entryId: 'entry-2',
@@ -265,7 +288,17 @@ void main() {
           ratingChange: 30,
           opponentTeam: 'Team B',
           won: true,
-          timestamp: DateTime(now.year, 1, 10), // January current year
+          timestamp: DateTime(previousYear, 12, 10), // December previous year
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-3',
+          gameId: 'game-3',
+          oldRating: 1650,
+          newRating: 1680,
+          ratingChange: 30,
+          opponentTeam: 'Team C',
+          won: true,
+          timestamp: DateTime(now.year, 1, 5), // January current year
         ),
       ];
 
@@ -311,6 +344,7 @@ void main() {
 
     testWidgets('reserved space increased for two-tier labels', (tester) async {
       final now = DateTime.now();
+      // Story 302.7: Need at least 3 games
       final history = [
         RatingHistoryEntry(
           entryId: 'entry-1',
@@ -320,7 +354,7 @@ void main() {
           ratingChange: 20,
           opponentTeam: 'Team A',
           won: true,
-          timestamp: DateTime(now.year, 6, 15),
+          timestamp: DateTime(now.year, 5, 15),
         ),
         RatingHistoryEntry(
           entryId: 'entry-2',
@@ -330,7 +364,17 @@ void main() {
           ratingChange: 30,
           opponentTeam: 'Team B',
           won: true,
-          timestamp: DateTime(now.year, 7, 10),
+          timestamp: DateTime(now.year, 6, 10),
+        ),
+        RatingHistoryEntry(
+          entryId: 'entry-3',
+          gameId: 'game-3',
+          oldRating: 1650,
+          newRating: 1680,
+          ratingChange: 30,
+          opponentTeam: 'Team C',
+          won: true,
+          timestamp: DateTime(now.year, 7, 5),
         ),
       ];
 

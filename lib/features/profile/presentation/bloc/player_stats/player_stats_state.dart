@@ -18,26 +18,30 @@ class PlayerStatsLoaded extends PlayerStatsState {
   final UserModel user;
   final List<RatingHistoryEntry> history;
   final UserRanking? ranking; // Story 302.5: Add ranking to state
+  final bool rankingLoadFailed; // Story 302.7: Track ranking load failures
 
   const PlayerStatsLoaded({
     required this.user,
     required this.history,
     this.ranking,
+    this.rankingLoadFailed = false,
   });
 
   @override
-  List<Object?> get props => [user, history, ranking];
+  List<Object?> get props => [user, history, ranking, rankingLoadFailed];
 
-  /// Create a copy of this state with updated fields (Story 302.5)
+  /// Create a copy of this state with updated fields (Story 302.5, 302.7)
   PlayerStatsLoaded copyWith({
     UserModel? user,
     List<RatingHistoryEntry>? history,
     UserRanking? ranking,
+    bool? rankingLoadFailed,
   }) {
     return PlayerStatsLoaded(
       user: user ?? this.user,
       history: history ?? this.history,
       ranking: ranking ?? this.ranking,
+      rankingLoadFailed: rankingLoadFailed ?? this.rankingLoadFailed,
     );
   }
 }
