@@ -6,6 +6,7 @@ class GroupBottomNavBar extends StatelessWidget {
   final int upcomingGamesCount;
   final VoidCallback? onInviteTap;
   final VoidCallback? onCreateGameTap;
+  final VoidCallback? onCreateTrainingTap;
   final VoidCallback? onGamesListTap;
 
   const GroupBottomNavBar({
@@ -14,8 +15,42 @@ class GroupBottomNavBar extends StatelessWidget {
     this.upcomingGamesCount = 0,
     this.onInviteTap,
     this.onCreateGameTap,
+    this.onCreateTrainingTap,
     this.onGamesListTap,
   });
+
+  void _showCreateMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.sports_volleyball),
+                title: const Text('Create Game'),
+                subtitle: const Text('Competitive game with ELO ratings'),
+                onTap: () {
+                  Navigator.pop(context);
+                  onCreateGameTap?.call();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.fitness_center),
+                title: const Text('Create Training Session'),
+                subtitle: const Text('Practice session without ELO impact'),
+                onTap: () {
+                  Navigator.pop(context);
+                  onCreateTrainingTap?.call();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +64,7 @@ class GroupBottomNavBar extends StatelessWidget {
             }
             break;
           case 1:
-            onCreateGameTap?.call();
+            _showCreateMenu(context);
             break;
           case 2:
             onGamesListTap?.call();
@@ -52,8 +87,8 @@ class GroupBottomNavBar extends StatelessWidget {
             Icons.add_circle,
             color: Theme.of(context).colorScheme.primary,
           ),
-          label: 'Create Game',
-          tooltip: 'Create a new game',
+          label: 'Create',
+          tooltip: 'Create game or training session',
         ),
         BottomNavigationBarItem(
           icon: Badge(
@@ -64,8 +99,8 @@ class GroupBottomNavBar extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
-          label: 'Games',
-          tooltip: 'View all games',
+          label: 'Activities',
+          tooltip: 'View all activities',
         ),
       ],
       selectedItemColor: Theme.of(context).colorScheme.primary,

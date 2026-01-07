@@ -1,127 +1,101 @@
 {
-  "timestamp": "2025-12-29T22:15:19.738Z",
+  "timestamp": "2026-01-07T21:17:07.058Z",
   "users": [
     {
       "index": 0,
-      "uid": "yj7IiUWu1yMJrTReRa46uVLZ9hz1",
+      "uid": "fRdPfMDzGXb9Kyc3OE9Un9LhmaH3",
       "email": "test1@mysta.com",
       "displayName": "Test1",
       "firstName": "Test",
       "lastName": "One",
-      "password": "test1010",
-      "eloRating": 1600
+      "password": "test1010"
     },
     {
       "index": 1,
-      "uid": "tbz2LsELgreG1R5b4uMbZr2XydF3",
+      "uid": "nxTlV1lKH4eQXxiMXbDL6aJh9gb2",
       "email": "test2@mysta.com",
       "displayName": "Test2",
       "firstName": "Test",
       "lastName": "Two",
-      "password": "test1010",
-      "eloRating": 1800
+      "password": "test1010"
     },
     {
       "index": 2,
-      "uid": "OpwamTLIGxb31Gt0FWUpuc9HQ5y2",
+      "uid": "BJJbUgGDMfY0EkZjksBrH2Sp3bD2",
       "email": "test3@mysta.com",
       "displayName": "Test3",
       "firstName": "Test",
       "lastName": "Three",
-      "password": "test1010",
-      "eloRating": 1700
+      "password": "test1010"
     },
     {
       "index": 3,
-      "uid": "VAok4KUt3lSdObP2MsPnDzDIpMk2",
+      "uid": "NZwWTWZiqtRGvSslvnmK7u9bh922",
       "email": "test4@mysta.com",
       "displayName": "Test4",
       "firstName": "Test",
       "lastName": "Four",
-      "password": "test1010",
-      "eloRating": 1500
+      "password": "test1010"
     },
     {
       "index": 4,
-      "uid": "8m1pG1A8LidvjMegBLPpacjCi453",
+      "uid": "lo2DetKa1cXtc29u8wzWxEEe96b2",
       "email": "test5@mysta.com",
       "displayName": "Test5",
       "firstName": "Test",
       "lastName": "Five",
-      "password": "test1010",
-      "eloRating": 1900
+      "password": "test1010"
     },
     {
       "index": 5,
-      "uid": "g9FWizMyYiOt2GNDzjcQvdWN4iE2",
+      "uid": "u7Lw1LvGD0hn2TE6ehmFtFvyvSD3",
       "email": "test6@mysta.com",
       "displayName": "Test6",
       "firstName": "Test",
       "lastName": "Six",
-      "password": "test1010",
-      "eloRating": 1400
+      "password": "test1010"
     },
     {
       "index": 6,
-      "uid": "eV1FSN9hC7Q4f755a7eHQDTyyvg1",
+      "uid": "WwmWbyqNJ7ZgiPNYYqWSKPoTYkv1",
       "email": "test7@mysta.com",
       "displayName": "Test7",
       "firstName": "Test",
       "lastName": "Seven",
-      "password": "test1010",
-      "eloRating": 1600
+      "password": "test1010"
     },
     {
       "index": 7,
-      "uid": "ELqPGMwwT1OBVHIsGAPqipQkz1o1",
+      "uid": "Pf4oXQeH72g8ydofnyIxyGkf5Lg1",
       "email": "test8@mysta.com",
       "displayName": "Test8",
       "firstName": "Test",
       "lastName": "Eight",
-      "password": "test1010",
-      "eloRating": 1300
+      "password": "test1010"
+    },
+    {
+      "index": 8,
+      "uid": "xkqR6TydIUXzCVicdtDFCH7LPy72",
+      "email": "test9@mysta.com",
+      "displayName": "Test9",
+      "firstName": "Test",
+      "lastName": "Nine",
+      "password": "test1010"
+    },
+    {
+      "index": 9,
+      "uid": "S9OEhfmXETe6qFzI1iw0oB99Y5C3",
+      "email": "test10@mysta.com",
+      "displayName": "Test10",
+      "firstName": "Test",
+      "lastName": "Ten",
+      "password": "test1010"
     }
   ],
-  "groupId": "Asx7FLYGuP5Cj71bSEOe",
-  "gameIds": [
-    "7Ukp0lC1k4gxMBBOdxnU",
-    "PQDVhbWSNeCilzTdSdDD",
-    "e3YWmbmvfwLCtz38nb3W",
-    "HBanHLGKj2fiydf3fO4R",
-    "UKvXpZC4Ncd0vwRqaXN1",
-    "0jVnPSyMt5ilI488iaUV",
-    "ONMnkDKLF803E7oM0MlJ",
-    "Z974gWvGq2RamH3qYf9C",
-    "4QEP6wbcXMD22frhQLWp",
-    "IS14GTY69Kf4YLcLjUQg",
-    "QOHAFIL84F6nG3bj0OKn",
-    "lVX5yfDJPBF6Ty4c1c6b",
-    "P7Bp1dGEffKu0ztlfxEu"
-  ],
+  "groupId": "98R8Gss7N1uFFMBOClDy",
+  "gameIds": [],
   "notes": {
     "password": "test1010",
-    "friendships": "All users are friends with each other",
-    "group": "All users are members of the test group",
-    "games": "13 games created for role-based performance test",
-    "scenario": "test1 plays in all three roles (weak-link, carry, balanced)",
-    "expectedResult": {
-      "weakLink": {
-        "games": 4,
-        "wins": 2,
-        "winRate": "50.0%"
-      },
-      "carry": {
-        "games": 6,
-        "wins": 5,
-        "winRate": "83.3%"
-      },
-      "balanced": {
-        "games": 3,
-        "wins": 2,
-        "winRate": "66.7%"
-      },
-      "totalGames": 13,
-      "insight": "💪 Strong carry performance! You elevate your teammates."
-    }
+    "description": "ELO Chart Test Environment"
   }
 }
