@@ -1,5 +1,6 @@
 import '../../data/models/game_model.dart';
 import '../../data/models/training_session_model.dart';
+import '../../data/models/training_session_participant_model.dart';
 
 /// Repository for managing training sessions in the Games layer
 /// Training sessions are group-bound practice events that do not affect ELO ratings
@@ -64,7 +65,40 @@ abstract class TrainingSessionRepository {
     int? minParticipants,
   });
 
-  /// Add participant to training session
+  /// Join training session (via Cloud Function for atomic operations)
+  ///
+  /// Uses Cloud Function to atomically:
+  /// - Validate user is a member of the group
+  /// - Check session is not full (with race condition protection)
+  /// - Add participant to participants subcollection
+  /// - Update denormalized participantIds array
+  ///
+  /// Throws:
+  /// - [Exception] if user is not a member of the group
+  /// - [Exception] if session is full
+  /// - [Exception] if session has already started or is not scheduled
+  /// - [Exception] if user has already joined
+  Future<void> joinTrainingSession(String sessionId);
+
+  /// Leave training session (via Cloud Function for atomic operations)
+  ///
+  /// Uses Cloud Function to atomically:
+  /// - Update participant status to 'left'
+  /// - Remove from denormalized participantIds array
+  ///
+  /// Only allowed if:
+  /// - The session is still scheduled (not started or completed)
+  /// - User is currently a participant
+  ///
+  /// Throws:
+  /// - [Exception] if user is not a participant
+  /// - [Exception] if session is not scheduled
+  Future<void> leaveTrainingSession(String sessionId);
+
+  /// Add participant to training session (DEPRECATED - use joinTrainingSession instead)
+  ///
+  /// Legacy method maintained for backward compatibility.
+  /// New code should use joinTrainingSession() which uses Cloud Functions.
   ///
   /// Validates that:
   /// - The user is a member of the group
@@ -74,12 +108,17 @@ abstract class TrainingSessionRepository {
   /// Throws:
   /// - [Exception] if user is not a member of the group
   /// - [Exception] if session is full
+  @Deprecated('Use joinTrainingSession() instead for atomic operations')
   Future<void> addParticipant(String sessionId, String userId);
 
-  /// Remove participant from training session
+  /// Remove participant from training session (DEPRECATED - use leaveTrainingSession instead)
+  ///
+  /// Legacy method maintained for backward compatibility.
+  /// New code should use leaveTrainingSession() which uses Cloud Functions.
   ///
   /// Only allowed if:
   /// - The session is still scheduled (not started or completed)
+  @Deprecated('Use leaveTrainingSession() instead for atomic operations')
   Future<void> removeParticipant(String sessionId, String userId);
 
   /// Cancel training session
@@ -102,8 +141,25 @@ abstract class TrainingSessionRepository {
   /// Check if training session exists
   Future<bool> trainingSessionExists(String sessionId);
 
-  /// Get training session participants
+  /// Get training session participants (deprecated - returns only IDs from denormalized array)
+  ///
+  /// This method returns participant IDs from the denormalized participantIds array.
+  /// For full participant information, use getTrainingSessionParticipantsStream().
+  @Deprecated('Use getTrainingSessionParticipantsStream() for full participant information')
   Future<List<String>> getTrainingSessionParticipants(String sessionId);
+
+  /// Stream training session participants from participants subcollection
+  ///
+  /// Returns a stream of participants with their join timestamps and status.
+  /// Only includes participants with 'joined' status (excludes those who left).
+  Stream<List<TrainingSessionParticipantModel>> getTrainingSessionParticipantsStream(
+      String sessionId);
+
+  /// Stream participant count for a training session
+  ///
+  /// Returns a real-time count of currently joined participants.
+  /// Updates whenever participants join or leave.
+  Stream<int> getTrainingSessionParticipantCount(String sessionId);
 
   /// Check if user can join training session
   ///
