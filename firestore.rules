@@ -242,6 +242,20 @@ service cloud.firestore {
       // Only creator can delete training sessions
       allow delete: if isAuthenticated() &&
                        request.auth.uid == resource.data.createdBy;
+
+      // Story 15.3: Participants subcollection rules
+      // Participants are managed via Cloud Functions (joinTrainingSession, leaveTrainingSession)
+      // for atomic operations and race condition protection
+      match /participants/{userId} {
+        // Read participants: group members only
+        allow get, list: if isAuthenticated() &&
+                            request.auth.uid in get(/databases/$(database)/documents/groups/$(get(/databases/$(database)/documents/trainingSessions/$(sessionId)).data.groupId)).data.memberIds;
+
+        // CRITICAL: Join/leave via Cloud Functions ONLY
+        // Use joinTrainingSession and leaveTrainingSession callable functions
+        // This enforces atomic operations and prevents race conditions when checking capacity
+        allow create, update, delete: if false;
+      }
     }
 
     // Deny all other access
