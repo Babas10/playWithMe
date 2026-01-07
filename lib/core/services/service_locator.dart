@@ -14,12 +14,14 @@ import 'package:play_with_me/features/auth/presentation/bloc/password_reset/pass
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
 import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_user_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_group_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_game_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_training_session_repository.dart';
 import 'package:play_with_me/core/data/repositories/firebase_image_storage_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_invitation_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_friend_repository.dart';
@@ -39,6 +41,7 @@ import 'package:play_with_me/features/friends/presentation/bloc/friend_request_c
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_bloc.dart';
+import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -110,6 +113,14 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<GameRepository>()) {
     sl.registerLazySingleton<GameRepository>(
       () => FirestoreGameRepository(),
+    );
+  }
+
+  if (!sl.isRegistered<TrainingSessionRepository>()) {
+    sl.registerLazySingleton<TrainingSessionRepository>(
+      () => FirestoreTrainingSessionRepository(
+        groupRepository: sl(),
+      ),
     );
   }
 
@@ -270,6 +281,14 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<GamesListBloc>()) {
     sl.registerFactory<GamesListBloc>(
       () => GamesListBloc(gameRepository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<TrainingSessionCreationBloc>()) {
+    sl.registerFactory<TrainingSessionCreationBloc>(
+      () => TrainingSessionCreationBloc(
+        trainingSessionRepository: sl(),
+      ),
     );
   }
 }

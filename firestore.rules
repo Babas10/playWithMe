@@ -209,6 +209,39 @@ service cloud.firestore {
                        request.auth.uid == resource.data.createdBy;
     }
 
+    // ============================================
+    // Training Sessions (Epic 15)
+    // ============================================
+
+    // Training Sessions: Group members can participate, creators can manage
+    // ARCHITECTURE: Training sessions are in Games layer, validate via group membership only
+    // SECURITY: Creation goes through Cloud Function for server-side validation
+    match /trainingSessions/{sessionId} {
+      // Individual session reads allowed for members (used by session details page)
+      allow get: if isAuthenticated() &&
+                    request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds;
+
+      // List/query operations allowed for group members
+      // Each document is checked individually - user must be member of the session's group
+      allow list: if isAuthenticated() &&
+                     request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds;
+
+      // CRITICAL: Training session creation is Cloud Functions ONLY
+      // Use createTrainingSession callable function for server-side validation
+      // This keeps rules minimal and validation logic centralized
+      allow create: if false;
+
+      // Training session updates allowed for creator or group members (for joining/leaving, completion)
+      // Note: Only group members can join (validated in repository layer)
+      allow update: if isAuthenticated() &&
+                       (request.auth.uid == resource.data.createdBy ||
+                        request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds);
+
+      // Only creator can delete training sessions
+      allow delete: if isAuthenticated() &&
+                       request.auth.uid == resource.data.createdBy;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;
