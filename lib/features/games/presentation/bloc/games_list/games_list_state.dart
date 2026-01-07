@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/group_activity_item.dart';
 
 abstract class GamesListState extends Equatable {
   const GamesListState();
@@ -17,18 +18,27 @@ class GamesListLoading extends GamesListState {
 }
 
 class GamesListLoaded extends GamesListState {
-  final List<GameModel> upcomingGames;
-  final List<GameModel> pastGames;
+  final List<GroupActivityItem> upcomingActivities;
+  final List<GroupActivityItem> pastActivities;
   final String userId;
 
   const GamesListLoaded({
-    required this.upcomingGames,
-    required this.pastGames,
+    required this.upcomingActivities,
+    required this.pastActivities,
     required this.userId,
   });
 
   @override
-  List<Object?> get props => [upcomingGames, pastGames, userId];
+  List<Object?> get props => [upcomingActivities, pastActivities, userId];
+
+  // Helper getters for backward compatibility and filtering
+  List<GameModel> get upcomingGames => upcomingActivities
+      .whereType<GameActivityItem>()
+      .map((item) => item.game)
+      .toList();
+
+  List<GameModel> get pastGames =>
+      pastActivities.whereType<GameActivityItem>().map((item) => item.game).toList();
 }
 
 class GamesListError extends GamesListState {

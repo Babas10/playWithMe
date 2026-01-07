@@ -22,6 +22,8 @@ import 'package:play_with_me/features/groups/presentation/widgets/group_bottom_n
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_creation_page.dart';
 import 'package:play_with_me/features/games/presentation/pages/games_list_page.dart';
+import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
+import 'package:play_with_me/features/training/presentation/pages/training_session_creation_page.dart';
 
 class GroupDetailsPage extends StatelessWidget {
   final String groupId;
@@ -369,6 +371,8 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                         upcomingGamesCount: gameCount,
                         onInviteTap: () => _navigateToInvitePage(context),
                         onCreateGameTap: () => _navigateToGameCreation(context),
+                        onCreateTrainingTap: () =>
+                            _navigateToTrainingCreation(context),
                         onGamesListTap: () => _showGamesListComingSoon(context),
                       );
                     },
@@ -630,6 +634,23 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
         builder: (context) => GamesListPage(
           groupId: widget.groupId,
           groupName: _group!.name,
+        ),
+      ),
+    );
+  }
+
+  void _navigateToTrainingCreation(BuildContext context) {
+    if (_group == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => sl<TrainingSessionCreationBloc>(),
+          child: TrainingSessionCreationPage(
+            groupId: widget.groupId,
+            groupName: _group!.name,
+          ),
         ),
       ),
     );

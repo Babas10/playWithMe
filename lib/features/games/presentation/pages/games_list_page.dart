@@ -1,8 +1,9 @@
-// Displays a list of all games for a group with real-time updates.
+// Displays the group activity feed with games and training sessions.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/group_activity_item.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -13,6 +14,7 @@ import 'package:play_with_me/features/games/presentation/bloc/game_creation/game
 import 'package:play_with_me/features/games/presentation/pages/game_creation_page.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_list_item.dart';
+import 'package:play_with_me/features/games/presentation/widgets/training_session_list_item.dart';
 
 class GamesListPage extends StatelessWidget {
   final String groupId;
@@ -102,26 +104,41 @@ class _GamesListPageContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (state.upcomingGames.isNotEmpty) ...[
-              _buildSectionHeader(context, 'Upcoming Games'),
-              ...state.upcomingGames.map((game) => GameListItem(
-                    game: game,
-                    userId: state.userId,
-                    onTap: () => _navigateToGameDetails(context, game.id),
-                  )),
+            if (state.upcomingActivities.isNotEmpty) ...[
+              _buildSectionHeader(context, 'Upcoming Activities'),
+              ...state.upcomingActivities.map((activity) =>
+                  _buildActivityItem(context, activity, state.userId, false)),
             ],
-            if (state.pastGames.isNotEmpty) ...[
-              _buildSectionHeader(context, 'Past Games'),
-              ...state.pastGames.map((game) => GameListItem(
-                    game: game,
-                    userId: state.userId,
-                    isPast: true,
-                    onTap: () => _navigateToGameDetails(context, game.id),
-                  )),
+            if (state.pastActivities.isNotEmpty) ...[
+              _buildSectionHeader(context, 'Past Activities'),
+              ...state.pastActivities.map((activity) =>
+                  _buildActivityItem(context, activity, state.userId, true)),
             ],
             const SizedBox(height: 80), // Space for FAB
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActivityItem(
+    BuildContext context,
+    GroupActivityItem activity,
+    String userId,
+    bool isPast,
+  ) {
+    return activity.when(
+      game: (game) => GameListItem(
+        game: game,
+        userId: userId,
+        isPast: isPast,
+        onTap: () => _navigateToGameDetails(context, game.id),
+      ),
+      training: (session) => TrainingSessionListItem(
+        session: session,
+        userId: userId,
+        isPast: isPast,
+        onTap: () => _navigateToTrainingDetails(context, session.id),
       ),
     );
   }
@@ -229,6 +246,17 @@ class _GamesListPageContent extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => GameDetailsPage(gameId: gameId),
+      ),
+    );
+  }
+
+  void _navigateToTrainingDetails(BuildContext context, String sessionId) {
+    // TODO: Navigate to training session details page when implemented
+    // For now, show a placeholder snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Training session details: $sessionId'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
