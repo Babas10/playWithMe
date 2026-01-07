@@ -113,4 +113,37 @@ abstract class TrainingSessionRepository {
   /// - Session is scheduled (not cancelled or completed)
   /// - Session hasn't started yet
   Future<bool> canUserJoinTrainingSession(String sessionId, String userId);
+
+  // ============================================================================
+  // Recurring Training Sessions (Story 15.2)
+  // ============================================================================
+
+  /// Get all instances of a recurring training session
+  ///
+  /// Returns all training sessions that have the specified parentSessionId
+  Stream<List<TrainingSessionModel>> getRecurringSessionInstances(
+      String parentSessionId);
+
+  /// Get upcoming instances of a recurring training session
+  ///
+  /// Returns only future instances that are scheduled
+  Stream<List<TrainingSessionModel>> getUpcomingRecurringSessionInstances(
+      String parentSessionId);
+
+  /// Generate recurring training session instances via Cloud Function
+  ///
+  /// This calls the Cloud Function to generate all instances based on
+  /// the parent session's recurrence rule
+  ///
+  /// Throws:
+  /// - [Exception] if user is not the creator of the parent session
+  /// - [Exception] if parent session doesn't have a recurrence rule
+  Future<List<String>> generateRecurringInstances(String parentSessionId);
+
+  /// Cancel a single instance of a recurring session
+  ///
+  /// This allows cancelling one occurrence without affecting the entire series
+  ///
+  /// Only the creator of the parent session can cancel instances
+  Future<void> cancelRecurringSessionInstance(String instanceId);
 }

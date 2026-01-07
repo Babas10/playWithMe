@@ -1,5 +1,6 @@
 // Validates CreateTrainingSessionBloc states for tracking training session creation form state and validation.
 
+import '../../../../../core/data/models/recurrence_rule_model.dart';
 import '../../../../../core/data/models/training_session_model.dart';
 import '../../../../../core/presentation/bloc/base_bloc_state.dart';
 
@@ -26,6 +27,7 @@ class TrainingSessionCreationFormState extends TrainingSessionCreationState {
   final int maxParticipants;
   final int minParticipants;
   final String? notes;
+  final RecurrenceRuleModel? recurrenceRule; // Story 15.2
 
   // Validation errors
   final String? groupError;
@@ -34,6 +36,7 @@ class TrainingSessionCreationFormState extends TrainingSessionCreationState {
   final String? locationError;
   final String? titleError;
   final String? participantsError;
+  final String? recurrenceError; // Story 15.2
 
   // Form validity
   final bool isValid;
@@ -50,12 +53,14 @@ class TrainingSessionCreationFormState extends TrainingSessionCreationState {
     this.maxParticipants = 12,
     this.minParticipants = 4,
     this.notes,
+    this.recurrenceRule, // Story 15.2
     this.groupError,
     this.startTimeError,
     this.endTimeError,
     this.locationError,
     this.titleError,
     this.participantsError,
+    this.recurrenceError, // Story 15.2
     this.isValid = false,
   });
 
@@ -71,13 +76,16 @@ class TrainingSessionCreationFormState extends TrainingSessionCreationState {
     int? maxParticipants,
     int? minParticipants,
     String? notes,
+    RecurrenceRuleModel? recurrenceRule, // Story 15.2
     String? groupError,
     String? startTimeError,
     String? endTimeError,
     String? locationError,
     String? titleError,
     String? participantsError,
+    String? recurrenceError, // Story 15.2
     bool? isValid,
+    bool clearRecurrenceRule = false, // Story 15.2 - allow clearing
   }) {
     return TrainingSessionCreationFormState(
       groupId: groupId ?? this.groupId,
@@ -91,12 +99,14 @@ class TrainingSessionCreationFormState extends TrainingSessionCreationState {
       maxParticipants: maxParticipants ?? this.maxParticipants,
       minParticipants: minParticipants ?? this.minParticipants,
       notes: notes ?? this.notes,
+      recurrenceRule: clearRecurrenceRule ? null : (recurrenceRule ?? this.recurrenceRule),
       groupError: groupError,
       startTimeError: startTimeError,
       endTimeError: endTimeError,
       locationError: locationError,
       titleError: titleError,
       participantsError: participantsError,
+      recurrenceError: recurrenceError,
       isValid: isValid ?? this.isValid,
     );
   }
@@ -114,12 +124,14 @@ class TrainingSessionCreationFormState extends TrainingSessionCreationState {
         maxParticipants,
         minParticipants,
         notes,
+        recurrenceRule, // Story 15.2
         groupError,
         startTimeError,
         endTimeError,
         locationError,
         titleError,
         participantsError,
+        recurrenceError, // Story 15.2
         isValid,
       ];
 }
