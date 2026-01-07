@@ -36,8 +36,11 @@ mixin _$TrainingSessionModel {
   @TimestampConverter()
   DateTime get createdAt => throw _privateConstructorUsedError;
   @TimestampConverter()
-  DateTime? get updatedAt => throw _privateConstructorUsedError; // Recurrence support (for Story 15.2 - future enhancement)
-  String? get recurrenceRule =>
+  DateTime? get updatedAt => throw _privateConstructorUsedError; // Recurrence support (Story 15.2)
+  RecurrenceRuleModel? get recurrenceRule =>
+      throw _privateConstructorUsedError; // Parent session ID (for recurring session instances)
+  // If this is set, this session is an instance of a recurring parent
+  String? get parentSessionId =>
       throw _privateConstructorUsedError; // Session status
   TrainingStatus get status =>
       throw _privateConstructorUsedError; // Participant tracking
@@ -75,13 +78,15 @@ abstract class $TrainingSessionModelCopyWith<$Res> {
     String createdBy,
     @TimestampConverter() DateTime createdAt,
     @TimestampConverter() DateTime? updatedAt,
-    String? recurrenceRule,
+    RecurrenceRuleModel? recurrenceRule,
+    String? parentSessionId,
     TrainingStatus status,
     List<String> participantIds,
     String? notes,
   });
 
   $GameLocationCopyWith<$Res> get location;
+  $RecurrenceRuleModelCopyWith<$Res>? get recurrenceRule;
 }
 
 /// @nodoc
@@ -115,6 +120,7 @@ class _$TrainingSessionModelCopyWithImpl<
     Object? createdAt = null,
     Object? updatedAt = freezed,
     Object? recurrenceRule = freezed,
+    Object? parentSessionId = freezed,
     Object? status = null,
     Object? participantIds = null,
     Object? notes = freezed,
@@ -172,6 +178,10 @@ class _$TrainingSessionModelCopyWithImpl<
             recurrenceRule: freezed == recurrenceRule
                 ? _value.recurrenceRule
                 : recurrenceRule // ignore: cast_nullable_to_non_nullable
+                      as RecurrenceRuleModel?,
+            parentSessionId: freezed == parentSessionId
+                ? _value.parentSessionId
+                : parentSessionId // ignore: cast_nullable_to_non_nullable
                       as String?,
             status: null == status
                 ? _value.status
@@ -199,6 +209,20 @@ class _$TrainingSessionModelCopyWithImpl<
       return _then(_value.copyWith(location: value) as $Val);
     });
   }
+
+  /// Create a copy of TrainingSessionModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RecurrenceRuleModelCopyWith<$Res>? get recurrenceRule {
+    if (_value.recurrenceRule == null) {
+      return null;
+    }
+
+    return $RecurrenceRuleModelCopyWith<$Res>(_value.recurrenceRule!, (value) {
+      return _then(_value.copyWith(recurrenceRule: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -223,7 +247,8 @@ abstract class _$$TrainingSessionModelImplCopyWith<$Res>
     String createdBy,
     @TimestampConverter() DateTime createdAt,
     @TimestampConverter() DateTime? updatedAt,
-    String? recurrenceRule,
+    RecurrenceRuleModel? recurrenceRule,
+    String? parentSessionId,
     TrainingStatus status,
     List<String> participantIds,
     String? notes,
@@ -231,6 +256,8 @@ abstract class _$$TrainingSessionModelImplCopyWith<$Res>
 
   @override
   $GameLocationCopyWith<$Res> get location;
+  @override
+  $RecurrenceRuleModelCopyWith<$Res>? get recurrenceRule;
 }
 
 /// @nodoc
@@ -260,6 +287,7 @@ class __$$TrainingSessionModelImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? updatedAt = freezed,
     Object? recurrenceRule = freezed,
+    Object? parentSessionId = freezed,
     Object? status = null,
     Object? participantIds = null,
     Object? notes = freezed,
@@ -317,6 +345,10 @@ class __$$TrainingSessionModelImplCopyWithImpl<$Res>
         recurrenceRule: freezed == recurrenceRule
             ? _value.recurrenceRule
             : recurrenceRule // ignore: cast_nullable_to_non_nullable
+                  as RecurrenceRuleModel?,
+        parentSessionId: freezed == parentSessionId
+            ? _value.parentSessionId
+            : parentSessionId // ignore: cast_nullable_to_non_nullable
                   as String?,
         status: null == status
             ? _value.status
@@ -352,6 +384,7 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
     @TimestampConverter() required this.createdAt,
     @TimestampConverter() this.updatedAt,
     this.recurrenceRule,
+    this.parentSessionId,
     this.status = TrainingStatus.scheduled,
     final List<String> participantIds = const [],
     this.notes,
@@ -389,9 +422,13 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
   @override
   @TimestampConverter()
   final DateTime? updatedAt;
-  // Recurrence support (for Story 15.2 - future enhancement)
+  // Recurrence support (Story 15.2)
   @override
-  final String? recurrenceRule;
+  final RecurrenceRuleModel? recurrenceRule;
+  // Parent session ID (for recurring session instances)
+  // If this is set, this session is an instance of a recurring parent
+  @override
+  final String? parentSessionId;
   // Session status
   @override
   @JsonKey()
@@ -413,7 +450,7 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
 
   @override
   String toString() {
-    return 'TrainingSessionModel(id: $id, groupId: $groupId, title: $title, description: $description, location: $location, startTime: $startTime, endTime: $endTime, minParticipants: $minParticipants, maxParticipants: $maxParticipants, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, recurrenceRule: $recurrenceRule, status: $status, participantIds: $participantIds, notes: $notes)';
+    return 'TrainingSessionModel(id: $id, groupId: $groupId, title: $title, description: $description, location: $location, startTime: $startTime, endTime: $endTime, minParticipants: $minParticipants, maxParticipants: $maxParticipants, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, recurrenceRule: $recurrenceRule, parentSessionId: $parentSessionId, status: $status, participantIds: $participantIds, notes: $notes)';
   }
 
   @override
@@ -443,6 +480,8 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
                 other.updatedAt == updatedAt) &&
             (identical(other.recurrenceRule, recurrenceRule) ||
                 other.recurrenceRule == recurrenceRule) &&
+            (identical(other.parentSessionId, parentSessionId) ||
+                other.parentSessionId == parentSessionId) &&
             (identical(other.status, status) || other.status == status) &&
             const DeepCollectionEquality().equals(
               other._participantIds,
@@ -468,6 +507,7 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
     createdAt,
     updatedAt,
     recurrenceRule,
+    parentSessionId,
     status,
     const DeepCollectionEquality().hash(_participantIds),
     notes,
@@ -505,7 +545,8 @@ abstract class _TrainingSessionModel extends TrainingSessionModel {
     required final String createdBy,
     @TimestampConverter() required final DateTime createdAt,
     @TimestampConverter() final DateTime? updatedAt,
-    final String? recurrenceRule,
+    final RecurrenceRuleModel? recurrenceRule,
+    final String? parentSessionId,
     final TrainingStatus status,
     final List<String> participantIds,
     final String? notes,
@@ -542,9 +583,12 @@ abstract class _TrainingSessionModel extends TrainingSessionModel {
   DateTime get createdAt;
   @override
   @TimestampConverter()
-  DateTime? get updatedAt; // Recurrence support (for Story 15.2 - future enhancement)
+  DateTime? get updatedAt; // Recurrence support (Story 15.2)
   @override
-  String? get recurrenceRule; // Session status
+  RecurrenceRuleModel? get recurrenceRule; // Parent session ID (for recurring session instances)
+  // If this is set, this session is an instance of a recurring parent
+  @override
+  String? get parentSessionId; // Session status
   @override
   TrainingStatus get status; // Participant tracking
   @override

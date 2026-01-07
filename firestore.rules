@@ -223,6 +223,8 @@ service cloud.firestore {
 
       // List/query operations allowed for group members
       // Each document is checked individually - user must be member of the session's group
+      // Story 15.2: This also supports querying recurring session instances via parentSessionId
+      // since each instance inherits the same groupId as the parent session
       allow list: if isAuthenticated() &&
                      request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds;
 

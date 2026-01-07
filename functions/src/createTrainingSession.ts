@@ -7,6 +7,16 @@ import * as admin from "firebase-admin";
 // Type Definitions
 // ============================================================================
 
+type RecurrenceFrequency = "none" | "weekly" | "monthly";
+
+interface RecurrenceRule {
+  frequency: RecurrenceFrequency;
+  interval: number;
+  count?: number;
+  endDate?: string;
+  daysOfWeek?: number[];
+}
+
 interface CreateTrainingSessionRequest {
   groupId: string;
   title: string;
@@ -18,6 +28,7 @@ interface CreateTrainingSessionRequest {
   minParticipants: number;
   maxParticipants: number;
   notes?: string;
+  recurrenceRule?: RecurrenceRule;
 }
 
 interface CreateTrainingSessionResponse {
@@ -259,7 +270,91 @@ export const createTrainingSession = functions
       }
 
       // ========================================
-      // 4. Create Training Session Document
+      // 4. Validate Recurrence Rule (if provided)
+      // ========================================
+
+      let recurrenceRule: RecurrenceRule | null = null;
+      if (data.recurrenceRule && data.recurrenceRule.frequency !== "none") {
+        recurrenceRule = data.recurrenceRule;
+
+        // Validate recurrence rule
+        if (recurrenceRule.interval < 1) {
+          throw new functions.https.HttpsError(
+            "invalid-argument",
+            "Recurrence interval must be at least 1"
+          );
+        }
+
+        // Either count or endDate must be specified
+        if (!recurrenceRule.count && !recurrenceRule.endDate) {
+          throw new functions.https.HttpsError(
+            "invalid-argument",
+            "Recurrence rule must specify either count or endDate"
+          );
+        }
+
+        // Both count and endDate cannot be specified
+        if (recurrenceRule.count && recurrenceRule.endDate) {
+          throw new functions.https.HttpsError(
+            "invalid-argument",
+            "Recurrence rule cannot specify both count and endDate"
+          );
+        }
+
+        // Validate count
+        if (recurrenceRule.count !== undefined) {
+          if (recurrenceRule.count < 1) {
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "Recurrence count must be at least 1"
+            );
+          }
+          if (recurrenceRule.count > 100) {
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "Recurrence count cannot exceed 100 occurrences"
+            );
+          }
+        }
+
+        // Validate endDate
+        if (recurrenceRule.endDate) {
+          const endDate = new Date(recurrenceRule.endDate);
+          if (isNaN(endDate.getTime())) {
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "Invalid endDate format"
+            );
+          }
+          if (endDate <= new Date()) {
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "Recurrence endDate must be in the future"
+            );
+          }
+        }
+
+        // Validate daysOfWeek for weekly recurrence
+        if (recurrenceRule.frequency === "weekly" && recurrenceRule.daysOfWeek) {
+          if (recurrenceRule.daysOfWeek.length === 0) {
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "Weekly recurrence must specify at least one day of week"
+            );
+          }
+          for (const day of recurrenceRule.daysOfWeek) {
+            if (day < 1 || day > 7) {
+              throw new functions.https.HttpsError(
+                "invalid-argument",
+                "Days of week must be between 1 (Monday) and 7 (Sunday)"
+              );
+            }
+          }
+        }
+      }
+
+      // ========================================
+      // 5. Create Training Session Document
       // ========================================
 
       try {
@@ -278,7 +373,8 @@ export const createTrainingSession = functions
           createdBy: userId,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: null,
-          recurrenceRule: null, // Future enhancement (Story 15.2)
+          recurrenceRule: recurrenceRule, // Story 15.2
+          parentSessionId: null, // This is a parent session (not an instance)
           status: "scheduled",
           participantIds: [], // Creator doesn't auto-join (they can join manually)
           notes: data.notes?.trim() || null,
