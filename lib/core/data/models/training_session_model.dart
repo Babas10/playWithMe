@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'game_model.dart'; // For GameLocation reuse
+import 'recurrence_rule_model.dart';
 
 part 'training_session_model.freezed.dart';
 part 'training_session_model.g.dart';
@@ -24,8 +25,11 @@ class TrainingSessionModel with _$TrainingSessionModel {
     required String createdBy,
     @TimestampConverter() required DateTime createdAt,
     @TimestampConverter() DateTime? updatedAt,
-    // Recurrence support (for Story 15.2 - future enhancement)
-    String? recurrenceRule,
+    // Recurrence support (Story 15.2)
+    RecurrenceRuleModel? recurrenceRule,
+    // Parent session ID (for recurring session instances)
+    // If this is set, this session is an instance of a recurring parent
+    String? parentSessionId,
     // Session status
     @Default(TrainingStatus.scheduled) TrainingStatus status,
     // Participant tracking
@@ -249,6 +253,20 @@ class TrainingSessionModel with _$TrainingSessionModel {
       return '${difference.inMinutes}m';
     }
   }
+
+  /// Recurrence-related methods
+
+  /// Check if this is a recurring training session (has a recurrence rule)
+  bool get isRecurring => recurrenceRule != null && recurrenceRule!.isRecurring;
+
+  /// Check if this is a recurrence instance (child of a recurring parent)
+  bool get isRecurrenceInstance => parentSessionId != null;
+
+  /// Check if this is a parent recurring session
+  bool get isParentRecurringSession => isRecurring && !isRecurrenceInstance;
+
+  /// Get recurrence description (human-readable)
+  String? get recurrenceDescription => recurrenceRule?.getDescription();
 }
 
 enum TrainingStatus {

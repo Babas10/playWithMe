@@ -22,6 +22,7 @@ export {getCompletedGames} from "./getCompletedGames"; // Story 14.7
 export {getHeadToHeadStats} from "./getHeadToHeadStats"; // Story 301.8
 export {calculateUserRanking} from "./calculateUserRanking"; // Story 302.2
 export {createTrainingSession} from "./createTrainingSession"; // Story 15.1 (Epic 15: Training Sessions)
+export {generateRecurringTrainingSessions} from "./generateRecurringTrainingSessions"; // Story 15.2 (Recurring Training Sessions)
 
 // Export friendship functions (callable functions)
 export {

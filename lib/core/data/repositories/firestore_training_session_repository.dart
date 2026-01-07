@@ -159,6 +159,12 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       // This enforces security and keeps Firestore rules minimal
       final callable = _functions.httpsCallable('createTrainingSession');
 
+      // Prepare recurrence rule for Cloud Function if present
+      Map<String, dynamic>? recurrenceRuleData;
+      if (session.recurrenceRule != null && session.recurrenceRule!.isRecurring) {
+        recurrenceRuleData = session.recurrenceRule!.toJson();
+      }
+
       final result = await callable.call<Map<String, dynamic>>({
         'groupId': session.groupId,
         'title': session.title,
@@ -170,6 +176,7 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
         'minParticipants': session.minParticipants,
         'maxParticipants': session.maxParticipants,
         'notes': session.notes,
+        if (recurrenceRuleData != null) 'recurrenceRule': recurrenceRuleData,
       });
 
       final sessionId = result.data['sessionId'] as String;
@@ -396,6 +403,111 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       return session.canUserJoin(userId);
     } catch (e) {
       throw Exception('Failed to check if user can join training session: $e');
+    }
+  }
+
+  // ============================================================================
+  // Recurring Training Sessions (Story 15.2)
+  // ============================================================================
+
+  @override
+  Stream<List<TrainingSessionModel>> getRecurringSessionInstances(
+      String parentSessionId) {
+    try {
+      return _firestore
+          .collection(_collection)
+          .where('parentSessionId', isEqualTo: parentSessionId)
+          .orderBy('startTime', descending: false)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => TrainingSessionModel.fromFirestore(doc))
+              .toList());
+    } catch (e) {
+      throw Exception('Failed to get recurring session instances: $e');
+    }
+  }
+
+  @override
+  Stream<List<TrainingSessionModel>> getUpcomingRecurringSessionInstances(
+      String parentSessionId) {
+    try {
+      final now = Timestamp.now();
+      return _firestore
+          .collection(_collection)
+          .where('parentSessionId', isEqualTo: parentSessionId)
+          .where('startTime', isGreaterThan: now)
+          .where('status', isEqualTo: 'scheduled')
+          .orderBy('startTime', descending: false)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => TrainingSessionModel.fromFirestore(doc))
+              .toList());
+    } catch (e) {
+      throw Exception(
+          'Failed to get upcoming recurring session instances: $e');
+    }
+  }
+
+  @override
+  Future<List<String>> generateRecurringInstances(
+      String parentSessionId) async {
+    try {
+      // Call Cloud Function to generate instances
+      final callable =
+          _functions.httpsCallable('generateRecurringTrainingSessions');
+
+      final result = await callable.call<Map<String, dynamic>>({
+        'parentSessionId': parentSessionId,
+      });
+
+      final sessionIds = List<String>.from(result.data['sessionIds'] as List);
+      return sessionIds;
+    } on FirebaseFunctionsException catch (e) {
+      // Handle specific Cloud Function errors with user-friendly messages
+      switch (e.code) {
+        case 'unauthenticated':
+          throw Exception(
+              'You must be logged in to generate recurring sessions');
+        case 'permission-denied':
+          throw Exception('Only the creator can generate recurring instances');
+        case 'not-found':
+          throw Exception('Parent training session not found');
+        case 'invalid-argument':
+          throw Exception(e.message ??
+              'Invalid recurrence rule or parent session configuration');
+        default:
+          throw Exception(
+              'Failed to generate recurring instances: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Failed to generate recurring instances: $e');
+    }
+  }
+
+  @override
+  Future<void> cancelRecurringSessionInstance(String instanceId) async {
+    try {
+      final session = await getTrainingSessionById(instanceId);
+      if (session == null) {
+        throw Exception('Training session instance not found');
+      }
+
+      // Verify this is actually an instance (has parentSessionId)
+      if (!session.isRecurrenceInstance) {
+        throw Exception(
+            'This is not a recurring session instance. Use cancelTrainingSession instead.');
+      }
+
+      // Cancel the instance using the standard cancel method
+      await cancelTrainingSession(instanceId);
+    } catch (e) {
+      if (e.toString().contains('Training session instance not found') ||
+          e.toString().contains('This is not a recurring session instance')) {
+        rethrow;
+      }
+      throw Exception('Failed to cancel recurring session instance: $e');
     }
   }
 }

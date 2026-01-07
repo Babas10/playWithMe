@@ -21,7 +21,12 @@ _$TrainingSessionModelImpl _$$TrainingSessionModelImplFromJson(
   createdBy: json['createdBy'] as String,
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: const TimestampConverter().fromJson(json['updatedAt']),
-  recurrenceRule: json['recurrenceRule'] as String?,
+  recurrenceRule: json['recurrenceRule'] == null
+      ? null
+      : RecurrenceRuleModel.fromJson(
+          json['recurrenceRule'] as Map<String, dynamic>,
+        ),
+  parentSessionId: json['parentSessionId'] as String?,
   status:
       $enumDecodeNullable(_$TrainingStatusEnumMap, json['status']) ??
       TrainingStatus.scheduled,
@@ -49,6 +54,7 @@ Map<String, dynamic> _$$TrainingSessionModelImplToJson(
   'createdAt': instance.createdAt.toIso8601String(),
   'updatedAt': const TimestampConverter().toJson(instance.updatedAt),
   'recurrenceRule': instance.recurrenceRule,
+  'parentSessionId': instance.parentSessionId,
   'status': _$TrainingStatusEnumMap[instance.status]!,
   'participantIds': instance.participantIds,
   'notes': instance.notes,
