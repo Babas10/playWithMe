@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/pages/head_to_head_page.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/empty_stats_placeholder.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/empty_states/insufficient_data_placeholder.dart';
 
 /// A card widget displaying rival/nemesis statistics.
 ///

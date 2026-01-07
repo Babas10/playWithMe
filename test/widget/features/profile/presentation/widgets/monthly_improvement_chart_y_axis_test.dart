@@ -8,6 +8,7 @@ import 'package:play_with_me/features/profile/presentation/widgets/monthly_impro
 
 void main() {
   // Helper to create simple history
+  // Story 302.7: Spread across different months to avoid single-month aggregation
   List<RatingHistoryEntry> createHistory(List<double> ratings) {
     return List.generate(
       ratings.length,
@@ -19,7 +20,7 @@ void main() {
         ratingChange: 10,
         opponentTeam: 'Opponents',
         won: true,
-        timestamp: DateTime(2024, 1, i + 1), // Daily entries
+        timestamp: DateTime(2024, i + 1, 15), // Spread across months
       ),
     );
   }
@@ -38,7 +39,8 @@ void main() {
       // numLabels = (1700-1600)/50 + 1 = 3 labels
       // Labels: 1600, 1650, 1700 (compact, exactly fits data)
 
-      final history = createHistory([1600, 1700]);
+      // Story 302.7: Minimum 3 games required
+      final history = createHistory([1600, 1650, 1700]);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -46,7 +48,7 @@ void main() {
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1700,
-              timePeriod: TimePeriod.thirtyDays,
+              timePeriod: TimePeriod.allTime, // Story 302.7: Use allTime to include older test data
             ),
           ),
         ),
@@ -72,15 +74,16 @@ void main() {
     });
 
     testWidgets('handles small ranges with compact intervals', (tester) async {
-      // Data range: 1600 to 1601 (range=1)
-      // rawInterval = 1 / 4 = 0.25
+      // Data range: 1599 to 1601 (range=2)
+      // rawInterval = 2 / 4 = 0.5
       // niceInterval = 1 (minimum enforced)
-      // minY = floor(1600/1) * 1 = 1600
+      // minY = floor(1599/1) * 1 = 1599
       // maxY = ceil(1601/1) * 1 = 1601
-      // numLabels = (1601-1600)/1 + 1 = 2 labels
-      // Labels: 1600, 1601 (compact, exactly fits data)
+      // numLabels = (1601-1599)/1 + 1 = 3 labels
+      // Labels: 1599, 1600, 1601 (compact, exactly fits data)
 
-      final history = createHistory([1600, 1601]);
+      // Story 302.7: Minimum 3 games required
+      final history = createHistory([1599, 1600, 1601]);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -88,7 +91,7 @@ void main() {
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1601,
-              timePeriod: TimePeriod.thirtyDays,
+              timePeriod: TimePeriod.allTime, // Story 302.7: Use allTime to include older test data
             ),
           ),
         ),
@@ -108,7 +111,7 @@ void main() {
       expect(interval, equals(1.0));
 
       // Verify bounds are tight around the data
-      expect(minY, equals(1600));
+      expect(minY, equals(1599));
       expect(maxY, equals(1601));
     });
 
@@ -125,7 +128,8 @@ void main() {
       // numLabels = (1750-1600)/50 + 1 = 4 labels
       // Labels: 1600, 1650, 1700, 1750 (compact, close to max 1718)
 
-      final history = createHistory([1600, 1718]);
+      // Story 302.7: Minimum 3 games required
+      final history = createHistory([1600, 1659, 1718]);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -133,7 +137,7 @@ void main() {
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1718,
-              timePeriod: TimePeriod.thirtyDays,
+              timePeriod: TimePeriod.allTime, // Story 302.7: Use allTime to include older test data
             ),
           ),
         ),

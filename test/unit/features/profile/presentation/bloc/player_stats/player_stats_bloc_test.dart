@@ -171,8 +171,12 @@ void main() {
         },
       );
 
+      // Removed: this test is now replaced by Story 302.7 test below
+      // The BLoC now emits a state with rankingLoadFailed: true when ranking fetch fails
+
+      // Story 302.7: Ranking error state tests
       blocTest<PlayerStatsBloc, PlayerStatsState>(
-        'does not emit error when ranking fetch fails',
+        'sets rankingLoadFailed to true when ranking fetch fails',
         setUp: () {
           when(() => mockUserRepository.getUserRanking(userId))
               .thenThrow(Exception('Network error'));
@@ -180,10 +184,55 @@ void main() {
         build: () => playerStatsBloc,
         seed: () => PlayerStatsLoaded(user: testUser, history: testHistory),
         act: (bloc) => bloc.add(const LoadRanking(userId)),
-        expect: () => [],
-        verify: (_) {
-          // State should remain unchanged
-          verify(() => mockUserRepository.getUserRanking(userId)).called(1);
+        expect: () => [
+          PlayerStatsLoaded(
+            user: testUser,
+            history: testHistory,
+            rankingLoadFailed: true,
+          ),
+        ],
+      );
+
+      blocTest<PlayerStatsBloc, PlayerStatsState>(
+        'clears rankingLoadFailed when ranking fetch succeeds after failure',
+        setUp: () {
+          when(() => mockUserRepository.getUserRanking(userId))
+              .thenAnswer((_) async => testRanking);
+        },
+        build: () => playerStatsBloc,
+        seed: () => PlayerStatsLoaded(
+          user: testUser,
+          history: testHistory,
+          rankingLoadFailed: true,
+        ),
+        act: (bloc) => bloc.add(const LoadRanking(userId)),
+        expect: () => [
+          PlayerStatsLoaded(
+            user: testUser,
+            history: testHistory,
+            ranking: testRanking,
+            rankingLoadFailed: false,
+          ),
+        ],
+      );
+
+      blocTest<PlayerStatsBloc, PlayerStatsState>(
+        'preserves rankingLoadFailed state when updating user stats',
+        setUp: () {
+          when(() => mockUserRepository.getRatingHistory(userId))
+              .thenAnswer((_) => Stream.value(testHistory));
+        },
+        build: () => playerStatsBloc,
+        seed: () => PlayerStatsLoaded(
+          user: testUser,
+          history: testHistory,
+          rankingLoadFailed: true,
+        ),
+        act: (bloc) => bloc.add(UpdateUserStats(testUser.copyWith(gamesPlayed: 11))),
+        verify: (bloc) {
+          final state = bloc.state as PlayerStatsLoaded;
+          expect(state.rankingLoadFailed, isTrue,
+              reason: 'rankingLoadFailed should be preserved when user updates');
         },
       );
     });
