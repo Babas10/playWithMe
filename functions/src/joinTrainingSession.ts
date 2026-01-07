@@ -66,22 +66,6 @@ async function isGroupMember(
   return memberIds.includes(userId);
 }
 
-/**
- * Get current participant count from participants subcollection
- */
-async function getParticipantCount(
-  db: admin.firestore.Firestore,
-  sessionId: string
-): Promise<number> {
-  const participantsSnapshot = await db
-    .collection("trainingSessions")
-    .doc(sessionId)
-    .collection("participants")
-    .where("status", "==", "joined")
-    .get();
-
-  return participantsSnapshot.size;
-}
 
 // ============================================================================
 // Main Cloud Function
