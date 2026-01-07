@@ -7,6 +7,7 @@ import '../../domain/repositories/group_repository.dart';
 import '../../domain/repositories/training_session_repository.dart';
 import '../models/game_model.dart';
 import '../models/training_session_model.dart';
+import '../models/training_session_participant_model.dart';
 
 /// Firestore implementation of TrainingSessionRepository
 ///
@@ -261,6 +262,62 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
   }
 
   @override
+  Future<void> joinTrainingSession(String sessionId) async {
+    try {
+      // Call Cloud Function for atomic join operation
+      final callable = _functions.httpsCallable('joinTrainingSession');
+
+      await callable.call<Map<String, dynamic>>({
+        'sessionId': sessionId,
+      });
+    } on FirebaseFunctionsException catch (e) {
+      // Handle specific Cloud Function errors with user-friendly messages
+      switch (e.code) {
+        case 'unauthenticated':
+          throw Exception('You must be logged in to join a training session');
+        case 'permission-denied':
+          throw Exception('You must be a member of the group to join');
+        case 'not-found':
+          throw Exception('Training session not found');
+        case 'failed-precondition':
+          throw Exception(e.message ?? 'Cannot join this training session');
+        case 'already-exists':
+          throw Exception('You have already joined this training session');
+        default:
+          throw Exception('Failed to join training session: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Failed to join training session: $e');
+    }
+  }
+
+  @override
+  Future<void> leaveTrainingSession(String sessionId) async {
+    try {
+      // Call Cloud Function for atomic leave operation
+      final callable = _functions.httpsCallable('leaveTrainingSession');
+
+      await callable.call<Map<String, dynamic>>({
+        'sessionId': sessionId,
+      });
+    } on FirebaseFunctionsException catch (e) {
+      // Handle specific Cloud Function errors with user-friendly messages
+      switch (e.code) {
+        case 'unauthenticated':
+          throw Exception('You must be logged in to leave a training session');
+        case 'not-found':
+          throw Exception('Training session not found');
+        case 'failed-precondition':
+          throw Exception(e.message ?? 'Cannot leave this training session');
+        default:
+          throw Exception('Failed to leave training session: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Failed to leave training session: $e');
+    }
+  }
+
+  @override
   Future<void> addParticipant(String sessionId, String userId) async {
     try {
       final currentSession = await getTrainingSessionById(sessionId);
@@ -403,6 +460,40 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       return session.canUserJoin(userId);
     } catch (e) {
       throw Exception('Failed to check if user can join training session: $e');
+    }
+  }
+
+  @override
+  Stream<List<TrainingSessionParticipantModel>> getTrainingSessionParticipantsStream(
+      String sessionId) {
+    try {
+      return _firestore
+          .collection(_collection)
+          .doc(sessionId)
+          .collection('participants')
+          .where('status', isEqualTo: 'joined')
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => TrainingSessionParticipantModel.fromFirestore(doc))
+              .toList());
+    } catch (e) {
+      throw Exception('Failed to stream training session participants: $e');
+    }
+  }
+
+  @override
+  Stream<int> getTrainingSessionParticipantCount(String sessionId) {
+    try {
+      return _firestore
+          .collection(_collection)
+          .doc(sessionId)
+          .collection('participants')
+          .where('status', isEqualTo: 'joined')
+          .snapshots()
+          .map((snapshot) => snapshot.docs.length);
+    } catch (e) {
+      throw Exception('Failed to stream training session participant count: $e');
     }
   }
 
