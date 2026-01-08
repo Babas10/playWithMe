@@ -16,6 +16,7 @@ import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
 import 'package:play_with_me/core/domain/repositories/exercise_repository.dart';
+import 'package:play_with_me/core/domain/repositories/training_feedback_repository.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
 import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
@@ -24,6 +25,7 @@ import 'package:play_with_me/core/data/repositories/firestore_group_repository.d
 import 'package:play_with_me/core/data/repositories/firestore_game_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_training_session_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_exercise_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_training_feedback_repository.dart';
 import 'package:play_with_me/core/data/repositories/firebase_image_storage_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_invitation_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_friend_repository.dart';
@@ -45,6 +47,7 @@ import 'package:play_with_me/features/games/presentation/bloc/game_details/game_
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/exercise/exercise_bloc.dart';
+import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -132,6 +135,12 @@ Future<void> initializeDependencies() async {
       () => FirestoreExerciseRepository(
         trainingSessionRepository: sl(),
       ),
+    );
+  }
+
+  if (!sl.isRegistered<TrainingFeedbackRepository>()) {
+    sl.registerLazySingleton<TrainingFeedbackRepository>(
+      () => FirestoreTrainingFeedbackRepository(),
     );
   }
 
@@ -310,6 +319,14 @@ Future<void> initializeDependencies() async {
     sl.registerFactory<ExerciseBloc>(
       () => ExerciseBloc(
         exerciseRepository: sl(),
+      ),
+    );
+  }
+
+  if (!sl.isRegistered<TrainingFeedbackBloc>()) {
+    sl.registerFactory<TrainingFeedbackBloc>(
+      () => TrainingFeedbackBloc(
+        feedbackRepository: sl(),
       ),
     );
   }

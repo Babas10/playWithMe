@@ -278,6 +278,25 @@ service cloud.firestore {
                          // Session hasn't started yet
                          get(/databases/$(database)/documents/trainingSessions/$(sessionId)).data.startTime > request.time;
       }
+
+      // Story 15.8: Anonymous Feedback subcollection rules
+      // Feedback is submitted anonymously by participants after training sessions
+      // Aggregated feedback is visible to session creator only
+      match /feedback/{feedbackId} {
+        // Read feedback: only session creator can read (for aggregated view)
+        // IMPORTANT: Individual feedback items are anonymous - no user IDs exposed
+        // Creator sees aggregated stats via repository layer
+        allow get, list: if isAuthenticated() &&
+                            request.auth.uid == get(/databases/$(database)/documents/trainingSessions/$(sessionId)).data.createdBy;
+
+        // CRITICAL: Feedback submission is Cloud Functions ONLY
+        // Use submitTrainingFeedback callable function for:
+        // - Participant validation (user was in participantIds)
+        // - Duplicate prevention (via participant hash)
+        // - Anonymity enforcement (hash instead of user ID)
+        // - Session timing validation (only after endTime)
+        allow create, update, delete: if false;
+      }
     }
 
     // Deny all other access
