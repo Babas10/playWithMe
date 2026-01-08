@@ -52,6 +52,25 @@ describe("processGameEloUpdates", () => {
       runTransaction: jest.fn((cb) => cb(transaction)),
     };
     (admin.firestore as any).mockReturnValue(db);
+
+    // Mock default game document (for defensive check in Story 15.5)
+    // Individual tests can override this if needed
+    const defaultGameRef = {
+      parent: { id: "games" },
+    };
+    const defaultGameDoc = {
+      exists: true,
+      ref: defaultGameRef,
+      data: () => ({}),
+    };
+
+    // Setup default collection mock that includes game document retrieval
+    db.collection.mockImplementation((collectionName: string) => ({
+      doc: jest.fn((id: string) => ({
+        id,
+        get: jest.fn().mockResolvedValue(defaultGameDoc),
+      })),
+    }));
   });
 
   test("updates ELO ratings correctly", async () => {
@@ -87,7 +106,7 @@ describe("processGameEloUpdates", () => {
       exists: true,
       data: () => playerMap[id],
     });
-    
+
     // Subcollection mock
     const subCollectionMock = {
       doc: jest.fn(() => ({ id: "historyId" })),
@@ -97,8 +116,25 @@ describe("processGameEloUpdates", () => {
       collection: jest.fn(() => subCollectionMock),
     };
 
+    // Mock game document for defensive check
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = {
+      exists: true,
+      id: gameId,
+      ref: gameRef,
+      data: () => gameData,
+    };
+
     const collectionMock = {
-      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+      doc: jest.fn((id) => {
+        if (id === gameId) {
+          return {
+            ...docRefMock,
+            get: jest.fn().mockResolvedValue(gameDocMock),
+          };
+        }
+        return {...docMock(id), ...docRefMock};
+      }),
     };
     db.collection.mockReturnValue(collectionMock);
 
@@ -147,8 +183,25 @@ describe("processGameEloUpdates", () => {
       collection: jest.fn(() => subCollectionMock),
     };
 
+    // Mock game document for defensive check
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = {
+      exists: true,
+      id: gameId,
+      ref: gameRef,
+      data: () => gameData,
+    };
+
     const collectionMock = {
-      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+      doc: jest.fn((id) => {
+        if (id === gameId) {
+          return {
+            ...docRefMock,
+            get: jest.fn().mockResolvedValue(gameDocMock),
+          };
+        }
+        return {...docMock(id), ...docRefMock};
+      }),
     };
     db.collection.mockReturnValue(collectionMock);
 
@@ -209,8 +262,25 @@ describe("processGameEloUpdates", () => {
       collection: jest.fn(() => subCollectionMock),
     };
 
+    // Mock game document for defensive check
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = {
+      exists: true,
+      id: gameId,
+      ref: gameRef,
+      data: () => gameData,
+    };
+
     const collectionMock = {
-      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+      doc: jest.fn((id) => {
+        if (id === gameId) {
+          return {
+            ...docRefMock,
+            get: jest.fn().mockResolvedValue(gameDocMock),
+          };
+        }
+        return {...docMock(id), ...docRefMock};
+      }),
     };
     db.collection.mockReturnValue(collectionMock);
 
@@ -265,8 +335,25 @@ describe("processGameEloUpdates", () => {
       collection: jest.fn(() => subCollectionMock),
     };
 
+    // Mock game document for defensive check
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = {
+      exists: true,
+      id: gameId,
+      ref: gameRef,
+      data: () => gameData,
+    };
+
     const collectionMock = {
-      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+      doc: jest.fn((id) => {
+        if (id === gameId) {
+          return {
+            ...docRefMock,
+            get: jest.fn().mockResolvedValue(gameDocMock),
+          };
+        }
+        return {...docMock(id), ...docRefMock};
+      }),
     };
     db.collection.mockReturnValue(collectionMock);
 
@@ -318,8 +405,25 @@ describe("processGameEloUpdates", () => {
       collection: jest.fn(() => subCollectionMock),
     };
 
+    // Mock game document for defensive check
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = {
+      exists: true,
+      id: gameId,
+      ref: gameRef,
+      data: () => gameData,
+    };
+
     const collectionMock = {
-      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+      doc: jest.fn((id) => {
+        if (id === gameId) {
+          return {
+            ...docRefMock,
+            get: jest.fn().mockResolvedValue(gameDocMock),
+          };
+        }
+        return {...docMock(id), ...docRefMock};
+      }),
     };
     db.collection.mockReturnValue(collectionMock);
 
@@ -376,8 +480,25 @@ describe("processGameEloUpdates", () => {
       collection: jest.fn(() => subCollectionMock),
     };
 
+    // Mock game document for defensive check
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = {
+      exists: true,
+      id: gameId,
+      ref: gameRef,
+      data: () => gameData,
+    };
+
     const collectionMock = {
-      doc: jest.fn((id) => ({...docMock(id), ...docRefMock})),
+      doc: jest.fn((id) => {
+        if (id === gameId) {
+          return {
+            ...docRefMock,
+            get: jest.fn().mockResolvedValue(gameDocMock),
+          };
+        }
+        return {...docMock(id), ...docRefMock};
+      }),
     };
     db.collection.mockReturnValue(collectionMock);
 
@@ -394,5 +515,166 @@ describe("processGameEloUpdates", () => {
     );
     // bestWin should not be set for loser
     expect(p1UpdateCall[1].bestWin).toBeUndefined();
+  });
+
+  // ========================================================================
+  // Story 15.5: Training Session Guards
+  // Ensure ELO processing explicitly rejects training sessions
+  // ========================================================================
+
+  test("rejects game data without teams (Story 15.5)", async () => {
+    const gameId = "training1";
+    const trainingData = {
+      // Training sessions don't have teams/result structure
+      groupId: "group1",
+      title: "Practice Session",
+      participantIds: ["p1", "p2", "p3"],
+    };
+
+    await expect(processGameEloUpdates(gameId, trainingData))
+      .rejects.toThrow("Invalid game data: Missing teams information");
+  });
+
+  test("rejects game data without result/games array (Story 15.5)", async () => {
+    const gameId = "training2";
+    const trainingData = {
+      teams: {
+        teamAPlayerIds: ["p1"],
+        teamBPlayerIds: ["p2"],
+      },
+      // Training sessions don't have results
+    };
+
+    await expect(processGameEloUpdates(gameId, trainingData))
+      .rejects.toThrow("Invalid game data: Missing result or games array");
+  });
+
+  test("rejects documents from non-games collection (Story 15.5)", async () => {
+    const gameId = "training3";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1"],
+        teamBPlayerIds: ["p2"],
+      },
+      result: {
+        games: [{ winner: "teamA" }],
+      },
+    };
+
+    // Mock a document from trainingSessions collection
+    const trainingRef = {
+      parent: { id: "trainingSessions" }, // Not "games"
+    };
+
+    const trainingDocMock = {
+      exists: true,
+      id: gameId,
+      ref: trainingRef,
+      data: () => gameData,
+    };
+
+    const collectionMock = {
+      doc: jest.fn(() => ({
+        get: jest.fn().mockResolvedValue(trainingDocMock)
+      })),
+    };
+    db.collection.mockReturnValue(collectionMock);
+
+    await expect(processGameEloUpdates(gameId, gameData))
+      .rejects.toThrow("ELO can only be processed for competitive games, not training sessions");
+  });
+
+  test("processes documents from games collection successfully (Story 15.5)", async () => {
+    const gameId = "game5";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1"],
+        teamBPlayerIds: ["p2"],
+      },
+      result: {
+        games: [{ winner: "teamA" }],
+      },
+    };
+
+    const playerMap: {[key: string]: any} = {
+      p1: { eloRating: 1200, displayName: "P1" },
+      p2: { eloRating: 1200, displayName: "P2" },
+    };
+
+    // Mock a document from games collection (correct path)
+    const gamesRef = {
+      parent: { id: "games" }, // Correct collection
+    };
+
+    const gameDocMock = {
+      exists: true,
+      id: gameId,
+      ref: gamesRef,
+      data: () => gameData,
+    };
+
+    const docMock = (id: string) => ({
+      id,
+      exists: true,
+      data: () => playerMap[id],
+    });
+
+    const subCollectionMock = {
+      doc: jest.fn(() => ({ id: "historyId" })),
+    };
+
+    const docRefMock = {
+      collection: jest.fn(() => subCollectionMock),
+    };
+
+    const collectionMock = {
+      doc: jest.fn((id) => {
+        if (id === gameId) {
+          return {
+            get: jest.fn().mockResolvedValue(gameDocMock),
+            ...docRefMock
+          };
+        }
+        return {...docMock(id), ...docRefMock};
+      }),
+    };
+    db.collection.mockReturnValue(collectionMock);
+
+    transaction.get.mockImplementation((ref: any) => Promise.resolve({
+      exists: true,
+      id: ref.id,
+      data: () => playerMap[ref.id] || {},
+    }));
+
+    // Should not throw
+    await expect(processGameEloUpdates(gameId, gameData)).resolves.not.toThrow();
+  });
+
+  test("rejects when game document doesn't exist (Story 15.5)", async () => {
+    const gameId = "nonexistent";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1"],
+        teamBPlayerIds: ["p2"],
+      },
+      result: {
+        games: [{ winner: "teamA" }],
+      },
+    };
+
+    const gameDocMock = {
+      exists: false, // Game not found
+      id: gameId,
+    };
+
+    const collectionMock = {
+      doc: jest.fn(() => ({
+        get: jest.fn().mockResolvedValue(gameDocMock)
+      })),
+    };
+    db.collection.mockReturnValue(collectionMock);
+
+    await expect(processGameEloUpdates(gameId, gameData))
+      .rejects.toThrow("Game not found");
   });
 });
