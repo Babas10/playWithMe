@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-01-08T03:31:38.965Z",
+  "timestamp": "2026-01-08T22:03:20.326Z",
   "users": [
     {
       "index": 0,
-      "uid": "XbFezMncO7fBEw7uKNFhYeMkEH92",
+      "uid": "9f6aZQB1mlT6x4hkt7CZaGG5FtR2",
       "email": "test1@mysta.com",
       "displayName": "Test1",
       "firstName": "Test",
@@ -12,7 +12,7 @@
     },
     {
       "index": 1,
-      "uid": "hmav6PYNfucSFHNpeoM9iYCTL4I3",
+      "uid": "WAp1IYchZkUO1z5sz0fCRoDAvWa2",
       "email": "test2@mysta.com",
       "displayName": "Test2",
       "firstName": "Test",
@@ -21,7 +21,7 @@
     },
     {
       "index": 2,
-      "uid": "j8Gss63hNmT9WrQhsUaIBszGinn1",
+      "uid": "2UsqP6kLEcO5STjPi1ECXussoUA2",
       "email": "test3@mysta.com",
       "displayName": "Test3",
       "firstName": "Test",
@@ -30,7 +30,7 @@
     },
     {
       "index": 3,
-      "uid": "0TBXZITm3Hfao9KX1iw8NZsNCgt2",
+      "uid": "iTq1nW2VbyMZsee5nTep6eUjgDS2",
       "email": "test4@mysta.com",
       "displayName": "Test4",
       "firstName": "Test",
@@ -39,7 +39,7 @@
     },
     {
       "index": 4,
-      "uid": "WlqbmDsr9JQBiu7SC0cymNI0ouf1",
+      "uid": "eagD7DkNM7erlN5ix3M02gYlee62",
       "email": "test5@mysta.com",
       "displayName": "Test5",
       "firstName": "Test",
@@ -48,7 +48,7 @@
     },
     {
       "index": 5,
-      "uid": "84By3hPJLNNnFDrQ4JaBs4r3STF3",
+      "uid": "O6Xbax6V4GSsw4yRb0vR3WNpxp53",
       "email": "test6@mysta.com",
       "displayName": "Test6",
       "firstName": "Test",
@@ -57,7 +57,7 @@
     },
     {
       "index": 6,
-      "uid": "WoudebZYDlgBeHlZTcTZ9Ma0lsI2",
+      "uid": "n4ib969ywuYXf6pHT8OyYsY6tYl1",
       "email": "test7@mysta.com",
       "displayName": "Test7",
       "firstName": "Test",
@@ -66,7 +66,7 @@
     },
     {
       "index": 7,
-      "uid": "0ZFZ1ykCySW5RmmQLWVah7U29Z13",
+      "uid": "B3RguoFS7WgVuh4SWSQFa3xL0vj1",
       "email": "test8@mysta.com",
       "displayName": "Test8",
       "firstName": "Test",
@@ -75,7 +75,7 @@
     },
     {
       "index": 8,
-      "uid": "bY1T0RzgQ6QYLnsdXKaPd3Zs3cI3",
+      "uid": "bc66wzjN2ObrYwatiyI1QgtCokY2",
       "email": "test9@mysta.com",
       "displayName": "Test9",
       "firstName": "Test",
@@ -84,7 +84,7 @@
     },
     {
       "index": 9,
-      "uid": "IQ3McugmYjd56u3Tiy7flzyiSpj1",
+      "uid": "Y7Lw8nZbg2QgNfvwguD3dTvpoh43",
       "email": "test10@mysta.com",
       "displayName": "Test10",
       "firstName": "Test",
@@ -92,20 +92,20 @@
       "password": "test1010"
     }
   ],
-  "groupId": "pu9tqeYsY5MvwmxMgfqH",
+  "groupId": "EsLruvpwEhahqaTvYmxp",
   "sessionIds": [
-    "RHF5e0dUnEotWqAAJQf8",
-    "1x4e2EkvOSof2D4lxOE9",
-    "EbLi8w5FF82Nb3QvnbjV",
-    "wk9rvSS96mXqXm44EmOS",
-    "tHBtcIXx0Y5urbpssO0B",
-    "6bv6aLPWFBFFifGnS6ee",
-    "ejHW5kFhA0hdpihToKm0",
-    "AYj3rBInPpcUXKFpAjtV",
-    "HKqMf7YDWqEDq1DriEAy",
-    "X2ruSb4egleWdAqslicc",
-    "TtFlwKNEaEu2tY2Va4IM",
-    "zQNvXGj6OGlC7ZwbF9yI"
+    "g3VdoNl73n3RmfX5YcbS",
+    "qHreHEeu3OBBZU3KzpdL",
+    "NnYdN6FVaGiKN4LEPPaj",
+    "LTa1BsnD2l0Bk5ajw4qL",
+    "kG5om4ETppbSk88YDkhH",
+    "J4M17XVEUf94UWCHj7r0",
+    "2nfdw8CjP91pudeY4YGV",
+    "xKuCeLaljJNqAYia1aTW",
+    "VRtGCPEZQsrePcNLcotl",
+    "Jh17RsR1sjNMrVanEy09",
+    "mawkJ8yHziZ2WRNjIYpt",
+    "IFmkM0ztQrbVFA2tf2IQ"
   ],
   "notes": {
     "password": "test1010",
@@ -116,7 +116,10 @@
       "Cancelled sessions",
       "Full capacity session (8/8)",
       "Sessions with users who joined and left",
-      "Small group and large group sessions"
+      "Small group and large group sessions",
+      "Sessions with exercises (fundamentals, advanced, team, conditioning, coaching)",
+      "Completed sessions with locked exercises (read-only)",
+      "Sessions with and without exercises"
     ]
   }
 }
