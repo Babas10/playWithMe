@@ -1,8 +1,8 @@
 /**
- * Training Session Test Environment Setup Script (Story 15.6)
+ * Training Session Test Environment Setup Script (Story 15.6, 15.7)
  *
  * This script creates a COMPLETE test environment specifically for testing
- * training session participation tracking.
+ * training session participation tracking and exercise management.
  *
  * It performs the following steps (Self-Contained):
  * 1. Clears the entire dev database (Users, Groups, Training Sessions, etc.)
@@ -16,6 +16,10 @@
  *    - Sessions at capacity
  * 5. Simulates user participation (join/leave operations)
  * 6. Creates realistic participation patterns
+ * 7. Adds exercises to training sessions (Story 15.7):
+ *    - Upcoming sessions with editable exercises
+ *    - Completed sessions with locked (read-only) exercises
+ *    - Various exercise types and durations
  *
  * Usage:
  *   cd functions
@@ -105,8 +109,9 @@ async function deleteTrainingSessionSubcollections(): Promise<void> {
 
   for (const sessionDoc of sessionsSnapshot.docs) {
     await deleteCollection(`trainingSessions/${sessionDoc.id}/participants`);
+    await deleteCollection(`trainingSessions/${sessionDoc.id}/exercises`);
   }
-  console.log(`✅ Deleted participants subcollections from ${sessionsSnapshot.size} training sessions`);
+  console.log(`✅ Deleted subcollections from ${sessionsSnapshot.size} training sessions`);
 }
 
 async function deleteUserSubcollections(): Promise<void> {
@@ -383,6 +388,131 @@ async function addParticipantToSession(
   }
 }
 
+// ==========================================
+// EXERCISE CREATION LOGIC (Story 15.7)
+// ==========================================
+
+async function addExerciseToSession(
+  sessionId: string,
+  name: string,
+  description: string | null,
+  durationMinutes: number | null
+): Promise<void> {
+  const exerciseRef = db
+    .collection("trainingSessions")
+    .doc(sessionId)
+    .collection("exercises")
+    .doc();
+
+  await exerciseRef.set({
+    name: name,
+    description: description,
+    durationMinutes: durationMinutes,
+    createdAt: admin.firestore.Timestamp.now(),
+    updatedAt: null,
+  });
+}
+
+async function addExercisesToSessions(sessionIds: string[]): Promise<void> {
+  console.log("\n🏋️ ADDING EXERCISES TO TRAINING SESSIONS\n");
+  console.log("=".repeat(50));
+
+  // Define exercise sets for different types of sessions
+  const basicExercises = [
+    { name: "Warm-up & Stretching", description: "Dynamic stretching and mobility work", duration: 15 },
+    { name: "Serving Practice", description: "Focus on consistent serves and accuracy", duration: 30 },
+    { name: "Passing Drills", description: "Platform passing and communication", duration: 25 },
+    { name: "Setting Technique", description: "Hand positioning and ball control", duration: 20 },
+    { name: "Cool Down", description: "Static stretching and recovery", duration: 10 },
+  ];
+
+  const advancedExercises = [
+    { name: "Jump Serve Training", description: "Power serving technique", duration: 25 },
+    { name: "Blocking Mechanics", description: "Timing, footwork, and hand positioning", duration: 30 },
+    { name: "Spiking Drills", description: "Approach, jump, and hitting technique", duration: 30 },
+    { name: "Defensive Positioning", description: "Court coverage and reading the hitter", duration: 25 },
+    { name: "Game Situations", description: "Scrimmage with specific scenarios", duration: 30 },
+  ];
+
+  const teamExercises = [
+    { name: "Partner Communication", description: "Calling the ball and court awareness", duration: 20 },
+    { name: "Transition Drills", description: "Moving from defense to offense", duration: 25 },
+    { name: "Team Serves", description: "Serve receive formations", duration: 20 },
+    { name: "Offensive Systems", description: "Set plays and rotations", duration: 30 },
+    { name: "Match Play", description: "Full team scrimmage", duration: 45 },
+  ];
+
+  const conditioningExercises = [
+    { name: "Sprint Intervals", description: "Short burst running for explosiveness", duration: 15 },
+    { name: "Jump Training", description: "Vertical leap and plyometrics", duration: 20 },
+    { name: "Core Strength", description: "Planks, rotations, and stability", duration: 15 },
+    { name: "Agility Ladder", description: "Footwork and coordination drills", duration: 15 },
+    { name: "Endurance Circuit", description: "Mixed cardio and strength exercises", duration: 25 },
+  ];
+
+  const coachingExercises = [
+    { name: "Video Analysis", description: "Review technique with slow-motion video", duration: 20 },
+    { name: "Individual Skills Assessment", description: "One-on-one evaluation", duration: 30 },
+    { name: "Personalized Drills", description: "Custom exercises based on assessment", duration: 40 },
+    { name: "Mental Game Discussion", description: "Strategy and decision-making", duration: 20 },
+  ];
+
+  let exerciseCount = 0;
+
+  // Session 1 (Tomorrow - Fundamentals): Basic exercises
+  for (const ex of basicExercises) {
+    await addExerciseToSession(sessionIds[0], ex.name, ex.description, ex.duration);
+    exerciseCount++;
+  }
+  console.log(`✅ Session 1: Added ${basicExercises.length} basic exercises`);
+
+  // Session 2 (In 3 days - Advanced): Advanced exercises
+  for (const ex of advancedExercises) {
+    await addExerciseToSession(sessionIds[1], ex.name, ex.description, ex.duration);
+    exerciseCount++;
+  }
+  console.log(`✅ Session 2: Added ${advancedExercises.length} advanced exercises`);
+
+  // Session 3 (In 5 days - Team Strategy): Team exercises
+  for (const ex of teamExercises) {
+    await addExerciseToSession(sessionIds[2], ex.name, ex.description, ex.duration);
+    exerciseCount++;
+  }
+  console.log(`✅ Session 3: Added ${teamExercises.length} team exercises`);
+
+  // Session 4 (In 7 days - Conditioning): Conditioning exercises
+  for (const ex of conditioningExercises) {
+    await addExerciseToSession(sessionIds[3], ex.name, ex.description, ex.duration);
+    exerciseCount++;
+  }
+  console.log(`✅ Session 4: Added ${conditioningExercises.length} conditioning exercises`);
+
+  // Session 5 (In 10 days - Coaching): Personalized exercises
+  for (const ex of coachingExercises) {
+    await addExerciseToSession(sessionIds[4], ex.name, ex.description, ex.duration);
+    exerciseCount++;
+  }
+  console.log(`✅ Session 5: Added ${coachingExercises.length} coaching exercises`);
+
+  // Session 6 (Completed - Serving): Add exercises to show they're locked
+  await addExerciseToSession(sessionIds[5], "Serve Placement Drills", "Target zones on the court", 25);
+  await addExerciseToSession(sessionIds[5], "Float Serve Technique", "Practicing consistent float serves", 20);
+  await addExerciseToSession(sessionIds[5], "Topspin Serve", "Advanced serving with spin", 15);
+  exerciseCount += 3;
+  console.log(`✅ Session 6 (Completed): Added 3 exercises (locked, read-only)`);
+
+  // Session 7 (Completed - Game Situations): Some exercises
+  await addExerciseToSession(sessionIds[6], "2v2 Mini Games", "Quick competitive drills", 30);
+  await addExerciseToSession(sessionIds[6], "Pressure Situations", "Practicing under game pressure", 25);
+  exerciseCount += 2;
+  console.log(`✅ Session 7 (Completed): Added 2 exercises (locked)`);
+
+  // Session 8 (Completed - Defense): No exercises (shows variety)
+  console.log(`✅ Session 8 (Completed): No exercises (empty case)`);
+
+  console.log(`\n✅ Total exercises created: ${exerciseCount}`);
+}
+
 async function createTrainingSessionsWithParticipation(
   groupId: string,
   users: TestUser[]
@@ -605,6 +735,9 @@ async function exportTestConfig(
         "Full capacity session (8/8)",
         "Sessions with users who joined and left",
         "Small group and large group sessions",
+        "Sessions with exercises (fundamentals, advanced, team, conditioning, coaching)",
+        "Completed sessions with locked exercises (read-only)",
+        "Sessions with and without exercises",
       ],
     },
   };
@@ -650,7 +783,10 @@ async function setupTrainingSessionTestEnvironment() {
     // 5. Create Training Sessions with Participation
     const sessionIds = await createTrainingSessionsWithParticipation(groupId, users);
 
-    // 6. Export Config
+    // 6. Add Exercises to Training Sessions (Story 15.7)
+    await addExercisesToSessions(sessionIds);
+
+    // 7. Export Config
     await exportTestConfig(users, groupId, sessionIds);
 
     // Summary
@@ -671,13 +807,18 @@ async function setupTrainingSessionTestEnvironment() {
     console.log("  - 10 users (Test1-Test10)");
     console.log("  - 1 group with all users as members");
     console.log("  - 12 training sessions:");
-    console.log("    • 5 upcoming sessions");
-    console.log("    • 5 completed sessions");
+    console.log("    • 5 upcoming sessions (with exercises)");
+    console.log("    • 5 completed sessions (3 with locked exercises)");
     console.log("    • 2 cancelled sessions");
     console.log("  - Various participation patterns:");
     console.log("    • Full capacity session");
     console.log("    • Sessions with users who left");
-    console.log("    • Different attendance levels\n");
+    console.log("    • Different attendance levels");
+    console.log("  - Exercise management (Story 15.7):");
+    console.log("    • Upcoming sessions with editable exercises");
+    console.log("    • Completed sessions with read-only exercises");
+    console.log("    • Mix of sessions with/without exercises");
+    console.log("    • Different exercise types: basic, advanced, team, conditioning\n");
 
   } catch (error) {
     console.error("\n❌ ERROR during setup:", error);

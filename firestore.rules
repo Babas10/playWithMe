@@ -256,6 +256,28 @@ service cloud.firestore {
         // This enforces atomic operations and prevents race conditions when checking capacity
         allow create, update, delete: if false;
       }
+
+      // Story 15.7: Exercises subcollection rules
+      // Exercises define drills/activities for the training session
+      // Only editable before session starts
+      match /exercises/{exerciseId} {
+        // Read exercises: group members only
+        allow get, list: if isAuthenticated() &&
+                            request.auth.uid in get(/databases/$(database)/documents/groups/$(get(/databases/$(database)/documents/trainingSessions/$(sessionId)).data.groupId)).data.memberIds;
+
+        // Create/update exercises: only creator and only before session starts
+        // Session creator can add exercises until session start time
+        allow create, update: if isAuthenticated() &&
+                                 request.auth.uid == get(/databases/$(database)/documents/trainingSessions/$(sessionId)).data.createdBy &&
+                                 // Session hasn't started yet (startTime is in the future)
+                                 get(/databases/$(database)/documents/trainingSessions/$(sessionId)).data.startTime > request.time;
+
+        // Delete exercises: only creator and only before session starts
+        allow delete: if isAuthenticated() &&
+                         request.auth.uid == get(/databases/$(database)/documents/trainingSessions/$(sessionId)).data.createdBy &&
+                         // Session hasn't started yet
+                         get(/databases/$(database)/documents/trainingSessions/$(sessionId)).data.startTime > request.time;
+      }
     }
 
     // Deny all other access
