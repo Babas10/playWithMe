@@ -1,0 +1,122 @@
+{
+  "timestamp": "2026-01-08T03:31:38.965Z",
+  "users": [
+    {
+      "index": 0,
+      "uid": "XbFezMncO7fBEw7uKNFhYeMkEH92",
+      "email": "test1@mysta.com",
+      "displayName": "Test1",
+      "firstName": "Test",
+      "lastName": "One",
+      "password": "test1010"
+    },
+    {
+      "index": 1,
+      "uid": "hmav6PYNfucSFHNpeoM9iYCTL4I3",
+      "email": "test2@mysta.com",
+      "displayName": "Test2",
+      "firstName": "Test",
+      "lastName": "Two",
+      "password": "test1010"
+    },
+    {
+      "index": 2,
+      "uid": "j8Gss63hNmT9WrQhsUaIBszGinn1",
+      "email": "test3@mysta.com",
+      "displayName": "Test3",
+      "firstName": "Test",
+      "lastName": "Three",
+      "password": "test1010"
+    },
+    {
+      "index": 3,
+      "uid": "0TBXZITm3Hfao9KX1iw8NZsNCgt2",
+      "email": "test4@mysta.com",
+      "displayName": "Test4",
+      "firstName": "Test",
+      "lastName": "Four",
+      "password": "test1010"
+    },
+    {
+      "index": 4,
+      "uid": "WlqbmDsr9JQBiu7SC0cymNI0ouf1",
+      "email": "test5@mysta.com",
+      "displayName": "Test5",
+      "firstName": "Test",
+      "lastName": "Five",
+      "password": "test1010"
+    },
+    {
+      "index": 5,
+      "uid": "84By3hPJLNNnFDrQ4JaBs4r3STF3",
+      "email": "test6@mysta.com",
+      "displayName": "Test6",
+      "firstName": "Test",
+      "lastName": "Six",
+      "password": "test1010"
+    },
+    {
+      "index": 6,
+      "uid": "WoudebZYDlgBeHlZTcTZ9Ma0lsI2",
+      "email": "test7@mysta.com",
+      "displayName": "Test7",
+      "firstName": "Test",
+      "lastName": "Seven",
+      "password": "test1010"
+    },
+    {
+      "index": 7,
+      "uid": "0ZFZ1ykCySW5RmmQLWVah7U29Z13",
+      "email": "test8@mysta.com",
+      "displayName": "Test8",
+      "firstName": "Test",
+      "lastName": "Eight",
+      "password": "test1010"
+    },
+    {
+      "index": 8,
+      "uid": "bY1T0RzgQ6QYLnsdXKaPd3Zs3cI3",
+      "email": "test9@mysta.com",
+      "displayName": "Test9",
+      "firstName": "Test",
+      "lastName": "Nine",
+      "password": "test1010"
+    },
+    {
+      "index": 9,
+      "uid": "IQ3McugmYjd56u3Tiy7flzyiSpj1",
+      "email": "test10@mysta.com",
+      "displayName": "Test10",
+      "firstName": "Test",
+      "lastName": "Ten",
+      "password": "test1010"
+    }
+  ],
+  "groupId": "pu9tqeYsY5MvwmxMgfqH",
+  "sessionIds": [
+    "RHF5e0dUnEotWqAAJQf8",
+    "1x4e2EkvOSof2D4lxOE9",
+    "EbLi8w5FF82Nb3QvnbjV",
+    "wk9rvSS96mXqXm44EmOS",
+    "tHBtcIXx0Y5urbpssO0B",
+    "6bv6aLPWFBFFifGnS6ee",
+    "ejHW5kFhA0hdpihToKm0",
+    "AYj3rBInPpcUXKFpAjtV",
+    "HKqMf7YDWqEDq1DriEAy",
+    "X2ruSb4egleWdAqslicc",
+    "TtFlwKNEaEu2tY2Va4IM",
+    "zQNvXGj6OGlC7ZwbF9yI"
+  ],
+  "notes": {
+    "password": "test1010",
+    "description": "Training Session Test Environment",
+    "testScenarios": [
+      "Upcoming sessions with various participation levels",
+      "Completed sessions with attendance history",
+      "Cancelled sessions",
+      "Full capacity session (8/8)",
+      "Sessions with users who joined and left",
+      "Small group and large group sessions"
+    ]
+  }
+}
