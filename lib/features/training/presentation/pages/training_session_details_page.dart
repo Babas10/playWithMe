@@ -9,6 +9,7 @@ import '../../../../core/domain/repositories/training_session_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/services/service_locator.dart';
 import '../bloc/exercise/exercise_bloc.dart';
+import '../bloc/feedback/training_feedback_bloc.dart';
 import '../bloc/training_session_participation/training_session_participation_bloc.dart';
 import '../bloc/training_session_participation/training_session_participation_event.dart';
 import '../bloc/training_session_participation/training_session_participation_state.dart';
@@ -94,33 +95,28 @@ class _TrainingSessionDetailsPageState
           final session = snapshot.data!;
           final isOrganizer = _currentUserId == session.createdBy;
           final isParticipant = session.isParticipant(_currentUserId ?? '');
+          final showFeedbackTab = session.status == TrainingStatus.completed && isParticipant;
+          final tabCount = showFeedbackTab ? 4 : 3;
 
           return Scaffold(
             appBar: AppBar(
               title: Text(session.title),
-              actions: [
-                // Feedback button for completed sessions
-                if (session.status == TrainingStatus.completed && isParticipant)
-                  IconButton(
-                    icon: const Icon(Icons.feedback_outlined),
-                    tooltip: 'Provide Feedback',
-                    onPressed: () => _navigateToFeedback(context, session),
-                  ),
-              ],
             ),
             body: DefaultTabController(
-              length: 3,
+              length: tabCount,
               child: Column(
                 children: [
                   // Session info header
                   _buildSessionHeader(context, session, isOrganizer),
 
                   // Tabs
-                  const TabBar(
+                  TabBar(
                     tabs: [
-                      Tab(text: 'Details', icon: Icon(Icons.info_outline)),
-                      Tab(text: 'Participants', icon: Icon(Icons.people)),
-                      Tab(text: 'Exercises', icon: Icon(Icons.fitness_center)),
+                      const Tab(text: 'Details', icon: Icon(Icons.info_outline)),
+                      const Tab(text: 'Participants', icon: Icon(Icons.people)),
+                      const Tab(text: 'Exercises', icon: Icon(Icons.fitness_center)),
+                      if (showFeedbackTab)
+                        const Tab(text: 'Feedback', icon: Icon(Icons.feedback_outlined)),
                     ],
                   ),
 
@@ -141,6 +137,16 @@ class _TrainingSessionDetailsPageState
                             trainingSessionId: widget.trainingSessionId,
                           ),
                         ),
+
+                        // Feedback tab (only for completed sessions where user participated)
+                        if (showFeedbackTab)
+                          BlocProvider(
+                            create: (context) => sl<TrainingFeedbackBloc>(),
+                            child: TrainingSessionFeedbackPage(
+                              trainingSessionId: widget.trainingSessionId,
+                              sessionTitle: session.title,
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -678,21 +684,6 @@ class _TrainingSessionDetailsPageState
             child: const Text('Leave'),
           ),
         ],
-      ),
-    );
-  }
-
-  void _navigateToFeedback(
-    BuildContext context,
-    TrainingSessionModel session,
-  ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TrainingSessionFeedbackPage(
-          trainingSessionId: session.id,
-          sessionTitle: session.title,
-        ),
       ),
     );
   }
