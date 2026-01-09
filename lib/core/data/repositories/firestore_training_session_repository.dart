@@ -417,6 +417,50 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
   }
 
   @override
+  Future<TrainingStatus> updateSessionStatusIfNeeded(String sessionId) async {
+    try {
+      final currentSession = await getTrainingSessionById(sessionId);
+      if (currentSession == null) {
+        throw Exception('Training session not found');
+      }
+
+      // Only update if session is scheduled and past endTime
+      if (currentSession.status != TrainingStatus.scheduled) {
+        return currentSession.status;
+      }
+
+      final now = DateTime.now();
+      if (currentSession.endTime.isAfter(now)) {
+        // Session hasn't ended yet
+        return TrainingStatus.scheduled;
+      }
+
+      // Session has ended - determine final status based on participants
+      final hasEnoughParticipants =
+          currentSession.participantIds.length >= currentSession.minParticipants;
+
+      TrainingSessionModel updatedSession;
+      if (hasEnoughParticipants) {
+        // Enough participants → mark as completed
+        updatedSession = currentSession.completeSession();
+      } else {
+        // Not enough participants → mark as cancelled
+        updatedSession = currentSession.cancelSession();
+      }
+
+      // Update in Firestore
+      await _firestore
+          .collection(_collection)
+          .doc(sessionId)
+          .set(updatedSession.toFirestore(), SetOptions(merge: true));
+
+      return updatedSession.status;
+    } catch (e) {
+      throw Exception('Failed to update training session status: $e');
+    }
+  }
+
+  @override
   Future<void> deleteTrainingSession(String sessionId) async {
     try {
       await _firestore.collection(_collection).doc(sessionId).delete();

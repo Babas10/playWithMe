@@ -46,6 +46,19 @@ class _TrainingSessionDetailsPageState
     _participationBloc = sl<TrainingSessionParticipationBloc>();
     _participationBloc.add(LoadParticipants(widget.trainingSessionId));
     _currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
+    // Auto-update session status if needed (completed/cancelled based on time and participants)
+    _updateSessionStatusIfNeeded();
+  }
+
+  Future<void> _updateSessionStatusIfNeeded() async {
+    try {
+      await sl<TrainingSessionRepository>()
+          .updateSessionStatusIfNeeded(widget.trainingSessionId);
+    } catch (e) {
+      // Silently fail - status will be updated on next page load
+      // This is a best-effort background update
+    }
   }
 
   @override
@@ -447,7 +460,7 @@ class _TrainingSessionDetailsPageState
           itemCount: participants.length,
           itemBuilder: (context, index) {
             final participant = participants[index];
-            final isOrg = participant.id == session.createdBy;
+            final isOrg = participant.uid == session.createdBy;
 
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
@@ -457,12 +470,12 @@ class _TrainingSessionDetailsPageState
                       ? NetworkImage(participant.photoUrl!)
                       : null,
                   child: participant.photoUrl == null
-                      ? Text(participant.displayName[0].toUpperCase())
+                      ? Text(participant.displayNameOrEmail[0].toUpperCase())
                       : null,
                 ),
                 title: Row(
                   children: [
-                    Text(participant.displayName),
+                    Text(participant.displayNameOrEmail),
                     if (isOrg) ...[
                       const SizedBox(width: 8),
                       const Icon(Icons.star, size: 16, color: Colors.amber),
@@ -478,7 +491,7 @@ class _TrainingSessionDetailsPageState
                         ),
                       )
                     : null,
-                trailing: participant.id == _currentUserId
+                trailing: participant.uid == _currentUserId
                     ? Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
