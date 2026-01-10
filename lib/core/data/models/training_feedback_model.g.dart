@@ -11,7 +11,12 @@ _$TrainingFeedbackModelImpl _$$TrainingFeedbackModelImplFromJson(
 ) => _$TrainingFeedbackModelImpl(
   id: json['id'] as String,
   trainingSessionId: json['trainingSessionId'] as String,
-  rating: (json['rating'] as num).toInt(),
+  exercisesQuality: (json['exercisesQuality'] as num).toInt(),
+  trainingIntensity: $enumDecode(
+    _$TrainingIntensityEnumMap,
+    json['trainingIntensity'],
+  ),
+  coachingClarity: (json['coachingClarity'] as num).toInt(),
   comment: json['comment'] as String?,
   participantHash: json['participantHash'] as String,
   submittedAt: const TimestampConverter().fromJson(json['submittedAt']),
@@ -22,8 +27,16 @@ Map<String, dynamic> _$$TrainingFeedbackModelImplToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'trainingSessionId': instance.trainingSessionId,
-  'rating': instance.rating,
+  'exercisesQuality': instance.exercisesQuality,
+  'trainingIntensity': _$TrainingIntensityEnumMap[instance.trainingIntensity]!,
+  'coachingClarity': instance.coachingClarity,
   'comment': instance.comment,
   'participantHash': instance.participantHash,
   'submittedAt': const TimestampConverter().toJson(instance.submittedAt),
+};
+
+const _$TrainingIntensityEnumMap = {
+  TrainingIntensity.tooLight: 'tooLight',
+  TrainingIntensity.justRight: 'justRight',
+  TrainingIntensity.tooIntense: 'tooIntense',
 };
