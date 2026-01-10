@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/data/models/training_session_model.dart';
 import '../../../../core/data/models/user_model.dart';
+import '../../../../core/domain/repositories/training_feedback_repository.dart';
 import '../../../../core/domain/repositories/training_session_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/services/service_locator.dart';
@@ -394,6 +395,9 @@ class _TrainingSessionDetailsPageState
                     DateFormat('MMM dd, yyyy').format(session.updatedAt!)),
             ],
           ),
+          // Feedback summary card (only for completed sessions with feedback)
+          if (session.status == TrainingStatus.completed)
+            _buildFeedbackSummaryCard(session.id),
           if (session.notes != null && session.notes!.isNotEmpty) ...[
             const SizedBox(height: 16),
             _buildDetailCard(
@@ -685,6 +689,130 @@ class _TrainingSessionDetailsPageState
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFeedbackSummaryCard(String sessionId) {
+    return FutureBuilder<FeedbackAggregation?>(
+      future: sl<TrainingFeedbackRepository>().getAggregatedFeedback(sessionId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox.shrink();
+        }
+
+        final aggregation = snapshot.data;
+
+        // Only show if there's feedback
+        if (aggregation == null || !aggregation.hasFeedback) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          children: [
+            const SizedBox(height: 16),
+            _buildDetailCard(
+              'Session Feedback',
+              Icons.feedback,
+              [
+                // Average rating with stars
+                Row(
+                  children: [
+                    Text(
+                      aggregation.roundedAverageRating.toStringAsFixed(1),
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(width: 8),
+                    ...List.generate(5, (index) {
+                      final rating = index + 1;
+                      return Icon(
+                        rating <= aggregation.roundedAverageRating
+                            ? Icons.star
+                            : rating - 0.5 <= aggregation.roundedAverageRating
+                                ? Icons.star_half
+                                : Icons.star_border,
+                        color: Colors.amber,
+                        size: 24,
+                      );
+                    }),
+                    const Spacer(),
+                    Text(
+                      '${aggregation.totalCount} ${aggregation.totalCount == 1 ? 'response' : 'responses'}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Rating distribution
+                ...List.generate(5, (index) {
+                  final rating = 5 - index; // Display from 5 to 1
+                  final count = aggregation.ratingDistribution[rating] ?? 0;
+                  final percentage = aggregation.getPercentageForRating(rating);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 12,
+                          child: Text(
+                            '$rating',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.star, size: 16, color: Colors.amber),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: percentage / 100,
+                              minHeight: 8,
+                              backgroundColor: Colors.grey[300],
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.amber,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 40,
+                          child: Text(
+                            '${percentage.toStringAsFixed(0)}%',
+                            style: const TextStyle(fontSize: 12),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                // Comments count
+                if (aggregation.comments.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.comment, size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${aggregation.comments.length} ${aggregation.comments.length == 1 ? 'comment' : 'comments'}',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 
