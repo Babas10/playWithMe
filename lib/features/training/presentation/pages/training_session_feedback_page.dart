@@ -27,7 +27,9 @@ class _TrainingSessionFeedbackPageState
     extends State<TrainingSessionFeedbackPage> {
   final _formKey = GlobalKey<FormState>();
   final _commentController = TextEditingController();
-  int _rating = 0;
+  int _exercisesQuality = 0;
+  String _trainingIntensity = 'justRight';
+  int _coachingClarity = 0;
   bool _hasSubmitted = false;
 
   @override
@@ -182,27 +184,26 @@ class _TrainingSessionFeedbackPageState
             ),
             const SizedBox(height: 32),
 
-            // Rating section
-            const Text(
-              'How would you rate this session?',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            // Exercises Quality Rating
+            _buildVolleyballRating(
+              'Exercises Quality',
+              'Were the drills effective?',
+              _exercisesQuality,
+              (rating) => setState(() => _exercisesQuality = rating),
             ),
-            const SizedBox(height: 16),
-            _buildRatingStars(),
-            if (_rating == 0)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text(
-                  'Please select a rating',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
+            const SizedBox(height: 24),
+
+            // Training Intensity
+            _buildIntensitySelector(),
+            const SizedBox(height: 24),
+
+            // Coaching Clarity Rating
+            _buildVolleyballRating(
+              'Coaching Clarity',
+              'Instructions & corrections?',
+              _coachingClarity,
+              (rating) => setState(() => _coachingClarity = rating),
+            ),
             const SizedBox(height: 32),
 
             // Comment section
@@ -289,35 +290,116 @@ class _TrainingSessionFeedbackPageState
     );
   }
 
-  Widget _buildRatingStars() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(5, (index) {
-        final starValue = index + 1;
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _rating = starValue;
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(
-              _rating >= starValue ? Icons.star : Icons.star_border,
-              size: 48,
-              color: _rating >= starValue ? Colors.amber : Colors.grey,
-            ),
+  Widget _buildVolleyballRating(
+    String label,
+    String subtitle,
+    int currentRating,
+    Function(int) onRatingChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
-        );
-      }),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(5, (index) {
+            final rating = index + 1;
+            return GestureDetector(
+              onTap: () => onRatingChanged(rating),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text(
+                  '🏐',
+                  style: TextStyle(
+                    fontSize: currentRating >= rating ? 40 : 36,
+                    color: currentRating >= rating ? null : Colors.grey[400],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Needs work', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            Text('Top-level training', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIntensitySelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Training Intensity',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'How was the physical demand?',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Column(
+          children: [
+            RadioListTile<String>(
+              title: const Text('Too light'),
+              value: 'tooLight',
+              groupValue: _trainingIntensity,
+              onChanged: (value) => setState(() => _trainingIntensity = value!),
+              activeColor: Colors.blue,
+            ),
+            RadioListTile<String>(
+              title: const Text('Just right'),
+              value: 'justRight',
+              groupValue: _trainingIntensity,
+              onChanged: (value) => setState(() => _trainingIntensity = value!),
+              activeColor: Colors.green,
+            ),
+            RadioListTile<String>(
+              title: const Text('Too intense'),
+              value: 'tooIntense',
+              groupValue: _trainingIntensity,
+              onChanged: (value) => setState(() => _trainingIntensity = value!),
+              activeColor: Colors.orange,
+            ),
+          ],
+        ),
+      ],
     );
   }
 
   void _submitFeedback(BuildContext context) {
-    if (_rating == 0) {
+    if (_exercisesQuality == 0 || _coachingClarity == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please select a rating before submitting'),
+          content: Text('Please rate both exercises quality and coaching clarity'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -327,7 +409,9 @@ class _TrainingSessionFeedbackPageState
     context.read<TrainingFeedbackBloc>().add(
           SubmitFeedback(
             trainingSessionId: widget.trainingSessionId,
-            rating: _rating,
+            exercisesQuality: _exercisesQuality,
+            trainingIntensity: _trainingIntensity,
+            coachingClarity: _coachingClarity,
             comment: _commentController.text.trim().isEmpty
                 ? null
                 : _commentController.text.trim(),

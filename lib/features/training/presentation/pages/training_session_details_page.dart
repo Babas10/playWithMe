@@ -816,8 +816,8 @@ class _TrainingSessionDetailsPageState
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Needs work', style: Theme.of(context).textTheme.caption),
-            Text('Top-level', style: Theme.of(context).textTheme.caption),
+            Text('Needs work', style: Theme.of(context).textTheme.bodySmall),
+            Text('Top-level', style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
       ],
