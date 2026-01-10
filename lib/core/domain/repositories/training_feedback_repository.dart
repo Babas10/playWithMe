@@ -21,10 +21,12 @@ abstract class TrainingFeedbackRepository {
   /// Throws:
   /// - [Exception] if user is not a participant
   /// - [Exception] if user has already submitted feedback
-  /// - [Exception] if rating is invalid (not 1-5)
+  /// - [Exception] if ratings are invalid (not 1-5)
   Future<void> submitFeedback({
     required String trainingSessionId,
-    required int rating,
+    required int exercisesQuality,
+    required String trainingIntensity, // 'tooLight', 'justRight', 'tooIntense'
+    required int coachingClarity,
     String? comment,
   });
 
@@ -60,34 +62,46 @@ abstract class TrainingFeedbackRepository {
 /// Aggregated feedback statistics
 class FeedbackAggregation extends Equatable {
   final String trainingSessionId;
-  final double averageRating;
+  final double averageExercisesQuality;
+  final double averageCoachingClarity;
   final int totalCount;
-  final Map<int, int> ratingDistribution; // rating -> count
+  final Map<int, int> exercisesDistribution; // rating -> count
+  final Map<int, int> coachingDistribution; // rating -> count
+  final Map<String, int> intensityDistribution; // intensity -> count
   final List<String> comments; // Non-empty comments (still anonymous)
 
   const FeedbackAggregation({
     required this.trainingSessionId,
-    required this.averageRating,
+    required this.averageExercisesQuality,
+    required this.averageCoachingClarity,
     required this.totalCount,
-    required this.ratingDistribution,
+    required this.exercisesDistribution,
+    required this.coachingDistribution,
+    required this.intensityDistribution,
     required this.comments,
   });
 
   @override
   List<Object?> get props => [
         trainingSessionId,
-        averageRating,
+        averageExercisesQuality,
+        averageCoachingClarity,
         totalCount,
-        ratingDistribution,
+        exercisesDistribution,
+        coachingDistribution,
+        intensityDistribution,
         comments,
       ];
 
   factory FeedbackAggregation.empty(String trainingSessionId) {
     return FeedbackAggregation(
       trainingSessionId: trainingSessionId,
-      averageRating: 0.0,
+      averageExercisesQuality: 0.0,
+      averageCoachingClarity: 0.0,
       totalCount: 0,
-      ratingDistribution: const {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+      exercisesDistribution: const {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+      coachingDistribution: const {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+      intensityDistribution: const {'tooLight': 0, 'justRight': 0, 'tooIntense': 0},
       comments: const [],
     );
   }
@@ -101,14 +115,25 @@ class FeedbackAggregation extends Equatable {
       return FeedbackAggregation.empty(trainingSessionId);
     }
 
-    final ratingDistribution = <int, int>{1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+    final exercisesDistribution = <int, int>{1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+    final coachingDistribution = <int, int>{1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+    final intensityDistribution = <String, int>{'tooLight': 0, 'justRight': 0, 'tooIntense': 0};
     final comments = <String>[];
-    var totalRating = 0;
+    var totalExercisesQuality = 0;
+    var totalCoachingClarity = 0;
 
     for (final feedback in feedbackList) {
-      totalRating += feedback.rating;
-      ratingDistribution[feedback.rating] =
-          (ratingDistribution[feedback.rating] ?? 0) + 1;
+      totalExercisesQuality += feedback.exercisesQuality;
+      totalCoachingClarity += feedback.coachingClarity;
+
+      exercisesDistribution[feedback.exercisesQuality] =
+          (exercisesDistribution[feedback.exercisesQuality] ?? 0) + 1;
+      coachingDistribution[feedback.coachingClarity] =
+          (coachingDistribution[feedback.coachingClarity] ?? 0) + 1;
+
+      final intensityKey = feedback.trainingIntensity.toString().split('.').last;
+      intensityDistribution[intensityKey] =
+          (intensityDistribution[intensityKey] ?? 0) + 1;
 
       if (feedback.hasComment) {
         comments.add(feedback.comment!);
@@ -117,24 +142,55 @@ class FeedbackAggregation extends Equatable {
 
     return FeedbackAggregation(
       trainingSessionId: trainingSessionId,
-      averageRating: totalRating / feedbackList.length,
+      averageExercisesQuality: totalExercisesQuality / feedbackList.length,
+      averageCoachingClarity: totalCoachingClarity / feedbackList.length,
       totalCount: feedbackList.length,
-      ratingDistribution: ratingDistribution,
+      exercisesDistribution: exercisesDistribution,
+      coachingDistribution: coachingDistribution,
+      intensityDistribution: intensityDistribution,
       comments: comments,
     );
   }
 
-  /// Get percentage for a specific rating
-  double getPercentageForRating(int rating) {
+  /// Get percentage for a specific exercises quality rating
+  double getPercentageForExercisesRating(int rating) {
     if (totalCount == 0) return 0.0;
-    return ((ratingDistribution[rating] ?? 0) / totalCount) * 100;
+    return ((exercisesDistribution[rating] ?? 0) / totalCount) * 100;
+  }
+
+  /// Get percentage for a specific coaching clarity rating
+  double getPercentageForCoachingRating(int rating) {
+    if (totalCount == 0) return 0.0;
+    return ((coachingDistribution[rating] ?? 0) / totalCount) * 100;
+  }
+
+  /// Get percentage for a specific intensity level
+  double getPercentageForIntensity(String intensity) {
+    if (totalCount == 0) return 0.0;
+    return ((intensityDistribution[intensity] ?? 0) / totalCount) * 100;
+  }
+
+  /// Get the most common intensity level
+  String get mostCommonIntensity {
+    if (totalCount == 0) return 'justRight';
+    return intensityDistribution.entries
+        .reduce((a, b) => a.value > b.value ? a : b)
+        .key;
   }
 
   /// Check if there is any feedback
   bool get hasFeedback => totalCount > 0;
 
-  /// Get rounded average rating for display (e.g., 4.5)
-  double get roundedAverageRating {
-    return (averageRating * 2).round() / 2;
+  /// Get rounded average exercises quality for display (e.g., 4.5)
+  double get roundedAverageExercises {
+    return (averageExercisesQuality * 2).round() / 2;
   }
+
+  /// Get rounded average coaching clarity for display (e.g., 4.5)
+  double get roundedAverageCoaching {
+    return (averageCoachingClarity * 2).round() / 2;
+  }
+
+  /// Get overall average (average of both ratings)
+  double get overallAverage => (averageExercisesQuality + averageCoachingClarity) / 2;
 }

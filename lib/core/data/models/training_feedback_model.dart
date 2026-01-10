@@ -4,6 +4,16 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'training_feedback_model.freezed.dart';
 part 'training_feedback_model.g.dart';
 
+/// Training intensity levels for feedback
+enum TrainingIntensity {
+  @JsonValue('tooLight')
+  tooLight,
+  @JsonValue('justRight')
+  justRight,
+  @JsonValue('tooIntense')
+  tooIntense,
+}
+
 /// Represents anonymous feedback for a training session
 /// Feedback is stored in a subcollection under training sessions
 /// The participant's identity is hashed to prevent duplicates while maintaining anonymity
@@ -12,8 +22,12 @@ class TrainingFeedbackModel with _$TrainingFeedbackModel {
   const factory TrainingFeedbackModel({
     required String id,
     required String trainingSessionId,
-    /// Rating from 1-5 stars
-    required int rating,
+    /// Exercises quality rating (1-5 volleyballs)
+    required int exercisesQuality,
+    /// Training intensity level
+    required TrainingIntensity trainingIntensity,
+    /// Coaching clarity rating (1-5 volleyballs)
+    required int coachingClarity,
     /// Optional written feedback
     String? comment,
     /// Hash of participant ID to prevent duplicates without exposing identity
@@ -65,8 +79,14 @@ class TrainingFeedbackModel with _$TrainingFeedbackModel {
 
   /// Validation methods
 
-  /// Validate rating is in valid range (1-5)
-  bool get hasValidRating => rating >= 1 && rating <= 5;
+  /// Validate exercises quality rating is in valid range (1-5)
+  bool get hasValidExercisesQuality => exercisesQuality >= 1 && exercisesQuality <= 5;
+
+  /// Validate coaching clarity rating is in valid range (1-5)
+  bool get hasValidCoachingClarity => coachingClarity >= 1 && coachingClarity <= 5;
+
+  /// Check if all ratings are valid
+  bool get hasValidRatings => hasValidExercisesQuality && hasValidCoachingClarity;
 
   /// Check if feedback has a comment
   bool get hasComment => comment != null && comment!.trim().isNotEmpty;
@@ -77,6 +97,9 @@ class TrainingFeedbackModel with _$TrainingFeedbackModel {
     final trimmed = comment!.trim();
     return trimmed.isEmpty ? null : trimmed;
   }
+
+  /// Get average of the two volleyball ratings (for overall score)
+  double get averageRating => (exercisesQuality + coachingClarity) / 2;
 }
 
 /// Timestamp converter for Freezed models

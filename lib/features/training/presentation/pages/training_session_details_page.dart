@@ -711,90 +711,47 @@ class _TrainingSessionDetailsPageState
           children: [
             const SizedBox(height: 16),
             _buildDetailCard(
-              'Session Feedback',
-              Icons.feedback,
+              '💬 Session Feedback',
+              Icons.sports_volleyball,
               [
-                // Average rating with stars
+                // Response count
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      aggregation.roundedAverageRating.toStringAsFixed(1),
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(width: 8),
-                    ...List.generate(5, (index) {
-                      final rating = index + 1;
-                      return Icon(
-                        rating <= aggregation.roundedAverageRating
-                            ? Icons.star
-                            : rating - 0.5 <= aggregation.roundedAverageRating
-                                ? Icons.star_half
-                                : Icons.star_border,
-                        color: Colors.amber,
-                        size: 24,
-                      );
-                    }),
-                    const Spacer(),
-                    Text(
                       '${aggregation.totalCount} ${aggregation.totalCount == 1 ? 'response' : 'responses'}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Rating distribution
-                ...List.generate(5, (index) {
-                  final rating = 5 - index; // Display from 5 to 1
-                  final count = aggregation.ratingDistribution[rating] ?? 0;
-                  final percentage = aggregation.getPercentageForRating(rating);
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 12,
-                          child: Text(
-                            '$rating',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.star, size: 16, color: Colors.amber),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: percentage / 100,
-                              minHeight: 8,
-                              backgroundColor: Colors.grey[300],
-                              valueColor: const AlwaysStoppedAnimation<Color>(
-                                Colors.amber,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          width: 40,
-                          child: Text(
-                            '${percentage.toStringAsFixed(0)}%',
-                            style: const TextStyle(fontSize: 12),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                // Exercises Quality
+                _buildRatingSection(
+                  context,
+                  'Exercises Quality',
+                  aggregation.roundedAverageExercises,
+                  (rating) => aggregation.getPercentageForExercisesRating(rating),
+                ),
+                const SizedBox(height: 16),
+
+                // Training Intensity
+                _buildIntensitySection(context, aggregation),
+                const SizedBox(height: 16),
+
+                // Coaching Clarity
+                _buildRatingSection(
+                  context,
+                  'Coaching Clarity',
+                  aggregation.roundedAverageCoaching,
+                  (rating) => aggregation.getPercentageForCoachingRating(rating),
+                ),
+
                 // Comments count
                 if (aggregation.comments.isNotEmpty) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
                   const Divider(),
                   const SizedBox(height: 8),
                   Row(
@@ -813,6 +770,136 @@ class _TrainingSessionDetailsPageState
           ],
         );
       },
+    );
+  }
+
+  Widget _buildRatingSection(
+    BuildContext context,
+    String label,
+    double averageRating,
+    double Function(int) getPercentage,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const Spacer(),
+            Text(
+              averageRating.toStringAsFixed(1),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+            ),
+            const Text(' 🏐', style: TextStyle(fontSize: 20)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Volleyball rating bar
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: LinearProgressIndicator(
+            value: averageRating / 5,
+            minHeight: 12,
+            backgroundColor: Colors.grey[300],
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.orange),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Needs work', style: Theme.of(context).textTheme.caption),
+            Text('Top-level', style: Theme.of(context).textTheme.caption),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIntensitySection(BuildContext context, FeedbackAggregation aggregation) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Training Intensity',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 8),
+        _buildIntensityOption(
+          context,
+          'Too light',
+          aggregation.getPercentageForIntensity('tooLight'),
+          aggregation.mostCommonIntensity == 'tooLight',
+        ),
+        _buildIntensityOption(
+          context,
+          'Just right',
+          aggregation.getPercentageForIntensity('justRight'),
+          aggregation.mostCommonIntensity == 'justRight',
+        ),
+        _buildIntensityOption(
+          context,
+          'Too intense',
+          aggregation.getPercentageForIntensity('tooIntense'),
+          aggregation.mostCommonIntensity == 'tooIntense',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIntensityOption(BuildContext context, String label, double percentage, bool isMostCommon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 90,
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: isMostCommon ? FontWeight.bold : FontWeight.normal,
+                  ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: percentage / 100,
+                minHeight: 8,
+                backgroundColor: Colors.grey[300],
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isMostCommon ? Colors.green : Colors.blue,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 45,
+            child: Text(
+              '${percentage.toStringAsFixed(0)}%',
+              style: const TextStyle(fontSize: 12),
+              textAlign: TextAlign.right,
+            ),
+          ),
+          if (isMostCommon) ...[
+            const SizedBox(width: 4),
+            const Icon(Icons.check_circle, size: 16, color: Colors.green),
+          ],
+        ],
+      ),
     );
   }
 
