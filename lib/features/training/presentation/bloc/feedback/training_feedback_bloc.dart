@@ -36,7 +36,9 @@ class TrainingFeedbackBloc
     try {
       await _feedbackRepository.submitFeedback(
         trainingSessionId: event.trainingSessionId,
-        rating: event.rating,
+        exercisesQuality: event.exercisesQuality,
+        trainingIntensity: event.trainingIntensity,
+        coachingClarity: event.coachingClarity,
         comment: event.comment,
       );
 

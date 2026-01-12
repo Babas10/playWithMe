@@ -46,6 +46,7 @@ import 'package:play_with_me/features/games/presentation/bloc/game_creation/game
 import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
+import 'package:play_with_me/features/training/presentation/bloc/training_session_participation/training_session_participation_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/exercise/exercise_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_bloc.dart';
 
@@ -327,6 +328,14 @@ Future<void> initializeDependencies() async {
     sl.registerFactory<TrainingFeedbackBloc>(
       () => TrainingFeedbackBloc(
         feedbackRepository: sl(),
+      ),
+    );
+  }
+
+  if (!sl.isRegistered<TrainingSessionParticipationBloc>()) {
+    sl.registerFactory<TrainingSessionParticipationBloc>(
+      () => TrainingSessionParticipationBloc(
+        trainingSessionRepository: sl(),
       ),
     );
   }

@@ -27,6 +27,7 @@ export {joinTrainingSession} from "./joinTrainingSession"; // Story 15.3 (Join T
 export {leaveTrainingSession} from "./leaveTrainingSession"; // Story 15.3 (Leave Training Session)
 export {submitTrainingFeedback} from "./submitTrainingFeedback"; // Story 15.8 (Anonymous Feedback)
 export {hasSubmittedTrainingFeedback} from "./hasSubmittedTrainingFeedback"; // Story 15.8 (Anonymous Feedback)
+export {onParticipantJoined, onParticipantLeft} from "./trainingSessionNotifications"; // Story 15.9 (Training Session Access)
 
 // Export friendship functions (callable functions)
 export {
