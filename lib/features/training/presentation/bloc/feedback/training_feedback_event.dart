@@ -12,17 +12,21 @@ abstract class TrainingFeedbackEvent extends Equatable {
 /// Event to submit feedback for a training session
 class SubmitFeedback extends TrainingFeedbackEvent {
   final String trainingSessionId;
-  final int rating;
+  final int exercisesQuality;
+  final int trainingIntensity;
+  final int coachingClarity;
   final String? comment;
 
   const SubmitFeedback({
     required this.trainingSessionId,
-    required this.rating,
+    required this.exercisesQuality,
+    required this.trainingIntensity,
+    required this.coachingClarity,
     this.comment,
   });
 
   @override
-  List<Object?> get props => [trainingSessionId, rating, comment];
+  List<Object?> get props => [trainingSessionId, exercisesQuality, trainingIntensity, coachingClarity, comment];
 }
 
 /// Event to load aggregated feedback for a training session

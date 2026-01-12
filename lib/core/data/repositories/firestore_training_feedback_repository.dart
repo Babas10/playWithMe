@@ -38,7 +38,9 @@ class FirestoreTrainingFeedbackRepository
   @override
   Future<void> submitFeedback({
     required String trainingSessionId,
-    required int rating,
+    required int exercisesQuality,
+    required int trainingIntensity,
+    required int coachingClarity,
     String? comment,
   }) async {
     try {
@@ -47,9 +49,15 @@ class FirestoreTrainingFeedbackRepository
         name: 'training.feedback',
       );
 
-      // Validate rating
-      if (rating < 1 || rating > 5) {
-        throw Exception('Rating must be between 1 and 5');
+      // Validate ratings
+      if (exercisesQuality < 1 || exercisesQuality > 5) {
+        throw Exception('Exercises quality rating must be between 1 and 5');
+      }
+      if (trainingIntensity < 1 || trainingIntensity > 5) {
+        throw Exception('Training intensity rating must be between 1 and 5');
+      }
+      if (coachingClarity < 1 || coachingClarity > 5) {
+        throw Exception('Coaching clarity rating must be between 1 and 5');
       }
 
       final user = _auth.currentUser;
@@ -66,7 +74,9 @@ class FirestoreTrainingFeedbackRepository
       final callable = _functions.httpsCallable('submitTrainingFeedback');
       await callable.call({
         'trainingSessionId': trainingSessionId,
-        'rating': rating,
+        'exercisesQuality': exercisesQuality,
+        'trainingIntensity': trainingIntensity,
+        'coachingClarity': coachingClarity,
         'comment': comment,
       });
 
