@@ -10,7 +10,9 @@ import * as crypto from "crypto";
 
 interface SubmitTrainingFeedbackRequest {
   trainingSessionId: string;
-  rating: number;
+  exercisesQuality: number;
+  trainingIntensity: number;
+  coachingClarity: number;
   comment?: string;
 }
 
@@ -115,7 +117,9 @@ export const submitTrainingFeedback = functions.https.onCall(
     console.log("[submitTrainingFeedback] Request from user:", {
       userId,
       sessionId: data.trainingSessionId,
-      rating: data.rating,
+      exercisesQuality: data.exercisesQuality,
+      trainingIntensity: data.trainingIntensity,
+      coachingClarity: data.coachingClarity,
       hasComment: !!data.comment,
     });
 
@@ -130,17 +134,48 @@ export const submitTrainingFeedback = functions.https.onCall(
       );
     }
 
-    if (!data.rating || typeof data.rating !== "number") {
+    // Validate exercises quality rating
+    if (!data.exercisesQuality || typeof data.exercisesQuality !== "number") {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "Rating is required"
+        "Exercises quality rating is required"
       );
     }
 
-    if (data.rating < 1 || data.rating > 5) {
+    if (data.exercisesQuality < 1 || data.exercisesQuality > 5) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "Rating must be between 1 and 5"
+        "Exercises quality rating must be between 1 and 5"
+      );
+    }
+
+    // Validate training intensity rating
+    if (!data.trainingIntensity || typeof data.trainingIntensity !== "number") {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Training intensity rating is required"
+      );
+    }
+
+    if (data.trainingIntensity < 1 || data.trainingIntensity > 5) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Training intensity rating must be between 1 and 5"
+      );
+    }
+
+    // Validate coaching clarity rating
+    if (!data.coachingClarity || typeof data.coachingClarity !== "number") {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Coaching clarity rating is required"
+      );
+    }
+
+    if (data.coachingClarity < 1 || data.coachingClarity > 5) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Coaching clarity rating must be between 1 and 5"
       );
     }
 
@@ -237,7 +272,9 @@ export const submitTrainingFeedback = functions.https.onCall(
 
     try {
       const feedbackData = {
-        rating: data.rating,
+        exercisesQuality: data.exercisesQuality,
+        trainingIntensity: data.trainingIntensity,
+        coachingClarity: data.coachingClarity,
         comment: data.comment?.trim() || null,
         participantHash: participantHash,
         submittedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -251,7 +288,9 @@ export const submitTrainingFeedback = functions.https.onCall(
 
       console.log("[submitTrainingFeedback] Feedback submitted successfully:", {
         sessionId: data.trainingSessionId,
-        rating: data.rating,
+        exercisesQuality: data.exercisesQuality,
+        trainingIntensity: data.trainingIntensity,
+        coachingClarity: data.coachingClarity,
         hasComment: !!data.comment,
       });
 
