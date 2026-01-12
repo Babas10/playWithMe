@@ -132,6 +132,20 @@ abstract class TrainingSessionRepository {
   /// This does NOT affect ELO ratings (training sessions are practice only)
   Future<void> completeTrainingSession(String sessionId);
 
+  /// Auto-update session status based on time and participants
+  ///
+  /// Automatically determines the session status after endTime has passed:
+  /// - If participantIds.length >= minParticipants → status = completed
+  /// - If participantIds.length < minParticipants → status = cancelled
+  ///
+  /// Only updates sessions that are:
+  /// - Currently in 'scheduled' status
+  /// - Past their endTime
+  ///
+  /// Returns:
+  /// - The updated status ('completed', 'cancelled', or 'scheduled' if no update)
+  Future<TrainingStatus> updateSessionStatusIfNeeded(String sessionId);
+
   /// Delete training session
   ///
   /// Only the creator can delete a training session

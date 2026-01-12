@@ -225,6 +225,44 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
   }
 
   @override
+  Future<TrainingStatus> updateSessionStatusIfNeeded(String sessionId) async {
+    final session = _sessions[sessionId];
+    if (session == null) {
+      throw Exception('Training session not found');
+    }
+
+    // Only update if session is scheduled and past endTime
+    if (session.status != TrainingStatus.scheduled) {
+      return session.status;
+    }
+
+    final now = DateTime.now();
+    if (session.endTime.isAfter(now)) {
+      // Session hasn't ended yet
+      return TrainingStatus.scheduled;
+    }
+
+    // Session has ended - determine final status based on participants
+    final hasEnoughParticipants =
+        session.participantIds.length >= session.minParticipants;
+
+    TrainingSessionModel updatedSession;
+    if (hasEnoughParticipants) {
+      // Enough participants → mark as completed
+      updatedSession = session.completeSession();
+    } else {
+      // Not enough participants → mark as cancelled
+      updatedSession = session.cancelSession();
+    }
+
+    _sessions[sessionId] = updatedSession;
+    _emitSessions();
+    _emitSessionUpdate(sessionId);
+
+    return updatedSession.status;
+  }
+
+  @override
   Future<void> deleteTrainingSession(String sessionId) async {
     _sessions.remove(sessionId);
     _emitSessions();

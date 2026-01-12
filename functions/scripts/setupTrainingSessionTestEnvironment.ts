@@ -1,8 +1,8 @@
 /**
- * Training Session Test Environment Setup Script (Story 15.6, 15.7)
+ * Training Session Test Environment Setup Script (Story 15.6, 15.7, 15.8)
  *
  * This script creates a COMPLETE test environment specifically for testing
- * training session participation tracking and exercise management.
+ * training session participation tracking, exercise management, and feedback.
  *
  * It performs the following steps (Self-Contained):
  * 1. Clears the entire dev database (Users, Groups, Training Sessions, etc.)
@@ -20,6 +20,11 @@
  *    - Upcoming sessions with editable exercises
  *    - Completed sessions with locked (read-only) exercises
  *    - Various exercise types and durations
+ * 8. Adds feedback to completed sessions (Story 15.8):
+ *    - Partial feedback coverage (some participants submitted)
+ *    - Full feedback coverage (all participants submitted)
+ *    - Empty feedback state (no feedback yet)
+ *    - Mix of ratings and optional comments
  *
  * Usage:
  *   cd functions
@@ -389,6 +394,87 @@ async function addParticipantToSession(
 }
 
 // ==========================================
+// FEEDBACK CREATION LOGIC (Story 15.8)
+// ==========================================
+
+async function addFeedbackToSession(
+  sessionId: string,
+  userId: string,
+  rating: number,
+  comment: string | null
+): Promise<void> {
+  const feedbackRef = db
+    .collection("trainingSessions")
+    .doc(sessionId)
+    .collection("feedback")
+    .doc(userId);
+
+  await feedbackRef.set({
+    userId: userId,
+    rating: rating,
+    comment: comment,
+    isAnonymous: true,
+    createdAt: admin.firestore.Timestamp.now(),
+  });
+}
+
+async function addFeedbackToCompletedSessions(
+  sessionIds: string[],
+  users: TestUser[]
+): Promise<void> {
+  console.log("\n💬 ADDING FEEDBACK TO COMPLETED SESSIONS\n");
+  console.log("=".repeat(50));
+
+  let feedbackCount = 0;
+
+  // Session 6 (Serving Masterclass - index 5): Multiple feedback entries
+  // Participants: users[1-7]
+  await addFeedbackToSession(sessionIds[5], users[1].uid, 5, "Excellent session! Really improved my serve accuracy.");
+  await addFeedbackToSession(sessionIds[5], users[2].uid, 4, "Great drills, could use more time on topspin serves.");
+  await addFeedbackToSession(sessionIds[5], users[3].uid, 5, null); // No comment, just rating
+  await addFeedbackToSession(sessionIds[5], users[4].uid, 4, "Very helpful coach. Would love more sessions like this!");
+  // users[5], users[6], users[7] haven't submitted feedback yet
+  feedbackCount += 4;
+  console.log(`✅ Session 6 (Serving Masterclass): 4/7 participants submitted feedback`);
+
+  // Session 7 (Game Situations - index 6): Some feedback
+  // Participants: users[1], users[2], users[4], users[6], users[8]
+  await addFeedbackToSession(sessionIds[6], users[1].uid, 5, "Loved the competitive drills!");
+  await addFeedbackToSession(sessionIds[6], users[2].uid, 3, "Session was good but a bit too intense for beginners.");
+  await addFeedbackToSession(sessionIds[6], users[8].uid, 4, null);
+  // users[4] and users[6] haven't submitted feedback
+  feedbackCount += 3;
+  console.log(`✅ Session 7 (Game Situations): 3/5 participants submitted feedback`);
+
+  // Session 8 (Defense Workshop - index 7): Full feedback from all participants
+  // Participants: users[1], users[2], users[3], users[5], users[8]
+  await addFeedbackToSession(sessionIds[7], users[1].uid, 5, "Best defensive training I've had!");
+  await addFeedbackToSession(sessionIds[7], users[2].uid, 5, "Coach explained techniques really well.");
+  await addFeedbackToSession(sessionIds[7], users[3].uid, 4, "Great session, my digging improved a lot.");
+  await addFeedbackToSession(sessionIds[7], users[5].uid, 5, null);
+  await addFeedbackToSession(sessionIds[7], users[8].uid, 4, "Very practical drills that I can use in games.");
+  feedbackCount += 5;
+  console.log(`✅ Session 8 (Defense Workshop): 5/5 participants submitted feedback`);
+
+  // Session 9 (Tournament Prep - index 8): Mixed feedback
+  // Participants: users[1-9]
+  await addFeedbackToSession(sessionIds[8], users[1].uid, 5, "Perfect prep for the tournament!");
+  await addFeedbackToSession(sessionIds[8], users[3].uid, 4, "Good intensity and focus on game situations.");
+  await addFeedbackToSession(sessionIds[8], users[5].uid, 5, null);
+  await addFeedbackToSession(sessionIds[8], users[7].uid, 3, "Could have been longer, felt rushed.");
+  // users[2], users[4], users[6], users[8], users[9] haven't submitted feedback
+  feedbackCount += 4;
+  console.log(`✅ Session 9 (Tournament Prep): 4/9 participants submitted feedback`);
+
+  // Session 10 (Beginner Basics - index 9): No feedback yet
+  // Participants: users[2], users[4], users[5], users[7], users[9]
+  // All participants haven't submitted feedback - this tests the empty feedback state
+  console.log(`✅ Session 10 (Beginner Basics): 0/5 participants submitted feedback (empty state)`);
+
+  console.log(`\n✅ Total feedback entries created: ${feedbackCount}`);
+}
+
+// ==========================================
 // EXERCISE CREATION LOGIC (Story 15.7)
 // ==========================================
 
@@ -738,6 +824,10 @@ async function exportTestConfig(
         "Sessions with exercises (fundamentals, advanced, team, conditioning, coaching)",
         "Completed sessions with locked exercises (read-only)",
         "Sessions with and without exercises",
+        "Completed sessions with feedback (partial and full coverage)",
+        "Feedback with ratings and optional comments",
+        "Empty feedback state (session with no feedback yet)",
+        "Test feedback button visibility (only for participants)",
       ],
     },
   };
@@ -786,7 +876,10 @@ async function setupTrainingSessionTestEnvironment() {
     // 6. Add Exercises to Training Sessions (Story 15.7)
     await addExercisesToSessions(sessionIds);
 
-    // 7. Export Config
+    // 7. Add Feedback to Completed Sessions (Story 15.8)
+    await addFeedbackToCompletedSessions(sessionIds, users);
+
+    // 8. Export Config
     await exportTestConfig(users, groupId, sessionIds);
 
     // Summary
@@ -802,7 +895,12 @@ async function setupTrainingSessionTestEnvironment() {
     console.log("  3. Navigate to the Training Sessions section");
     console.log("  4. View upcoming, completed, and cancelled sessions");
     console.log("  5. Test join/leave functionality");
-    console.log("  6. Check participant lists and capacity limits\n");
+    console.log("  6. Check participant lists and capacity limits");
+    console.log("  7. Test feedback on completed sessions:");
+    console.log("     • See feedback button only if you participated");
+    console.log("     • Submit feedback (rating + optional comment)");
+    console.log("     • View aggregated feedback (after submission)");
+    console.log("     • Some sessions already have partial feedback\n");
     console.log("\n📊 Test Data Summary:");
     console.log("  - 10 users (Test1-Test10)");
     console.log("  - 1 group with all users as members");
@@ -818,7 +916,15 @@ async function setupTrainingSessionTestEnvironment() {
     console.log("    • Upcoming sessions with editable exercises");
     console.log("    • Completed sessions with read-only exercises");
     console.log("    • Mix of sessions with/without exercises");
-    console.log("    • Different exercise types: basic, advanced, team, conditioning\n");
+    console.log("    • Different exercise types: basic, advanced, team, conditioning");
+    console.log("  - Feedback entries (Story 15.8):");
+    console.log("    • 16 feedback entries across 4 completed sessions");
+    console.log("    • Session 6: 4/7 participants submitted (partial feedback)");
+    console.log("    • Session 7: 3/5 participants submitted (partial feedback)");
+    console.log("    • Session 8: 5/5 participants submitted (full feedback)");
+    console.log("    • Session 9: 4/9 participants submitted (partial feedback)");
+    console.log("    • Session 10: 0/5 participants submitted (empty state)");
+    console.log("    • Mix of ratings (3-5 stars) and comments (some null)\n");
 
   } catch (error) {
     console.error("\n❌ ERROR during setup:", error);
