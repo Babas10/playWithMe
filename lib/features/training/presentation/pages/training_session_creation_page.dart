@@ -6,6 +6,7 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_event.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_state.dart';
+import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
 
 class TrainingSessionCreationPage extends StatefulWidget {
   final String groupId;
@@ -166,7 +167,18 @@ class _TrainingSessionCreationPageState
         TrainingSessionCreationState>(
       listener: (context, state) {
         if (state is TrainingSessionCreationSuccess) {
+          // Pop the creation page
           Navigator.of(context).pop();
+
+          // Navigate to the training session details page
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TrainingSessionDetailsPage(
+                trainingSessionId: state.sessionId,
+              ),
+            ),
+          );
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Training session created successfully!'),

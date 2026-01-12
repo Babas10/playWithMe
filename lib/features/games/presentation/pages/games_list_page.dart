@@ -15,6 +15,7 @@ import 'package:play_with_me/features/games/presentation/pages/game_creation_pag
 import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_list_item.dart';
 import 'package:play_with_me/features/games/presentation/widgets/training_session_list_item.dart';
+import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
 
 class GamesListPage extends StatelessWidget {
   final String groupId;
@@ -251,12 +252,12 @@ class _GamesListPageContent extends StatelessWidget {
   }
 
   void _navigateToTrainingDetails(BuildContext context, String sessionId) {
-    // TODO: Navigate to training session details page when implemented
-    // For now, show a placeholder snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Training session details: $sessionId'),
-        duration: const Duration(seconds: 2),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TrainingSessionDetailsPage(
+          trainingSessionId: sessionId,
+        ),
       ),
     );
   }

@@ -26,8 +26,14 @@ mixin _$TrainingFeedbackModel {
   String get id => throw _privateConstructorUsedError;
   String get trainingSessionId => throw _privateConstructorUsedError;
 
-  /// Rating from 1-5 stars
-  int get rating => throw _privateConstructorUsedError;
+  /// Exercises quality rating (1-5)
+  int get exercisesQuality => throw _privateConstructorUsedError;
+
+  /// Training intensity rating (1-5)
+  int get trainingIntensity => throw _privateConstructorUsedError;
+
+  /// Coaching clarity rating (1-5)
+  int get coachingClarity => throw _privateConstructorUsedError;
 
   /// Optional written feedback
   String? get comment => throw _privateConstructorUsedError;
@@ -60,7 +66,9 @@ abstract class $TrainingFeedbackModelCopyWith<$Res> {
   $Res call({
     String id,
     String trainingSessionId,
-    int rating,
+    int exercisesQuality,
+    int trainingIntensity,
+    int coachingClarity,
     String? comment,
     String participantHash,
     @TimestampConverter() DateTime submittedAt,
@@ -87,7 +95,9 @@ class _$TrainingFeedbackModelCopyWithImpl<
   $Res call({
     Object? id = null,
     Object? trainingSessionId = null,
-    Object? rating = null,
+    Object? exercisesQuality = null,
+    Object? trainingIntensity = null,
+    Object? coachingClarity = null,
     Object? comment = freezed,
     Object? participantHash = null,
     Object? submittedAt = null,
@@ -102,9 +112,17 @@ class _$TrainingFeedbackModelCopyWithImpl<
                 ? _value.trainingSessionId
                 : trainingSessionId // ignore: cast_nullable_to_non_nullable
                       as String,
-            rating: null == rating
-                ? _value.rating
-                : rating // ignore: cast_nullable_to_non_nullable
+            exercisesQuality: null == exercisesQuality
+                ? _value.exercisesQuality
+                : exercisesQuality // ignore: cast_nullable_to_non_nullable
+                      as int,
+            trainingIntensity: null == trainingIntensity
+                ? _value.trainingIntensity
+                : trainingIntensity // ignore: cast_nullable_to_non_nullable
+                      as int,
+            coachingClarity: null == coachingClarity
+                ? _value.coachingClarity
+                : coachingClarity // ignore: cast_nullable_to_non_nullable
                       as int,
             comment: freezed == comment
                 ? _value.comment
@@ -136,7 +154,9 @@ abstract class _$$TrainingFeedbackModelImplCopyWith<$Res>
   $Res call({
     String id,
     String trainingSessionId,
-    int rating,
+    int exercisesQuality,
+    int trainingIntensity,
+    int coachingClarity,
     String? comment,
     String participantHash,
     @TimestampConverter() DateTime submittedAt,
@@ -160,7 +180,9 @@ class __$$TrainingFeedbackModelImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? trainingSessionId = null,
-    Object? rating = null,
+    Object? exercisesQuality = null,
+    Object? trainingIntensity = null,
+    Object? coachingClarity = null,
     Object? comment = freezed,
     Object? participantHash = null,
     Object? submittedAt = null,
@@ -175,9 +197,17 @@ class __$$TrainingFeedbackModelImplCopyWithImpl<$Res>
             ? _value.trainingSessionId
             : trainingSessionId // ignore: cast_nullable_to_non_nullable
                   as String,
-        rating: null == rating
-            ? _value.rating
-            : rating // ignore: cast_nullable_to_non_nullable
+        exercisesQuality: null == exercisesQuality
+            ? _value.exercisesQuality
+            : exercisesQuality // ignore: cast_nullable_to_non_nullable
+                  as int,
+        trainingIntensity: null == trainingIntensity
+            ? _value.trainingIntensity
+            : trainingIntensity // ignore: cast_nullable_to_non_nullable
+                  as int,
+        coachingClarity: null == coachingClarity
+            ? _value.coachingClarity
+            : coachingClarity // ignore: cast_nullable_to_non_nullable
                   as int,
         comment: freezed == comment
             ? _value.comment
@@ -202,7 +232,9 @@ class _$TrainingFeedbackModelImpl extends _TrainingFeedbackModel {
   const _$TrainingFeedbackModelImpl({
     required this.id,
     required this.trainingSessionId,
-    required this.rating,
+    required this.exercisesQuality,
+    required this.trainingIntensity,
+    required this.coachingClarity,
     this.comment,
     required this.participantHash,
     @TimestampConverter() required this.submittedAt,
@@ -216,9 +248,17 @@ class _$TrainingFeedbackModelImpl extends _TrainingFeedbackModel {
   @override
   final String trainingSessionId;
 
-  /// Rating from 1-5 stars
+  /// Exercises quality rating (1-5)
   @override
-  final int rating;
+  final int exercisesQuality;
+
+  /// Training intensity rating (1-5)
+  @override
+  final int trainingIntensity;
+
+  /// Coaching clarity rating (1-5)
+  @override
+  final int coachingClarity;
 
   /// Optional written feedback
   @override
@@ -236,7 +276,7 @@ class _$TrainingFeedbackModelImpl extends _TrainingFeedbackModel {
 
   @override
   String toString() {
-    return 'TrainingFeedbackModel(id: $id, trainingSessionId: $trainingSessionId, rating: $rating, comment: $comment, participantHash: $participantHash, submittedAt: $submittedAt)';
+    return 'TrainingFeedbackModel(id: $id, trainingSessionId: $trainingSessionId, exercisesQuality: $exercisesQuality, trainingIntensity: $trainingIntensity, coachingClarity: $coachingClarity, comment: $comment, participantHash: $participantHash, submittedAt: $submittedAt)';
   }
 
   @override
@@ -247,7 +287,12 @@ class _$TrainingFeedbackModelImpl extends _TrainingFeedbackModel {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.trainingSessionId, trainingSessionId) ||
                 other.trainingSessionId == trainingSessionId) &&
-            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.exercisesQuality, exercisesQuality) ||
+                other.exercisesQuality == exercisesQuality) &&
+            (identical(other.trainingIntensity, trainingIntensity) ||
+                other.trainingIntensity == trainingIntensity) &&
+            (identical(other.coachingClarity, coachingClarity) ||
+                other.coachingClarity == coachingClarity) &&
             (identical(other.comment, comment) || other.comment == comment) &&
             (identical(other.participantHash, participantHash) ||
                 other.participantHash == participantHash) &&
@@ -261,7 +306,9 @@ class _$TrainingFeedbackModelImpl extends _TrainingFeedbackModel {
     runtimeType,
     id,
     trainingSessionId,
-    rating,
+    exercisesQuality,
+    trainingIntensity,
+    coachingClarity,
     comment,
     participantHash,
     submittedAt,
@@ -289,7 +336,9 @@ abstract class _TrainingFeedbackModel extends TrainingFeedbackModel {
   const factory _TrainingFeedbackModel({
     required final String id,
     required final String trainingSessionId,
-    required final int rating,
+    required final int exercisesQuality,
+    required final int trainingIntensity,
+    required final int coachingClarity,
     final String? comment,
     required final String participantHash,
     @TimestampConverter() required final DateTime submittedAt,
@@ -304,9 +353,17 @@ abstract class _TrainingFeedbackModel extends TrainingFeedbackModel {
   @override
   String get trainingSessionId;
 
-  /// Rating from 1-5 stars
+  /// Exercises quality rating (1-5)
   @override
-  int get rating;
+  int get exercisesQuality;
+
+  /// Training intensity rating (1-5)
+  @override
+  int get trainingIntensity;
+
+  /// Coaching clarity rating (1-5)
+  @override
+  int get coachingClarity;
 
   /// Optional written feedback
   @override

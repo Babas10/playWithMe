@@ -50,7 +50,9 @@ void main() {
 
   group('TrainingFeedbackBloc', () {
     const testSessionId = 'session123';
-    const testRating = 4;
+    const testExercisesQuality = 4;
+    const testTrainingIntensity = 5;
+    const testCoachingClarity = 4;
     const testComment = 'Great training session!';
 
     test('initial state is FeedbackInitial', () {
@@ -63,14 +65,18 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: testComment,
               )).thenAnswer((_) async {});
           return bloc;
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
           comment: testComment,
         )),
         expect: () => [
@@ -80,7 +86,9 @@ void main() {
         verify: (_) {
           verify(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: testComment,
               )).called(1);
         },
@@ -91,14 +99,18 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: null,
               )).thenAnswer((_) async {});
           return bloc;
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
         )),
         expect: () => [
           const SubmittingFeedback(testSessionId),
@@ -107,7 +119,9 @@ void main() {
         verify: (_) {
           verify(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: null,
               )).called(1);
         },
@@ -118,7 +132,9 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: testComment,
               )).thenThrow(
             FakeFirebaseFunctionsException('unauthenticated'),
@@ -127,7 +143,9 @@ void main() {
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
           comment: testComment,
         )),
         expect: () => [
@@ -144,7 +162,9 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: testComment,
               )).thenThrow(
             FakeFirebaseFunctionsException('failed-precondition'),
@@ -153,7 +173,9 @@ void main() {
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
           comment: testComment,
         )),
         expect: () => [
@@ -170,7 +192,9 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: testComment,
               )).thenThrow(
             FakeFirebaseFunctionsException('already-exists'),
@@ -179,7 +203,9 @@ void main() {
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
           comment: testComment,
         )),
         expect: () => [
@@ -196,7 +222,9 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: testComment,
               )).thenThrow(
             FakeFirebaseException('permission-denied'),
@@ -205,7 +233,9 @@ void main() {
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
           comment: testComment,
         )),
         expect: () => [
@@ -222,7 +252,9 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
                 comment: testComment,
               )).thenThrow(
             Exception('Network error'),
@@ -231,7 +263,9 @@ void main() {
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
           comment: testComment,
         )),
         expect: () => [
@@ -249,7 +283,9 @@ void main() {
         TrainingFeedbackModel(
           id: 'feedback1',
           trainingSessionId: testSessionId,
-          rating: 5,
+          exercisesQuality: 5,
+          trainingIntensity: 5,
+          coachingClarity: 4,
           comment: 'Excellent session!',
           participantHash: 'hash1',
           submittedAt: DateTime(2025, 1, 1, 12, 0),
@@ -257,7 +293,9 @@ void main() {
         TrainingFeedbackModel(
           id: 'feedback2',
           trainingSessionId: testSessionId,
-          rating: 4,
+          exercisesQuality: 4,
+          trainingIntensity: 3,
+          coachingClarity: 5,
           comment: 'Good training',
           participantHash: 'hash2',
           submittedAt: DateTime(2025, 1, 1, 12, 5),
@@ -265,7 +303,9 @@ void main() {
         TrainingFeedbackModel(
           id: 'feedback3',
           trainingSessionId: testSessionId,
-          rating: 5,
+          exercisesQuality: 5,
+          trainingIntensity: 4,
+          coachingClarity: 5,
           comment: null,
           participantHash: 'hash3',
           submittedAt: DateTime(2025, 1, 1, 12, 10),
@@ -444,7 +484,9 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
               )).thenThrow(
             FakeFirebaseFunctionsException('unauthenticated'),
           );
@@ -452,7 +494,9 @@ void main() {
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
         )),
         expect: () => [
           const SubmittingFeedback(testSessionId),
@@ -468,7 +512,9 @@ void main() {
         build: () {
           when(() => mockRepository.submitFeedback(
                 trainingSessionId: testSessionId,
-                rating: testRating,
+                exercisesQuality: testExercisesQuality,
+                trainingIntensity: testTrainingIntensity,
+                coachingClarity: testCoachingClarity,
               )).thenThrow(
             FakeFirebaseFunctionsException('not-found'),
           );
@@ -476,7 +522,9 @@ void main() {
         },
         act: (bloc) => bloc.add(const SubmitFeedback(
           trainingSessionId: testSessionId,
-          rating: testRating,
+          exercisesQuality: testExercisesQuality,
+          trainingIntensity: testTrainingIntensity,
+          coachingClarity: testCoachingClarity,
         )),
         expect: () => [
           const SubmittingFeedback(testSessionId),
