@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../domain/repositories/training_feedback_repository.dart';
 import '../models/training_feedback_model.dart';
@@ -126,18 +127,12 @@ class FirestoreTrainingFeedbackRepository
   @override
   Stream<FeedbackAggregation?> getAggregatedFeedbackStream(
       String trainingSessionId) {
-    return _getFeedbackCollection(trainingSessionId)
-        .orderBy('submittedAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-      if (snapshot.docs.isEmpty) {
+    // Calculate aggregation from individual feedback list (which uses Cloud Function)
+    // This avoids direct Firestore access and reuses the same data source
+    return getFeedbackListStream(trainingSessionId).map((feedbackList) {
+      if (feedbackList.isEmpty) {
         return FeedbackAggregation.empty(trainingSessionId);
       }
-
-      final feedbackList = snapshot.docs
-          .map((doc) =>
-              TrainingFeedbackModel.fromFirestore(doc, trainingSessionId))
-          .toList();
 
       return FeedbackAggregation.fromFeedbackList(
           trainingSessionId, feedbackList);
@@ -175,6 +170,50 @@ class FirestoreTrainingFeedbackRepository
       );
       return false;
     }
+  }
+
+  @override
+  Stream<List<TrainingFeedbackModel>> getFeedbackListStream(
+      String trainingSessionId) {
+    // Use Cloud Function to fetch feedback (validates group membership server-side)
+    // Returns a stream that fetches immediately then polls periodically
+    return Stream.periodic(const Duration(seconds: 5))
+        .startWith(0) // Emit immediately on subscription
+        .asyncMap((_) async {
+      try {
+        final callable = _functions.httpsCallable('getTrainingFeedback');
+        final result = await callable.call({
+          'trainingSessionId': trainingSessionId,
+        });
+
+        final feedbackData = result.data['feedback'] as List<dynamic>;
+
+        return feedbackData.map((item) {
+          // iOS returns Map<Object?, Object?> so we need to explicitly cast
+          final feedbackMap = Map<String, dynamic>.from(item as Map);
+          // Cloud Function returns ISO string for submittedAt, ready for model
+          return TrainingFeedbackModel.fromJson({
+            ...feedbackMap,
+            'trainingSessionId': trainingSessionId,
+            'participantHash': 'anonymous', // Hash not returned by Cloud Function
+          });
+        }).toList();
+      } catch (e) {
+        developer.log(
+          '[FirestoreTrainingFeedbackRepository] Error fetching feedback: $e',
+          name: 'training.feedback',
+          error: e,
+        );
+        return <TrainingFeedbackModel>[];
+      }
+    }).handleError((error) {
+      developer.log(
+        '[FirestoreTrainingFeedbackRepository] Error in feedback stream: $error',
+        name: 'training.feedback',
+        error: error,
+      );
+      return <TrainingFeedbackModel>[];
+    });
   }
 
   @override

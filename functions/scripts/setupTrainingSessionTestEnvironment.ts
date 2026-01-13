@@ -34,6 +34,7 @@
 import * as admin from "firebase-admin";
 import * as fs from "fs";
 import * as path from "path";
+import * as crypto from "crypto";
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
@@ -44,6 +45,19 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 const DEFAULT_PASSWORD = "test1010";
+
+// Salt for participant hash (must match Cloud Functions)
+const PARTICIPANT_HASH_SALT = process.env.PARTICIPANT_HASH_SALT || "playwithme-feedback-salt-v1";
+
+/**
+ * Generate anonymous participant hash
+ * Hash = SHA256(sessionId + userId + salt)
+ * Must match the hash generation in submitTrainingFeedback Cloud Function
+ */
+function generateParticipantHash(sessionId: string, userId: string): string {
+  const data = `${sessionId}:${userId}:${PARTICIPANT_HASH_SALT}`;
+  return crypto.createHash("sha256").update(data).digest("hex");
+}
 
 // Test user data
 const TEST_USERS = [
@@ -115,6 +129,7 @@ async function deleteTrainingSessionSubcollections(): Promise<void> {
   for (const sessionDoc of sessionsSnapshot.docs) {
     await deleteCollection(`trainingSessions/${sessionDoc.id}/participants`);
     await deleteCollection(`trainingSessions/${sessionDoc.id}/exercises`);
+    await deleteCollection(`trainingSessions/${sessionDoc.id}/feedback`);
   }
   console.log(`✅ Deleted subcollections from ${sessionsSnapshot.size} training sessions`);
 }
@@ -397,24 +412,34 @@ async function addParticipantToSession(
 // FEEDBACK CREATION LOGIC (Story 15.8)
 // ==========================================
 
+/**
+ * Add feedback to a training session
+ * Schema must match the Cloud Function (submitTrainingFeedback)
+ */
 async function addFeedbackToSession(
   sessionId: string,
   userId: string,
-  rating: number,
+  exercisesQuality: number,
+  trainingIntensity: number,
+  coachingClarity: number,
   comment: string | null
 ): Promise<void> {
+  // Generate anonymous participant hash (same as Cloud Function)
+  const participantHash = generateParticipantHash(sessionId, userId);
+
   const feedbackRef = db
     .collection("trainingSessions")
     .doc(sessionId)
     .collection("feedback")
-    .doc(userId);
+    .doc(); // Auto-generate document ID (don't use userId)
 
   await feedbackRef.set({
-    userId: userId,
-    rating: rating,
+    exercisesQuality: exercisesQuality,
+    trainingIntensity: trainingIntensity,
+    coachingClarity: coachingClarity,
     comment: comment,
-    isAnonymous: true,
-    createdAt: admin.firestore.Timestamp.now(),
+    participantHash: participantHash,
+    submittedAt: admin.firestore.Timestamp.now(),
   });
 }
 
@@ -429,39 +454,39 @@ async function addFeedbackToCompletedSessions(
 
   // Session 6 (Serving Masterclass - index 5): Multiple feedback entries
   // Participants: users[1-7]
-  await addFeedbackToSession(sessionIds[5], users[1].uid, 5, "Excellent session! Really improved my serve accuracy.");
-  await addFeedbackToSession(sessionIds[5], users[2].uid, 4, "Great drills, could use more time on topspin serves.");
-  await addFeedbackToSession(sessionIds[5], users[3].uid, 5, null); // No comment, just rating
-  await addFeedbackToSession(sessionIds[5], users[4].uid, 4, "Very helpful coach. Would love more sessions like this!");
+  await addFeedbackToSession(sessionIds[5], users[1].uid, 5, 5, 5, "Excellent session! Really improved my serve accuracy.");
+  await addFeedbackToSession(sessionIds[5], users[2].uid, 4, 4, 4, "Great drills, could use more time on topspin serves.");
+  await addFeedbackToSession(sessionIds[5], users[3].uid, 5, 4, 5, null); // No comment, just ratings
+  await addFeedbackToSession(sessionIds[5], users[4].uid, 5, 3, 5, "Very helpful coach. Would love more sessions like this!");
   // users[5], users[6], users[7] haven't submitted feedback yet
   feedbackCount += 4;
   console.log(`✅ Session 6 (Serving Masterclass): 4/7 participants submitted feedback`);
 
   // Session 7 (Game Situations - index 6): Some feedback
   // Participants: users[1], users[2], users[4], users[6], users[8]
-  await addFeedbackToSession(sessionIds[6], users[1].uid, 5, "Loved the competitive drills!");
-  await addFeedbackToSession(sessionIds[6], users[2].uid, 3, "Session was good but a bit too intense for beginners.");
-  await addFeedbackToSession(sessionIds[6], users[8].uid, 4, null);
+  await addFeedbackToSession(sessionIds[6], users[1].uid, 5, 5, 4, "Loved the competitive drills!");
+  await addFeedbackToSession(sessionIds[6], users[2].uid, 4, 5, 3, "Session was good but a bit too intense for beginners.");
+  await addFeedbackToSession(sessionIds[6], users[8].uid, 4, 4, 4, null);
   // users[4] and users[6] haven't submitted feedback
   feedbackCount += 3;
   console.log(`✅ Session 7 (Game Situations): 3/5 participants submitted feedback`);
 
   // Session 8 (Defense Workshop - index 7): Full feedback from all participants
   // Participants: users[1], users[2], users[3], users[5], users[8]
-  await addFeedbackToSession(sessionIds[7], users[1].uid, 5, "Best defensive training I've had!");
-  await addFeedbackToSession(sessionIds[7], users[2].uid, 5, "Coach explained techniques really well.");
-  await addFeedbackToSession(sessionIds[7], users[3].uid, 4, "Great session, my digging improved a lot.");
-  await addFeedbackToSession(sessionIds[7], users[5].uid, 5, null);
-  await addFeedbackToSession(sessionIds[7], users[8].uid, 4, "Very practical drills that I can use in games.");
+  await addFeedbackToSession(sessionIds[7], users[1].uid, 5, 5, 5, "Best defensive training I've had!");
+  await addFeedbackToSession(sessionIds[7], users[2].uid, 5, 4, 5, "Coach explained techniques really well.");
+  await addFeedbackToSession(sessionIds[7], users[3].uid, 4, 4, 4, "Great session, my digging improved a lot.");
+  await addFeedbackToSession(sessionIds[7], users[5].uid, 5, 5, 5, null);
+  await addFeedbackToSession(sessionIds[7], users[8].uid, 4, 4, 5, "Very practical drills that I can use in games.");
   feedbackCount += 5;
   console.log(`✅ Session 8 (Defense Workshop): 5/5 participants submitted feedback`);
 
   // Session 9 (Tournament Prep - index 8): Mixed feedback
   // Participants: users[1-9]
-  await addFeedbackToSession(sessionIds[8], users[1].uid, 5, "Perfect prep for the tournament!");
-  await addFeedbackToSession(sessionIds[8], users[3].uid, 4, "Good intensity and focus on game situations.");
-  await addFeedbackToSession(sessionIds[8], users[5].uid, 5, null);
-  await addFeedbackToSession(sessionIds[8], users[7].uid, 3, "Could have been longer, felt rushed.");
+  await addFeedbackToSession(sessionIds[8], users[1].uid, 5, 5, 5, "Perfect prep for the tournament!");
+  await addFeedbackToSession(sessionIds[8], users[3].uid, 4, 4, 4, "Good intensity and focus on game situations.");
+  await addFeedbackToSession(sessionIds[8], users[5].uid, 5, 4, 5, null);
+  await addFeedbackToSession(sessionIds[8], users[7].uid, 3, 4, 3, "Could have been longer, felt rushed.");
   // users[2], users[4], users[6], users[8], users[9] haven't submitted feedback
   feedbackCount += 4;
   console.log(`✅ Session 9 (Tournament Prep): 4/9 participants submitted feedback`);
