@@ -15,7 +15,7 @@ import '../bloc/training_session_participation/training_session_participation_bl
 import '../bloc/training_session_participation/training_session_participation_event.dart';
 import '../bloc/training_session_participation/training_session_participation_state.dart';
 import '../widgets/exercise_list_widget.dart';
-import 'training_session_feedback_page.dart';
+import '../widgets/feedback_display_widget.dart';
 
 /// Training session details page with complete functionality:
 /// - Session details display
@@ -143,7 +143,7 @@ class _TrainingSessionDetailsPageState
                         if (showFeedbackTab)
                           BlocProvider(
                             create: (context) => sl<TrainingFeedbackBloc>(),
-                            child: TrainingSessionFeedbackPage(
+                            child: FeedbackDisplayWidget(
                               trainingSessionId: widget.trainingSessionId,
                               sessionTitle: session.title,
                             ),
