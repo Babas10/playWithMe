@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/data/models/training_session_model.dart';
 import '../../../../core/data/models/user_model.dart';
-import '../../../../core/domain/repositories/training_feedback_repository.dart';
 import '../../../../core/domain/repositories/training_session_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/services/service_locator.dart';
@@ -97,7 +96,7 @@ class _TrainingSessionDetailsPageState
           final isOrganizer = _currentUserId == session.createdBy;
           final isParticipant = session.isParticipant(_currentUserId ?? '');
           final showFeedbackTab = session.status == TrainingStatus.completed && isParticipant;
-          final tabCount = showFeedbackTab ? 4 : 3;
+          final tabCount = showFeedbackTab ? 3 : 2;
 
           return Scaffold(
             appBar: AppBar(
@@ -113,7 +112,6 @@ class _TrainingSessionDetailsPageState
                   // Tabs
                   TabBar(
                     tabs: [
-                      const Tab(text: 'Details', icon: Icon(Icons.info_outline)),
                       const Tab(text: 'Participants', icon: Icon(Icons.people)),
                       const Tab(text: 'Exercises', icon: Icon(Icons.fitness_center)),
                       if (showFeedbackTab)
@@ -125,9 +123,6 @@ class _TrainingSessionDetailsPageState
                   Expanded(
                     child: TabBarView(
                       children: [
-                        // Details tab
-                        _buildDetailsTab(session),
-
                         // Participants tab
                         _buildParticipantsTab(session, isOrganizer),
 
@@ -265,7 +260,7 @@ class _TrainingSessionDetailsPageState
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withAlpha(26),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.red),
                   ),
@@ -281,6 +276,32 @@ class _TrainingSessionDetailsPageState
               ],
             ],
           ),
+
+          // Notes (if available)
+          if (session.notes != null && session.notes!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.withAlpha(26),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.withAlpha(77)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.note, size: 16, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      session.notes!,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -312,7 +333,7 @@ class _TrainingSessionDetailsPageState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(26),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color),
       ),
@@ -334,104 +355,28 @@ class _TrainingSessionDetailsPageState
     );
   }
 
-  Widget _buildDetailsTab(TrainingSessionModel session) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDetailCard(
-            'Schedule',
-            Icons.schedule,
-            [
-              _buildDetailRow('Start',
-                  DateFormat('MMM dd, yyyy • HH:mm').format(session.startTime)),
-              _buildDetailRow('End',
-                  DateFormat('MMM dd, yyyy • HH:mm').format(session.endTime)),
-              _buildDetailRow(
-                  'Duration',
-                  session.duration.inHours > 0
-                      ? '${session.duration.inHours}h ${session.duration.inMinutes.remainder(60)}min'
-                      : '${session.duration.inMinutes}min'),
-              _buildDetailRow(
-                  'Time Until',
-                  session.isPast
-                      ? 'Past'
-                      : session.getTimeUntilSession()),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildDetailCard(
-            'Location',
-            Icons.location_on,
-            [
-              _buildDetailRow('Name', session.location.name),
-              if (session.location.address != null)
-                _buildDetailRow('Address', session.location.address!),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildDetailCard(
-            'Participation',
-            Icons.people,
-            [
-              _buildDetailRow('Current', '${session.participantIds.length}'),
-              _buildDetailRow('Minimum', '${session.minParticipants}'),
-              _buildDetailRow('Maximum', '${session.maxParticipants}'),
-              _buildDetailRow('Available Spots', '${session.availableSpots}'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildDetailCard(
-            'Status',
-            Icons.info_outline,
-            [
-              _buildDetailRow('Status',
-                  session.status.toString().split('.').last.toUpperCase()),
-              _buildDetailRow(
-                  'Created', DateFormat('MMM dd, yyyy').format(session.createdAt)),
-              if (session.updatedAt != null)
-                _buildDetailRow('Updated',
-                    DateFormat('MMM dd, yyyy').format(session.updatedAt!)),
-            ],
-          ),
-          // Feedback summary card (only for completed sessions with feedback)
-          if (session.status == TrainingStatus.completed)
-            _buildFeedbackSummaryCard(session.id),
-          if (session.notes != null && session.notes!.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            _buildDetailCard(
-              'Notes',
-              Icons.note,
-              [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(session.notes!),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
   Widget _buildParticipantsTab(TrainingSessionModel session, bool isOrganizer) {
     if (session.participantIds.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.people_outline, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text(
+            const Icon(Icons.people_outline, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            const Text(
               'No participants yet',
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               'Be the first to join!',
               style: TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 24),
+            // Show participation info even when empty
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: _buildParticipationInfoCard(session),
             ),
           ],
         ),
@@ -467,9 +412,19 @@ class _TrainingSessionDetailsPageState
 
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: participants.length,
+          itemCount: participants.length + 1, // +1 for participation info card
           itemBuilder: (context, index) {
-            final participant = participants[index];
+            // First item is the participation info card
+            if (index == 0) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _buildParticipationInfoCard(session),
+              );
+            }
+
+            // Adjust index for participant list
+            final participantIndex = index - 1;
+            final participant = participants[participantIndex];
             final isOrg = participant.uid == session.createdBy;
 
             return Card(
@@ -508,7 +463,7 @@ class _TrainingSessionDetailsPageState
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withAlpha(26),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.blue),
                         ),
@@ -527,6 +482,56 @@ class _TrainingSessionDetailsPageState
           },
         );
       },
+    );
+  }
+
+  Widget _buildParticipationInfoCard(TrainingSessionModel session) {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.people, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Participation',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const Divider(),
+            _buildParticipationRow('Current', '${session.participantIds.length}'),
+            _buildParticipationRow('Minimum', '${session.minParticipants}'),
+            _buildParticipationRow('Maximum', '${session.maxParticipants}'),
+            _buildParticipationRow('Available Spots', '${session.availableSpots}'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParticipationRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(color: Colors.grey),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
     );
   }
 
@@ -692,192 +697,4 @@ class _TrainingSessionDetailsPageState
     );
   }
 
-  Widget _buildFeedbackSummaryCard(String sessionId) {
-    return FutureBuilder<FeedbackAggregation?>(
-      future: sl<TrainingFeedbackRepository>().getAggregatedFeedback(sessionId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox.shrink();
-        }
-
-        final aggregation = snapshot.data;
-
-        // Only show if there's feedback
-        if (aggregation == null || !aggregation.hasFeedback) {
-          return const SizedBox.shrink();
-        }
-
-        return Column(
-          children: [
-            const SizedBox(height: 16),
-            _buildDetailCard(
-              '💬 Session Feedback',
-              Icons.sports_volleyball,
-              [
-                // Response count
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${aggregation.totalCount} ${aggregation.totalCount == 1 ? 'response' : 'responses'}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Exercises Quality
-                _buildRatingSection(
-                  context,
-                  'Exercises Quality',
-                  aggregation.roundedAverageExercises,
-                ),
-                const SizedBox(height: 16),
-
-                // Training Intensity
-                _buildRatingSection(
-                  context,
-                  'Training Intensity',
-                  aggregation.roundedAverageIntensity,
-                ),
-                const SizedBox(height: 16),
-
-                // Coaching Clarity
-                _buildRatingSection(
-                  context,
-                  'Coaching Clarity',
-                  aggregation.roundedAverageCoaching,
-                ),
-
-                // Comments count
-                if (aggregation.comments.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.comment, size: 16),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${aggregation.comments.length} ${aggregation.comments.length == 1 ? 'comment' : 'comments'}',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildRatingSection(
-    BuildContext context,
-    String label,
-    double averageRating,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const Spacer(),
-            Text(
-              averageRating.toStringAsFixed(1),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.sports_volleyball,
-              size: 24,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        // Icon rating bar
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: LinearProgressIndicator(
-            value: averageRating / 5,
-            minHeight: 12,
-            backgroundColor: Colors.grey[300],
-            valueColor: AlwaysStoppedAnimation<Color>(
-              Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Needs work', style: Theme.of(context).textTheme.bodySmall),
-            Text('Top-level', style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDetailCard(String title, IconData icon, List<Widget> children) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const Divider(),
-            ...children,
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(color: Colors.grey),
-          ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
