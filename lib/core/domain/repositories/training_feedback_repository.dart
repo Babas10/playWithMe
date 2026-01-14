@@ -52,6 +52,13 @@ abstract class TrainingFeedbackRepository {
   /// Uses Cloud Function to check without exposing individual feedback
   Future<bool> hasUserSubmittedFeedback(String trainingSessionId);
 
+  /// Get list of individual feedback entries for a training session
+  ///
+  /// Returns all feedback entries sorted by submission time (most recent first)
+  /// Note: All feedback is anonymous - no user information is exposed
+  Stream<List<TrainingFeedbackModel>> getFeedbackListStream(
+      String trainingSessionId);
+
   /// Delete all feedback for a training session
   ///
   /// Only the session creator can delete all feedback
