@@ -23,6 +23,7 @@ class TrainingSessionParticipationBloc extends Bloc<
     on<LoadParticipants>(_onLoadParticipants);
     on<JoinTrainingSession>(_onJoinTrainingSession);
     on<LeaveTrainingSession>(_onLeaveTrainingSession);
+    on<CancelTrainingSession>(_onCancelTrainingSession);
     on<_ParticipantsUpdated>(_onParticipantsUpdated);
     on<_ParticipantsError>(_onParticipantsError);
   }
@@ -143,6 +144,43 @@ class TrainingSessionParticipationBloc extends Bloc<
     }
   }
 
+  /// Handles cancellation of a training session (Story 15.14)
+  /// Only the session creator can cancel
+  Future<void> _onCancelTrainingSession(
+    CancelTrainingSession event,
+    Emitter<TrainingSessionParticipationState> emit,
+  ) async {
+    emit(CancellingSession(event.sessionId));
+
+    try {
+      await _trainingSessionRepository.cancelTrainingSession(event.sessionId);
+
+      emit(CancelledSession(sessionId: event.sessionId));
+    } on FirebaseFunctionsException catch (e) {
+      emit(ParticipationError(
+        message: _getCancelErrorMessage(e),
+        errorCode: e.code,
+      ));
+    } on FirebaseException catch (e) {
+      emit(ParticipationError(
+        message: _getFirestoreErrorMessage(e),
+        errorCode: e.code,
+      ));
+    } catch (e) {
+      // Extract message from Exception if available
+      String errorMessage = e.toString();
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring('Exception: '.length);
+      }
+      // Use extracted message if it's meaningful, otherwise use fallback
+      final message = errorMessage.isNotEmpty &&
+              !errorMessage.contains('Instance of')
+          ? errorMessage
+          : 'Failed to cancel training session. Please try again.';
+      emit(ParticipationError(message: message));
+    }
+  }
+
   /// Internal event to handle participants stream updates
   void _onParticipantsUpdated(
     _ParticipantsUpdated event,
@@ -178,6 +216,24 @@ class TrainingSessionParticipationBloc extends Bloc<
         return 'You have already joined this training session';
       case 'failed-precondition':
         return e.message ?? 'Cannot complete this action';
+      case 'internal':
+        return 'An error occurred. Please try again later';
+      default:
+        return e.message ?? 'An unexpected error occurred';
+    }
+  }
+
+  /// Get friendly error message for cancel operation (Story 15.14)
+  String _getCancelErrorMessage(FirebaseFunctionsException e) {
+    switch (e.code) {
+      case 'unauthenticated':
+        return 'You must be logged in to cancel a training session';
+      case 'permission-denied':
+        return 'Only the session creator can cancel this training session';
+      case 'not-found':
+        return 'Training session not found';
+      case 'failed-precondition':
+        return e.message ?? 'Cannot cancel this training session';
       case 'internal':
         return 'An error occurred. Please try again later';
       default:

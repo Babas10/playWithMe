@@ -38,3 +38,14 @@ class LeaveTrainingSession extends TrainingSessionParticipationEvent {
   @override
   List<Object?> get props => [sessionId];
 }
+
+/// Event to cancel a training session (Story 15.14)
+/// Only the session creator can cancel
+class CancelTrainingSession extends TrainingSessionParticipationEvent {
+  final String sessionId;
+
+  const CancelTrainingSession(this.sessionId);
+
+  @override
+  List<Object?> get props => [sessionId];
+}

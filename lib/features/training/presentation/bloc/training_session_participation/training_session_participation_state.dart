@@ -83,6 +83,30 @@ class LeftSession extends TrainingSessionParticipationState {
   List<Object?> get props => [sessionId, message];
 }
 
+/// State when the session is being cancelled (Story 15.14)
+class CancellingSession extends TrainingSessionParticipationState {
+  final String sessionId;
+
+  const CancellingSession(this.sessionId);
+
+  @override
+  List<Object?> get props => [sessionId];
+}
+
+/// State when session has been successfully cancelled (Story 15.14)
+class CancelledSession extends TrainingSessionParticipationState {
+  final String sessionId;
+  final String message;
+
+  const CancelledSession({
+    required this.sessionId,
+    this.message = 'Training session cancelled successfully',
+  });
+
+  @override
+  List<Object?> get props => [sessionId, message];
+}
+
 /// State when an error occurs during participation operations
 class ParticipationError extends TrainingSessionParticipationState {
   final String message;

@@ -121,9 +121,18 @@ abstract class TrainingSessionRepository {
   @Deprecated('Use leaveTrainingSession() instead for atomic operations')
   Future<void> removeParticipant(String sessionId, String userId);
 
-  /// Cancel training session
+  /// Cancel training session (via Cloud Function for permission validation)
   ///
-  /// Only the creator can cancel a training session
+  /// Uses Cloud Function to:
+  /// - Validate user is authenticated
+  /// - Validate user is the session creator (permission check)
+  /// - Set status to 'cancelled' with cancelledBy and cancelledAt tracking
+  ///
+  /// Throws:
+  /// - [Exception] if user is not authenticated
+  /// - [Exception] if user is not the session creator
+  /// - [Exception] if session is already cancelled or completed
+  /// - [Exception] if session not found
   Future<void> cancelTrainingSession(String sessionId);
 
   /// Complete training session

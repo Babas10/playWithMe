@@ -46,7 +46,11 @@ mixin _$TrainingSessionModel {
       throw _privateConstructorUsedError; // Participant tracking
   List<String> get participantIds =>
       throw _privateConstructorUsedError; // Session notes
-  String? get notes => throw _privateConstructorUsedError;
+  String? get notes =>
+      throw _privateConstructorUsedError; // Cancellation tracking (Story 15.14)
+  String? get cancelledBy => throw _privateConstructorUsedError;
+  @TimestampConverter()
+  DateTime? get cancelledAt => throw _privateConstructorUsedError;
 
   /// Serializes this TrainingSessionModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -83,6 +87,8 @@ abstract class $TrainingSessionModelCopyWith<$Res> {
     TrainingStatus status,
     List<String> participantIds,
     String? notes,
+    String? cancelledBy,
+    @TimestampConverter() DateTime? cancelledAt,
   });
 
   $GameLocationCopyWith<$Res> get location;
@@ -124,6 +130,8 @@ class _$TrainingSessionModelCopyWithImpl<
     Object? status = null,
     Object? participantIds = null,
     Object? notes = freezed,
+    Object? cancelledBy = freezed,
+    Object? cancelledAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -195,6 +203,14 @@ class _$TrainingSessionModelCopyWithImpl<
                 ? _value.notes
                 : notes // ignore: cast_nullable_to_non_nullable
                       as String?,
+            cancelledBy: freezed == cancelledBy
+                ? _value.cancelledBy
+                : cancelledBy // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            cancelledAt: freezed == cancelledAt
+                ? _value.cancelledAt
+                : cancelledAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
@@ -252,6 +268,8 @@ abstract class _$$TrainingSessionModelImplCopyWith<$Res>
     TrainingStatus status,
     List<String> participantIds,
     String? notes,
+    String? cancelledBy,
+    @TimestampConverter() DateTime? cancelledAt,
   });
 
   @override
@@ -291,6 +309,8 @@ class __$$TrainingSessionModelImplCopyWithImpl<$Res>
     Object? status = null,
     Object? participantIds = null,
     Object? notes = freezed,
+    Object? cancelledBy = freezed,
+    Object? cancelledAt = freezed,
   }) {
     return _then(
       _$TrainingSessionModelImpl(
@@ -362,6 +382,14 @@ class __$$TrainingSessionModelImplCopyWithImpl<$Res>
             ? _value.notes
             : notes // ignore: cast_nullable_to_non_nullable
                   as String?,
+        cancelledBy: freezed == cancelledBy
+            ? _value.cancelledBy
+            : cancelledBy // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        cancelledAt: freezed == cancelledAt
+            ? _value.cancelledAt
+            : cancelledAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -388,6 +416,8 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
     this.status = TrainingStatus.scheduled,
     final List<String> participantIds = const [],
     this.notes,
+    this.cancelledBy,
+    @TimestampConverter() this.cancelledAt,
   }) : _participantIds = participantIds,
        super._();
 
@@ -447,10 +477,16 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
   // Session notes
   @override
   final String? notes;
+  // Cancellation tracking (Story 15.14)
+  @override
+  final String? cancelledBy;
+  @override
+  @TimestampConverter()
+  final DateTime? cancelledAt;
 
   @override
   String toString() {
-    return 'TrainingSessionModel(id: $id, groupId: $groupId, title: $title, description: $description, location: $location, startTime: $startTime, endTime: $endTime, minParticipants: $minParticipants, maxParticipants: $maxParticipants, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, recurrenceRule: $recurrenceRule, parentSessionId: $parentSessionId, status: $status, participantIds: $participantIds, notes: $notes)';
+    return 'TrainingSessionModel(id: $id, groupId: $groupId, title: $title, description: $description, location: $location, startTime: $startTime, endTime: $endTime, minParticipants: $minParticipants, maxParticipants: $maxParticipants, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, recurrenceRule: $recurrenceRule, parentSessionId: $parentSessionId, status: $status, participantIds: $participantIds, notes: $notes, cancelledBy: $cancelledBy, cancelledAt: $cancelledAt)';
   }
 
   @override
@@ -487,12 +523,16 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
               other._participantIds,
               _participantIds,
             ) &&
-            (identical(other.notes, notes) || other.notes == notes));
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.cancelledBy, cancelledBy) ||
+                other.cancelledBy == cancelledBy) &&
+            (identical(other.cancelledAt, cancelledAt) ||
+                other.cancelledAt == cancelledAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     id,
     groupId,
@@ -511,7 +551,9 @@ class _$TrainingSessionModelImpl extends _TrainingSessionModel {
     status,
     const DeepCollectionEquality().hash(_participantIds),
     notes,
-  );
+    cancelledBy,
+    cancelledAt,
+  ]);
 
   /// Create a copy of TrainingSessionModel
   /// with the given fields replaced by the non-null parameter values.
@@ -550,6 +592,8 @@ abstract class _TrainingSessionModel extends TrainingSessionModel {
     final TrainingStatus status,
     final List<String> participantIds,
     final String? notes,
+    final String? cancelledBy,
+    @TimestampConverter() final DateTime? cancelledAt,
   }) = _$TrainingSessionModelImpl;
   const _TrainingSessionModel._() : super._();
 
@@ -594,7 +638,12 @@ abstract class _TrainingSessionModel extends TrainingSessionModel {
   @override
   List<String> get participantIds; // Session notes
   @override
-  String? get notes;
+  String? get notes; // Cancellation tracking (Story 15.14)
+  @override
+  String? get cancelledBy;
+  @override
+  @TimestampConverter()
+  DateTime? get cancelledAt;
 
   /// Create a copy of TrainingSessionModel
   /// with the given fields replaced by the non-null parameter values.

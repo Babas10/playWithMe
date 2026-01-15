@@ -25,6 +25,7 @@ export {createTrainingSession} from "./createTrainingSession"; // Story 15.1 (Ep
 export {generateRecurringTrainingSessions} from "./generateRecurringTrainingSessions"; // Story 15.2 (Recurring Training Sessions)
 export {joinTrainingSession} from "./joinTrainingSession"; // Story 15.3 (Join Training Session)
 export {leaveTrainingSession} from "./leaveTrainingSession"; // Story 15.3 (Leave Training Session)
+export {cancelTrainingSession} from "./cancelTrainingSession"; // Story 15.14 (Cancel Training Session)
 export {submitTrainingFeedback} from "./submitTrainingFeedback"; // Story 15.8 (Anonymous Feedback)
 export {hasSubmittedTrainingFeedback} from "./hasSubmittedTrainingFeedback"; // Story 15.8 (Anonymous Feedback)
 export {getTrainingFeedback} from "./getTrainingFeedback"; // Story 15.11 (Display Feedback)

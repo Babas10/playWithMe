@@ -97,10 +97,63 @@ class _TrainingSessionDetailsPageState
           final isParticipant = session.isParticipant(_currentUserId ?? '');
           final showFeedbackTab = session.status == TrainingStatus.completed && isParticipant;
           final tabCount = showFeedbackTab ? 3 : 2;
+          final canCancel = session.canUserCancel(_currentUserId ?? '');
 
           return Scaffold(
             appBar: AppBar(
               title: Text(session.title),
+              actions: [
+                // Cancel button only visible to organizer for scheduled sessions
+                if (canCancel)
+                  BlocConsumer<TrainingSessionParticipationBloc,
+                      TrainingSessionParticipationState>(
+                    listener: (context, state) {
+                      if (state is CancelledSession) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Training session cancelled'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                        // Navigate back after cancellation
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    builder: (context, state) {
+                      final isCancelling = state is CancellingSession;
+                      return PopupMenuButton<String>(
+                        enabled: !isCancelling,
+                        icon: isCancelling
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.more_vert),
+                        onSelected: (value) {
+                          if (value == 'cancel') {
+                            _showCancelConfirmation(context, session);
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          const PopupMenuItem<String>(
+                            value: 'cancel',
+                            child: Row(
+                              children: [
+                                Icon(Icons.cancel, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Cancel Session',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+              ],
             ),
             body: DefaultTabController(
               length: tabCount,
@@ -697,4 +750,36 @@ class _TrainingSessionDetailsPageState
     );
   }
 
+  /// Show confirmation dialog before cancelling a training session (Story 15.14)
+  void _showCancelConfirmation(
+      BuildContext context, TrainingSessionModel session) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cancel Training Session?'),
+        content: Text(
+          'Are you sure you want to cancel "${session.title}"?\n\n'
+          'All participants will be notified.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Keep Session'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              context.read<TrainingSessionParticipationBloc>().add(
+                    CancelTrainingSession(widget.trainingSessionId),
+                  );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('Cancel Session'),
+          ),
+        ],
+      ),
+    );
+  }
 }

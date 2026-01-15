@@ -375,6 +375,190 @@ void main() {
       );
     });
 
+    // Story 15.14: Cancel Training Session tests
+    group('CancelTrainingSession', () {
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, CancelledSession] when cancel succeeds',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenAnswer((_) async => {});
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const CancelledSession(sessionId: testSessionId),
+        ],
+        verify: (_) {
+          verify(() => mockRepository.cancelTrainingSession(testSessionId))
+              .called(1);
+        },
+      );
+
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, ParticipationError] when cancel fails with unauthenticated error',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenThrow(FakeFirebaseFunctionsException(
+            'unauthenticated',
+            'Not authenticated',
+          ));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const ParticipationError(
+            message: 'You must be logged in to cancel a training session',
+            errorCode: 'unauthenticated',
+          ),
+        ],
+      );
+
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, ParticipationError] when cancel fails with permission-denied error',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenThrow(FakeFirebaseFunctionsException(
+            'permission-denied',
+            'Only creator can cancel',
+          ));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const ParticipationError(
+            message: 'Only the session creator can cancel this training session',
+            errorCode: 'permission-denied',
+          ),
+        ],
+      );
+
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, ParticipationError] when cancel fails with not-found error',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenThrow(FakeFirebaseFunctionsException(
+            'not-found',
+            'Session not found',
+          ));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const ParticipationError(
+            message: 'Training session not found',
+            errorCode: 'not-found',
+          ),
+        ],
+      );
+
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, ParticipationError] when cancel fails with failed-precondition (already cancelled)',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenThrow(FakeFirebaseFunctionsException(
+            'failed-precondition',
+            'This training session is already cancelled',
+          ));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const ParticipationError(
+            message: 'This training session is already cancelled',
+            errorCode: 'failed-precondition',
+          ),
+        ],
+      );
+
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, ParticipationError] when cancel fails with failed-precondition (completed)',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenThrow(FakeFirebaseFunctionsException(
+            'failed-precondition',
+            'Cannot cancel a completed training session',
+          ));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const ParticipationError(
+            message: 'Cannot cancel a completed training session',
+            errorCode: 'failed-precondition',
+          ),
+        ],
+      );
+
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, ParticipationError] when cancel fails with internal error',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenThrow(FakeFirebaseFunctionsException(
+            'internal',
+            'Server error',
+          ));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const ParticipationError(
+            message: 'An error occurred. Please try again later',
+            errorCode: 'internal',
+          ),
+        ],
+      );
+
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, ParticipationError] when cancel fails with Firestore error',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenThrow(
+                  FakeFirebaseException('unavailable', 'Service unavailable'));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const ParticipationError(
+            message: 'Service temporarily unavailable. Please try again',
+            errorCode: 'unavailable',
+          ),
+        ],
+      );
+
+      blocTest<TrainingSessionParticipationBloc,
+          TrainingSessionParticipationState>(
+        'emits [CancellingSession, ParticipationError] when cancel fails with generic error',
+        build: () {
+          when(() => mockRepository.cancelTrainingSession(testSessionId))
+              .thenThrow(Exception('Unknown error'));
+          return bloc;
+        },
+        act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
+        expect: () => [
+          const CancellingSession(testSessionId),
+          const ParticipationError(
+            message: 'Unknown error',
+          ),
+        ],
+      );
+    });
+
     group('Error handling', () {
       blocTest<TrainingSessionParticipationBloc,
           TrainingSessionParticipationState>(
