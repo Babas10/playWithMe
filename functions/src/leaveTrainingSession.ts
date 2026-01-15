@@ -110,13 +110,18 @@ export const leaveTrainingSession = functions.https.onCall(
 
     try {
       const result = await db.runTransaction(async (transaction) => {
-        // Check if user is currently a participant
+        // IMPORTANT: In Firestore transactions, ALL reads must happen BEFORE any writes
+
+        // 1. Define all document references
         const participantRef = db
           .collection("trainingSessions")
           .doc(data.sessionId)
           .collection("participants")
           .doc(userId);
 
+        const sessionRef = db.collection("trainingSessions").doc(data.sessionId);
+
+        // 2. Perform ALL reads first
         const participantDoc = await transaction.get(participantRef);
 
         if (!participantDoc.exists) {
@@ -134,13 +139,7 @@ export const leaveTrainingSession = functions.https.onCall(
           );
         }
 
-        // Update participant status to 'left'
-        transaction.update(participantRef, {
-          status: "left",
-        });
-
-        // Update denormalized participantIds array in session document
-        // Get all current participants with 'joined' status
+        // Get all current participants with 'joined' status (READ before writes)
         const participantsSnapshot = await transaction.get(
           db
             .collection("trainingSessions")
@@ -149,13 +148,18 @@ export const leaveTrainingSession = functions.https.onCall(
             .where("status", "==", "joined")
         );
 
-        // Filter out the leaving user
+        // Calculate remaining participants (excluding the leaving user)
         const remainingParticipantIds = participantsSnapshot.docs
           .map((doc) => doc.id)
           .filter((id) => id !== userId);
 
-        const sessionRef = db.collection("trainingSessions").doc(data.sessionId);
+        // 3. Now perform ALL writes
+        // Update participant status to 'left'
+        transaction.update(participantRef, {
+          status: "left",
+        });
 
+        // Update denormalized participantIds array in session document
         transaction.update(sessionRef, {
           participantIds: remainingParticipantIds,
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
