@@ -91,9 +91,17 @@ class TrainingSessionParticipationBloc extends Bloc<
         errorCode: e.code,
       ));
     } catch (e) {
-      emit(ParticipationError(
-        message: 'Failed to join training session. Please try again.',
-      ));
+      // Extract message from Exception if available
+      String errorMessage = e.toString();
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring('Exception: '.length);
+      }
+      // Use extracted message if it's meaningful, otherwise use fallback
+      final message = errorMessage.isNotEmpty &&
+              !errorMessage.contains('Instance of')
+          ? errorMessage
+          : 'Failed to join training session. Please try again.';
+      emit(ParticipationError(message: message));
     }
   }
 
@@ -121,9 +129,17 @@ class TrainingSessionParticipationBloc extends Bloc<
         errorCode: e.code,
       ));
     } catch (e) {
-      emit(ParticipationError(
-        message: 'Failed to leave training session. Please try again.',
-      ));
+      // Extract message from Exception if available
+      String errorMessage = e.toString();
+      if (errorMessage.startsWith('Exception: ')) {
+        errorMessage = errorMessage.substring('Exception: '.length);
+      }
+      // Use extracted message if it's meaningful, otherwise use fallback
+      final message = errorMessage.isNotEmpty &&
+              !errorMessage.contains('Instance of')
+          ? errorMessage
+          : 'Failed to leave training session. Please try again.';
+      emit(ParticipationError(message: message));
     }
   }
 
