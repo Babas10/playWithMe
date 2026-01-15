@@ -154,6 +154,13 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
       if (errorMessage.startsWith('Exception: ')) {
         errorMessage = errorMessage.substring('Exception: '.length);
       }
+
+      // Ensure we show a group-specific error message
+      // This prevents confusion with other features (e.g., training sessions)
+      if (!errorMessage.toLowerCase().contains('group')) {
+        errorMessage = 'Failed to leave group. Please try again.';
+      }
+
       emit(GroupMemberError(errorMessage));
     }
   }

@@ -543,7 +543,47 @@ void main() {
       )),
       expect: () => [
         const GroupMemberLoading(),
-        const GroupMemberError('Network error'),
+        // Bug fix #373: Error messages not containing "group" are replaced
+        // with a user-friendly group-specific message
+        const GroupMemberError('Failed to leave group. Please try again.'),
+      ],
+    );
+
+    // Bug fix #373: Ensure wrong context error messages are replaced
+    blocTest<GroupMemberBloc, GroupMemberState>(
+      'replaces non-group error messages with group-specific message',
+      build: () {
+        // Simulates a scenario where wrong error message is propagated
+        when(() => mockGroupRepository.leaveGroup('group1'))
+            .thenThrow(Exception('Failed to leave training session'));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const LeaveGroup(
+        groupId: 'group1',
+        userId: 'user1',
+      )),
+      expect: () => [
+        const GroupMemberLoading(),
+        // Should show group-specific error, not training session error
+        const GroupMemberError('Failed to leave group. Please try again.'),
+      ],
+    );
+
+    blocTest<GroupMemberBloc, GroupMemberState>(
+      'preserves group-related error messages',
+      build: () {
+        when(() => mockGroupRepository.leaveGroup('group1'))
+            .thenThrow(Exception('Failed to leave group: connection timeout'));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const LeaveGroup(
+        groupId: 'group1',
+        userId: 'user1',
+      )),
+      expect: () => [
+        const GroupMemberLoading(),
+        // Group-related error messages should be preserved
+        const GroupMemberError('Failed to leave group: connection timeout'),
       ],
     );
   });
