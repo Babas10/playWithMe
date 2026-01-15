@@ -36,6 +36,9 @@ class TrainingSessionModel with _$TrainingSessionModel {
     @Default([]) List<String> participantIds,
     // Session notes
     String? notes,
+    // Cancellation tracking (Story 15.14)
+    String? cancelledBy,
+    @TimestampConverter() DateTime? cancelledAt,
   }) = _TrainingSessionModel;
 
   const TrainingSessionModel._();
@@ -66,6 +69,10 @@ class TrainingSessionModel with _$TrainingSessionModel {
       jsonData['updatedAt'] =
           (data['updatedAt'] as Timestamp).toDate().toIso8601String();
     }
+    if (data['cancelledAt'] is Timestamp) {
+      jsonData['cancelledAt'] =
+          (data['cancelledAt'] as Timestamp).toDate().toIso8601String();
+    }
 
     return TrainingSessionModel.fromJson({
       ...jsonData,
@@ -90,6 +97,9 @@ class TrainingSessionModel with _$TrainingSessionModel {
     }
     if (updatedAt != null && json['updatedAt'] is String) {
       json['updatedAt'] = Timestamp.fromDate(updatedAt!);
+    }
+    if (cancelledAt != null && json['cancelledAt'] is String) {
+      json['cancelledAt'] = Timestamp.fromDate(cancelledAt!);
     }
 
     // Ensure location is properly serialized
@@ -222,12 +232,25 @@ class TrainingSessionModel with _$TrainingSessionModel {
   }
 
   /// Cancel the training session
-  TrainingSessionModel cancelSession() {
+  /// [userId] is the ID of the user who cancelled the session (optional for tracking)
+  /// When cancelled automatically by the system (e.g., due to insufficient participants),
+  /// userId can be omitted and cancelledBy will be null.
+  TrainingSessionModel cancelSession([String? userId]) {
     if (status == TrainingStatus.completed) return this;
+    if (status == TrainingStatus.cancelled) return this;
+    final now = DateTime.now();
     return copyWith(
       status: TrainingStatus.cancelled,
-      updatedAt: DateTime.now(),
+      cancelledBy: userId,
+      cancelledAt: now,
+      updatedAt: now,
     );
+  }
+
+  /// Check if user can cancel the training session
+  /// Only the creator can cancel and only if the session is scheduled
+  bool canUserCancel(String userId) {
+    return isCreator(userId) && status == TrainingStatus.scheduled;
   }
 
   /// Complete the training session

@@ -381,17 +381,27 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
   @override
   Future<void> cancelTrainingSession(String sessionId) async {
     try {
-      final currentSession = await getTrainingSessionById(sessionId);
-      if (currentSession == null) {
-        throw Exception('Training session not found');
+      // Call Cloud Function for cancel operation with permission validation
+      final callable = _functions.httpsCallable('cancelTrainingSession');
+
+      await callable.call<Map<String, dynamic>>({
+        'sessionId': sessionId,
+      });
+    } on FirebaseFunctionsException catch (e) {
+      // Handle specific Cloud Function errors with user-friendly messages
+      switch (e.code) {
+        case 'unauthenticated':
+          throw Exception('You must be logged in to cancel a training session');
+        case 'permission-denied':
+          throw Exception(
+              'Only the session creator can cancel this training session');
+        case 'not-found':
+          throw Exception('Training session not found');
+        case 'failed-precondition':
+          throw Exception(e.message ?? 'Cannot cancel this training session');
+        default:
+          throw Exception('Failed to cancel training session: ${e.message}');
       }
-
-      final updatedSession = currentSession.cancelSession();
-
-      await _firestore
-          .collection(_collection)
-          .doc(sessionId)
-          .set(updatedSession.toFirestore(), SetOptions(merge: true));
     } catch (e) {
       throw Exception('Failed to cancel training session: $e');
     }

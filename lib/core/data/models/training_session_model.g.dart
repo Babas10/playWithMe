@@ -36,6 +36,8 @@ _$TrainingSessionModelImpl _$$TrainingSessionModelImplFromJson(
           .toList() ??
       const [],
   notes: json['notes'] as String?,
+  cancelledBy: json['cancelledBy'] as String?,
+  cancelledAt: const TimestampConverter().fromJson(json['cancelledAt']),
 );
 
 Map<String, dynamic> _$$TrainingSessionModelImplToJson(
@@ -58,6 +60,8 @@ Map<String, dynamic> _$$TrainingSessionModelImplToJson(
   'status': _$TrainingStatusEnumMap[instance.status]!,
   'participantIds': instance.participantIds,
   'notes': instance.notes,
+  'cancelledBy': instance.cancelledBy,
+  'cancelledAt': const TimestampConverter().toJson(instance.cancelledAt),
 };
 
 const _$TrainingStatusEnumMap = {
