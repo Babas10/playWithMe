@@ -258,8 +258,9 @@ void main() {
         act: (bloc) => bloc.add(const JoinTrainingSession(testSessionId)),
         expect: () => [
           const JoiningSession(testSessionId),
+          // Now correctly extracts the exception message
           const ParticipationError(
-            message: 'Failed to join training session. Please try again.',
+            message: 'Unknown error',
           ),
         ],
       );
@@ -366,8 +367,9 @@ void main() {
         act: (bloc) => bloc.add(const LeaveTrainingSession(testSessionId)),
         expect: () => [
           const LeavingSession(testSessionId),
+          // Now correctly extracts the exception message
           const ParticipationError(
-            message: 'Failed to leave training session. Please try again.',
+            message: 'Unknown error',
           ),
         ],
       );
