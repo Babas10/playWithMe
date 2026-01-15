@@ -35,7 +35,12 @@ mixin _$NotificationPreferencesEntity {
   bool get quietHoursEnabled => throw _privateConstructorUsedError;
   String? get quietHoursStart => throw _privateConstructorUsedError;
   String? get quietHoursEnd => throw _privateConstructorUsedError;
-  Map<String, bool> get groupSpecific => throw _privateConstructorUsedError;
+  Map<String, bool> get groupSpecific =>
+      throw _privateConstructorUsedError; // Training session notification preferences (Story 15.13)
+  bool get trainingSessionCreated => throw _privateConstructorUsedError;
+  bool get trainingMinParticipantsReached => throw _privateConstructorUsedError;
+  bool get trainingFeedbackReceived => throw _privateConstructorUsedError;
+  bool get trainingSessionCancelled => throw _privateConstructorUsedError;
 
   /// Serializes this NotificationPreferencesEntity to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -72,6 +77,10 @@ abstract class $NotificationPreferencesEntityCopyWith<$Res> {
     String? quietHoursStart,
     String? quietHoursEnd,
     Map<String, bool> groupSpecific,
+    bool trainingSessionCreated,
+    bool trainingMinParticipantsReached,
+    bool trainingFeedbackReceived,
+    bool trainingSessionCancelled,
   });
 }
 
@@ -106,6 +115,10 @@ class _$NotificationPreferencesEntityCopyWithImpl<
     Object? quietHoursStart = freezed,
     Object? quietHoursEnd = freezed,
     Object? groupSpecific = null,
+    Object? trainingSessionCreated = null,
+    Object? trainingMinParticipantsReached = null,
+    Object? trainingFeedbackReceived = null,
+    Object? trainingSessionCancelled = null,
   }) {
     return _then(
       _value.copyWith(
@@ -161,6 +174,23 @@ class _$NotificationPreferencesEntityCopyWithImpl<
                 ? _value.groupSpecific
                 : groupSpecific // ignore: cast_nullable_to_non_nullable
                       as Map<String, bool>,
+            trainingSessionCreated: null == trainingSessionCreated
+                ? _value.trainingSessionCreated
+                : trainingSessionCreated // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            trainingMinParticipantsReached:
+                null == trainingMinParticipantsReached
+                ? _value.trainingMinParticipantsReached
+                : trainingMinParticipantsReached // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            trainingFeedbackReceived: null == trainingFeedbackReceived
+                ? _value.trainingFeedbackReceived
+                : trainingFeedbackReceived // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            trainingSessionCancelled: null == trainingSessionCancelled
+                ? _value.trainingSessionCancelled
+                : trainingSessionCancelled // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -190,6 +220,10 @@ abstract class _$$NotificationPreferencesEntityImplCopyWith<$Res>
     String? quietHoursStart,
     String? quietHoursEnd,
     Map<String, bool> groupSpecific,
+    bool trainingSessionCreated,
+    bool trainingMinParticipantsReached,
+    bool trainingFeedbackReceived,
+    bool trainingSessionCancelled,
   });
 }
 
@@ -224,6 +258,10 @@ class __$$NotificationPreferencesEntityImplCopyWithImpl<$Res>
     Object? quietHoursStart = freezed,
     Object? quietHoursEnd = freezed,
     Object? groupSpecific = null,
+    Object? trainingSessionCreated = null,
+    Object? trainingMinParticipantsReached = null,
+    Object? trainingFeedbackReceived = null,
+    Object? trainingSessionCancelled = null,
   }) {
     return _then(
       _$NotificationPreferencesEntityImpl(
@@ -279,6 +317,22 @@ class __$$NotificationPreferencesEntityImplCopyWithImpl<$Res>
             ? _value._groupSpecific
             : groupSpecific // ignore: cast_nullable_to_non_nullable
                   as Map<String, bool>,
+        trainingSessionCreated: null == trainingSessionCreated
+            ? _value.trainingSessionCreated
+            : trainingSessionCreated // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        trainingMinParticipantsReached: null == trainingMinParticipantsReached
+            ? _value.trainingMinParticipantsReached
+            : trainingMinParticipantsReached // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        trainingFeedbackReceived: null == trainingFeedbackReceived
+            ? _value.trainingFeedbackReceived
+            : trainingFeedbackReceived // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        trainingSessionCancelled: null == trainingSessionCancelled
+            ? _value.trainingSessionCancelled
+            : trainingSessionCancelled // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -302,6 +356,10 @@ class _$NotificationPreferencesEntityImpl
     this.quietHoursStart,
     this.quietHoursEnd,
     final Map<String, bool> groupSpecific = const {},
+    this.trainingSessionCreated = true,
+    this.trainingMinParticipantsReached = true,
+    this.trainingFeedbackReceived = true,
+    this.trainingSessionCancelled = true,
   }) : _groupSpecific = groupSpecific,
        super._();
 
@@ -352,9 +410,23 @@ class _$NotificationPreferencesEntityImpl
     return EqualUnmodifiableMapView(_groupSpecific);
   }
 
+  // Training session notification preferences (Story 15.13)
+  @override
+  @JsonKey()
+  final bool trainingSessionCreated;
+  @override
+  @JsonKey()
+  final bool trainingMinParticipantsReached;
+  @override
+  @JsonKey()
+  final bool trainingFeedbackReceived;
+  @override
+  @JsonKey()
+  final bool trainingSessionCancelled;
+
   @override
   String toString() {
-    return 'NotificationPreferencesEntity(groupInvitations: $groupInvitations, invitationAccepted: $invitationAccepted, gameCreated: $gameCreated, memberJoined: $memberJoined, memberLeft: $memberLeft, roleChanged: $roleChanged, friendRequestReceived: $friendRequestReceived, friendRequestAccepted: $friendRequestAccepted, friendRemoved: $friendRemoved, quietHoursEnabled: $quietHoursEnabled, quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, groupSpecific: $groupSpecific)';
+    return 'NotificationPreferencesEntity(groupInvitations: $groupInvitations, invitationAccepted: $invitationAccepted, gameCreated: $gameCreated, memberJoined: $memberJoined, memberLeft: $memberLeft, roleChanged: $roleChanged, friendRequestReceived: $friendRequestReceived, friendRequestAccepted: $friendRequestAccepted, friendRemoved: $friendRemoved, quietHoursEnabled: $quietHoursEnabled, quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, groupSpecific: $groupSpecific, trainingSessionCreated: $trainingSessionCreated, trainingMinParticipantsReached: $trainingMinParticipantsReached, trainingFeedbackReceived: $trainingFeedbackReceived, trainingSessionCancelled: $trainingSessionCancelled)';
   }
 
   @override
@@ -389,7 +461,25 @@ class _$NotificationPreferencesEntityImpl
             const DeepCollectionEquality().equals(
               other._groupSpecific,
               _groupSpecific,
-            ));
+            ) &&
+            (identical(other.trainingSessionCreated, trainingSessionCreated) ||
+                other.trainingSessionCreated == trainingSessionCreated) &&
+            (identical(
+                  other.trainingMinParticipantsReached,
+                  trainingMinParticipantsReached,
+                ) ||
+                other.trainingMinParticipantsReached ==
+                    trainingMinParticipantsReached) &&
+            (identical(
+                  other.trainingFeedbackReceived,
+                  trainingFeedbackReceived,
+                ) ||
+                other.trainingFeedbackReceived == trainingFeedbackReceived) &&
+            (identical(
+                  other.trainingSessionCancelled,
+                  trainingSessionCancelled,
+                ) ||
+                other.trainingSessionCancelled == trainingSessionCancelled));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -409,6 +499,10 @@ class _$NotificationPreferencesEntityImpl
     quietHoursStart,
     quietHoursEnd,
     const DeepCollectionEquality().hash(_groupSpecific),
+    trainingSessionCreated,
+    trainingMinParticipantsReached,
+    trainingFeedbackReceived,
+    trainingSessionCancelled,
   );
 
   /// Create a copy of NotificationPreferencesEntity
@@ -446,6 +540,10 @@ abstract class _NotificationPreferencesEntity
     final String? quietHoursStart,
     final String? quietHoursEnd,
     final Map<String, bool> groupSpecific,
+    final bool trainingSessionCreated,
+    final bool trainingMinParticipantsReached,
+    final bool trainingFeedbackReceived,
+    final bool trainingSessionCancelled,
   }) = _$NotificationPreferencesEntityImpl;
   const _NotificationPreferencesEntity._() : super._();
 
@@ -477,7 +575,15 @@ abstract class _NotificationPreferencesEntity
   @override
   String? get quietHoursEnd;
   @override
-  Map<String, bool> get groupSpecific;
+  Map<String, bool> get groupSpecific; // Training session notification preferences (Story 15.13)
+  @override
+  bool get trainingSessionCreated;
+  @override
+  bool get trainingMinParticipantsReached;
+  @override
+  bool get trainingFeedbackReceived;
+  @override
+  bool get trainingSessionCancelled;
 
   /// Create a copy of NotificationPreferencesEntity
   /// with the given fields replaced by the non-null parameter values.

@@ -23,4 +23,9 @@ class NotificationEvent with _$NotificationEvent {
     required String groupId,
     required bool enabled,
   }) = _ToggleGroupSpecific;
+  // Training session notification toggle events (Story 15.13)
+  const factory NotificationEvent.toggleTrainingSessionCreated(bool enabled) = _ToggleTrainingSessionCreated;
+  const factory NotificationEvent.toggleTrainingMinParticipantsReached(bool enabled) = _ToggleTrainingMinParticipantsReached;
+  const factory NotificationEvent.toggleTrainingFeedbackReceived(bool enabled) = _ToggleTrainingFeedbackReceived;
+  const factory NotificationEvent.toggleTrainingSessionCancelled(bool enabled) = _ToggleTrainingSessionCancelled;
 }

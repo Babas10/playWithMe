@@ -54,6 +54,23 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           groupId,
           enabled,
         ),
+        // Training session notification toggle handlers (Story 15.13)
+        toggleTrainingSessionCreated: (enabled) => _handleToggle(
+          emit,
+          (prefs) => prefs.copyWith(trainingSessionCreated: enabled),
+        ),
+        toggleTrainingMinParticipantsReached: (enabled) => _handleToggle(
+          emit,
+          (prefs) => prefs.copyWith(trainingMinParticipantsReached: enabled),
+        ),
+        toggleTrainingFeedbackReceived: (enabled) => _handleToggle(
+          emit,
+          (prefs) => prefs.copyWith(trainingFeedbackReceived: enabled),
+        ),
+        toggleTrainingSessionCancelled: (enabled) => _handleToggle(
+          emit,
+          (prefs) => prefs.copyWith(trainingSessionCancelled: enabled),
+        ),
       );
     });
   }

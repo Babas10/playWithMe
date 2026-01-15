@@ -31,6 +31,11 @@ mixin _$NotificationEvent {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
@@ -46,6 +51,10 @@ mixin _$NotificationEvent {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
@@ -61,6 +70,10 @@ mixin _$NotificationEvent {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -77,6 +90,14 @@ mixin _$NotificationEvent {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
@@ -91,6 +112,14 @@ mixin _$NotificationEvent {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
@@ -104,6 +133,14 @@ mixin _$NotificationEvent {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
 }
@@ -185,6 +222,11 @@ class _$LoadPreferencesImpl implements _LoadPreferences {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return loadPreferences();
   }
@@ -204,6 +246,10 @@ class _$LoadPreferencesImpl implements _LoadPreferences {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return loadPreferences?.call();
   }
@@ -223,6 +269,10 @@ class _$LoadPreferencesImpl implements _LoadPreferences {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (loadPreferences != null) {
@@ -246,6 +296,14 @@ class _$LoadPreferencesImpl implements _LoadPreferences {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return loadPreferences(this);
   }
@@ -264,6 +322,14 @@ class _$LoadPreferencesImpl implements _LoadPreferences {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return loadPreferences?.call(this);
   }
@@ -281,6 +347,14 @@ class _$LoadPreferencesImpl implements _LoadPreferences {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (loadPreferences != null) {
@@ -394,6 +468,11 @@ class _$UpdatePreferencesImpl implements _UpdatePreferences {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return updatePreferences(preferences);
   }
@@ -413,6 +492,10 @@ class _$UpdatePreferencesImpl implements _UpdatePreferences {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return updatePreferences?.call(preferences);
   }
@@ -432,6 +515,10 @@ class _$UpdatePreferencesImpl implements _UpdatePreferences {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (updatePreferences != null) {
@@ -455,6 +542,14 @@ class _$UpdatePreferencesImpl implements _UpdatePreferences {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return updatePreferences(this);
   }
@@ -473,6 +568,14 @@ class _$UpdatePreferencesImpl implements _UpdatePreferences {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return updatePreferences?.call(this);
   }
@@ -490,6 +593,14 @@ class _$UpdatePreferencesImpl implements _UpdatePreferences {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (updatePreferences != null) {
@@ -599,6 +710,11 @@ class _$ToggleGroupInvitationsImpl implements _ToggleGroupInvitations {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return toggleGroupInvitations(enabled);
   }
@@ -618,6 +734,10 @@ class _$ToggleGroupInvitationsImpl implements _ToggleGroupInvitations {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return toggleGroupInvitations?.call(enabled);
   }
@@ -637,6 +757,10 @@ class _$ToggleGroupInvitationsImpl implements _ToggleGroupInvitations {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleGroupInvitations != null) {
@@ -660,6 +784,14 @@ class _$ToggleGroupInvitationsImpl implements _ToggleGroupInvitations {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return toggleGroupInvitations(this);
   }
@@ -678,6 +810,14 @@ class _$ToggleGroupInvitationsImpl implements _ToggleGroupInvitations {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return toggleGroupInvitations?.call(this);
   }
@@ -695,6 +835,14 @@ class _$ToggleGroupInvitationsImpl implements _ToggleGroupInvitations {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleGroupInvitations != null) {
@@ -803,6 +951,11 @@ class _$ToggleInvitationAcceptedImpl implements _ToggleInvitationAccepted {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return toggleInvitationAccepted(enabled);
   }
@@ -822,6 +975,10 @@ class _$ToggleInvitationAcceptedImpl implements _ToggleInvitationAccepted {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return toggleInvitationAccepted?.call(enabled);
   }
@@ -841,6 +998,10 @@ class _$ToggleInvitationAcceptedImpl implements _ToggleInvitationAccepted {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleInvitationAccepted != null) {
@@ -864,6 +1025,14 @@ class _$ToggleInvitationAcceptedImpl implements _ToggleInvitationAccepted {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return toggleInvitationAccepted(this);
   }
@@ -882,6 +1051,14 @@ class _$ToggleInvitationAcceptedImpl implements _ToggleInvitationAccepted {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return toggleInvitationAccepted?.call(this);
   }
@@ -899,6 +1076,14 @@ class _$ToggleInvitationAcceptedImpl implements _ToggleInvitationAccepted {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleInvitationAccepted != null) {
@@ -1006,6 +1191,11 @@ class _$ToggleGameCreatedImpl implements _ToggleGameCreated {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return toggleGameCreated(enabled);
   }
@@ -1025,6 +1215,10 @@ class _$ToggleGameCreatedImpl implements _ToggleGameCreated {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return toggleGameCreated?.call(enabled);
   }
@@ -1044,6 +1238,10 @@ class _$ToggleGameCreatedImpl implements _ToggleGameCreated {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleGameCreated != null) {
@@ -1067,6 +1265,14 @@ class _$ToggleGameCreatedImpl implements _ToggleGameCreated {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return toggleGameCreated(this);
   }
@@ -1085,6 +1291,14 @@ class _$ToggleGameCreatedImpl implements _ToggleGameCreated {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return toggleGameCreated?.call(this);
   }
@@ -1102,6 +1316,14 @@ class _$ToggleGameCreatedImpl implements _ToggleGameCreated {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleGameCreated != null) {
@@ -1209,6 +1431,11 @@ class _$ToggleMemberJoinedImpl implements _ToggleMemberJoined {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return toggleMemberJoined(enabled);
   }
@@ -1228,6 +1455,10 @@ class _$ToggleMemberJoinedImpl implements _ToggleMemberJoined {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return toggleMemberJoined?.call(enabled);
   }
@@ -1247,6 +1478,10 @@ class _$ToggleMemberJoinedImpl implements _ToggleMemberJoined {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleMemberJoined != null) {
@@ -1270,6 +1505,14 @@ class _$ToggleMemberJoinedImpl implements _ToggleMemberJoined {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return toggleMemberJoined(this);
   }
@@ -1288,6 +1531,14 @@ class _$ToggleMemberJoinedImpl implements _ToggleMemberJoined {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return toggleMemberJoined?.call(this);
   }
@@ -1305,6 +1556,14 @@ class _$ToggleMemberJoinedImpl implements _ToggleMemberJoined {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleMemberJoined != null) {
@@ -1412,6 +1671,11 @@ class _$ToggleMemberLeftImpl implements _ToggleMemberLeft {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return toggleMemberLeft(enabled);
   }
@@ -1431,6 +1695,10 @@ class _$ToggleMemberLeftImpl implements _ToggleMemberLeft {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return toggleMemberLeft?.call(enabled);
   }
@@ -1450,6 +1718,10 @@ class _$ToggleMemberLeftImpl implements _ToggleMemberLeft {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleMemberLeft != null) {
@@ -1473,6 +1745,14 @@ class _$ToggleMemberLeftImpl implements _ToggleMemberLeft {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return toggleMemberLeft(this);
   }
@@ -1491,6 +1771,14 @@ class _$ToggleMemberLeftImpl implements _ToggleMemberLeft {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return toggleMemberLeft?.call(this);
   }
@@ -1508,6 +1796,14 @@ class _$ToggleMemberLeftImpl implements _ToggleMemberLeft {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleMemberLeft != null) {
@@ -1614,6 +1910,11 @@ class _$ToggleRoleChangedImpl implements _ToggleRoleChanged {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return toggleRoleChanged(enabled);
   }
@@ -1633,6 +1934,10 @@ class _$ToggleRoleChangedImpl implements _ToggleRoleChanged {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return toggleRoleChanged?.call(enabled);
   }
@@ -1652,6 +1957,10 @@ class _$ToggleRoleChangedImpl implements _ToggleRoleChanged {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleRoleChanged != null) {
@@ -1675,6 +1984,14 @@ class _$ToggleRoleChangedImpl implements _ToggleRoleChanged {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return toggleRoleChanged(this);
   }
@@ -1693,6 +2010,14 @@ class _$ToggleRoleChangedImpl implements _ToggleRoleChanged {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return toggleRoleChanged?.call(this);
   }
@@ -1710,6 +2035,14 @@ class _$ToggleRoleChangedImpl implements _ToggleRoleChanged {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleRoleChanged != null) {
@@ -1835,6 +2168,11 @@ class _$ToggleQuietHoursImpl implements _ToggleQuietHours {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return toggleQuietHours(enabled, start, end);
   }
@@ -1854,6 +2192,10 @@ class _$ToggleQuietHoursImpl implements _ToggleQuietHours {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return toggleQuietHours?.call(enabled, start, end);
   }
@@ -1873,6 +2215,10 @@ class _$ToggleQuietHoursImpl implements _ToggleQuietHours {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleQuietHours != null) {
@@ -1896,6 +2242,14 @@ class _$ToggleQuietHoursImpl implements _ToggleQuietHours {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return toggleQuietHours(this);
   }
@@ -1914,6 +2268,14 @@ class _$ToggleQuietHoursImpl implements _ToggleQuietHours {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return toggleQuietHours?.call(this);
   }
@@ -1931,6 +2293,14 @@ class _$ToggleQuietHoursImpl implements _ToggleQuietHours {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleQuietHours != null) {
@@ -2053,6 +2423,11 @@ class _$ToggleGroupSpecificImpl implements _ToggleGroupSpecific {
     required TResult Function(bool enabled, String? start, String? end)
     toggleQuietHours,
     required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
   }) {
     return toggleGroupSpecific(groupId, enabled);
   }
@@ -2072,6 +2447,10 @@ class _$ToggleGroupSpecificImpl implements _ToggleGroupSpecific {
     TResult? Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
   }) {
     return toggleGroupSpecific?.call(groupId, enabled);
   }
@@ -2091,6 +2470,10 @@ class _$ToggleGroupSpecificImpl implements _ToggleGroupSpecific {
     TResult Function(bool enabled, String? start, String? end)?
     toggleQuietHours,
     TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleGroupSpecific != null) {
@@ -2114,6 +2497,14 @@ class _$ToggleGroupSpecificImpl implements _ToggleGroupSpecific {
     required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
     required TResult Function(_ToggleQuietHours value) toggleQuietHours,
     required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
   }) {
     return toggleGroupSpecific(this);
   }
@@ -2132,6 +2523,14 @@ class _$ToggleGroupSpecificImpl implements _ToggleGroupSpecific {
     TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
   }) {
     return toggleGroupSpecific?.call(this);
   }
@@ -2149,6 +2548,14 @@ class _$ToggleGroupSpecificImpl implements _ToggleGroupSpecific {
     TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
     TResult Function(_ToggleQuietHours value)? toggleQuietHours,
     TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
     required TResult orElse(),
   }) {
     if (toggleGroupSpecific != null) {
@@ -2172,4 +2579,1001 @@ abstract class _ToggleGroupSpecific implements NotificationEvent {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ToggleGroupSpecificImplCopyWith<_$ToggleGroupSpecificImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ToggleTrainingSessionCreatedImplCopyWith<$Res> {
+  factory _$$ToggleTrainingSessionCreatedImplCopyWith(
+    _$ToggleTrainingSessionCreatedImpl value,
+    $Res Function(_$ToggleTrainingSessionCreatedImpl) then,
+  ) = __$$ToggleTrainingSessionCreatedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool enabled});
+}
+
+/// @nodoc
+class __$$ToggleTrainingSessionCreatedImplCopyWithImpl<$Res>
+    extends
+        _$NotificationEventCopyWithImpl<
+          $Res,
+          _$ToggleTrainingSessionCreatedImpl
+        >
+    implements _$$ToggleTrainingSessionCreatedImplCopyWith<$Res> {
+  __$$ToggleTrainingSessionCreatedImplCopyWithImpl(
+    _$ToggleTrainingSessionCreatedImpl _value,
+    $Res Function(_$ToggleTrainingSessionCreatedImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? enabled = null}) {
+    return _then(
+      _$ToggleTrainingSessionCreatedImpl(
+        null == enabled
+            ? _value.enabled
+            : enabled // ignore: cast_nullable_to_non_nullable
+                  as bool,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$ToggleTrainingSessionCreatedImpl
+    implements _ToggleTrainingSessionCreated {
+  const _$ToggleTrainingSessionCreatedImpl(this.enabled);
+
+  @override
+  final bool enabled;
+
+  @override
+  String toString() {
+    return 'NotificationEvent.toggleTrainingSessionCreated(enabled: $enabled)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ToggleTrainingSessionCreatedImpl &&
+            (identical(other.enabled, enabled) || other.enabled == enabled));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, enabled);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ToggleTrainingSessionCreatedImplCopyWith<
+    _$ToggleTrainingSessionCreatedImpl
+  >
+  get copyWith =>
+      __$$ToggleTrainingSessionCreatedImplCopyWithImpl<
+        _$ToggleTrainingSessionCreatedImpl
+      >(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loadPreferences,
+    required TResult Function(NotificationPreferencesEntity preferences)
+    updatePreferences,
+    required TResult Function(bool enabled) toggleGroupInvitations,
+    required TResult Function(bool enabled) toggleInvitationAccepted,
+    required TResult Function(bool enabled) toggleGameCreated,
+    required TResult Function(bool enabled) toggleMemberJoined,
+    required TResult Function(bool enabled) toggleMemberLeft,
+    required TResult Function(bool enabled) toggleRoleChanged,
+    required TResult Function(bool enabled, String? start, String? end)
+    toggleQuietHours,
+    required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingSessionCreated(enabled);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loadPreferences,
+    TResult? Function(NotificationPreferencesEntity preferences)?
+    updatePreferences,
+    TResult? Function(bool enabled)? toggleGroupInvitations,
+    TResult? Function(bool enabled)? toggleInvitationAccepted,
+    TResult? Function(bool enabled)? toggleGameCreated,
+    TResult? Function(bool enabled)? toggleMemberJoined,
+    TResult? Function(bool enabled)? toggleMemberLeft,
+    TResult? Function(bool enabled)? toggleRoleChanged,
+    TResult? Function(bool enabled, String? start, String? end)?
+    toggleQuietHours,
+    TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingSessionCreated?.call(enabled);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loadPreferences,
+    TResult Function(NotificationPreferencesEntity preferences)?
+    updatePreferences,
+    TResult Function(bool enabled)? toggleGroupInvitations,
+    TResult Function(bool enabled)? toggleInvitationAccepted,
+    TResult Function(bool enabled)? toggleGameCreated,
+    TResult Function(bool enabled)? toggleMemberJoined,
+    TResult Function(bool enabled)? toggleMemberLeft,
+    TResult Function(bool enabled)? toggleRoleChanged,
+    TResult Function(bool enabled, String? start, String? end)?
+    toggleQuietHours,
+    TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
+    required TResult orElse(),
+  }) {
+    if (toggleTrainingSessionCreated != null) {
+      return toggleTrainingSessionCreated(enabled);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_LoadPreferences value) loadPreferences,
+    required TResult Function(_UpdatePreferences value) updatePreferences,
+    required TResult Function(_ToggleGroupInvitations value)
+    toggleGroupInvitations,
+    required TResult Function(_ToggleInvitationAccepted value)
+    toggleInvitationAccepted,
+    required TResult Function(_ToggleGameCreated value) toggleGameCreated,
+    required TResult Function(_ToggleMemberJoined value) toggleMemberJoined,
+    required TResult Function(_ToggleMemberLeft value) toggleMemberLeft,
+    required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
+    required TResult Function(_ToggleQuietHours value) toggleQuietHours,
+    required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingSessionCreated(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_LoadPreferences value)? loadPreferences,
+    TResult? Function(_UpdatePreferences value)? updatePreferences,
+    TResult? Function(_ToggleGroupInvitations value)? toggleGroupInvitations,
+    TResult? Function(_ToggleInvitationAccepted value)?
+    toggleInvitationAccepted,
+    TResult? Function(_ToggleGameCreated value)? toggleGameCreated,
+    TResult? Function(_ToggleMemberJoined value)? toggleMemberJoined,
+    TResult? Function(_ToggleMemberLeft value)? toggleMemberLeft,
+    TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
+    TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
+    TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingSessionCreated?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_LoadPreferences value)? loadPreferences,
+    TResult Function(_UpdatePreferences value)? updatePreferences,
+    TResult Function(_ToggleGroupInvitations value)? toggleGroupInvitations,
+    TResult Function(_ToggleInvitationAccepted value)? toggleInvitationAccepted,
+    TResult Function(_ToggleGameCreated value)? toggleGameCreated,
+    TResult Function(_ToggleMemberJoined value)? toggleMemberJoined,
+    TResult Function(_ToggleMemberLeft value)? toggleMemberLeft,
+    TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
+    TResult Function(_ToggleQuietHours value)? toggleQuietHours,
+    TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
+    required TResult orElse(),
+  }) {
+    if (toggleTrainingSessionCreated != null) {
+      return toggleTrainingSessionCreated(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ToggleTrainingSessionCreated implements NotificationEvent {
+  const factory _ToggleTrainingSessionCreated(final bool enabled) =
+      _$ToggleTrainingSessionCreatedImpl;
+
+  bool get enabled;
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ToggleTrainingSessionCreatedImplCopyWith<
+    _$ToggleTrainingSessionCreatedImpl
+  >
+  get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ToggleTrainingMinParticipantsReachedImplCopyWith<$Res> {
+  factory _$$ToggleTrainingMinParticipantsReachedImplCopyWith(
+    _$ToggleTrainingMinParticipantsReachedImpl value,
+    $Res Function(_$ToggleTrainingMinParticipantsReachedImpl) then,
+  ) = __$$ToggleTrainingMinParticipantsReachedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool enabled});
+}
+
+/// @nodoc
+class __$$ToggleTrainingMinParticipantsReachedImplCopyWithImpl<$Res>
+    extends
+        _$NotificationEventCopyWithImpl<
+          $Res,
+          _$ToggleTrainingMinParticipantsReachedImpl
+        >
+    implements _$$ToggleTrainingMinParticipantsReachedImplCopyWith<$Res> {
+  __$$ToggleTrainingMinParticipantsReachedImplCopyWithImpl(
+    _$ToggleTrainingMinParticipantsReachedImpl _value,
+    $Res Function(_$ToggleTrainingMinParticipantsReachedImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? enabled = null}) {
+    return _then(
+      _$ToggleTrainingMinParticipantsReachedImpl(
+        null == enabled
+            ? _value.enabled
+            : enabled // ignore: cast_nullable_to_non_nullable
+                  as bool,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$ToggleTrainingMinParticipantsReachedImpl
+    implements _ToggleTrainingMinParticipantsReached {
+  const _$ToggleTrainingMinParticipantsReachedImpl(this.enabled);
+
+  @override
+  final bool enabled;
+
+  @override
+  String toString() {
+    return 'NotificationEvent.toggleTrainingMinParticipantsReached(enabled: $enabled)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ToggleTrainingMinParticipantsReachedImpl &&
+            (identical(other.enabled, enabled) || other.enabled == enabled));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, enabled);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ToggleTrainingMinParticipantsReachedImplCopyWith<
+    _$ToggleTrainingMinParticipantsReachedImpl
+  >
+  get copyWith =>
+      __$$ToggleTrainingMinParticipantsReachedImplCopyWithImpl<
+        _$ToggleTrainingMinParticipantsReachedImpl
+      >(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loadPreferences,
+    required TResult Function(NotificationPreferencesEntity preferences)
+    updatePreferences,
+    required TResult Function(bool enabled) toggleGroupInvitations,
+    required TResult Function(bool enabled) toggleInvitationAccepted,
+    required TResult Function(bool enabled) toggleGameCreated,
+    required TResult Function(bool enabled) toggleMemberJoined,
+    required TResult Function(bool enabled) toggleMemberLeft,
+    required TResult Function(bool enabled) toggleRoleChanged,
+    required TResult Function(bool enabled, String? start, String? end)
+    toggleQuietHours,
+    required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingMinParticipantsReached(enabled);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loadPreferences,
+    TResult? Function(NotificationPreferencesEntity preferences)?
+    updatePreferences,
+    TResult? Function(bool enabled)? toggleGroupInvitations,
+    TResult? Function(bool enabled)? toggleInvitationAccepted,
+    TResult? Function(bool enabled)? toggleGameCreated,
+    TResult? Function(bool enabled)? toggleMemberJoined,
+    TResult? Function(bool enabled)? toggleMemberLeft,
+    TResult? Function(bool enabled)? toggleRoleChanged,
+    TResult? Function(bool enabled, String? start, String? end)?
+    toggleQuietHours,
+    TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingMinParticipantsReached?.call(enabled);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loadPreferences,
+    TResult Function(NotificationPreferencesEntity preferences)?
+    updatePreferences,
+    TResult Function(bool enabled)? toggleGroupInvitations,
+    TResult Function(bool enabled)? toggleInvitationAccepted,
+    TResult Function(bool enabled)? toggleGameCreated,
+    TResult Function(bool enabled)? toggleMemberJoined,
+    TResult Function(bool enabled)? toggleMemberLeft,
+    TResult Function(bool enabled)? toggleRoleChanged,
+    TResult Function(bool enabled, String? start, String? end)?
+    toggleQuietHours,
+    TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
+    required TResult orElse(),
+  }) {
+    if (toggleTrainingMinParticipantsReached != null) {
+      return toggleTrainingMinParticipantsReached(enabled);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_LoadPreferences value) loadPreferences,
+    required TResult Function(_UpdatePreferences value) updatePreferences,
+    required TResult Function(_ToggleGroupInvitations value)
+    toggleGroupInvitations,
+    required TResult Function(_ToggleInvitationAccepted value)
+    toggleInvitationAccepted,
+    required TResult Function(_ToggleGameCreated value) toggleGameCreated,
+    required TResult Function(_ToggleMemberJoined value) toggleMemberJoined,
+    required TResult Function(_ToggleMemberLeft value) toggleMemberLeft,
+    required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
+    required TResult Function(_ToggleQuietHours value) toggleQuietHours,
+    required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingMinParticipantsReached(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_LoadPreferences value)? loadPreferences,
+    TResult? Function(_UpdatePreferences value)? updatePreferences,
+    TResult? Function(_ToggleGroupInvitations value)? toggleGroupInvitations,
+    TResult? Function(_ToggleInvitationAccepted value)?
+    toggleInvitationAccepted,
+    TResult? Function(_ToggleGameCreated value)? toggleGameCreated,
+    TResult? Function(_ToggleMemberJoined value)? toggleMemberJoined,
+    TResult? Function(_ToggleMemberLeft value)? toggleMemberLeft,
+    TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
+    TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
+    TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingMinParticipantsReached?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_LoadPreferences value)? loadPreferences,
+    TResult Function(_UpdatePreferences value)? updatePreferences,
+    TResult Function(_ToggleGroupInvitations value)? toggleGroupInvitations,
+    TResult Function(_ToggleInvitationAccepted value)? toggleInvitationAccepted,
+    TResult Function(_ToggleGameCreated value)? toggleGameCreated,
+    TResult Function(_ToggleMemberJoined value)? toggleMemberJoined,
+    TResult Function(_ToggleMemberLeft value)? toggleMemberLeft,
+    TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
+    TResult Function(_ToggleQuietHours value)? toggleQuietHours,
+    TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
+    required TResult orElse(),
+  }) {
+    if (toggleTrainingMinParticipantsReached != null) {
+      return toggleTrainingMinParticipantsReached(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ToggleTrainingMinParticipantsReached
+    implements NotificationEvent {
+  const factory _ToggleTrainingMinParticipantsReached(final bool enabled) =
+      _$ToggleTrainingMinParticipantsReachedImpl;
+
+  bool get enabled;
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ToggleTrainingMinParticipantsReachedImplCopyWith<
+    _$ToggleTrainingMinParticipantsReachedImpl
+  >
+  get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ToggleTrainingFeedbackReceivedImplCopyWith<$Res> {
+  factory _$$ToggleTrainingFeedbackReceivedImplCopyWith(
+    _$ToggleTrainingFeedbackReceivedImpl value,
+    $Res Function(_$ToggleTrainingFeedbackReceivedImpl) then,
+  ) = __$$ToggleTrainingFeedbackReceivedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool enabled});
+}
+
+/// @nodoc
+class __$$ToggleTrainingFeedbackReceivedImplCopyWithImpl<$Res>
+    extends
+        _$NotificationEventCopyWithImpl<
+          $Res,
+          _$ToggleTrainingFeedbackReceivedImpl
+        >
+    implements _$$ToggleTrainingFeedbackReceivedImplCopyWith<$Res> {
+  __$$ToggleTrainingFeedbackReceivedImplCopyWithImpl(
+    _$ToggleTrainingFeedbackReceivedImpl _value,
+    $Res Function(_$ToggleTrainingFeedbackReceivedImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? enabled = null}) {
+    return _then(
+      _$ToggleTrainingFeedbackReceivedImpl(
+        null == enabled
+            ? _value.enabled
+            : enabled // ignore: cast_nullable_to_non_nullable
+                  as bool,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$ToggleTrainingFeedbackReceivedImpl
+    implements _ToggleTrainingFeedbackReceived {
+  const _$ToggleTrainingFeedbackReceivedImpl(this.enabled);
+
+  @override
+  final bool enabled;
+
+  @override
+  String toString() {
+    return 'NotificationEvent.toggleTrainingFeedbackReceived(enabled: $enabled)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ToggleTrainingFeedbackReceivedImpl &&
+            (identical(other.enabled, enabled) || other.enabled == enabled));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, enabled);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ToggleTrainingFeedbackReceivedImplCopyWith<
+    _$ToggleTrainingFeedbackReceivedImpl
+  >
+  get copyWith =>
+      __$$ToggleTrainingFeedbackReceivedImplCopyWithImpl<
+        _$ToggleTrainingFeedbackReceivedImpl
+      >(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loadPreferences,
+    required TResult Function(NotificationPreferencesEntity preferences)
+    updatePreferences,
+    required TResult Function(bool enabled) toggleGroupInvitations,
+    required TResult Function(bool enabled) toggleInvitationAccepted,
+    required TResult Function(bool enabled) toggleGameCreated,
+    required TResult Function(bool enabled) toggleMemberJoined,
+    required TResult Function(bool enabled) toggleMemberLeft,
+    required TResult Function(bool enabled) toggleRoleChanged,
+    required TResult Function(bool enabled, String? start, String? end)
+    toggleQuietHours,
+    required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingFeedbackReceived(enabled);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loadPreferences,
+    TResult? Function(NotificationPreferencesEntity preferences)?
+    updatePreferences,
+    TResult? Function(bool enabled)? toggleGroupInvitations,
+    TResult? Function(bool enabled)? toggleInvitationAccepted,
+    TResult? Function(bool enabled)? toggleGameCreated,
+    TResult? Function(bool enabled)? toggleMemberJoined,
+    TResult? Function(bool enabled)? toggleMemberLeft,
+    TResult? Function(bool enabled)? toggleRoleChanged,
+    TResult? Function(bool enabled, String? start, String? end)?
+    toggleQuietHours,
+    TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingFeedbackReceived?.call(enabled);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loadPreferences,
+    TResult Function(NotificationPreferencesEntity preferences)?
+    updatePreferences,
+    TResult Function(bool enabled)? toggleGroupInvitations,
+    TResult Function(bool enabled)? toggleInvitationAccepted,
+    TResult Function(bool enabled)? toggleGameCreated,
+    TResult Function(bool enabled)? toggleMemberJoined,
+    TResult Function(bool enabled)? toggleMemberLeft,
+    TResult Function(bool enabled)? toggleRoleChanged,
+    TResult Function(bool enabled, String? start, String? end)?
+    toggleQuietHours,
+    TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
+    required TResult orElse(),
+  }) {
+    if (toggleTrainingFeedbackReceived != null) {
+      return toggleTrainingFeedbackReceived(enabled);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_LoadPreferences value) loadPreferences,
+    required TResult Function(_UpdatePreferences value) updatePreferences,
+    required TResult Function(_ToggleGroupInvitations value)
+    toggleGroupInvitations,
+    required TResult Function(_ToggleInvitationAccepted value)
+    toggleInvitationAccepted,
+    required TResult Function(_ToggleGameCreated value) toggleGameCreated,
+    required TResult Function(_ToggleMemberJoined value) toggleMemberJoined,
+    required TResult Function(_ToggleMemberLeft value) toggleMemberLeft,
+    required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
+    required TResult Function(_ToggleQuietHours value) toggleQuietHours,
+    required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingFeedbackReceived(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_LoadPreferences value)? loadPreferences,
+    TResult? Function(_UpdatePreferences value)? updatePreferences,
+    TResult? Function(_ToggleGroupInvitations value)? toggleGroupInvitations,
+    TResult? Function(_ToggleInvitationAccepted value)?
+    toggleInvitationAccepted,
+    TResult? Function(_ToggleGameCreated value)? toggleGameCreated,
+    TResult? Function(_ToggleMemberJoined value)? toggleMemberJoined,
+    TResult? Function(_ToggleMemberLeft value)? toggleMemberLeft,
+    TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
+    TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
+    TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingFeedbackReceived?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_LoadPreferences value)? loadPreferences,
+    TResult Function(_UpdatePreferences value)? updatePreferences,
+    TResult Function(_ToggleGroupInvitations value)? toggleGroupInvitations,
+    TResult Function(_ToggleInvitationAccepted value)? toggleInvitationAccepted,
+    TResult Function(_ToggleGameCreated value)? toggleGameCreated,
+    TResult Function(_ToggleMemberJoined value)? toggleMemberJoined,
+    TResult Function(_ToggleMemberLeft value)? toggleMemberLeft,
+    TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
+    TResult Function(_ToggleQuietHours value)? toggleQuietHours,
+    TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
+    required TResult orElse(),
+  }) {
+    if (toggleTrainingFeedbackReceived != null) {
+      return toggleTrainingFeedbackReceived(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ToggleTrainingFeedbackReceived implements NotificationEvent {
+  const factory _ToggleTrainingFeedbackReceived(final bool enabled) =
+      _$ToggleTrainingFeedbackReceivedImpl;
+
+  bool get enabled;
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ToggleTrainingFeedbackReceivedImplCopyWith<
+    _$ToggleTrainingFeedbackReceivedImpl
+  >
+  get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ToggleTrainingSessionCancelledImplCopyWith<$Res> {
+  factory _$$ToggleTrainingSessionCancelledImplCopyWith(
+    _$ToggleTrainingSessionCancelledImpl value,
+    $Res Function(_$ToggleTrainingSessionCancelledImpl) then,
+  ) = __$$ToggleTrainingSessionCancelledImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool enabled});
+}
+
+/// @nodoc
+class __$$ToggleTrainingSessionCancelledImplCopyWithImpl<$Res>
+    extends
+        _$NotificationEventCopyWithImpl<
+          $Res,
+          _$ToggleTrainingSessionCancelledImpl
+        >
+    implements _$$ToggleTrainingSessionCancelledImplCopyWith<$Res> {
+  __$$ToggleTrainingSessionCancelledImplCopyWithImpl(
+    _$ToggleTrainingSessionCancelledImpl _value,
+    $Res Function(_$ToggleTrainingSessionCancelledImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? enabled = null}) {
+    return _then(
+      _$ToggleTrainingSessionCancelledImpl(
+        null == enabled
+            ? _value.enabled
+            : enabled // ignore: cast_nullable_to_non_nullable
+                  as bool,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$ToggleTrainingSessionCancelledImpl
+    implements _ToggleTrainingSessionCancelled {
+  const _$ToggleTrainingSessionCancelledImpl(this.enabled);
+
+  @override
+  final bool enabled;
+
+  @override
+  String toString() {
+    return 'NotificationEvent.toggleTrainingSessionCancelled(enabled: $enabled)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ToggleTrainingSessionCancelledImpl &&
+            (identical(other.enabled, enabled) || other.enabled == enabled));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, enabled);
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ToggleTrainingSessionCancelledImplCopyWith<
+    _$ToggleTrainingSessionCancelledImpl
+  >
+  get copyWith =>
+      __$$ToggleTrainingSessionCancelledImplCopyWithImpl<
+        _$ToggleTrainingSessionCancelledImpl
+      >(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loadPreferences,
+    required TResult Function(NotificationPreferencesEntity preferences)
+    updatePreferences,
+    required TResult Function(bool enabled) toggleGroupInvitations,
+    required TResult Function(bool enabled) toggleInvitationAccepted,
+    required TResult Function(bool enabled) toggleGameCreated,
+    required TResult Function(bool enabled) toggleMemberJoined,
+    required TResult Function(bool enabled) toggleMemberLeft,
+    required TResult Function(bool enabled) toggleRoleChanged,
+    required TResult Function(bool enabled, String? start, String? end)
+    toggleQuietHours,
+    required TResult Function(String groupId, bool enabled) toggleGroupSpecific,
+    required TResult Function(bool enabled) toggleTrainingSessionCreated,
+    required TResult Function(bool enabled)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(bool enabled) toggleTrainingFeedbackReceived,
+    required TResult Function(bool enabled) toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingSessionCancelled(enabled);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loadPreferences,
+    TResult? Function(NotificationPreferencesEntity preferences)?
+    updatePreferences,
+    TResult? Function(bool enabled)? toggleGroupInvitations,
+    TResult? Function(bool enabled)? toggleInvitationAccepted,
+    TResult? Function(bool enabled)? toggleGameCreated,
+    TResult? Function(bool enabled)? toggleMemberJoined,
+    TResult? Function(bool enabled)? toggleMemberLeft,
+    TResult? Function(bool enabled)? toggleRoleChanged,
+    TResult? Function(bool enabled, String? start, String? end)?
+    toggleQuietHours,
+    TResult? Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult? Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult? Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult? Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult? Function(bool enabled)? toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingSessionCancelled?.call(enabled);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loadPreferences,
+    TResult Function(NotificationPreferencesEntity preferences)?
+    updatePreferences,
+    TResult Function(bool enabled)? toggleGroupInvitations,
+    TResult Function(bool enabled)? toggleInvitationAccepted,
+    TResult Function(bool enabled)? toggleGameCreated,
+    TResult Function(bool enabled)? toggleMemberJoined,
+    TResult Function(bool enabled)? toggleMemberLeft,
+    TResult Function(bool enabled)? toggleRoleChanged,
+    TResult Function(bool enabled, String? start, String? end)?
+    toggleQuietHours,
+    TResult Function(String groupId, bool enabled)? toggleGroupSpecific,
+    TResult Function(bool enabled)? toggleTrainingSessionCreated,
+    TResult Function(bool enabled)? toggleTrainingMinParticipantsReached,
+    TResult Function(bool enabled)? toggleTrainingFeedbackReceived,
+    TResult Function(bool enabled)? toggleTrainingSessionCancelled,
+    required TResult orElse(),
+  }) {
+    if (toggleTrainingSessionCancelled != null) {
+      return toggleTrainingSessionCancelled(enabled);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_LoadPreferences value) loadPreferences,
+    required TResult Function(_UpdatePreferences value) updatePreferences,
+    required TResult Function(_ToggleGroupInvitations value)
+    toggleGroupInvitations,
+    required TResult Function(_ToggleInvitationAccepted value)
+    toggleInvitationAccepted,
+    required TResult Function(_ToggleGameCreated value) toggleGameCreated,
+    required TResult Function(_ToggleMemberJoined value) toggleMemberJoined,
+    required TResult Function(_ToggleMemberLeft value) toggleMemberLeft,
+    required TResult Function(_ToggleRoleChanged value) toggleRoleChanged,
+    required TResult Function(_ToggleQuietHours value) toggleQuietHours,
+    required TResult Function(_ToggleGroupSpecific value) toggleGroupSpecific,
+    required TResult Function(_ToggleTrainingSessionCreated value)
+    toggleTrainingSessionCreated,
+    required TResult Function(_ToggleTrainingMinParticipantsReached value)
+    toggleTrainingMinParticipantsReached,
+    required TResult Function(_ToggleTrainingFeedbackReceived value)
+    toggleTrainingFeedbackReceived,
+    required TResult Function(_ToggleTrainingSessionCancelled value)
+    toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingSessionCancelled(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_LoadPreferences value)? loadPreferences,
+    TResult? Function(_UpdatePreferences value)? updatePreferences,
+    TResult? Function(_ToggleGroupInvitations value)? toggleGroupInvitations,
+    TResult? Function(_ToggleInvitationAccepted value)?
+    toggleInvitationAccepted,
+    TResult? Function(_ToggleGameCreated value)? toggleGameCreated,
+    TResult? Function(_ToggleMemberJoined value)? toggleMemberJoined,
+    TResult? Function(_ToggleMemberLeft value)? toggleMemberLeft,
+    TResult? Function(_ToggleRoleChanged value)? toggleRoleChanged,
+    TResult? Function(_ToggleQuietHours value)? toggleQuietHours,
+    TResult? Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult? Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult? Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult? Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult? Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
+  }) {
+    return toggleTrainingSessionCancelled?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_LoadPreferences value)? loadPreferences,
+    TResult Function(_UpdatePreferences value)? updatePreferences,
+    TResult Function(_ToggleGroupInvitations value)? toggleGroupInvitations,
+    TResult Function(_ToggleInvitationAccepted value)? toggleInvitationAccepted,
+    TResult Function(_ToggleGameCreated value)? toggleGameCreated,
+    TResult Function(_ToggleMemberJoined value)? toggleMemberJoined,
+    TResult Function(_ToggleMemberLeft value)? toggleMemberLeft,
+    TResult Function(_ToggleRoleChanged value)? toggleRoleChanged,
+    TResult Function(_ToggleQuietHours value)? toggleQuietHours,
+    TResult Function(_ToggleGroupSpecific value)? toggleGroupSpecific,
+    TResult Function(_ToggleTrainingSessionCreated value)?
+    toggleTrainingSessionCreated,
+    TResult Function(_ToggleTrainingMinParticipantsReached value)?
+    toggleTrainingMinParticipantsReached,
+    TResult Function(_ToggleTrainingFeedbackReceived value)?
+    toggleTrainingFeedbackReceived,
+    TResult Function(_ToggleTrainingSessionCancelled value)?
+    toggleTrainingSessionCancelled,
+    required TResult orElse(),
+  }) {
+    if (toggleTrainingSessionCancelled != null) {
+      return toggleTrainingSessionCancelled(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ToggleTrainingSessionCancelled implements NotificationEvent {
+  const factory _ToggleTrainingSessionCancelled(final bool enabled) =
+      _$ToggleTrainingSessionCancelledImpl;
+
+  bool get enabled;
+
+  /// Create a copy of NotificationEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ToggleTrainingSessionCancelledImplCopyWith<
+    _$ToggleTrainingSessionCancelledImpl
+  >
+  get copyWith => throw _privateConstructorUsedError;
 }
