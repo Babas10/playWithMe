@@ -19,6 +19,11 @@ class NotificationPreferencesEntity with _$NotificationPreferencesEntity {
     String? quietHoursStart,
     String? quietHoursEnd,
     @Default({}) Map<String, bool> groupSpecific,
+    // Training session notification preferences (Story 15.13)
+    @Default(true) bool trainingSessionCreated,
+    @Default(true) bool trainingMinParticipantsReached,
+    @Default(true) bool trainingFeedbackReceived,
+    @Default(true) bool trainingSessionCancelled,
   }) = _NotificationPreferencesEntity;
 
   const NotificationPreferencesEntity._();

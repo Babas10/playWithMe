@@ -28,7 +28,13 @@ export {leaveTrainingSession} from "./leaveTrainingSession"; // Story 15.3 (Leav
 export {submitTrainingFeedback} from "./submitTrainingFeedback"; // Story 15.8 (Anonymous Feedback)
 export {hasSubmittedTrainingFeedback} from "./hasSubmittedTrainingFeedback"; // Story 15.8 (Anonymous Feedback)
 export {getTrainingFeedback} from "./getTrainingFeedback"; // Story 15.11 (Display Feedback)
-export {onParticipantJoined, onParticipantLeft} from "./trainingSessionNotifications"; // Story 15.9 (Training Session Access)
+export {
+  onTrainingSessionCreated,
+  onTrainingSessionUpdated,
+  onTrainingFeedbackCreated,
+  onParticipantJoined,
+  onParticipantLeft,
+} from "./trainingSessionNotifications"; // Story 15.13 (Training Session Lifecycle Notifications)
 
 // Export friendship functions (callable functions)
 export {
