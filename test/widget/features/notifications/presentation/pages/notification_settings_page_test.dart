@@ -116,6 +116,10 @@ void main() {
       await tester.pump();
       await tester.pump();
 
+      // Scroll down to find Admin Notifications section (after Training Sessions)
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+
       // Assert
       expect(find.text('Member Joined'), findsOneWidget);
       expect(find.text('Member Left'), findsOneWidget);
@@ -129,7 +133,7 @@ void main() {
       await tester.pump();
 
       // Scroll down to find Quiet Hours section
-      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.drag(find.byType(ListView), const Offset(0, -800));
       await tester.pumpAndSettle();
 
       // Assert
@@ -145,13 +149,14 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      // Assert - Group Events and Admin Notifications are visible
+      // Assert - Group Events and Training Sessions are visible at the top
       expect(find.text('Group Events'), findsOneWidget);
-      expect(find.text('Admin Notifications'), findsOneWidget);
+      expect(find.text('Training Sessions'), findsOneWidget);
 
-      // Scroll down to find Quiet Hours
-      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      // Scroll down to find Admin Notifications and Quiet Hours
+      await tester.drag(find.byType(ListView), const Offset(0, -800));
       await tester.pumpAndSettle();
+      expect(find.text('Admin Notifications'), findsOneWidget);
       expect(find.text('Quiet Hours'), findsOneWidget);
     });
 
@@ -162,6 +167,10 @@ void main() {
       await tester.pump();
       await tester.pump();
       await tester.pump();
+
+      // Scroll down to find Admin Notifications section (after Training Sessions)
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await tester.pumpAndSettle();
 
       // Assert
       expect(
@@ -230,7 +239,7 @@ void main() {
       await tester.pump();
 
       // Scroll down to find Quiet Hours section
-      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.drag(find.byType(ListView), const Offset(0, -800));
       await tester.pumpAndSettle();
 
       // Assert
@@ -257,7 +266,7 @@ void main() {
       await tester.pump();
 
       // Scroll down to find Quiet Hours section
-      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.drag(find.byType(ListView), const Offset(0, -800));
       await tester.pumpAndSettle();
 
       // Assert

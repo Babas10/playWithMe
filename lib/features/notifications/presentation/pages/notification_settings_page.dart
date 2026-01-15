@@ -83,6 +83,51 @@ class _NotificationSettingsView extends StatelessWidget {
 
                 const Divider(height: 32),
 
+                // Training Sessions Section (Story 15.13)
+                _SectionHeader(title: 'Training Sessions'),
+                SwitchListTile(
+                  title: const Text('New Training Sessions'),
+                  subtitle: const Text('When a training session is created in your groups'),
+                  value: preferences.trainingSessionCreated,
+                  onChanged: (value) {
+                    context.read<NotificationBloc>().add(
+                          NotificationEvent.toggleTrainingSessionCreated(value),
+                        );
+                  },
+                ),
+                SwitchListTile(
+                  title: const Text('Minimum Participants Reached'),
+                  subtitle: const Text('When a training session has enough participants'),
+                  value: preferences.trainingMinParticipantsReached,
+                  onChanged: (value) {
+                    context.read<NotificationBloc>().add(
+                          NotificationEvent.toggleTrainingMinParticipantsReached(value),
+                        );
+                  },
+                ),
+                SwitchListTile(
+                  title: const Text('Feedback Received'),
+                  subtitle: const Text('When someone leaves feedback on a training session'),
+                  value: preferences.trainingFeedbackReceived,
+                  onChanged: (value) {
+                    context.read<NotificationBloc>().add(
+                          NotificationEvent.toggleTrainingFeedbackReceived(value),
+                        );
+                  },
+                ),
+                SwitchListTile(
+                  title: const Text('Session Cancelled'),
+                  subtitle: const Text('When a training session you joined is cancelled'),
+                  value: preferences.trainingSessionCancelled,
+                  onChanged: (value) {
+                    context.read<NotificationBloc>().add(
+                          NotificationEvent.toggleTrainingSessionCancelled(value),
+                        );
+                  },
+                ),
+
+                const Divider(height: 32),
+
                 // Admin Notifications Section
                 _SectionHeader(title: 'Admin Notifications'),
                 const Padding(

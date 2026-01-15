@@ -208,5 +208,102 @@ void main() {
         ],
       );
     });
+
+    // Story 15.13: Training Session Notification Toggle Events
+    group('Training Session Toggle Events', () {
+      const initialPreferences = NotificationPreferencesEntity();
+
+      blocTest<NotificationBloc, NotificationState>(
+        'toggleTrainingSessionCreated updates preferences correctly',
+        build: () {
+          final mockRepository = MockNotificationRepository();
+          when(() => mockRepository.updatePreferences(any())).thenAnswer(
+            (_) async => {},
+          );
+          return NotificationBloc(repository: mockRepository);
+        },
+        seed: () => const NotificationState.loaded(initialPreferences),
+        act: (bloc) => bloc.add(
+          const NotificationEvent.toggleTrainingSessionCreated(false),
+        ),
+        expect: () => [
+          const NotificationState.updating(
+            NotificationPreferencesEntity(trainingSessionCreated: false),
+          ),
+          const NotificationState.loaded(
+            NotificationPreferencesEntity(trainingSessionCreated: false),
+          ),
+        ],
+      );
+
+      blocTest<NotificationBloc, NotificationState>(
+        'toggleTrainingMinParticipantsReached updates preferences correctly',
+        build: () {
+          final mockRepository = MockNotificationRepository();
+          when(() => mockRepository.updatePreferences(any())).thenAnswer(
+            (_) async => {},
+          );
+          return NotificationBloc(repository: mockRepository);
+        },
+        seed: () => const NotificationState.loaded(initialPreferences),
+        act: (bloc) => bloc.add(
+          const NotificationEvent.toggleTrainingMinParticipantsReached(false),
+        ),
+        expect: () => [
+          const NotificationState.updating(
+            NotificationPreferencesEntity(trainingMinParticipantsReached: false),
+          ),
+          const NotificationState.loaded(
+            NotificationPreferencesEntity(trainingMinParticipantsReached: false),
+          ),
+        ],
+      );
+
+      blocTest<NotificationBloc, NotificationState>(
+        'toggleTrainingFeedbackReceived updates preferences correctly',
+        build: () {
+          final mockRepository = MockNotificationRepository();
+          when(() => mockRepository.updatePreferences(any())).thenAnswer(
+            (_) async => {},
+          );
+          return NotificationBloc(repository: mockRepository);
+        },
+        seed: () => const NotificationState.loaded(initialPreferences),
+        act: (bloc) => bloc.add(
+          const NotificationEvent.toggleTrainingFeedbackReceived(false),
+        ),
+        expect: () => [
+          const NotificationState.updating(
+            NotificationPreferencesEntity(trainingFeedbackReceived: false),
+          ),
+          const NotificationState.loaded(
+            NotificationPreferencesEntity(trainingFeedbackReceived: false),
+          ),
+        ],
+      );
+
+      blocTest<NotificationBloc, NotificationState>(
+        'toggleTrainingSessionCancelled updates preferences correctly',
+        build: () {
+          final mockRepository = MockNotificationRepository();
+          when(() => mockRepository.updatePreferences(any())).thenAnswer(
+            (_) async => {},
+          );
+          return NotificationBloc(repository: mockRepository);
+        },
+        seed: () => const NotificationState.loaded(initialPreferences),
+        act: (bloc) => bloc.add(
+          const NotificationEvent.toggleTrainingSessionCancelled(false),
+        ),
+        expect: () => [
+          const NotificationState.updating(
+            NotificationPreferencesEntity(trainingSessionCancelled: false),
+          ),
+          const NotificationState.loaded(
+            NotificationPreferencesEntity(trainingSessionCancelled: false),
+          ),
+        ],
+      );
+    });
   });
 }
