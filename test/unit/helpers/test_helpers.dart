@@ -96,7 +96,6 @@ Future<void> initializeTestDependencies({
   sl.registerFactory<RegistrationBloc>(
     () => RegistrationBloc(
       authRepository: sl<AuthRepository>(),
-      userRepository: sl<UserRepository>(),
     ),
   );
 

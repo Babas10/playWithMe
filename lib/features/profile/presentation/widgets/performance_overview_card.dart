@@ -61,8 +61,6 @@ class PerformanceOverviewCard extends StatelessWidget {
   }
 
   Widget _buildStatsGrid(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Column(
       children: [
         // Row 1: Current ELO and Peak ELO
@@ -152,7 +150,6 @@ class _StatItem extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String? subLabel;
-  final Color? valueColor;
 
   const _StatItem({
     required this.label,
@@ -160,7 +157,6 @@ class _StatItem extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     this.subLabel,
-    this.valueColor,
   });
 
   @override
@@ -203,7 +199,7 @@ class _StatItem extends StatelessWidget {
             value,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: valueColor ?? theme.colorScheme.onSurface,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           // Sub-label (optional)

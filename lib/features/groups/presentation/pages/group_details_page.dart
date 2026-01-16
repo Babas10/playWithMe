@@ -14,7 +14,6 @@ import 'package:play_with_me/core/presentation/bloc/group_member/group_member_st
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
-import 'package:play_with_me/features/groups/presentation/widgets/member_action_menu.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/member_action_dialogs.dart';
 import 'package:play_with_me/features/groups/presentation/pages/invite_member_page.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/member_list_item_with_friendship.dart';
@@ -225,53 +224,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     }
   }
 
-  Future<void> _handleMemberAction(
-    BuildContext context,
-    MemberAction action,
-    UserModel member,
-  ) async {
-    final confirmed = await _showConfirmationDialog(context, action, member);
-    if (!confirmed || !context.mounted) return;
-
-    final groupMemberBloc = context.read<GroupMemberBloc>();
-
-    switch (action) {
-      case MemberAction.promote:
-        groupMemberBloc.add(PromoteMemberToAdmin(
-          groupId: widget.groupId,
-          userId: member.uid,
-        ));
-        break;
-      case MemberAction.demote:
-        groupMemberBloc.add(DemoteMemberFromAdmin(
-          groupId: widget.groupId,
-          userId: member.uid,
-        ));
-        break;
-      case MemberAction.remove:
-        groupMemberBloc.add(RemoveMemberFromGroup(
-          groupId: widget.groupId,
-          userId: member.uid,
-        ));
-        break;
-    }
-  }
-
-  Future<bool> _showConfirmationDialog(
-    BuildContext context,
-    MemberAction action,
-    UserModel member,
-  ) async {
-    switch (action) {
-      case MemberAction.promote:
-        return await showPromoteConfirmationDialog(context, member);
-      case MemberAction.demote:
-        return await showDemoteConfirmationDialog(context, member);
-      case MemberAction.remove:
-        return await showRemoveMemberConfirmationDialog(context, member);
-    }
-  }
-
   void _showSuccessMessage(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -434,7 +386,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     }
 
     final currentUserId = authState.user.uid;
-    final isCurrentUserAdmin = _group!.isAdmin(currentUserId);
 
     return RefreshIndicator(
       onRefresh: _loadGroupDetails,
@@ -459,8 +410,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
             ),
             BlocBuilder<GroupMemberBloc, GroupMemberState>(
               builder: (context, memberState) {
-                final isProcessing = memberState is GroupMemberLoading;
-
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

@@ -20,7 +20,6 @@ import 'package:play_with_me/features/profile/presentation/bloc/player_stats/pla
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/expanded_stats_section.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_history_screen.dart';
-import 'package:play_with_me/features/games/presentation/bloc/game_history/game_history_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 
 /// Profile page displaying user information and account details

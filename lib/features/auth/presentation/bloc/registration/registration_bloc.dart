@@ -1,20 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:play_with_me/core/data/models/user_model.dart';
-import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_state.dart';
 
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   final AuthRepository _authRepository;
-  final UserRepository _userRepository;
 
   RegistrationBloc({
     required AuthRepository authRepository,
-    required UserRepository userRepository,
   })  : _authRepository = authRepository,
-        _userRepository = userRepository,
         super(const RegistrationInitial()) {
     on<RegistrationSubmitted>(_onRegistrationSubmitted);
     on<RegistrationFormReset>(_onRegistrationFormReset);

@@ -20,7 +20,6 @@ class TrainingSessionListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCancelled = session.status == TrainingStatus.cancelled;
-    final isCompleted = session.status == TrainingStatus.completed;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
