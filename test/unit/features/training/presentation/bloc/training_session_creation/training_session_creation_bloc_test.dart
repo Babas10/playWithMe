@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/data/models/training_session_model.dart';
+import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_event.dart';
@@ -399,11 +400,13 @@ void main() {
       );
 
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
-        'emits error when repository throws not a member exception',
+        'emits error when repository throws TrainingSessionException with NOT_A_MEMBER code',
         build: () => bloc,
         setUp: () {
           when(() => mockRepository.createTrainingSession(any())).thenThrow(
-              Exception('Creator is not a member of the group'));
+              TrainingSessionException(
+                  'You must be a member of the group to create a training session',
+                  code: 'NOT_A_MEMBER'));
         },
         seed: () => TrainingSessionCreationFormState(
           groupId: 'group-1',
@@ -427,11 +430,12 @@ void main() {
       );
 
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
-        'emits error when repository throws group not found exception',
+        'emits error when repository throws TrainingSessionException with not-found code',
         build: () => bloc,
         setUp: () {
-          when(() => mockRepository.createTrainingSession(any()))
-              .thenThrow(Exception('Group not found'));
+          when(() => mockRepository.createTrainingSession(any())).thenThrow(
+              TrainingSessionException('The selected group no longer exists',
+                  code: 'not-found'));
         },
         seed: () => TrainingSessionCreationFormState(
           groupId: 'group-1',
@@ -449,7 +453,7 @@ void main() {
           isA<TrainingSessionCreationError>()
               .having((s) => s.message, 'message',
                   'The selected group no longer exists')
-              .having((s) => s.errorCode, 'errorCode', 'GROUP_NOT_FOUND')
+              .having((s) => s.errorCode, 'errorCode', 'not-found')
               .having((s) => s.isRetryable, 'isRetryable', true),
         ],
       );

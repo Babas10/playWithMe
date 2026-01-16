@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
 
 /// Firebase implementation of image storage repository
@@ -42,16 +43,16 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
 
       // Verify upload was successful
       if (snapshot.state != TaskState.success) {
-        throw Exception('Upload failed with state: ${snapshot.state}');
+        throw ImageStorageException('Upload failed with state: ${snapshot.state}', code: 'upload-failed');
       }
 
       // Get and return the download URL
       final downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } on FirebaseException catch (e) {
-      throw Exception('Failed to upload avatar: ${e.code} - ${e.message}');
+      throw ImageStorageException('Failed to upload avatar: ${e.code} - ${e.message}', code: e.code);
     } catch (e) {
-      throw Exception('Failed to upload avatar: $e');
+      throw ImageStorageException('Failed to upload avatar: $e');
     }
   }
 
@@ -71,10 +72,10 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
     } on FirebaseException catch (e) {
       // Ignore if folder doesn't exist
       if (e.code != 'object-not-found') {
-        throw Exception('Failed to delete avatar: ${e.message}');
+        throw ImageStorageException('Failed to delete avatar: ${e.message}', code: e.code);
       }
     } catch (e) {
-      throw Exception('Failed to delete avatar: $e');
+      throw ImageStorageException('Failed to delete avatar: $e');
     }
   }
 
@@ -98,9 +99,9 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
       if (e.code == 'object-not-found') {
         return null;
       }
-      throw Exception('Failed to get avatar URL: ${e.message}');
+      throw ImageStorageException('Failed to get avatar URL: ${e.message}', code: e.code);
     } catch (e) {
-      throw Exception('Failed to get avatar URL: $e');
+      throw ImageStorageException('Failed to get avatar URL: $e');
     }
   }
 }

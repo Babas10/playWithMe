@@ -7,6 +7,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/data/models/training_session_participant_model.dart';
+import '../../../../../core/domain/exceptions/repository_exceptions.dart';
 import '../../../../../core/domain/repositories/training_session_repository.dart';
 import 'training_session_participation_event.dart';
 import 'training_session_participation_state.dart';
@@ -81,6 +82,11 @@ class TrainingSessionParticipationBloc extends Bloc<
 
       // Reload participants to reflect the change
       add(LoadParticipants(event.sessionId));
+    } on TrainingSessionException catch (e) {
+      emit(ParticipationError(
+        message: e.message,
+        errorCode: e.code,
+      ));
     } on FirebaseFunctionsException catch (e) {
       emit(ParticipationError(
         message: _getFriendlyErrorMessage(e),
@@ -92,17 +98,9 @@ class TrainingSessionParticipationBloc extends Bloc<
         errorCode: e.code,
       ));
     } catch (e) {
-      // Extract message from Exception if available
-      String errorMessage = e.toString();
-      if (errorMessage.startsWith('Exception: ')) {
-        errorMessage = errorMessage.substring('Exception: '.length);
-      }
-      // Use extracted message if it's meaningful, otherwise use fallback
-      final message = errorMessage.isNotEmpty &&
-              !errorMessage.contains('Instance of')
-          ? errorMessage
-          : 'Failed to join training session. Please try again.';
-      emit(ParticipationError(message: message));
+      emit(ParticipationError(
+        message: 'Failed to join training session. Please try again.',
+      ));
     }
   }
 
@@ -119,6 +117,11 @@ class TrainingSessionParticipationBloc extends Bloc<
 
       // Reload participants to reflect the change
       add(LoadParticipants(event.sessionId));
+    } on TrainingSessionException catch (e) {
+      emit(ParticipationError(
+        message: e.message,
+        errorCode: e.code,
+      ));
     } on FirebaseFunctionsException catch (e) {
       emit(ParticipationError(
         message: _getFriendlyErrorMessage(e),
@@ -130,17 +133,9 @@ class TrainingSessionParticipationBloc extends Bloc<
         errorCode: e.code,
       ));
     } catch (e) {
-      // Extract message from Exception if available
-      String errorMessage = e.toString();
-      if (errorMessage.startsWith('Exception: ')) {
-        errorMessage = errorMessage.substring('Exception: '.length);
-      }
-      // Use extracted message if it's meaningful, otherwise use fallback
-      final message = errorMessage.isNotEmpty &&
-              !errorMessage.contains('Instance of')
-          ? errorMessage
-          : 'Failed to leave training session. Please try again.';
-      emit(ParticipationError(message: message));
+      emit(ParticipationError(
+        message: 'Failed to leave training session. Please try again.',
+      ));
     }
   }
 
@@ -156,6 +151,11 @@ class TrainingSessionParticipationBloc extends Bloc<
       await _trainingSessionRepository.cancelTrainingSession(event.sessionId);
 
       emit(CancelledSession(sessionId: event.sessionId));
+    } on TrainingSessionException catch (e) {
+      emit(ParticipationError(
+        message: e.message,
+        errorCode: e.code,
+      ));
     } on FirebaseFunctionsException catch (e) {
       emit(ParticipationError(
         message: _getCancelErrorMessage(e),
@@ -167,17 +167,9 @@ class TrainingSessionParticipationBloc extends Bloc<
         errorCode: e.code,
       ));
     } catch (e) {
-      // Extract message from Exception if available
-      String errorMessage = e.toString();
-      if (errorMessage.startsWith('Exception: ')) {
-        errorMessage = errorMessage.substring('Exception: '.length);
-      }
-      // Use extracted message if it's meaningful, otherwise use fallback
-      final message = errorMessage.isNotEmpty &&
-              !errorMessage.contains('Instance of')
-          ? errorMessage
-          : 'Failed to cancel training session. Please try again.';
-      emit(ParticipationError(message: message));
+      emit(ParticipationError(
+        message: 'Failed to cancel training session. Please try again.',
+      ));
     }
   }
 
@@ -257,7 +249,9 @@ class TrainingSessionParticipationBloc extends Bloc<
 
   /// Get generic error message
   String _getErrorMessage(dynamic error) {
-    if (error is FirebaseFunctionsException) {
+    if (error is TrainingSessionException) {
+      return error.message;
+    } else if (error is FirebaseFunctionsException) {
       return _getFriendlyErrorMessage(error);
     } else if (error is FirebaseException) {
       return _getFirestoreErrorMessage(error);
@@ -267,7 +261,9 @@ class TrainingSessionParticipationBloc extends Bloc<
 
   /// Get error code from exception
   String? _getErrorCode(dynamic error) {
-    if (error is FirebaseFunctionsException) {
+    if (error is TrainingSessionException) {
+      return error.code;
+    } else if (error is FirebaseFunctionsException) {
       return error.code;
     } else if (error is FirebaseException) {
       return error.code;

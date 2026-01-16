@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../domain/exceptions/repository_exceptions.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../../domain/repositories/training_session_repository.dart';
 import '../models/game_model.dart';
@@ -34,10 +35,16 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
   @override
   Future<TrainingSessionModel?> getTrainingSessionById(String sessionId) async {
     try {
-      final doc = await _firestore.collection(_collection).doc(sessionId).get();
+      final doc =
+          await _firestore.collection(_collection).doc(sessionId).get();
       return doc.exists ? TrainingSessionModel.fromFirestore(doc) : null;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to get training session: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to get training session: $e');
+      throw TrainingSessionException('Failed to get training session: $e',
+          code: 'unknown');
     }
   }
 
@@ -50,9 +57,20 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .snapshots()
           .map((snapshot) => snapshot.exists
               ? TrainingSessionModel.fromFirestore(snapshot)
-              : null);
+              : null)
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to stream training session: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to stream training session: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception('Failed to stream training session: $e');
+      throw TrainingSessionException('Failed to stream training session: $e',
+          code: 'stream-error');
     }
   }
 
@@ -68,9 +86,21 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .map((snapshot) => snapshot.docs
               .where((doc) => doc.exists)
               .map((doc) => TrainingSessionModel.fromFirestore(doc))
-              .toList());
+              .toList())
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to get training sessions for group: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to get training sessions for group: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception('Failed to get training sessions for group: $e');
+      throw TrainingSessionException(
+          'Failed to get training sessions for group: $e',
+          code: 'stream-error');
     }
   }
 
@@ -89,9 +119,21 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .map((snapshot) => snapshot.docs
               .where((doc) => doc.exists)
               .map((doc) => TrainingSessionModel.fromFirestore(doc))
-              .toList());
+              .toList())
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to get upcoming training sessions for group: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to get upcoming training sessions for group: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception('Failed to get upcoming training sessions for group: $e');
+      throw TrainingSessionException(
+          'Failed to get upcoming training sessions for group: $e',
+          code: 'stream-error');
     }
   }
 
@@ -114,8 +156,14 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .where((doc) => doc.exists)
           .map((doc) => TrainingSessionModel.fromFirestore(doc))
           .toList();
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to get past training sessions for group: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to get past training sessions for group: $e');
+      throw TrainingSessionException(
+          'Failed to get past training sessions for group: $e',
+          code: 'unknown');
     }
   }
 
@@ -131,9 +179,21 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .map((snapshot) => snapshot.docs
               .where((doc) => doc.exists)
               .map((doc) => TrainingSessionModel.fromFirestore(doc))
-              .toList());
+              .toList())
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to get training sessions for user: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to get training sessions for user: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception('Failed to get training sessions for user: $e');
+      throw TrainingSessionException(
+          'Failed to get training sessions for user: $e',
+          code: 'stream-error');
     }
   }
 
@@ -147,9 +207,21 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .where('startTime', isGreaterThan: now)
           .where('status', isEqualTo: 'scheduled')
           .snapshots()
-          .map((snapshot) => snapshot.docs.length);
+          .map((snapshot) => snapshot.docs.length)
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to get upcoming training sessions count: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to get upcoming training sessions count: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception('Failed to get upcoming training sessions count: $e');
+      throw TrainingSessionException(
+          'Failed to get upcoming training sessions count: $e',
+          code: 'stream-error');
     }
   }
 
@@ -162,7 +234,8 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
 
       // Prepare recurrence rule for Cloud Function if present
       Map<String, dynamic>? recurrenceRuleData;
-      if (session.recurrenceRule != null && session.recurrenceRule!.isRecurring) {
+      if (session.recurrenceRule != null &&
+          session.recurrenceRule!.isRecurring) {
         recurrenceRuleData = session.recurrenceRule!.toJson();
       }
 
@@ -186,18 +259,30 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       // Handle specific Cloud Function errors with user-friendly messages
       switch (e.code) {
         case 'unauthenticated':
-          throw Exception('You must be logged in to create a training session');
+          throw TrainingSessionException(
+              'You must be logged in to create a training session',
+              code: e.code);
         case 'permission-denied':
-          throw Exception('Creator is not a member of the group');
+          throw TrainingSessionException(
+              'Creator is not a member of the group',
+              code: e.code);
         case 'not-found':
-          throw Exception('Group not found');
+          throw TrainingSessionException('Group not found', code: e.code);
         case 'invalid-argument':
-          throw Exception(e.message ?? 'Invalid session data');
+          throw TrainingSessionException(e.message ?? 'Invalid session data',
+              code: e.code);
         default:
-          throw Exception('Failed to create training session: ${e.message}');
+          throw TrainingSessionException(
+              'Failed to create training session: ${e.message}',
+              code: e.code);
       }
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to create training session: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to create training session: $e');
+      throw TrainingSessionException('Failed to create training session: $e',
+          code: 'unknown');
     }
   }
 
@@ -214,7 +299,8 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     try {
       final currentSession = await getTrainingSessionById(sessionId);
       if (currentSession == null) {
-        throw Exception('Training session not found');
+        throw TrainingSessionException('Training session not found',
+            code: 'not-found');
       }
 
       final updatedSession = currentSession.updateInfo(
@@ -230,8 +316,16 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .collection(_collection)
           .doc(sessionId)
           .set(updatedSession.toFirestore(), SetOptions(merge: true));
+    } on TrainingSessionException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to update training session info: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to update training session info: $e');
+      throw TrainingSessionException(
+          'Failed to update training session info: $e',
+          code: 'unknown');
     }
   }
 
@@ -244,7 +338,8 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     try {
       final currentSession = await getTrainingSessionById(sessionId);
       if (currentSession == null) {
-        throw Exception('Training session not found');
+        throw TrainingSessionException('Training session not found',
+            code: 'not-found');
       }
 
       final updatedSession = currentSession.updateSettings(
@@ -256,8 +351,16 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .collection(_collection)
           .doc(sessionId)
           .set(updatedSession.toFirestore(), SetOptions(merge: true));
+    } on TrainingSessionException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to update training session settings: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to update training session settings: $e');
+      throw TrainingSessionException(
+          'Failed to update training session settings: $e',
+          code: 'unknown');
     }
   }
 
@@ -274,20 +377,32 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       // Handle specific Cloud Function errors with user-friendly messages
       switch (e.code) {
         case 'unauthenticated':
-          throw Exception('You must be logged in to join a training session');
+          throw TrainingSessionException(
+              'You must be logged in to join a training session',
+              code: e.code);
         case 'permission-denied':
-          throw Exception('You must be a member of the group to join');
+          throw TrainingSessionException(
+              'You must be a member of the group to join',
+              code: e.code);
         case 'not-found':
-          throw Exception('Training session not found');
+          throw TrainingSessionException('Training session not found',
+              code: e.code);
         case 'failed-precondition':
-          throw Exception(e.message ?? 'Cannot join this training session');
+          throw TrainingSessionException(
+              e.message ?? 'Cannot join this training session',
+              code: e.code);
         case 'already-exists':
-          throw Exception('You have already joined this training session');
+          throw TrainingSessionException(
+              'You have already joined this training session',
+              code: e.code);
         default:
-          throw Exception('Failed to join training session: ${e.message}');
+          throw TrainingSessionException(
+              'Failed to join training session: ${e.message}',
+              code: e.code);
       }
     } catch (e) {
-      throw Exception('Failed to join training session: $e');
+      throw TrainingSessionException('Failed to join training session: $e',
+          code: 'unknown');
     }
   }
 
@@ -304,16 +419,24 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       // Handle specific Cloud Function errors with user-friendly messages
       switch (e.code) {
         case 'unauthenticated':
-          throw Exception('You must be logged in to leave a training session');
+          throw TrainingSessionException(
+              'You must be logged in to leave a training session',
+              code: e.code);
         case 'not-found':
-          throw Exception('Training session not found');
+          throw TrainingSessionException('Training session not found',
+              code: e.code);
         case 'failed-precondition':
-          throw Exception(e.message ?? 'Cannot leave this training session');
+          throw TrainingSessionException(
+              e.message ?? 'Cannot leave this training session',
+              code: e.code);
         default:
-          throw Exception('Failed to leave training session: ${e.message}');
+          throw TrainingSessionException(
+              'Failed to leave training session: ${e.message}',
+              code: e.code);
       }
     } catch (e) {
-      throw Exception('Failed to leave training session: $e');
+      throw TrainingSessionException('Failed to leave training session: $e',
+          code: 'unknown');
     }
   }
 
@@ -322,24 +445,28 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     try {
       final currentSession = await getTrainingSessionById(sessionId);
       if (currentSession == null) {
-        throw Exception('Training session not found');
+        throw TrainingSessionException('Training session not found',
+            code: 'not-found');
       }
 
       // Validate user is a member of the group
       final groupMembers =
           await _groupRepository.getGroupMembers(currentSession.groupId);
       if (!groupMembers.contains(userId)) {
-        throw Exception('User is not a member of the group');
+        throw TrainingSessionException('User is not a member of the group',
+            code: 'permission-denied');
       }
 
       // Check if session is full
       if (currentSession.isFull) {
-        throw Exception('Training session is full');
+        throw TrainingSessionException('Training session is full',
+            code: 'failed-precondition');
       }
 
       // Check if session is still scheduled
       if (currentSession.status != TrainingStatus.scheduled) {
-        throw Exception('Training session is not scheduled');
+        throw TrainingSessionException('Training session is not scheduled',
+            code: 'invalid-state');
       }
 
       final updatedSession = currentSession.addParticipant(userId);
@@ -348,14 +475,14 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .collection(_collection)
           .doc(sessionId)
           .set(updatedSession.toFirestore(), SetOptions(merge: true));
+    } on TrainingSessionException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException('Failed to add participant: ${e.message}',
+          code: e.code);
     } catch (e) {
-      if (e.toString().contains('Training session not found') ||
-          e.toString().contains('User is not a member') ||
-          e.toString().contains('Training session is full') ||
-          e.toString().contains('Training session is not scheduled')) {
-        rethrow;
-      }
-      throw Exception('Failed to add participant: $e');
+      throw TrainingSessionException('Failed to add participant: $e',
+          code: 'unknown');
     }
   }
 
@@ -364,7 +491,8 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     try {
       final currentSession = await getTrainingSessionById(sessionId);
       if (currentSession == null) {
-        throw Exception('Training session not found');
+        throw TrainingSessionException('Training session not found',
+            code: 'not-found');
       }
 
       final updatedSession = currentSession.removeParticipant(userId);
@@ -373,8 +501,15 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .collection(_collection)
           .doc(sessionId)
           .set(updatedSession.toFirestore(), SetOptions(merge: true));
+    } on TrainingSessionException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to remove participant: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to remove participant: $e');
+      throw TrainingSessionException('Failed to remove participant: $e',
+          code: 'unknown');
     }
   }
 
@@ -391,19 +526,28 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       // Handle specific Cloud Function errors with user-friendly messages
       switch (e.code) {
         case 'unauthenticated':
-          throw Exception('You must be logged in to cancel a training session');
+          throw TrainingSessionException(
+              'You must be logged in to cancel a training session',
+              code: e.code);
         case 'permission-denied':
-          throw Exception(
-              'Only the session creator can cancel this training session');
+          throw TrainingSessionException(
+              'Only the session creator can cancel this training session',
+              code: e.code);
         case 'not-found':
-          throw Exception('Training session not found');
+          throw TrainingSessionException('Training session not found',
+              code: e.code);
         case 'failed-precondition':
-          throw Exception(e.message ?? 'Cannot cancel this training session');
+          throw TrainingSessionException(
+              e.message ?? 'Cannot cancel this training session',
+              code: e.code);
         default:
-          throw Exception('Failed to cancel training session: ${e.message}');
+          throw TrainingSessionException(
+              'Failed to cancel training session: ${e.message}',
+              code: e.code);
       }
     } catch (e) {
-      throw Exception('Failed to cancel training session: $e');
+      throw TrainingSessionException('Failed to cancel training session: $e',
+          code: 'unknown');
     }
   }
 
@@ -412,7 +556,8 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     try {
       final currentSession = await getTrainingSessionById(sessionId);
       if (currentSession == null) {
-        throw Exception('Training session not found');
+        throw TrainingSessionException('Training session not found',
+            code: 'not-found');
       }
 
       final updatedSession = currentSession.completeSession();
@@ -421,8 +566,15 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .collection(_collection)
           .doc(sessionId)
           .set(updatedSession.toFirestore(), SetOptions(merge: true));
+    } on TrainingSessionException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to complete training session: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to complete training session: $e');
+      throw TrainingSessionException('Failed to complete training session: $e',
+          code: 'unknown');
     }
   }
 
@@ -431,7 +583,8 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     try {
       final currentSession = await getTrainingSessionById(sessionId);
       if (currentSession == null) {
-        throw Exception('Training session not found');
+        throw TrainingSessionException('Training session not found',
+            code: 'not-found');
       }
 
       // Only update if session is scheduled and past endTime
@@ -465,8 +618,16 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .set(updatedSession.toFirestore(), SetOptions(merge: true));
 
       return updatedSession.status;
+    } on TrainingSessionException {
+      rethrow;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to update training session status: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to update training session status: $e');
+      throw TrainingSessionException(
+          'Failed to update training session status: $e',
+          code: 'unknown');
     }
   }
 
@@ -474,18 +635,30 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
   Future<void> deleteTrainingSession(String sessionId) async {
     try {
       await _firestore.collection(_collection).doc(sessionId).delete();
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to delete training session: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to delete training session: $e');
+      throw TrainingSessionException('Failed to delete training session: $e',
+          code: 'unknown');
     }
   }
 
   @override
   Future<bool> trainingSessionExists(String sessionId) async {
     try {
-      final doc = await _firestore.collection(_collection).doc(sessionId).get();
+      final doc =
+          await _firestore.collection(_collection).doc(sessionId).get();
       return doc.exists;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to check if training session exists: ${e.message}',
+          code: e.code);
     } catch (e) {
-      throw Exception('Failed to check if training session exists: $e');
+      throw TrainingSessionException(
+          'Failed to check if training session exists: $e',
+          code: 'unknown');
     }
   }
 
@@ -494,8 +667,12 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     try {
       final session = await getTrainingSessionById(sessionId);
       return session?.participantIds ?? [];
+    } on TrainingSessionException {
+      rethrow;
     } catch (e) {
-      throw Exception('Failed to get training session participants: $e');
+      throw TrainingSessionException(
+          'Failed to get training session participants: $e',
+          code: 'unknown');
     }
   }
 
@@ -512,14 +689,18 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       if (!groupMembers.contains(userId)) return false;
 
       return session.canUserJoin(userId);
+    } on TrainingSessionException {
+      rethrow;
     } catch (e) {
-      throw Exception('Failed to check if user can join training session: $e');
+      throw TrainingSessionException(
+          'Failed to check if user can join training session: $e',
+          code: 'unknown');
     }
   }
 
   @override
-  Stream<List<TrainingSessionParticipantModel>> getTrainingSessionParticipantsStream(
-      String sessionId) {
+  Stream<List<TrainingSessionParticipantModel>>
+      getTrainingSessionParticipantsStream(String sessionId) {
     try {
       return _firestore
           .collection(_collection)
@@ -530,9 +711,21 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .map((snapshot) => snapshot.docs
               .where((doc) => doc.exists)
               .map((doc) => TrainingSessionParticipantModel.fromFirestore(doc))
-              .toList());
+              .toList())
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to stream training session participants: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to stream training session participants: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception('Failed to stream training session participants: $e');
+      throw TrainingSessionException(
+          'Failed to stream training session participants: $e',
+          code: 'stream-error');
     }
   }
 
@@ -545,9 +738,21 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .collection('participants')
           .where('status', isEqualTo: 'joined')
           .snapshots()
-          .map((snapshot) => snapshot.docs.length);
+          .map((snapshot) => snapshot.docs.length)
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to stream training session participant count: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to stream training session participant count: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception('Failed to stream training session participant count: $e');
+      throw TrainingSessionException(
+          'Failed to stream training session participant count: $e',
+          code: 'stream-error');
     }
   }
 
@@ -567,9 +772,21 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .map((snapshot) => snapshot.docs
               .where((doc) => doc.exists)
               .map((doc) => TrainingSessionModel.fromFirestore(doc))
-              .toList());
+              .toList())
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to get recurring session instances: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to get recurring session instances: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception('Failed to get recurring session instances: $e');
+      throw TrainingSessionException(
+          'Failed to get recurring session instances: $e',
+          code: 'stream-error');
     }
   }
 
@@ -588,10 +805,21 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
           .map((snapshot) => snapshot.docs
               .where((doc) => doc.exists)
               .map((doc) => TrainingSessionModel.fromFirestore(doc))
-              .toList());
+              .toList())
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to get upcoming recurring session instances: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to get upcoming recurring session instances: $error',
+            code: 'stream-error');
+      });
     } catch (e) {
-      throw Exception(
-          'Failed to get upcoming recurring session instances: $e');
+      throw TrainingSessionException(
+          'Failed to get upcoming recurring session instances: $e',
+          code: 'stream-error');
     }
   }
 
@@ -613,21 +841,30 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
       // Handle specific Cloud Function errors with user-friendly messages
       switch (e.code) {
         case 'unauthenticated':
-          throw Exception(
-              'You must be logged in to generate recurring sessions');
+          throw TrainingSessionException(
+              'You must be logged in to generate recurring sessions',
+              code: e.code);
         case 'permission-denied':
-          throw Exception('Only the creator can generate recurring instances');
+          throw TrainingSessionException(
+              'Only the creator can generate recurring instances',
+              code: e.code);
         case 'not-found':
-          throw Exception('Parent training session not found');
+          throw TrainingSessionException('Parent training session not found',
+              code: e.code);
         case 'invalid-argument':
-          throw Exception(e.message ??
-              'Invalid recurrence rule or parent session configuration');
+          throw TrainingSessionException(
+              e.message ??
+                  'Invalid recurrence rule or parent session configuration',
+              code: e.code);
         default:
-          throw Exception(
-              'Failed to generate recurring instances: ${e.message}');
+          throw TrainingSessionException(
+              'Failed to generate recurring instances: ${e.message}',
+              code: e.code);
       }
     } catch (e) {
-      throw Exception('Failed to generate recurring instances: $e');
+      throw TrainingSessionException(
+          'Failed to generate recurring instances: $e',
+          code: 'unknown');
     }
   }
 
@@ -636,23 +873,25 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     try {
       final session = await getTrainingSessionById(instanceId);
       if (session == null) {
-        throw Exception('Training session instance not found');
+        throw TrainingSessionException('Training session instance not found',
+            code: 'not-found');
       }
 
       // Verify this is actually an instance (has parentSessionId)
       if (!session.isRecurrenceInstance) {
-        throw Exception(
-            'This is not a recurring session instance. Use cancelTrainingSession instead.');
+        throw TrainingSessionException(
+            'This is not a recurring session instance. Use cancelTrainingSession instead.',
+            code: 'invalid-argument');
       }
 
       // Cancel the instance using the standard cancel method
       await cancelTrainingSession(instanceId);
+    } on TrainingSessionException {
+      rethrow;
     } catch (e) {
-      if (e.toString().contains('Training session instance not found') ||
-          e.toString().contains('This is not a recurring session instance')) {
-        rethrow;
-      }
-      throw Exception('Failed to cancel recurring session instance: $e');
+      throw TrainingSessionException(
+          'Failed to cancel recurring session instance: $e',
+          code: 'unknown');
     }
   }
 }

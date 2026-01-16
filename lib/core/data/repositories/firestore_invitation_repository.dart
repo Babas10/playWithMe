@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../domain/exceptions/repository_exceptions.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../../domain/repositories/invitation_repository.dart';
 import '../models/invitation_model.dart';
@@ -63,9 +64,9 @@ class FirestoreInvitationRepository implements InvitationRepository {
         default:
           message = 'Failed to send invitation: ${e.message ?? e.code}';
       }
-      throw Exception(message);
+      throw InvitationException(message, code: e.code);
     } catch (e) {
-      throw Exception('Failed to send invitation: $e');
+      throw InvitationException('Failed to send invitation: $e');
     }
   }
 
@@ -86,7 +87,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
             .toList();
       });
     } catch (e) {
-      throw Exception('Failed to get pending invitations: $e');
+      throw InvitationException('Failed to get pending invitations: $e');
     }
   }
 
@@ -105,7 +106,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
           .map((doc) => InvitationModel.fromFirestore(doc))
           .toList();
     } catch (e) {
-      throw Exception('Failed to get invitations: $e');
+      throw InvitationException('Failed to get invitations: $e');
     }
   }
 
@@ -124,7 +125,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
 
       return doc.exists ? InvitationModel.fromFirestore(doc) : null;
     } catch (e) {
-      throw Exception('Failed to get invitation: $e');
+      throw InvitationException('Failed to get invitation: $e');
     }
   }
 
@@ -141,9 +142,9 @@ class FirestoreInvitationRepository implements InvitationRepository {
         'invitationId': invitationId,
       });
     } on FirebaseFunctionsException catch (e) {
-      throw Exception('Failed to accept invitation: ${e.message ?? e.code}');
+      throw InvitationException('Failed to accept invitation: ${e.message ?? e.code}');
     } catch (e) {
-      throw Exception('Failed to accept invitation: $e');
+      throw InvitationException('Failed to accept invitation: $e');
     }
   }
 
@@ -159,9 +160,9 @@ class FirestoreInvitationRepository implements InvitationRepository {
         'invitationId': invitationId,
       });
     } on FirebaseFunctionsException catch (e) {
-      throw Exception('Failed to decline invitation: ${e.message ?? e.code}');
+      throw InvitationException('Failed to decline invitation: ${e.message ?? e.code}');
     } catch (e) {
-      throw Exception('Failed to decline invitation: $e');
+      throw InvitationException('Failed to decline invitation: $e');
     }
   }
 
@@ -178,7 +179,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
           .doc(invitationId)
           .delete();
     } catch (e) {
-      throw Exception('Failed to delete invitation: $e');
+      throw InvitationException('Failed to delete invitation: $e');
     }
   }
 
@@ -199,7 +200,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
 
       return snapshot.docs.isNotEmpty;
     } catch (e) {
-      throw Exception('Failed to check pending invitation: $e');
+      throw InvitationException('Failed to check pending invitation: $e');
     }
   }
 
@@ -213,7 +214,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
       throw UnimplementedError(
           'Getting invitations sent by user requires different schema');
     } catch (e) {
-      throw Exception('Failed to get invitations sent by user: $e');
+      throw InvitationException('Failed to get invitations sent by user: $e');
     }
   }
 
@@ -229,7 +230,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
         invitationId: invitationId,
       );
     } catch (e) {
-      throw Exception('Failed to cancel invitation: $e');
+      throw InvitationException('Failed to cancel invitation: $e');
     }
   }
 }
