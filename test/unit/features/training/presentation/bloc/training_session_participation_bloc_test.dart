@@ -258,9 +258,9 @@ void main() {
         act: (bloc) => bloc.add(const JoinTrainingSession(testSessionId)),
         expect: () => [
           const JoiningSession(testSessionId),
-          // Now correctly extracts the exception message
+          // Now provides a user-friendly generic fallback message
           const ParticipationError(
-            message: 'Unknown error',
+            message: 'Failed to join training session. Please try again.',
           ),
         ],
       );
@@ -367,9 +367,9 @@ void main() {
         act: (bloc) => bloc.add(const LeaveTrainingSession(testSessionId)),
         expect: () => [
           const LeavingSession(testSessionId),
-          // Now correctly extracts the exception message
+          // Now provides a user-friendly generic fallback message
           const ParticipationError(
-            message: 'Unknown error',
+            message: 'Failed to leave training session. Please try again.',
           ),
         ],
       );
@@ -552,8 +552,9 @@ void main() {
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
         expect: () => [
           const CancellingSession(testSessionId),
+          // Now provides a user-friendly generic fallback message
           const ParticipationError(
-            message: 'Unknown error',
+            message: 'Failed to cancel training session. Please try again.',
           ),
         ],
       );

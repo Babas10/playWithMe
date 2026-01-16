@@ -347,6 +347,172 @@ try {
 
 ---
 
+### **🚨 Error Handling Patterns (Critical)**
+
+The app uses **custom exception classes** for consistent error handling across repositories and BLoCs. This pattern ensures:
+- Type-safe error catching
+- Consistent error codes for analytics and debugging
+- User-friendly error messages
+- Proper error propagation from repositories to UI
+
+#### **Custom Exception Classes**
+
+All custom exceptions are defined in `lib/core/domain/exceptions/repository_exceptions.dart`:
+
+```dart
+/// Exception thrown by GameRepository operations.
+class GameException implements Exception {
+  final String message;
+  final String? code;
+
+  GameException(this.message, {this.code});
+
+  @override
+  String toString() => message;
+}
+```
+
+**Available Exception Classes:**
+| Exception Class | Used By |
+|----------------|---------|
+| `GameException` | `GameRepository` |
+| `TrainingSessionException` | `TrainingSessionRepository` |
+| `GroupException` | `GroupRepository` |
+| `InvitationException` | `InvitationRepository` |
+| `UserException` | `UserRepository` |
+| `ExerciseException` | `ExerciseRepository` |
+| `ImageStorageException` | `ImageStorageRepository` |
+| `FriendshipException` | `FriendRepository` |
+
+#### **Repository Error Handling**
+
+Repositories must:
+1. **Catch Firebase exceptions** and convert them to custom exceptions
+2. **Include error codes** from Firebase when available
+3. **Provide meaningful error messages**
+
+```dart
+// ✅ CORRECT - Repository throwing custom exception
+Future<String> createGame(GameModel game) async {
+  try {
+    final docRef = await _firestore.collection('games').add(game.toJson());
+    return docRef.id;
+  } on FirebaseException catch (e) {
+    throw GameException(
+      'Failed to create game: ${e.message}',
+      code: e.code,
+    );
+  } catch (e) {
+    throw GameException('Failed to create game: $e');
+  }
+}
+
+// ❌ WRONG - Throwing generic Exception
+Future<String> createGame(GameModel game) async {
+  try {
+    final docRef = await _firestore.collection('games').add(game.toJson());
+    return docRef.id;
+  } catch (e) {
+    throw Exception('Failed to create game: $e'); // Don't do this!
+  }
+}
+```
+
+#### **BLoC Error Handling**
+
+BLoCs must:
+1. **Catch specific custom exceptions first**
+2. **Fall back to generic catch** for unexpected errors
+3. **Extract error codes** for state emission
+
+```dart
+// ✅ CORRECT - BLoC catching specific exception first
+Future<void> _onSubmitGame(
+  SubmitGame event,
+  Emitter<GameCreationState> emit,
+) async {
+  try {
+    emit(const GameCreationSubmitting());
+    final gameId = await _gameRepository.createGame(game);
+    emit(GameCreationSuccess(gameId: gameId));
+  } on GameException catch (e) {
+    emit(GameCreationError(
+      message: e.message,
+      errorCode: e.code ?? 'CREATE_GAME_ERROR',
+    ));
+  } catch (e) {
+    emit(GameCreationError(
+      message: 'Failed to create game: ${e.toString()}',
+      errorCode: 'CREATE_GAME_ERROR',
+    ));
+  }
+}
+
+// ❌ WRONG - Only catching generic exception
+} catch (e) {
+  emit(GameCreationError(message: e.toString())); // Don't do this!
+}
+```
+
+#### **Error Messages Utility**
+
+Use `lib/core/utils/error_messages.dart` for converting exceptions to user-friendly messages:
+
+```dart
+// In error_messages.dart
+static (String message, bool isRetryable) getErrorMessage(Exception e) {
+  // Check for custom repository exceptions first
+  if (e is GameException) {
+    return (e.message, _isRetryableByCode(e.code));
+  }
+  // Then check Firebase exceptions
+  if (e is FirebaseFunctionsException) {
+    return _getCloudFunctionErrorMessage(e);
+  }
+  // ...
+}
+```
+
+**Feature-Specific Error Message Classes:**
+- `GroupErrorMessages.getErrorMessage(e)` - For group operations
+- `InvitationErrorMessages.getErrorMessage(e)` - For invitation operations
+
+#### **Adding a New Custom Exception**
+
+When creating a new repository:
+
+1. **Add exception class** to `repository_exceptions.dart`:
+   ```dart
+   class NewFeatureException implements Exception {
+     final String message;
+     final String? code;
+     NewFeatureException(this.message, {this.code});
+     @override
+     String toString() => message;
+   }
+   ```
+
+2. **Update `error_messages.dart`** to handle the new exception:
+   ```dart
+   if (e is NewFeatureException) {
+     return (e.message, _isRetryableByCode(e.code));
+   }
+   ```
+
+3. **Use in repository**:
+   ```dart
+   throw NewFeatureException('Error message', code: 'ERROR_CODE');
+   ```
+
+4. **Catch in BLoC**:
+   ```dart
+   } on NewFeatureException catch (e) {
+     emit(NewFeatureError(message: e.message, errorCode: e.code));
+   }
+   ```
+
+---
+
 ### **Continuous Integration & Linting**
 
 * Use `flutter analyze` and `dart test` before committing.

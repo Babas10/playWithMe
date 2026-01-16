@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../domain/exceptions/repository_exceptions.dart';
 import '../../domain/repositories/group_repository.dart';
 import '../../utils/error_messages.dart';
 import '../models/group_model.dart';
@@ -40,7 +41,7 @@ class FirestoreGroupRepository implements GroupRepository {
         rethrow;
       }
     }
-    throw Exception('Max retries exceeded');
+    throw GroupException('Max retries exceeded', code: 'retry-failed');
   }
 
   @override
@@ -49,7 +50,7 @@ class FirestoreGroupRepository implements GroupRepository {
       final doc = await _firestore.collection(_collection).doc(groupId).get();
       return doc.exists ? GroupModel.fromFirestore(doc) : null;
     } catch (e) {
-      throw Exception('Failed to get group: $e');
+      throw GroupException('Failed to get group: $e');
     }
   }
 
@@ -78,7 +79,7 @@ class FirestoreGroupRepository implements GroupRepository {
 
       return groups;
     } catch (e) {
-      throw Exception('Failed to get groups: $e');
+      throw GroupException('Failed to get groups: $e');
     }
   }
 
@@ -102,11 +103,11 @@ class FirestoreGroupRepository implements GroupRepository {
             if (error is FirebaseException &&
                 error.code == 'failed-precondition' &&
                 error.message?.contains('index') == true) {
-              throw Exception(
-                'Firestore index required. Please run: firebase deploy --only firestore:indexes'
-              );
+              throw GroupException(
+                'Firestore index required. Please run: firebase deploy --only firestore:indexes',
+                code: 'failed-precondition');
             }
-            throw Exception('Failed to get groups for user: $error');
+            throw GroupException('Failed to get groups for user: $error');
           })
           .map((snapshot) {
             print('📊 [GroupRepository] Snapshot received with ${snapshot.docs.length} documents');
@@ -138,7 +139,7 @@ class FirestoreGroupRepository implements GroupRepository {
     } catch (e, stackTrace) {
       print('❌ [GroupRepository] Exception in getGroupsForUser: $e');
       print('   Stack trace: $stackTrace');
-      throw Exception('Failed to get groups for user: $e');
+      throw GroupException('Failed to get groups for user: $e');
     }
   }
 
@@ -153,7 +154,7 @@ class FirestoreGroupRepository implements GroupRepository {
             .add(data);
         return docRef.id;
       } catch (e) {
-        throw Exception('Failed to create group: $e');
+        throw GroupException('Failed to create group: $e');
       }
     });
   }
@@ -169,7 +170,7 @@ class FirestoreGroupRepository implements GroupRepository {
       try {
         final currentGroup = await getGroupById(groupId);
         if (currentGroup == null) {
-          throw Exception('Group not found');
+          throw GroupException('Group not found', code: 'not-found');
         }
 
         final updatedGroup = currentGroup.updateInfo(
@@ -184,7 +185,7 @@ class FirestoreGroupRepository implements GroupRepository {
             .doc(groupId)
             .set(updatedGroup.toFirestore(), SetOptions(merge: true));
       } catch (e) {
-        throw Exception('Failed to update group info: $e');
+        throw GroupException('Failed to update group info: $e');
       }
     });
   }
@@ -201,7 +202,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       final currentGroup = await getGroupById(groupId);
       if (currentGroup == null) {
-        throw Exception('Group not found');
+        throw GroupException('Group not found', code: 'not-found');
       }
 
       final updatedGroup = currentGroup.updateSettings(
@@ -218,7 +219,7 @@ class FirestoreGroupRepository implements GroupRepository {
           .doc(groupId)
           .set(updatedGroup.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      throw Exception('Failed to update group settings: $e');
+      throw GroupException('Failed to update group settings: $e');
     }
   }
 
@@ -228,7 +229,7 @@ class FirestoreGroupRepository implements GroupRepository {
       try {
         final currentGroup = await getGroupById(groupId);
         if (currentGroup == null) {
-          throw Exception('Group not found');
+          throw GroupException('Group not found', code: 'not-found');
         }
 
         final updatedGroup = currentGroup.addMember(userId);
@@ -238,7 +239,7 @@ class FirestoreGroupRepository implements GroupRepository {
             .doc(groupId)
             .set(updatedGroup.toFirestore(), SetOptions(merge: true));
       } catch (e) {
-        throw Exception('Failed to add member: $e');
+        throw GroupException('Failed to add member: $e');
       }
     });
   }
@@ -248,7 +249,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       final currentGroup = await getGroupById(groupId);
       if (currentGroup == null) {
-        throw Exception('Group not found');
+        throw GroupException('Group not found', code: 'not-found');
       }
 
       final updatedGroup = currentGroup.removeMember(userId);
@@ -258,7 +259,7 @@ class FirestoreGroupRepository implements GroupRepository {
           .doc(groupId)
           .set(updatedGroup.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      throw Exception('Failed to remove member: $e');
+      throw GroupException('Failed to remove member: $e');
     }
   }
 
@@ -271,12 +272,12 @@ class FirestoreGroupRepository implements GroupRepository {
       });
 
       if (result.data['success'] != true) {
-        throw Exception(result.data['message'] ?? 'Failed to leave group');
+        throw GroupException(result.data['message'] ?? 'Failed to leave group', code: 'unknown');
       }
     } on FirebaseFunctionsException catch (e) {
-      throw Exception(e.message ?? 'Failed to leave group');
+      throw GroupException(e.message ?? 'Failed to leave group', code: e.code);
     } catch (e) {
-      throw Exception('Failed to leave group: $e');
+      throw GroupException('Failed to leave group: $e', code: 'unknown');
     }
   }
 
@@ -285,7 +286,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       final currentGroup = await getGroupById(groupId);
       if (currentGroup == null) {
-        throw Exception('Group not found');
+        throw GroupException('Group not found', code: 'not-found');
       }
 
       final updatedGroup = currentGroup.promoteToAdmin(userId);
@@ -295,7 +296,7 @@ class FirestoreGroupRepository implements GroupRepository {
           .doc(groupId)
           .set(updatedGroup.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      throw Exception('Failed to promote to admin: $e');
+      throw GroupException('Failed to promote to admin: $e');
     }
   }
 
@@ -304,7 +305,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       final currentGroup = await getGroupById(groupId);
       if (currentGroup == null) {
-        throw Exception('Group not found');
+        throw GroupException('Group not found', code: 'not-found');
       }
 
       final updatedGroup = currentGroup.demoteFromAdmin(userId);
@@ -314,7 +315,7 @@ class FirestoreGroupRepository implements GroupRepository {
           .doc(groupId)
           .set(updatedGroup.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      throw Exception('Failed to demote from admin: $e');
+      throw GroupException('Failed to demote from admin: $e');
     }
   }
 
@@ -323,7 +324,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       final currentGroup = await getGroupById(groupId);
       if (currentGroup == null) {
-        throw Exception('Group not found');
+        throw GroupException('Group not found', code: 'not-found');
       }
 
       final updatedGroup = currentGroup.addGame(gameId);
@@ -333,7 +334,7 @@ class FirestoreGroupRepository implements GroupRepository {
           .doc(groupId)
           .set(updatedGroup.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      throw Exception('Failed to add game: $e');
+      throw GroupException('Failed to add game: $e');
     }
   }
 
@@ -342,7 +343,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       final currentGroup = await getGroupById(groupId);
       if (currentGroup == null) {
-        throw Exception('Group not found');
+        throw GroupException('Group not found', code: 'not-found');
       }
 
       final updatedGroup = currentGroup.removeGame(gameId);
@@ -352,7 +353,7 @@ class FirestoreGroupRepository implements GroupRepository {
           .doc(groupId)
           .set(updatedGroup.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      throw Exception('Failed to remove game: $e');
+      throw GroupException('Failed to remove game: $e');
     }
   }
 
@@ -361,7 +362,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       final currentGroup = await getGroupById(groupId);
       if (currentGroup == null) {
-        throw Exception('Group not found');
+        throw GroupException('Group not found', code: 'not-found');
       }
 
       final updatedGroup = currentGroup.updateActivity();
@@ -371,7 +372,7 @@ class FirestoreGroupRepository implements GroupRepository {
           .doc(groupId)
           .set(updatedGroup.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      throw Exception('Failed to update activity: $e');
+      throw GroupException('Failed to update activity: $e');
     }
   }
 
@@ -396,7 +397,7 @@ class FirestoreGroupRepository implements GroupRepository {
           .map((doc) => GroupModel.fromFirestore(doc))
           .toList();
     } catch (e) {
-      throw Exception('Failed to search public groups: $e');
+      throw GroupException('Failed to search public groups: $e');
     }
   }
 
@@ -406,7 +407,7 @@ class FirestoreGroupRepository implements GroupRepository {
       final group = await getGroupById(groupId);
       return group?.memberIds ?? [];
     } catch (e) {
-      throw Exception('Failed to get group members: $e');
+      throw GroupException('Failed to get group members: $e');
     }
   }
 
@@ -416,7 +417,7 @@ class FirestoreGroupRepository implements GroupRepository {
       final group = await getGroupById(groupId);
       return group?.adminIds ?? [];
     } catch (e) {
-      throw Exception('Failed to get group admins: $e');
+      throw GroupException('Failed to get group admins: $e');
     }
   }
 
@@ -437,7 +438,7 @@ class FirestoreGroupRepository implements GroupRepository {
 
       return true;
     } catch (e) {
-      throw Exception('Failed to check if user can join group: $e');
+      throw GroupException('Failed to check if user can join group: $e');
     }
   }
 
@@ -446,7 +447,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       await _firestore.collection(_collection).doc(groupId).delete();
     } catch (e) {
-      throw Exception('Failed to delete group: $e');
+      throw GroupException('Failed to delete group: $e');
     }
   }
 
@@ -456,7 +457,7 @@ class FirestoreGroupRepository implements GroupRepository {
       final doc = await _firestore.collection(_collection).doc(groupId).get();
       return doc.exists;
     } catch (e) {
-      throw Exception('Failed to check if group exists: $e');
+      throw GroupException('Failed to check if group exists: $e');
     }
   }
 
@@ -465,7 +466,7 @@ class FirestoreGroupRepository implements GroupRepository {
     try {
       final group = await getGroupById(groupId);
       if (group == null) {
-        throw Exception('Group not found');
+        throw GroupException('Group not found', code: 'not-found');
       }
 
       return {
@@ -477,7 +478,7 @@ class FirestoreGroupRepository implements GroupRepository {
         'lastActivity': group.lastActivity?.toIso8601String(),
       };
     } catch (e) {
-      throw Exception('Failed to get group stats: $e');
+      throw GroupException('Failed to get group stats: $e');
     }
   }
 }

@@ -1,12 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../domain/exceptions/repository_exceptions.dart';
+
 /// Utility class for converting exceptions to user-friendly error messages.
 class ErrorMessages {
   /// Convert a Firebase exception to a user-friendly error message.
   ///
   /// Returns a tuple of (message, isRetryable).
   static (String message, bool isRetryable) getErrorMessage(Exception e) {
+    // Check for custom repository exceptions first
+    if (e is GameException ||
+        e is TrainingSessionException ||
+        e is GroupException ||
+        e is InvitationException ||
+        e is UserException ||
+        e is ExerciseException ||
+        e is ImageStorageException) {
+      return (e.toString(), _isRetryableByCode(_getExceptionCode(e)));
+    }
     // Check FirebaseFunctionsException first as it may extend FirebaseException
     if (e is FirebaseFunctionsException) {
       return _getCloudFunctionErrorMessage(e);
@@ -15,6 +27,31 @@ class ErrorMessages {
     } else {
       return ('An unexpected error occurred. Please try again.', true);
     }
+  }
+
+  /// Get the error code from a custom exception
+  static String? _getExceptionCode(Exception e) {
+    if (e is GameException) return e.code;
+    if (e is TrainingSessionException) return e.code;
+    if (e is GroupException) return e.code;
+    if (e is InvitationException) return e.code;
+    if (e is UserException) return e.code;
+    if (e is ExerciseException) return e.code;
+    if (e is ImageStorageException) return e.code;
+    return null;
+  }
+
+  /// Check if an error code indicates a retryable error
+  static bool _isRetryableByCode(String? code) {
+    if (code == null) return true;
+    const nonRetryableCodes = {
+      'permission-denied',
+      'not-found',
+      'already-exists',
+      'unauthenticated',
+      'invalid-argument',
+    };
+    return !nonRetryableCodes.contains(code);
   }
 
   /// Convert a Firestore exception to a user-friendly error message.
@@ -164,6 +201,11 @@ class ErrorMessages {
 class GroupErrorMessages {
   /// Get error message for group operations.
   static (String message, bool isRetryable) getErrorMessage(Exception e) {
+    // Check for custom GroupException first
+    if (e is GroupException) {
+      return (e.message, ErrorMessages._isRetryableByCode(e.code));
+    }
+
     final errorMessage = e.toString().toLowerCase();
 
     // Check for specific group-related errors
@@ -200,6 +242,11 @@ class GroupErrorMessages {
 class InvitationErrorMessages {
   /// Get error message for invitation operations.
   static (String message, bool isRetryable) getErrorMessage(Exception e) {
+    // Check for custom InvitationException first
+    if (e is InvitationException) {
+      return (e.message, ErrorMessages._isRetryableByCode(e.code));
+    }
+
     final errorMessage = e.toString().toLowerCase();
 
     // Check for specific invitation-related errors
