@@ -1,8 +1,6 @@
 // Displays the group activity feed with games and training sessions.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/data/models/group_activity_item.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';

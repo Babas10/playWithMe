@@ -60,8 +60,6 @@ class PartnerDetailPage extends StatelessWidget {
     TeammateStats stats,
     UserModel partner,
   ) {
-    final theme = Theme.of(context);
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
