@@ -1,7 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
-import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
-import 'package:play_with_me/core/data/models/user_model.dart';
 import 'head_to_head_event.dart';
 import 'head_to_head_state.dart';
 

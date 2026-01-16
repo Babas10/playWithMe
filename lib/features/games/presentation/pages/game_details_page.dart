@@ -524,11 +524,6 @@ class _RsvpButtons extends StatelessWidget {
           final isPlaying = game.isPlayer(userId);
           final isOnWaitlist = game.isOnWaitlist(userId);
           final canJoin = game.canUserJoin(userId);
-          final isCreator = game.isCreator(userId);
-          
-          final canMarkCompleted = isCreator &&
-              (game.status == GameStatus.scheduled ||
-                  game.status == GameStatus.inProgress);
 
           // Democratized Result Entry Logic (Story 14.14)
           final canEnterResults = game.canUserEnterResults(userId);

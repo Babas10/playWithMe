@@ -222,7 +222,6 @@ Future<void> initializeDependencies() async {
     sl.registerFactory<RegistrationBloc>(
       () => RegistrationBloc(
         authRepository: sl(),
-        userRepository: sl(),
       ),
     );
   }

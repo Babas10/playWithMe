@@ -96,10 +96,6 @@ class _RecordResultsView extends StatelessWidget {
           }
 
           if (state is RecordResultsLoaded || state is RecordResultsSaving) {
-            final loadedState = state is RecordResultsLoaded
-                ? state
-                : (state as RecordResultsSaving);
-
             return Column(
               children: [
                 Expanded(
