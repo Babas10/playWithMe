@@ -3,6 +3,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/data/models/exercise_model.dart';
+import '../../../../../core/domain/exceptions/repository_exceptions.dart';
 import '../../../../../core/domain/repositories/exercise_repository.dart';
 import '../../../../../core/utils/error_messages.dart';
 import 'exercise_event.dart';
@@ -52,11 +53,16 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
           );
         },
         onError: (error, stackTrace) {
+          if (error is ExerciseException) {
+            return ExerciseError(message: error.message);
+          }
           return ExerciseError(
             message: ErrorMessages.getErrorMessage(error as Exception).$1,
           );
         },
       );
+    } on ExerciseException catch (e) {
+      emit(ExerciseError(message: e.message));
     } catch (e) {
       emit(ExerciseError(
         message: ErrorMessages.getErrorMessage(e as Exception).$1,
@@ -102,6 +108,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
       emit(ExerciseAdded(exerciseId: exerciseId));
 
       // Reload exercises to show updated list
+      emit(ExercisesLoaded(
+        exercises: _currentExercises,
+        canModify: _canModify,
+      ));
+    } on ExerciseException catch (e) {
+      emit(ExerciseError(message: e.message));
+      // Restore previous state after error
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
@@ -155,6 +168,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
         exercises: _currentExercises,
         canModify: _canModify,
       ));
+    } on ExerciseException catch (e) {
+      emit(ExerciseError(message: e.message));
+      // Restore previous state after error
+      emit(ExercisesLoaded(
+        exercises: _currentExercises,
+        canModify: _canModify,
+      ));
     } catch (e) {
       emit(ExerciseError(
         message: ErrorMessages.getErrorMessage(e as Exception).$1,
@@ -197,6 +217,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
       emit(const ExerciseDeleted());
 
       // Reload exercises to show updated list
+      emit(ExercisesLoaded(
+        exercises: _currentExercises,
+        canModify: _canModify,
+      ));
+    } on ExerciseException catch (e) {
+      emit(ExerciseError(message: e.message));
+      // Restore previous state after error
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
 import 'package:play_with_me/core/services/image_picker_service.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
@@ -142,6 +143,11 @@ class AvatarUploadBloc extends Bloc<AvatarUploadEvent, AvatarUploadState> {
       await _authRepository.reloadUser();
 
       emit(AvatarUploadState.uploadSuccess(downloadUrl: downloadUrl));
+    } on ImageStorageException catch (e) {
+      emit(AvatarUploadState.uploadError(
+        message: e.message,
+        imageFile: imageFile,
+      ));
     } catch (e) {
       emit(AvatarUploadState.uploadError(
         message: e.toString().replaceAll('Exception: ', ''),
@@ -185,6 +191,10 @@ class AvatarUploadBloc extends Bloc<AvatarUploadEvent, AvatarUploadState> {
       await _authRepository.reloadUser();
 
       emit(const AvatarUploadState.deleteSuccess());
+    } on ImageStorageException catch (e) {
+      emit(AvatarUploadState.deleteError(
+        message: e.message,
+      ));
     } catch (e) {
       emit(AvatarUploadState.deleteError(
         message: e.toString().replaceAll('Exception: ', ''),

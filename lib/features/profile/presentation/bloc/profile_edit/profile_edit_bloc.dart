@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/profile_edit_event.dart';
@@ -140,6 +141,12 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
       await _authRepository.reloadUser();
 
       emit(const ProfileEditState.success());
+    } on UserException catch (e) {
+      emit(ProfileEditState.error(
+        message: e.message,
+        displayName: _currentDisplayName,
+        photoUrl: _currentPhotoUrl,
+      ));
     } catch (e) {
       emit(ProfileEditState.error(
         message: e.toString().replaceAll('Exception: ', ''),

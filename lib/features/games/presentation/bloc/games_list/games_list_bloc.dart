@@ -1,6 +1,7 @@
 // Manages group activity feed state with real-time Firestore updates (games + training sessions).
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
 import 'package:play_with_me/core/data/models/group_activity_item.dart';
@@ -62,6 +63,10 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
           add(const ActivityListUpdated(activities: []));
         },
       );
+    } on GameException catch (e) {
+      emit(GamesListError(message: e.message));
+    } on TrainingSessionException catch (e) {
+      emit(GamesListError(message: e.message));
     } catch (e) {
       emit(GamesListError(
           message: 'Failed to load activities: ${e.toString()}'));
