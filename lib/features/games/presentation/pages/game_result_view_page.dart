@@ -323,7 +323,6 @@ class _EloUpdatesCard extends StatelessWidget {
               final playerName = _getPlayerName(playerId);
               final oldRating = eloEntry.oldRating.toInt();
               final newRating = eloEntry.newRating.toInt();
-              final change = eloEntry.ratingChange;
               final isGain = eloEntry.isGain;
               final isLoss = eloEntry.isLoss;
 

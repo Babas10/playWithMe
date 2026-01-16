@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
-import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/head_to_head/head_to_head_bloc.dart';
