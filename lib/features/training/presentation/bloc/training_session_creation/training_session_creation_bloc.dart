@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/data/models/game_model.dart';
 import '../../../../../core/data/models/training_session_model.dart';
+import '../../../../../core/domain/exceptions/repository_exceptions.dart';
 import '../../../../../core/domain/repositories/training_session_repository.dart';
 import 'training_session_creation_event.dart';
 import 'training_session_creation_state.dart';
@@ -145,6 +146,11 @@ class TrainingSessionCreationBloc
 
       // Success is handled by the existing success state
       // The UI will navigate away automatically
+    } on TrainingSessionException catch (e) {
+      emit(TrainingSessionCreationError(
+        message: 'Training session created, but failed to generate recurring instances: ${e.message}',
+        errorCode: e.code ?? 'GENERATE_INSTANCES_ERROR',
+      ));
     } catch (e) {
       // If generation fails, we still created the parent session
       // Just log the error and allow the user to try again later
@@ -221,25 +227,15 @@ class TrainingSessionCreationBloc
         sessionId: sessionId,
         session: createdSession,
       ));
-    } catch (e) {
-      // Check for specific error messages
-      String errorMessage = 'Failed to create training session';
-      String? errorCode;
-
-      if (e.toString().contains('Creator is not a member of the group')) {
-        errorMessage = 'You must be a member of the group to create a training session';
-        errorCode = 'NOT_A_MEMBER';
-      } else if (e.toString().contains('Group not found')) {
-        errorMessage = 'The selected group no longer exists';
-        errorCode = 'GROUP_NOT_FOUND';
-      } else {
-        errorMessage = 'Failed to create training session: ${e.toString()}';
-        errorCode = 'CREATE_SESSION_ERROR';
-      }
-
+    } on TrainingSessionException catch (e) {
       emit(TrainingSessionCreationError(
-        message: errorMessage,
-        errorCode: errorCode,
+        message: e.message,
+        errorCode: e.code ?? 'CREATE_SESSION_ERROR',
+      ));
+    } catch (e) {
+      emit(TrainingSessionCreationError(
+        message: 'Failed to create training session: ${e.toString()}',
+        errorCode: 'CREATE_SESSION_ERROR',
       ));
     }
   }

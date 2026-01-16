@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../domain/exceptions/repository_exceptions.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../models/rating_history_entry.dart';
 import '../models/user_model.dart';
@@ -81,9 +82,9 @@ class FirestoreUserRepository implements UserRepository {
         isAnonymous: false, // Not returned by public profile
       );
     } on FirebaseFunctionsException catch (e) {
-      throw Exception('Failed to get user: ${e.code} - ${e.message}');
+      throw UserException('Failed to get user: ${e.code} - ${e.message}');
     } catch (e) {
-      throw Exception('Failed to get user: $e');
+      throw UserException('Failed to get user: $e');
     }
   }
 
@@ -124,9 +125,9 @@ class FirestoreUserRepository implements UserRepository {
         );
       }).toList();
     } on FirebaseFunctionsException catch (e) {
-      throw Exception('Failed to get users: ${e.message ?? e.code}');
+      throw UserException('Failed to get users: ${e.message ?? e.code}');
     } catch (e) {
-      throw Exception('Failed to get users: $e');
+      throw UserException('Failed to get users: $e');
     }
   }
 
@@ -138,7 +139,7 @@ class FirestoreUserRepository implements UserRepository {
           .doc(user.uid)
           .set(user.toFirestore(), SetOptions(merge: true));
     } catch (e) {
-      throw Exception('Failed to create/update user: $e');
+      throw UserException('Failed to create/update user: $e');
     }
   }
 
@@ -156,7 +157,7 @@ class FirestoreUserRepository implements UserRepository {
     try {
       final currentUser = await getUserById(uid);
       if (currentUser == null) {
-        throw Exception('User not found');
+        throw UserException('User not found', code: 'not-found');
       }
 
       final updatedUser = currentUser.updateProfile(
@@ -172,7 +173,7 @@ class FirestoreUserRepository implements UserRepository {
 
       await createOrUpdateUser(updatedUser);
     } catch (e) {
-      throw Exception('Failed to update user profile: $e');
+      throw UserException('Failed to update user profile: $e');
     }
   }
 
@@ -185,7 +186,7 @@ class FirestoreUserRepository implements UserRepository {
     try {
       final currentUser = await getUserById(uid);
       if (currentUser == null) {
-        throw Exception('User not found');
+        throw UserException('User not found', code: 'not-found');
       }
 
       final updatedUser = currentUser.updatePreferences(
@@ -196,7 +197,7 @@ class FirestoreUserRepository implements UserRepository {
 
       await createOrUpdateUser(updatedUser);
     } catch (e) {
-      throw Exception('Failed to update user preferences: $e');
+      throw UserException('Failed to update user preferences: $e');
     }
   }
 
@@ -209,7 +210,7 @@ class FirestoreUserRepository implements UserRepository {
     try {
       final currentUser = await getUserById(uid);
       if (currentUser == null) {
-        throw Exception('User not found');
+        throw UserException('User not found', code: 'not-found');
       }
 
       final updatedUser = currentUser.updatePrivacy(
@@ -220,7 +221,7 @@ class FirestoreUserRepository implements UserRepository {
 
       await createOrUpdateUser(updatedUser);
     } catch (e) {
-      throw Exception('Failed to update user privacy: $e');
+      throw UserException('Failed to update user privacy: $e');
     }
   }
 
@@ -229,13 +230,13 @@ class FirestoreUserRepository implements UserRepository {
     try {
       final currentUser = await getUserById(uid);
       if (currentUser == null) {
-        throw Exception('User not found');
+        throw UserException('User not found', code: 'not-found');
       }
 
       final updatedUser = currentUser.joinGroup(groupId);
       await createOrUpdateUser(updatedUser);
     } catch (e) {
-      throw Exception('Failed to join group: $e');
+      throw UserException('Failed to join group: $e');
     }
   }
 
@@ -244,13 +245,13 @@ class FirestoreUserRepository implements UserRepository {
     try {
       final currentUser = await getUserById(uid);
       if (currentUser == null) {
-        throw Exception('User not found');
+        throw UserException('User not found', code: 'not-found');
       }
 
       final updatedUser = currentUser.leaveGroup(groupId);
       await createOrUpdateUser(updatedUser);
     } catch (e) {
-      throw Exception('Failed to leave group: $e');
+      throw UserException('Failed to leave group: $e');
     }
   }
 
@@ -262,13 +263,13 @@ class FirestoreUserRepository implements UserRepository {
     try {
       final currentUser = await getUserById(uid);
       if (currentUser == null) {
-        throw Exception('User not found');
+        throw UserException('User not found', code: 'not-found');
       }
 
       final updatedUser = currentUser.addGame(gameId, won: won, score: score);
       await createOrUpdateUser(updatedUser);
     } catch (e) {
-      throw Exception('Failed to add game participation: $e');
+      throw UserException('Failed to add game participation: $e');
     }
   }
 
@@ -315,7 +316,7 @@ class FirestoreUserRepository implements UserRepository {
 
       return users.values.toList();
     } catch (e) {
-      throw Exception('Failed to search users: $e');
+      throw UserException('Failed to search users: $e');
     }
   }
 
@@ -332,7 +333,7 @@ class FirestoreUserRepository implements UserRepository {
           .map((doc) => UserModel.fromFirestore(doc))
           .toList();
     } catch (e) {
-      throw Exception('Failed to get users in group: $e');
+      throw UserException('Failed to get users in group: $e');
     }
   }
 
@@ -341,7 +342,7 @@ class FirestoreUserRepository implements UserRepository {
     try {
       await _firestore.collection(_collection).doc(uid).delete();
     } catch (e) {
-      throw Exception('Failed to delete user: $e');
+      throw UserException('Failed to delete user: $e');
     }
   }
 
@@ -351,7 +352,7 @@ class FirestoreUserRepository implements UserRepository {
       final doc = await _firestore.collection(_collection).doc(uid).get();
       return doc.exists;
     } catch (e) {
-      throw Exception('Failed to check if user exists: $e');
+      throw UserException('Failed to check if user exists: $e');
     }
   }
 
@@ -419,7 +420,7 @@ class FirestoreUserRepository implements UserRepository {
         gameId: entry.gameId,
       );
     } catch (e) {
-      throw Exception('Failed to get best ELO in period: $e');
+      throw UserException('Failed to get best ELO in period: $e');
     }
   }
 
@@ -445,7 +446,7 @@ class FirestoreUserRepository implements UserRepository {
           teammateStatsMap[teammateId] as Map<String, dynamic>;
       return TeammateStats.fromFirestore(teammateId, statsData);
     } catch (e) {
-      throw Exception('Failed to get teammate stats: $e');
+      throw UserException('Failed to get teammate stats: $e');
     }
   }
 
@@ -519,16 +520,16 @@ class FirestoreUserRepository implements UserRepository {
       // Handle specific Cloud Function errors
       switch (e.code) {
         case 'unauthenticated':
-          throw Exception('You must be logged in to view head-to-head statistics');
+          throw UserException('You must be logged in to view head-to-head statistics', code: 'unauthenticated');
         case 'permission-denied':
-          throw Exception('You don\'t have permission to view these statistics');
+          throw UserException('You don\'t have permission to view these statistics', code: 'permission-denied');
         case 'not-found':
           return null;
         default:
-          throw Exception('Failed to get head-to-head stats: ${e.message}');
+          throw UserException('Failed to get head-to-head stats: ${e.message}');
       }
     } catch (e) {
-      throw Exception('Failed to get head-to-head stats: $e');
+      throw UserException('Failed to get head-to-head stats: $e');
     }
   }
 
@@ -556,16 +557,16 @@ class FirestoreUserRepository implements UserRepository {
     } on FirebaseFunctionsException catch (e) {
       switch (e.code) {
         case 'unauthenticated':
-          throw Exception('You must be logged in to view rankings');
+          throw UserException('You must be logged in to view rankings', code: 'unauthenticated');
         case 'not-found':
-          throw Exception('User not found');
+          throw UserException('User not found', code: 'not-found');
         case 'internal':
-          throw Exception('Failed to calculate ranking. Please try again.');
+          throw UserException('Failed to calculate ranking. Please try again.', code: 'internal');
         default:
-          throw Exception('Failed to get ranking: ${e.message}');
+          throw UserException('Failed to get ranking: ${e.message}');
       }
     } catch (e) {
-      throw Exception('Failed to get ranking: $e');
+      throw UserException('Failed to get ranking: $e');
     }
   }
 }

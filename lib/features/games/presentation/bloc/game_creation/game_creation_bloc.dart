@@ -3,6 +3,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/data/models/game_model.dart';
+import '../../../../../core/domain/exceptions/repository_exceptions.dart';
 import '../../../../../core/domain/repositories/game_repository.dart';
 import 'game_creation_event.dart';
 import 'game_creation_state.dart';
@@ -154,6 +155,11 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
       emit(GameCreationSuccess(
         gameId: gameId,
         game: createdGame,
+      ));
+    } on GameException catch (e) {
+      emit(GameCreationError(
+        message: e.message,
+        errorCode: e.code ?? 'CREATE_GAME_ERROR',
       ));
     } catch (e) {
       emit(GameCreationError(

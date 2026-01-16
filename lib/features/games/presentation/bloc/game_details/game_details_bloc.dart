@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
@@ -44,6 +45,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
           add(GameDetailsUpdated(game: null));
         },
       );
+    } on GameException catch (e) {
+      emit(GameDetailsError(
+        message: e.message,
+        errorCode: e.code ?? 'LOAD_GAME_DETAILS_ERROR',
+      ));
     } catch (e) {
       emit(GameDetailsError(
         message: 'Failed to load game details: ${e.toString()}',
@@ -140,6 +146,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       await _gameRepository.addPlayer(event.gameId, event.userId);
 
       // The stream will automatically update with the new state
+    } on GameException catch (e) {
+      emit(GameDetailsError(
+        message: e.message,
+        errorCode: e.code ?? 'JOIN_GAME_ERROR',
+      ));
     } catch (e) {
       emit(GameDetailsError(
         message: 'Failed to join game: ${e.toString()}',
@@ -167,6 +178,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       await _gameRepository.removePlayer(event.gameId, event.userId);
 
       // The stream will automatically update with the new state
+    } on GameException catch (e) {
+      emit(GameDetailsError(
+        message: e.message,
+        errorCode: e.code ?? 'LEAVE_GAME_ERROR',
+      ));
     } catch (e) {
       emit(GameDetailsError(
         message: 'Failed to leave game: ${e.toString()}',
@@ -200,6 +216,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       }
 
       // The stream will automatically update with the new state
+    } on GameException catch (e) {
+      emit(GameDetailsError(
+        message: e.message,
+        errorCode: e.code ?? 'MARK_COMPLETED_ERROR',
+      ));
     } catch (e) {
       emit(GameDetailsError(
         message: 'Failed to mark game as completed: ${e.toString()}',
@@ -225,6 +246,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
 
       await _gameRepository.confirmGameResult(event.gameId, event.userId);
       // Stream updates state
+    } on GameException catch (e) {
+      emit(GameDetailsError(
+        message: e.message,
+        errorCode: e.code ?? 'CONFIRM_RESULT_ERROR',
+      ));
     } catch (e) {
       emit(GameDetailsError(
         message: 'Failed to confirm result: ${e.toString()}',
