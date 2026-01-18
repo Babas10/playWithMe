@@ -103,7 +103,7 @@ class FirestoreUserRepository implements UserRepository {
 
     try {
       // Use Cloud Function for secure cross-user query
-      final callable = FirebaseFunctions.instance.httpsCallable('getUsersByIds');
+      final callable = _functions.httpsCallable('getUsersByIds');
       final result = await callable.call({
         'userIds': uids,
       });
