@@ -57,7 +57,7 @@ class FirebaseEmulatorHelper {
     final firestore = FirebaseFirestore.instance;
 
     // Collections to clear
-    final collections = ['users', 'groups', 'games', 'friendships'];
+    final collections = ['users', 'groups', 'games', 'friendships', 'trainingSessions'];
 
     for (final collection in collections) {
       try {
@@ -77,7 +77,7 @@ class FirebaseEmulatorHelper {
   /// Delete all subcollections of a document reference
   static Future<void> _deleteSubcollections(DocumentReference docRef) async {
     // Known subcollections
-    final subcollections = ['invitations', 'preferences'];
+    final subcollections = ['invitations', 'preferences', 'exercises', 'feedback', 'participants'];
 
     for (final subcollection in subcollections) {
       try {
@@ -238,4 +238,102 @@ class FirebaseEmulatorHelper {
 
   /// Get Auth instance
   static FirebaseAuth get auth => FirebaseAuth.instance;
+
+  /// Create a test training session in Firestore
+  ///
+  /// Helper method to create a training session for testing.
+  static Future<String> createTestTrainingSession({
+    required String groupId,
+    required String createdBy,
+    required String title,
+    String? description,
+    DateTime? startTime,
+    DateTime? endTime,
+    String locationName = 'Test Location',
+    String? locationAddress,
+    int minParticipants = 2,
+    int maxParticipants = 10,
+    List<String>? participantIds,
+    String status = 'scheduled',
+  }) async {
+    final sessionRef = FirebaseFirestore.instance.collection('trainingSessions').doc();
+
+    final now = DateTime.now();
+    final sessionStartTime = startTime ?? now.add(const Duration(days: 1));
+    final sessionEndTime = endTime ?? sessionStartTime.add(const Duration(hours: 2));
+
+    await sessionRef.set({
+      'groupId': groupId,
+      'createdBy': createdBy,
+      'title': title,
+      'description': description,
+      'startTime': Timestamp.fromDate(sessionStartTime),
+      'endTime': Timestamp.fromDate(sessionEndTime),
+      'location': {
+        'name': locationName,
+        'address': locationAddress,
+      },
+      'minParticipants': minParticipants,
+      'maxParticipants': maxParticipants,
+      'participantIds': participantIds ?? [createdBy],
+      'status': status,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    return sessionRef.id;
+  }
+
+  /// Create a test exercise in a training session
+  ///
+  /// Helper method to create an exercise for testing.
+  static Future<String> createTestExercise({
+    required String trainingSessionId,
+    required String name,
+    String? description,
+    int? durationMinutes,
+  }) async {
+    final exerciseRef = FirebaseFirestore.instance
+        .collection('trainingSessions')
+        .doc(trainingSessionId)
+        .collection('exercises')
+        .doc();
+
+    await exerciseRef.set({
+      'name': name,
+      'description': description,
+      'durationMinutes': durationMinutes,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    return exerciseRef.id;
+  }
+
+  /// Create a test feedback for a training session
+  ///
+  /// Helper method to create anonymous feedback for testing.
+  static Future<String> createTestFeedback({
+    required String trainingSessionId,
+    required int exercisesQuality,
+    required int trainingIntensity,
+    required int coachingClarity,
+    String? comment,
+    required String participantHash,
+  }) async {
+    final feedbackRef = FirebaseFirestore.instance
+        .collection('trainingSessions')
+        .doc(trainingSessionId)
+        .collection('feedback')
+        .doc();
+
+    await feedbackRef.set({
+      'exercisesQuality': exercisesQuality,
+      'trainingIntensity': trainingIntensity,
+      'coachingClarity': coachingClarity,
+      'comment': comment,
+      'participantHash': participantHash,
+      'submittedAt': FieldValue.serverTimestamp(),
+    });
+
+    return feedbackRef.id;
+  }
 }
