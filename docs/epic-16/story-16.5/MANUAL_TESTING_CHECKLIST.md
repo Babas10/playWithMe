@@ -1,7 +1,7 @@
 # PlayWithMe - Manual Testing Checklist
 
 **Story**: 16.5 - Create Manual Testing Checklist
-**Version**: 1.0
+**Version**: 1.1
 **Last Updated**: January 2026
 
 ---
@@ -220,14 +220,22 @@ firebase emulators:start --only auth,firestore,functions --project playwithme-de
 | GROUP-033 | Invite non-friend | 1. Try to invite User C (stranger) | Only friends can be invited | [ ] |
 | GROUP-034 | Invite existing member | 1. Try to invite existing member | "Already a member" error | [ ] |
 
-### 5.5 Leave Group
+### 5.5 Pending Invitations Page
+
+| ID | Test Case | Steps | Expected Result | Status |
+|----|-----------|-------|-----------------|--------|
+| GROUP-035 | View pending invitations | 1. Have pending invitations<br>2. Tap invitations badge/icon | Pending invitations page shows all invites | [ ] |
+| GROUP-036 | Empty invitations state | 1. Login with no pending invites<br>2. Go to invitations | Empty state: "No pending invitations" | [ ] |
+| GROUP-037 | Invitations badge count | 1. Have 3 pending invitations<br>2. Check badge | Badge shows "3" | [ ] |
+
+### 5.6 Leave Group
 
 | ID | Test Case | Steps | Expected Result | Status |
 |----|-----------|-------|-----------------|--------|
 | GROUP-040 | Leave group (member) | 1. Go to group as member<br>2. Tap "Leave Group"<br>3. Confirm | Removed from group | [ ] |
 | GROUP-041 | Leave group (last admin) | 1. As only admin, try to leave | Must assign another admin first | [ ] |
 
-### 5.6 Group Admin Actions
+### 5.7 Group Admin Actions
 
 | ID | Test Case | Steps | Expected Result | Status |
 |----|-----------|-------|-----------------|--------|
@@ -370,6 +378,15 @@ firebase emulators:start --only auth,firestore,functions --project playwithme-de
 | NOTIF-006 | Game result notification | 1. Submit game result<br>2. Check player notifications | Players notified | [ ] |
 | NOTIF-007 | Training created notification | 1. Create training session<br>2. Check member notifications | Members notified | [ ] |
 | NOTIF-008 | Training cancelled notification | 1. Cancel training<br>2. Check participant notifications | Participants notified | [ ] |
+| NOTIF-009 | Member joined group notification | 1. User joins group<br>2. Check other member notifications | Members notified | [ ] |
+| NOTIF-010 | Member left group notification | 1. User leaves group<br>2. Check other member notifications | Members notified | [ ] |
+| NOTIF-011 | Role changed notification | 1. Promote/demote member<br>2. Check user notification | User notified of role change | [ ] |
+| NOTIF-012 | Player left game notification | 1. Player leaves game<br>2. Check other player notifications | Players notified | [ ] |
+| NOTIF-013 | Waitlist promoted notification | 1. Player leaves full game<br>2. Check waitlisted user notification | Waitlisted user notified | [ ] |
+| NOTIF-014 | Game cancelled notification | 1. Cancel a game<br>2. Check player notifications | All players notified | [ ] |
+| NOTIF-015 | Training feedback received notification | 1. Submit training feedback<br>2. Check organizer notification | Organizer notified of new feedback | [ ] |
+| NOTIF-016 | Training min participants reached | 1. Enough players join training<br>2. Check organizer notification | Organizer notified threshold reached | [ ] |
+| NOTIF-017 | Invitation accepted notification | 1. Accept group invitation<br>2. Check inviter/admin notifications | Group admins notified | [ ] |
 
 ### 8.2 Notification Settings
 
@@ -526,13 +543,13 @@ Open/In Progress/Fixed/Closed
 | Authentication | 15 |
 | Profile | 17 |
 | Friends | 11 |
-| Groups | 17 |
+| Groups | 20 |
 | Games | 20 |
 | Training | 18 |
-| Notifications | 10 |
+| Notifications | 19 |
 | Edge Cases | 18 |
 | Cross-Platform | 15 |
-| **Total** | **141** |
+| **Total** | **153** |
 
 ---
 
@@ -541,3 +558,4 @@ Open/In Progress/Fixed/Closed
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | Jan 2026 | Initial checklist creation |
+| 1.1 | Jan 2026 | Added 12 additional tests: 9 notification types (NOTIF-009 to NOTIF-017), 3 pending invitations tests (GROUP-035 to GROUP-037). Total tests: 153 |
