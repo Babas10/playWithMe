@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/empty_states/insufficient_data_placeholder.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A card widget displaying comprehensive performance statistics.
 ///
@@ -29,10 +30,10 @@ class PerformanceOverviewCard extends StatelessWidget {
 
     // Show empty state for new users with no games
     if (user.gamesPlayed == 0) {
-      return const EmptyStatsPlaceholder(
-        title: 'No Performance Data',
-        message: 'Play your first game to see your performance statistics!',
-        unlockMessage: 'Play at least 1 game to unlock',
+      return EmptyStatsPlaceholder(
+        title: AppLocalizations.of(context)!.noPerformanceData,
+        message: AppLocalizations.of(context)!.playFirstGameToSeeStats,
+        unlockMessage: AppLocalizations.of(context)!.playAtLeastOneGame,
         icon: Icons.show_chart,
       );
     }
@@ -46,7 +47,7 @@ class PerformanceOverviewCard extends StatelessWidget {
           children: [
             // Header
             Text(
-              'Performance Overview',
+              AppLocalizations.of(context)!.performanceOverview,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -68,7 +69,7 @@ class PerformanceOverviewCard extends StatelessWidget {
           children: [
             Expanded(
               child: _StatItem(
-                label: 'Current ELO',
+                label: AppLocalizations.of(context)!.currentElo,
                 value: user.eloRating.toStringAsFixed(0),
                 icon: Icons.show_chart,
                 iconColor: Colors.blue,
@@ -77,7 +78,7 @@ class PerformanceOverviewCard extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _StatItem(
-                label: 'Peak ELO',
+                label: AppLocalizations.of(context)!.peakElo,
                 value: user.eloPeak.toStringAsFixed(0),
                 icon: Icons.trending_up,
                 iconColor: Colors.green,
@@ -94,7 +95,7 @@ class PerformanceOverviewCard extends StatelessWidget {
           children: [
             Expanded(
               child: _StatItem(
-                label: 'Games Played',
+                label: AppLocalizations.of(context)!.gamesPlayed,
                 value: user.gamesPlayed.toString(),
                 icon: Icons.sports_volleyball,
                 iconColor: Colors.orange,
@@ -103,7 +104,7 @@ class PerformanceOverviewCard extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _StatItem(
-                label: 'Win Rate',
+                label: AppLocalizations.of(context)!.winRate,
                 value: '${(user.winRate * 100).toStringAsFixed(1)}%',
                 icon: Icons.pie_chart,
                 iconColor: Colors.purple,
@@ -120,11 +121,11 @@ class PerformanceOverviewCard extends StatelessWidget {
           )
         else
           _StatItem(
-            label: 'Best Win',
-            value: 'Win a game to unlock',
+            label: AppLocalizations.of(context)!.bestWin,
+            value: AppLocalizations.of(context)!.winGameToUnlock,
             icon: Icons.emoji_events_outlined,
             iconColor: Colors.amber.withOpacity(0.5),
-            subLabel: 'Beat opponents to track your best victory',
+            subLabel: AppLocalizations.of(context)!.beatOpponentsToTrack,
           ),
         const SizedBox(height: 12),
         // Row 4: Average Point Differential (Wins vs Losses)
@@ -132,11 +133,11 @@ class PerformanceOverviewCard extends StatelessWidget {
           _PointDiffStatItem(pointStats: user.pointStats!)
         else
           _StatItem(
-            label: 'Avg Point Diff',
-            value: 'Complete a game to unlock',
+            label: AppLocalizations.of(context)!.avgPointDiff,
+            value: AppLocalizations.of(context)!.completeGameToUnlock,
             icon: Icons.trending_up_outlined,
             iconColor: Colors.teal.withOpacity(0.5),
-            subLabel: 'Win and lose sets to see your margins',
+            subLabel: AppLocalizations.of(context)!.winAndLoseSetsToSee,
           ),
       ],
     );
@@ -250,7 +251,7 @@ class _PointDiffStatItem extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Avg Point Differential',
+                AppLocalizations.of(context)!.avgPointDifferential,
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: theme.colorScheme.onSurface.withOpacity(0.6),
@@ -276,7 +277,7 @@ class _PointDiffStatItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'In Wins',
+                          AppLocalizations.of(context)!.inWins,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface.withOpacity(0.5),
                           ),
@@ -294,7 +295,7 @@ class _PointDiffStatItem extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${pointStats.winningSetsCount} sets',
+                      AppLocalizations.of(context)!.setsCount(pointStats.winningSetsCount),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurface.withOpacity(0.4),
                       ),
@@ -323,7 +324,7 @@ class _PointDiffStatItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'In Losses',
+                          AppLocalizations.of(context)!.inLosses,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface.withOpacity(0.5),
                           ),
@@ -341,7 +342,7 @@ class _PointDiffStatItem extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${pointStats.losingSetsCount} sets',
+                      AppLocalizations.of(context)!.setsCount(pointStats.losingSetsCount),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurface.withOpacity(0.4),
                       ),
@@ -391,7 +392,7 @@ class _BestWinStatItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Best Win',
+                AppLocalizations.of(context)!.bestWin,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withOpacity(0.7),
                   fontWeight: FontWeight.w500,
@@ -408,7 +409,7 @@ class _BestWinStatItem extends StatelessWidget {
           // Team composition (if available)
           if (bestWin.opponentNames != null) ...[
             Text(
-              'Team: ${bestWin.opponentNames!.replaceAll(' & ', ' · ')}',
+              AppLocalizations.of(context)!.teamLabel(bestWin.opponentNames!.replaceAll(' & ', ' · ')),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w500,
@@ -418,7 +419,7 @@ class _BestWinStatItem extends StatelessWidget {
           ],
           // Team ELO
           Text(
-            'Team ELO: ${bestWin.avgEloString}',
+            AppLocalizations.of(context)!.teamEloLabel(bestWin.avgEloString),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w500,
@@ -427,7 +428,7 @@ class _BestWinStatItem extends StatelessWidget {
           const SizedBox(height: 4),
           // ELO gained
           Text(
-            '${bestWin.eloGainString} ELO gained',
+            AppLocalizations.of(context)!.eloGained(bestWin.eloGainString),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.5),
             ),

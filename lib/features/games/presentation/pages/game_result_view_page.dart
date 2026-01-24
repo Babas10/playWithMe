@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 import '../../../../core/data/models/game_model.dart';
 import '../../../../core/data/models/rating_history_entry.dart';
@@ -40,29 +41,31 @@ class GameResultViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (game.result == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Game Results'),
+          title: Text(l10n.gameResults),
           elevation: 0,
         ),
-        body: const Center(
+        body: Center(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.sports_score, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
+                const Icon(Icons.sports_score, size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
                 Text(
-                  'No results available yet',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  l10n.noResultsAvailable,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'Scores will appear here once they are entered',
+                  l10n.scoresWillAppear,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ],
             ),
@@ -76,15 +79,15 @@ class GameResultViewPage extends StatelessWidget {
 
     // Generate team names
     final teamAName = teams != null
-        ? _getTeamName(teams.teamAPlayerIds, 'Team A')
-        : 'Team A';
+        ? _getTeamName(teams.teamAPlayerIds, l10n.teamA)
+        : l10n.teamA;
     final teamBName = teams != null
-        ? _getTeamName(teams.teamBPlayerIds, 'Team B')
-        : 'Team B';
+        ? _getTeamName(teams.teamBPlayerIds, l10n.teamB)
+        : l10n.teamB;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Game Results'),
+        title: Text(l10n.gameResults),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -110,7 +113,7 @@ class GameResultViewPage extends StatelessWidget {
             if (playerEloUpdates.isNotEmpty) const SizedBox(height: 20),
             // Individual Games List
             Text(
-              'Individual Games',
+              l10n.individualGames,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -147,6 +150,7 @@ class _OverallResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final gamesWon = result.gamesWon;
     final winnerColor = result.overallWinner == 'teamA' ? Colors.blue : Colors.red;
 
@@ -173,7 +177,7 @@ class _OverallResultCard extends StatelessWidget {
                   Icon(Icons.emoji_events, color: winnerColor, size: 28),
                   const SizedBox(width: 10),
                   Text(
-                    'Final Score',
+                    l10n.finalScore,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -282,14 +286,16 @@ class _EloUpdatesCard extends StatelessWidget {
     this.playerEloUpdates = const {},
   });
 
-  String _getPlayerName(String playerId) {
+  String _getPlayerName(BuildContext context, String playerId) {
+    final l10n = AppLocalizations.of(context)!;
     return players?[playerId]?.displayName ??
            players?[playerId]?.email ??
-           'Unknown Player';
+           l10n.unknownPlayer;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Filter to only players with ELO updates
     final playersWithElo = playerIds.where((id) => playerEloUpdates[id] != null).toList();
 
@@ -308,7 +314,7 @@ class _EloUpdatesCard extends StatelessWidget {
                 const Icon(Icons.trending_up, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'ELO Rating Changes',
+                  l10n.eloRatingChanges,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -320,7 +326,7 @@ class _EloUpdatesCard extends StatelessWidget {
               final eloEntry = playerEloUpdates[playerId];
               if (eloEntry == null) return const SizedBox.shrink();
 
-              final playerName = _getPlayerName(playerId);
+              final playerName = _getPlayerName(context, playerId);
               final oldRating = eloEntry.oldRating.toInt();
               final newRating = eloEntry.newRating.toInt();
               final isGain = eloEntry.isGain;
@@ -412,6 +418,7 @@ class _IndividualGameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final setsWon = game.setsWon;
     final winnerColor = game.winner == 'teamA' ? Colors.blue : Colors.red;
 
@@ -444,7 +451,7 @@ class _IndividualGameCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Game $gameNumber',
+                  l10n.gameNumber(gameNumber),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -457,7 +464,7 @@ class _IndividualGameCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Sets: ${setsWon['teamA']} - ${setsWon['teamB']}',
+                  l10n.setsScore(setsWon['teamA'] ?? 0, setsWon['teamB'] ?? 0),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: Colors.grey[700],
@@ -481,7 +488,7 @@ class _IndividualGameCard extends StatelessWidget {
                     SizedBox(
                       width: 50,
                       child: Text(
-                        'Set ${set.setNumber}',
+                        l10n.setNumber(set.setNumber),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w500,
                             ),

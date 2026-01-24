@@ -1,9 +1,11 @@
 // Tests player name resolution in GameResultViewPage widget.
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_result_view_page.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 void main() {
   group('GameResultViewPage', () {
@@ -82,12 +84,20 @@ void main() {
     testWidgets('displays player names when players data is provided', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: GameResultViewPage(
             game: gameWithResult,
             players: players,
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Note: Player names are now only shown in the ELO card (when ELO is calculated)
       // The Teams card was removed as redundant in Story 290
@@ -99,12 +109,20 @@ void main() {
     testWidgets('displays player IDs when players data is not provided', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: GameResultViewPage(
             game: gameWithResult,
             players: null, // No player data
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // With the Teams card removed, player IDs are no longer individually listed
       // They still appear in the Overall Result card as team names
@@ -122,12 +140,20 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: GameResultViewPage(
             game: gameWithResult,
             players: partialPlayers,
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // With Teams card removed, player names appear in Overall Result team names
       // Available players still show in team composition
@@ -139,12 +165,20 @@ void main() {
     testWidgets('displays team names correctly', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: GameResultViewPage(
             game: gameWithResult,
             players: players,
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Verify team labels show player names instead of generic "Team A"/"Team B"
       expect(find.text('Alice & Bob'), findsAtLeastNWidgets(1));
@@ -156,12 +190,20 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: GameResultViewPage(
             game: gameWithoutResult,
             players: players,
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('No results available yet'), findsOneWidget);
       expect(find.text('Scores will appear here once they are entered'), findsOneWidget);
@@ -170,12 +212,20 @@ void main() {
     testWidgets('displays game results card with correct structure', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: GameResultViewPage(
             game: gameWithResult,
             players: players,
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Verify overall result card elements
       expect(find.text('Final Score'), findsOneWidget);
@@ -188,12 +238,20 @@ void main() {
     testWidgets('displays individual games section', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: GameResultViewPage(
             game: gameWithResult,
             players: players,
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Individual Games'), findsOneWidget);
       expect(find.text('Game 1'), findsOneWidget);

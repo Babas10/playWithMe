@@ -1,5 +1,6 @@
 // Widget for displaying a single invitation with accept/decline actions
 import 'package:flutter/material.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/invitation_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -45,7 +46,7 @@ class InvitationTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Invited by ${invitation.inviterName}',
+                  AppLocalizations.of(context)!.invitedBy(invitation.inviterName),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -86,7 +87,7 @@ class InvitationTile extends StatelessWidget {
                       color: Theme.of(context).colorScheme.error,
                     ),
                   ),
-                  child: const Text('Decline'),
+                  child: Text(AppLocalizations.of(context)!.decline),
                 ),
                 const SizedBox(width: 8),
 
@@ -105,7 +106,7 @@ class InvitationTile extends StatelessWidget {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Accept'),
+                      : Text(AppLocalizations.of(context)!.accept),
                 ),
               ],
             ),

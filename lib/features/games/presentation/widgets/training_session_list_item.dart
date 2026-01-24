@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/training_session_model.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 class TrainingSessionListItem extends StatelessWidget {
   final TrainingSessionModel session;
@@ -66,7 +67,7 @@ class TrainingSessionListItem extends StatelessWidget {
               _buildInfoRow(
                 context,
                 Icons.calendar_today,
-                _formatDateTime(session.startTime),
+                _formatDateTime(context, session.startTime),
                 isCancelled ? Colors.grey : Theme.of(context).colorScheme.secondary,
               ),
               const SizedBox(height: 8),
@@ -82,7 +83,7 @@ class TrainingSessionListItem extends StatelessWidget {
               _buildInfoRow(
                 context,
                 Icons.access_time,
-                _formatDuration(session.duration),
+                _formatDuration(context, session.duration),
                 isCancelled ? Colors.grey : Theme.of(context).colorScheme.secondary,
               ),
               const SizedBox(height: 12),
@@ -112,6 +113,7 @@ class TrainingSessionListItem extends StatelessWidget {
   }
 
   Widget _buildTrainingBadge(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isCancelled = session.status == TrainingStatus.cancelled;
     final isParticipant = session.isParticipant(userId);
 
@@ -124,7 +126,7 @@ class TrainingSessionListItem extends StatelessWidget {
           border: Border.all(color: Colors.grey),
         ),
         child: Text(
-          'CANCELLED',
+          l10n.cancelled,
           style: TextStyle(
             color: Colors.grey.shade700,
             fontWeight: FontWeight.bold,
@@ -154,7 +156,7 @@ class TrainingSessionListItem extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              'JOINED',
+              l10n.joined,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.bold,
@@ -173,7 +175,7 @@ class TrainingSessionListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        'TRAINING',
+        l10n.training,
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSecondaryContainer,
           fontWeight: FontWeight.bold,
@@ -208,6 +210,7 @@ class TrainingSessionListItem extends StatelessWidget {
   }
 
   Widget _buildParticipantCountBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final progress = session.currentParticipantCount / session.maxParticipants;
 
     return Column(
@@ -217,7 +220,7 @@ class TrainingSessionListItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${session.currentParticipantCount}/${session.maxParticipants} participants',
+              l10n.participantsCount(session.currentParticipantCount, session.maxParticipants),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: isPast
                         ? Theme.of(context).colorScheme.onSurfaceVariant
@@ -227,7 +230,7 @@ class TrainingSessionListItem extends StatelessWidget {
             ),
             if (session.currentParticipantCount < session.minParticipants)
               Text(
-                'Min: ${session.minParticipants}',
+                l10n.minParticipants(session.minParticipants),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -256,7 +259,8 @@ class TrainingSessionListItem extends StatelessWidget {
     );
   }
 
-  String _formatDateTime(DateTime dateTime) {
+  String _formatDateTime(BuildContext context, DateTime dateTime) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
@@ -265,9 +269,9 @@ class TrainingSessionListItem extends StatelessWidget {
 
     String dayString;
     if (sessionDate == today) {
-      dayString = 'Today';
+      dayString = l10n.today;
     } else if (sessionDate == tomorrow) {
-      dayString = 'Tomorrow';
+      dayString = l10n.tomorrow;
     } else {
       dayString = DateFormat('EEE, MMM d').format(dateTime);
     }
@@ -276,16 +280,17 @@ class TrainingSessionListItem extends StatelessWidget {
     return '$dayString • $timeString';
   }
 
-  String _formatDuration(Duration duration) {
+  String _formatDuration(BuildContext context, Duration duration) {
+    final l10n = AppLocalizations.of(context)!;
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
 
     if (hours > 0 && minutes > 0) {
-      return '${hours}h ${minutes}m';
+      return l10n.durationFormat(hours, minutes);
     } else if (hours > 0) {
-      return '${hours}h';
+      return l10n.durationHours(hours);
     } else {
-      return '${minutes}m';
+      return l10n.durationMinutes(minutes);
     }
   }
 }

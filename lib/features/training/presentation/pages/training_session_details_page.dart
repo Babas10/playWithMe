@@ -8,6 +8,7 @@ import '../../../../core/data/models/user_model.dart';
 import '../../../../core/domain/repositories/training_session_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/services/service_locator.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/exercise/exercise_bloc.dart';
 import '../bloc/feedback/training_feedback_bloc.dart';
 import '../bloc/training_session_participation/training_session_participation_bloc.dart';
@@ -76,18 +77,19 @@ class _TrainingSessionDetailsPageState
         stream: sl<TrainingSessionRepository>()
             .getTrainingSessionStream(widget.trainingSessionId),
         builder: (context, snapshot) {
+          final l10n = AppLocalizations.of(context)!;
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(
-              appBar: AppBar(title: const Text('Training Session')),
+              appBar: AppBar(title: Text(l10n.trainingSession)),
               body: const Center(child: CircularProgressIndicator()),
             );
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
             return Scaffold(
-              appBar: AppBar(title: const Text('Training Session')),
-              body: const Center(
-                child: Text('Training session not found'),
+              appBar: AppBar(title: Text(l10n.trainingSession)),
+              body: Center(
+                child: Text(l10n.trainingNotFound),
               ),
             );
           }
@@ -110,8 +112,8 @@ class _TrainingSessionDetailsPageState
                     listener: (context, state) {
                       if (state is CancelledSession) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Training session cancelled'),
+                          SnackBar(
+                            content: Text(l10n.trainingCancelled),
                             backgroundColor: Colors.orange,
                           ),
                         );
@@ -136,15 +138,15 @@ class _TrainingSessionDetailsPageState
                           }
                         },
                         itemBuilder: (context) => [
-                          const PopupMenuItem<String>(
+                          PopupMenuItem<String>(
                             value: 'cancel',
                             child: Row(
                               children: [
-                                Icon(Icons.cancel, color: Colors.red),
-                                SizedBox(width: 8),
+                                const Icon(Icons.cancel, color: Colors.red),
+                                const SizedBox(width: 8),
                                 Text(
-                                  'Cancel Session',
-                                  style: TextStyle(color: Colors.red),
+                                  l10n.cancelSession,
+                                  style: const TextStyle(color: Colors.red),
                                 ),
                               ],
                             ),
@@ -165,10 +167,10 @@ class _TrainingSessionDetailsPageState
                   // Tabs
                   TabBar(
                     tabs: [
-                      const Tab(text: 'Participants', icon: Icon(Icons.people)),
-                      const Tab(text: 'Exercises', icon: Icon(Icons.fitness_center)),
+                      Tab(text: l10n.participants, icon: const Icon(Icons.people)),
+                      Tab(text: l10n.exercises, icon: const Icon(Icons.fitness_center)),
                       if (showFeedbackTab)
-                        const Tab(text: 'Feedback', icon: Icon(Icons.feedback_outlined)),
+                        Tab(text: l10n.feedback, icon: const Icon(Icons.feedback_outlined)),
                     ],
                   ),
 
@@ -249,6 +251,7 @@ class _TrainingSessionDetailsPageState
           FutureBuilder<UserModel?>(
             future: sl<UserRepository>().getUserById(session.createdBy),
             builder: (context, userSnapshot) {
+              final l10n = AppLocalizations.of(context)!;
               final organizer = userSnapshot.data;
               return Row(
                 children: [
@@ -260,8 +263,8 @@ class _TrainingSessionDetailsPageState
                   const SizedBox(width: 4),
                   Text(
                     isOrganizer
-                        ? 'You are organizing'
-                        : 'Organized by ${organizer?.displayName ?? "Loading..."}',
+                        ? l10n.youAreOrganizing
+                        : l10n.organizedBy(organizer?.displayName ?? l10n.loading),
                     style: TextStyle(
                       fontWeight: isOrganizer ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -301,33 +304,38 @@ class _TrainingSessionDetailsPageState
           const SizedBox(height: 4),
 
           // Participant count
-          Row(
-            children: [
-              const Icon(Icons.people, size: 16),
-              const SizedBox(width: 4),
-              Text(
-                '${session.participantIds.length}/${session.maxParticipants} participants',
-              ),
-              if (session.isFull) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withAlpha(26),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red),
+          Builder(
+            builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return Row(
+                children: [
+                  const Icon(Icons.people, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    l10n.participantsCount(session.participantIds.length, session.maxParticipants),
                   ),
-                  child: const Text(
-                    'FULL',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
+                  if (session.isFull) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withAlpha(26),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red),
+                      ),
+                      child: Text(
+                        l10n.full.toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ],
+                  ],
+                ],
+              );
+            },
           ),
 
           // Notes (if available)
@@ -361,78 +369,88 @@ class _TrainingSessionDetailsPageState
   }
 
   Widget _buildStatusBadge(TrainingStatus status) {
-    Color color;
-    IconData icon;
-    String label;
+    return Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        Color color;
+        IconData icon;
+        String label;
 
-    switch (status) {
-      case TrainingStatus.scheduled:
-        color = Colors.blue;
-        icon = Icons.schedule;
-        label = 'Scheduled';
-        break;
-      case TrainingStatus.completed:
-        color = Colors.green;
-        icon = Icons.check_circle;
-        label = 'Completed';
-        break;
-      case TrainingStatus.cancelled:
-        color = Colors.red;
-        icon = Icons.cancel;
-        label = 'Cancelled';
-        break;
-    }
+        switch (status) {
+          case TrainingStatus.scheduled:
+            color = Colors.blue;
+            icon = Icons.schedule;
+            label = l10n.scheduled;
+            break;
+          case TrainingStatus.completed:
+            color = Colors.green;
+            icon = Icons.check_circle;
+            label = l10n.completed;
+            break;
+          case TrainingStatus.cancelled:
+            color = Colors.red;
+            icon = Icons.cancel;
+            label = l10n.cancelled;
+            break;
+        }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withAlpha(26),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withAlpha(26),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color),
           ),
-        ],
-      ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: color),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildParticipantsTab(TrainingSessionModel session, bool isOrganizer) {
     if (session.participantIds.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.people_outline, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            const Text(
-              'No participants yet',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+      return Builder(
+        builder: (context) {
+          final l10n = AppLocalizations.of(context)!;
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.people_outline, size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.noParticipantsYet,
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.beFirstToJoin,
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 24),
+                // Show participation info even when empty
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: _buildParticipationInfoCard(session),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Be the first to join!',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 24),
-            // Show participation info even when empty
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: _buildParticipationInfoCard(session),
-            ),
-          ],
-        ),
+          );
+        },
       );
     }
 
@@ -444,13 +462,14 @@ class _TrainingSessionDetailsPageState
         }
 
         if (snapshot.hasError) {
+          final l10n = AppLocalizations.of(context)!;
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.error_outline, size: 64, color: Colors.red),
                 const SizedBox(height: 16),
-                Text('Error loading participants'),
+                Text(l10n.errorLoadingParticipants),
                 const SizedBox(height: 8),
                 Text(
                   snapshot.error.toString(),
@@ -480,6 +499,7 @@ class _TrainingSessionDetailsPageState
             final participant = participants[participantIndex];
             final isOrg = participant.uid == session.createdBy;
 
+            final l10n = AppLocalizations.of(context)!;
             return Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
@@ -501,9 +521,9 @@ class _TrainingSessionDetailsPageState
                   ],
                 ),
                 subtitle: isOrg
-                    ? const Text(
-                        'Organizer',
-                        style: TextStyle(
+                    ? Text(
+                        l10n.organizer,
+                        style: const TextStyle(
                           color: Colors.amber,
                           fontWeight: FontWeight.bold,
                         ),
@@ -520,9 +540,9 @@ class _TrainingSessionDetailsPageState
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.blue),
                         ),
-                        child: const Text(
-                          'You',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.you,
+                          style: const TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
@@ -539,33 +559,38 @@ class _TrainingSessionDetailsPageState
   }
 
   Widget _buildParticipationInfoCard(TrainingSessionModel session) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        return Card(
+          elevation: 2,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.people, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  'Participation',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                Row(
+                  children: [
+                    const Icon(Icons.people, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.participation,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
                 ),
+                const Divider(),
+                _buildParticipationRow(l10n.current, '${session.participantIds.length}'),
+                _buildParticipationRow(l10n.minimum, '${session.minParticipants}'),
+                _buildParticipationRow(l10n.maximum, '${session.maxParticipants}'),
+                _buildParticipationRow(l10n.availableSpots, '${session.availableSpots}'),
               ],
             ),
-            const Divider(),
-            _buildParticipationRow('Current', '${session.participantIds.length}'),
-            _buildParticipationRow('Minimum', '${session.minParticipants}'),
-            _buildParticipationRow('Maximum', '${session.maxParticipants}'),
-            _buildParticipationRow('Available Spots', '${session.availableSpots}'),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -611,17 +636,18 @@ class _TrainingSessionDetailsPageState
     return BlocConsumer<TrainingSessionParticipationBloc,
         TrainingSessionParticipationState>(
       listener: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
         if (state is JoinedSession) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Successfully joined training session!'),
+            SnackBar(
+              content: Text(l10n.joinedTrainingSuccess),
               backgroundColor: Colors.green,
             ),
           );
         } else if (state is LeftSession) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('You have left the training session'),
+            SnackBar(
+              content: Text(l10n.leftTraining),
               backgroundColor: Colors.orange,
             ),
           );
@@ -635,6 +661,7 @@ class _TrainingSessionDetailsPageState
         }
       },
       builder: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
         final isLoading =
             state is JoiningSession || state is LeavingSession;
 
@@ -654,7 +681,7 @@ class _TrainingSessionDetailsPageState
                     ),
                   )
                 : const Icon(Icons.exit_to_app),
-            label: Text(isLoading ? 'Leaving...' : 'Leave'),
+            label: Text(isLoading ? l10n.leaving : l10n.leave),
             backgroundColor: Colors.orange,
           );
         } else {
@@ -677,12 +704,12 @@ class _TrainingSessionDetailsPageState
                 : const Icon(Icons.add),
             label: Text(
               isLoading
-                  ? 'Joining...'
+                  ? l10n.joining
                   : canJoin
-                      ? 'Join'
+                      ? l10n.join
                       : session.isFull
-                          ? 'Full'
-                          : 'Cannot Join',
+                          ? l10n.full
+                          : l10n.cannotJoin,
             ),
             backgroundColor: canJoin ? Colors.green : Colors.grey,
           );
@@ -692,19 +719,22 @@ class _TrainingSessionDetailsPageState
   }
 
   void _joinSession(BuildContext context, TrainingSessionModel session) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Join Training Session'),
+        title: Text(l10n.joinTrainingSession),
         content: Text(
-          'Do you want to join "${session.title}"?\n\n'
-          'Date: ${DateFormat('MMM dd, yyyy • HH:mm').format(session.startTime)}\n'
-          'Location: ${session.location.name}',
+          l10n.doYouWantToJoin(
+            session.title,
+            DateFormat('MMM dd, yyyy • HH:mm').format(session.startTime),
+            session.location.name,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -713,7 +743,7 @@ class _TrainingSessionDetailsPageState
                     JoinTrainingSession(widget.trainingSessionId),
                   );
             },
-            child: const Text('Join'),
+            child: Text(l10n.join),
           ),
         ],
       ),
@@ -721,17 +751,16 @@ class _TrainingSessionDetailsPageState
   }
 
   void _leaveSession(BuildContext context, TrainingSessionModel session) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Leave Training Session'),
-        content: Text(
-          'Are you sure you want to leave "${session.title}"?',
-        ),
+        title: Text(l10n.leaveTrainingSession),
+        content: Text(l10n.areYouSureLeave(session.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -743,7 +772,7 @@ class _TrainingSessionDetailsPageState
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
             ),
-            child: const Text('Leave'),
+            child: Text(l10n.leave),
           ),
         ],
       ),
@@ -753,18 +782,16 @@ class _TrainingSessionDetailsPageState
   /// Show confirmation dialog before cancelling a training session (Story 15.14)
   void _showCancelConfirmation(
       BuildContext context, TrainingSessionModel session) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Cancel Training Session?'),
-        content: Text(
-          'Are you sure you want to cancel "${session.title}"?\n\n'
-          'All participants will be notified.',
-        ),
+        title: Text(l10n.cancelTrainingSession),
+        content: Text(l10n.cancelSessionConfirm(session.title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Keep Session'),
+            child: Text(l10n.keepSession),
           ),
           ElevatedButton(
             onPressed: () {
@@ -776,7 +803,7 @@ class _TrainingSessionDetailsPageState
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
             ),
-            child: const Text('Cancel Session'),
+            child: Text(l10n.cancelSession),
           ),
         ],
       ),

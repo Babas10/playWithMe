@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_list_item.dart';
@@ -42,8 +44,14 @@ void main() {
     testWidgets('displays game title and location', (tester) async {
       final game = _createGame();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -60,8 +68,14 @@ void main() {
     testWidgets('displays scheduled status color (blue)', (tester) async {
       final game = _createGame(status: GameStatus.scheduled);
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -78,8 +92,14 @@ void main() {
     testWidgets('displays in progress status color (orange)', (tester) async {
       final game = _createGame(status: GameStatus.inProgress);
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -96,8 +116,14 @@ void main() {
     testWidgets('displays cancelled status styling (grey + strikethrough)', (tester) async {
       final game = _createGame(status: GameStatus.cancelled);
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -131,8 +157,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -150,8 +182,14 @@ void main() {
     testWidgets('displays verification status with purple badge', (tester) async {
       final game = _createGame(status: GameStatus.verification);
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -169,8 +207,14 @@ void main() {
     testWidgets('applies background tint for verification status', (tester) async {
       final game = _createGame(status: GameStatus.verification);
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -187,8 +231,14 @@ void main() {
     testWidgets('displays RSVP badge when not completed/cancelled', (tester) async {
       final game = _createGame(status: GameStatus.scheduled, userId: 'user-1');
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -206,8 +256,14 @@ void main() {
       bool tapped = false;
       final game = _createGame();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',

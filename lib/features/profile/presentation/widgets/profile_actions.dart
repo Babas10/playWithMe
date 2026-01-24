@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Widget containing action buttons for profile operations
 class ProfileActions extends StatelessWidget {
@@ -17,6 +18,7 @@ class ProfileActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -26,7 +28,7 @@ class ProfileActions extends StatelessWidget {
           FilledButton.icon(
             onPressed: onEditProfile,
             icon: const Icon(Icons.settings),
-            label: const Text('Account Settings'),
+            label: Text(l10n.accountSettings),
           ),
           const SizedBox(height: 12),
 
@@ -35,7 +37,7 @@ class ProfileActions extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onNotificationSettings,
               icon: const Icon(Icons.notifications_outlined),
-              label: const Text('Notification Settings'),
+              label: Text(l10n.notificationSettings),
             ),
 
           // Game History button
@@ -44,7 +46,7 @@ class ProfileActions extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onGameHistory,
               icon: const Icon(Icons.history),
-              label: const Text('Game History'),
+              label: Text(l10n.gameHistory),
             ),
           ],
           const SizedBox(height: 24),
@@ -53,7 +55,7 @@ class ProfileActions extends StatelessWidget {
           TextButton.icon(
             onPressed: onSignOut,
             icon: const Icon(Icons.logout),
-            label: const Text('Sign Out'),
+            label: Text(l10n.signOut),
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.error,
             ),
