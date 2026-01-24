@@ -8,6 +8,7 @@ import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/partner_detail/partner_detail_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/partner_detail/partner_detail_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/partner_detail/partner_detail_state.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PartnerDetailPage extends StatelessWidget {
   final String userId;
@@ -30,7 +31,7 @@ class PartnerDetailPage extends StatelessWidget {
         )),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Partner Details'),
+          title: Text(AppLocalizations.of(context)!.partnerDetailsTitle),
         ),
         body: BlocBuilder<PartnerDetailBloc, PartnerDetailState>(
           builder: (context, state) {
@@ -134,6 +135,7 @@ class PartnerDetailPage extends StatelessWidget {
 
   Widget _buildRecordCard(BuildContext context, TeammateStats stats) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       child: Padding(
@@ -142,7 +144,7 @@ class PartnerDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Overall Record',
+              l10n.overallRecord,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -153,19 +155,19 @@ class PartnerDetailPage extends StatelessWidget {
               children: [
                 _buildStatColumn(
                   context,
-                  'Games',
+                  l10n.games,
                   stats.gamesPlayed.toString(),
                   Colors.blue,
                 ),
                 _buildStatColumn(
                   context,
-                  'Win Rate',
+                  l10n.winRate,
                   '${stats.winRate.toStringAsFixed(1)}%',
                   Colors.green,
                 ),
                 _buildStatColumn(
                   context,
-                  'Record',
+                  l10n.record,
                   stats.recordString,
                   Colors.orange,
                 ),
@@ -179,6 +181,7 @@ class PartnerDetailPage extends StatelessWidget {
 
   Widget _buildPointDifferentialCard(BuildContext context, TeammateStats stats) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final avgDiff = stats.avgPointDifferential;
     final isPositive = avgDiff >= 0;
 
@@ -189,7 +192,7 @@ class PartnerDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Point Differential',
+              l10n.pointDifferential,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -200,19 +203,19 @@ class PartnerDetailPage extends StatelessWidget {
               children: [
                 _buildStatColumn(
                   context,
-                  'Avg Per Game',
+                  l10n.avgPerGame,
                   stats.formattedPointDifferential,
                   isPositive ? Colors.green : Colors.red,
                 ),
                 _buildStatColumn(
                   context,
-                  'Points For',
+                  l10n.pointsFor,
                   stats.avgPointsScored.toStringAsFixed(1),
                   Colors.blue,
                 ),
                 _buildStatColumn(
                   context,
-                  'Points Against',
+                  l10n.pointsAgainst,
                   stats.avgPointsAllowed.toStringAsFixed(1),
                   Colors.orange,
                 ),
@@ -226,6 +229,7 @@ class PartnerDetailPage extends StatelessWidget {
 
   Widget _buildEloCard(BuildContext context, TeammateStats stats) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isPositive = stats.eloChange >= 0;
 
     return Card(
@@ -235,7 +239,7 @@ class PartnerDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'ELO Performance',
+              l10n.eloPerformance,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -246,13 +250,13 @@ class PartnerDetailPage extends StatelessWidget {
               children: [
                 _buildStatColumn(
                   context,
-                  'Total Change',
+                  l10n.totalChange,
                   stats.formattedEloChange,
                   isPositive ? Colors.green : Colors.red,
                 ),
                 _buildStatColumn(
                   context,
-                  'Avg Per Game',
+                  l10n.avgPerGame,
                   stats.avgEloChange >= 0
                       ? '+${stats.avgEloChange.toStringAsFixed(1)}'
                       : stats.avgEloChange.toStringAsFixed(1),
@@ -268,6 +272,7 @@ class PartnerDetailPage extends StatelessWidget {
 
   Widget _buildRecentFormCard(BuildContext context, TeammateStats stats) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       child: Padding(
@@ -279,7 +284,7 @@ class PartnerDetailPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Recent Form',
+                  l10n.recentForm,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -294,7 +299,9 @@ class PartnerDetailPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
-                      '${stats.currentStreak.abs()} ${stats.isOnWinningStreak ? "W" : "L"} Streak',
+                      stats.isOnWinningStreak
+                          ? l10n.streakWins(stats.currentStreak.abs())
+                          : l10n.streakLosses(stats.currentStreak.abs()),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: stats.isOnWinningStreak ? Colors.green : Colors.red,
                         fontWeight: FontWeight.bold,
@@ -307,7 +314,7 @@ class PartnerDetailPage extends StatelessWidget {
             if (stats.recentGames.isEmpty)
               Center(
                 child: Text(
-                  'No recent games',
+                  l10n.noRecentGames,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.6),
                   ),
@@ -379,7 +386,7 @@ class PartnerDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'ELO: ${game.formattedEloChange}',
+                  AppLocalizations.of(context)!.eloLabel(game.formattedEloChange),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: game.eloChange >= 0 ? Colors.green : Colors.red,
                   ),

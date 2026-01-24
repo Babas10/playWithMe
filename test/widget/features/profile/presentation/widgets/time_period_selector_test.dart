@@ -1,5 +1,7 @@
 // Tests TimePeriodSelector widget displays chips and handles user interaction.
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
@@ -9,8 +11,14 @@ void main() {
     testWidgets('renders all 4 time period chips', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (_) {},
@@ -29,8 +37,14 @@ void main() {
     testWidgets('selected chip has primary color background', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.thirtyDays,
               onPeriodChanged: (_) {},
@@ -50,8 +64,14 @@ void main() {
     testWidgets('unselected chips have outlined style', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (_) {},
@@ -74,8 +94,14 @@ void main() {
       TimePeriod? selectedPeriod;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (period) {
@@ -99,8 +125,14 @@ void main() {
       final List<TimePeriod> tappedPeriods = [];
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (period) {
@@ -131,8 +163,14 @@ void main() {
     testWidgets('chip labels match TimePeriod.displayName', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (_) {},
@@ -150,8 +188,14 @@ void main() {
     testWidgets('widget is horizontally scrollable', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (_) {},
@@ -171,8 +215,14 @@ void main() {
     testWidgets('widget has correct height (48px)', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (_) {},
@@ -190,8 +240,14 @@ void main() {
     testWidgets('chips are separated by 8px spacing', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (_) {},
@@ -218,8 +274,14 @@ void main() {
       TimePeriod? lastSelectedPeriod;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.thirtyDays,
               onPeriodChanged: (period) {
@@ -243,8 +305,14 @@ void main() {
     testWidgets('AnimatedContainer animates chip selection', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: TimePeriodSelector(
               selectedPeriod: TimePeriod.allTime,
               onPeriodChanged: (_) {},

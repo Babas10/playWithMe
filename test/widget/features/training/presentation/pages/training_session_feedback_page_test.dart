@@ -3,12 +3,14 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_event.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_state.dart';
 import 'package:play_with_me/features/training/presentation/pages/training_session_feedback_page.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 class MockTrainingFeedbackBloc
     extends MockBloc<TrainingFeedbackEvent, TrainingFeedbackState>
@@ -41,6 +43,13 @@ void main() {
 
   Widget createTestWidget() {
     return MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
       home: BlocProvider<TrainingFeedbackBloc>.value(
         value: mockFeedbackBloc,
         child: const TrainingSessionFeedbackPage(

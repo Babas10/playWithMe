@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/pages/partner_detail_page.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A card widget displaying best partner statistics.
 ///
@@ -18,6 +19,7 @@ class PartnersCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final bestPartner = _findBestPartner();
 
     return Card(
@@ -47,12 +49,12 @@ class PartnersCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         '🤝 ',
-                        style: const TextStyle(fontSize: 24),
+                        style: TextStyle(fontSize: 24),
                       ),
                       Text(
-                        'Best Partner',
+                        l10n.bestPartner,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -82,6 +84,7 @@ class PartnersCard extends StatelessWidget {
 
   Widget _buildPartnerInfo(BuildContext context, _PartnerData partner) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final winRate = (partner.gamesWon / partner.gamesPlayed * 100).toStringAsFixed(1);
 
     return Row(
@@ -111,7 +114,7 @@ class PartnersCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '$winRate% Win Rate',
+                l10n.winRatePercent(winRate),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.green,
                   fontWeight: FontWeight.w600,
@@ -119,7 +122,7 @@ class PartnersCard extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                '${partner.gamesWon}W - ${partner.gamesPlayed - partner.gamesWon}L • ${partner.gamesPlayed} games',
+                l10n.winsLossesGames(partner.gamesWon, partner.gamesPlayed - partner.gamesWon, partner.gamesPlayed),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withOpacity(0.6),
                 ),
@@ -137,7 +140,7 @@ class PartnersCard extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
+              const Icon(
                 Icons.trending_up,
                 size: 16,
                 color: Colors.green,
@@ -159,6 +162,7 @@ class PartnersCard extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
@@ -176,7 +180,7 @@ class PartnersCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'No partner data yet',
+              l10n.noPartnerDataYet,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),
                 fontWeight: FontWeight.w500,
@@ -203,7 +207,7 @@ class PartnersCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'Play 5+ games with a teammate',
+                    l10n.playGamesWithTeammate,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w500,

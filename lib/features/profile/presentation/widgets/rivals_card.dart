@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/pages/head_to_head_page.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/empty_states/insufficient_data_placeholder.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A card widget displaying rival/nemesis statistics.
 ///
@@ -52,7 +53,7 @@ class RivalsCard extends StatelessWidget {
                         style: const TextStyle(fontSize: 24),
                       ),
                       Text(
-                        'Rival',
+                        AppLocalizations.of(context)!.rival,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -112,7 +113,7 @@ class RivalsCard extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              '(${nemesis.gamesPlayed} matchups)',
+              '(${AppLocalizations.of(context)!.matchups(nemesis.gamesPlayed)})',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),
               ),
@@ -131,7 +132,7 @@ class RivalsCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Win Rate: ${nemesis.winRate.toStringAsFixed(1)}%',
+              AppLocalizations.of(context)!.winRateLabel(nemesis.winRate.toStringAsFixed(1)),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: nemesis.winRate < 50.0
                     ? theme.colorScheme.error
@@ -164,7 +165,7 @@ class RivalsCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Tap for full breakdown',
+                AppLocalizations.of(context)!.tapForFullBreakdown,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w500,
@@ -179,10 +180,10 @@ class RivalsCard extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return EmptyStatsPlaceholder(
-      title: 'No Nemesis Yet',
-      message: 'Play at least 3 games against the same opponent to track your toughest matchup.',
+      title: AppLocalizations.of(context)!.noNemesisYet,
+      message: AppLocalizations.of(context)!.playGamesAgainstSameOpponent,
       icon: Icons.emoji_events_outlined,
-      unlockMessage: 'Face the same opponent 3+ times',
+      unlockMessage: AppLocalizations.of(context)!.faceOpponentThreeTimes,
     );
   }
 }

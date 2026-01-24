@@ -1,5 +1,6 @@
 // Action menu for group member management (promote, demote, remove)
 import 'package:flutter/material.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 enum MemberAction {
   promote,
@@ -25,6 +26,8 @@ class MemberActionMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Non-admins don't see any menu
     if (!isCurrentUserAdmin) {
       return const SizedBox.shrink();
@@ -38,13 +41,13 @@ class MemberActionMenu extends StatelessWidget {
         // Promote to Admin (only if not already an admin)
         if (!isTargetUserAdmin) {
           items.add(
-            const PopupMenuItem(
+            PopupMenuItem(
               value: MemberAction.promote,
               child: Row(
                 children: [
-                  Icon(Icons.admin_panel_settings, size: 20),
-                  SizedBox(width: 12),
-                  Text('Promote to Admin'),
+                  const Icon(Icons.admin_panel_settings, size: 20),
+                  const SizedBox(width: 12),
+                  Text(l10n.promoteToAdmin),
                 ],
               ),
             ),
@@ -54,13 +57,13 @@ class MemberActionMenu extends StatelessWidget {
         // Demote to Member (only if is admin, not creator, and not last admin)
         if (isTargetUserAdmin && !isTargetUserCreator && canDemote) {
           items.add(
-            const PopupMenuItem(
+            PopupMenuItem(
               value: MemberAction.demote,
               child: Row(
                 children: [
-                  Icon(Icons.person, size: 20),
-                  SizedBox(width: 12),
-                  Text('Demote to Member'),
+                  const Icon(Icons.person, size: 20),
+                  const SizedBox(width: 12),
+                  Text(l10n.demoteToMember),
                 ],
               ),
             ),
@@ -84,7 +87,7 @@ class MemberActionMenu extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Remove from Group',
+                    l10n.removeFromGroup,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.error,
                     ),

@@ -1,5 +1,7 @@
 // Tests for RoleBasedPerformanceCard widget - validates UI rendering and interaction for role-based stats.
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/role_based_performance_card.dart';
@@ -76,8 +78,14 @@ void main() {
 
     testWidgets('displays empty state when no role-based data', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithNoData),
           ),
         ),
@@ -100,8 +108,14 @@ void main() {
 
     testWidgets('card is collapsed by default', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithAllRoles),
           ),
         ),
@@ -114,8 +128,14 @@ void main() {
 
     testWidgets('expands and collapses when tapped', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithAllRoles),
           ),
         ),
@@ -145,8 +165,14 @@ void main() {
 
     testWidgets('displays all three roles when available', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithAllRoles),
           ),
         ),
@@ -169,8 +195,14 @@ void main() {
 
     testWidgets('displays correct stats for carry role', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithOnlyCarry),
           ),
         ),
@@ -192,8 +224,14 @@ void main() {
 
     testWidgets('displays correct stats for weak-link role with positive framing', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithOnlyWeakLink),
           ),
         ),
@@ -218,8 +256,14 @@ void main() {
 
     testWidgets('win rate displays in green when >= 50%', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithOnlyCarry),
           ),
         ),
@@ -238,8 +282,14 @@ void main() {
 
     testWidgets('win rate displays in orange when < 50%', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithAllRoles),
           ),
         ),
@@ -258,8 +308,14 @@ void main() {
 
     testWidgets('displays personalized insight for strong carry performance', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithStrongCarry),
           ),
         ),
@@ -276,8 +332,14 @@ void main() {
 
     testWidgets('displays personalized insight for good weak-link performance', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithOnlyWeakLink),
           ),
         ),
@@ -293,8 +355,14 @@ void main() {
 
     testWidgets('displays icons for each role', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithAllRoles),
           ),
         ),
@@ -312,8 +380,14 @@ void main() {
 
     testWidgets('shows correct colors for each role', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithAllRoles),
           ),
         ),
@@ -336,8 +410,14 @@ void main() {
 
     testWidgets('only shows roles with games played', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithOnlyCarry),
           ),
         ),
@@ -355,8 +435,14 @@ void main() {
 
     testWidgets('header shows Advanced badge', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithAllRoles),
           ),
         ),
@@ -368,8 +454,14 @@ void main() {
 
     testWidgets('displays description text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RoleBasedPerformanceCard(user: userWithAllRoles),
           ),
         ),

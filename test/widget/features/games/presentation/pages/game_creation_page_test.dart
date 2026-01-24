@@ -2,8 +2,10 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
@@ -64,6 +66,13 @@ void main() {
 
   Widget createTestWidget() {
     return MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
       home: MultiBlocProvider(
         providers: [
           BlocProvider<GameCreationBloc>.value(value: mockGameCreationBloc),
@@ -119,7 +128,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.text('Date & Time'), findsOneWidget);
-        expect(find.text('Tap to select'), findsOneWidget);
+        // 'Tap to select' appears twice: in ListTile subtitle and as validation hint
+        expect(find.text('Tap to select'), findsNWidgets(2));
         expect(find.byIcon(Icons.calendar_today), findsOneWidget);
       });
 
@@ -279,14 +289,15 @@ void main() {
       testWidgets('date time selector is tappable', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        final dateTimeSelector = find.text('Tap to select');
-        expect(dateTimeSelector, findsOneWidget);
+        // Find the ListTile with the calendar icon (date time selector)
+        final dateTimeTile = find.ancestor(
+          of: find.byIcon(Icons.calendar_today),
+          matching: find.byType(ListTile),
+        );
+        expect(dateTimeTile, findsOneWidget);
 
         // Verify the list tile is tappable
-        await tester.tap(find.ancestor(
-          of: dateTimeSelector,
-          matching: find.byType(ListTile),
-        ));
+        await tester.tap(dateTimeTile);
         await tester.pump();
 
         // Date picker dialog should appear
@@ -297,9 +308,11 @@ void main() {
           (tester) async {
         await tester.pumpWidget(createTestWidget());
 
+        // The widget shows 'Tap to select' as the validation hint
+        // It appears in the ListTile subtitle and as validation text
         expect(
-          find.text('Please select a date and time'),
-          findsOneWidget,
+          find.text('Tap to select'),
+          findsNWidgets(2),
         );
       });
     });

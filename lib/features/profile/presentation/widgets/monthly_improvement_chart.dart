@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/empty_states/insufficient_data_placeholder.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Enhanced area chart showing ELO progress over time with adaptive aggregation.
 ///
@@ -30,16 +31,18 @@ class MonthlyImprovementChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Story 302.7: Check 1 - Minimum 3 games required
     if (ratingHistory.length < 3) {
       return InsufficientDataPlaceholder(
-        featureName: 'Monthly Progress Chart',
-        requirement: 'Play at least 3 games',
+        featureName: l10n.monthlyProgressChart,
+        requirement: l10n.playAtLeastNGames(3),
         icon: Icons.timeline,
-        currentProgress: '${ratingHistory.length}/3 games',
+        currentProgress: l10n.nOfNGames(ratingHistory.length, 3),
         message: ratingHistory.isEmpty
-            ? 'Start playing to track your progress!'
-            : 'Keep playing to unlock this chart!',
+            ? l10n.startPlayingToTrackProgress
+            : l10n.keepPlayingToUnlockChart,
       );
     }
 
@@ -54,10 +57,10 @@ class MonthlyImprovementChart extends StatelessWidget {
     // (relaxed for short periods where single-day data is acceptable)
     if (aggregatedData.length < 2 && !_isSingleDayDataAcceptable(timePeriod)) {
       return InsufficientDataPlaceholder(
-        featureName: 'Monthly Progress Chart',
-        requirement: 'Play games over a longer period',
+        featureName: l10n.monthlyProgressChart,
+        requirement: l10n.playGamesOverLongerPeriod,
         icon: Icons.timeline,
-        message: 'Keep playing to see your progress!',
+        message: l10n.keepPlayingToSeeProgress,
       );
     }
 
@@ -72,6 +75,8 @@ class MonthlyImprovementChart extends StatelessWidget {
 
   Widget _buildEmptyPeriodPlaceholder(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -91,7 +96,7 @@ class MonthlyImprovementChart extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No Games in This Period',
+            l10n.noGamesInThisPeriod,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -99,7 +104,7 @@ class MonthlyImprovementChart extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'No games played in the last ${_getPeriodDisplayName(timePeriod)}',
+            l10n.noGamesPlayedInLast(_getPeriodDisplayName(context, timePeriod)),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -107,7 +112,7 @@ class MonthlyImprovementChart extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Try selecting a longer time period',
+            l10n.trySelectingLongerPeriod,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               fontStyle: FontStyle.italic,
@@ -119,16 +124,17 @@ class MonthlyImprovementChart extends StatelessWidget {
     );
   }
 
-  String _getPeriodDisplayName(TimePeriod period) {
+  String _getPeriodDisplayName(BuildContext context, TimePeriod period) {
+    final l10n = AppLocalizations.of(context)!;
     switch (period) {
       case TimePeriod.thirtyDays:
-        return '30 days';
+        return l10n.periodLabel30Days;
       case TimePeriod.ninetyDays:
-        return '90 days';
+        return l10n.periodLabel90Days;
       case TimePeriod.oneYear:
-        return 'year';
+        return l10n.periodLabelYear;
       case TimePeriod.allTime:
-        return 'all time';
+        return l10n.periodLabelAllTime;
     }
   }
 

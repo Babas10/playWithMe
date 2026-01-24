@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/domain/repositories/group_repository.dart';
@@ -61,12 +62,13 @@ class _GameCreationPageState extends State<GameCreationPage> {
     final now = DateTime.now();
     final initialDate = now.add(const Duration(days: 1));
 
+    final l10n = AppLocalizations.of(context)!;
     final date = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: now,
       lastDate: now.add(const Duration(days: 365)),
-      helpText: 'Select Game Date',
+      helpText: l10n.selectGameDate,
     );
 
     if (date == null || !mounted) return;
@@ -74,7 +76,7 @@ class _GameCreationPageState extends State<GameCreationPage> {
     final time = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 14, minute: 0),
-      helpText: 'Select Game Time',
+      helpText: l10n.selectGameTime,
     );
 
     if (time == null || !mounted) return;
@@ -123,19 +125,20 @@ class _GameCreationPageState extends State<GameCreationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Game'),
+        title: Text(l10n.createGame),
         centerTitle: true,
       ),
       body: BlocConsumer<GameCreationBloc, GameCreationState>(
         listener: (context, state) {
           if (state is GameCreationSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Game created successfully!'),
+              SnackBar(
+                content: Text(l10n.gameCreatedSuccess),
                 backgroundColor: Colors.green,
-                duration: Duration(seconds: 2),
+                duration: const Duration(seconds: 2),
               ),
             );
 
@@ -160,8 +163,8 @@ class _GameCreationPageState extends State<GameCreationPage> {
           return BlocBuilder<AuthenticationBloc, AuthenticationState>(
             builder: (context, authState) {
               if (authState is! AuthenticationAuthenticated) {
-                return const Center(
-                  child: Text('Please log in to create a game'),
+                return Center(
+                  child: Text(l10n.pleaseLogInToCreateGame),
                 );
               }
 
@@ -176,7 +179,7 @@ class _GameCreationPageState extends State<GameCreationPage> {
                       Card(
                         child: ListTile(
                           leading: const Icon(Icons.group),
-                          title: const Text('Group'),
+                          title: Text(l10n.group),
                           subtitle: Text(widget.groupName),
                           trailing: const Icon(Icons.check_circle, color: Colors.green),
                         ),
@@ -186,21 +189,21 @@ class _GameCreationPageState extends State<GameCreationPage> {
                       // Game Title
                       TextFormField(
                         controller: _titleController,
-                        decoration: const InputDecoration(
-                          labelText: 'Game Title',
-                          hintText: 'e.g., Beach Volleyball',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.sports_volleyball),
+                        decoration: InputDecoration(
+                          labelText: l10n.gameTitle,
+                          hintText: l10n.gameTitleHint,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.sports_volleyball),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please enter a game title';
+                            return l10n.pleaseTitleRequired;
                           }
                           if (value.trim().length < 3) {
-                            return 'Title must be at least 3 characters';
+                            return l10n.titleMinLength;
                           }
                           if (value.trim().length > 100) {
-                            return 'Title must be less than 100 characters';
+                            return l10n.titleMaxLength;
                           }
                           return null;
                         },
@@ -211,11 +214,11 @@ class _GameCreationPageState extends State<GameCreationPage> {
                       // Description (Optional)
                       TextFormField(
                         controller: _descriptionController,
-                        decoration: const InputDecoration(
-                          labelText: 'Description (Optional)',
-                          hintText: 'Add details about the game...',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.description),
+                        decoration: InputDecoration(
+                          labelText: l10n.descriptionOptional,
+                          hintText: l10n.gameDescriptionHint,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.description),
                         ),
                         maxLines: 3,
                         enabled: !isSubmitting,
@@ -224,12 +227,12 @@ class _GameCreationPageState extends State<GameCreationPage> {
 
                       // Date and Time
                       ListTile(
-                        title: const Text('Date & Time'),
+                        title: Text(l10n.dateTime),
                         subtitle: _selectedDateTime != null
                             ? Text(
                                 '${_selectedDateTime!.day}/${_selectedDateTime!.month}/${_selectedDateTime!.year} at ${_selectedDateTime!.hour.toString().padLeft(2, '0')}:${_selectedDateTime!.minute.toString().padLeft(2, '0')}',
                               )
-                            : const Text('Tap to select'),
+                            : Text(l10n.tapToSelect),
                         leading: const Icon(Icons.calendar_today),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: isSubmitting ? null : () => _selectDateTime(context),
@@ -246,11 +249,11 @@ class _GameCreationPageState extends State<GameCreationPage> {
                         ),
                       ),
                       if (_selectedDateTime == null)
-                        const Padding(
-                          padding: EdgeInsets.only(left: 16, top: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16, top: 8),
                           child: Text(
-                            'Please select a date and time',
-                            style: TextStyle(
+                            l10n.tapToSelect,
+                            style: const TextStyle(
                               color: Colors.red,
                               fontSize: 12,
                             ),
@@ -261,15 +264,15 @@ class _GameCreationPageState extends State<GameCreationPage> {
                       // Location
                       TextFormField(
                         controller: _locationController,
-                        decoration: const InputDecoration(
-                          labelText: 'Location',
-                          hintText: 'e.g., Venice Beach',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.location_on),
+                        decoration: InputDecoration(
+                          labelText: l10n.location,
+                          hintText: l10n.locationHint,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.location_on),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please enter a location';
+                            return l10n.pleaseEnterLocation;
                           }
                           return null;
                         },
@@ -280,11 +283,11 @@ class _GameCreationPageState extends State<GameCreationPage> {
                       // Address (Optional)
                       TextFormField(
                         controller: _addressController,
-                        decoration: const InputDecoration(
-                          labelText: 'Address (Optional)',
-                          hintText: 'Full address...',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.place),
+                        decoration: InputDecoration(
+                          labelText: l10n.addressOptional,
+                          hintText: l10n.addressHint,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.place),
                         ),
                         enabled: !isSubmitting,
                       ),
@@ -304,9 +307,9 @@ class _GameCreationPageState extends State<GameCreationPage> {
                                 width: 20,
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
-                            : const Text(
-                                'Create Game',
-                                style: TextStyle(fontSize: 16),
+                            : Text(
+                                l10n.createGame,
+                                style: const TextStyle(fontSize: 16),
                               ),
                       ),
                     ],

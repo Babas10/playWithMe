@@ -347,6 +347,123 @@ try {
 
 ---
 
+### **🌍 Localization Standards (Critical, Non-Negotiable)**
+
+The app supports **5 languages**: English (EN), French (FR), German (DE), Spanish (ES), and Italian (IT).
+
+**CRITICAL: All user-facing strings must be localized.** Never hardcode text that users will see.
+
+#### **Localization Files**
+
+| File | Purpose |
+|------|---------|
+| `lib/l10n/app_en.arb` | English (primary source) |
+| `lib/l10n/app_fr.arb` | French |
+| `lib/l10n/app_de.arb` | German |
+| `lib/l10n/app_es.arb` | Spanish |
+| `lib/l10n/app_it.arb` | Italian |
+
+#### **How to Add New Strings**
+
+1. **Add the string to all 5 ARB files:**
+   ```json
+   // app_en.arb
+   "welcomeMessage": "Welcome to PlayWithMe",
+   "@welcomeMessage": {
+     "description": "Welcome message shown on home page"
+   }
+   ```
+
+2. **Run the localization generator:**
+   ```bash
+   flutter gen-l10n
+   ```
+
+3. **Use in widgets:**
+   ```dart
+   import 'package:play_with_me/l10n/app_localizations.dart';
+
+   // In build method:
+   final l10n = AppLocalizations.of(context)!;
+   Text(l10n.welcomeMessage)
+   ```
+
+#### **Widget Test Localization Requirements**
+
+**All widget tests MUST include localization delegates** in `MaterialApp`:
+
+```dart
+// ✅ CORRECT - Test with localization
+testWidgets('renders correctly', (tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
+      home: MyWidget(),
+    ),
+  );
+});
+
+// ❌ WRONG - Test without localization (will fail if widget uses l10n)
+testWidgets('renders correctly', (tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: MyWidget(), // Missing localization delegates!
+    ),
+  );
+});
+```
+
+**Required imports for tests:**
+```dart
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
+```
+
+#### **Localization Checklist for New Features**
+
+Before marking a feature complete:
+- [ ] All user-visible strings are localized (no hardcoded text)
+- [ ] Strings added to all 5 ARB files (EN, FR, DE, ES, IT)
+- [ ] Ran `flutter gen-l10n` to regenerate localization files
+- [ ] Widget tests include localization delegates
+- [ ] Tested UI renders correctly with localized strings
+
+#### **Common Localization Patterns**
+
+**Pluralization:**
+```json
+"gamesCount": "{count, plural, =0{No games} =1{1 game} other{{count} games}}",
+"@gamesCount": {
+  "placeholders": {
+    "count": {"type": "int"}
+  }
+}
+```
+
+**Parameterized strings:**
+```json
+"welcomeUser": "Welcome, {name}!",
+"@welcomeUser": {
+  "placeholders": {
+    "name": {"type": "String"}
+  }
+}
+```
+
+**Usage:**
+```dart
+l10n.gamesCount(5)     // "5 games"
+l10n.welcomeUser('John') // "Welcome, John!"
+```
+
+---
+
 ### **🚨 Error Handling Patterns (Critical)**
 
 The app uses **custom exception classes** for consistent error handling across repositories and BLoCs. This pattern ensures:

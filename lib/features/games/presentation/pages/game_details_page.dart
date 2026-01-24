@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
@@ -47,9 +48,10 @@ class _GameDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Game Details'),
+        title: Text(l10n.gameDetails),
         elevation: 0,
       ),
       body: BlocBuilder<GameDetailsBloc, GameDetailsState>(
@@ -74,7 +76,7 @@ class _GameDetailsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Error',
+                      l10n.error(state.message),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
@@ -89,7 +91,7 @@ class _GameDetailsView extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Go Back'),
+                        child: Text(l10n.goBack),
                       ),
                     ],
                   ],
@@ -112,7 +114,7 @@ class _GameDetailsView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Game Not Found',
+                      l10n.gameNotFound,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
@@ -124,7 +126,7 @@ class _GameDetailsView extends StatelessWidget {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Go Back'),
+                      child: Text(l10n.goBack),
                     ),
                   ],
                 ),

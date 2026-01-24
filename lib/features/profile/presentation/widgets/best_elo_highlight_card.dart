@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/best_elo_record.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Highlight card displaying the best ELO achieved in the selected time period.
 ///
@@ -52,7 +53,7 @@ class BestEloHighlightCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'No games in this period',
+              AppLocalizations.of(context)!.noGamesInThisPeriod,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -107,7 +108,7 @@ class BestEloHighlightCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Best ELO ${_getPeriodLabel()}',
+                      _getPeriodLabel(context),
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -140,16 +141,17 @@ class BestEloHighlightCard extends StatelessWidget {
     );
   }
 
-  String _getPeriodLabel() {
+  String _getPeriodLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (timePeriod) {
       case TimePeriod.thirtyDays:
-        return 'This Month';
+        return l10n.bestEloThisMonth;
       case TimePeriod.ninetyDays:
-        return 'Past 90 Days';
+        return l10n.bestEloPast90Days;
       case TimePeriod.oneYear:
-        return 'This Year';
+        return l10n.bestEloThisYear;
       case TimePeriod.allTime:
-        return 'All Time';
+        return l10n.bestEloAllTime;
     }
   }
 }

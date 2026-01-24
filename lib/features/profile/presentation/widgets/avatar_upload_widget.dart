@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
 import 'package:play_with_me/core/services/image_picker_service.dart';
@@ -39,8 +40,8 @@ class AvatarUploadWidget extends StatelessWidget {
 
             // Show success message
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Avatar uploaded successfully'),
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.avatarUploadedSuccess),
                 backgroundColor: Colors.green,
               ),
             );
@@ -69,8 +70,8 @@ class AvatarUploadWidget extends StatelessWidget {
 
             // Show success message
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Avatar removed successfully'),
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.avatarRemovedSuccess),
                 backgroundColor: Colors.green,
               ),
             );
@@ -220,7 +221,7 @@ class _AvatarUploadContent extends StatelessWidget {
                           );
                     },
                     icon: const Icon(Icons.cancel),
-                    label: const Text('Cancel'),
+                    label: Text(AppLocalizations.of(context)!.cancel),
                   ),
                   const SizedBox(width: 16),
                   FilledButton.icon(
@@ -230,7 +231,7 @@ class _AvatarUploadContent extends StatelessWidget {
                           );
                     },
                     icon: const Icon(Icons.upload),
-                    label: const Text('Upload'),
+                    label: Text(AppLocalizations.of(context)!.upload),
                   ),
                 ],
               ),
@@ -240,9 +241,9 @@ class _AvatarUploadContent extends StatelessWidget {
               TextButton.icon(
                 onPressed: () => _showDeleteConfirmation(context),
                 icon: const Icon(Icons.delete_outline, color: Colors.red),
-                label: const Text(
-                  'Remove Avatar',
-                  style: TextStyle(color: Colors.red),
+                label: Text(
+                  AppLocalizations.of(context)!.removeAvatar,
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
           ],
@@ -253,6 +254,7 @@ class _AvatarUploadContent extends StatelessWidget {
 
   /// Show dialog to select image source (camera or gallery)
   void _showImageSourceDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => SafeArea(
@@ -261,7 +263,7 @@ class _AvatarUploadContent extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Take Photo'),
+              title: Text(l10n.takePhoto),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 context.read<AvatarUploadBloc>().add(
@@ -273,7 +275,7 @@ class _AvatarUploadContent extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: Text(l10n.chooseFromGallery),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 context.read<AvatarUploadBloc>().add(
@@ -285,7 +287,7 @@ class _AvatarUploadContent extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.cancel),
-              title: const Text('Cancel'),
+              title: Text(l10n.cancel),
               onTap: () {
                 Navigator.of(sheetContext).pop();
               },
@@ -298,15 +300,16 @@ class _AvatarUploadContent extends StatelessWidget {
 
   /// Show confirmation dialog before deleting avatar
   void _showDeleteConfirmation(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Remove Avatar'),
-        content: const Text('Are you sure you want to remove your avatar?'),
+        title: Text(l10n.removeAvatar),
+        content: Text(l10n.confirmRemoveAvatar),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -318,7 +321,7 @@ class _AvatarUploadContent extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: Colors.red,
             ),
-            child: const Text('Remove'),
+            child: Text(l10n.remove),
           ),
         ],
       ),
