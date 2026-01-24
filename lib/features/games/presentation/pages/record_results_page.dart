@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 import '../../../../core/data/models/user_model.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
@@ -43,15 +44,15 @@ class _RecordResultsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Record Results'),
+        title: Text(AppLocalizations.of(context)!.recordResults),
         elevation: 0,
       ),
       body: BlocConsumer<RecordResultsBloc, RecordResultsState>(
         listener: (context, state) {
           if (state is RecordResultsSaved) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Teams saved successfully'),
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.teamsSavedSuccess),
                 backgroundColor: Colors.green,
               ),
             );
@@ -105,19 +106,19 @@ class _RecordResultsView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Assign Players to Teams',
+                          AppLocalizations.of(context)!.assignPlayersToTeams,
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Drag players to assign them to Team A or Team B',
+                          AppLocalizations.of(context)!.dragPlayersToAssign,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(height: 24),
                         if (state is RecordResultsLoaded) ...[
                           _TeamSection(
                             key: const Key('team_a_section'),
-                            title: 'Team A',
+                            title: AppLocalizations.of(context)!.teamA,
                             playerIds: state.teamAPlayerIds,
                             players: state.players,
                             color: Colors.blue,
@@ -130,7 +131,7 @@ class _RecordResultsView extends StatelessWidget {
                           const SizedBox(height: 16),
                           _TeamSection(
                             key: const Key('team_b_section'),
-                            title: 'Team B',
+                            title: AppLocalizations.of(context)!.teamB,
                             playerIds: state.teamBPlayerIds,
                             players: state.players,
                             color: Colors.red,
@@ -227,7 +228,9 @@ class _TeamSection extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  '${playerIds.length} ${playerIds.length == 1 ? "player" : "players"}',
+                  playerIds.length == 1
+                      ? AppLocalizations.of(context)!.playerCountSingular
+                      : AppLocalizations.of(context)!.playerCountPlural(playerIds.length),
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -238,7 +241,7 @@ class _TeamSection extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 alignment: Alignment.center,
                 child: Text(
-                  'No players assigned',
+                  AppLocalizations.of(context)!.noPlayersAssigned,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.grey,
                       ),
@@ -284,7 +287,7 @@ class _UnassignedPlayersSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Unassigned Players',
+              AppLocalizations.of(context)!.unassignedPlayers,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -300,7 +303,7 @@ class _UnassignedPlayersSection extends StatelessWidget {
                     const Icon(Icons.check_circle, color: Colors.green),
                     const SizedBox(width: 8),
                     Text(
-                      'All players assigned!',
+                      AppLocalizations.of(context)!.allPlayersAssigned,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
@@ -376,7 +379,7 @@ class _PlayerChip extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.close, size: 20),
             onPressed: onRemove,
-            tooltip: 'Remove from team',
+            tooltip: AppLocalizations.of(context)!.removeFromTeam,
           ),
         ],
       ),
@@ -442,7 +445,7 @@ class _UnassignedPlayerItem extends StatelessWidget {
                   foregroundColor: Colors.white,
                   minimumSize: const Size(60, 36),
                 ),
-                child: const Text('Team A'),
+                child: Text(AppLocalizations.of(context)!.teamA),
               ),
               const SizedBox(width: 8),
               ElevatedButton(
@@ -453,7 +456,7 @@ class _UnassignedPlayerItem extends StatelessWidget {
                   foregroundColor: Colors.white,
                   minimumSize: const Size(60, 36),
                 ),
-                child: const Text('Team B'),
+                child: Text(AppLocalizations.of(context)!.teamB),
               ),
             ],
           ),
@@ -498,7 +501,9 @@ class _SaveButton extends StatelessWidget {
               disabledBackgroundColor: Colors.grey.shade300,
             ),
             child: Text(
-              canSave ? 'Save Teams' : 'Assign All Players to Continue',
+              canSave
+                  ? AppLocalizations.of(context)!.saveTeams
+                  : AppLocalizations.of(context)!.assignAllPlayersToContinue,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),

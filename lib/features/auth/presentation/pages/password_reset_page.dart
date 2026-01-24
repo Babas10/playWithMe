@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_state.dart';
@@ -29,9 +30,10 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reset Password'),
+        title: Text(l10n.resetPassword),
         centerTitle: true,
       ),
       body: BlocListener<PasswordResetBloc, PasswordResetState>(
@@ -46,7 +48,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                 ),
               );
           } else if (state is PasswordResetSuccess) {
-            _showSuccessDialog(state.email);
+            _showSuccessDialog(context, state.email);
           }
         },
         child: Padding(
@@ -64,29 +66,29 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Forgot Your Password?',
+                  l10n.forgotYourPassword,
                   style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Enter your email address and we\'ll send you a link to reset your password.',
+                  l10n.forgotPasswordInstructions,
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 AuthFormField(
                   controller: _emailController,
-                  hintText: 'Email',
+                  hintText: l10n.emailHint,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.done,
                   prefixIcon: Icons.email,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Email is required';
+                      return l10n.emailRequired;
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                      return 'Please enter a valid email';
+                      return l10n.validEmailRequired;
                     }
                     return null;
                   },
@@ -96,7 +98,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                 BlocBuilder<PasswordResetBloc, PasswordResetState>(
                   builder: (context, state) {
                     return AuthButton(
-                      text: 'Send Reset Email',
+                      text: l10n.sendResetEmail,
                       isLoading: state is PasswordResetLoading,
                       onPressed: _submitPasswordReset,
                     );
@@ -107,7 +109,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Back to Login'),
+                  child: Text(l10n.backToLogin),
                 ),
               ],
             ),
@@ -125,23 +127,24 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
     }
   }
 
-  void _showSuccessDialog(String email) {
+  void _showSuccessDialog(BuildContext context, String email) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           icon: Icon(
             Icons.check_circle,
             color: Colors.green,
             size: 48,
           ),
-          title: const Text('Email Sent!'),
+          title: Text(l10n.emailSent),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'We\'ve sent a password reset link to:',
+                l10n.resetLinkSentTo,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
@@ -152,7 +155,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Please check your email and follow the instructions to reset your password.',
+                l10n.checkEmailResetInstructions,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey.shade600),
               ),
@@ -161,10 +164,10 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
+                Navigator.of(dialogContext).pop(); // Close dialog
                 Navigator.of(context).pop(); // Go back to login
               },
-              child: const Text('OK'),
+              child: Text(l10n.ok),
             ),
           ],
         );

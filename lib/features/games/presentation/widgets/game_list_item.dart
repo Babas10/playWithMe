@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'game_result_badge.dart';
@@ -68,7 +69,7 @@ class GameListItem extends StatelessWidget {
               _buildInfoRow(
                 context,
                 Icons.calendar_today,
-                _formatDateTime(game.scheduledAt),
+                _formatDateTime(context, game.scheduledAt),
                 isCancelled ? Colors.grey : statusColor,
               ),
               const SizedBox(height: 8),
@@ -149,6 +150,7 @@ class GameListItem extends StatelessWidget {
   }
 
   Widget _buildVerificationBadge(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -162,7 +164,7 @@ class GameListItem extends StatelessWidget {
           Icon(Icons.pending_actions, size: 16, color: Colors.purple.shade700),
           const SizedBox(width: 4),
           Text(
-            'Pending Verification',
+            l10n.pendingVerification,
             style: TextStyle(
               color: Colors.purple.shade800,
               fontWeight: FontWeight.bold,
@@ -175,6 +177,7 @@ class GameListItem extends StatelessWidget {
   }
 
   Widget _buildRsvpStatusBadge(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isPlayer = game.isPlayer(userId);
     final isOnWaitlist = game.isOnWaitlist(userId);
 
@@ -192,7 +195,7 @@ class GameListItem extends StatelessWidget {
             const Icon(Icons.check_circle, size: 16, color: Colors.green),
             const SizedBox(width: 4),
             Text(
-              "You're In",
+              l10n.youreIn,
               style: TextStyle(
                 color: Colors.green.shade700,
                 fontWeight: FontWeight.w600,
@@ -218,7 +221,7 @@ class GameListItem extends StatelessWidget {
             const Icon(Icons.hourglass_empty, size: 16, color: Colors.orange),
             const SizedBox(width: 4),
             Text(
-              'On Waitlist',
+              l10n.onWaitlist,
               style: TextStyle(
                 color: Colors.orange.shade700,
                 fontWeight: FontWeight.w600,
@@ -244,7 +247,7 @@ class GameListItem extends StatelessWidget {
             const Icon(Icons.block, size: 16, color: Colors.red),
             const SizedBox(width: 4),
             Text(
-              'Full',
+              l10n.full,
               style: TextStyle(
                 color: Colors.red.shade700,
                 fontWeight: FontWeight.w600,
@@ -272,7 +275,7 @@ class GameListItem extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            'Join Game',
+            l10n.joinGame,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onPrimaryContainer,
               fontWeight: FontWeight.w600,
@@ -333,7 +336,8 @@ class GameListItem extends StatelessWidget {
     );
   }
 
-  String _formatDateTime(DateTime dateTime) {
+  String _formatDateTime(BuildContext context, DateTime dateTime) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
@@ -341,9 +345,9 @@ class GameListItem extends StatelessWidget {
 
     String dayString;
     if (gameDate == today) {
-      dayString = 'Today';
+      dayString = l10n.today;
     } else if (gameDate == tomorrow) {
-      dayString = 'Tomorrow';
+      dayString = l10n.tomorrow;
     } else {
       dayString = DateFormat('EEE, MMM d').format(dateTime);
     }

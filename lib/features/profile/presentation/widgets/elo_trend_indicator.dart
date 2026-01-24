@@ -1,6 +1,7 @@
 // ELO trend indicator widget showing rating delta and direction.
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Widget that displays ELO rating with trend indicator.
 ///
@@ -24,6 +25,7 @@ class ELOTrendIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final trendData = _calculateTrend();
 
     return Card(
@@ -36,7 +38,7 @@ class ELOTrendIndicator extends StatelessWidget {
           children: [
             // Label
             Text(
-              'ELO Rating',
+              l10n.eloRatingLabel,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),
                 fontWeight: FontWeight.w500,
@@ -86,7 +88,7 @@ class ELOTrendIndicator extends StatelessWidget {
             if (trendData != null && trendData['delta'] != 0) ...[
               const SizedBox(height: 4),
               Text(
-                'Last ${trendData['gamesCount']} games',
+                l10n.lastNGames(trendData['gamesCount'] as int),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withOpacity(0.5),
                 ),
@@ -94,7 +96,7 @@ class ELOTrendIndicator extends StatelessWidget {
             ] else if (recentHistory.isEmpty) ...[
               const SizedBox(height: 4),
               Text(
-                'No games played yet',
+                l10n.noGamesPlayedYet,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withOpacity(0.5),
                 ),

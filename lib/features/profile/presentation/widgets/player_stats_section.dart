@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/elo_history_chart.dart';
@@ -10,6 +11,7 @@ class PlayerStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
       builder: (context, state) {
         if (state is PlayerStatsLoading) {
@@ -17,7 +19,7 @@ class PlayerStatsSection extends StatelessWidget {
         }
 
         if (state is PlayerStatsError) {
-          return Center(child: Text('Error: ${state.message}'));
+          return Center(child: Text(l10n.error(state.message)));
         }
 
         if (state is PlayerStatsLoaded) {
@@ -30,13 +32,13 @@ class PlayerStatsSection extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Text(
-                  'Performance Stats',
+                  l10n.performanceStats,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
               ),
-              
+
               // ELO History Chart
               Container(
                 height: 200,
@@ -58,28 +60,28 @@ class PlayerStatsSection extends StatelessWidget {
                 crossAxisSpacing: 12.0,
                 children: [
                   StatCard(
-                    label: 'ELO Rating',
+                    label: l10n.eloRatingLabel,
                     value: user.eloRating.toStringAsFixed(0),
-                    subLabel: 'Peak: ${user.eloPeak.toStringAsFixed(0)}',
+                    subLabel: l10n.peak(user.eloPeak.toStringAsFixed(0)),
                     icon: Icons.show_chart,
                     iconColor: Colors.blue,
                   ),
                   StatCard(
-                    label: 'Win Rate',
+                    label: l10n.winRate,
                     value: '${(user.winRate * 100).toStringAsFixed(1)}%',
-                    subLabel: '${user.gamesWon}W - ${user.gamesLost}L',
+                    subLabel: l10n.winsLosses(user.gamesWon, user.gamesLost),
                     icon: Icons.pie_chart,
                     iconColor: Colors.green,
                   ),
                   StatCard(
-                    label: 'Streak',
+                    label: l10n.streakLabel,
                     value: user.streakValue.toString(),
-                    subLabel: user.isOnWinningStreak ? 'Winning' : (user.isOnLosingStreak ? 'Losing' : 'None'),
+                    subLabel: user.isOnWinningStreak ? l10n.winning : (user.isOnLosingStreak ? l10n.losingStreak : l10n.noStreak),
                     icon: Icons.local_fire_department,
                     iconColor: user.isOnWinningStreak ? Colors.orange : Colors.grey,
                   ),
                   StatCard(
-                    label: 'Games Played',
+                    label: l10n.gamesPlayedLabel,
                     value: user.gamesPlayed.toString(),
                     icon: Icons.sports_volleyball,
                     iconColor: Colors.orange,
@@ -141,7 +143,7 @@ class _BestTeammateCard extends StatelessWidget {
       child: Card(
         child: ListTile(
           leading: const CircleAvatar(child: Icon(Icons.person)), // Placeholder for avatar
-          title: const Text('Best Teammate'),
+          title: Text(AppLocalizations.of(context)!.bestTeammate),
           subtitle: Text('ID: ${bestId.substring(0, 5)}... • $wins wins ($winRate%)'), // ID is temporary until we resolve name
           trailing: const Icon(Icons.star, color: Colors.amber),
         ),

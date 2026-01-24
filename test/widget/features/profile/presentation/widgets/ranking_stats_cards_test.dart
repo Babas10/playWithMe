@@ -1,5 +1,7 @@
 // Validates RankingStatsCards widget displays correct ranking stats (Story 302.5).
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/user_ranking.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/ranking_stats_cards.dart';
@@ -8,7 +10,14 @@ void main() {
   group('RankingStatsCards', () {
     testWidgets('shows empty state when ranking is null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
           home: Scaffold(
             body: RankingStatsCards(
               ranking: null,
@@ -30,8 +39,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RankingStatsCards(
               ranking: ranking,
             ),
@@ -53,8 +68,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RankingStatsCards(
               ranking: ranking,
             ),
@@ -78,8 +99,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RankingStatsCards(
               ranking: ranking,
             ),
@@ -101,8 +128,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RankingStatsCards(
               ranking: ranking,
             ),
@@ -126,8 +159,14 @@ void main() {
       bool callbackTriggered = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RankingStatsCards(
               ranking: ranking,
               onAddFriendsTap: () {
@@ -156,8 +195,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: Center(
               child: SizedBox(
                 width: 600, // Wide screen
@@ -185,8 +230,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: Center(
               child: SizedBox(
                 width: 250, // Very narrow screen (< 280px threshold)
@@ -214,8 +265,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RankingStatsCards(
               ranking: ranking,
             ),
@@ -246,8 +303,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: RankingStatsCards(
               ranking: ranking,
             ),

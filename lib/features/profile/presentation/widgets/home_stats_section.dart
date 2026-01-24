@@ -5,6 +5,7 @@ import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/compact_stat_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/elo_trend_indicator.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/win_streak_badge.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A section widget displaying glance-level statistics on the home screen.
 ///
@@ -30,6 +31,8 @@ class HomeStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -38,7 +41,7 @@ class HomeStatsSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Text(
-            'Performance Overview',
+            l10n.performanceOverview,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -64,18 +67,18 @@ class HomeStatsSection extends StatelessWidget {
                   // Win Rate
                   Expanded(
                     child: CompactStatCard(
-                      label: 'Win Rate',
+                      label: l10n.winRate,
                       value: '${(user.winRate * 100).toStringAsFixed(1)}%',
                       icon: Icons.pie_chart,
                       iconColor: Colors.green,
-                      subLabel: '${user.gamesWon}W - ${user.gamesLost}L',
+                      subLabel: l10n.winsLosses(user.gamesWon, user.gamesLost),
                     ),
                   ),
                   const SizedBox(width: 8),
                   // Games Played
                   Expanded(
                     child: CompactStatCard(
-                      label: 'Games Played',
+                      label: l10n.gamesPlayed,
                       value: user.gamesPlayed.toString(),
                       icon: Icons.sports_volleyball,
                       iconColor: Colors.orange,

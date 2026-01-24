@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/services/service_locator.dart';
@@ -38,17 +39,18 @@ class _ScoreEntryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Enter Scores'),
+        title: Text(l10n.enterScores),
         elevation: 0,
       ),
       body: BlocConsumer<ScoreEntryBloc, ScoreEntryState>(
         listener: (context, state) {
           if (state is ScoreEntrySaved) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Scores saved successfully!'),
+              SnackBar(
+                content: Text(l10n.scoresSavedSuccess),
                 backgroundColor: Colors.green,
               ),
             );
@@ -100,13 +102,13 @@ class _ScoreEntryView extends StatelessWidget {
           }
 
           if (state is ScoreEntrySaving) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Saving scores...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.savingScores),
                 ],
               ),
             );
@@ -126,6 +128,7 @@ class _GameCountSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -133,7 +136,7 @@ class _GameCountSelector extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'How many games did you play?',
+            l10n.howManyGamesPlayed,
             style: Theme.of(context).textTheme.headlineSmall,
             textAlign: TextAlign.center,
           ),

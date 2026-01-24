@@ -1,5 +1,6 @@
 // Confirmation dialogs for member management actions
 import 'package:flutter/material.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 
 /// Shows a confirmation dialog for promoting a member to admin
@@ -7,25 +8,22 @@ Future<bool> showPromoteConfirmationDialog(
   BuildContext context,
   UserModel member,
 ) async {
+  final l10n = AppLocalizations.of(context)!;
   return await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Promote to Admin'),
+          title: Text(l10n.promoteToAdmin),
           content: Text(
-            'Are you sure you want to promote ${member.displayName ?? member.email} to admin?\n\n'
-            'Admins can:\n'
-            '• Manage group members\n'
-            '• Invite new members\n'
-            '• Modify group settings',
+            l10n.promoteConfirmMessage(member.displayName ?? member.email),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Promote'),
+              child: Text(l10n.promote),
             ),
           ],
         ),
@@ -38,25 +36,25 @@ Future<bool> showDemoteConfirmationDialog(
   BuildContext context,
   UserModel member,
 ) async {
+  final l10n = AppLocalizations.of(context)!;
   return await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Demote to Member'),
+          title: Text(l10n.demoteToMember),
           content: Text(
-            'Are you sure you want to demote ${member.displayName ?? member.email} to regular member?\n\n'
-            'They will lose admin privileges.',
+            l10n.demoteConfirmMessage(member.displayName ?? member.email),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.orange,
               ),
-              child: const Text('Demote'),
+              child: Text(l10n.demote),
             ),
           ],
         ),
@@ -69,25 +67,25 @@ Future<bool> showRemoveMemberConfirmationDialog(
   BuildContext context,
   UserModel member,
 ) async {
+  final l10n = AppLocalizations.of(context)!;
   return await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Remove Member'),
+          title: Text(l10n.removeMember),
           content: Text(
-            'Are you sure you want to remove ${member.displayName ?? member.email} from the group?\n\n'
-            'This action cannot be undone. They will need to be re-invited to rejoin.',
+            l10n.removeConfirmMessage(member.displayName ?? member.email),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.red,
               ),
-              child: const Text('Remove'),
+              child: Text(l10n.remove),
             ),
           ],
         ),
@@ -100,25 +98,25 @@ Future<bool> showLeaveGroupConfirmationDialog(
   BuildContext context,
   String groupName,
 ) async {
+  final l10n = AppLocalizations.of(context)!;
   return await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Leave Group'),
+          title: Text(l10n.leaveGroup),
           content: Text(
-            'Are you sure you want to leave "$groupName"?\n\n'
-            'You will need to be re-invited to rejoin this group.',
+            l10n.leaveGroupConfirmMessage(groupName),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.red,
               ),
-              child: const Text('Leave'),
+              child: Text(l10n.leave),
             ),
           ],
         ),

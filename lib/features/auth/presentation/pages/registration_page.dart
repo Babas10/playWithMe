@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_state.dart';
@@ -37,9 +38,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Account'),
+        title: Text(l10n.createAccount),
         centerTitle: true,
       ),
       body: BlocListener<RegistrationBloc, RegistrationState>(
@@ -55,8 +57,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
               );
           } else if (state is RegistrationSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Account created successfully! Please check your email for verification.'),
+              SnackBar(
+                content: Text(l10n.accountCreatedSuccess),
                 backgroundColor: Colors.green,
               ),
             );
@@ -78,29 +80,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Join PlayWithMe!',
+                  l10n.joinPlayWithMe,
                   style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Create your account to start organizing volleyball games',
+                  l10n.createAccountSubtitle,
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 AuthFormField(
                   controller: _emailController,
-                  hintText: 'Email',
+                  hintText: l10n.emailHint,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   prefixIcon: Icons.email,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Email is required';
+                      return l10n.emailRequired;
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                      return 'Please enter a valid email';
+                      return l10n.validEmailRequired;
                     }
                     return null;
                   },
@@ -108,12 +110,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 16),
                 AuthFormField(
                   controller: _displayNameController,
-                  hintText: 'Display Name (Optional)',
+                  hintText: l10n.displayNameOptionalHint,
                   textInputAction: TextInputAction.next,
                   prefixIcon: Icons.person,
                   validator: (value) {
                     if (value != null && value.trim().length > 50) {
-                      return 'Display name must be less than 50 characters';
+                      return l10n.displayNameTooLong;
                     }
                     return null;
                   },
@@ -121,7 +123,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 16),
                 AuthFormField(
                   controller: _passwordController,
-                  hintText: 'Password',
+                  hintText: l10n.passwordHint,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.next,
                   prefixIcon: Icons.lock,
@@ -137,10 +139,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Password is required';
+                      return l10n.passwordRequired;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return l10n.passwordTooShort;
                     }
                     return null;
                   },
@@ -148,7 +150,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 16),
                 AuthFormField(
                   controller: _confirmPasswordController,
-                  hintText: 'Confirm Password',
+                  hintText: l10n.confirmPassword,
                   obscureText: _obscureConfirmPassword,
                   textInputAction: TextInputAction.done,
                   prefixIcon: Icons.lock,
@@ -164,10 +166,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Please confirm your password';
+                      return l10n.pleaseConfirmPassword;
                     }
                     if (value != _passwordController.text) {
-                      return 'Passwords do not match';
+                      return l10n.passwordsDoNotMatch;
                     }
                     return null;
                   },
@@ -177,7 +179,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 BlocBuilder<RegistrationBloc, RegistrationState>(
                   builder: (context, state) {
                     return AuthButton(
-                      text: 'Create Account',
+                      text: l10n.createAccount,
                       isLoading: state is RegistrationLoading,
                       onPressed: _submitRegistration,
                     );
@@ -187,12 +189,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have an account? '),
+                    Text(l10n.alreadyHaveAccount),
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text('Sign In'),
+                      child: Text(l10n.signIn),
                     ),
                   ],
                 ),
@@ -200,7 +202,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    'By creating an account, you agree to our Terms of Service and Privacy Policy.',
+                    l10n.termsAgreement,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey.shade600,
                         ),

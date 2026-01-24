@@ -7,6 +7,7 @@ import 'package:play_with_me/features/training/presentation/bloc/training_sessio
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_event.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_state.dart';
 import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 class TrainingSessionCreationPage extends StatefulWidget {
   final String groupId;
@@ -57,12 +58,13 @@ class _TrainingSessionCreationPageState
     final now = DateTime.now();
     final initialDate = now.add(const Duration(days: 1));
 
+    final l10n = AppLocalizations.of(context)!;
     final date = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: now,
       lastDate: now.add(const Duration(days: 365)),
-      helpText: 'Select Start Date',
+      helpText: l10n.selectStartDate,
     );
 
     if (date == null || !mounted) return;
@@ -70,7 +72,7 @@ class _TrainingSessionCreationPageState
     final time = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 14, minute: 0),
-      helpText: 'Select Start Time',
+      helpText: l10n.selectStartTime,
     );
 
     if (time == null || !mounted) return;
@@ -91,9 +93,10 @@ class _TrainingSessionCreationPageState
   }
 
   Future<void> _selectEndTime(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     if (_selectedStartTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select start time first')),
+        SnackBar(content: Text(l10n.pleaseSelectStartTimeFirst)),
       );
       return;
     }
@@ -104,7 +107,7 @@ class _TrainingSessionCreationPageState
         hour: _selectedEndTime?.hour ?? 16,
         minute: _selectedEndTime?.minute ?? 0,
       ),
-      helpText: 'Select End Time',
+      helpText: l10n.selectEndTime,
     );
 
     if (time == null || !mounted) return;
@@ -123,20 +126,21 @@ class _TrainingSessionCreationPageState
   }
 
   void _handleSubmit(BuildContext context, String userId) {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (_selectedStartTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select start time')),
+        SnackBar(content: Text(l10n.pleaseSelectStartTime)),
       );
       return;
     }
 
     if (_selectedEndTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select end time')),
+        SnackBar(content: Text(l10n.pleaseSelectEndTime)),
       );
       return;
     }
@@ -166,6 +170,7 @@ class _TrainingSessionCreationPageState
     return BlocListener<TrainingSessionCreationBloc,
         TrainingSessionCreationState>(
       listener: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
         if (state is TrainingSessionCreationSuccess) {
           // Pop the creation page
           Navigator.of(context).pop();
@@ -180,8 +185,8 @@ class _TrainingSessionCreationPageState
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Training session created successfully!'),
+            SnackBar(
+              content: Text(l10n.trainingCreatedSuccess),
               backgroundColor: Colors.green,
             ),
           );
@@ -194,18 +199,21 @@ class _TrainingSessionCreationPageState
           );
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Create Training Session'),
-          centerTitle: true,
-        ),
-        body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-          builder: (context, authState) {
-            if (authState is! AuthenticationAuthenticated) {
-              return const Center(
-                child: Text('Please log in to create a training session'),
-              );
-            }
+      child: Builder(
+        builder: (context) {
+          final l10n = AppLocalizations.of(context)!;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(l10n.createTrainingSession),
+              centerTitle: true,
+            ),
+            body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+              builder: (context, authState) {
+                if (authState is! AuthenticationAuthenticated) {
+                  return Center(
+                    child: Text(l10n.pleaseLogInToCreateTraining),
+                  );
+                }
 
             return BlocBuilder<TrainingSessionCreationBloc,
                 TrainingSessionCreationState>(
@@ -226,14 +234,14 @@ class _TrainingSessionCreationPageState
                         const SizedBox(height: 24),
                         TextFormField(
                           controller: _titleController,
-                          decoration: const InputDecoration(
-                            labelText: 'Title',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.fitness_center),
+                          decoration: InputDecoration(
+                            labelText: l10n.title,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.fitness_center),
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'Please enter a title';
+                              return l10n.pleaseEnterTitle;
                             }
                             return null;
                           },
@@ -242,10 +250,10 @@ class _TrainingSessionCreationPageState
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _descriptionController,
-                          decoration: const InputDecoration(
-                            labelText: 'Description (Optional)',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.description),
+                          decoration: InputDecoration(
+                            labelText: l10n.descriptionOptional,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.description),
                           ),
                           maxLines: 3,
                           enabled: !isLoading,
@@ -253,14 +261,14 @@ class _TrainingSessionCreationPageState
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _locationController,
-                          decoration: const InputDecoration(
-                            labelText: 'Location',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.location_on),
+                          decoration: InputDecoration(
+                            labelText: l10n.location,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.location_on),
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'Please enter a location';
+                              return l10n.pleaseEnterLocation;
                             }
                             return null;
                           },
@@ -268,10 +276,10 @@ class _TrainingSessionCreationPageState
                         ),
                         const SizedBox(height: 16),
                         ListTile(
-                          title: const Text('Start Time'),
+                          title: Text(l10n.startTime),
                           subtitle: Text(_selectedStartTime != null
                               ? '${_selectedStartTime!.day}/${_selectedStartTime!.month}/${_selectedStartTime!.year} at ${_selectedStartTime!.hour}:${_selectedStartTime!.minute.toString().padLeft(2, '0')}'
-                              : 'Not selected'),
+                              : l10n.notSelected),
                           trailing: const Icon(Icons.calendar_today),
                           onTap: isLoading
                               ? null
@@ -284,10 +292,10 @@ class _TrainingSessionCreationPageState
                         ),
                         const SizedBox(height: 16),
                         ListTile(
-                          title: const Text('End Time'),
+                          title: Text(l10n.endTime),
                           subtitle: Text(_selectedEndTime != null
                               ? '${_selectedEndTime!.day}/${_selectedEndTime!.month}/${_selectedEndTime!.year} at ${_selectedEndTime!.hour}:${_selectedEndTime!.minute.toString().padLeft(2, '0')}'
-                              : 'Not selected'),
+                              : l10n.notSelected),
                           trailing: const Icon(Icons.access_time),
                           onTap: isLoading
                               ? null
@@ -306,7 +314,7 @@ class _TrainingSessionCreationPageState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Min Participants',
+                                    l10n.minParticipantsLabel,
                                     style:
                                         Theme.of(context).textTheme.bodyMedium,
                                   ),
@@ -342,7 +350,7 @@ class _TrainingSessionCreationPageState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Max Participants',
+                                    l10n.maxParticipantsLabel,
                                     style:
                                         Theme.of(context).textTheme.bodyMedium,
                                   ),
@@ -389,7 +397,7 @@ class _TrainingSessionCreationPageState
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Create Training Session'),
+                                : Text(l10n.createTrainingSession),
                           ),
                         ),
                       ],
@@ -398,8 +406,10 @@ class _TrainingSessionCreationPageState
                 );
               },
             );
-          },
-        ),
+              },
+            ),
+          );
+        },
       ),
     );
   }

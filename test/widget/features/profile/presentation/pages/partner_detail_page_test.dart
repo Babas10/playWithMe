@@ -1,6 +1,8 @@
 // Widget tests for PartnerDetailPage verifying UI rendering and state transitions.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
@@ -104,7 +106,14 @@ void main() {
   });
 
   Widget createTestWidget() {
-    return const MaterialApp(
+    return MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
       home: PartnerDetailPage(
         userId: testUserId,
         partnerId: testPartnerId,
