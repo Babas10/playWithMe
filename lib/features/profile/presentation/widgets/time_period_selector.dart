@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A horizontal selector for choosing time periods (Story 302.3).
 ///
@@ -18,6 +19,20 @@ class TimePeriodSelector extends StatelessWidget {
     required this.onPeriodChanged,
   });
 
+  String _getLocalizedLabel(BuildContext context, TimePeriod period) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (period) {
+      case TimePeriod.thirtyDays:
+        return l10n.period30d;
+      case TimePeriod.ninetyDays:
+        return l10n.period90d;
+      case TimePeriod.oneYear:
+        return l10n.period1y;
+      case TimePeriod.allTime:
+        return l10n.periodAllTime;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -31,7 +46,7 @@ class TimePeriodSelector extends StatelessWidget {
           final isSelected = period == selectedPeriod;
 
           return _PeriodChip(
-            label: period.displayName,
+            label: _getLocalizedLabel(context, period),
             isSelected: isSelected,
             onTap: () => onPeriodChanged(period),
           );

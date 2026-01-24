@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_state.dart';
@@ -32,9 +33,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: Text(l10n.login),
         centerTitle: true,
       ),
       body: BlocListener<LoginBloc, LoginState>(
@@ -67,29 +69,29 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Welcome Back!',
+                  l10n.welcomeBack,
                   style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to continue organizing your volleyball games',
+                  l10n.signInToContinue,
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 AuthFormField(
                   controller: _emailController,
-                  hintText: 'Email',
+                  hintText: l10n.emailHint,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   prefixIcon: Icons.email,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Email is required';
+                      return l10n.emailRequired;
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                      return 'Please enter a valid email';
+                      return l10n.validEmailRequired;
                     }
                     return null;
                   },
@@ -97,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 16),
                 AuthFormField(
                   controller: _passwordController,
-                  hintText: 'Password',
+                  hintText: l10n.passwordHint,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.done,
                   prefixIcon: Icons.lock,
@@ -113,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Password is required';
+                      return l10n.passwordRequired;
                     }
                     return null;
                   },
@@ -123,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                 BlocBuilder<LoginBloc, LoginState>(
                   builder: (context, state) {
                     return AuthButton(
-                      text: 'Login',
+                      text: l10n.login,
                       isLoading: state is LoginLoading,
                       onPressed: _submitLogin,
                     );
@@ -133,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                 BlocBuilder<LoginBloc, LoginState>(
                   builder: (context, state) {
                     return AuthButton(
-                      text: 'Continue as Guest',
+                      text: l10n.continueAsGuest,
                       isOutlined: true,
                       isLoading: state is LoginLoading,
                       onPressed: () {
@@ -146,12 +148,12 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account? "),
+                    Text(l10n.dontHaveAccount),
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pushNamed('/register');
                       },
-                      child: const Text('Sign Up'),
+                      child: Text(l10n.signUp),
                     ),
                   ],
                 ),
@@ -159,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     Navigator.of(context).pushNamed('/forgot-password');
                   },
-                  child: const Text('Forgot Password?'),
+                  child: Text(l10n.forgotPassword),
                 ),
               ],
             ),

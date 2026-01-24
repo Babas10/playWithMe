@@ -15,6 +15,7 @@ import 'package:play_with_me/features/profile/presentation/widgets/best_elo_high
 import 'package:play_with_me/features/profile/presentation/widgets/monthly_improvement_chart.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/ranking_stats_cards.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A card widget displaying momentum and consistency metrics.
 ///
@@ -58,7 +59,7 @@ class MomentumConsistencyCard extends StatelessWidget {
             children: [
               // Header
               Text(
-                'Momentum & Consistency',
+                AppLocalizations.of(context)!.momentumAndConsistency,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -69,7 +70,7 @@ class MomentumConsistencyCard extends StatelessWidget {
               const SizedBox(height: 24),
               // Monthly Progress with Time Period Selector
               Text(
-                'ELO Progress',
+                AppLocalizations.of(context)!.eloProgress,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -158,7 +159,7 @@ class MomentumConsistencyCard extends StatelessWidget {
     final streakColor = isWinning ? Colors.green : Colors.red;
     final streakIcon = isWinning ? Icons.trending_up : Icons.trending_down;
     final streakEmoji = isWinning ? '🔥' : '❄️';
-    final streakLabel = isWinning ? 'Win Streak' : 'Loss Streak';
+    final streakLabel = isWinning ? AppLocalizations.of(context)!.winStreak : AppLocalizations.of(context)!.lossStreak;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -204,7 +205,7 @@ class MomentumConsistencyCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'games',
+                      AppLocalizations.of(context)!.gamesCount(streakValue).replaceFirst('$streakValue ', ''),
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: streakColor.withOpacity(0.8),
                       ),
@@ -247,7 +248,7 @@ class MomentumConsistencyCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'No Active Streak',
+                  AppLocalizations.of(context)!.noActiveStreak,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurface.withOpacity(0.7),
@@ -255,7 +256,7 @@ class MomentumConsistencyCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Win your next game to start a streak!',
+                  AppLocalizations.of(context)!.winNextGameToStartStreak,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.5),
                   ),

@@ -1,6 +1,7 @@
 // Role-based performance card showing adaptability stats across different team contexts.
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A collapsible card widget displaying role-based performance metrics.
 ///
@@ -61,7 +62,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
                         const SizedBox(width: 12),
                         Flexible(
                           child: Text(
-                            'Adaptability Stats',
+                            AppLocalizations.of(context)!.adaptabilityStats,
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -84,7 +85,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          'Advanced',
+                          AppLocalizations.of(context)!.advanced,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.w600,
@@ -127,7 +128,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
       children: [
         // Description
         Text(
-          'See how you perform in different team roles',
+          AppLocalizations.of(context)!.seeHowYouPerform,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurface.withOpacity(0.7),
           ),
@@ -137,11 +138,11 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
         // Carry Stats (if available)
         if (stats.carry.games > 0) ...  [
           _RoleStatRow(
-            role: 'Leading the Team',
+            role: AppLocalizations.of(context)!.leadingTheTeam,
             icon: Icons.emoji_events,
             color: Colors.amber,
             stats: stats.carry,
-            description: 'When you\'re the highest-rated player',
+            description: AppLocalizations.of(context)!.whenHighestRated,
           ),
           const SizedBox(height: 16),
         ],
@@ -149,11 +150,11 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
         // Weak Link Stats (reframed positively)
         if (stats.weakLink.games > 0) ...[
           _RoleStatRow(
-            role: 'Playing with Stronger Partners',
+            role: AppLocalizations.of(context)!.playingWithStrongerPartners,
             icon: Icons.people,
             color: Colors.blue,
             stats: stats.weakLink,
-            description: 'When playing with more experienced teammates',
+            description: AppLocalizations.of(context)!.whenMoreExperiencedTeammates,
           ),
           const SizedBox(height: 16),
         ],
@@ -161,11 +162,11 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
         // Balanced Stats
         if (stats.balanced.games > 0) ...[
           _RoleStatRow(
-            role: 'Balanced Teams',
+            role: AppLocalizations.of(context)!.balancedTeams,
             icon: Icons.balance,
             color: Colors.green,
             stats: stats.balanced,
-            description: 'When playing with similarly-rated teammates',
+            description: AppLocalizations.of(context)!.whenSimilarlyRatedTeammates,
           ),
           const SizedBox(height: 16),
         ],
@@ -184,7 +185,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
       children: [
         // Description
         Text(
-          'See how you perform in different team roles',
+          AppLocalizations.of(context)!.seeHowYouPerform,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurface.withOpacity(0.7),
           ),
@@ -207,7 +208,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Adaptability Stats Locked',
+                  AppLocalizations.of(context)!.adaptabilityStatsLocked,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.6),
                     fontWeight: FontWeight.w600,
@@ -215,7 +216,7 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Play more games to see how you perform in different team roles',
+                  AppLocalizations.of(context)!.playMoreGamesToSeeRoles,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.5),
                   ),

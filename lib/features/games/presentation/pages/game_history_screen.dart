@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../bloc/game_history/game_history_bloc.dart';
@@ -62,33 +63,34 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
   }
 
   void _showFilterDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Filter Games'),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.filterGames),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<GameHistoryFilter>(
-              title: const Text('All Games'),
+              title: Text(l10n.allGames),
               value: GameHistoryFilter.all,
               groupValue: _selectedFilter,
               onChanged: (value) {
                 if (value != null) {
                   setState(() => _selectedFilter = value);
-                  Navigator.pop(context);
+                  Navigator.pop(dialogContext);
                   _applyFilter(value);
                 }
               },
             ),
             RadioListTile<GameHistoryFilter>(
-              title: const Text('My Games Only'),
+              title: Text(l10n.myGamesOnly),
               value: GameHistoryFilter.myGames,
               groupValue: _selectedFilter,
               onChanged: (value) {
                 if (value != null) {
                   setState(() => _selectedFilter = value);
-                  Navigator.pop(context);
+                  Navigator.pop(dialogContext);
                   _applyFilter(value);
                 }
               },
@@ -97,8 +99,8 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -150,19 +152,20 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Game History'),
+        title: Text(l10n.gameHistory),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilterDialog,
-            tooltip: 'Filter',
+            tooltip: l10n.filter,
           ),
           IconButton(
             icon: const Icon(Icons.date_range),
             onPressed: _showDateRangePicker,
-            tooltip: 'Date Range',
+            tooltip: l10n.dateRange,
           ),
         ],
       ),
@@ -176,8 +179,8 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
         child: BlocBuilder<GameHistoryBloc, GameHistoryState>(
           builder: (context, state) {
             return state.when(
-              initial: () => const Center(
-                child: Text('Select filters to view game history'),
+              initial: () => Center(
+                child: Text(l10n.selectFiltersToView),
               ),
               loading: () => const Center(
                 child: CircularProgressIndicator(),
@@ -240,7 +243,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
                               ),
                             );
                       },
-                      child: const Text('Retry'),
+                      child: Text(l10n.retry),
                     ),
                   ],
                 ),
@@ -257,16 +260,17 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
     DateTime? startDate,
     DateTime? endDate,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: Theme.of(context).colorScheme.surfaceVariant,
       child: Row(
         children: [
-          const Text('Active filters: '),
+          Text(l10n.activeFilters),
           const SizedBox(width: 8),
           if (filter == GameHistoryFilter.myGames)
             Chip(
-              label: const Text('My Games'),
+              label: Text(l10n.myGames),
               onDeleted: () => _applyFilter(GameHistoryFilter.all),
             ),
           if (startDate != null) ...[
@@ -284,6 +288,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -295,12 +300,12 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No completed games yet',
+            l10n.noCompletedGamesYet,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           Text(
-            'Games will appear here after they are completed',
+            l10n.gamesWillAppearAfterCompleted,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),

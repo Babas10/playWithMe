@@ -1,5 +1,7 @@
 // Widget tests for HomeStatsSection
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
@@ -68,8 +70,14 @@ void main() {
 
     testWidgets('renders section header', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: testUser,
               ratingHistory: testHistory,
@@ -84,8 +92,14 @@ void main() {
 
     testWidgets('renders ELOTrendIndicator', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: testUser,
               ratingHistory: testHistory,
@@ -100,8 +114,14 @@ void main() {
 
     testWidgets('renders CompactStatCard widgets', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: testUser,
               ratingHistory: testHistory,
@@ -119,8 +139,14 @@ void main() {
 
     testWidgets('displays correct win rate', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: testUser,
               ratingHistory: testHistory,
@@ -137,8 +163,14 @@ void main() {
 
     testWidgets('displays correct games played', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: testUser,
               ratingHistory: testHistory,
@@ -153,8 +185,14 @@ void main() {
 
     testWidgets('renders WinStreakBadge when streak >= 2', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: testUser,
               ratingHistory: testHistory,
@@ -171,8 +209,14 @@ void main() {
       final userWithSmallStreak = testUser.copyWith(currentStreak: 1);
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: userWithSmallStreak,
               ratingHistory: testHistory,
@@ -189,8 +233,14 @@ void main() {
       final userWithLossStreak = testUser.copyWith(currentStreak: -3);
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: userWithLossStreak,
               ratingHistory: testHistory,
@@ -205,8 +255,14 @@ void main() {
 
     testWidgets('handles empty rating history', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: testUser,
               ratingHistory: const [],
@@ -230,8 +286,14 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],          home: Scaffold(
             body: HomeStatsSection(
               user: newUser,
               ratingHistory: const [],

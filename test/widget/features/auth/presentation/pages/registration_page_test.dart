@@ -1,6 +1,8 @@
 // Widget tests for RegistrationPage verifying UI rendering and user interactions.
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -44,7 +46,13 @@ void main() {
 
   Widget createTestWidget({bool withNavigatorObserver = false}) {
     return MaterialApp(
-      home: BlocProvider<RegistrationBloc>.value(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],      home: BlocProvider<RegistrationBloc>.value(
         value: mockRegistrationBloc,
         child: const RegistrationPage(),
       ),
@@ -558,8 +566,14 @@ void main() {
       testWidgets('navigates back on Sign In tap', (tester) async {
         // Create a simple navigation stack to test pop
         await tester.pumpWidget(
-          MaterialApp(
-            home: Builder(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],            home: Builder(
               builder: (context) => Scaffold(
                 body: TextButton(
                   onPressed: () {
@@ -667,8 +681,14 @@ void main() {
 
         // Create a simple navigation stack
         await tester.pumpWidget(
-          MaterialApp(
-            home: Builder(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],            home: Builder(
               builder: (context) => Scaffold(
                 body: TextButton(
                   onPressed: () {
@@ -718,8 +738,14 @@ void main() {
 
         // Create a simple navigation stack
         await tester.pumpWidget(
-          MaterialApp(
-            home: Builder(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],            home: Builder(
               builder: (context) => Scaffold(
                 body: TextButton(
                   onPressed: () {

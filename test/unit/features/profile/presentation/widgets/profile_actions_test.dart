@@ -1,22 +1,39 @@
 // Verifies that ProfileActions displays action buttons and triggers callbacks correctly
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_actions.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 void main() {
+  Widget createTestWidget({
+    required VoidCallback onEditProfile,
+    required VoidCallback onSignOut,
+  }) {
+    return MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
+      home: Scaffold(
+        body: ProfileActions(
+          onEditProfile: onEditProfile,
+          onSignOut: onSignOut,
+        ),
+      ),
+    );
+  }
+
   group('ProfileActions', () {
     testWidgets('displays both action buttons', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ProfileActions(
-              onEditProfile: () {},
-              onSignOut: () {},
-            ),
-          ),
-        ),
+        createTestWidget(onEditProfile: () {}, onSignOut: () {}),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Account Settings'), findsOneWidget);
       expect(find.text('Sign Out'), findsOneWidget);
@@ -26,15 +43,12 @@ void main() {
       bool accountSettingsCalled = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ProfileActions(
-              onEditProfile: () => accountSettingsCalled = true,
-              onSignOut: () {},
-            ),
-          ),
+        createTestWidget(
+          onEditProfile: () => accountSettingsCalled = true,
+          onSignOut: () {},
         ),
       );
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Account Settings'));
       await tester.pump();
@@ -46,15 +60,12 @@ void main() {
       bool signOutCalled = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ProfileActions(
-              onEditProfile: () {},
-              onSignOut: () => signOutCalled = true,
-            ),
-          ),
+        createTestWidget(
+          onEditProfile: () {},
+          onSignOut: () => signOutCalled = true,
         ),
       );
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Sign Out'));
       await tester.pump();
@@ -64,14 +75,7 @@ void main() {
 
     testWidgets('uses proper button styles for each action', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ProfileActions(
-              onEditProfile: () {},
-              onSignOut: () {},
-            ),
-          ),
-        ),
+        createTestWidget(onEditProfile: () {}, onSignOut: () {}),
       );
       await tester.pumpAndSettle();
 
@@ -83,15 +87,9 @@ void main() {
 
     testWidgets('displays icons for each action', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ProfileActions(
-              onEditProfile: () {},
-              onSignOut: () {},
-            ),
-          ),
-        ),
+        createTestWidget(onEditProfile: () {}, onSignOut: () {}),
       );
+      await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.settings), findsOneWidget);
       expect(find.byIcon(Icons.logout), findsOneWidget);

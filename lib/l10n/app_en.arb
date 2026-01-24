@@ -469,5 +469,1836 @@
   "ok": "OK",
   "@ok": {
     "description": "OK button label"
+  },
+
+  "dontHaveAccount": "Don't have an account? ",
+  "@dontHaveAccount": {
+    "description": "Text before sign up link on login page"
+  },
+
+  "signUp": "Sign Up",
+  "@signUp": {
+    "description": "Sign up button text"
+  },
+
+  "resetPassword": "Reset Password",
+  "@resetPassword": {
+    "description": "Reset password page title"
+  },
+
+  "backToLogin": "Back to Login",
+  "@backToLogin": {
+    "description": "Back to login button text"
+  },
+
+  "emailSent": "Email Sent!",
+  "@emailSent": {
+    "description": "Email sent dialog title"
+  },
+
+  "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Create account page title"
+  },
+
+  "accountCreatedSuccess": "Account created successfully! Please check your email for verification.",
+  "@accountCreatedSuccess": {
+    "description": "Success message after account creation"
+  },
+
+  "alreadyHaveAccount": "Already have an account? ",
+  "@alreadyHaveAccount": {
+    "description": "Text before sign in link on registration page"
+  },
+
+  "signIn": "Sign In",
+  "@signIn": {
+    "description": "Sign in button text"
+  },
+
+  "emailHint": "Email",
+  "@emailHint": {
+    "description": "Email field hint text"
+  },
+
+  "passwordHint": "Password",
+  "@passwordHint": {
+    "description": "Password field hint text"
+  },
+
+  "displayNameOptionalHint": "Display Name (Optional)",
+  "@displayNameOptionalHint": {
+    "description": "Display name optional field hint"
+  },
+
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password field hint"
+  },
+
+  "createGame": "Create Game",
+  "@createGame": {
+    "description": "Create game page title and button"
+  },
+
+  "gameCreatedSuccess": "Game created successfully!",
+  "@gameCreatedSuccess": {
+    "description": "Success message after game creation"
+  },
+
+  "pleaseLogInToCreateGame": "Please log in to create a game",
+  "@pleaseLogInToCreateGame": {
+    "description": "Message when user needs to log in to create game"
+  },
+
+  "group": "Group",
+  "@group": {
+    "description": "Group field label"
+  },
+
+  "dateTime": "Date & Time",
+  "@dateTime": {
+    "description": "Date and time field label"
+  },
+
+  "tapToSelect": "Tap to select",
+  "@tapToSelect": {
+    "description": "Tap to select hint text"
+  },
+
+  "gameDetails": "Game Details",
+  "@gameDetails": {
+    "description": "Game details page title"
+  },
+
+  "goBack": "Go Back",
+  "@goBack": {
+    "description": "Go back button text"
+  },
+
+  "organizer": "Organizer",
+  "@organizer": {
+    "description": "Organizer label"
+  },
+
+  "enterResults": "Enter Results",
+  "@enterResults": {
+    "description": "Enter results button label"
+  },
+
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+
+  "editDispute": "Edit / Dispute",
+  "@editDispute": {
+    "description": "Edit or dispute button label"
+  },
+
+  "filterGames": "Filter Games",
+  "@filterGames": {
+    "description": "Filter games dialog title"
+  },
+
+  "allGames": "All Games",
+  "@allGames": {
+    "description": "All games filter option"
+  },
+
+  "myGamesOnly": "My Games Only",
+  "@myGamesOnly": {
+    "description": "My games only filter option"
+  },
+
+  "gameHistory": "Game History",
+  "@gameHistory": {
+    "description": "Game history page title"
+  },
+
+  "selectFiltersToView": "Select filters to view game history",
+  "@selectFiltersToView": {
+    "description": "Message to select filters"
+  },
+
+  "activeFilters": "Active filters: ",
+  "@activeFilters": {
+    "description": "Active filters label"
+  },
+
+  "myGames": "My Games",
+  "@myGames": {
+    "description": "My games chip label"
+  },
+
+  "gameResults": "Game Results",
+  "@gameResults": {
+    "description": "Game results page title"
+  },
+
+  "groupNameGames": "{groupName} Games",
+  "@groupNameGames": {
+    "description": "Games list page title with group name",
+    "placeholders": {
+      "groupName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "recordResults": "Record Results",
+  "@recordResults": {
+    "description": "Record results page title"
+  },
+
+  "teamsSavedSuccess": "Teams saved successfully",
+  "@teamsSavedSuccess": {
+    "description": "Success message when teams are saved"
+  },
+
+  "teamA": "Team A",
+  "@teamA": {
+    "description": "Team A label"
+  },
+
+  "teamB": "Team B",
+  "@teamB": {
+    "description": "Team B label"
+  },
+
+  "enterScores": "Enter Scores",
+  "@enterScores": {
+    "description": "Enter scores page title"
+  },
+
+  "scoresSavedSuccess": "Scores saved successfully!",
+  "@scoresSavedSuccess": {
+    "description": "Success message when scores are saved"
+  },
+
+  "savingScores": "Saving scores...",
+  "@savingScores": {
+    "description": "Saving scores loading text"
+  },
+
+  "oneSet": "1 Set",
+  "@oneSet": {
+    "description": "One set option"
+  },
+
+  "bestOfTwo": "Best of 2",
+  "@bestOfTwo": {
+    "description": "Best of 2 sets option"
+  },
+
+  "bestOfThree": "Best of 3",
+  "@bestOfThree": {
+    "description": "Best of 3 sets option"
+  },
+
+  "gameTitle": "Game Title",
+  "@gameTitle": {
+    "description": "Game title field label"
+  },
+
+  "gameTitleHint": "e.g., Beach Volleyball",
+  "@gameTitleHint": {
+    "description": "Game title hint text"
+  },
+
+  "descriptionOptional": "Description (Optional)",
+  "@descriptionOptional": {
+    "description": "Optional description field label"
+  },
+
+  "gameDescriptionHint": "Add details about the game...",
+  "@gameDescriptionHint": {
+    "description": "Game description hint text"
+  },
+
+  "location": "Location",
+  "@location": {
+    "description": "Location field label"
+  },
+
+  "locationHint": "e.g., Venice Beach",
+  "@locationHint": {
+    "description": "Location hint text"
+  },
+
+  "addressOptional": "Address (Optional)",
+  "@addressOptional": {
+    "description": "Optional address field label"
+  },
+
+  "addressHint": "Full address...",
+  "@addressHint": {
+    "description": "Address hint text"
+  },
+
+  "filter": "Filter",
+  "@filter": {
+    "description": "Filter tooltip"
+  },
+
+  "dateRange": "Date Range",
+  "@dateRange": {
+    "description": "Date range tooltip"
+  },
+
+  "removeFromTeam": "Remove from team",
+  "@removeFromTeam": {
+    "description": "Remove from team tooltip"
+  },
+
+  "clearFilter": "Clear filter",
+  "@clearFilter": {
+    "description": "Clear filter tooltip"
+  },
+
+  "filterByDate": "Filter by date",
+  "@filterByDate": {
+    "description": "Filter by date tooltip"
+  },
+
+  "groupNameRequired": "Group Name *",
+  "@groupNameRequired": {
+    "description": "Required group name field label"
+  },
+
+  "groupNameHint": "e.g., Beach Volleyball Crew",
+  "@groupNameHint": {
+    "description": "Group name hint text"
+  },
+
+  "groupDescriptionHint": "e.g., Weekly beach volleyball games at Santa Monica",
+  "@groupDescriptionHint": {
+    "description": "Group description hint text"
+  },
+
+  "pleaseSelectStartTimeFirst": "Please select start time first",
+  "@pleaseSelectStartTimeFirst": {
+    "description": "Message when end time selected before start time"
+  },
+
+  "pleaseSelectStartTime": "Please select start time",
+  "@pleaseSelectStartTime": {
+    "description": "Validation message for start time"
+  },
+
+  "pleaseSelectEndTime": "Please select end time",
+  "@pleaseSelectEndTime": {
+    "description": "Validation message for end time"
+  },
+
+  "trainingCreatedSuccess": "Training session created successfully!",
+  "@trainingCreatedSuccess": {
+    "description": "Success message after training creation"
+  },
+
+  "createTrainingSession": "Create Training Session",
+  "@createTrainingSession": {
+    "description": "Create training session page title and button"
+  },
+
+  "pleaseLogInToCreateTraining": "Please log in to create a training session",
+  "@pleaseLogInToCreateTraining": {
+    "description": "Message when user needs to log in to create training"
+  },
+
+  "startTime": "Start Time",
+  "@startTime": {
+    "description": "Start time field label"
+  },
+
+  "endTime": "End Time",
+  "@endTime": {
+    "description": "End time field label"
+  },
+
+  "title": "Title",
+  "@title": {
+    "description": "Title field label"
+  },
+
+  "trainingSession": "Training Session",
+  "@trainingSession": {
+    "description": "Training session page title"
+  },
+
+  "trainingNotFound": "Training session not found",
+  "@trainingNotFound": {
+    "description": "Message when training session is not found"
+  },
+
+  "trainingCancelled": "Training session cancelled",
+  "@trainingCancelled": {
+    "description": "Message when training session is cancelled"
+  },
+
+  "errorLoadingParticipants": "Error loading participants",
+  "@errorLoadingParticipants": {
+    "description": "Error message when participants fail to load"
+  },
+
+  "joinedTrainingSuccess": "Successfully joined training session!",
+  "@joinedTrainingSuccess": {
+    "description": "Success message when joining training"
+  },
+
+  "leftTraining": "You have left the training session",
+  "@leftTraining": {
+    "description": "Message when leaving training"
+  },
+
+  "joinTrainingSession": "Join Training Session",
+  "@joinTrainingSession": {
+    "description": "Join training dialog title"
+  },
+
+  "join": "Join",
+  "@join": {
+    "description": "Join button text"
+  },
+
+  "leaveTrainingSession": "Leave Training Session",
+  "@leaveTrainingSession": {
+    "description": "Leave training dialog title"
+  },
+
+  "leave": "Leave",
+  "@leave": {
+    "description": "Leave button text"
+  },
+
+  "cancelTrainingSession": "Cancel Training Session?",
+  "@cancelTrainingSession": {
+    "description": "Cancel training dialog title"
+  },
+
+  "keepSession": "Keep Session",
+  "@keepSession": {
+    "description": "Keep session button text"
+  },
+
+  "cancelSession": "Cancel Session",
+  "@cancelSession": {
+    "description": "Cancel session button text"
+  },
+
+  "sessionFeedback": "Session Feedback",
+  "@sessionFeedback": {
+    "description": "Session feedback page title"
+  },
+
+  "thankYouFeedback": "Thank you for your feedback!",
+  "@thankYouFeedback": {
+    "description": "Thank you message after feedback"
+  },
+
+  "backToSession": "Back to Session",
+  "@backToSession": {
+    "description": "Back to session button text"
+  },
+
+  "needsWork": "Needs work",
+  "@needsWork": {
+    "description": "Feedback rating label - needs work"
+  },
+
+  "topLevelTraining": "Top-level training",
+  "@topLevelTraining": {
+    "description": "Feedback rating label - top level"
+  },
+
+  "pleaseRateAllCategories": "Please rate all three categories before submitting",
+  "@pleaseRateAllCategories": {
+    "description": "Validation message for feedback"
+  },
+
+  "emailVerification": "Email Verification",
+  "@emailVerification": {
+    "description": "Email verification page title"
+  },
+
+  "verificationEmailSent": "Verification email sent to {email}",
+  "@verificationEmailSent": {
+    "description": "Success message when verification email is sent",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+
+  "backToProfile": "Back to Profile",
+  "@backToProfile": {
+    "description": "Back to profile button text"
+  },
+
+  "sendVerificationEmail": "Send Verification Email",
+  "@sendVerificationEmail": {
+    "description": "Send verification email button text"
+  },
+
+  "refreshStatus": "Refresh Status",
+  "@refreshStatus": {
+    "description": "Refresh status button text"
+  },
+
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Try again button text"
+  },
+
+  "eloHistory": "ELO History",
+  "@eloHistory": {
+    "description": "ELO history page title"
+  },
+
+  "gameDetailsComingSoon": "Game details coming soon!",
+  "@gameDetailsComingSoon": {
+    "description": "Coming soon message for game details"
+  },
+
+  "headToHead": "Head-to-Head",
+  "@headToHead": {
+    "description": "Head to head page title"
+  },
+
+  "partnerDetails": "Partner Details",
+  "@partnerDetails": {
+    "description": "Partner details page title"
+  },
+
+  "invitations": "Invitations",
+  "@invitations": {
+    "description": "Invitations page title"
+  },
+
+  "pleaseLogInToViewInvitations": "Please log in to view invitations",
+  "@pleaseLogInToViewInvitations": {
+    "description": "Message when user needs to log in to view invitations"
+  },
+
+  "pendingInvitations": "Pending Invitations",
+  "@pendingInvitations": {
+    "description": "Pending invitations page title"
+  },
+
+  "notificationSettings": "Notification Settings",
+  "@notificationSettings": {
+    "description": "Notification settings page title"
+  },
+
+  "initializing": "Initializing...",
+  "@initializing": {
+    "description": "Initializing state text"
+  },
+
+  "groupInvitations": "Group Invitations",
+  "@groupInvitations": {
+    "description": "Group invitations notification setting title"
+  },
+
+  "groupInvitationsDesc": "When someone invites you to a group",
+  "@groupInvitationsDesc": {
+    "description": "Group invitations notification setting description"
+  },
+
+  "invitationAccepted": "Invitation Accepted",
+  "@invitationAccepted": {
+    "description": "Invitation accepted notification setting title"
+  },
+
+  "invitationAcceptedDesc": "When someone accepts your invitation",
+  "@invitationAcceptedDesc": {
+    "description": "Invitation accepted notification setting description"
+  },
+
+  "newGames": "New Games",
+  "@newGames": {
+    "description": "New games notification setting title"
+  },
+
+  "newGamesDesc": "When a new game is created in your groups",
+  "@newGamesDesc": {
+    "description": "New games notification setting description"
+  },
+
+  "roleChanges": "Role Changes",
+  "@roleChanges": {
+    "description": "Role changes notification setting title"
+  },
+
+  "roleChangesDesc": "When you are promoted to admin",
+  "@roleChangesDesc": {
+    "description": "Role changes notification setting description"
+  },
+
+  "newTrainingSessions": "New Training Sessions",
+  "@newTrainingSessions": {
+    "description": "New training sessions notification setting title"
+  },
+
+  "newTrainingSessionsDesc": "When a training session is created in your groups",
+  "@newTrainingSessionsDesc": {
+    "description": "New training sessions notification setting description"
+  },
+
+  "minParticipantsReached": "Minimum Participants Reached",
+  "@minParticipantsReached": {
+    "description": "Min participants reached notification setting title"
+  },
+
+  "minParticipantsReachedDesc": "When a training session has enough participants",
+  "@minParticipantsReachedDesc": {
+    "description": "Min participants reached notification setting description"
+  },
+
+  "feedbackReceived": "Feedback Received",
+  "@feedbackReceived": {
+    "description": "Feedback received notification setting title"
+  },
+
+  "feedbackReceivedDesc": "When someone leaves feedback on a training session",
+  "@feedbackReceivedDesc": {
+    "description": "Feedback received notification setting description"
+  },
+
+  "sessionCancelled": "Session Cancelled",
+  "@sessionCancelled": {
+    "description": "Session cancelled notification setting title"
+  },
+
+  "sessionCancelledDesc": "When a training session you joined is cancelled",
+  "@sessionCancelledDesc": {
+    "description": "Session cancelled notification setting description"
+  },
+
+  "memberJoined": "Member Joined",
+  "@memberJoined": {
+    "description": "Member joined notification setting title"
+  },
+
+  "memberJoinedDesc": "When someone joins your group",
+  "@memberJoinedDesc": {
+    "description": "Member joined notification setting description"
+  },
+
+  "memberLeft": "Member Left",
+  "@memberLeft": {
+    "description": "Member left notification setting title"
+  },
+
+  "memberLeftDesc": "When someone leaves your group",
+  "@memberLeftDesc": {
+    "description": "Member left notification setting description"
+  },
+
+  "enableQuietHours": "Enable Quiet Hours",
+  "@enableQuietHours": {
+    "description": "Enable quiet hours toggle title"
+  },
+
+  "quietHoursDesc": "Pause notifications during specific times",
+  "@quietHoursDesc": {
+    "description": "Quiet hours toggle description"
+  },
+
+  "adjustQuietHours": "Adjust Quiet Hours",
+  "@adjustQuietHours": {
+    "description": "Adjust quiet hours button title"
+  },
+
+  "setQuietHours": "Set Quiet Hours",
+  "@setQuietHours": {
+    "description": "Set quiet hours dialog title"
+  },
+
+  "error": "Error: {message}",
+  "@error": {
+    "description": "Generic error message with details",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+
+  "pleaseLogInToAddFriends": "Please log in to add friends",
+  "@pleaseLogInToAddFriends": {
+    "description": "Message when user needs to log in to add friends"
+  },
+
+  "welcomeBack": "Welcome Back!",
+  "@welcomeBack": {
+    "description": "Welcome back heading on login page"
+  },
+
+  "signInToContinue": "Sign in to continue organizing your volleyball games",
+  "@signInToContinue": {
+    "description": "Subtitle on login page"
+  },
+
+  "emailRequired": "Email is required",
+  "@emailRequired": {
+    "description": "Validation error when email is empty"
+  },
+
+  "validEmailRequired": "Please enter a valid email",
+  "@validEmailRequired": {
+    "description": "Validation error when email format is invalid"
+  },
+
+  "passwordRequired": "Password is required",
+  "@passwordRequired": {
+    "description": "Validation error when password is empty"
+  },
+
+  "continueAsGuest": "Continue as Guest",
+  "@continueAsGuest": {
+    "description": "Button to continue without account"
+  },
+
+  "joinPlayWithMe": "Join PlayWithMe!",
+  "@joinPlayWithMe": {
+    "description": "Heading on registration page"
+  },
+
+  "createAccountSubtitle": "Create your account to start organizing volleyball games",
+  "@createAccountSubtitle": {
+    "description": "Subtitle on registration page"
+  },
+
+  "displayNameTooLong": "Display name must be less than 50 characters",
+  "@displayNameTooLong": {
+    "description": "Validation error when display name is too long"
+  },
+
+  "passwordTooShort": "Password must be at least 6 characters",
+  "@passwordTooShort": {
+    "description": "Validation error when password is too short"
+  },
+
+  "pleaseConfirmPassword": "Please confirm your password",
+  "@pleaseConfirmPassword": {
+    "description": "Validation error when confirm password is empty"
+  },
+
+  "passwordsDoNotMatch": "Passwords do not match",
+  "@passwordsDoNotMatch": {
+    "description": "Validation error when passwords don't match"
+  },
+
+  "termsAgreement": "By creating an account, you agree to our Terms of Service and Privacy Policy.",
+  "@termsAgreement": {
+    "description": "Terms agreement text on registration page"
+  },
+
+  "forgotYourPassword": "Forgot Your Password?",
+  "@forgotYourPassword": {
+    "description": "Heading on password reset page"
+  },
+
+  "forgotPasswordInstructions": "Enter your email address and we'll send you a link to reset your password.",
+  "@forgotPasswordInstructions": {
+    "description": "Instructions on password reset page"
+  },
+
+  "sendResetEmail": "Send Reset Email",
+  "@sendResetEmail": {
+    "description": "Button to send password reset email"
+  },
+
+  "resetLinkSentTo": "We've sent a password reset link to:",
+  "@resetLinkSentTo": {
+    "description": "Message in password reset success dialog"
+  },
+
+  "checkEmailResetInstructions": "Please check your email and follow the instructions to reset your password.",
+  "@checkEmailResetInstructions": {
+    "description": "Instructions in password reset success dialog"
+  },
+
+  "noResultsAvailable": "No results available yet",
+  "@noResultsAvailable": {
+    "description": "Heading when no game results"
+  },
+
+  "scoresWillAppear": "Scores will appear here once they are entered",
+  "@scoresWillAppear": {
+    "description": "Description when no game results"
+  },
+
+  "individualGames": "Individual Games",
+  "@individualGames": {
+    "description": "Section title for individual games"
+  },
+
+  "howManyGamesPlayed": "How many games did you play?",
+  "@howManyGamesPlayed": {
+    "description": "Question on score entry page"
+  },
+
+  "assignPlayersToTeams": "Assign Players to Teams",
+  "@assignPlayersToTeams": {
+    "description": "Heading on record results page"
+  },
+
+  "dragPlayersToAssign": "Drag players to assign them to Team A or Team B",
+  "@dragPlayersToAssign": {
+    "description": "Instructions on record results page"
+  },
+
+  "pendingVerification": "Pending Verification",
+  "@pendingVerification": {
+    "description": "Status badge for pending verification"
+  },
+
+  "youreIn": "You're In",
+  "@youreIn": {
+    "description": "Status badge for confirmed participation"
+  },
+
+  "onWaitlist": "On Waitlist",
+  "@onWaitlist": {
+    "description": "Status badge for waitlist"
+  },
+
+  "full": "Full",
+  "@full": {
+    "description": "Status badge when game is full"
+  },
+
+  "joinGame": "Join Game",
+  "@joinGame": {
+    "description": "Button to join a game"
+  },
+
+  "today": "Today",
+  "@today": {
+    "description": "Date label for today"
+  },
+
+  "tomorrow": "Tomorrow",
+  "@tomorrow": {
+    "description": "Date label for tomorrow"
+  },
+
+  "player": "Player",
+  "@player": {
+    "description": "Player fallback name"
+  },
+
+  "noScoresRecorded": "No scores recorded",
+  "@noScoresRecorded": {
+    "description": "Placeholder when no scores"
+  },
+
+  "eloUpdated": "ELO Updated",
+  "@eloUpdated": {
+    "description": "Badge text for ELO update"
+  },
+
+  "vs": "VS",
+  "@vs": {
+    "description": "Versus separator"
+  },
+
+  "cancelled": "CANCELLED",
+  "@cancelled": {
+    "description": "Status badge for cancelled"
+  },
+
+  "joined": "JOINED",
+  "@joined": {
+    "description": "Status badge for joined"
+  },
+
+  "training": "TRAINING",
+  "@training": {
+    "description": "Training badge"
+  },
+
+  "minParticipants": "Min: {count}",
+  "@minParticipants": {
+    "description": "Minimum participants label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "selectGameDate": "Select Game Date",
+  "@selectGameDate": {
+    "description": "Help text for game date picker"
+  },
+
+  "selectGameTime": "Select Game Time",
+  "@selectGameTime": {
+    "description": "Help text for game time picker"
+  },
+
+  "pleaseTitleRequired": "Please enter a game title",
+  "@pleaseTitleRequired": {
+    "description": "Validation error when game title is empty"
+  },
+
+  "titleMinLength": "Title must be at least 3 characters",
+  "@titleMinLength": {
+    "description": "Validation error when title is too short"
+  },
+
+  "titleMaxLength": "Title must be less than 100 characters",
+  "@titleMaxLength": {
+    "description": "Validation error when title is too long"
+  },
+
+  "pleaseEnterTitle": "Please enter a title",
+  "@pleaseEnterTitle": {
+    "description": "Validation error when title is empty"
+  },
+
+  "pleaseEnterLocation": "Please enter a location",
+  "@pleaseEnterLocation": {
+    "description": "Validation error when location is empty"
+  },
+
+  "notSelected": "Not selected",
+  "@notSelected": {
+    "description": "Default text when nothing selected"
+  },
+
+  "selectStartDate": "Select Start Date",
+  "@selectStartDate": {
+    "description": "Help text for start date picker"
+  },
+
+  "selectStartTime": "Select Start Time",
+  "@selectStartTime": {
+    "description": "Help text for start time picker"
+  },
+
+  "selectEndTime": "Select End Time",
+  "@selectEndTime": {
+    "description": "Help text for end time picker"
+  },
+
+  "participants": "Participants",
+  "@participants": {
+    "description": "Participants tab label"
+  },
+
+  "exercises": "Exercises",
+  "@exercises": {
+    "description": "Exercises tab label"
+  },
+
+  "feedback": "Feedback",
+  "@feedback": {
+    "description": "Feedback tab label"
+  },
+
+  "date": "Date",
+  "@date": {
+    "description": "Date label"
+  },
+
+  "time": "Time",
+  "@time": {
+    "description": "Time label"
+  },
+
+  "players": "Players",
+  "@players": {
+    "description": "Players label"
+  },
+
+  "competitiveGameWithElo": "Competitive game with ELO ratings",
+  "@competitiveGameWithElo": {
+    "description": "Description for create game option"
+  },
+
+  "practiceSessionNoElo": "Practice session without ELO impact",
+  "@practiceSessionNoElo": {
+    "description": "Description for create training option"
+  },
+
+  "promoteToAdmin": "Promote to Admin",
+  "@promoteToAdmin": {
+    "description": "Dialog title for promoting member"
+  },
+
+  "promote": "Promote",
+  "@promote": {
+    "description": "Promote button text"
+  },
+
+  "demoteToMember": "Demote to Member",
+  "@demoteToMember": {
+    "description": "Dialog title for demoting admin"
+  },
+
+  "demote": "Demote",
+  "@demote": {
+    "description": "Demote button text"
+  },
+
+  "removeMember": "Remove Member",
+  "@removeMember": {
+    "description": "Dialog title for removing member"
+  },
+
+  "leaveGroup": "Leave Group",
+  "@leaveGroup": {
+    "description": "Dialog title for leaving group"
+  },
+
+  "selectAll": "Select All",
+  "@selectAll": {
+    "description": "Select all button"
+  },
+
+  "clearAll": "Clear All",
+  "@clearAll": {
+    "description": "Clear all button"
+  },
+
+  "upload": "Upload",
+  "@upload": {
+    "description": "Upload button"
+  },
+
+  "avatarUploadedSuccess": "Avatar uploaded successfully",
+  "@avatarUploadedSuccess": {
+    "description": "Success message for avatar upload"
+  },
+
+  "avatarRemovedSuccess": "Avatar removed successfully",
+  "@avatarRemovedSuccess": {
+    "description": "Success message for avatar removal"
+  },
+
+  "bestTeammate": "Best Teammate",
+  "@bestTeammate": {
+    "description": "Best teammate card title"
+  },
+
+  "gameNotFound": "Game Not Found",
+  "@gameNotFound": {
+    "description": "Error heading when game not found"
+  },
+
+  "noCompletedGamesYet": "No completed games yet",
+  "@noCompletedGamesYet": {
+    "description": "Empty state title for game history"
+  },
+
+  "gamesWillAppearAfterCompleted": "Games will appear here after they are completed",
+  "@gamesWillAppearAfterCompleted": {
+    "description": "Empty state description for game history"
+  },
+
+  "finalScore": "Final Score",
+  "@finalScore": {
+    "description": "Final score heading"
+  },
+
+  "eloRatingChanges": "ELO Rating Changes",
+  "@eloRatingChanges": {
+    "description": "ELO rating changes section title"
+  },
+
+  "unknownPlayer": "Unknown Player",
+  "@unknownPlayer": {
+    "description": "Fallback name for unknown player"
+  },
+
+  "gameNumber": "Game {number}",
+  "@gameNumber": {
+    "description": "Game number label",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+
+  "setsScore": "Sets: {teamA} - {teamB}",
+  "@setsScore": {
+    "description": "Sets score display",
+    "placeholders": {
+      "teamA": {
+        "type": "int"
+      },
+      "teamB": {
+        "type": "int"
+      }
+    }
+  },
+
+  "setNumber": "Set {number}",
+  "@setNumber": {
+    "description": "Set number label",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+
+  "format": "Format:",
+  "@format": {
+    "description": "Format label"
+  },
+
+  "invalidScore": "Invalid score",
+  "@invalidScore": {
+    "description": "Validation error for invalid score"
+  },
+
+  "overallWinnerTeamA": "Overall Winner: Team A",
+  "@overallWinnerTeamA": {
+    "description": "Overall winner message for Team A"
+  },
+
+  "overallWinnerTeamB": "Overall Winner: Team B",
+  "@overallWinnerTeamB": {
+    "description": "Overall winner message for Team B"
+  },
+
+  "saveScores": "Save Scores",
+  "@saveScores": {
+    "description": "Save scores button"
+  },
+
+  "completeGamesToContinue": "Complete {current}/{total} games to continue",
+  "@completeGamesToContinue": {
+    "description": "Message to complete games before saving",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+
+  "upcomingActivities": "Upcoming Activities",
+  "@upcomingActivities": {
+    "description": "Section header for upcoming activities"
+  },
+
+  "pastActivities": "Past Activities",
+  "@pastActivities": {
+    "description": "Section header for past activities"
+  },
+
+  "noUpcomingGamesYet": "No upcoming games yet",
+  "@noUpcomingGamesYet": {
+    "description": "Empty state title for games list"
+  },
+
+  "createFirstGame": "Create the first game!",
+  "@createFirstGame": {
+    "description": "Empty state call to action"
+  },
+
+  "gamesWon": "games won",
+  "@gamesWon": {
+    "description": "Games won label"
+  },
+
+  "playerCountSingular": "1 player",
+  "@playerCountSingular": {
+    "description": "Single player count"
+  },
+
+  "playerCountPlural": "{count} players",
+  "@playerCountPlural": {
+    "description": "Multiple players count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "wonScoreDescription": "{winner} won {score}",
+  "@wonScoreDescription": {
+    "description": "Winner and score description",
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      },
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+
+  "playersWaitlisted": "{count} waitlisted",
+  "@playersWaitlisted": {
+    "description": "Number of players waitlisted",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "playersCount": "{current}/{max} players",
+  "@playersCount": {
+    "description": "Current vs max players",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+
+  "minParticipantsLabel": "Min Participants",
+  "@minParticipantsLabel": {
+    "description": "Label for minimum participants field"
+  },
+
+  "maxParticipantsLabel": "Max Participants",
+  "@maxParticipantsLabel": {
+    "description": "Label for maximum participants field"
+  },
+
+  "youAreOrganizing": "You are organizing",
+  "@youAreOrganizing": {
+    "description": "Message shown when user is the organizer"
+  },
+
+  "organizedBy": "Organized by {name}",
+  "@organizedBy": {
+    "description": "Message showing who organized the session",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "scheduled": "Scheduled",
+  "@scheduled": {
+    "description": "Status label for scheduled sessions"
+  },
+
+  "completed": "Completed",
+  "@completed": {
+    "description": "Status label for completed sessions"
+  },
+
+  "noParticipantsYet": "No participants yet",
+  "@noParticipantsYet": {
+    "description": "Empty state message when no participants"
+  },
+
+  "beFirstToJoin": "Be the first to join!",
+  "@beFirstToJoin": {
+    "description": "Call to action to join empty session"
+  },
+
+  "participation": "Participation",
+  "@participation": {
+    "description": "Participation section title"
+  },
+
+  "current": "Current",
+  "@current": {
+    "description": "Current count label"
+  },
+
+  "minimum": "Minimum",
+  "@minimum": {
+    "description": "Minimum count label"
+  },
+
+  "maximum": "Maximum",
+  "@maximum": {
+    "description": "Maximum count label"
+  },
+
+  "availableSpots": "Available Spots",
+  "@availableSpots": {
+    "description": "Available spots label"
+  },
+
+  "you": "You",
+  "@you": {
+    "description": "Label indicating current user"
+  },
+
+  "joining": "Joining...",
+  "@joining": {
+    "description": "Joining in progress text"
+  },
+
+  "leaving": "Leaving...",
+  "@leaving": {
+    "description": "Leaving in progress text"
+  },
+
+  "cannotJoin": "Cannot Join",
+  "@cannotJoin": {
+    "description": "Message when user cannot join"
+  },
+
+  "allParticipantsNotified": "All participants will be notified.",
+  "@allParticipantsNotified": {
+    "description": "Info about notifying participants"
+  },
+
+  "feedbackAlreadySubmitted": "Feedback Already Submitted",
+  "@feedbackAlreadySubmitted": {
+    "description": "Title when feedback was already submitted"
+  },
+
+  "alreadyProvidedFeedback": "You have already provided feedback for \"{sessionTitle}\".",
+  "@alreadyProvidedFeedback": {
+    "description": "Message when feedback was already provided",
+    "placeholders": {
+      "sessionTitle": {
+        "type": "String"
+      }
+    }
+  },
+
+  "provideAnonymousFeedback": "Provide Anonymous Feedback",
+  "@provideAnonymousFeedback": {
+    "description": "Title for feedback form"
+  },
+
+  "feedbackIsAnonymous": "Your feedback is anonymous and helps improve future training sessions.",
+  "@feedbackIsAnonymous": {
+    "description": "Info about anonymous feedback"
+  },
+
+  "exercisesQuality": "Exercises Quality",
+  "@exercisesQuality": {
+    "description": "Feedback category for exercise quality"
+  },
+
+  "wereDrillsEffective": "Were the drills effective?",
+  "@wereDrillsEffective": {
+    "description": "Subtitle for exercises quality rating"
+  },
+
+  "trainingIntensity": "Training Intensity",
+  "@trainingIntensity": {
+    "description": "Feedback category for training intensity"
+  },
+
+  "physicalDemandLevel": "Physical demand level",
+  "@physicalDemandLevel": {
+    "description": "Subtitle for training intensity rating"
+  },
+
+  "coachingClarity": "Coaching Clarity",
+  "@coachingClarity": {
+    "description": "Feedback category for coaching clarity"
+  },
+
+  "instructionsAndCorrections": "Instructions & corrections?",
+  "@instructionsAndCorrections": {
+    "description": "Subtitle for coaching clarity rating"
+  },
+
+  "additionalCommentsOptional": "Additional Comments (Optional)",
+  "@additionalCommentsOptional": {
+    "description": "Label for optional comments field"
+  },
+
+  "shareYourThoughts": "Share your thoughts about the session, exercises, or suggestions for improvement...",
+  "@shareYourThoughts": {
+    "description": "Hint text for feedback comments"
+  },
+
+  "submitFeedback": "Submit Feedback",
+  "@submitFeedback": {
+    "description": "Submit feedback button text"
+  },
+
+  "feedbackPrivacyNotice": "Your feedback is completely anonymous and cannot be traced back to you.",
+  "@feedbackPrivacyNotice": {
+    "description": "Privacy notice for feedback"
+  },
+
+  "invite": "Invite",
+  "@invite": {
+    "description": "Invite label"
+  },
+
+  "inviteMembers": "Invite Members",
+  "@inviteMembers": {
+    "description": "Invite members tooltip"
+  },
+
+  "adminOnly": "Admin only",
+  "@adminOnly": {
+    "description": "Admin only restriction message"
+  },
+
+  "create": "Create",
+  "@create": {
+    "description": "Create label"
+  },
+
+  "createGameOrTraining": "Create game or training session",
+  "@createGameOrTraining": {
+    "description": "Tooltip for create button"
+  },
+
+  "activities": "Activities",
+  "@activities": {
+    "description": "Activities label"
+  },
+
+  "viewAllActivities": "View all activities",
+  "@viewAllActivities": {
+    "description": "Tooltip for activities button"
+  },
+
+  "removeFromGroup": "Remove from Group",
+  "@removeFromGroup": {
+    "description": "Remove from group menu item"
+  },
+
+  "promoteConfirmMessage": "Are you sure you want to promote {name} to admin?\n\nAdmins can:\n• Manage group members\n• Invite new members\n• Modify group settings",
+  "@promoteConfirmMessage": {
+    "description": "Confirmation message for promoting member",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "demoteConfirmMessage": "Are you sure you want to demote {name} to regular member?\n\nThey will lose admin privileges.",
+  "@demoteConfirmMessage": {
+    "description": "Confirmation message for demoting admin",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "removeConfirmMessage": "Are you sure you want to remove {name} from the group?\n\nThis action cannot be undone. They will need to be re-invited to rejoin.",
+  "@removeConfirmMessage": {
+    "description": "Confirmation message for removing member",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "leaveGroupConfirmMessage": "Are you sure you want to leave \"{groupName}\"?\n\nYou will need to be re-invited to rejoin this group.",
+  "@leaveGroupConfirmMessage": {
+    "description": "Confirmation message for leaving group",
+    "placeholders": {
+      "groupName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "performanceStats": "Performance Stats",
+  "@performanceStats": {
+    "description": "Performance stats section title"
+  },
+
+  "eloRatingLabel": "ELO Rating",
+  "@eloRatingLabel": {
+    "description": "ELO rating stat label"
+  },
+
+  "peak": "Peak: {value}",
+  "@peak": {
+    "description": "Peak rating label",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+
+  "winRate": "Win Rate",
+  "@winRate": {
+    "description": "Win rate stat label"
+  },
+
+  "winsLosses": "{wins}W - {losses}L",
+  "@winsLosses": {
+    "description": "Wins and losses display",
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      }
+    }
+  },
+
+  "streakLabel": "Streak",
+  "@streakLabel": {
+    "description": "Streak stat label"
+  },
+
+  "winning": "Winning",
+  "@winning": {
+    "description": "Winning streak label"
+  },
+
+  "losingStreak": "Losing",
+  "@losingStreak": {
+    "description": "Losing streak label"
+  },
+
+  "noStreak": "None",
+  "@noStreak": {
+    "description": "No streak label"
+  },
+
+  "gamesPlayedLabel": "Games Played",
+  "@gamesPlayedLabel": {
+    "description": "Games played stat label"
+  },
+
+  "noPlayersAssigned": "No players assigned",
+  "@noPlayersAssigned": {
+    "description": "Empty state for team with no players"
+  },
+
+  "unassignedPlayers": "Unassigned Players",
+  "@unassignedPlayers": {
+    "description": "Section title for unassigned players"
+  },
+
+  "allPlayersAssigned": "All players assigned!",
+  "@allPlayersAssigned": {
+    "description": "Success message when all players assigned"
+  },
+
+  "saveTeams": "Save Teams",
+  "@saveTeams": {
+    "description": "Save teams button text"
+  },
+
+  "assignAllPlayersToContinue": "Assign All Players to Continue",
+  "@assignAllPlayersToContinue": {
+    "description": "Message when not all players assigned"
+  },
+
+  "invitedBy": "Invited by {name}",
+  "@invitedBy": {
+    "description": "Invitation info showing inviter name",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorTitle": "Error",
+  "@errorTitle": {
+    "description": "Error title"
+  },
+
+  "participantsCount": "{current}/{max} participants",
+  "@participantsCount": {
+    "description": "Participants count display",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+
+  "doYouWantToJoin": "Do you want to join \"{sessionTitle}\"?\n\nDate: {dateTime}\nLocation: {location}",
+  "@doYouWantToJoin": {
+    "description": "Join confirmation dialog message",
+    "placeholders": {
+      "sessionTitle": {
+        "type": "String"
+      },
+      "dateTime": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+
+  "areYouSureLeave": "Are you sure you want to leave \"{sessionTitle}\"?",
+  "@areYouSureLeave": {
+    "description": "Leave confirmation dialog message",
+    "placeholders": {
+      "sessionTitle": {
+        "type": "String"
+      }
+    }
+  },
+
+  "cancelSessionConfirm": "Are you sure you want to cancel \"{sessionTitle}\"?\n\nAll participants will be notified.",
+  "@cancelSessionConfirm": {
+    "description": "Cancel session confirmation message",
+    "placeholders": {
+      "sessionTitle": {
+        "type": "String"
+      }
+    }
+  },
+
+  "durationFormat": "{hours}h {minutes}m",
+  "@durationFormat": {
+    "description": "Duration display format",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+
+  "durationHours": "{hours}h",
+  "@durationHours": {
+    "description": "Duration in hours only",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+
+  "durationMinutes": "{minutes}m",
+  "@durationMinutes": {
+    "description": "Duration in minutes only",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+
+  "bestPartner": "Best Partner",
+  "noPartnerDataYet": "No partner data yet",
+  "playGamesWithTeammate": "Play 5+ games with a teammate",
+  "winRatePercent": "{rate}% Win Rate",
+  "@winRatePercent": {
+    "placeholders": {
+      "rate": {"type": "String"}
+    }
+  },
+  "gamesCount": "{count} games",
+  "@gamesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "winsLossesGames": "{wins}W - {losses}L • {total} games",
+  "@winsLossesGames": {
+    "placeholders": {
+      "wins": {"type": "int"},
+      "losses": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+
+  "momentumAndConsistency": "Momentum & Consistency",
+  "eloProgress": "ELO Progress",
+  "winStreak": "Win Streak",
+  "lossStreak": "Loss Streak",
+  "noActiveStreak": "No Active Streak",
+  "winNextGameToStartStreak": "Win your next game to start a streak!",
+
+  "rival": "Rival",
+  "matchups": "{count} matchups",
+  "@matchups": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "winRateLabel": "Win Rate: {rate}%",
+  "@winRateLabel": {
+    "placeholders": {
+      "rate": {"type": "String"}
+    }
+  },
+  "tapForFullBreakdown": "Tap for full breakdown",
+  "noNemesisYet": "No Nemesis Yet",
+  "playGamesAgainstSameOpponent": "Play at least 3 games against the same opponent to track your toughest matchup.",
+  "faceOpponentThreeTimes": "Face the same opponent 3+ times",
+
+  "noPerformanceData": "No Performance Data",
+  "playFirstGameToSeeStats": "Play your first game to see your performance statistics!",
+  "playAtLeastOneGame": "Play at least 1 game to unlock",
+  "performanceOverview": "Performance Overview",
+  "currentElo": "Current ELO",
+  "peakElo": "Peak ELO",
+  "gamesPlayed": "Games Played",
+  "winRate": "Win Rate",
+  "bestWin": "Best Win",
+  "winGameToUnlock": "Win a game to unlock",
+  "beatOpponentsToTrack": "Beat opponents to track your best victory",
+  "avgPointDiff": "Avg Point Diff",
+  "completeGameToUnlock": "Complete a game to unlock",
+  "winAndLoseSetsToSee": "Win and lose sets to see your margins",
+  "avgPointDifferential": "Avg Point Differential",
+  "inWins": "In Wins",
+  "inLosses": "In Losses",
+  "setsCount": "{count} sets",
+  "@setsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "teamLabel": "Team: {names}",
+  "@teamLabel": {
+    "placeholders": {
+      "names": {"type": "String"}
+    }
+  },
+  "teamEloLabel": "Team ELO: {elo}",
+  "@teamEloLabel": {
+    "placeholders": {
+      "elo": {"type": "String"}
+    }
+  },
+  "eloGained": "{amount} ELO gained",
+  "@eloGained": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+
+  "adaptabilityStats": "Adaptability Stats",
+  "advanced": "Advanced",
+  "seeHowYouPerform": "See how you perform in different team roles",
+  "leadingTheTeam": "Leading the Team",
+  "whenHighestRated": "When you're the highest-rated player",
+  "playingWithStrongerPartners": "Playing with Stronger Partners",
+  "whenMoreExperiencedTeammates": "When playing with more experienced teammates",
+  "balancedTeams": "Balanced Teams",
+  "whenSimilarlyRatedTeammates": "When playing with similarly-rated teammates",
+  "adaptabilityStatsLocked": "Adaptability Stats Locked",
+  "playMoreGamesToSeeRoles": "Play more games to see how you perform in different team roles",
+
+  "noStatsYet": "No Stats Yet",
+  "startPlayingToSeeStats": "Start playing games to see your statistics!",
+
+  "playGamesToUnlockRankings": "Play games to unlock rankings",
+  "globalRank": "Global Rank",
+  "percentile": "Percentile",
+  "friendsRank": "Friends Rank",
+  "addFriendsAction": "Add friends",
+
+  "period30d": "30d",
+  "period90d": "90d",
+  "period1y": "1y",
+  "periodAllTime": "All Time",
+
+  "monthlyProgressChart": "Monthly Progress Chart",
+  "playAtLeastNGames": "Play at least {count} games",
+  "@playAtLeastNGames": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "nOfNGames": "{current}/{total} games",
+  "@nOfNGames": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "startPlayingToTrackProgress": "Start playing to track your progress!",
+  "keepPlayingToUnlockChart": "Keep playing to unlock this chart!",
+  "playGamesOverLongerPeriod": "Play games over a longer period",
+  "keepPlayingToSeeProgress": "Keep playing to see your progress!",
+  "noGamesInThisPeriod": "No Games in This Period",
+  "noGamesPlayedInLast": "No games played in the last {period}",
+  "@noGamesPlayedInLast": {
+    "placeholders": {
+      "period": {"type": "String"}
+    }
+  },
+  "trySelectingLongerPeriod": "Try selecting a longer time period",
+  "periodLabel30Days": "30 days",
+  "periodLabel90Days": "90 days",
+  "periodLabelYear": "year",
+  "periodLabelAllTime": "all time",
+
+  "bestEloThisMonth": "Best ELO This Month",
+  "bestEloPast90Days": "Best ELO Past 90 Days",
+  "bestEloThisYear": "Best ELO This Year",
+  "bestEloAllTime": "Best ELO All Time",
+
+  "lastNGames": "Last {count} games",
+  "@lastNGames": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "noGamesPlayedYet": "No games played yet",
+  "winsStreakCount": "{count} wins",
+  "@winsStreakCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "lossesStreakCount": "{count} losses",
+  "@lossesStreakCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "partnerDetailsTitle": "Partner Details",
+  "overallRecord": "Overall Record",
+  "games": "Games",
+  "record": "Record",
+  "pointDifferential": "Point Differential",
+  "avgPerGame": "Avg Per Game",
+  "pointsFor": "Points For",
+  "pointsAgainst": "Points Against",
+  "eloPerformance": "ELO Performance",
+  "totalChange": "Total Change",
+  "recentForm": "Recent Form",
+  "streakWins": "{count} W Streak",
+  "@streakWins": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "streakLosses": "{count} L Streak",
+  "@streakLosses": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "noRecentGames": "No recent games",
+  "eloLabel": "ELO: {value}",
+  "@eloLabel": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
   }
 }

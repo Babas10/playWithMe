@@ -1,6 +1,7 @@
 // Displays three ranking stat cards: global rank, percentile, and friends rank (Story 302.5).
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_ranking.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Three stat cards showing global rank, percentile, and friends rank.
 ///
@@ -79,7 +80,7 @@ class RankingStatsCards extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            'Play games to unlock rankings',
+            AppLocalizations.of(context)!.playGamesToUnlockRankings,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -101,7 +102,7 @@ class _GlobalRankCard extends StatelessWidget {
     return _RankingStatCard(
       icon: Icons.public,
       iconColor: Colors.blue,
-      label: 'Global Rank',
+      label: AppLocalizations.of(context)!.globalRank,
       value: ranking.globalRankDisplay,
     );
   }
@@ -118,7 +119,7 @@ class _PercentileCard extends StatelessWidget {
     return _RankingStatCard(
       icon: Icons.trending_up,
       iconColor: Colors.green,
-      label: 'Percentile',
+      label: AppLocalizations.of(context)!.percentile,
       value: ranking.percentileDisplay,
     );
   }
@@ -141,8 +142,8 @@ class _FriendsRankCard extends StatelessWidget {
       return _RankingStatCard(
         icon: Icons.people,
         iconColor: Colors.orange,
-        label: 'Friends Rank',
-        value: 'Add friends',
+        label: AppLocalizations.of(context)!.friendsRank,
+        value: AppLocalizations.of(context)!.addFriendsAction,
         isActionable: true,
         onTap: onAddFriendsTap,
       );
@@ -151,7 +152,7 @@ class _FriendsRankCard extends StatelessWidget {
     return _RankingStatCard(
       icon: Icons.people,
       iconColor: Colors.orange,
-      label: 'Friends Rank',
+      label: AppLocalizations.of(context)!.friendsRank,
       value: ranking.friendsRankDisplay!,
     );
   }

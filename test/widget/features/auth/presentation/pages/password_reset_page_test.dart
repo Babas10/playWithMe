@@ -2,6 +2,8 @@
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -40,7 +42,13 @@ void main() {
 
   Widget createTestWidget() {
     return MaterialApp(
-      home: BlocProvider<PasswordResetBloc>.value(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],      home: BlocProvider<PasswordResetBloc>.value(
         value: mockPasswordResetBloc,
         child: const PasswordResetPage(),
       ),
@@ -348,8 +356,14 @@ void main() {
     group('Navigation', () {
       testWidgets('back to login button navigates back', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: BlocProvider<PasswordResetBloc>.value(
+    MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],            home: BlocProvider<PasswordResetBloc>.value(
               value: mockPasswordResetBloc,
               child: Navigator(
                 onGenerateRoute: (settings) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../bloc/feedback/training_feedback_bloc.dart';
 import '../bloc/feedback/training_feedback_event.dart';
 import '../bloc/feedback/training_feedback_state.dart';
@@ -48,9 +49,10 @@ class _TrainingSessionFeedbackPageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Session Feedback'),
+        title: Text(l10n.sessionFeedback),
       ),
       body: BlocConsumer<TrainingFeedbackBloc, TrainingFeedbackState>(
         listener: (context, state) {
@@ -59,8 +61,8 @@ class _TrainingSessionFeedbackPageState
               _hasSubmitted = true;
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Thank you for your feedback!'),
+              SnackBar(
+                content: Text(l10n.thankYouFeedback),
                 backgroundColor: Colors.green,
               ),
             );
@@ -99,6 +101,7 @@ class _TrainingSessionFeedbackPageState
   }
 
   Widget _buildAlreadySubmittedView() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -111,9 +114,9 @@ class _TrainingSessionFeedbackPageState
               color: Colors.green,
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Feedback Already Submitted',
-              style: TextStyle(
+            Text(
+              l10n.feedbackAlreadySubmitted,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -121,7 +124,7 @@ class _TrainingSessionFeedbackPageState
             ),
             const SizedBox(height: 16),
             Text(
-              'You have already provided feedback for "${widget.sessionTitle}".',
+              l10n.alreadyProvidedFeedback(widget.sessionTitle),
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -131,7 +134,7 @@ class _TrainingSessionFeedbackPageState
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Back to Session'),
+              child: Text(l10n.backToSession),
             ),
           ],
         ),
@@ -141,6 +144,7 @@ class _TrainingSessionFeedbackPageState
 
   Widget _buildFeedbackForm(TrainingFeedbackState state) {
     final isSubmitting = state is SubmittingFeedback;
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -157,9 +161,9 @@ class _TrainingSessionFeedbackPageState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Provide Anonymous Feedback',
-                      style: TextStyle(
+                    Text(
+                      l10n.provideAnonymousFeedback,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -170,9 +174,9 @@ class _TrainingSessionFeedbackPageState
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Your feedback is anonymous and helps improve future training sessions.',
-                      style: TextStyle(
+                    Text(
+                      l10n.feedbackIsAnonymous,
+                      style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
                       ),
@@ -185,8 +189,8 @@ class _TrainingSessionFeedbackPageState
 
             // Exercises Quality Rating
             _buildIconRating(
-              'Exercises Quality',
-              'Were the drills effective?',
+              l10n.exercisesQuality,
+              l10n.wereDrillsEffective,
               _exercisesQuality,
               (rating) => setState(() => _exercisesQuality = rating),
             ),
@@ -194,8 +198,8 @@ class _TrainingSessionFeedbackPageState
 
             // Training Intensity
             _buildIconRating(
-              'Training Intensity',
-              'Physical demand level',
+              l10n.trainingIntensity,
+              l10n.physicalDemandLevel,
               _trainingIntensity,
               (rating) => setState(() => _trainingIntensity = rating),
             ),
@@ -203,17 +207,17 @@ class _TrainingSessionFeedbackPageState
 
             // Coaching Clarity Rating
             _buildIconRating(
-              'Coaching Clarity',
-              'Instructions & corrections?',
+              l10n.coachingClarity,
+              l10n.instructionsAndCorrections,
               _coachingClarity,
               (rating) => setState(() => _coachingClarity = rating),
             ),
             const SizedBox(height: 32),
 
             // Comment section
-            const Text(
-              'Additional Comments (Optional)',
-              style: TextStyle(
+            Text(
+              l10n.additionalCommentsOptional,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -224,8 +228,7 @@ class _TrainingSessionFeedbackPageState
               maxLines: 5,
               maxLength: 500,
               decoration: InputDecoration(
-                hintText:
-                    'Share your thoughts about the session, exercises, or suggestions for improvement...',
+                hintText: l10n.shareYourThoughts,
                 border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surface,
@@ -252,9 +255,9 @@ class _TrainingSessionFeedbackPageState
                         color: Colors.white,
                       ),
                     )
-                  : const Text(
-                      'Submit Feedback',
-                      style: TextStyle(
+                  : Text(
+                      l10n.submitFeedback,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -263,22 +266,22 @@ class _TrainingSessionFeedbackPageState
             const SizedBox(height: 16),
 
             // Anonymous reminder
-            const Card(
+            Card(
               color: Colors.blue,
               child: Padding(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.privacy_tip_outlined,
                       color: Colors.white,
                       size: 20,
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Your feedback is completely anonymous and cannot be traced back to you.',
-                        style: TextStyle(
+                        l10n.feedbackPrivacyNotice,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
                         ),
@@ -340,22 +343,28 @@ class _TrainingSessionFeedbackPageState
           }),
         ),
         const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Needs work', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-            Text('Top-level training', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-          ],
+        Builder(
+          builder: (context) {
+            final l10n = AppLocalizations.of(context)!;
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(l10n.needsWork, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text(l10n.topLevelTraining, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+              ],
+            );
+          },
         ),
       ],
     );
   }
 
   void _submitFeedback(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_exercisesQuality == 0 || _trainingIntensity == 0 || _coachingClarity == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please rate all three categories before submitting'),
+        SnackBar(
+          content: Text(l10n.pleaseRateAllCategories),
           backgroundColor: Colors.orange,
         ),
       );

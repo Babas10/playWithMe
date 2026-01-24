@@ -1,5 +1,6 @@
 // Win streak badge widget displaying current win/loss streak.
 import 'package:flutter/material.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A badge widget that displays the current win or loss streak.
 ///
@@ -20,10 +21,12 @@ class WinStreakBadge extends StatelessWidget {
 
   String get streakEmoji => isWinningStreak ? '🔥' : '❄️';
 
-  String get streakText {
+  String _getStreakText(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final absStreak = currentStreak.abs();
-    final type = isWinningStreak ? 'wins' : 'losses';
-    return '$absStreak $type';
+    return isWinningStreak
+        ? l10n.winsStreakCount(absStreak)
+        : l10n.lossesStreakCount(absStreak);
   }
 
   Color get streakColor => isWinningStreak ? Colors.green : Colors.blue;
@@ -52,7 +55,7 @@ class WinStreakBadge extends StatelessWidget {
             const SizedBox(width: 8),
             // Streak text
             Text(
-              streakText,
+              _getStreakText(context),
               style: theme.textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: streakColor,
