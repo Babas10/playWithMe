@@ -32,9 +32,8 @@ void main() {
   }
 
   group('FriendSelectorWidget', () {
-    testWidgets('displays loading state while fetching friends', (tester) async {
-      // Skip - timing issue with Future.delayed in tests
-    }, skip: true);
+    // NOTE: Loading state timing test moved to integration tests
+    // See: https://github.com/Babas10/playWithMe/issues/442
 
     testWidgets('displays empty state when user has no friends', (tester) async {
       // Arrange

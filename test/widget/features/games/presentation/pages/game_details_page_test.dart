@@ -102,6 +102,7 @@ void main() {
     testWidgets('displays loading indicator initially', (tester) async {
       // Skip: Synchronous mock streams emit too fast to catch transient loading state
       // This behavior is covered by integration tests with real Firebase timing
+      // See: https://github.com/Babas10/playWithMe/issues/442
     }, skip: true);
 
     testWidgets('displays game details when loaded', (tester) async {
@@ -302,6 +303,7 @@ void main() {
       // Skip: Synchronous mock repository completes operations too fast
       // to catch the transient OperationInProgress state with loading indicator
       // This behavior is covered by integration tests with real Firebase timing
+      // See: https://github.com/Babas10/playWithMe/issues/442
     }, skip: true);
 
     testWidgets('real-time updates: player list updates when someone joins',
