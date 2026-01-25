@@ -278,43 +278,54 @@ class FirestoreUserRepository implements UserRepository {
     if (query.trim().isEmpty) return [];
 
     try {
-      final queryLower = query.toLowerCase();
+      // Use Cloud Function for secure cross-user search
+      // The Cloud Function handles:
+      // - Query validation (minimum 3 characters)
+      // - Case-insensitive search by email and displayName
+      // - Filtering out self, friends, and pending requests
+      final callable = _functions.httpsCallable('searchUsers');
+      final result = await callable.call({
+        'query': query,
+      });
 
-      // Search by display name (case-insensitive)
-      final displayNameQuery = await _firestore
-          .collection(_collection)
-          .where('displayName', isGreaterThanOrEqualTo: queryLower)
-          .where('displayName', isLessThanOrEqualTo: '${queryLower}z')
-          .limit(limit)
-          .get();
+      // Convert result.data to Map<String, dynamic> safely
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final usersData = List<Map<String, dynamic>>.from(
+        (data['users'] as List).map((u) => Map<String, dynamic>.from(u as Map)),
+      );
 
-      // Search by email (case-insensitive)
-      final emailQuery = await _firestore
-          .collection(_collection)
-          .where('email', isGreaterThanOrEqualTo: queryLower)
-          .where('email', isLessThanOrEqualTo: '${queryLower}z')
-          .limit(limit)
-          .get();
+      // Apply limit if fewer results than Cloud Function default (20)
+      final limitedUsers = usersData.take(limit).toList();
 
-      final users = <String, UserModel>{};
-
-      // Add users from display name query
-      for (final doc in displayNameQuery.docs) {
-        if (doc.exists) {
-          final user = UserModel.fromFirestore(doc);
-          users[user.uid] = user;
-        }
+      return limitedUsers.map((userData) {
+        return UserModel(
+          uid: userData['uid'] as String,
+          email: userData['email'] as String,
+          displayName: userData['displayName'] as String?,
+          photoUrl: userData['photoUrl'] as String?,
+          isEmailVerified: false, // Not returned by Cloud Function
+          isAnonymous: false, // Not returned by Cloud Function
+        );
+      }).toList();
+    } on FirebaseFunctionsException catch (e) {
+      // Handle specific Cloud Function errors
+      switch (e.code) {
+        case 'unauthenticated':
+          throw UserException(
+            'You must be logged in to search for users',
+            code: 'unauthenticated',
+          );
+        case 'invalid-argument':
+          // Query too short or invalid - return empty list instead of throwing
+          return [];
+        case 'permission-denied':
+          throw UserException(
+            'You don\'t have permission to search for users',
+            code: 'permission-denied',
+          );
+        default:
+          throw UserException('Failed to search users: ${e.message}');
       }
-
-      // Add users from email query (avoiding duplicates)
-      for (final doc in emailQuery.docs) {
-        if (doc.exists && !users.containsKey(doc.id)) {
-          final user = UserModel.fromFirestore(doc);
-          users[user.uid] = user;
-        }
-      }
-
-      return users.values.toList();
     } catch (e) {
       throw UserException('Failed to search users: $e');
     }
