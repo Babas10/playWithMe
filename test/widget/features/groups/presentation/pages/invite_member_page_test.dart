@@ -130,8 +130,7 @@ void main() {
       expect(find.text('Select friends to invite'), findsOneWidget);
     });
 
-    testWidgets('shows "no repository" message when FriendRepository is null', (tester) async {
-      // Skip - requires GetIt setup for GroupRepository even when null friend repository
-    }, skip: true);
+    // NOTE: Test for null FriendRepository requires GetIt setup refactoring
+    // See: https://github.com/Babas10/playWithMe/issues/442
   });
 }

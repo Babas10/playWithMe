@@ -120,7 +120,9 @@ void main() {
       expect(find.byType(GroupListItem), findsOneWidget);
       expect(find.text('Beach Volleyball Crew'), findsOneWidget);
       expect(find.textContaining('2 members'), findsOneWidget);
-    }, skip: true); // TODO: Re-enable once Firestore emulator tests are stable (async stream timing issues in CI)
+      // Skip: Firestore emulator stream timing unstable in CI
+      // See: https://github.com/Babas10/playWithMe/issues/442
+    }, skip: true);
 
     testWidgets('end-to-end: real-time update when group is added', (tester) async {
       // Arrange - Start with empty Firestore
@@ -155,6 +157,8 @@ void main() {
       expect(find.byType(GroupListItem), findsOneWidget);
       expect(find.text('New Volleyball Team'), findsOneWidget);
       expect(find.byType(EmptyGroupList), findsNothing);
-    }, skip: true); // TODO: Re-enable once Firestore emulator tests are stable (async stream timing issues in CI)
+      // Skip: Firestore emulator stream timing unstable in CI
+      // See: https://github.com/Babas10/playWithMe/issues/442
+    }, skip: true);
   });
 }

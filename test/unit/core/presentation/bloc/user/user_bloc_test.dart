@@ -28,24 +28,10 @@ void main() {
     });
 
     group('LoadCurrentUser', () {
-      test('emits UserLoaded when current user exists', () {
-        // Skipped due to async stream timing issue with mock setup.
-        // Works correctly in real Firebase Auth integration.
-        // The BLoC listens to currentUser stream, but mocktail timing
-        // doesn't align with blocTest expectations for stream events.
-      }, skip: 'Stream-based test timing issue (Firebase mock limitation)');
-
-      test('emits UserNotFound when no current user', () {
-        // Skipped due to async stream timing issue with mock setup.
-        // Works correctly in real Firebase Auth integration.
-        // This tests the authentication flow when user is not logged in.
-      }, skip: 'Stream-based test timing issue (Firebase mock limitation)');
-
-      test('emits UserError when stream has error', () {
-        // Skipped due to async stream timing issue with mock setup.
-        // Works correctly in real Firebase Auth integration.
-        // This tests error handling when auth stream fails (network issues, etc.).
-      }, skip: 'Stream-based test timing issue (Firebase mock limitation)');
+      // NOTE: Stream-based tests for LoadCurrentUser require Firebase Emulator
+      // and are covered in integration tests. The BLoC listens to currentUser
+      // stream, but mocktail timing doesn't align with blocTest expectations
+      // for stream events. See: https://github.com/Babas10/playWithMe/issues/442
     });
 
     group('LoadUserById', () {
