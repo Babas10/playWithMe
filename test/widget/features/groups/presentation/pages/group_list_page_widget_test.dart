@@ -149,7 +149,9 @@ void main() {
       expect(find.byType(GroupListItem), findsOneWidget);
       expect(find.text('New Volleyball Team'), findsOneWidget);
       expect(find.byType(EmptyGroupList), findsNothing);
-    }, skip: true); // TODO: Fix timing issue with dynamic stream updates in tests
+      // Skip: Stream timing test, move to integration tests
+      // See: https://github.com/Babas10/playWithMe/issues/442
+    }, skip: true);
 
     testWidgets('displays multiple groups correctly', (tester) async {
       // Arrange

@@ -241,7 +241,9 @@ void main() {
       // Navigation is tested via integration tests since GroupDetailsPage requires repositories
       // This test verifies the tap gesture is recognized
       expect(find.byType(GroupListItem), findsOneWidget);
-    }, skip: true); // Skip: Navigation to GroupDetailsPage tested in integration tests
+      // Skip: Navigation requires integration test
+      // See: https://github.com/Babas10/playWithMe/issues/442
+    }, skip: true);
 
 
     testWidgets('tapping Create Group FAB navigates to GroupCreationPage', (tester) async {
