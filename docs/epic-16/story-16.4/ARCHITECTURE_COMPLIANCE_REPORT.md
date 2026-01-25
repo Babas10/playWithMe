@@ -2,6 +2,7 @@
 
 **Story**: 16.4 - Architecture Compliance Check
 **Date**: 2026-01-16
+**Updated**: 2026-01-25
 **Status**: Complete
 
 ---
@@ -10,7 +11,7 @@
 
 This report verifies compliance with the architectural patterns and layered dependency rules defined in CLAUDE.md for the PlayWithMe application.
 
-**Overall Compliance**: ✅ **96% Compliant** (2 minor violations found)
+**Overall Compliance**: ✅ **100% Compliant** (All violations resolved)
 
 | Category | Status | Notes |
 |----------|--------|-------|
@@ -20,7 +21,7 @@ This report verifies compliance with the architectural patterns and layered depe
 | Service Locator | ✅ Compliant | All registrations are correct |
 | Cloud Functions Security | ✅ Compliant | All functions have auth checks |
 | Firestore Security Rules | ✅ Compliant | Rules match implementation |
-| Cross-User Queries | ⚠️ 2 Violations | Some direct Firestore queries should use Cloud Functions |
+| Cross-User Queries | ✅ Compliant | All queries now use Cloud Functions (fixed in Stories 16.4.1 & 16.4.2) |
 
 ---
 
@@ -261,70 +262,60 @@ All functions use structured `HttpsError` with appropriate codes:
 
 ## 7. Cross-User Query Analysis
 
-### 7.1 Violations Found
+### 7.1 Violations Found (RESOLVED)
 
-⚠️ **2 methods in `FirestoreUserRepository` directly query Firestore for cross-user data:**
+✅ **All 2 violations have been fixed:**
 
-#### Violation 1: `searchUsers` method (lib/core/data/repositories/firestore_user_repository.dart:277)
+#### Violation 1: `searchUsers` method - ✅ FIXED in Story 16.4.1
+
+The method now uses the `searchUsers` Cloud Function:
 
 ```dart
-// CURRENT (Direct Firestore query - would be blocked by security rules)
-Future<List<UserModel>> searchUsers(String query, {int limit = 20}) async {
-  final displayNameQuery = await _firestore
-      .collection(_collection)
-      .where('displayName', isGreaterThanOrEqualTo: queryLower)
-      .limit(limit)
-      .get();
-  // ...
-}
-```
-
-**Should be**:
-```dart
-// RECOMMENDED (Use Cloud Function)
+// FIXED (Uses Cloud Function - Story 16.4.1)
 Future<List<UserModel>> searchUsers(String query, {int limit = 20}) async {
   final callable = _functions.httpsCallable('searchUsers');
   final result = await callable.call({'query': query});
-  // ...
+  // Parses Cloud Function response and returns UserModel list
 }
 ```
 
-#### Violation 2: `getUsersInGroup` method (lib/core/data/repositories/firestore_user_repository.dart:324)
+#### Violation 2: `getUsersInGroup` method - ✅ FIXED in Story 16.4.2
+
+The method now:
+1. Fetches the group document to get `memberIds` (allowed by security rules)
+2. Uses the `getUsersByIds` Cloud Function for secure cross-user queries
 
 ```dart
-// CURRENT (Direct Firestore query - would be blocked by security rules)
+// FIXED (Uses Cloud Function - Story 16.4.2)
 Future<List<UserModel>> getUsersInGroup(String groupId) async {
-  final query = await _firestore
-      .collection(_collection)
-      .where('groupIds', arrayContains: groupId)
-      .get();
-  // ...
-}
-```
+  // Step 1: Get group document to retrieve memberIds
+  final groupDoc = await _firestore.collection('groups').doc(groupId).get();
+  final memberIds = (groupDoc.data()?['memberIds'] as List?)?.cast<String>() ?? [];
 
-**Should be**:
-```dart
-// RECOMMENDED (Use Cloud Function)
-Future<List<UserModel>> getUsersInGroup(String groupId) async {
+  if (memberIds.isEmpty) return [];
+
+  // Step 2: Use Cloud Function to get user data securely
   final callable = _functions.httpsCallable('getUsersByIds');
-  // Get memberIds from group first, then fetch users
-  // ...
+  final result = await callable.call({'userIds': memberIds});
+  // Parses Cloud Function response and returns UserModel list
 }
 ```
 
-### 7.2 Impact Assessment
+### 7.2 Resolution Status
 
-| Aspect | Impact |
-|--------|--------|
-| Security | Low - Blocked by Firestore rules |
-| Functionality | Medium - Methods may fail at runtime |
-| Architecture | Medium - Violates Cloud Function wrapper pattern |
+| Violation | Story | Status | Merged |
+|-----------|-------|--------|--------|
+| `searchUsers` | [Story 16.4.1](https://github.com/Babas10/playWithMe/issues/417) | ✅ Fixed | PR #440 |
+| `getUsersInGroup` | [Story 16.4.2](https://github.com/Babas10/playWithMe/issues/418) | ✅ Fixed | PR pending |
 
-### 7.3 Recommendation
+### 7.3 Security Benefits
 
-Follow-up issues created to refactor these methods to use Cloud Functions:
-- **[Story 16.4.1](https://github.com/Babas10/playWithMe/issues/417)**: Refactor `searchUsers` to use `searchUsers` Cloud Function
-- **[Story 16.4.2](https://github.com/Babas10/playWithMe/issues/418)**: Refactor `getUsersInGroup` to use `getUsersByIds` Cloud Function
+Both fixes now provide:
+- ✅ Proper authentication validation via Cloud Functions
+- ✅ Rate limiting capabilities
+- ✅ Consistent error handling with structured error codes
+- ✅ Audit trail for cross-user data access
+- ✅ Compliance with Cross-User Query Pattern from CLAUDE.md
 
 ---
 
@@ -359,16 +350,17 @@ Follow-up issues created to refactor these methods to use Cloud Functions:
 4. **Service Locator**: All registrations follow correct patterns (singletons vs factories)
 5. **Cloud Functions**: All 31 functions have authentication checks and input validation
 6. **Firestore Rules**: Security rules properly enforce access control
+7. **Cross-User Queries**: All queries now use Cloud Functions (fixed in Stories 16.4.1 & 16.4.2)
 
-### Violations Found (⚠️)
+### Violations Fixed (✅)
 
-1. **`FirestoreUserRepository.searchUsers`**: Directly queries users collection instead of using `searchUsers` Cloud Function
-2. **`FirestoreUserRepository.getUsersInGroup`**: Directly queries users collection instead of using `getUsersByIds` Cloud Function
+1. **`FirestoreUserRepository.searchUsers`**: ✅ Now uses `searchUsers` Cloud Function (Story 16.4.1)
+2. **`FirestoreUserRepository.getUsersInGroup`**: ✅ Now uses `getUsersByIds` Cloud Function (Story 16.4.2)
 
 ### Recommendations
 
-1. **Short-term**: Document these violations and create follow-up stories for remediation
-2. **Long-term**: Add architecture tests to prevent direct cross-user queries in repositories
+1. ✅ ~~**Short-term**: Document these violations and create follow-up stories for remediation~~ (Completed)
+2. ⬜ **Long-term**: Add architecture tests to prevent direct cross-user queries in repositories
 
 ---
 
@@ -377,7 +369,9 @@ Follow-up issues created to refactor these methods to use Cloud Functions:
 1. ✅ Document findings in this report
 2. ✅ Verify existing architecture tests pass
 3. ✅ Create follow-up issues for violations ([#417](https://github.com/Babas10/playWithMe/issues/417), [#418](https://github.com/Babas10/playWithMe/issues/418))
-4. ⬜ Consider adding additional architecture tests for cross-user query prevention
+4. ✅ Fix `searchUsers` violation (Story 16.4.1 - PR #440)
+5. ✅ Fix `getUsersInGroup` violation (Story 16.4.2 - PR pending)
+6. ⬜ Consider adding additional architecture tests for cross-user query prevention
 
 ---
 

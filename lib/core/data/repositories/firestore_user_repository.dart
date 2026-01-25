@@ -334,15 +334,70 @@ class FirestoreUserRepository implements UserRepository {
   @override
   Future<List<UserModel>> getUsersInGroup(String groupId) async {
     try {
-      final query = await _firestore
-          .collection(_collection)
-          .where('groupIds', arrayContains: groupId)
-          .get();
+      // Step 1: Get group document to retrieve memberIds
+      // This is allowed by Firestore security rules (user can read group they belong to)
+      final groupDoc = await _firestore.collection('groups').doc(groupId).get();
 
-      return query.docs
-          .where((doc) => doc.exists)
-          .map((doc) => UserModel.fromFirestore(doc))
-          .toList();
+      if (!groupDoc.exists) {
+        return [];
+      }
+
+      final groupData = groupDoc.data();
+      if (groupData == null) {
+        return [];
+      }
+
+      // Extract memberIds from group document
+      final memberIds = (groupData['memberIds'] as List?)?.cast<String>() ?? [];
+
+      if (memberIds.isEmpty) {
+        return [];
+      }
+
+      // Step 2: Use Cloud Function to get user data securely
+      // This follows the Cross-User Query Pattern from CLAUDE.md
+      final callable = _functions.httpsCallable('getUsersByIds');
+      final result = await callable.call({
+        'userIds': memberIds,
+      });
+
+      // Convert result.data to Map<String, dynamic> safely
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final usersData = List<Map<String, dynamic>>.from(
+        (data['users'] as List).map((u) => Map<String, dynamic>.from(u as Map)),
+      );
+
+      return usersData.map((userData) {
+        return UserModel(
+          uid: userData['uid'] as String,
+          email: userData['email'] as String,
+          displayName: userData['displayName'] as String?,
+          photoUrl: userData['photoUrl'] as String?,
+          isEmailVerified: false, // Not returned by Cloud Function
+          isAnonymous: false, // Not returned by Cloud Function
+        );
+      }).toList();
+    } on FirebaseFunctionsException catch (e) {
+      // Handle specific Cloud Function errors
+      switch (e.code) {
+        case 'unauthenticated':
+          throw UserException(
+            'You must be logged in to get users in group',
+            code: 'unauthenticated',
+          );
+        case 'permission-denied':
+          throw UserException(
+            'You don\'t have permission to view users in this group',
+            code: 'permission-denied',
+          );
+        case 'invalid-argument':
+          throw UserException(
+            'Invalid group data',
+            code: 'invalid-argument',
+          );
+        default:
+          throw UserException('Failed to get users in group: ${e.message}');
+      }
     } catch (e) {
       throw UserException('Failed to get users in group: $e');
     }
