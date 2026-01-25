@@ -606,39 +606,183 @@ void main() {
     });
 
     group('getUsersInGroup', () {
-      test('returns users in a specific group', () async {
-        await fakeFirestore.collection('users').doc('user-1').set({
-          'email': 'user1@example.com',
-          'displayName': 'User 1',
-          'isEmailVerified': true,
-          'isAnonymous': false,
-          'groupIds': ['group-123'],
+      test('returns users in a specific group via Cloud Function', () async {
+        // Create group document with memberIds
+        await fakeFirestore.collection('groups').doc('group-123').set({
+          'name': 'Test Group',
+          'memberIds': ['user-1', 'user-2'],
         });
-        await fakeFirestore.collection('users').doc('user-2').set({
-          'email': 'user2@example.com',
-          'displayName': 'User 2',
-          'isEmailVerified': true,
-          'isAnonymous': false,
-          'groupIds': ['group-123', 'group-456'],
-        });
-        await fakeFirestore.collection('users').doc('user-3').set({
-          'email': 'user3@example.com',
-          'displayName': 'User 3',
-          'isEmailVerified': true,
-          'isAnonymous': false,
-          'groupIds': ['group-456'],
+
+        // Mock the getUsersByIds Cloud Function
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+
+        when(() => mockFunctions.httpsCallable('getUsersByIds'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'users': [
+            {
+              'uid': 'user-1',
+              'email': 'user1@example.com',
+              'displayName': 'User 1',
+              'photoUrl': null,
+            },
+            {
+              'uid': 'user-2',
+              'email': 'user2@example.com',
+              'displayName': 'User 2',
+              'photoUrl': null,
+            },
+          ],
         });
 
         final result = await repository.getUsersInGroup('group-123');
 
         expect(result.length, 2);
         expect(result.map((u) => u.displayName), containsAll(['User 1', 'User 2']));
+        verify(() => mockFunctions.httpsCallable('getUsersByIds')).called(1);
       });
 
-      test('returns empty list when no users in group', () async {
+      test('returns empty list when group does not exist', () async {
         final result = await repository.getUsersInGroup('non-existent-group');
 
         expect(result, isEmpty);
+      });
+
+      test('returns empty list when group has no members', () async {
+        // Create group document with empty memberIds
+        await fakeFirestore.collection('groups').doc('group-empty').set({
+          'name': 'Empty Group',
+          'memberIds': <String>[],
+        });
+
+        final result = await repository.getUsersInGroup('group-empty');
+
+        expect(result, isEmpty);
+      });
+
+      test('returns empty list when group has null memberIds', () async {
+        // Create group document without memberIds field
+        await fakeFirestore.collection('groups').doc('group-null').set({
+          'name': 'Group Without Members',
+        });
+
+        final result = await repository.getUsersInGroup('group-null');
+
+        expect(result, isEmpty);
+      });
+
+      test('throws UserException on unauthenticated Cloud Function error', () async {
+        // Create group document with memberIds
+        await fakeFirestore.collection('groups').doc('group-123').set({
+          'name': 'Test Group',
+          'memberIds': ['user-1'],
+        });
+
+        final mockCallable = MockHttpsCallable();
+
+        when(() => mockFunctions.httpsCallable('getUsersByIds'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'unauthenticated',
+            message: 'User must be authenticated',
+          ),
+        );
+
+        expect(
+          () => repository.getUsersInGroup('group-123'),
+          throwsA(isA<UserException>().having(
+            (e) => e.code,
+            'code',
+            'unauthenticated',
+          )),
+        );
+      });
+
+      test('throws UserException on permission-denied Cloud Function error', () async {
+        // Create group document with memberIds
+        await fakeFirestore.collection('groups').doc('group-123').set({
+          'name': 'Test Group',
+          'memberIds': ['user-1'],
+        });
+
+        final mockCallable = MockHttpsCallable();
+
+        when(() => mockFunctions.httpsCallable('getUsersByIds'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'permission-denied',
+            message: 'Access denied',
+          ),
+        );
+
+        expect(
+          () => repository.getUsersInGroup('group-123'),
+          throwsA(isA<UserException>().having(
+            (e) => e.code,
+            'code',
+            'permission-denied',
+          )),
+        );
+      });
+
+      test('throws UserException on invalid-argument Cloud Function error', () async {
+        // Create group document with memberIds
+        await fakeFirestore.collection('groups').doc('group-123').set({
+          'name': 'Test Group',
+          'memberIds': ['user-1'],
+        });
+
+        final mockCallable = MockHttpsCallable();
+
+        when(() => mockFunctions.httpsCallable('getUsersByIds'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'invalid-argument',
+            message: 'Invalid user IDs',
+          ),
+        );
+
+        expect(
+          () => repository.getUsersInGroup('group-123'),
+          throwsA(isA<UserException>().having(
+            (e) => e.code,
+            'code',
+            'invalid-argument',
+          )),
+        );
+      });
+
+      test('throws UserException on generic Cloud Function error', () async {
+        // Create group document with memberIds
+        await fakeFirestore.collection('groups').doc('group-123').set({
+          'name': 'Test Group',
+          'memberIds': ['user-1'],
+        });
+
+        final mockCallable = MockHttpsCallable();
+
+        when(() => mockFunctions.httpsCallable('getUsersByIds'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'internal',
+            message: 'Server error',
+          ),
+        );
+
+        expect(
+          () => repository.getUsersInGroup('group-123'),
+          throwsA(isA<UserException>().having(
+            (e) => e.message,
+            'message',
+            contains('Failed to get users in group'),
+          )),
+        );
       });
     });
 
