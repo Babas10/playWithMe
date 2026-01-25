@@ -1,7 +1,6 @@
 // Verifies that FirestoreUserRepository correctly handles all user data operations.
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -431,24 +430,178 @@ void main() {
         expect(result, isEmpty);
       });
 
-      test('finds users by display name', () async {
-        await fakeFirestore.collection('users').doc('user-1').set({
-          'email': 'john@example.com',
-          'displayName': 'john',
-          'isEmailVerified': true,
-          'isAnonymous': false,
-        });
-        await fakeFirestore.collection('users').doc('user-2').set({
-          'email': 'jane@example.com',
-          'displayName': 'jane',
-          'isEmailVerified': true,
-          'isAnonymous': false,
+      test('calls Cloud Function and returns users', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+
+        when(() => mockFunctions.httpsCallable('searchUsers'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'users': [
+            {
+              'uid': 'user-1',
+              'email': 'john@example.com',
+              'displayName': 'John Doe',
+              'photoUrl': null,
+            },
+          ],
         });
 
         final result = await repository.searchUsers('john');
 
         expect(result.length, 1);
-        expect(result.first.displayName, 'john');
+        expect(result.first.uid, 'user-1');
+        expect(result.first.displayName, 'John Doe');
+        expect(result.first.email, 'john@example.com');
+        verify(() => mockFunctions.httpsCallable('searchUsers')).called(1);
+      });
+
+      test('returns multiple users from Cloud Function', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+
+        when(() => mockFunctions.httpsCallable('searchUsers'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'users': [
+            {
+              'uid': 'user-1',
+              'email': 'john@example.com',
+              'displayName': 'John Doe',
+              'photoUrl': null,
+            },
+            {
+              'uid': 'user-2',
+              'email': 'jane@example.com',
+              'displayName': 'Jane Smith',
+              'photoUrl': 'https://example.com/photo.jpg',
+            },
+          ],
+        });
+
+        final result = await repository.searchUsers('example');
+
+        expect(result.length, 2);
+        expect(result.map((u) => u.uid), containsAll(['user-1', 'user-2']));
+      });
+
+      test('respects limit parameter', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+
+        when(() => mockFunctions.httpsCallable('searchUsers'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'users': [
+            {'uid': 'user-1', 'email': 'a@example.com', 'displayName': 'A', 'photoUrl': null},
+            {'uid': 'user-2', 'email': 'b@example.com', 'displayName': 'B', 'photoUrl': null},
+            {'uid': 'user-3', 'email': 'c@example.com', 'displayName': 'C', 'photoUrl': null},
+          ],
+        });
+
+        final result = await repository.searchUsers('example', limit: 2);
+
+        expect(result.length, 2);
+      });
+
+      test('returns empty list when Cloud Function returns empty users', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+
+        when(() => mockFunctions.httpsCallable('searchUsers'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({'users': []});
+
+        final result = await repository.searchUsers('nonexistent');
+
+        expect(result, isEmpty);
+      });
+
+      test('returns empty list for invalid-argument error (query too short)', () async {
+        final mockCallable = MockHttpsCallable();
+
+        when(() => mockFunctions.httpsCallable('searchUsers'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'invalid-argument',
+            message: 'Query must be at least 3 characters long',
+          ),
+        );
+
+        final result = await repository.searchUsers('ab');
+
+        expect(result, isEmpty);
+      });
+
+      test('throws UserException with unauthenticated code', () async {
+        final mockCallable = MockHttpsCallable();
+
+        when(() => mockFunctions.httpsCallable('searchUsers'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'unauthenticated',
+            message: 'User must be authenticated',
+          ),
+        );
+
+        expect(
+          () => repository.searchUsers('john'),
+          throwsA(isA<UserException>().having(
+            (e) => e.code,
+            'code',
+            'unauthenticated',
+          )),
+        );
+      });
+
+      test('throws UserException with permission-denied code', () async {
+        final mockCallable = MockHttpsCallable();
+
+        when(() => mockFunctions.httpsCallable('searchUsers'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'permission-denied',
+            message: 'Access denied',
+          ),
+        );
+
+        expect(
+          () => repository.searchUsers('john'),
+          throwsA(isA<UserException>().having(
+            (e) => e.code,
+            'code',
+            'permission-denied',
+          )),
+        );
+      });
+
+      test('throws UserException on generic Cloud Function error', () async {
+        final mockCallable = MockHttpsCallable();
+
+        when(() => mockFunctions.httpsCallable('searchUsers'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'internal',
+            message: 'Server error',
+          ),
+        );
+
+        expect(
+          () => repository.searchUsers('john'),
+          throwsA(isA<UserException>().having(
+            (e) => e.message,
+            'message',
+            contains('Failed to search users'),
+          )),
+        );
       });
     });
 
