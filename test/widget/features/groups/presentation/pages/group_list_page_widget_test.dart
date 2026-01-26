@@ -118,40 +118,9 @@ void main() {
       expect(find.textContaining('2 members'), findsOneWidget);
     });
 
-    testWidgets('automatically updates when a new group is added', (tester) async {
-      // Arrange - Start with no groups
-      await tester.pumpWidget(createApp());
-      groupBloc.add(LoadGroupsForUser(userId: testUserId));
-      await tester.runAsync(() async {
-        await Future.delayed(const Duration(milliseconds: 100));
-      });
-      await tester.pumpAndSettle();
-
-      // Verify empty state
-      expect(find.byType(EmptyGroupList), findsOneWidget);
-
-      // Act - Add a group while stream is active
-      final newGroup = GroupModel(
-        id: 'group-1',
-        name: 'New Volleyball Team',
-        createdBy: testUserId,
-        createdAt: DateTime.now(),
-        memberIds: [testUserId],
-        adminIds: [testUserId],
-      );
-      await tester.runAsync(() async {
-        mockGroupRepository.addGroup(newGroup);
-        await Future.delayed(const Duration(milliseconds: 100));
-      });
-      await tester.pumpAndSettle();
-
-      // Assert - UI should automatically update
-      expect(find.byType(GroupListItem), findsOneWidget);
-      expect(find.text('New Volleyball Team'), findsOneWidget);
-      expect(find.byType(EmptyGroupList), findsNothing);
-      // Skip: Stream timing test, move to integration tests
-      // See: https://github.com/Babas10/playWithMe/issues/442
-    }, skip: true);
+    // NOTE: Real-time stream update test removed - stream timing cannot be reliably
+    // tested with mocked repositories. Real-time updates are covered in integration tests.
+    // See: integration_test/group_stream_integration_test.dart
 
     testWidgets('displays multiple groups correctly', (tester) async {
       // Arrange

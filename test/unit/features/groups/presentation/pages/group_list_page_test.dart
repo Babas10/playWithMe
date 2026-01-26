@@ -217,34 +217,9 @@ void main() {
       ), findsOneWidget);
     });
 
-    testWidgets('tapping group item navigates to group details', (tester) async {
-      final groups = [
-        GroupModel(
-          id: 'group-1',
-          name: 'Test Group',
-          createdBy: 'user-123',
-          createdAt: DateTime(2024, 1, 1),
-          memberIds: const ['user-123'],
-          adminIds: const ['user-123'],
-        ),
-      ];
-
-      await tester.pumpWidget(createWidgetUnderTest(
-        groupState: GroupsLoaded(groups: groups),
-      ));
-      await tester.pump();
-
-      // Tap on group item to trigger navigation
-      await tester.tap(find.byType(GroupListItem));
-      await tester.pump();
-
-      // Navigation is tested via integration tests since GroupDetailsPage requires repositories
-      // This test verifies the tap gesture is recognized
-      expect(find.byType(GroupListItem), findsOneWidget);
-      // Skip: Navigation requires integration test
-      // See: https://github.com/Babas10/playWithMe/issues/442
-    }, skip: true);
-
+    // NOTE: Navigation to GroupDetailsPage test removed - navigation requires real repositories
+    // which cannot be properly mocked in widget tests. Navigation is covered in integration tests.
+    // See: integration_test/group_navigation_integration_test.dart
 
     testWidgets('tapping Create Group FAB navigates to GroupCreationPage', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());

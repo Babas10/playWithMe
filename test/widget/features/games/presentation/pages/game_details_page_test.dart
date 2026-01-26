@@ -99,11 +99,9 @@ void main() {
   }
 
   group('GameDetailsPage Widget Tests', () {
-    testWidgets('displays loading indicator initially', (tester) async {
-      // Skip: Synchronous mock streams emit too fast to catch transient loading state
-      // This behavior is covered by integration tests with real Firebase timing
-      // See: https://github.com/Babas10/playWithMe/issues/442
-    }, skip: true);
+    // NOTE: Loading indicator timing test removed - transient states cannot be reliably
+    // tested with synchronous mocks. Stream timing is covered in integration tests.
+    // See: integration_test/group_stream_integration_test.dart
 
     testWidgets('displays game details when loaded', (tester) async {
       mockGameRepository.addGame(TestGameData.testGame);
@@ -298,13 +296,9 @@ void main() {
       expect(find.text('Game Not Found'), findsNothing);
     });
 
-    testWidgets('displays loading indicator during RSVP operation',
-        (tester) async {
-      // Skip: Synchronous mock repository completes operations too fast
-      // to catch the transient OperationInProgress state with loading indicator
-      // This behavior is covered by integration tests with real Firebase timing
-      // See: https://github.com/Babas10/playWithMe/issues/442
-    }, skip: true);
+    // NOTE: RSVP loading indicator timing test removed - transient states cannot be
+    // reliably tested with synchronous mocks. RSVP flow is covered in integration tests.
+    // See: integration_test/game_details_rsvp_test.dart
 
     testWidgets('real-time updates: player list updates when someone joins',
         (tester) async {
