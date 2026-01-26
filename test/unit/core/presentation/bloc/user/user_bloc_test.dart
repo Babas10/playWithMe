@@ -31,7 +31,8 @@ void main() {
       // NOTE: Stream-based tests for LoadCurrentUser require Firebase Emulator
       // and are covered in integration tests. The BLoC listens to currentUser
       // stream, but mocktail timing doesn't align with blocTest expectations
-      // for stream events. See: https://github.com/Babas10/playWithMe/issues/442
+      // for stream events.
+      // See: integration_test/user_auth_stream_integration_test.dart
     });
 
     group('LoadUserById', () {
