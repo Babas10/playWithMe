@@ -36,7 +36,10 @@ import 'package:play_with_me/features/profile/presentation/bloc/player_stats/pla
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/home_stats_section.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/next_game_card.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -399,45 +402,105 @@ class _HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
-      builder: (context, state) {
-        if (state is PlayerStatsLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (state is PlayerStatsError) {
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, authState) {
+        if (authState is! AuthenticationAuthenticated) {
           return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                const SizedBox(height: 16),
-                Text(
-                  'Error loading stats: ${state.message}',
-                  style: const TextStyle(color: Colors.red),
-                  textAlign: TextAlign.center,
+            child: Text(
+              AppLocalizations.of(context)!.welcomeMessage,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          );
+        }
+
+        return BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
+          builder: (context, statsState) {
+            if (statsState is PlayerStatsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (statsState is PlayerStatsError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error loading stats: ${statsState.message}',
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        }
+              );
+            }
 
-        if (state is PlayerStatsLoaded) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: HomeStatsSection(
-              user: state.user,
-              ratingHistory: state.history,
-            ),
-          );
-        }
+            if (statsState is PlayerStatsLoaded) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Stats section (ELO, Win rate, etc.)
+                    HomeStatsSection(
+                      user: statsState.user,
+                      ratingHistory: statsState.history,
+                    ),
 
-        // Initial state
-        return Center(
-          child: Text(
-            AppLocalizations.of(context)!.welcomeMessage,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
+                    const SizedBox(height: 16),
+
+                    // Next Game Card
+                    StreamBuilder(
+                      stream: sl<GameRepository>().getNextGameForUser(authState.user.uid),
+                      builder: (context, snapshot) {
+                        // Show loading state only initially
+                        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+                          return const SizedBox.shrink();
+                        }
+
+                        // Log errors for debugging
+                        if (snapshot.hasError) {
+                          debugPrint('🔴 [HomeTab] NextGame stream error: ${snapshot.error}');
+                        }
+
+                        final nextGame = snapshot.data;
+                        debugPrint('🏠 [HomeTab] NextGame snapshot - hasData: ${snapshot.hasData}, data: ${nextGame?.title ?? 'null'}');
+
+                        return NextGameCard(
+                          game: nextGame,
+                          userId: authState.user.uid,
+                          onTap: nextGame != null
+                              ? () {
+                                  final gameRepository = sl<GameRepository>();
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (newContext) => RepositoryProvider.value(
+                                        value: gameRepository,
+                                        child: GameDetailsPage(
+                                          gameId: nextGame.id,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              : null,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Initial state
+            return Center(
+              child: Text(
+                AppLocalizations.of(context)!.welcomeMessage,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            );
+          },
         );
       },
     );

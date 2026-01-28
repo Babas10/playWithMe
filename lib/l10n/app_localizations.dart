@@ -2989,6 +2989,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ELO: {value}'**
   String eloLabel(String value);
+
+  /// Header for next upcoming game section on homepage
+  ///
+  /// In en, this message translates to:
+  /// **'Next Game'**
+  String get nextGame;
+
+  /// Message shown when user has no upcoming games
+  ///
+  /// In en, this message translates to:
+  /// **'No games organized yet'**
+  String get noGamesScheduled;
 }
 
 class _AppLocalizationsDelegate

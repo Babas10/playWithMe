@@ -1598,4 +1598,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String eloLabel(String value) {
     return 'ELO: $value';
   }
+
+  @override
+  String get nextGame => 'Next Game';
+
+  @override
+  String get noGamesScheduled => 'No games organized yet';
 }

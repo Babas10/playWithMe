@@ -121,6 +121,20 @@
       ]
     },
     {
+      "collectionGroup": "games",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "playerIds",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "scheduledAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "ratingHistory",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
