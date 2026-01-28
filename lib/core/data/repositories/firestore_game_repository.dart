@@ -192,6 +192,128 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Stream<GameModel?> getNextGameForUser(String userId) {
+    // Use Cloud Function for secure server-side query
+    // This bypasses Firestore security rules and is more efficient
+
+    return Stream.fromFuture(_fetchNextGameForUser(userId));
+  }
+
+  /// Helper method to fetch next game from Cloud Function
+  Future<GameModel?> _fetchNextGameForUser(String userId) async {
+    try {
+      print('🔍 [getNextGameForUser] Calling Cloud Function for user: $userId');
+      final callable = FirebaseFunctions.instance
+          .httpsCallable('getUpcomingGamesForUser');
+      final result = await callable.call();
+
+      print('📦 [getNextGameForUser] Cloud Function response: ${result.data}');
+
+      final gamesData = result.data['games'] as List<dynamic>?;
+      if (gamesData == null || gamesData.isEmpty) {
+        print('⚠️ [getNextGameForUser] No games returned from Cloud Function');
+        return null;
+      }
+
+      print('✅ [getNextGameForUser] Found ${gamesData.length} games, returning first one');
+
+      // Parse the first game from the Cloud Function response
+      final firstGameData = Map<String, dynamic>.from(gamesData.first as Map);
+
+      // Convert Firestore Timestamp to DateTime
+      final scheduledAtTimestamp = firstGameData['scheduledAt'];
+      final createdAtTimestamp = firstGameData['createdAt'];
+      final updatedAtTimestamp = firstGameData['updatedAt'];
+
+      final game = GameModel(
+        id: firstGameData['id'] as String,
+        title: firstGameData['title'] as String,
+        description: firstGameData['description'] as String?,
+        groupId: firstGameData['groupId'] as String,
+        createdBy: firstGameData['createdBy'] as String,
+        createdAt: _parseTimestamp(createdAtTimestamp),
+        updatedAt: updatedAtTimestamp != null
+            ? _parseTimestamp(updatedAtTimestamp)
+            : null,
+        scheduledAt: _parseTimestamp(scheduledAtTimestamp),
+        startedAt: firstGameData['startedAt'] != null
+            ? _parseTimestamp(firstGameData['startedAt'])
+            : null,
+        endedAt: firstGameData['endedAt'] != null
+            ? _parseTimestamp(firstGameData['endedAt'])
+            : null,
+        location: GameLocation.fromJson(
+            Map<String, dynamic>.from(firstGameData['location'] as Map)),
+        status: GameStatus.values.firstWhere(
+          (e) => e.toString().split('.').last == firstGameData['status'],
+          orElse: () => GameStatus.scheduled,
+        ),
+        maxPlayers: firstGameData['maxPlayers'] as int,
+        minPlayers: firstGameData['minPlayers'] as int,
+        playerIds: List<String>.from(firstGameData['playerIds'] ?? []),
+        waitlistIds: List<String>.from(firstGameData['waitlistIds'] ?? []),
+        allowWaitlist: firstGameData['allowWaitlist'] as bool? ?? true,
+        allowPlayerInvites:
+            firstGameData['allowPlayerInvites'] as bool? ?? true,
+        visibility: GameVisibility.values.firstWhere(
+          (e) => e.toString().split('.').last == firstGameData['visibility'],
+          orElse: () => GameVisibility.group,
+        ),
+        notes: firstGameData['notes'] as String?,
+        equipment: firstGameData['equipment'] != null
+            ? List<String>.from(firstGameData['equipment'] as List? ?? [])
+            : [],
+        gameType: firstGameData['gameType'] != null
+            ? GameType.values.firstWhere(
+                (e) =>
+                    e.toString().split('.').last == firstGameData['gameType'],
+                orElse: () => GameType.casual,
+              )
+            : null,
+        skillLevel: firstGameData['skillLevel'] != null
+            ? GameSkillLevel.values.firstWhere(
+                (e) =>
+                    e.toString().split('.').last ==
+                    firstGameData['skillLevel'],
+                orElse: () => GameSkillLevel.mixed,
+              )
+            : null,
+        estimatedDuration: firstGameData['estimatedDuration'] != null
+            ? Duration(minutes: firstGameData['estimatedDuration'] as int)
+            : null,
+        weatherDependent: firstGameData['weatherDependent'] as bool? ?? false,
+        weatherNotes: firstGameData['weatherNotes'] as String?,
+      );
+
+      print('🎮 [getNextGameForUser] Successfully parsed game: ${game.title} (id: ${game.id})');
+      return game;
+    } on FirebaseFunctionsException catch (e) {
+      print('❌ [getNextGameForUser] FirebaseFunctionsException: ${e.code} - ${e.message}');
+      throw GameException(
+          'Failed to get next game: ${e.message}', code: e.code);
+    } catch (e) {
+      print('❌ [getNextGameForUser] Error: $e');
+      throw GameException('Failed to get next game: $e');
+    }
+  }
+
+  /// Helper to parse Firestore Timestamp from Cloud Function response
+  DateTime _parseTimestamp(dynamic timestamp) {
+    if (timestamp is Timestamp) {
+      return timestamp.toDate();
+    }
+    // Cloud Function returns timestamps as {_seconds, _nanoseconds}
+    if (timestamp is Map) {
+      final seconds = timestamp['_seconds'] as int;
+      final nanoseconds = timestamp['_nanoseconds'] as int;
+      return DateTime.fromMillisecondsSinceEpoch(
+        seconds * 1000 + (nanoseconds / 1000000).round(),
+      );
+    }
+    throw Exception('Invalid timestamp format');
+  }
+
+  @override
   Future<List<GameModel>> getPastGamesForUser(String userId,
       {int limit = 20}) async {
     try {

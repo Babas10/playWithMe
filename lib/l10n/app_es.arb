@@ -488,5 +488,7 @@
   "streakWins": "{count} V Racha",
   "streakLosses": "{count} D Racha",
   "noRecentGames": "Sin partidos recientes",
-  "eloLabel": "ELO: {value}"
+  "eloLabel": "ELO: {value}",
+  "nextGame": "Próximo partido",
+  "noGamesScheduled": "Aún no hay partidos organizados"
 }

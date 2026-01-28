@@ -2300,5 +2300,15 @@
     "placeholders": {
       "value": {"type": "String"}
     }
+  },
+
+  "nextGame": "Next Game",
+  "@nextGame": {
+    "description": "Header for next upcoming game section on homepage"
+  },
+
+  "noGamesScheduled": "No games organized yet",
+  "@noGamesScheduled": {
+    "description": "Message shown when user has no upcoming games"
   }
 }
