@@ -488,5 +488,7 @@
   "streakWins": "{count} V consécutives",
   "streakLosses": "{count} D consécutives",
   "noRecentGames": "Pas de matchs récents",
-  "eloLabel": "ELO : {value}"
+  "eloLabel": "ELO : {value}",
+  "nextGame": "Prochain match",
+  "noGamesScheduled": "Aucun match organisé pour le moment"
 }

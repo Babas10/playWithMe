@@ -7,6 +7,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import '../../../../../unit/core/data/repositories/mock_game_repository.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
@@ -73,7 +75,11 @@ void main() {
     if (sl.isRegistered<UserRepository>()) {
       sl.unregister<UserRepository>();
     }
+    if (sl.isRegistered<GameRepository>()) {
+      sl.unregister<GameRepository>();
+    }
     sl.registerSingleton<UserRepository>(mockUserRepository);
+    sl.registerSingleton<GameRepository>(MockGameRepository());
 
     when(() => mockAuthBloc.state).thenReturn(const AuthenticationAuthenticated(testUserEntity));
     // Use broadcast stream to allow multiple subscriptions

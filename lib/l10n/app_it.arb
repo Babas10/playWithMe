@@ -488,5 +488,7 @@
   "streakWins": "{count} V Serie",
   "streakLosses": "{count} S Serie",
   "noRecentGames": "Nessuna partita recente",
-  "eloLabel": "ELO: {value}"
+  "eloLabel": "ELO: {value}",
+  "nextGame": "Prossima partita",
+  "noGamesScheduled": "Nessuna partita organizzata ancora"
 }
