@@ -24,6 +24,11 @@ abstract class GameRepository {
   /// Get upcoming games for a user
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId);
 
+  /// Get the next upcoming game for a user (chronologically first)
+  /// Returns the single next scheduled game where user has joined
+  /// (playerIds or waitlistIds) and game is not cancelled.
+  Stream<GameModel?> getNextGameForUser(String userId);
+
   /// Get past games for a user
   Future<List<GameModel>> getPastGamesForUser(String userId, {int limit = 20});
 

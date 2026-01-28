@@ -19,7 +19,9 @@ import 'package:play_with_me/features/profile/presentation/bloc/player_stats/pla
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/expanded_stats_section.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/next_game_card.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_history_screen.dart';
+import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 
 /// Profile page displaying user information and account details
@@ -135,6 +137,41 @@ class _ProfileContent extends StatelessWidget {
               }
 
               return const SizedBox.shrink();
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Next Game Card
+          StreamBuilder(
+            stream: sl<GameRepository>().getNextGameForUser(state.user.uid),
+            builder: (context, snapshot) {
+              // Show loading state only initially, not on every rebuild
+              if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+                return const SizedBox.shrink();
+              }
+
+              final nextGame = snapshot.data;
+
+              return NextGameCard(
+                game: nextGame,
+                userId: state.user.uid,
+                onTap: nextGame != null
+                    ? () {
+                        final gameRepository = sl<GameRepository>();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (newContext) => RepositoryProvider.value(
+                              value: gameRepository,
+                              child: GameDetailsPage(
+                                gameId: nextGame.id,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+              );
             },
           ),
 

@@ -136,6 +136,21 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Stream<GameModel?> getNextGameForUser(String userId) {
+    // Reuse the existing getUpcomingGamesForUser and take the first game
+    return getUpcomingGamesForUser(userId).map((games) {
+      if (games.isEmpty) {
+        return null;
+      }
+      // Filter out cancelled games and return the first one
+      final validGames = games
+          .where((game) => game.status != GameStatus.cancelled)
+          .toList();
+      return validGames.isNotEmpty ? validGames.first : null;
+    });
+  }
+
+  @override
   Future<List<GameModel>> getPastGamesForUser(String userId, {int limit = 20}) async {
     final now = DateTime.now();
     return _games.values
