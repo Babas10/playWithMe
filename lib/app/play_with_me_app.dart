@@ -37,9 +37,12 @@ import 'package:play_with_me/features/profile/presentation/bloc/player_stats/pla
 import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/home_stats_section.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/next_game_card.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/next_training_session_card.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
+import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -479,6 +482,53 @@ class _HomeTab extends StatelessWidget {
                                         value: gameRepository,
                                         child: GameDetailsPage(
                                           gameId: nextGame.id,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              : null,
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Next Training Session Card
+                    StreamBuilder(
+                      stream: sl<TrainingSessionRepository>()
+                          .getNextTrainingSessionForUser(authState.user.uid),
+                      builder: (context, snapshot) {
+                        // Show loading state only initially
+                        if (snapshot.connectionState == ConnectionState.waiting &&
+                            !snapshot.hasData) {
+                          return const SizedBox.shrink();
+                        }
+
+                        // Log errors for debugging
+                        if (snapshot.hasError) {
+                          debugPrint(
+                              '🔴 [HomeTab] NextTrainingSession stream error: ${snapshot.error}');
+                        }
+
+                        final nextSession = snapshot.data;
+                        debugPrint(
+                            '🏋️ [HomeTab] NextTrainingSession snapshot - hasData: ${snapshot.hasData}, data: ${nextSession?.title ?? 'null'}');
+
+                        return NextTrainingSessionCard(
+                          session: nextSession,
+                          userId: authState.user.uid,
+                          onTap: nextSession != null
+                              ? () {
+                                  final trainingSessionRepository =
+                                      sl<TrainingSessionRepository>();
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (newContext) =>
+                                          RepositoryProvider.value(
+                                        value: trainingSessionRepository,
+                                        child: TrainingSessionDetailsPage(
+                                          trainingSessionId: nextSession.id,
                                         ),
                                       ),
                                     ),

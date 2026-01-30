@@ -1620,4 +1620,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noGamesScheduled => 'Aún no hay partidos organizados';
+
+  @override
+  String get nextTrainingSession => 'Próxima sesión de entrenamiento';
+
+  @override
+  String get noTrainingSessionsScheduled =>
+      'No hay sesiones de entrenamiento programadas';
 }

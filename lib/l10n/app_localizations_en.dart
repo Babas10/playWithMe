@@ -1604,4 +1604,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noGamesScheduled => 'No games organized yet';
+
+  @override
+  String get nextTrainingSession => 'Next Training Session';
+
+  @override
+  String get noTrainingSessionsScheduled => 'No training sessions scheduled';
 }

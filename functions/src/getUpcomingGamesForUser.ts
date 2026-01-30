@@ -61,9 +61,13 @@ export interface GetUpcomingGamesForUserResponse {
 /**
  * Handler function for getting upcoming games for the authenticated user
  *
+ * This function returns upcoming games from ALL groups the user is a member of,
+ * regardless of whether they have joined the game. This helps promote games
+ * and encourages participation.
+ *
  * Security:
  * - Validates user authentication
- * - Returns only games where user is in playerIds
+ * - Returns games from groups where user is a member
  * - Filters for future games (scheduledAt > now)
  * - Excludes cancelled games
  * - Uses Admin SDK to bypass Firestore security rules
@@ -94,66 +98,99 @@ export async function getUpcomingGamesForUserHandler(
   const db = admin.firestore();
 
   try {
-    // Query games where user is a player and scheduled in the future
-    const now = admin.firestore.Timestamp.now();
-    const gamesSnapshot = await db
-      .collection("games")
-      .where("playerIds", "array-contains", currentUserId)
-      .where("scheduledAt", ">", now)
-      .orderBy("scheduledAt", "asc")
+    // Step 1: Get all groups the user is a member of
+    const groupsSnapshot = await db
+      .collection("groups")
+      .where("memberIds", "array-contains", currentUserId)
       .get();
 
-    const games: GameData[] = [];
+    if (groupsSnapshot.empty) {
+      functions.logger.info("User is not a member of any groups", {
+        currentUserId,
+      });
+      return {games: []};
+    }
 
-    for (const doc of gamesSnapshot.docs) {
-      if (doc.exists) {
-        const gameData = doc.data();
+    const groupIds = groupsSnapshot.docs.map((doc) => doc.id);
 
-        // Exclude cancelled games
-        if (gameData.status === "cancelled") {
-          continue;
+    functions.logger.info("Found groups for user", {
+      currentUserId,
+      groupCount: groupIds.length,
+      groupIds,
+    });
+
+    // Step 2: Query games from those groups
+    // Firestore 'in' query is limited to 30 values, so we may need to batch
+    const now = admin.firestore.Timestamp.now();
+    const allGames: GameData[] = [];
+
+    // Process in batches of 30 (Firestore 'in' query limit)
+    const batchSize = 30;
+    for (let i = 0; i < groupIds.length; i += batchSize) {
+      const batchGroupIds = groupIds.slice(i, i + batchSize);
+
+      const gamesSnapshot = await db
+        .collection("games")
+        .where("groupId", "in", batchGroupIds)
+        .where("scheduledAt", ">", now)
+        .orderBy("scheduledAt", "asc")
+        .get();
+
+      for (const doc of gamesSnapshot.docs) {
+        if (doc.exists) {
+          const gameData = doc.data();
+
+          // Exclude cancelled games
+          if (gameData.status === "cancelled") {
+            continue;
+          }
+
+          // Map Firestore document to GameData interface
+          allGames.push({
+            id: doc.id,
+            title: gameData.title,
+            description: gameData.description,
+            groupId: gameData.groupId,
+            createdBy: gameData.createdBy,
+            createdAt: gameData.createdAt,
+            updatedAt: gameData.updatedAt,
+            scheduledAt: gameData.scheduledAt,
+            startedAt: gameData.startedAt,
+            endedAt: gameData.endedAt,
+            location: gameData.location,
+            status: gameData.status,
+            maxPlayers: gameData.maxPlayers,
+            minPlayers: gameData.minPlayers,
+            playerIds: gameData.playerIds || [],
+            waitlistIds: gameData.waitlistIds || [],
+            allowWaitlist: gameData.allowWaitlist ?? true,
+            allowPlayerInvites: gameData.allowPlayerInvites ?? true,
+            visibility: gameData.visibility || "group",
+            notes: gameData.notes,
+            equipment: gameData.equipment,
+            gameType: gameData.gameType,
+            skillLevel: gameData.skillLevel,
+            scores: gameData.scores,
+            winnerId: gameData.winnerId,
+            estimatedDuration: gameData.estimatedDuration,
+            weatherDependent: gameData.weatherDependent,
+            weatherNotes: gameData.weatherNotes,
+          });
         }
-
-        // Map Firestore document to GameData interface
-        games.push({
-          id: doc.id,
-          title: gameData.title,
-          description: gameData.description,
-          groupId: gameData.groupId,
-          createdBy: gameData.createdBy,
-          createdAt: gameData.createdAt,
-          updatedAt: gameData.updatedAt,
-          scheduledAt: gameData.scheduledAt,
-          startedAt: gameData.startedAt,
-          endedAt: gameData.endedAt,
-          location: gameData.location,
-          status: gameData.status,
-          maxPlayers: gameData.maxPlayers,
-          minPlayers: gameData.minPlayers,
-          playerIds: gameData.playerIds || [],
-          waitlistIds: gameData.waitlistIds || [],
-          allowWaitlist: gameData.allowWaitlist ?? true,
-          allowPlayerInvites: gameData.allowPlayerInvites ?? true,
-          visibility: gameData.visibility || "group",
-          notes: gameData.notes,
-          equipment: gameData.equipment,
-          gameType: gameData.gameType,
-          skillLevel: gameData.skillLevel,
-          scores: gameData.scores,
-          winnerId: gameData.winnerId,
-          estimatedDuration: gameData.estimatedDuration,
-          weatherDependent: gameData.weatherDependent,
-          weatherNotes: gameData.weatherNotes,
-        });
       }
     }
 
-    functions.logger.info("Upcoming games fetched successfully", {
-      currentUserId,
-      gamesCount: games.length,
+    // Sort all games by scheduledAt (in case we had multiple batches)
+    allGames.sort((a, b) => {
+      return a.scheduledAt.toMillis() - b.scheduledAt.toMillis();
     });
 
-    return {games};
+    functions.logger.info("Upcoming games fetched successfully", {
+      currentUserId,
+      gamesCount: allGames.length,
+    });
+
+    return {games: allGames};
   } catch (error) {
     // Re-throw HttpsError as-is
     if (error instanceof functions.https.HttpsError) {
@@ -177,16 +214,16 @@ export async function getUpcomingGamesForUserHandler(
 /**
  * Cloud Function to securely fetch upcoming games for the authenticated user.
  *
- * This function allows users to retrieve all their upcoming games (where they
- * are in the playerIds list). Games are filtered to show only future games
- * (scheduledAt > now) and exclude cancelled games.
+ * This function returns upcoming games from ALL groups the user is a member of,
+ * regardless of whether they have joined the game yet. This is designed to help
+ * promote games and encourage participation.
  *
  * Security:
  * - Requires authentication
- * - Returns only games where user is a participant (playerIds)
+ * - Returns games from groups where user is a member (memberIds)
  * - Uses Admin SDK to bypass security rules (efficient query)
- * - Filters for future games only
- * - Excludes cancelled games
+ * - Filters for future games only (scheduledAt > now)
+ * - Only returns scheduled games (excludes cancelled)
  *
  * Usage:
  * - Used by homepage to display next upcoming game
