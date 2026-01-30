@@ -2310,5 +2310,15 @@
   "noGamesScheduled": "No games organized yet",
   "@noGamesScheduled": {
     "description": "Message shown when user has no upcoming games"
+  },
+
+  "nextTrainingSession": "Next Training Session",
+  "@nextTrainingSession": {
+    "description": "Header for next upcoming training session section on homepage"
+  },
+
+  "noTrainingSessionsScheduled": "No training sessions scheduled",
+  "@noTrainingSessionsScheduled": {
+    "description": "Message shown when user has no upcoming training sessions"
   }
 }

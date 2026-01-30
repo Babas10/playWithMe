@@ -198,6 +198,76 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
   }
 
   @override
+  Stream<TrainingSessionModel?> getNextTrainingSessionForUser(String userId) {
+    final controller = StreamController<TrainingSessionModel?>();
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? groupsSub;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? sessionsSub;
+
+    groupsSub = _firestore
+        .collection('groups')
+        .where('memberIds', arrayContains: userId)
+        .snapshots()
+        .listen(
+      (groupsSnapshot) {
+        sessionsSub?.cancel();
+        final groupIds = groupsSnapshot.docs.map((d) => d.id).toList();
+        if (groupIds.isEmpty) {
+          controller.add(null);
+          return;
+        }
+
+        // Firestore 'whereIn' is limited to 30 values
+        sessionsSub = _firestore
+            .collection(_collection)
+            .where('groupId', whereIn: groupIds.take(30).toList())
+            .where('status', isEqualTo: 'scheduled')
+            .where('startTime', isGreaterThan: Timestamp.now())
+            .orderBy('startTime')
+            .snapshots()
+            .listen(
+          (sessionsSnapshot) {
+            final sessions = sessionsSnapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => TrainingSessionModel.fromFirestore(doc))
+                .toList();
+
+            controller.add(sessions.isEmpty ? null : sessions.first);
+          },
+          onError: (Object error) {
+            if (error is FirebaseException) {
+              controller.addError(TrainingSessionException(
+                  'Failed to get next training session: ${error.message}',
+                  code: error.code));
+            } else {
+              controller.addError(TrainingSessionException(
+                  'Failed to get next training session: $error',
+                  code: 'stream-error'));
+            }
+          },
+        );
+      },
+      onError: (Object error) {
+        if (error is FirebaseException) {
+          controller.addError(TrainingSessionException(
+              'Failed to get next training session: ${error.message}',
+              code: error.code));
+        } else {
+          controller.addError(TrainingSessionException(
+              'Failed to get next training session: $error',
+              code: 'stream-error'));
+        }
+      },
+    );
+
+    controller.onCancel = () {
+      groupsSub?.cancel();
+      sessionsSub?.cancel();
+    };
+
+    return controller.stream;
+  }
+
+  @override
   Stream<int> getUpcomingTrainingSessionsCount(String groupId) {
     try {
       final now = Timestamp.now();
