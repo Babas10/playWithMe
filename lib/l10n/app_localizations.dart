@@ -3001,6 +3001,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No games organized yet'**
   String get noGamesScheduled;
+
+  /// Header for next upcoming training session section on homepage
+  ///
+  /// In en, this message translates to:
+  /// **'Next Training Session'**
+  String get nextTrainingSession;
+
+  /// Message shown when user has no upcoming training sessions
+  ///
+  /// In en, this message translates to:
+  /// **'No training sessions scheduled'**
+  String get noTrainingSessionsScheduled;
 }
 
 class _AppLocalizationsDelegate

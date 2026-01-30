@@ -318,4 +318,18 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
   Future<void> cancelRecurringSessionInstance(String instanceId) async {
     // Mock implementation
   }
+
+  @override
+  Stream<TrainingSessionModel?> getNextTrainingSessionForUser(String userId) {
+    return _sessionsController.stream.map((sessions) {
+      final now = DateTime.now();
+      final upcoming = sessions
+          .where((session) =>
+              session.startTime.isAfter(now) &&
+              session.status == TrainingStatus.scheduled)
+          .toList()
+        ..sort((a, b) => a.startTime.compareTo(b.startTime));
+      return upcoming.isEmpty ? null : upcoming.first;
+    });
+  }
 }

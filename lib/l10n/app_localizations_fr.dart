@@ -1630,4 +1630,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noGamesScheduled => 'Aucun match organisé pour le moment';
+
+  @override
+  String get nextTrainingSession => 'Prochaine séance d\'entraînement';
+
+  @override
+  String get noTrainingSessionsScheduled =>
+      'Aucune séance d\'entraînement prévue';
 }

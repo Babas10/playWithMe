@@ -490,5 +490,7 @@
   "noRecentGames": "Nessuna partita recente",
   "eloLabel": "ELO: {value}",
   "nextGame": "Prossima partita",
-  "noGamesScheduled": "Nessuna partita organizzata ancora"
+  "noGamesScheduled": "Nessuna partita organizzata ancora",
+  "nextTrainingSession": "Prossimo allenamento",
+  "noTrainingSessionsScheduled": "Nessun allenamento programmato"
 }

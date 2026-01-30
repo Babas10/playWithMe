@@ -33,6 +33,11 @@ abstract class TrainingSessionRepository {
   /// Get training sessions for a user (across all groups they're members of)
   Stream<List<TrainingSessionModel>> getTrainingSessionsForUser(String userId);
 
+  /// Get the next upcoming training session for a user (chronologically first)
+  /// Returns the single next scheduled training session where user has joined
+  /// and session is not cancelled.
+  Stream<TrainingSessionModel?> getNextTrainingSessionForUser(String userId);
+
   /// Get count of upcoming training sessions for a group
   Stream<int> getUpcomingTrainingSessionsCount(String groupId);
 
