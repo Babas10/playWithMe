@@ -114,7 +114,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.text('Game Title'), findsOneWidget);
-        expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
+        // One in form field + one in PlayWithMeAppBar title
+        expect(find.byIcon(Icons.sports_volleyball), findsNWidgets(2));
       });
 
       testWidgets('renders description input field', (tester) async {
