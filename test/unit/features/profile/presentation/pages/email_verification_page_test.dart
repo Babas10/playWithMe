@@ -2,8 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_state.dart';
@@ -37,6 +39,13 @@ void main() {
     return MediaQuery(
       data: const MediaQueryData(size: Size(800, 1200)), // Larger viewport for tests
       child: MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
         home: BlocProvider<EmailVerificationBloc>.value(
           value: mockBloc,
           child: const EmailVerificationPage(),

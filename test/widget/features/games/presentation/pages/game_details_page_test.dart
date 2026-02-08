@@ -146,9 +146,10 @@ void main() {
 
     testWidgets('displays "I\'m In" button when user is not playing',
         (tester) async {
-      // Create a game where test user is NOT a player
+      // Create a game where test user is NOT a player and NOT the creator
       final gameWithoutUser = TestGameData.testGame.copyWith(
         playerIds: ['other-user-1', 'other-user-2'],
+        createdBy: 'other-creator',
       );
       mockGameRepository.addGame(gameWithoutUser);
 
@@ -162,7 +163,7 @@ void main() {
       expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
     });
 
-    testWidgets('displays "I\'m Out" button when user is playing',
+    testWidgets('displays leave option via popup menu when user is playing',
         (tester) async {
       mockGameRepository.addGame(TestGameData.testGame);
 
@@ -172,15 +173,16 @@ void main() {
       });
       await tester.pumpAndSettle();
 
-      expect(find.text('I\'m Out'), findsOneWidget);
-      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
+      // In the redesign, users leave via a 3-dot popup menu in the player list
+      expect(find.byIcon(Icons.more_vert), findsOneWidget);
     });
 
     testWidgets('displays "Join Waitlist" button when game is full',
         (tester) async {
-      // Create a full game where the test user is NOT a player
+      // Create a full game where the test user is NOT a player and NOT the creator
       final fullGameWithoutTestUser = TestGameData.fullGame.copyWith(
         playerIds: ['other-user-1', 'other-user-2'],
+        createdBy: 'other-creator',
       );
       mockGameRepository.addGame(fullGameWithoutTestUser);
 
@@ -205,6 +207,7 @@ void main() {
     testWidgets('tapping "I\'m In" button triggers join event', (tester) async {
       final gameWithoutUser = TestGameData.testGame.copyWith(
         playerIds: ['other-user-1'],
+        createdBy: 'other-creator',
       );
       mockGameRepository.addGame(gameWithoutUser);
 
@@ -228,7 +231,7 @@ void main() {
       expect(updatedGame!.playerIds.contains(testUserId), true);
     });
 
-    testWidgets('tapping "I\'m Out" button triggers leave event',
+    testWidgets('tapping leave via popup menu triggers leave event',
         (tester) async {
       mockGameRepository.addGame(TestGameData.testGame);
 
@@ -238,10 +241,18 @@ void main() {
       });
       await tester.pumpAndSettle();
 
-      final button = find.text('I\'m Out');
-      expect(button, findsOneWidget);
+      // Open the 3-dot popup menu
+      final menuButton = find.byIcon(Icons.more_vert);
+      expect(menuButton, findsOneWidget);
 
-      await tester.tap(button);
+      await tester.tap(menuButton);
+      await tester.pumpAndSettle();
+
+      // Tap "Leave Game" from the popup menu
+      final leaveOption = find.text('Leave Game');
+      expect(leaveOption, findsOneWidget);
+
+      await tester.tap(leaveOption);
       await tester.runAsync(() async {
         await Future.delayed(const Duration(milliseconds: 100));
       });

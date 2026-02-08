@@ -94,7 +94,8 @@ void main() {
       testWidgets('renders volleyball icon', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
+        // One in page body (decorative) + one in PlayWithMeAppBar title
+        expect(find.byIcon(Icons.sports_volleyball), findsNWidgets(2));
       });
 
       testWidgets('renders email input field', (tester) async {

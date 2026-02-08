@@ -1,9 +1,11 @@
 // Widget tests for HeadToHeadPage verifying UI rendering and state transitions.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/pages/head_to_head_page.dart';
@@ -98,6 +100,13 @@ void main() {
 
   Widget createTestWidget() {
     return const MaterialApp(
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [Locale('en')],
       home: HeadToHeadPage(
         userId: testUserId,
         opponentId: testOpponentId,
