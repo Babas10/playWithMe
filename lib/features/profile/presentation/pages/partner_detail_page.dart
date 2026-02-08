@@ -1,5 +1,6 @@
 // Partner detail screen showing comprehensive teammate statistics.
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/teammate_stats.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
@@ -30,8 +31,9 @@ class PartnerDetailPage extends StatelessWidget {
           partnerId: partnerId,
         )),
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.partnerDetailsTitle),
+        appBar: PlayWithMeAppBar.build(
+          context: context,
+          title: AppLocalizations.of(context)!.partnerDetailsTitle,
         ),
         body: BlocBuilder<PartnerDetailBloc, PartnerDetailState>(
           builder: (context, state) {

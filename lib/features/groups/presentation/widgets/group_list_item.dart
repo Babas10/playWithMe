@@ -1,6 +1,7 @@
 // Widget displaying a single group in the list with name, member count, and photo
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class GroupListItem extends StatelessWidget {
@@ -66,7 +67,7 @@ class GroupListItem extends StatelessWidget {
                         Text(
                           l10n.memberCount(group.memberCount),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                         ),
                         const SizedBox(width: 16),
@@ -118,10 +119,10 @@ class GroupListItem extends StatelessWidget {
       backgroundColor: _getGroupColor(),
       child: Text(
         _getGroupInitials(),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: AppColors.secondary,
         ),
       ),
     );
@@ -136,19 +137,8 @@ class GroupListItem extends StatelessWidget {
   }
 
   Color _getGroupColor() {
-    // Generate a consistent color based on group name
-    final hash = group.name.hashCode;
-    final colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.purple,
-      Colors.orange,
-      Colors.teal,
-      Colors.indigo,
-      Colors.pink,
-      Colors.cyan,
-    ];
-    return colors[hash.abs() % colors.length];
+    // Use the app theme primary color for group avatars
+    return AppColors.primary;
   }
 
   String _getPrivacyLabel(BuildContext context, GroupPrivacy privacy) {

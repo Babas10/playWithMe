@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 import '../../../../core/data/models/game_model.dart';
@@ -45,9 +47,9 @@ class GameResultViewPage extends StatelessWidget {
 
     if (game.result == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.gameResults),
-          elevation: 0,
+        appBar: PlayWithMeAppBar.build(
+          context: context,
+          title: l10n.gameResults,
         ),
         body: Center(
           child: Padding(
@@ -86,9 +88,9 @@ class GameResultViewPage extends StatelessWidget {
         : l10n.teamB;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.gameResults),
-        elevation: 0,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: l10n.gameResults,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -116,6 +118,7 @@ class GameResultViewPage extends StatelessWidget {
               l10n.individualGames,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
                   ),
             ),
             const SizedBox(height: 16),
@@ -152,7 +155,6 @@ class _OverallResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final gamesWon = result.gamesWon;
-    final winnerColor = result.overallWinner == 'teamA' ? Colors.blue : Colors.red;
 
     return Card(
       elevation: 3,
@@ -161,8 +163,8 @@ class _OverallResultCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           gradient: LinearGradient(
             colors: [
-              winnerColor.withOpacity(0.08),
-              winnerColor.withOpacity(0.03),
+              AppColors.primary.withValues(alpha: 0.15),
+              AppColors.primary.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -174,12 +176,13 @@ class _OverallResultCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.emoji_events, color: winnerColor, size: 28),
+                  Icon(Icons.emoji_events, color: AppColors.primary, size: 28),
                   const SizedBox(width: 10),
                   Text(
                     l10n.finalScore,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
                         ),
                   ),
                 ],
@@ -193,7 +196,6 @@ class _OverallResultCard extends StatelessWidget {
                       teamName: teamAName,
                       score: gamesWon['teamA'] ?? 0,
                       isWinner: result.overallWinner == 'teamA',
-                      winnerColor: Colors.blue,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -202,7 +204,6 @@ class _OverallResultCard extends StatelessWidget {
                       teamName: teamBName,
                       score: gamesWon['teamB'] ?? 0,
                       isWinner: result.overallWinner == 'teamB',
-                      winnerColor: Colors.red,
                     ),
                   ),
                 ],
@@ -219,20 +220,20 @@ class _TeamScore extends StatelessWidget {
   final String teamName;
   final int score;
   final bool isWinner;
-  final Color winnerColor;
 
   const _TeamScore({
     required this.teamName,
     required this.score,
     required this.isWinner,
-    required this.winnerColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Use winner color for winner, neutral grey for loser
-    final displayColor = isWinner ? winnerColor : Colors.grey.shade600;
-    final backgroundColor = isWinner ? winnerColor : Colors.grey.shade300;
+    // Winner: blue background with white text
+    // Loser: yellow background with blue text
+    final backgroundColor = isWinner ? AppColors.secondary : AppColors.primary;
+    final textColor = isWinner ? Colors.white : AppColors.secondary;
+    final borderColor = isWinner ? AppColors.secondary : AppColors.primary;
 
     return Column(
       children: [
@@ -243,7 +244,7 @@ class _TeamScore extends StatelessWidget {
             color: backgroundColor,
             shape: BoxShape.circle,
             border: Border.all(
-              color: displayColor,
+              color: borderColor,
               width: isWinner ? 2.5 : 1.5,
             ),
           ),
@@ -253,7 +254,7 @@ class _TeamScore extends StatelessWidget {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: isWinner ? Colors.white : displayColor,
+                color: textColor,
               ),
             ),
           ),
@@ -266,7 +267,7 @@ class _TeamScore extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: isWinner ? FontWeight.bold : FontWeight.w500,
-                color: displayColor,
+                color: AppColors.secondary,
                 height: 1.2,
               ),
         ),
@@ -311,12 +312,13 @@ class _EloUpdatesCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.trending_up, size: 20),
+                Icon(Icons.trending_up, size: 20, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Text(
                   l10n.eloRatingChanges,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
                       ),
                 ),
               ],
@@ -420,7 +422,6 @@ class _IndividualGameCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final setsWon = game.setsWon;
-    final winnerColor = game.winner == 'teamA' ? Colors.blue : Colors.red;
 
     return Card(
       margin: EdgeInsets.only(bottom: isLast ? 0 : 12),
@@ -435,7 +436,7 @@ class _IndividualGameCard extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: winnerColor.withOpacity(0.15),
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Center(
@@ -443,7 +444,7 @@ class _IndividualGameCard extends StatelessWidget {
                       '$gameNumber',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: winnerColor,
+                        color: AppColors.secondary,
                         fontSize: 16,
                       ),
                     ),
@@ -454,6 +455,7 @@ class _IndividualGameCard extends StatelessWidget {
                   l10n.gameNumber(gameNumber),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
                       ),
                 ),
               ],
@@ -467,7 +469,7 @@ class _IndividualGameCard extends StatelessWidget {
                   l10n.setsScore(setsWon['teamA'] ?? 0, setsWon['teamB'] ?? 0),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey[700],
+                        color: AppColors.secondary,
                       ),
                 ),
               ],
@@ -491,6 +493,7 @@ class _IndividualGameCard extends StatelessWidget {
                         l10n.setNumber(set.setNumber),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w500,
+                              color: AppColors.secondary,
                             ),
                       ),
                     ),
@@ -506,31 +509,31 @@ class _IndividualGameCard extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: teamAWon
-                                  ? Colors.blue.withOpacity(0.2)
-                                  : Colors.grey.withOpacity(0.1),
+                                  ? AppColors.secondary
+                                  : AppColors.primary,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: teamAWon ? Colors.blue : Colors.grey,
+                                color: teamAWon ? AppColors.secondary : AppColors.primary,
                                 width: teamAWon ? 2 : 1,
                               ),
                             ),
                             child: Text(
                               set.teamAPoints.toString(),
                               style: TextStyle(
-                                fontWeight:
-                                    teamAWon ? FontWeight.bold : FontWeight.normal,
-                                color: teamAWon ? Colors.blue : Colors.grey[700],
+                                fontWeight: FontWeight.bold,
+                                color: teamAWon ? Colors.white : AppColors.secondary,
                                 fontSize: 16,
                               ),
                             ),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               '-',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                color: AppColors.secondary,
                               ),
                             ),
                           ),
@@ -541,20 +544,19 @@ class _IndividualGameCard extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: teamBWon
-                                  ? Colors.red.withOpacity(0.2)
-                                  : Colors.grey.withOpacity(0.1),
+                                  ? AppColors.secondary
+                                  : AppColors.primary,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: teamBWon ? Colors.red : Colors.grey,
+                                color: teamBWon ? AppColors.secondary : AppColors.primary,
                                 width: teamBWon ? 2 : 1,
                               ),
                             ),
                             child: Text(
                               set.teamBPoints.toString(),
                               style: TextStyle(
-                                fontWeight:
-                                    teamBWon ? FontWeight.bold : FontWeight.normal,
-                                color: teamBWon ? Colors.red : Colors.grey[700],
+                                fontWeight: FontWeight.bold,
+                                color: teamBWon ? Colors.white : AppColors.secondary,
                                 fontSize: 16,
                               ),
                             ),

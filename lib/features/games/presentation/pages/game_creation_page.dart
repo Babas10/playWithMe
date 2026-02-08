@@ -1,6 +1,7 @@
 // Game creation page for creating new games with form validation and group selection.
 
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
@@ -127,9 +128,9 @@ class _GameCreationPageState extends State<GameCreationPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.createGame),
-        centerTitle: true,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: l10n.createGame,
       ),
       body: BlocConsumer<GameCreationBloc, GameCreationState>(
         listener: (context, state) {

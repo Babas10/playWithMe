@@ -1,5 +1,6 @@
 // Head-to-head rivalry screen showing comprehensive opponent statistics.
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
@@ -28,8 +29,9 @@ class HeadToHeadPage extends StatelessWidget {
           opponentId: opponentId,
         )),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Head-to-Head'),
+        appBar: PlayWithMeAppBar.build(
+          context: context,
+          title: 'Head-to-Head',
         ),
         body: BlocBuilder<HeadToHeadBloc, HeadToHeadState>(
           builder: (context, state) {

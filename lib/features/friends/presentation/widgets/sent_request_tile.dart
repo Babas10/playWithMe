@@ -19,9 +19,13 @@ class SentRequestTile extends StatelessWidget {
 
     return ListTile(
       leading: CircleAvatar(
+        backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
         child: Text(
           _getInitials(request.recipientName),
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF004E64),
+          ),
         ),
       ),
       title: Text(

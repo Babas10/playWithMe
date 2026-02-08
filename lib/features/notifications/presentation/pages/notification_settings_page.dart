@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
@@ -28,8 +29,9 @@ class _NotificationSettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notification Settings'),
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: 'Notification Settings',
       ),
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {

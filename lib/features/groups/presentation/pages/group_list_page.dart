@@ -1,5 +1,6 @@
 // Displays a list of groups that the current user is a member of with real-time updates
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
@@ -26,8 +27,10 @@ class GroupListPage extends StatelessWidget {
       builder: (context, authState) {
         if (authState is! AuthenticationAuthenticated) {
           return Scaffold(
-            appBar: AppBar(
-              title: Text(AppLocalizations.of(context)!.myGroups),
+            appBar: PlayWithMeAppBar.build(
+              context: context,
+              title: AppLocalizations.of(context)!.myGroups,
+              showUserActions: false,
             ),
             body: Center(
               child: Text(AppLocalizations.of(context)!.pleaseLogInToViewGroups),
@@ -133,6 +136,10 @@ class GroupListPage extends StatelessWidget {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
+        foregroundColor: const Color(0xFF004E64),
+        elevation: 0,
+        highlightElevation: 0,
         onPressed: () => _navigateToCreateGroup(context),
         icon: const Icon(Icons.add),
         label: Text(AppLocalizations.of(context)!.createGroup),

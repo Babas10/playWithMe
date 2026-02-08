@@ -1,6 +1,7 @@
 // Game History Screen with pagination and filters (Story 14.7)
 
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
@@ -154,9 +155,10 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.gameHistory),
-        actions: [
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: l10n.gameHistory,
+        extraActions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilterDialog,

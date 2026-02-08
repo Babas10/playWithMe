@@ -1,5 +1,6 @@
 // Confirmation dialogs for member management actions
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 
@@ -52,7 +53,8 @@ Future<bool> showDemoteConfirmationDialog(
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.orange,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.secondary,
               ),
               child: Text(l10n.demote),
             ),

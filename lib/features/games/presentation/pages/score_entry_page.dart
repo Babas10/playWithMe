@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -41,19 +43,13 @@ class _ScoreEntryView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.enterScores),
-        elevation: 0,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: l10n.enterScores,
       ),
       body: BlocConsumer<ScoreEntryBloc, ScoreEntryState>(
         listener: (context, state) {
           if (state is ScoreEntrySaved) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.scoresSavedSuccess),
-                backgroundColor: Colors.green,
-              ),
-            );
             Navigator.of(context).pop();
           } else if (state is ScoreEntryError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -239,10 +235,23 @@ class _GameCard extends StatelessWidget {
                   'Game ${gameIndex + 1}',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
                       ),
                 ),
                 if (gameData.isComplete)
-                  const Icon(Icons.check_circle, color: Colors.green),
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: AppColors.secondary,
+                      size: 16,
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 12),
@@ -253,6 +262,7 @@ class _GameCard extends StatelessWidget {
             const SizedBox(height: 16),
             ...List.generate(gameData.numberOfSets, (setIndex) {
               return _SetScoreInput(
+                key: ValueKey('game_${gameIndex}_set_$setIndex'),
                 gameIndex: gameIndex,
                 setIndex: setIndex,
                 setData: setIndex < gameData.sets.length
@@ -314,6 +324,7 @@ class _SetScoreInput extends StatefulWidget {
   final SetScoreData setData;
 
   const _SetScoreInput({
+    super.key,
     required this.gameIndex,
     required this.setIndex,
     required this.setData,
@@ -326,6 +337,10 @@ class _SetScoreInput extends StatefulWidget {
 class _SetScoreInputState extends State<_SetScoreInput> {
   late final TextEditingController _teamAController;
   late final TextEditingController _teamBController;
+  final FocusNode _teamAFocusNode = FocusNode();
+  final FocusNode _teamBFocusNode = FocusNode();
+  bool _teamAFocused = false;
+  bool _teamBFocused = false;
 
   @override
   void initState() {
@@ -336,6 +351,16 @@ class _SetScoreInputState extends State<_SetScoreInput> {
     _teamBController = TextEditingController(
       text: widget.setData.teamBPoints?.toString() ?? '',
     );
+    _teamAFocusNode.addListener(_onTeamAFocusChange);
+    _teamBFocusNode.addListener(_onTeamBFocusChange);
+  }
+
+  void _onTeamAFocusChange() {
+    setState(() => _teamAFocused = _teamAFocusNode.hasFocus);
+  }
+
+  void _onTeamBFocusChange() {
+    setState(() => _teamBFocused = _teamBFocusNode.hasFocus);
   }
 
   @override
@@ -362,8 +387,12 @@ class _SetScoreInputState extends State<_SetScoreInput> {
 
   @override
   void dispose() {
+    _teamAFocusNode.removeListener(_onTeamAFocusChange);
+    _teamBFocusNode.removeListener(_onTeamBFocusChange);
     _teamAController.dispose();
     _teamBController.dispose();
+    _teamAFocusNode.dispose();
+    _teamBFocusNode.dispose();
     super.dispose();
   }
 
@@ -387,10 +416,17 @@ class _SetScoreInputState extends State<_SetScoreInput> {
                 Expanded(
                   child: TextField(
                     key: Key('team_a_score_${widget.gameIndex}_${widget.setIndex}'),
-                    decoration: const InputDecoration(
+                    focusNode: _teamAFocusNode,
+                    decoration: InputDecoration(
                       labelText: 'Team A',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      floatingLabelStyle: TextStyle(
+                        color: _teamAFocused ? AppColors.secondary : Colors.grey,
+                      ),
+                      border: const OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -417,10 +453,17 @@ class _SetScoreInputState extends State<_SetScoreInput> {
                 Expanded(
                   child: TextField(
                     key: Key('team_b_score_${widget.gameIndex}_${widget.setIndex}'),
-                    decoration: const InputDecoration(
+                    focusNode: _teamBFocusNode,
+                    decoration: InputDecoration(
                       labelText: 'Team B',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      floatingLabelStyle: TextStyle(
+                        color: _teamBFocused ? AppColors.secondary : Colors.grey,
+                      ),
+                      border: const OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.primary, width: 2),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -448,7 +491,19 @@ class _SetScoreInputState extends State<_SetScoreInput> {
           SizedBox(
             width: 24,
             child: widget.setData.isValid
-                ? const Icon(Icons.check, color: Colors.green, size: 20)
+                ? Container(
+                    width: 20,
+                    height: 20,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: AppColors.secondary,
+                      size: 14,
+                    ),
+                  )
                 : widget.setData.isComplete
                     ? Tooltip(
                         message: widget.setData.validationError ?? 'Invalid score',
@@ -483,10 +538,10 @@ class _SaveButton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: AppColors.bottomNavBackground,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.shadow,
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -503,7 +558,7 @@ class _SaveButton extends StatelessWidget {
                   'Overall Winner: ${overallWinner == "teamA" ? "Team A" : "Team B"}',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.secondary,
                       ),
                 ),
               ),
