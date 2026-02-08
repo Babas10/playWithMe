@@ -1,5 +1,6 @@
 // Full ELO history screen with comprehensive rating timeline.
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
@@ -26,9 +27,10 @@ class FullEloHistoryPage extends StatelessWidget {
         userRepository: sl<UserRepository>(),
       )..add(EloHistoryEvent.loadHistory(userId: userId, limit: 100)),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('ELO History'),
-          actions: [
+        appBar: PlayWithMeAppBar.build(
+          context: context,
+          title: 'ELO History',
+          extraActions: [
             BlocBuilder<EloHistoryBloc, EloHistoryState>(
               builder: (context, state) {
                 if (state is! EloHistoryLoaded) return const SizedBox.shrink();

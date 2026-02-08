@@ -374,6 +374,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterResults => 'Enter Results';
 
   @override
+  String get leaveGame => 'Leave Game';
+
+  @override
+  String get leaveWaitlist => 'Leave Waitlist';
+
+  @override
   String get confirm => 'Confirm';
 
   @override
@@ -825,7 +831,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get joined => 'JOINED';
 
   @override
-  String get training => 'TRAINING';
+  String get training => 'Training';
+
+  @override
+  String get gameLabel => 'GAME';
 
   @override
   String minParticipants(int count) {
@@ -990,6 +999,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createFirstGame => 'Create the first game!';
+
+  @override
+  String get noActivitiesYet => 'No activities yet';
+
+  @override
+  String get createFirstActivity => 'Create the first activity!';
 
   @override
   String get gamesWon => 'games won';

@@ -1,5 +1,7 @@
 // Page for inviting friends from My Community to a group
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
@@ -64,9 +66,9 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
   Future<void> _sendInvitations(BuildContext context, String inviterUid, String inviterName) async {
     if (_selectedFriendIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select at least one friend to invite'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: const Text('Please select at least one friend to invite'),
+          backgroundColor: AppColors.primary,
         ),
       );
       return;
@@ -132,7 +134,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Failed to send $failureCount invitation(s)'),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.primary,
             ),
           );
         }
@@ -152,8 +154,10 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
       builder: (context, authState) {
         if (authState is! AuthenticationAuthenticated) {
           return Scaffold(
-            appBar: AppBar(
-              title: const Text('Invite Members'),
+            appBar: PlayWithMeAppBar.build(
+              context: context,
+              title: 'Invite Members',
+              showUserActions: false,
             ),
             body: const Center(
               child: Text('Please log in to invite members'),
@@ -164,8 +168,10 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
         // Check if FriendRepository is available
         if (_friendRepository == null) {
           return Scaffold(
-            appBar: AppBar(
-              title: const Text('Invite Members'),
+            appBar: PlayWithMeAppBar.build(
+              context: context,
+              title: 'Invite Members',
+              showUserActions: false,
             ),
             body: const Center(
               child: Text('Friend list not available'),
@@ -174,9 +180,9 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
         }
 
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Invite Members'),
-            centerTitle: true,
+          appBar: PlayWithMeAppBar.build(
+            context: context,
+            title: 'Invite Members',
           ),
           body: Column(
             children: [
@@ -184,18 +190,18 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Card(
-                  color: Colors.blue.shade50,
+                  color: AppColors.primary.withValues(alpha: 0.2),
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.blue.shade700),
+                        Icon(Icons.info_outline, color: AppColors.secondary),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Select friends from your community to invite to this group',
                             style: TextStyle(
-                              color: Colors.blue.shade900,
+                              color: AppColors.secondary,
                               fontSize: 14,
                             ),
                           ),

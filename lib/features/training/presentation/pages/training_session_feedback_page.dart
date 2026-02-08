@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -51,8 +53,9 @@ class _TrainingSessionFeedbackPageState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.sessionFeedback),
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: l10n.sessionFeedback,
       ),
       body: BlocConsumer<TrainingFeedbackBloc, TrainingFeedbackState>(
         listener: (context, state) {
@@ -108,10 +111,10 @@ class _TrainingSessionFeedbackPageState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.check_circle_outline,
               size: 80,
-              color: Colors.green,
+              color: AppColors.primary,
             ),
             const SizedBox(height: 24),
             Text(
@@ -243,7 +246,7 @@ class _TrainingSessionFeedbackPageState
                   : () => _submitFeedback(context),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Colors.blue,
+                backgroundColor: AppColors.secondary,
                 foregroundColor: Colors.white,
               ),
               child: isSubmitting
@@ -267,22 +270,22 @@ class _TrainingSessionFeedbackPageState
 
             // Anonymous reminder
             Card(
-              color: Colors.blue,
+              color: AppColors.primary,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.privacy_tip_outlined,
-                      color: Colors.white,
+                      color: AppColors.secondary,
                       size: 20,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         l10n.feedbackPrivacyNotice,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColors.secondary,
                           fontSize: 12,
                         ),
                       ),
@@ -365,7 +368,7 @@ class _TrainingSessionFeedbackPageState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.pleaseRateAllCategories),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.primary,
         ),
       );
       return;

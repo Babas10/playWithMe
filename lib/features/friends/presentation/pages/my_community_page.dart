@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_event.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_state.dart';
@@ -52,52 +53,62 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-        appBar: AppBar(
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: [
-              Tab(text: l10n.friends),
-              BlocBuilder<FriendRequestCountBloc, FriendRequestCountState>(
-                builder: (context, state) {
-                  final count = state is FriendRequestCountLoaded ? state.count : 0;
-                  return Tab(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(l10n.requests),
-                        if (count > 0) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 18,
-                              minHeight: 18,
-                            ),
-                            child: Text(
-                              count > 9 ? '9+' : '$count',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+        body: Column(
+          children: [
+            Container(
+              color: AppColors.scaffoldBackground,
+              child: TabBar(
+                controller: _tabController,
+                labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+                indicatorSize: TabBarIndicatorSize.label,
+                indicatorColor: AppColors.primary,
+                labelColor: AppColors.secondary,
+                unselectedLabelColor: AppColors.secondary,
+                tabs: [
+                  Tab(height: 40, text: l10n.friends),
+                  BlocBuilder<FriendRequestCountBloc, FriendRequestCountState>(
+                    builder: (context, state) {
+                      final count = state is FriendRequestCountLoaded ? state.count : 0;
+                      return Tab(
+                        height: 40,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(l10n.requests),
+                            if (count > 0) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 18,
+                                  minHeight: 18,
+                                ),
+                                child: Text(
+                                  count > 9 ? '9+' : '$count',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
-                },
+                            ],
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        body: BlocListener<FriendBloc, FriendState>(
+            ),
+            Expanded(
+              child: BlocListener<FriendBloc, FriendState>(
               listener: (context, state) {
                 state.when(
                   initial: () {},
@@ -230,6 +241,9 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
             );
                 },
               ),
+            ),
+          ),
+          ],
         ),
         floatingActionButton: _buildAddFriendButton(context, l10n),
       );
@@ -238,6 +252,10 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
   Widget _buildAddFriendButton(BuildContext context, AppLocalizations l10n) {
     return FloatingActionButton.extended(
       heroTag: 'add_friend_fab', // Unique tag to avoid Hero conflicts
+      backgroundColor: AppColors.primary.withValues(alpha: 0.25),
+      foregroundColor: AppColors.secondary,
+      elevation: 0,
+      highlightElevation: 0,
       onPressed: () {
         // Capture the bloc before navigation to avoid context issues
         final friendBloc = context.read<FriendBloc>();

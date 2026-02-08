@@ -788,6 +788,18 @@ abstract class AppLocalizations {
   /// **'Enter Results'**
   String get enterResults;
 
+  /// Leave game menu option
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Game'**
+  String get leaveGame;
+
+  /// Leave waitlist menu option
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Waitlist'**
+  String get leaveWaitlist;
+
   /// Confirm button text
   ///
   /// In en, this message translates to:
@@ -1649,8 +1661,14 @@ abstract class AppLocalizations {
   /// Training badge
   ///
   /// In en, this message translates to:
-  /// **'TRAINING'**
+  /// **'Training'**
   String get training;
+
+  /// Game badge label
+  ///
+  /// In en, this message translates to:
+  /// **'GAME'**
+  String get gameLabel;
 
   /// Minimum participants label
   ///
@@ -1957,6 +1975,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create the first game!'**
   String get createFirstGame;
+
+  /// Empty state title for activities list
+  ///
+  /// In en, this message translates to:
+  /// **'No activities yet'**
+  String get noActivitiesYet;
+
+  /// Empty state call to action for activities
+  ///
+  /// In en, this message translates to:
+  /// **'Create the first activity!'**
+  String get createFirstActivity;
 
   /// Games won label
   ///

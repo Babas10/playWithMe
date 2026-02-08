@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 
 /// Widget for selecting friends to invite to a group
@@ -178,17 +179,17 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
 
   Widget _buildEmptyState() {
     return Card(
-      color: Colors.blue.shade50,
+      color: AppColors.primary.withValues(alpha: 0.2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Icon(Icons.people_outline, color: Colors.blue.shade700, size: 48),
+            Icon(Icons.people_outline, color: AppColors.secondary, size: 48),
             const SizedBox(height: 8),
             Text(
               'No Friends Yet',
               style: TextStyle(
-                color: Colors.blue.shade900,
+                color: AppColors.secondary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -196,7 +197,7 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
             const SizedBox(height: 4),
             Text(
               'Add friends to invite them to groups',
-              style: TextStyle(color: Colors.blue.shade800),
+              style: TextStyle(color: AppColors.secondary),
               textAlign: TextAlign.center,
             ),
           ],
@@ -216,14 +217,20 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
             children: [
               TextButton.icon(
                 onPressed: _selectedFriendIds.length == _friends!.length ? null : _selectAll,
-                icon: const Icon(Icons.check_box, size: 18),
-                label: const Text('Select All'),
+                icon: Icon(Icons.check_box, size: 18, color: AppColors.secondary),
+                label: Text(
+                  'Select All',
+                  style: TextStyle(color: AppColors.secondary),
+                ),
               ),
               const SizedBox(width: 8),
               TextButton.icon(
                 onPressed: _selectedFriendIds.isEmpty ? null : _clearAll,
-                icon: const Icon(Icons.clear, size: 18),
-                label: const Text('Clear All'),
+                icon: Icon(Icons.clear, size: 18, color: AppColors.secondary),
+                label: Text(
+                  'Clear All',
+                  style: TextStyle(color: AppColors.secondary),
+                ),
               ),
             ],
           ),
@@ -246,27 +253,36 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
               return CheckboxListTile(
                 value: isSelected,
                 onChanged: (_) => _toggleSelection(friend.uid),
+                activeColor: AppColors.primary,
+                checkColor: AppColors.secondary,
                 title: Text(
                   friend.displayNameOrEmail,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: isSelected ? AppColors.secondary : null,
+                  ),
                 ),
                 subtitle: friend.displayName != null
                     ? Text(
                         friend.email,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: isSelected ? AppColors.secondary.withValues(alpha: 0.7) : Colors.grey[600],
                         ),
                       )
                     : null,
                 secondary: CircleAvatar(
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.25),
                   backgroundImage: friend.photoUrl != null
                       ? NetworkImage(friend.photoUrl!)
                       : null,
                   child: friend.photoUrl == null
                       ? Text(
                           friend.displayNameOrEmail[0].toUpperCase(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondary,
+                          ),
                         )
                       : null,
                 ),

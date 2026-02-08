@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
@@ -73,9 +75,9 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Group'),
-        centerTitle: true,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: 'Create Group',
       ),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
@@ -139,11 +141,15 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                       TextFormField(
                         controller: _nameController,
                         enabled: !isLoading,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Group Name *',
                           hintText: 'e.g., Beach Volleyball Crew',
-                          prefixIcon: Icon(Icons.group),
-                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.group, color: AppColors.secondary),
+                          border: const OutlineInputBorder(),
+                          floatingLabelStyle: TextStyle(color: AppColors.secondary),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.primary, width: 2),
+                          ),
                           helperText: 'Choose a name for your group (min 3 characters)',
                         ),
                         validator: _validateGroupName,
@@ -157,11 +163,15 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                       TextFormField(
                         controller: _descriptionController,
                         enabled: !isLoading,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Description (Optional)',
                           hintText: 'e.g., Weekly beach volleyball games at Santa Monica',
-                          prefixIcon: Icon(Icons.description),
-                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.description, color: AppColors.secondary),
+                          border: const OutlineInputBorder(),
+                          floatingLabelStyle: TextStyle(color: AppColors.secondary),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.primary, width: 2),
+                          ),
                           helperText: 'Add a description to help others understand your group',
                           alignLabelWithHint: true,
                         ),
@@ -188,18 +198,18 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
 
                       // Info card
                       Card(
-                        color: Colors.blue.shade50,
+                        color: AppColors.primary.withValues(alpha: 0.2),
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
                             children: [
-                              Icon(Icons.info_outline, color: Colors.blue.shade700),
+                              Icon(Icons.info_outline, color: AppColors.secondary),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   'You will automatically become the group admin and first member',
                                   style: TextStyle(
-                                    color: Colors.blue.shade900,
+                                    color: AppColors.secondary,
                                     fontSize: 14,
                                   ),
                                 ),

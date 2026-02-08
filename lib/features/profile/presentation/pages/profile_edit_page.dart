@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
@@ -189,10 +190,10 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                 }
               },
           child: Scaffold(
-            appBar: AppBar(
-              title: Text(AppLocalizations.of(context)!.accountSettings),
-              centerTitle: true,
-              actions: [
+            appBar: PlayWithMeAppBar.build(
+              context: context,
+              title: AppLocalizations.of(context)!.accountSettings,
+              extraActions: [
                 if (hasUnsavedChanges)
                   TextButton(
                     onPressed: isSaving

@@ -380,6 +380,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enterResults => 'Ergebnisse Eingeben';
 
   @override
+  String get leaveGame => 'Spiel Verlassen';
+
+  @override
+  String get leaveWaitlist => 'Warteliste Verlassen';
+
+  @override
   String get confirm => 'Bestätigen';
 
   @override
@@ -836,7 +842,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get joined => 'BEIGETRETEN';
 
   @override
-  String get training => 'TRAINING';
+  String get training => 'Training';
+
+  @override
+  String get gameLabel => 'SPIEL';
 
   @override
   String minParticipants(int count) {
@@ -1001,6 +1010,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get createFirstGame => 'Erstellen Sie das erste Spiel!';
+
+  @override
+  String get noActivitiesYet => 'Noch keine Aktivitäten';
+
+  @override
+  String get createFirstActivity => 'Erstellen Sie die erste Aktivität!';
 
   @override
   String get gamesWon => 'Spiele gewonnen';

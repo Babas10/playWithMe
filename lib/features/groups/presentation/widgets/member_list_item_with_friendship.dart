@@ -32,12 +32,16 @@ class MemberListItemWithFriendship extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
+        backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
         backgroundImage:
             user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
         child: user.photoUrl == null
             ? Text(
                 _getInitials(user.displayName ?? user.email),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF004E64),
+                ),
               )
             : null,
       ),
@@ -55,8 +59,8 @@ class MemberListItemWithFriendship extends StatelessWidget {
             Text(
               '(You)',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -67,9 +71,9 @@ class MemberListItemWithFriendship extends StatelessWidget {
                 'Admin',
                 style: TextStyle(fontSize: 12),
               ),
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
               labelStyle: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                color: Color(0xFF004E64),
                 fontWeight: FontWeight.bold,
               ),
               padding: EdgeInsets.zero,

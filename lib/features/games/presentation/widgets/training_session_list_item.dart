@@ -1,5 +1,7 @@
 // Widget for displaying a training session in the group activity feed
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/presentation/widgets/joined_badge.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/training_session_model.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -20,6 +22,7 @@ class TrainingSessionListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isCancelled = session.status == TrainingStatus.cancelled;
 
     return Card(
@@ -41,9 +44,7 @@ class TrainingSessionListItem extends StatelessWidget {
                   Icon(
                     Icons.fitness_center,
                     size: 20,
-                    color: isCancelled
-                        ? Colors.grey
-                        : Theme.of(context).colorScheme.secondary,
+                    color: isCancelled ? Colors.grey : AppColors.secondary,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -59,7 +60,7 @@ class TrainingSessionListItem extends StatelessWidget {
                           ),
                     ),
                   ),
-                  _buildTrainingBadge(context),
+                  _buildTypeBadge(context),
                 ],
               ),
               const SizedBox(height: 12),
@@ -68,7 +69,7 @@ class TrainingSessionListItem extends StatelessWidget {
                 context,
                 Icons.calendar_today,
                 _formatDateTime(context, session.startTime),
-                isCancelled ? Colors.grey : Theme.of(context).colorScheme.secondary,
+                isCancelled ? Colors.grey : AppColors.secondary,
               ),
               const SizedBox(height: 8),
               // Location
@@ -76,7 +77,7 @@ class TrainingSessionListItem extends StatelessWidget {
                 context,
                 Icons.location_on,
                 session.location.name,
-                isCancelled ? Colors.grey : Theme.of(context).colorScheme.secondary,
+                isCancelled ? Colors.grey : AppColors.secondary,
               ),
               const SizedBox(height: 8),
               // Duration
@@ -84,11 +85,19 @@ class TrainingSessionListItem extends StatelessWidget {
                 context,
                 Icons.access_time,
                 _formatDuration(context, session.duration),
-                isCancelled ? Colors.grey : Theme.of(context).colorScheme.secondary,
+                isCancelled ? Colors.grey : AppColors.secondary,
+              ),
+              const SizedBox(height: 8),
+              // Min participants
+              _buildInfoRow(
+                context,
+                Icons.people,
+                l10n.minParticipants(session.minParticipants),
+                isCancelled ? Colors.grey : AppColors.secondary,
               ),
               const SizedBox(height: 12),
               // Participant count (no scores for training sessions)
-              if (!isCancelled) _buildParticipantCountBar(context),
+              if (!isCancelled) _buildParticipantCountBarWithBadge(context),
             ],
           ),
         ),
@@ -101,21 +110,20 @@ class TrainingSessionListItem extends StatelessWidget {
       return Theme.of(context)
           .colorScheme
           .surfaceContainerHighest
-          .withOpacity(0.5);
+          .withValues(alpha: 0.5);
     }
 
     if (session.status == TrainingStatus.completed) {
-      return Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2);
+      return Colors.green.withValues(alpha: 0.05);
     }
 
-    // Subtle background for training sessions
-    return Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.1);
+    // Default: no special background (same as games)
+    return null;
   }
 
-  Widget _buildTrainingBadge(BuildContext context) {
+  Widget _buildTypeBadge(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isCancelled = session.status == TrainingStatus.cancelled;
-    final isParticipant = session.isParticipant(userId);
 
     if (isCancelled) {
       return Container(
@@ -136,38 +144,6 @@ class TrainingSessionListItem extends StatelessWidget {
       );
     }
 
-    if (isParticipant) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.check_circle,
-              size: 12,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              l10n.joined,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.secondary,
-                fontWeight: FontWeight.bold,
-                fontSize: 10,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -175,9 +151,9 @@ class TrainingSessionListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        l10n.training,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.onSecondaryContainer,
+        l10n.training.toUpperCase(),
+        style: const TextStyle(
+          color: AppColors.secondary,
           fontWeight: FontWeight.bold,
           fontSize: 10,
         ),
@@ -209,52 +185,50 @@ class TrainingSessionListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildParticipantCountBar(BuildContext context) {
+  Widget _buildParticipantCountBarWithBadge(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final progress = session.currentParticipantCount / session.maxParticipants;
+    final isParticipant = session.isParticipant(userId);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              l10n.participantsCount(session.currentParticipantCount, session.maxParticipants),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isPast
-                        ? Theme.of(context).colorScheme.onSurfaceVariant
-                        : Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-            if (session.currentParticipantCount < session.minParticipants)
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                l10n.minParticipants(session.minParticipants),
+                l10n.participantsCount(session.currentParticipantCount, session.maxParticipants),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: isPast
+                          ? Theme.of(context).colorScheme.onSurfaceVariant
+                          : Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w500,
                     ),
               ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 6,
-            backgroundColor: isPast
-                ? Theme.of(context).colorScheme.surfaceVariant
-                : Theme.of(context).colorScheme.surfaceVariant,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              isPast
-                  ? Theme.of(context).colorScheme.onSurfaceVariant
-                  : session.currentParticipantCount >= session.minParticipants
-                      ? Theme.of(context).colorScheme.secondary
-                      : Colors.orange,
-            ),
+              const SizedBox(height: 4),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 6,
+                  backgroundColor: isPast
+                      ? Theme.of(context).colorScheme.surfaceVariant
+                      : Theme.of(context).colorScheme.surfaceVariant,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isPast
+                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                        : AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
+        if (isParticipant) ...[
+          const SizedBox(width: 12),
+          const JoinedBadge(),
+        ],
       ],
     );
   }

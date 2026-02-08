@@ -94,11 +94,15 @@ class SearchResultTile extends StatelessWidget {
 
     return ListTile(
       leading: CircleAvatar(
+        backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
         backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
         child: photoUrl == null
             ? Text(
                 _getInitials(displayName ?? foundUser.email),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF004E64),
+                ),
               )
             : null,
       ),
@@ -157,6 +161,8 @@ class SearchResultTile extends StatelessWidget {
     return FilledButton(
       onPressed: onSendRequest,
       style: FilledButton.styleFrom(
+        backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
+        foregroundColor: const Color(0xFF004E64),
         padding: const EdgeInsets.symmetric(horizontal: 16),
       ),
       child: Text(l10n.sendFriendRequest),

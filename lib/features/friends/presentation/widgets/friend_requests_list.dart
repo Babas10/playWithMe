@@ -52,6 +52,7 @@ class FriendRequestsList extends StatelessWidget {
     }
 
     return ListView(
+      padding: const EdgeInsets.only(bottom: 80),
       children: [
         if (hasReceivedRequests) ...[
           Padding(

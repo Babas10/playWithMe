@@ -1,4 +1,4 @@
-// Widget tests for HomeStatsSection
+// Widget tests for HomeStatsSection with Performance Overview title and 4 stat cards.
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -6,9 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/home_stats_section.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/compact_stat_card.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/elo_trend_indicator.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/win_streak_badge.dart';
 
 void main() {
   group('HomeStatsSection Widget Tests', () {
@@ -25,26 +22,17 @@ void main() {
       currentStreak: 3,
     );
 
+    // History ordered newest-first (widget's _calculateTrend expects first=newest)
     final testHistory = <RatingHistoryEntry>[
       RatingHistoryEntry(
-        entryId: 'entry-1',
-        gameId: 'game-1',
-        oldRating: 1560,
-        newRating: 1550,
-        ratingChange: -10,
-        opponentTeam: 'Team A & Team B',
-        won: false,
-        timestamp: DateTime.now().subtract(const Duration(days: 4)),
-      ),
-      RatingHistoryEntry(
-        entryId: 'entry-2',
-        gameId: 'game-2',
-        oldRating: 1550,
-        newRating: 1570,
-        ratingChange: 20,
-        opponentTeam: 'Team C & Team D',
+        entryId: 'entry-4',
+        gameId: 'game-4',
+        oldRating: 1585,
+        newRating: 1600,
+        ratingChange: 15,
+        opponentTeam: 'Team G & Team H',
         won: true,
-        timestamp: DateTime.now().subtract(const Duration(days: 3)),
+        timestamp: DateTime.now().subtract(const Duration(days: 1)),
       ),
       RatingHistoryEntry(
         entryId: 'entry-3',
@@ -57,224 +45,142 @@ void main() {
         timestamp: DateTime.now().subtract(const Duration(days: 2)),
       ),
       RatingHistoryEntry(
-        entryId: 'entry-4',
-        gameId: 'game-4',
-        oldRating: 1585,
-        newRating: 1600,
-        ratingChange: 15,
-        opponentTeam: 'Team G & Team H',
+        entryId: 'entry-2',
+        gameId: 'game-2',
+        oldRating: 1550,
+        newRating: 1570,
+        ratingChange: 20,
+        opponentTeam: 'Team C & Team D',
         won: true,
-        timestamp: DateTime.now().subtract(const Duration(days: 1)),
+        timestamp: DateTime.now().subtract(const Duration(days: 3)),
+      ),
+      RatingHistoryEntry(
+        entryId: 'entry-1',
+        gameId: 'game-1',
+        oldRating: 1560,
+        newRating: 1550,
+        ratingChange: -10,
+        opponentTeam: 'Team A & Team B',
+        won: false,
+        timestamp: DateTime.now().subtract(const Duration(days: 4)),
       ),
     ];
 
-    testWidgets('renders section header', (tester) async {
+    Future<void> pumpHomeStatsSection(
+      WidgetTester tester, {
+      UserModel? user,
+      List<RatingHistoryEntry>? history,
+    }) async {
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: HomeStatsSection(
-              user: testUser,
-              ratingHistory: testHistory,
+              user: user ?? testUser,
+              ratingHistory: history ?? testHistory,
             ),
           ),
         ),
       );
       await tester.pumpAndSettle();
+    }
 
-      expect(find.text('Performance Overview'), findsOneWidget);
+    testWidgets('renders Performance Overview section title', (tester) async {
+      await pumpHomeStatsSection(tester);
+
+      expect(find.text('PERFORMANCE OVERVIEW'), findsOneWidget);
     });
 
-    testWidgets('renders ELOTrendIndicator', (tester) async {
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: testUser,
-              ratingHistory: testHistory,
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+    testWidgets('renders ELO rating label and value', (tester) async {
+      await pumpHomeStatsSection(tester);
 
-      expect(find.byType(ELOTrendIndicator), findsOneWidget);
+      expect(find.text('ELO Rating'), findsOneWidget);
+      expect(find.text('1600'), findsOneWidget);
     });
 
-    testWidgets('renders CompactStatCard widgets', (tester) async {
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: testUser,
-              ratingHistory: testHistory,
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+    testWidgets('renders streak label', (tester) async {
+      await pumpHomeStatsSection(tester);
 
-      // Should have 2 CompactStatCards: Win Rate and Games Played
-      expect(find.byType(CompactStatCard), findsNWidgets(2));
+      expect(find.text('Streak'), findsOneWidget);
+    });
+
+    testWidgets('renders win rate and games played labels', (tester) async {
+      await pumpHomeStatsSection(tester);
+
       expect(find.text('Win Rate'), findsOneWidget);
       expect(find.text('Games Played'), findsOneWidget);
     });
 
-    testWidgets('displays correct win rate', (tester) async {
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: testUser,
-              ratingHistory: testHistory,
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+    testWidgets('renders trophy icon for win rate card', (tester) async {
+      await pumpHomeStatsSection(tester);
+
+      expect(find.byIcon(Icons.emoji_events), findsOneWidget);
+    });
+
+    testWidgets('renders volleyball icon for games played card', (tester) async {
+      await pumpHomeStatsSection(tester);
+
+      expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
+    });
+
+    testWidgets('displays correct win rate value', (tester) async {
+      await pumpHomeStatsSection(tester);
 
       final expectedWinRate = (testUser.winRate * 100).toStringAsFixed(1);
       expect(find.text('$expectedWinRate%'), findsOneWidget);
       expect(find.text('${testUser.gamesWon}W - ${testUser.gamesLost}L'), findsOneWidget);
     });
 
-    testWidgets('displays correct games played', (tester) async {
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: testUser,
-              ratingHistory: testHistory,
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+    testWidgets('displays correct games played value', (tester) async {
+      await pumpHomeStatsSection(tester);
 
       expect(find.text(testUser.gamesPlayed.toString()), findsOneWidget);
     });
 
-    testWidgets('renders WinStreakBadge when streak >= 2', (tester) async {
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: testUser,
-              ratingHistory: testHistory,
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+    testWidgets('shows winning streak with weather emoji when streak >= 2', (tester) async {
+      await pumpHomeStatsSection(tester);
 
-      expect(find.byType(WinStreakBadge), findsOneWidget);
+      // User has currentStreak = 3, should show "3 wins ☀️" weather metaphor
+      expect(find.textContaining('3 wins'), findsOneWidget);
     });
 
-    testWidgets('does not render WinStreakBadge when streak < 2', (tester) async {
+    testWidgets('shows no streak text when streak < 2', (tester) async {
       final userWithSmallStreak = testUser.copyWith(currentStreak: 1);
 
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: userWithSmallStreak,
-              ratingHistory: testHistory,
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+      await pumpHomeStatsSection(tester, user: userWithSmallStreak);
 
-      expect(find.byType(WinStreakBadge), findsNothing);
+      expect(find.text('None'), findsOneWidget);
     });
 
-    testWidgets('renders WinStreakBadge for negative streak <= -2', (tester) async {
+    testWidgets('shows losing streak with weather emoji for negative streak <= -2', (tester) async {
       final userWithLossStreak = testUser.copyWith(currentStreak: -3);
 
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: userWithLossStreak,
-              ratingHistory: testHistory,
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+      await pumpHomeStatsSection(tester, user: userWithLossStreak);
 
-      expect(find.byType(WinStreakBadge), findsOneWidget);
+      // Should show "3 losses 🌧️" weather metaphor in red
+      expect(find.textContaining('3 losses'), findsOneWidget);
+    });
+
+    testWidgets('shows ELO trend delta for positive history', (tester) async {
+      await pumpHomeStatsSection(tester);
+
+      // first.newRating=1600, last.oldRating=1560, delta=+40
+      expect(find.text('+40'), findsOneWidget);
     });
 
     testWidgets('handles empty rating history', (tester) async {
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: testUser,
-              ratingHistory: const [],
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+      await pumpHomeStatsSection(tester, history: const []);
 
-      // Should still render without errors
-      expect(find.byType(ELOTrendIndicator), findsOneWidget);
-      expect(find.byType(CompactStatCard), findsNWidgets(2));
+      // Should show "No games played yet" in ELO card
+      expect(find.text('No games played yet'), findsOneWidget);
+      // Should still render all 4 cards without errors
+      expect(find.byType(Card), findsNWidgets(4));
     });
 
     testWidgets('handles user with no games played', (tester) async {
@@ -285,26 +191,17 @@ void main() {
         currentStreak: 0,
       );
 
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: HomeStatsSection(
-              user: newUser,
-              ratingHistory: const [],
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+      await pumpHomeStatsSection(tester, user: newUser, history: const []);
 
       expect(find.text('0'), findsAtLeastNWidgets(1)); // Games played = 0
-      expect(find.byType(WinStreakBadge), findsNothing); // No streak badge
+      expect(find.text('None'), findsOneWidget); // No streak
+    });
+
+    testWidgets('renders four cards in two rows', (tester) async {
+      await pumpHomeStatsSection(tester);
+
+      // Should have exactly 4 Card widgets: ELO, Streak, Win Rate, Games Played
+      expect(find.byType(Card), findsNWidgets(4));
     });
   });
 }

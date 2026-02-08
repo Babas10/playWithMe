@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 
 import '../../../../core/data/models/exercise_model.dart';
 import '../bloc/exercise/exercise_bloc.dart';
@@ -118,7 +119,7 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.primary,
             ),
           );
         } else if (state is ExerciseAdded) {
@@ -226,16 +227,16 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
               if (!state.canModify)
                 Container(
                   padding: const EdgeInsets.all(16),
-                  color: Colors.orange[100],
+                  color: AppColors.primary.withValues(alpha: 0.2),
                   child: Row(
                     children: [
-                      const Icon(Icons.lock, color: Colors.orange),
+                      Icon(Icons.lock, color: AppColors.secondary),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Exercises cannot be modified after session starts',
                           style: TextStyle(
-                            color: Colors.orange[900],
+                            color: AppColors.secondary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
