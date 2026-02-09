@@ -1,5 +1,7 @@
 // Displays detailed information about a group including members and admin actions
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
@@ -271,8 +273,10 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
         builder: (context, authState) {
           if (authState is! AuthenticationAuthenticated) {
             return Scaffold(
-              appBar: AppBar(
-                title: const Text('Group Details'),
+              appBar: PlayWithMeAppBar.build(
+                context: context,
+                title: 'Group Details',
+                showUserActions: false,
               ),
               body: const Center(
                 child: Text('Please log in to view group details'),
@@ -281,10 +285,10 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
           }
 
           return Scaffold(
-            appBar: AppBar(
-              title: const Text('Group Details'),
-              centerTitle: true,
-              actions: [
+            appBar: PlayWithMeAppBar.build(
+              context: context,
+              title: 'Group Details',
+              extraActions: [
                 // Menu button for Leave Group
                 if (_group != null)
                   PopupMenuButton<String>(
@@ -427,6 +431,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                     if (_isLoadingFriendships && !isCurrentUser) {
                       return ListTile(
                         leading: CircleAvatar(
+                          backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
                           backgroundImage: member.photoUrl != null
                               ? NetworkImage(member.photoUrl!)
                               : null,
@@ -434,8 +439,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                               ? Text(
                                   _getInitials(
                                       member.displayName ?? member.email),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF004E64)),
                                 )
                               : null,
                         ),
@@ -492,6 +498,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
             _group!.name,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: AppColors.secondary,
                 ),
           ),
           const SizedBox(height: 8),

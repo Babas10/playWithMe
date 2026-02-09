@@ -94,7 +94,8 @@ void main() {
       testWidgets('renders volleyball icon', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
+        // One in page body (decorative) + one in PlayWithMeAppBar title
+        expect(find.byIcon(Icons.sports_volleyball), findsNWidgets(2));
       });
 
       testWidgets('renders email input field', (tester) async {
@@ -116,15 +117,6 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.widgetWithText(AuthButton, 'Login'), findsOneWidget);
-      });
-
-      testWidgets('renders continue as guest button', (tester) async {
-        await tester.pumpWidget(createTestWidget());
-
-        expect(
-          find.widgetWithText(AuthButton, 'Continue as Guest'),
-          findsOneWidget,
-        );
       });
 
       testWidgets('renders sign up link', (tester) async {
@@ -302,10 +294,10 @@ void main() {
 
         await tester.pumpWidget(createTestWidget());
 
-        expect(find.byType(CircularProgressIndicator), findsNWidgets(2));
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
 
-      testWidgets('buttons are disabled during loading', (tester) async {
+      testWidgets('login button is disabled during loading', (tester) async {
         when(() => mockLoginBloc.state).thenReturn(const LoginLoading());
 
         await tester.pumpWidget(createTestWidget());
@@ -315,28 +307,6 @@ void main() {
           find.byType(ElevatedButton),
         );
         expect(elevatedButton.onPressed, isNull);
-
-        // Find the OutlinedButton (Continue as Guest button)
-        final outlinedButton = tester.widget<OutlinedButton>(
-          find.byType(OutlinedButton).first,
-        );
-        expect(outlinedButton.onPressed, isNull);
-      });
-    });
-
-    group('Continue as Guest Button', () {
-      testWidgets('triggers LoginAnonymouslySubmitted event on tap',
-          (tester) async {
-        await tester.pumpWidget(createTestWidget());
-
-        final guestButton =
-            find.widgetWithText(OutlinedButton, 'Continue as Guest');
-        await tester.tap(guestButton);
-        await tester.pump();
-
-        verify(
-          () => mockLoginBloc.add(const LoginAnonymouslySubmitted()),
-        ).called(1);
       });
     });
 

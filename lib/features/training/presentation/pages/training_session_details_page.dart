@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
@@ -80,14 +82,22 @@ class _TrainingSessionDetailsPageState
           final l10n = AppLocalizations.of(context)!;
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(
-              appBar: AppBar(title: Text(l10n.trainingSession)),
+              appBar: PlayWithMeAppBar.build(
+                context: context,
+                title: l10n.training,
+                showUserActions: false,
+              ),
               body: const Center(child: CircularProgressIndicator()),
             );
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
             return Scaffold(
-              appBar: AppBar(title: Text(l10n.trainingSession)),
+              appBar: PlayWithMeAppBar.build(
+                context: context,
+                title: l10n.training,
+                showUserActions: false,
+              ),
               body: Center(
                 child: Text(l10n.trainingNotFound),
               ),
@@ -102,9 +112,10 @@ class _TrainingSessionDetailsPageState
           final canCancel = session.canUserCancel(_currentUserId ?? '');
 
           return Scaffold(
-            appBar: AppBar(
-              title: Text(session.title),
-              actions: [
+            appBar: PlayWithMeAppBar.build(
+              context: context,
+              title: l10n.training,
+              extraActions: [
                 // Cancel button only visible to organizer for scheduled sessions
                 if (canCancel)
                   BlocConsumer<TrainingSessionParticipationBloc,
@@ -114,7 +125,7 @@ class _TrainingSessionDetailsPageState
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(l10n.trainingCancelled),
-                            backgroundColor: Colors.orange,
+                            backgroundColor: AppColors.primary,
                           ),
                         );
                         // Navigate back after cancellation
@@ -229,7 +240,10 @@ class _TrainingSessionDetailsPageState
               Expanded(
                 child: Text(
                   session.title,
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
+                      ),
                 ),
               ),
               _buildStatusBadge(session.status),
@@ -279,7 +293,7 @@ class _TrainingSessionDetailsPageState
           // Date/Time
           Row(
             children: [
-              const Icon(Icons.calendar_today, size: 16),
+              Icon(Icons.calendar_today, size: 16, color: AppColors.primary),
               const SizedBox(width: 4),
               Text(
                 DateFormat('MMM dd, yyyy • HH:mm').format(session.startTime),
@@ -291,7 +305,7 @@ class _TrainingSessionDetailsPageState
           // Location
           Row(
             children: [
-              const Icon(Icons.location_on, size: 16),
+              Icon(Icons.location_on, size: 16, color: AppColors.primary),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -309,7 +323,7 @@ class _TrainingSessionDetailsPageState
               final l10n = AppLocalizations.of(context)!;
               return Row(
                 children: [
-                  const Icon(Icons.people, size: 16),
+                  Icon(Icons.people, size: 16, color: AppColors.primary),
                   const SizedBox(width: 4),
                   Text(
                     l10n.participantsCount(session.participantIds.length, session.maxParticipants),
@@ -378,7 +392,7 @@ class _TrainingSessionDetailsPageState
 
         switch (status) {
           case TrainingStatus.scheduled:
-            color = Colors.blue;
+            color = AppColors.secondary;
             icon = Icons.schedule;
             label = l10n.scheduled;
             break;
@@ -536,14 +550,13 @@ class _TrainingSessionDetailsPageState
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withAlpha(26),
+                          color: AppColors.primary,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.blue),
                         ),
                         child: Text(
                           l10n.you,
-                          style: const TextStyle(
-                            color: Colors.blue,
+                          style: TextStyle(
+                            color: AppColors.secondary,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
@@ -648,7 +661,7 @@ class _TrainingSessionDetailsPageState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.leftTraining),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.primary,
             ),
           );
         } else if (state is ParticipationError) {
@@ -680,9 +693,12 @@ class _TrainingSessionDetailsPageState
                       color: Colors.white,
                     ),
                   )
-                : const Icon(Icons.exit_to_app),
-            label: Text(isLoading ? l10n.leaving : l10n.leave),
-            backgroundColor: Colors.orange,
+                : const Icon(Icons.exit_to_app, color: Colors.white),
+            label: Text(
+              isLoading ? l10n.leaving : l10n.leave,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: AppColors.primary,
           );
         } else {
           // Show Join button
@@ -701,7 +717,7 @@ class _TrainingSessionDetailsPageState
                       color: Colors.white,
                     ),
                   )
-                : const Icon(Icons.add),
+                : const Icon(Icons.add, color: Colors.white),
             label: Text(
               isLoading
                   ? l10n.joining
@@ -710,8 +726,9 @@ class _TrainingSessionDetailsPageState
                       : session.isFull
                           ? l10n.full
                           : l10n.cannotJoin,
+              style: const TextStyle(color: Colors.white),
             ),
-            backgroundColor: canJoin ? Colors.green : Colors.grey,
+            backgroundColor: canJoin ? AppColors.primary : Colors.grey,
           );
         }
       },
@@ -719,35 +736,9 @@ class _TrainingSessionDetailsPageState
   }
 
   void _joinSession(BuildContext context, TrainingSessionModel session) {
-    final l10n = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.joinTrainingSession),
-        content: Text(
-          l10n.doYouWantToJoin(
-            session.title,
-            DateFormat('MMM dd, yyyy • HH:mm').format(session.startTime),
-            session.location.name,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<TrainingSessionParticipationBloc>().add(
-                    JoinTrainingSession(widget.trainingSessionId),
-                  );
-            },
-            child: Text(l10n.join),
-          ),
-        ],
-      ),
-    );
+    context.read<TrainingSessionParticipationBloc>().add(
+          JoinTrainingSession(widget.trainingSessionId),
+        );
   }
 
   void _leaveSession(BuildContext context, TrainingSessionModel session) {
@@ -770,7 +761,8 @@ class _TrainingSessionDetailsPageState
                   );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.secondary,
             ),
             child: Text(l10n.leave),
           ),

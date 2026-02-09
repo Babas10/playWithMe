@@ -1,5 +1,6 @@
 // Displays a list of pending invitations for the current user with real-time updates
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
@@ -19,8 +20,10 @@ class PendingInvitationsPage extends StatelessWidget {
       builder: (context, authState) {
         if (authState is! AuthenticationAuthenticated) {
           return Scaffold(
-            appBar: AppBar(
-              title: const Text('Invitations'),
+            appBar: PlayWithMeAppBar.build(
+              context: context,
+              title: 'Invitations',
+              showUserActions: false,
             ),
             body: const Center(
               child: Text('Please log in to view invitations'),
@@ -44,9 +47,9 @@ class PendingInvitationsPage extends StatelessWidget {
   Widget _buildScaffold(
       BuildContext context, AuthenticationAuthenticated authState) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pending Invitations'),
-        centerTitle: true,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: 'Pending Invitations',
       ),
       body: BlocConsumer<InvitationBloc, InvitationState>(
         listener: (context, state) {

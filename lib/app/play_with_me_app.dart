@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
-import 'package:play_with_me/core/widgets/environment_indicator.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
@@ -43,6 +42,7 @@ import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -81,7 +81,24 @@ class PlayWithMeApp extends StatelessWidget {
           return MaterialApp(
             title: 'PlayWithMe${EnvironmentConfig.appSuffix}',
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: AppColors.primary,
+              ).copyWith(
+                primary: AppColors.primary,
+                secondary: AppColors.secondary,
+                error: AppColors.danger,
+                onSurface: AppColors.onSurface,
+                onSurfaceVariant: AppColors.textMuted,
+              ),
+              scaffoldBackgroundColor: AppColors.scaffoldBackground,
+              cardTheme: CardThemeData(
+                elevation: 0,
+                color: Colors.white,
+                shadowColor: AppColors.shadow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
               useMaterial3: true,
             ),
             locale: currentLocale,
@@ -238,111 +255,132 @@ class _HomePageState extends State<HomePage> {
         BlocProvider<PlayerStatsBloc>.value(value: _playerStatsBloc),
       ],
       child: Scaffold(
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                // Environment indicator at the top
-                const EnvironmentIndicator(showDetails: true),
-
-                // App bar
-                AppBar(
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                  title: Text(_selectedIndex == 0
-                      ? '${AppLocalizations.of(context)!.appTitle}${EnvironmentConfig.appSuffix}'
+        appBar: AppBar(
+          backgroundColor: AppColors.appBarBackground,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          toolbarHeight: 52,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.sports_volleyball,
+                color: AppColors.secondary,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  _selectedIndex == 0
+                      ? AppLocalizations.of(context)!.appTitle
                       : _selectedIndex == 1
                           ? AppLocalizations.of(context)!.myGroups
-                          : AppLocalizations.of(context)!.myCommunity),
-                  centerTitle: true,
-                  actions: [
-                    // Invitation badge
-                    BlocBuilder<InvitationBloc, InvitationState>(
-                      builder: (context, state) {
-                        int pendingCount = 0;
-                        if (state is InvitationsLoaded) {
-                          pendingCount = state.invitations.length;
-                        }
-
-                        return Stack(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.mail_outline),
-                              tooltip: 'Invitations',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => BlocProvider<InvitationBloc>.value(
-                                      value: _invitationBloc,
-                                      child: const PendingInvitationsPage(),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            if (pendingCount > 0)
-                              Positioned(
-                                right: 8,
-                                top: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 18,
-                                    minHeight: 18,
-                                  ),
-                                  child: Text(
-                                    pendingCount > 9 ? '9+' : '$pendingCount',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.person),
-                      tooltip: AppLocalizations.of(context)!.profile,
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/profile');
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.logout),
-                      tooltip: AppLocalizations.of(context)!.signOut,
-                      onPressed: () {
-                        context.read<AuthenticationBloc>().add(
-                          const AuthenticationLogoutRequested(),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-
-              // Main content
-              Expanded(
-                child: IndexedStack(
-                  index: _selectedIndex,
-                  children: _pages,
+                          : AppLocalizations.of(context)!.myCommunity,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.secondary,
+                        letterSpacing: -0.5,
+                      ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
+          centerTitle: false,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(
+              color: AppColors.divider,
+              height: 1,
+            ),
+          ),
+          actions: [
+            // Invitation badge
+            BlocBuilder<InvitationBloc, InvitationState>(
+              builder: (context, state) {
+                int pendingCount = 0;
+                if (state is InvitationsLoaded) {
+                  pendingCount = state.invitations.length;
+                }
 
-          // Debug panel for development
-          const FirebaseDebugPanel(),
-        ],
-      ),
+                return Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.mail_outline, size: 22),
+                      tooltip: 'Invitations',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider<InvitationBloc>.value(
+                              value: _invitationBloc,
+                              child: const PendingInvitationsPage(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    if (pendingCount > 0)
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            pendingCount > 9 ? '9+' : '$pendingCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.person_outline, size: 22),
+              tooltip: AppLocalizations.of(context)!.profile,
+              onPressed: () {
+                Navigator.pushNamed(context, '/profile');
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout, size: 22),
+              tooltip: AppLocalizations.of(context)!.signOut,
+              onPressed: () {
+                context.read<AuthenticationBloc>().add(
+                  const AuthenticationLogoutRequested(),
+                );
+              },
+            ),
+          ],
+        ),
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: _pages,
+        ),
         bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: AppColors.bottomNavBackground,
+          selectedItemColor: AppColors.navLabelColor,
+          unselectedItemColor: AppColors.navLabelColor,
+          selectedIconTheme: const IconThemeData(
+            color: AppColors.primary,
+          ),
+          unselectedIconTheme: const IconThemeData(
+            color: AppColors.navLabelColor,
+          ),
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: const Icon(Icons.home),
@@ -441,34 +479,45 @@ class _HomeTab extends StatelessWidget {
 
             if (statsState is PlayerStatsLoaded) {
               return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.only(top: 30, bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Stats section (ELO, Win rate, etc.)
+                    // Stats section (ELO, Win Rate, Streak, Games Played)
                     HomeStatsSection(
                       user: statsState.user,
                       ratingHistory: statsState.history,
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 25),
+
+                    // Next Game section title
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, bottom: 15.0),
+                      child: Text(
+                        AppLocalizations.of(context)!.nextGame.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textMuted,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
 
                     // Next Game Card
                     StreamBuilder(
                       stream: sl<GameRepository>().getNextGameForUser(authState.user.uid),
                       builder: (context, snapshot) {
-                        // Show loading state only initially
                         if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
                           return const SizedBox.shrink();
                         }
 
-                        // Log errors for debugging
                         if (snapshot.hasError) {
-                          debugPrint('🔴 [HomeTab] NextGame stream error: ${snapshot.error}');
+                          debugPrint('NextGame stream error: ${snapshot.error}');
                         }
 
                         final nextGame = snapshot.data;
-                        debugPrint('🏠 [HomeTab] NextGame snapshot - hasData: ${snapshot.hasData}, data: ${nextGame?.title ?? 'null'}');
 
                         return NextGameCard(
                           game: nextGame,
@@ -492,28 +541,38 @@ class _HomeTab extends StatelessWidget {
                       },
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 25),
+
+                    // Next Training Session section title
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, bottom: 15.0),
+                      child: Text(
+                        AppLocalizations.of(context)!.nextTrainingSession.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textMuted,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
 
                     // Next Training Session Card
                     StreamBuilder(
                       stream: sl<TrainingSessionRepository>()
                           .getNextTrainingSessionForUser(authState.user.uid),
                       builder: (context, snapshot) {
-                        // Show loading state only initially
                         if (snapshot.connectionState == ConnectionState.waiting &&
                             !snapshot.hasData) {
                           return const SizedBox.shrink();
                         }
 
-                        // Log errors for debugging
                         if (snapshot.hasError) {
                           debugPrint(
-                              '🔴 [HomeTab] NextTrainingSession stream error: ${snapshot.error}');
+                              'NextTrainingSession stream error: ${snapshot.error}');
                         }
 
                         final nextSession = snapshot.data;
-                        debugPrint(
-                            '🏋️ [HomeTab] NextTrainingSession snapshot - hasData: ${snapshot.hasData}, data: ${nextSession?.title ?? 'null'}');
 
                         return NextTrainingSessionCard(
                           session: nextSession,

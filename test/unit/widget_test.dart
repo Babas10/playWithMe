@@ -58,12 +58,11 @@ void main() {
     expect(find.byType(TextFormField), findsNWidgets(2)); // Email and password fields
 
     // Verify authentication-specific buttons
-    expect(find.byType(AuthButton), findsNWidgets(2)); // Login and Continue as Guest buttons
-    expect(find.text('Continue as Guest'), findsOneWidget);
+    expect(find.byType(AuthButton), findsOneWidget); // Login button only
     expect(find.text('Sign Up'), findsOneWidget);
     expect(find.text('Forgot Password?'), findsOneWidget);
 
-    // Verify volleyball icon is present (app branding)
-    expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
+    // Verify volleyball icons are present (app branding - one in content, one in AppBar)
+    expect(find.byIcon(Icons.sports_volleyball), findsNWidgets(2));
   });
 }

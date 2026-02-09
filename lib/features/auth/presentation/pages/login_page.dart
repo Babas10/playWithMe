@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
@@ -35,9 +36,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.login),
-        centerTitle: true,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: l10n.login,
+        showUserActions: false,
       ),
       body: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
@@ -128,19 +130,6 @@ class _LoginPageState extends State<LoginPage> {
                       text: l10n.login,
                       isLoading: state is LoginLoading,
                       onPressed: _submitLogin,
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                BlocBuilder<LoginBloc, LoginState>(
-                  builder: (context, state) {
-                    return AuthButton(
-                      text: l10n.continueAsGuest,
-                      isOutlined: true,
-                      isLoading: state is LoginLoading,
-                      onPressed: () {
-                        context.read<LoginBloc>().add(const LoginAnonymouslySubmitted());
-                      },
                     );
                   },
                 ),

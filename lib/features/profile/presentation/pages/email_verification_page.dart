@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
@@ -11,9 +12,9 @@ class EmailVerificationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Email Verification'),
-        centerTitle: true,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: 'Email Verification',
       ),
       body: BlocConsumer<EmailVerificationBloc, EmailVerificationState>(
         listener: (context, state) {
