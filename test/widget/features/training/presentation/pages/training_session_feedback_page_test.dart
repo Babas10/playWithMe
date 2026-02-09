@@ -123,8 +123,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         // Each rating section has 5 volleyball icons
-        // 3 categories * 5 icons = 15 volleyball icons
-        expect(find.byIcon(Icons.sports_volleyball), findsNWidgets(15));
+        // 3 categories * 5 icons = 15 volleyball icons + 1 in PlayWithMeAppBar
+        expect(find.byIcon(Icons.sports_volleyball), findsNWidgets(16));
       });
 
       testWidgets('renders rating labels', (tester) async {
@@ -187,13 +187,14 @@ void main() {
       testWidgets('can tap to select exercises quality rating', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        // Find all volleyball icons (15 total: 3 categories x 5 icons)
+        // Find all volleyball icons (16 total: 1 AppBar + 3 categories x 5 icons)
         final volleyballIcons = find.byIcon(Icons.sports_volleyball);
-        expect(volleyballIcons, findsNWidgets(15));
+        expect(volleyballIcons, findsNWidgets(16));
 
-        // Tap the third icon (index 2) in the first category (Exercises Quality)
+        // Tap the third icon (index 3) in the first category (Exercises Quality)
+        // Index 0 is the AppBar icon, so rating icons start at index 1
         // This gives a 3-star rating
-        await tester.tap(volleyballIcons.at(2));
+        await tester.tap(volleyballIcons.at(3));
         await tester.pump();
 
         // The tap should succeed without errors

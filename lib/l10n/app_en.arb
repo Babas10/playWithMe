@@ -586,6 +586,16 @@
     "description": "Enter results button label"
   },
 
+  "leaveGame": "Leave Game",
+  "@leaveGame": {
+    "description": "Leave game menu option"
+  },
+
+  "leaveWaitlist": "Leave Waitlist",
+  "@leaveWaitlist": {
+    "description": "Leave waitlist menu option"
+  },
+
   "confirm": "Confirm",
   "@confirm": {
     "description": "Confirm button text"
@@ -1316,9 +1326,14 @@
     "description": "Status badge for joined"
   },
 
-  "training": "TRAINING",
+  "training": "Training",
   "@training": {
     "description": "Training badge"
+  },
+
+  "gameLabel": "GAME",
+  "@gameLabel": {
+    "description": "Game badge label"
   },
 
   "minParticipants": "Min: {count}",
@@ -1605,6 +1620,16 @@
   "createFirstGame": "Create the first game!",
   "@createFirstGame": {
     "description": "Empty state call to action"
+  },
+
+  "noActivitiesYet": "No activities yet",
+  "@noActivitiesYet": {
+    "description": "Empty state title for activities list"
+  },
+
+  "createFirstActivity": "Create the first activity!",
+  "@createFirstActivity": {
+    "description": "Empty state call to action for activities"
   },
 
   "gamesWon": "games won",

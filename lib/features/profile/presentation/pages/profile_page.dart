@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
@@ -31,9 +32,9 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.profile),
-        centerTitle: true,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: AppLocalizations.of(context)!.profile,
       ),
       body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
         builder: (context, state) {

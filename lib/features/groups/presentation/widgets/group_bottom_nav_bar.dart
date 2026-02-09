@@ -1,5 +1,6 @@
 // Reusable bottom navigation bar for group details page with three main actions
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class GroupBottomNavBar extends StatelessWidget {
@@ -24,30 +25,52 @@ class GroupBottomNavBar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
       builder: (BuildContext context) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.sports_volleyball),
-                title: Text(l10n.createGame),
-                subtitle: Text(l10n.competitiveGameWithElo),
-                onTap: () {
-                  Navigator.pop(context);
-                  onCreateGameTap?.call();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.fitness_center),
-                title: Text(l10n.createTrainingSession),
-                subtitle: Text(l10n.practiceSessionNoElo),
-                onTap: () {
-                  Navigator.pop(context);
-                  onCreateTrainingTap?.call();
-                },
-              ),
-            ],
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.sports_volleyball, color: AppColors.secondary),
+                  title: Text(
+                    l10n.createGame,
+                    style: TextStyle(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    l10n.competitiveGameWithElo,
+                    style: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    onCreateGameTap?.call();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.fitness_center, color: AppColors.secondary),
+                  title: Text(
+                    l10n.createTrainingSession,
+                    style: TextStyle(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    l10n.practiceSessionNoElo,
+                    style: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    onCreateTrainingTap?.call();
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -58,6 +81,7 @@ class GroupBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return BottomNavigationBar(
+      backgroundColor: AppColors.bottomNavBackground,
       type: BottomNavigationBarType.fixed,
       onTap: (index) {
         switch (index) {
@@ -79,7 +103,7 @@ class GroupBottomNavBar extends StatelessWidget {
           icon: Icon(
             Icons.person_add,
             color: isAdmin
-                ? Theme.of(context).colorScheme.primary
+                ? AppColors.primary
                 : Theme.of(context).disabledColor,
           ),
           label: l10n.invite,
@@ -88,7 +112,7 @@ class GroupBottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(
             Icons.add_circle,
-            color: Theme.of(context).colorScheme.primary,
+            color: AppColors.primary,
           ),
           label: l10n.create,
           tooltip: l10n.createGameOrTraining,
@@ -99,14 +123,14 @@ class GroupBottomNavBar extends StatelessWidget {
             isLabelVisible: upcomingGamesCount > 0,
             child: Icon(
               Icons.list,
-              color: Theme.of(context).colorScheme.primary,
+              color: AppColors.primary,
             ),
           ),
           label: l10n.activities,
           tooltip: l10n.viewAllActivities,
         ),
       ],
-      selectedItemColor: Theme.of(context).colorScheme.primary,
+      selectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
       unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
       showSelectedLabels: true,
       showUnselectedLabels: true,

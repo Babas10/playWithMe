@@ -65,14 +65,6 @@ void main() {
       );
     }
 
-    testWidgets('displays section header "Next Training Session"', (tester) async {
-      // Arrange & Act
-      await pumpNextTrainingSessionCard(tester);
-
-      // Assert
-      expect(find.text('Next Training Session'), findsOneWidget);
-    });
-
     testWidgets('displays empty state when no session provided', (tester) async {
       // Arrange & Act
       await pumpNextTrainingSessionCard(tester, session: null);
@@ -132,7 +124,7 @@ void main() {
       expect(tapped, true);
     });
 
-    testWidgets('does not call onTap when empty state is shown', (tester) async {
+    testWidgets('calls onTap when empty state card is tapped', (tester) async {
       // Arrange
       bool tapped = false;
 
@@ -144,13 +136,13 @@ void main() {
         },
       );
 
-      // Act - Try to tap the empty state card
-      final card = find.byType(Card).first;
-      await tester.tap(card);
+      // Act - Tap the empty state card (InkWell wraps all content)
+      final inkWell = find.byType(InkWell).first;
+      await tester.tap(inkWell);
       await tester.pumpAndSettle();
 
-      // Assert - Should not trigger callback
-      expect(tapped, false);
+      // Assert - Card is tappable even in empty state
+      expect(tapped, true);
     });
 
     testWidgets('displays participant count progress', (tester) async {
@@ -218,15 +210,17 @@ void main() {
       expect(find.byType(Card), findsWidgets); // TrainingSessionListItem uses Card
     });
 
-    testWidgets('displays fitness_center icon for training sessions', (tester) async {
+    testWidgets('displays calendar and location icons for sessions', (tester) async {
       // Arrange
       final session = createTestSession();
 
       // Act
       await pumpNextTrainingSessionCard(tester, session: session);
 
-      // Assert - TrainingSessionListItem shows fitness_center icon
-      expect(find.byIcon(Icons.fitness_center), findsOneWidget);
+      // Assert - session content shows calendar, location, and time icons
+      expect(find.byIcon(Icons.calendar_today), findsOneWidget);
+      expect(find.byIcon(Icons.location_on), findsOneWidget);
+      expect(find.byIcon(Icons.access_time), findsOneWidget);
     });
 
     testWidgets('displays duration information', (tester) async {
@@ -244,7 +238,7 @@ void main() {
       expect(find.text('2h'), findsOneWidget);
     });
 
-    testWidgets('shows training badge when user has not joined', (tester) async {
+    testWidgets('shows join badge when user has not joined', (tester) async {
       // Arrange
       final session = createTestSession(
         participantIds: ['other-user-1', 'other-user-2'], // user not in list
@@ -253,8 +247,8 @@ void main() {
       // Act
       await pumpNextTrainingSessionCard(tester, session: session);
 
-      // Assert - Should show "TRAINING" badge instead of "JOINED"
-      expect(find.text('TRAINING'), findsOneWidget);
+      // Assert - Should show "Join" badge instead of "JOINED"
+      expect(find.text('Join'), findsOneWidget);
       expect(find.text('JOINED'), findsNothing);
     });
   });

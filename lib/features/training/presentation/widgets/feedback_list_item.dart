@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/data/models/training_feedback_model.dart';
@@ -26,12 +27,12 @@ class FeedbackListItem extends StatelessWidget {
             Row(
               children: [
                 // Anonymous avatar
-                const CircleAvatar(
-                  backgroundColor: Colors.grey,
+                CircleAvatar(
+                  backgroundColor: AppColors.primary,
                   radius: 20,
                   child: Icon(
                     Icons.person,
-                    color: Colors.white,
+                    color: AppColors.secondary,
                     size: 20,
                   ),
                 ),
@@ -57,7 +58,7 @@ class FeedbackListItem extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.blue.withValues(alpha: 0.1),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Row(
@@ -66,14 +67,14 @@ class FeedbackListItem extends StatelessWidget {
                                 Icon(
                                   Icons.privacy_tip_outlined,
                                   size: 12,
-                                  color: Colors.blue[700],
+                                  color: AppColors.secondary,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   'Private',
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: Colors.blue[700],
+                                    color: AppColors.secondary,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),

@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_list_item.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_result_badge.dart';
 import 'package:play_with_me/features/games/presentation/widgets/set_scores_display.dart';
@@ -65,7 +66,7 @@ void main() {
       expect(find.text('Court 1'), findsOneWidget);
     });
 
-    testWidgets('displays scheduled status color (blue)', (tester) async {
+    testWidgets('displays scheduled status color', (tester) async {
       final game = _createGame(status: GameStatus.scheduled);
       await tester.pumpWidget(
     MaterialApp(
@@ -86,10 +87,10 @@ void main() {
       );
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.calendar_today));
-      expect(icon.color, Colors.blue);
+      expect(icon.color, AppColors.secondary);
     });
 
-    testWidgets('displays in progress status color (orange)', (tester) async {
+    testWidgets('displays in progress status color', (tester) async {
       final game = _createGame(status: GameStatus.inProgress);
       await tester.pumpWidget(
     MaterialApp(
@@ -110,7 +111,7 @@ void main() {
       );
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.calendar_today));
-      expect(icon.color, Colors.orange);
+      expect(icon.color, AppColors.secondary);
     });
 
     testWidgets('displays cancelled status styling (grey + strikethrough)', (tester) async {
@@ -179,7 +180,7 @@ void main() {
       expect(find.text('21-19'), findsOneWidget);
     });
 
-    testWidgets('displays verification status with purple badge', (tester) async {
+    testWidgets('displays verification status with theme badge', (tester) async {
       final game = _createGame(status: GameStatus.verification);
       await tester.pumpWidget(
     MaterialApp(
@@ -201,7 +202,7 @@ void main() {
 
       expect(find.text('Pending Verification'), findsOneWidget);
       final icon = tester.widget<Icon>(find.byIcon(Icons.pending_actions));
-      expect(icon.color, Colors.purple.shade700);
+      expect(icon.color, AppColors.secondary);
     });
 
     testWidgets('applies background tint for verification status', (tester) async {
@@ -225,7 +226,7 @@ void main() {
       );
 
       final card = tester.widget<Card>(find.byType(Card));
-      expect(card.color, Colors.purple.withOpacity(0.05));
+      expect(card.color, AppColors.primary.withValues(alpha: 0.1));
     });
 
     testWidgets('displays RSVP badge when not completed/cancelled', (tester) async {
@@ -249,7 +250,7 @@ void main() {
       );
 
       // Assuming user-1 is in the game from _createGame default
-      expect(find.text("You're In"), findsOneWidget);
+      expect(find.text("JOINED"), findsOneWidget);
     });
 
     testWidgets('calls onTap when tapped', (tester) async {

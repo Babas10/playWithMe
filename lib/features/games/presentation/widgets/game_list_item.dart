@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/presentation/widgets/joined_badge.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
@@ -21,7 +23,6 @@ class GameListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = _getStatusColor(context);
     final isCompletedWithResult = game.status == GameStatus.completed && game.result != null;
     final isCancelled = game.status == GameStatus.cancelled;
     final isVerification = game.status == GameStatus.verification;
@@ -38,8 +39,16 @@ class GameListItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Title row with game badge
               Row(
                 children: [
+                  // Game icon to distinguish from training sessions
+                  Icon(
+                    Icons.sports_volleyball,
+                    size: 20,
+                    color: isCancelled ? Colors.grey : AppColors.secondary,
+                  ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       game.title,
@@ -48,8 +57,8 @@ class GameListItem extends StatelessWidget {
                             color: isCancelled
                                 ? Theme.of(context).colorScheme.onSurfaceVariant
                                 : null,
-                            decoration: isCancelled 
-                                ? TextDecoration.lineThrough 
+                            decoration: isCancelled
+                                ? TextDecoration.lineThrough
                                 : null,
                           ),
                     ),
@@ -61,8 +70,10 @@ class GameListItem extends StatelessWidget {
                     )
                   else if (isVerification)
                     _buildVerificationBadge(context)
-                  else if (!isCancelled)
-                    _buildRsvpStatusBadge(context),
+                  else if (isCancelled)
+                    _buildCancelledBadge(context)
+                  else
+                    _buildTypeBadge(context),
                 ],
               ),
               const SizedBox(height: 12),
@@ -70,14 +81,14 @@ class GameListItem extends StatelessWidget {
                 context,
                 Icons.calendar_today,
                 _formatDateTime(context, game.scheduledAt),
-                isCancelled ? Colors.grey : statusColor,
+                isCancelled ? Colors.grey : AppColors.secondary,
               ),
               const SizedBox(height: 8),
               _buildInfoRow(
                 context,
                 Icons.location_on,
                 game.location.name,
-                isCancelled ? Colors.grey : statusColor,
+                isCancelled ? Colors.grey : AppColors.secondary,
               ),
               const SizedBox(height: 12),
               if (isCompletedWithResult) ...[
@@ -85,7 +96,7 @@ class GameListItem extends StatelessWidget {
                 const SizedBox(height: 8),
                 SetScoresDisplay(result: game.result!),
               ] else if (!isCancelled) ...[
-                _buildPlayerCountBar(context),
+                _buildPlayerCountBarWithBadge(context),
               ],
             ],
           ),
@@ -101,28 +112,13 @@ class GameListItem extends StatelessWidget {
     
     switch (game.status) {
       case GameStatus.verification:
-        return Colors.purple.withOpacity(0.05);
+        return AppColors.primary.withValues(alpha: 0.1);
       case GameStatus.completed:
         return Colors.green.withOpacity(0.05);
       case GameStatus.inProgress:
         return Colors.orange.withOpacity(0.05);
       default:
         return null;
-    }
-  }
-
-  Color _getStatusColor(BuildContext context) {
-    switch (game.status) {
-      case GameStatus.scheduled:
-        return Colors.blue;
-      case GameStatus.inProgress:
-        return Colors.orange;
-      case GameStatus.verification:
-        return Colors.purple;
-      case GameStatus.completed:
-        return Colors.green;
-      case GameStatus.cancelled:
-        return Colors.grey;
     }
   }
 
@@ -154,19 +150,19 @@ class GameListItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.purple.shade100,
+        color: AppColors.primary,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.purple.shade300),
+        border: Border.all(color: AppColors.primary),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.pending_actions, size: 16, color: Colors.purple.shade700),
+          Icon(Icons.pending_actions, size: 16, color: AppColors.secondary),
           const SizedBox(width: 4),
           Text(
             l10n.pendingVerification,
             style: TextStyle(
-              color: Colors.purple.shade800,
+              color: AppColors.secondary,
               fontWeight: FontWeight.bold,
               fontSize: 12,
             ),
@@ -176,162 +172,150 @@ class GameListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildRsvpStatusBadge(BuildContext context) {
+  Widget _buildTypeBadge(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        l10n.gameLabel,
+        style: const TextStyle(
+          color: AppColors.secondary,
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCancelledBadge(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey),
+      ),
+      child: Text(
+        l10n.cancelled,
+        style: TextStyle(
+          color: Colors.grey.shade700,
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  Widget? _buildStatusBadge(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isPlayer = game.isPlayer(userId);
     final isOnWaitlist = game.isOnWaitlist(userId);
 
     if (isPlayer) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.green.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.green),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.check_circle, size: 16, color: Colors.green),
-            const SizedBox(width: 4),
-            Text(
-              l10n.youreIn,
-              style: TextStyle(
-                color: Colors.green.shade700,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      );
+      return const JoinedBadge();
     }
 
     if (isOnWaitlist) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.orange.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.orange.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.orange),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.hourglass_empty, size: 16, color: Colors.orange),
-            const SizedBox(width: 4),
-            Text(
-              l10n.onWaitlist,
-              style: TextStyle(
-                color: Colors.orange.shade700,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
-          ],
+        child: Text(
+          l10n.onWaitlist,
+          style: TextStyle(
+            color: Colors.orange.shade700,
+            fontWeight: FontWeight.bold,
+            fontSize: 10,
+          ),
         ),
       );
     }
 
     if (game.isFull && !game.allowWaitlist) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.red.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.red),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.block, size: 16, color: Colors.red),
-            const SizedBox(width: 4),
-            Text(
-              l10n.full,
-              style: TextStyle(
-                color: Colors.red.shade700,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
-          ],
+        child: Text(
+          l10n.full,
+          style: TextStyle(
+            color: Colors.red.shade700,
+            fontWeight: FontWeight.bold,
+            fontSize: 10,
+          ),
         ),
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.person_add,
-            size: 16,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            l10n.joinGame,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
+    return null;
   }
 
-  Widget _buildPlayerCountBar(BuildContext context) {
+  Widget _buildPlayerCountBarWithBadge(BuildContext context) {
     final progress = game.currentPlayerCount / game.maxPlayers;
+    final statusBadge = _buildStatusBadge(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '${game.currentPlayerCount}/${game.maxPlayers} players',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isPast
-                        ? Theme.of(context).colorScheme.onSurfaceVariant
-                        : Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w500,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${game.currentPlayerCount}/${game.maxPlayers} players',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: isPast
+                              ? Theme.of(context).colorScheme.onSurfaceVariant
+                              : Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
                   ),
-            ),
-            if (game.waitlistCount > 0)
-              Text(
-                '${game.waitlistCount} waitlisted',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  if (game.waitlistCount > 0)
+                    Text(
+                      '${game.waitlistCount} waitlisted',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                     ),
+                ],
               ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 6,
-            backgroundColor: isPast
-                ? Theme.of(context).colorScheme.surfaceVariant
-                : Theme.of(context).colorScheme.surfaceVariant,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              isPast
-                  ? Theme.of(context).colorScheme.onSurfaceVariant
-                  : game.currentPlayerCount >= game.minPlayers
-                      ? Colors.green
-                      : Colors.orange,
-            ),
+              const SizedBox(height: 4),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 6,
+                  backgroundColor: isPast
+                      ? Theme.of(context).colorScheme.surfaceVariant
+                      : Theme.of(context).colorScheme.surfaceVariant,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isPast
+                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                        : AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
+        if (statusBadge != null) ...[
+          const SizedBox(width: 12),
+          statusBadge,
+        ],
       ],
     );
   }

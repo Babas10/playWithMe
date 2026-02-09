@@ -1,5 +1,6 @@
 // Training session creation page - simplified version for Story 15.4
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -203,9 +204,9 @@ class _TrainingSessionCreationPageState
         builder: (context) {
           final l10n = AppLocalizations.of(context)!;
           return Scaffold(
-            appBar: AppBar(
-              title: Text(l10n.createTrainingSession),
-              centerTitle: true,
+            appBar: PlayWithMeAppBar.build(
+              context: context,
+              title: l10n.createTrainingSession,
             ),
             body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
               builder: (context, authState) {

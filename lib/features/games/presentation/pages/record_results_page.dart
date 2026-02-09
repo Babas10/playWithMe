@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
@@ -43,19 +45,13 @@ class _RecordResultsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.recordResults),
-        elevation: 0,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: AppLocalizations.of(context)!.recordResults,
       ),
       body: BlocConsumer<RecordResultsBloc, RecordResultsState>(
         listener: (context, state) {
           if (state is RecordResultsSaved) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(AppLocalizations.of(context)!.teamsSavedSuccess),
-                backgroundColor: Colors.green,
-              ),
-            );
             // Navigate to score entry page
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
@@ -121,7 +117,7 @@ class _RecordResultsView extends StatelessWidget {
                             title: AppLocalizations.of(context)!.teamA,
                             playerIds: state.teamAPlayerIds,
                             players: state.players,
-                            color: Colors.blue,
+                            color: AppColors.primary,
                             onRemove: (playerId) {
                               context.read<RecordResultsBloc>().add(
                                     RemovePlayerFromTeam(playerId: playerId),
@@ -134,7 +130,7 @@ class _RecordResultsView extends StatelessWidget {
                             title: AppLocalizations.of(context)!.teamB,
                             playerIds: state.teamBPlayerIds,
                             players: state.players,
-                            color: Colors.red,
+                            color: AppColors.secondary,
                             onRemove: (playerId) {
                               context.read<RecordResultsBloc>().add(
                                     RemovePlayerFromTeam(playerId: playerId),
@@ -222,8 +218,9 @@ class _TeamSection extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
                       ),
                 ),
                 const Spacer(),
@@ -288,8 +285,9 @@ class _UnassignedPlayersSection extends StatelessWidget {
           children: [
             Text(
               AppLocalizations.of(context)!.unassignedPlayers,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
                   ),
             ),
             const SizedBox(height: 12),
@@ -300,12 +298,24 @@ class _UnassignedPlayersSection extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.check_circle, color: Colors.green),
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        color: AppColors.secondary,
+                        size: 16,
+                      ),
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       AppLocalizations.of(context)!.allPlayersAssigned,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.green,
+                            color: AppColors.secondary,
                             fontWeight: FontWeight.bold,
                           ),
                     ),
@@ -363,10 +373,13 @@ class _PlayerChip extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: color,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.25),
             child: Text(
               playerName.substring(0, 1).toUpperCase(),
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppColors.secondary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -421,10 +434,13 @@ class _UnassignedPlayerItem extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: Colors.grey,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.25),
             child: Text(
               playerName.substring(0, 1).toUpperCase(),
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppColors.secondary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -441,8 +457,8 @@ class _UnassignedPlayerItem extends StatelessWidget {
                 key: Key('assign_team_A_button_$playerId'),
                 onPressed: onAssignToTeamA,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.secondary,
                   minimumSize: const Size(60, 36),
                 ),
                 child: Text(AppLocalizations.of(context)!.teamA),
@@ -452,7 +468,7 @@ class _UnassignedPlayerItem extends StatelessWidget {
                 key: Key('assign_team_B_button_$playerId'),
                 onPressed: onAssignToTeamB,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.secondary,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(60, 36),
                 ),
@@ -480,10 +496,10 @@ class _SaveButton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: AppColors.bottomNavBackground,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.shadow,
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

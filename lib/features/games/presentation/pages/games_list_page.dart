@@ -1,5 +1,7 @@
 // Displays the group activity feed with games and training sessions.
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/group_activity_item.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
@@ -13,7 +15,10 @@ import 'package:play_with_me/features/games/presentation/pages/game_creation_pag
 import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_list_item.dart';
 import 'package:play_with_me/features/games/presentation/widgets/training_session_list_item.dart';
+import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
+import 'package:play_with_me/features/training/presentation/pages/training_session_creation_page.dart';
 import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 class GamesListPage extends StatelessWidget {
   final String groupId;
@@ -57,9 +62,9 @@ class _GamesListPageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('$groupName Games'),
-        centerTitle: true,
+      appBar: PlayWithMeAppBar.build(
+        context: context,
+        title: 'Activities',
       ),
       body: BlocBuilder<GamesListBloc, GamesListState>(
         builder: (context, state) {
@@ -84,11 +89,7 @@ class _GamesListPageContent extends StatelessWidget {
           return const SizedBox.shrink();
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _navigateToGameCreation(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Create Game'),
-      ),
+      bottomNavigationBar: _buildBottomNavBar(context),
     );
   }
 
@@ -149,7 +150,7 @@ class _GamesListPageContent extends StatelessWidget {
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
+              color: AppColors.secondary,
             ),
       ),
     );
@@ -193,6 +194,7 @@ class _GamesListPageContent extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -204,24 +206,145 @@ class _GamesListPageContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No upcoming games yet',
+            l10n.noActivitiesYet,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           Text(
-            'Create the first game!',
+            l10n.createFirstActivity,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
-            onPressed: () => _navigateToGameCreation(context),
+            onPressed: () => _showCreateMenu(context),
             icon: const Icon(Icons.add),
-            label: const Text('Create Game'),
+            label: Text(l10n.create),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildBottomNavBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.bottomNavBackground,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildNavItem(
+                context,
+                icon: Icons.add_circle,
+                label: l10n.create,
+                onTap: () => _showCreateMenu(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: AppColors.primary,
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: AppColors.navLabelColor,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCreateMenu(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.sports_volleyball, color: AppColors.secondary),
+                  title: Text(
+                    l10n.createGame,
+                    style: TextStyle(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    l10n.competitiveGameWithElo,
+                    style: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateToGameCreation(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.fitness_center, color: AppColors.secondary),
+                  title: Text(
+                    l10n.createTrainingSession,
+                    style: TextStyle(
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    l10n.practiceSessionNoElo,
+                    style: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateToTrainingCreation(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -232,6 +355,21 @@ class _GamesListPageContent extends StatelessWidget {
         builder: (context) => BlocProvider(
           create: (context) => sl<GameCreationBloc>(),
           child: GameCreationPage(
+            groupId: groupId,
+            groupName: groupName,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToTrainingCreation(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => sl<TrainingSessionCreationBloc>(),
+          child: TrainingSessionCreationPage(
             groupId: groupId,
             groupName: groupName,
           ),
