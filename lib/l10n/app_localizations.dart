@@ -1940,6 +1940,12 @@ abstract class AppLocalizations {
   /// **'Overall Winner: Team B'**
   String get overallWinnerTeamB;
 
+  /// Message shown when game result is a tie
+  ///
+  /// In en, this message translates to:
+  /// **'Result: Tie'**
+  String get resultTie;
+
   /// Save scores button
   ///
   /// In en, this message translates to:

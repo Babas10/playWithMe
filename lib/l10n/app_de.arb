@@ -306,6 +306,7 @@
   "invalidScore": "Ungültiger Punktestand",
   "overallWinnerTeamA": "Gesamtsieger: Team A",
   "overallWinnerTeamB": "Gesamtsieger: Team B",
+  "resultTie": "Ergebnis: Unentschieden",
   "saveScores": "Punkte Speichern",
   "completeGamesToContinue": "Beenden Sie {current}/{total} Spiele zum Fortfahren",
   "upcomingActivities": "Kommende Aktivitäten",

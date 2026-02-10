@@ -981,6 +981,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overallWinnerTeamB => 'Overall Winner: Team B';
 
   @override
+  String get resultTie => 'Result: Tie';
+
+  @override
   String get saveScores => 'Save Scores';
 
   @override
