@@ -196,6 +196,8 @@ class _OverallResultCard extends StatelessWidget {
                       teamName: teamAName,
                       score: gamesWon['teamA'] ?? 0,
                       isWinner: result.overallWinner == 'teamA',
+                      isTied: result.overallWinner == null,
+                      isTeamA: true,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -204,6 +206,8 @@ class _OverallResultCard extends StatelessWidget {
                       teamName: teamBName,
                       score: gamesWon['teamB'] ?? 0,
                       isWinner: result.overallWinner == 'teamB',
+                      isTied: result.overallWinner == null,
+                      isTeamA: false,
                     ),
                   ),
                 ],
@@ -220,20 +224,37 @@ class _TeamScore extends StatelessWidget {
   final String teamName;
   final int score;
   final bool isWinner;
+  final bool isTied;
+  final bool isTeamA;
 
   const _TeamScore({
     required this.teamName,
     required this.score,
     required this.isWinner,
+    this.isTied = false,
+    this.isTeamA = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Winner: blue background with white text
-    // Loser: yellow background with blue text
-    final backgroundColor = isWinner ? AppColors.secondary : AppColors.primary;
-    final textColor = isWinner ? Colors.white : AppColors.secondary;
-    final borderColor = isWinner ? AppColors.secondary : AppColors.primary;
+    final Color backgroundColor;
+    final Color textColor;
+    final Color borderColor;
+
+    if (isWinner) {
+      backgroundColor = AppColors.secondary;
+      textColor = Colors.white;
+      borderColor = AppColors.secondary;
+    } else if (isTied) {
+      // Tie: Team A gets yellow/gold, Team B gets blue — visually distinct
+      backgroundColor = isTeamA ? AppColors.primary : AppColors.secondary;
+      textColor = isTeamA ? AppColors.secondary : Colors.white;
+      borderColor = isTeamA ? AppColors.primary : AppColors.secondary;
+    } else {
+      backgroundColor = AppColors.primary;
+      textColor = AppColors.secondary;
+      borderColor = AppColors.primary;
+    }
 
     return Column(
       children: [

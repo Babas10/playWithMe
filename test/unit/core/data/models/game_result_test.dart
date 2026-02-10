@@ -260,6 +260,109 @@ void main() {
       });
     });
 
+    group('Tied Session Results', () {
+      test('isValid returns true for 2-game session with 1-1 tie', () {
+        final result = GameResult(
+          games: [
+            IndividualGame(
+              gameNumber: 1,
+              sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+              winner: 'teamA',
+            ),
+            IndividualGame(
+              gameNumber: 2,
+              sets: [SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1)],
+              winner: 'teamB',
+            ),
+          ],
+          overallWinner: null,
+        );
+
+        expect(result.isValid(), true);
+        expect(result.gamesWon['teamA'], 1);
+        expect(result.gamesWon['teamB'], 1);
+      });
+
+      test('isValid returns true for 4-game session with 2-2 tie', () {
+        final result = GameResult(
+          games: [
+            IndividualGame(
+              gameNumber: 1,
+              sets: [SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1)],
+              winner: 'teamA',
+            ),
+            IndividualGame(
+              gameNumber: 2,
+              sets: [SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1)],
+              winner: 'teamB',
+            ),
+            IndividualGame(
+              gameNumber: 3,
+              sets: [SetScore(teamAPoints: 21, teamBPoints: 17, setNumber: 1)],
+              winner: 'teamA',
+            ),
+            IndividualGame(
+              gameNumber: 4,
+              sets: [SetScore(teamAPoints: 18, teamBPoints: 21, setNumber: 1)],
+              winner: 'teamB',
+            ),
+          ],
+          overallWinner: null,
+        );
+
+        expect(result.isValid(), true);
+        expect(result.gamesWon['teamA'], 2);
+        expect(result.gamesWon['teamB'], 2);
+        expect(result.scoreDescription, '2-2');
+      });
+
+      test('isValid returns false for tied result with non-null overallWinner', () {
+        final result = GameResult(
+          games: [
+            IndividualGame(
+              gameNumber: 1,
+              sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+              winner: 'teamA',
+            ),
+            IndividualGame(
+              gameNumber: 2,
+              sets: [SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1)],
+              winner: 'teamB',
+            ),
+          ],
+          overallWinner: 'teamA',
+        );
+
+        expect(result.isValid(), false);
+      });
+
+      test('toJson and fromJson work correctly for tied session', () {
+        final result = GameResult(
+          games: [
+            IndividualGame(
+              gameNumber: 1,
+              sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+              winner: 'teamA',
+            ),
+            IndividualGame(
+              gameNumber: 2,
+              sets: [SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1)],
+              winner: 'teamB',
+            ),
+          ],
+          overallWinner: null,
+        );
+
+        final json = result.toJson();
+        final fromJson = GameResult.fromJson(json);
+
+        expect(fromJson.games.length, 2);
+        expect(fromJson.overallWinner, null);
+        expect(fromJson.gamesWon['teamA'], 1);
+        expect(fromJson.gamesWon['teamB'], 1);
+      });
+    });
+
     group('Invalid Session Results', () {
       test('isValid returns false for empty games list', () {
         final result = GameResult(

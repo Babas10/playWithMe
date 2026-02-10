@@ -45,8 +45,13 @@ class GameResultBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final winnerName = _getTeamName(result.overallWinner);
-    final scoreText = '$winnerName won ${result.scoreDescription}';
+    final String scoreText;
+    if (result.overallWinner != null) {
+      final winnerName = _getTeamName(result.overallWinner!);
+      scoreText = '$winnerName won ${result.scoreDescription}';
+    } else {
+      scoreText = 'Tie ${result.scoreDescription}';
+    }
 
     return GestureDetector(
       onTap: onTap,

@@ -192,6 +192,7 @@ class _ScoreEntryForm extends StatelessWidget {
         _SaveButton(
           canSave: state.canSave,
           overallWinner: state.overallWinner,
+          isTied: state.isTied,
           gamesWon: state.games.where((g) => g.isComplete).length,
           totalGames: state.games.length,
           onSave: () {
@@ -521,6 +522,7 @@ class _SetScoreInputState extends State<_SetScoreInput> {
 class _SaveButton extends StatelessWidget {
   final bool canSave;
   final String? overallWinner;
+  final bool isTied;
   final int gamesWon;
   final int totalGames;
   final VoidCallback onSave;
@@ -528,6 +530,7 @@ class _SaveButton extends StatelessWidget {
   const _SaveButton({
     required this.canSave,
     required this.overallWinner,
+    required this.isTied,
     required this.gamesWon,
     required this.totalGames,
     required this.onSave,
@@ -535,6 +538,7 @@ class _SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -551,11 +555,15 @@ class _SaveButton extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (canSave && overallWinner != null)
+            if (canSave)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Text(
-                  'Overall Winner: ${overallWinner == "teamA" ? "Team A" : "Team B"}',
+                  isTied
+                      ? l10n.resultTie
+                      : overallWinner == 'teamA'
+                          ? l10n.overallWinnerTeamA
+                          : l10n.overallWinnerTeamB,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.secondary,
@@ -574,8 +582,8 @@ class _SaveButton extends StatelessWidget {
                 ),
                 child: Text(
                   canSave
-                      ? 'Save Scores'
-                      : 'Complete $gamesWon/$totalGames games to continue',
+                      ? l10n.saveScores
+                      : l10n.completeGamesToContinue(gamesWon, totalGames),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),

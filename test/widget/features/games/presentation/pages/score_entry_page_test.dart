@@ -113,6 +113,60 @@ void main() {
     );
   }
 
+  group('ScoreEntryPage Tied Games Widget Tests', () {
+    testWidgets('can save scores when teams are tied', (tester) async {
+      final mockObserver = MockNavigatorObserver();
+
+      await tester.pumpWidget(BlocProvider<AuthenticationBloc>.value(
+        value: mockAuthBloc,
+        child: MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: ScoreEntryPage(
+            gameId: testGameId,
+          ),
+          navigatorObservers: [mockObserver],
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      // Select 2 games
+      await tester.tap(find.text('2'));
+      await tester.pumpAndSettle();
+
+      // Enter scores - Game 1: Team A wins
+      await tester.enterText(find.byKey(const Key('team_a_score_0_0')), '21');
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('team_b_score_0_0')), '19');
+      await tester.pumpAndSettle();
+
+      // Enter scores - Game 2: Team B wins (tie!)
+      await tester.enterText(find.byKey(const Key('team_a_score_1_0')), '19');
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('team_b_score_1_0')), '21');
+      await tester.pumpAndSettle();
+
+      // Verify the "Result: Tie" text is shown
+      expect(find.text('Result: Tie'), findsOneWidget);
+
+      // Verify the Save Scores button is enabled
+      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Scores');
+      expect(saveButtonFinder, findsOneWidget);
+
+      // Tap save
+      await tester.ensureVisible(saveButtonFinder);
+      await tester.tap(saveButtonFinder);
+      await tester.pumpAndSettle();
+
+      verify(() => mockObserver.didPop(any(), any())).called(1);
+    });
+  });
+
   group('ScoreEntryPage Widget Tests', () {
     testWidgets('displays game count selector when loaded', (tester) async {
       await tester.pumpWidget(createApp(gameId: testGameId));

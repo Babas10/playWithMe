@@ -991,6 +991,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get overallWinnerTeamB => 'Ganador General: Equipo B';
 
   @override
+  String get resultTie => 'Resultado: Empate';
+
+  @override
   String get saveScores => 'Guardar Puntajes';
 
   @override

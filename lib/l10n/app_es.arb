@@ -306,6 +306,7 @@
   "invalidScore": "Puntaje inválido",
   "overallWinnerTeamA": "Ganador General: Equipo A",
   "overallWinnerTeamB": "Ganador General: Equipo B",
+  "resultTie": "Resultado: Empate",
   "saveScores": "Guardar Puntajes",
   "completeGamesToContinue": "Completa {current}/{total} partidos para continuar",
   "upcomingActivities": "Actividades Próximas",
