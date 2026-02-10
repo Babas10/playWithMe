@@ -587,7 +587,7 @@ class IndividualGame with _$IndividualGame {
 class GameResult with _$GameResult {
   const factory GameResult({
     @IndividualGameListConverter() required List<IndividualGame> games,
-    required String overallWinner, // 'teamA' or 'teamB' - who won more games
+    String? overallWinner, // 'teamA', 'teamB', or null for tie
   }) = _GameResult;
 
   const GameResult._();
@@ -610,6 +610,11 @@ class GameResult with _$GameResult {
 
     // Count wins for each team
     final wins = gamesWon;
+
+    // If overallWinner is null, it must be a tie (equal wins)
+    if (overallWinner == null) {
+      return wins['teamA']! == wins['teamB']!;
+    }
 
     // Overall winner must have won more games
     if (overallWinner == 'teamA') {

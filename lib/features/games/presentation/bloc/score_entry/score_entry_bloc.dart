@@ -207,7 +207,7 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
     // Create result
     final result = GameResult(
       games: individualGames,
-      overallWinner: currentState.overallWinner!,
+      overallWinner: currentState.overallWinner,
     );
 
     // Validate result

@@ -306,6 +306,7 @@
   "invalidScore": "Punteggio non valido",
   "overallWinnerTeamA": "Vincitore Generale: Squadra A",
   "overallWinnerTeamB": "Vincitore Generale: Squadra B",
+  "resultTie": "Risultato: Pareggio",
   "saveScores": "Salva Punteggi",
   "completeGamesToContinue": "Completa {current}/{total} partite per continuare",
   "upcomingActivities": "Attività Imminenti",
