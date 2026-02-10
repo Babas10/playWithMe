@@ -306,6 +306,7 @@
   "invalidScore": "Score invalide",
   "overallWinnerTeamA": "Vainqueur Général : Équipe A",
   "overallWinnerTeamB": "Vainqueur Général : Équipe B",
+  "resultTie": "Résultat : Égalité",
   "saveScores": "Enregistrer les Scores",
   "completeGamesToContinue": "Terminez {current}/{total} matchs pour continuer",
   "upcomingActivities": "Activités à Venir",

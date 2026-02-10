@@ -2294,7 +2294,7 @@ GameResult _$GameResultFromJson(Map<String, dynamic> json) {
 mixin _$GameResult {
   @IndividualGameListConverter()
   List<IndividualGame> get games => throw _privateConstructorUsedError;
-  String get overallWinner => throw _privateConstructorUsedError;
+  String? get overallWinner => throw _privateConstructorUsedError;
 
   /// Serializes this GameResult to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2315,7 +2315,7 @@ abstract class $GameResultCopyWith<$Res> {
   @useResult
   $Res call({
     @IndividualGameListConverter() List<IndividualGame> games,
-    String overallWinner,
+    String? overallWinner,
   });
 }
 
@@ -2333,17 +2333,17 @@ class _$GameResultCopyWithImpl<$Res, $Val extends GameResult>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? games = null, Object? overallWinner = null}) {
+  $Res call({Object? games = null, Object? overallWinner = freezed}) {
     return _then(
       _value.copyWith(
             games: null == games
                 ? _value.games
                 : games // ignore: cast_nullable_to_non_nullable
                       as List<IndividualGame>,
-            overallWinner: null == overallWinner
+            overallWinner: freezed == overallWinner
                 ? _value.overallWinner
                 : overallWinner // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
           )
           as $Val,
     );
@@ -2361,7 +2361,7 @@ abstract class _$$GameResultImplCopyWith<$Res>
   @useResult
   $Res call({
     @IndividualGameListConverter() List<IndividualGame> games,
-    String overallWinner,
+    String? overallWinner,
   });
 }
 
@@ -2378,17 +2378,17 @@ class __$$GameResultImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? games = null, Object? overallWinner = null}) {
+  $Res call({Object? games = null, Object? overallWinner = freezed}) {
     return _then(
       _$GameResultImpl(
         games: null == games
             ? _value._games
             : games // ignore: cast_nullable_to_non_nullable
                   as List<IndividualGame>,
-        overallWinner: null == overallWinner
+        overallWinner: freezed == overallWinner
             ? _value.overallWinner
             : overallWinner // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
       ),
     );
   }
@@ -2399,7 +2399,7 @@ class __$$GameResultImplCopyWithImpl<$Res>
 class _$GameResultImpl extends _GameResult {
   const _$GameResultImpl({
     @IndividualGameListConverter() required final List<IndividualGame> games,
-    required this.overallWinner,
+    this.overallWinner,
   }) : _games = games,
        super._();
 
@@ -2416,7 +2416,7 @@ class _$GameResultImpl extends _GameResult {
   }
 
   @override
-  final String overallWinner;
+  final String? overallWinner;
 
   @override
   String toString() {
@@ -2458,7 +2458,7 @@ class _$GameResultImpl extends _GameResult {
 abstract class _GameResult extends GameResult {
   const factory _GameResult({
     @IndividualGameListConverter() required final List<IndividualGame> games,
-    required final String overallWinner,
+    final String? overallWinner,
   }) = _$GameResultImpl;
   const _GameResult._() : super._();
 
@@ -2469,7 +2469,7 @@ abstract class _GameResult extends GameResult {
   @IndividualGameListConverter()
   List<IndividualGame> get games;
   @override
-  String get overallWinner;
+  String? get overallWinner;
 
   /// Create a copy of GameResult
   /// with the given fields replaced by the non-null parameter values.

@@ -180,8 +180,14 @@ class ScoreEntryLoaded extends ScoreEntryState {
     return null;
   }
 
-  /// Check if we can save (all games complete and there's a winner)
-  bool get canSave => allGamesComplete && overallWinner != null;
+  /// Check if the result is a tie (equal game wins)
+  bool get isTied {
+    if (!allGamesComplete) return false;
+    return overallWinner == null;
+  }
+
+  /// Check if we can save (all games complete, with winner or tie)
+  bool get canSave => allGamesComplete;
 
   /// Copy with method for state updates
   ScoreEntryLoaded copyWith({

@@ -236,7 +236,7 @@ _$GameResultImpl _$$GameResultImplFromJson(Map<String, dynamic> json) =>
       games: const IndividualGameListConverter().fromJson(
         json['games'] as List,
       ),
-      overallWinner: json['overallWinner'] as String,
+      overallWinner: json['overallWinner'] as String?,
     );
 
 Map<String, dynamic> _$$GameResultImplToJson(_$GameResultImpl instance) =>

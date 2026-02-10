@@ -421,6 +421,108 @@ void main() {
       );
 
       blocTest<ScoreEntryBloc, ScoreEntryState>(
+        'saves valid tied session (1-1)',
+        build: () {
+          final game = TestGameData.testGame.copyWith(
+            status: GameStatus.completed,
+            endedAt: DateTime.now(),
+            playerIds: ['p1', 'p2'],
+            teams: const GameTeams(
+              teamAPlayerIds: ['p1'],
+              teamBPlayerIds: ['p2'],
+            ),
+          );
+          mockGameRepository.addGame(game);
+          return ScoreEntryBloc(gameRepository: mockGameRepository);
+        },
+        seed: () => ScoreEntryLoaded(
+          game: TestGameData.testGame.copyWith(
+            status: GameStatus.completed,
+            playerIds: ['p1', 'p2'],
+            teams: const GameTeams(
+              teamAPlayerIds: ['p1'],
+              teamBPlayerIds: ['p2'],
+            ),
+          ),
+          gameCount: 2,
+          games: [
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
+            ),
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 19, teamBPoints: 21)],
+            ),
+          ],
+        ),
+        act: (bloc) => bloc.add(const SaveScores(userId: 'test-uid-123')),
+        expect: () => [
+          isA<ScoreEntrySaving>(),
+          isA<ScoreEntrySaved>()
+              .having((state) => state.result.games.length, 'games count', 2)
+              .having((state) => state.result.overallWinner, 'winner', null)
+              .having((state) => state.result.gamesWon['teamA'], 'teamA wins', 1)
+              .having((state) => state.result.gamesWon['teamB'], 'teamB wins', 1),
+        ],
+      );
+
+      blocTest<ScoreEntryBloc, ScoreEntryState>(
+        'saves valid tied session (2-2)',
+        build: () {
+          final game = TestGameData.testGame.copyWith(
+            status: GameStatus.completed,
+            endedAt: DateTime.now(),
+            playerIds: ['p1', 'p2'],
+            teams: const GameTeams(
+              teamAPlayerIds: ['p1'],
+              teamBPlayerIds: ['p2'],
+            ),
+          );
+          mockGameRepository.addGame(game);
+          return ScoreEntryBloc(gameRepository: mockGameRepository);
+        },
+        seed: () => ScoreEntryLoaded(
+          game: TestGameData.testGame.copyWith(
+            status: GameStatus.completed,
+            playerIds: ['p1', 'p2'],
+            teams: const GameTeams(
+              teamAPlayerIds: ['p1'],
+              teamBPlayerIds: ['p2'],
+            ),
+          ),
+          gameCount: 4,
+          games: [
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 18)],
+            ),
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 19, teamBPoints: 21)],
+            ),
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 17)],
+            ),
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 18, teamBPoints: 21)],
+            ),
+          ],
+        ),
+        act: (bloc) => bloc.add(const SaveScores(userId: 'test-uid-123')),
+        expect: () => [
+          isA<ScoreEntrySaving>(),
+          isA<ScoreEntrySaved>()
+              .having((state) => state.result.games.length, 'games count', 4)
+              .having((state) => state.result.overallWinner, 'winner', null)
+              .having((state) => state.result.gamesWon['teamA'], 'teamA wins', 2)
+              .having((state) => state.result.gamesWon['teamB'], 'teamB wins', 2),
+        ],
+      );
+
+      blocTest<ScoreEntryBloc, ScoreEntryState>(
         'emits error when scores incomplete',
         build: () => ScoreEntryBloc(gameRepository: mockGameRepository),
         seed: () => ScoreEntryLoaded(
@@ -522,6 +624,80 @@ void main() {
         );
 
         expect(state.canSave, true);
+      });
+
+      test('canSave returns true when all games complete and tied', () {
+        final state = ScoreEntryLoaded(
+          game: TestGameData.testGame,
+          gameCount: 2,
+          games: [
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
+            ),
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 19, teamBPoints: 21)],
+            ),
+          ],
+        );
+
+        expect(state.canSave, true);
+      });
+
+      test('isTied returns true when teams have equal wins', () {
+        final state = ScoreEntryLoaded(
+          game: TestGameData.testGame,
+          gameCount: 2,
+          games: [
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
+            ),
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 19, teamBPoints: 21)],
+            ),
+          ],
+        );
+
+        expect(state.isTied, true);
+        expect(state.overallWinner, null);
+      });
+
+      test('isTied returns false when there is a clear winner', () {
+        final state = ScoreEntryLoaded(
+          game: TestGameData.testGame,
+          gameCount: 1,
+          games: [
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
+            ),
+          ],
+        );
+
+        expect(state.isTied, false);
+        expect(state.overallWinner, 'teamA');
+      });
+
+      test('isTied returns false when games are incomplete', () {
+        final state = ScoreEntryLoaded(
+          game: TestGameData.testGame,
+          gameCount: 2,
+          games: [
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
+            ),
+            GameData(
+              numberOfSets: 1,
+              sets: [const SetScoreData()],
+            ),
+          ],
+        );
+
+        expect(state.isTied, false);
       });
 
       test('canSave returns false when games incomplete', () {

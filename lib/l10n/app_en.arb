@@ -1584,6 +1584,11 @@
     "description": "Overall winner message for Team B"
   },
 
+  "resultTie": "Result: Tie",
+  "@resultTie": {
+    "description": "Message shown when game result is a tie"
+  },
+
   "saveScores": "Save Scores",
   "@saveScores": {
     "description": "Save scores button"
