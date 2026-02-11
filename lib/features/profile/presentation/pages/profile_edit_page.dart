@@ -303,8 +303,8 @@ class _ProfileEditContentState extends State<_ProfileEditContent> {
                           // Country Dropdown
                           DropdownButtonFormField<String>(
                             value: localeState is LocalePreferencesLoaded
-                                ? localeState.preferences.country
-                                : 'United States',
+                                ? Countries.normalize(localeState.preferences.country)
+                                : Countries.defaultCountry,
                             decoration: InputDecoration(
                               labelText: AppLocalizations.of(context)!.country,
                               helperText: 'Select your country',
