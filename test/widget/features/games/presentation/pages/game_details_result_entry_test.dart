@@ -124,12 +124,12 @@ void main() {
     expect(find.text('Enter Results'), findsNothing);
   });
 
-  testWidgets('Creator sees "Enter Results" button even when game is future', (tester) async {
+  testWidgets('Creator does NOT see "Enter Results" button when game is future', (tester) async {
     final futureGame = baseGame.copyWith(
       scheduledAt: DateTime.now().add(const Duration(hours: 2)),
     );
     mockGameRepository.addGame(futureGame);
-    
+
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(UserEntity(uid: creatorId, email: '', isEmailVerified: true, isAnonymous: false)),
     );
@@ -137,7 +137,7 @@ void main() {
     await tester.pumpWidget(createWidgetUnderTest(futureGame.id));
     await tester.pumpAndSettle();
 
-    expect(find.text('Enter Results'), findsOneWidget);
+    expect(find.text('Enter Results'), findsNothing);
   });
 
   testWidgets('Participant sees "Enter Results" button when game is in progress', (tester) async {
@@ -179,7 +179,7 @@ void main() {
       scheduledAt: DateTime.now().subtract(const Duration(hours: 2)),
     );
     mockGameRepository.addGame(pastGame);
-    
+
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(UserEntity(uid: participantId, email: '', isEmailVerified: true, isAnonymous: false)),
     );
@@ -191,5 +191,59 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(RecordResultsPage), findsOneWidget);
+  });
+
+  testWidgets('Participant does NOT see "Enter Results" when game has insufficient players', (tester) async {
+    final insufficientPlayersGame = baseGame.copyWith(
+      scheduledAt: DateTime.now().subtract(const Duration(hours: 2)),
+      minPlayers: 4,
+      playerIds: [creatorId, participantId], // Only 2 players, need 4
+    );
+    mockGameRepository.addGame(insufficientPlayersGame);
+
+    when(() => mockAuthBloc.state).thenReturn(
+      AuthenticationAuthenticated(UserEntity(uid: participantId, email: '', isEmailVerified: true, isAnonymous: false)),
+    );
+
+    await tester.pumpWidget(createWidgetUnderTest(insufficientPlayersGame.id));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enter Results'), findsNothing);
+  });
+
+  testWidgets('Creator does NOT see "Enter Results" when game has insufficient players', (tester) async {
+    final insufficientPlayersGame = baseGame.copyWith(
+      scheduledAt: DateTime.now().subtract(const Duration(hours: 2)),
+      minPlayers: 4,
+      playerIds: [creatorId, participantId], // Only 2 players, need 4
+    );
+    mockGameRepository.addGame(insufficientPlayersGame);
+
+    when(() => mockAuthBloc.state).thenReturn(
+      AuthenticationAuthenticated(UserEntity(uid: creatorId, email: '', isEmailVerified: true, isAnonymous: false)),
+    );
+
+    await tester.pumpWidget(createWidgetUnderTest(insufficientPlayersGame.id));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enter Results'), findsNothing);
+  });
+
+  testWidgets('Participant sees "Enter Results" when game is past with enough players', (tester) async {
+    final validGame = baseGame.copyWith(
+      scheduledAt: DateTime.now().subtract(const Duration(hours: 2)),
+      minPlayers: 2,
+      playerIds: [creatorId, participantId, 'user-3', 'user-4'],
+    );
+    mockGameRepository.addGame(validGame);
+
+    when(() => mockAuthBloc.state).thenReturn(
+      AuthenticationAuthenticated(UserEntity(uid: participantId, email: '', isEmailVerified: true, isAnonymous: false)),
+    );
+
+    await tester.pumpWidget(createWidgetUnderTest(validGame.id));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enter Results'), findsOneWidget);
   });
 }

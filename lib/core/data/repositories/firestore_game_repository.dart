@@ -711,6 +711,22 @@ class FirestoreGameRepository implements GameRepository {
               code: 'invalid-state');
         }
 
+        // Check if game has passed its scheduled time
+        if (!currentGame.isPast &&
+            currentGame.status != GameStatus.completed &&
+            currentGame.status != GameStatus.inProgress) {
+          throw GameException(
+              'Cannot save result before the scheduled game time',
+              code: 'failed-precondition');
+        }
+
+        // Check if game has minimum required players
+        if (!currentGame.hasMinimumPlayers) {
+          throw GameException(
+              'Cannot save result without the minimum number of players (${currentGame.minPlayers} required, ${currentGame.currentPlayerCount} joined)',
+              code: 'failed-precondition');
+        }
+
         // Validate teams
         if (teams.hasPlayerOnBothTeams()) {
           throw GameException('A player cannot be on both teams',
