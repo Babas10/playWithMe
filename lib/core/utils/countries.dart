@@ -1,5 +1,18 @@
 /// Utility class providing a comprehensive list of countries
 class Countries {
+  /// Default country used as fallback when stored value is not recognized
+  static const String defaultCountry = 'United States';
+
+  /// Returns [value] if it matches a country in [all], otherwise returns [defaultCountry].
+  ///
+  /// This handles cases where the stored country preference is an ISO code
+  /// (e.g., 'ES' from the device locale) instead of a full country name.
+  static String normalize(String? value) {
+    if (value == null || value.isEmpty) return defaultCountry;
+    if (all.contains(value)) return value;
+    return defaultCountry;
+  }
+
   /// List of major countries (~200 countries)
   static const List<String> all = [
     'Afghanistan',

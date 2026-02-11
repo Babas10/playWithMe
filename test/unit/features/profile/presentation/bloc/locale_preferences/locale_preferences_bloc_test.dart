@@ -4,6 +4,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/utils/countries.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_bloc.dart';
@@ -395,6 +396,63 @@ void main() {
             hasUnsavedChanges: true,
           ),
         ],
+      );
+
+      blocTest<LocalePreferencesBloc, LocalePreferencesState>(
+        'emits ISO code country as-is from repository, requiring UI normalization',
+        build: () {
+          final isoPreferences = const LocalePreferencesEntity(
+            locale: Locale('es'),
+            country: 'ES',
+            timeZone: null,
+            lastSyncedAt: null,
+          );
+          when(() => mockRepository.loadPreferences())
+              .thenAnswer((_) async => isoPreferences);
+          return LocalePreferencesBloc(repository: mockRepository);
+        },
+        act: (bloc) =>
+            bloc.add(const LocalePreferencesEvent.loadPreferences()),
+        expect: () => [
+          const LocalePreferencesState.loading(),
+          isA<LocalePreferencesLoaded>().having(
+            (s) => s.preferences.country,
+            'country',
+            'ES',
+          ),
+        ],
+        verify: (_) {
+          // Confirm that Countries.normalize resolves the ISO code
+          expect(Countries.normalize('ES'), Countries.defaultCountry);
+        },
+      );
+
+      blocTest<LocalePreferencesBloc, LocalePreferencesState>(
+        'emits ISO code country from Firestore, requiring UI normalization',
+        build: () {
+          final isoPreferences = const LocalePreferencesEntity(
+            locale: Locale('fr'),
+            country: 'FR',
+            timeZone: null,
+            lastSyncedAt: null,
+          );
+          when(() => mockRepository.loadFromFirestore('user123'))
+              .thenAnswer((_) async => isoPreferences);
+          return LocalePreferencesBloc(repository: mockRepository);
+        },
+        act: (bloc) =>
+            bloc.add(const LocalePreferencesEvent.loadFromFirestore('user123')),
+        expect: () => [
+          const LocalePreferencesState.loading(),
+          isA<LocalePreferencesLoaded>().having(
+            (s) => s.preferences.country,
+            'country',
+            'FR',
+          ),
+        ],
+        verify: (_) {
+          expect(Countries.normalize('FR'), Countries.defaultCountry);
+        },
       );
 
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(

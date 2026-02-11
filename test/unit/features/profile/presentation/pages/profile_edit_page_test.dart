@@ -440,5 +440,100 @@ void main() {
         expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
       });
     });
+
+    group('Country Dropdown ISO Code Handling (Bug #449)', () {
+      testWidgets('renders without crash when country is an ISO code', (tester) async {
+        // Simulate the bug scenario: stored country preference is 'ES' (ISO code)
+        final isoPreferences = const LocalePreferencesEntity(
+          locale: Locale('es'),
+          country: 'ES',
+          timeZone: 'Europe/Madrid',
+          lastSyncedAt: null,
+        );
+
+        when(() => mockLocalePrefsBloc.state).thenReturn(
+          LocalePreferencesState.loaded(
+            preferences: isoPreferences,
+            hasUnsavedChanges: false,
+          ),
+        );
+        when(() => mockLocalePrefsBloc.stream).thenAnswer(
+          (_) => Stream<LocalePreferencesState>.value(
+            LocalePreferencesState.loaded(
+              preferences: isoPreferences,
+              hasUnsavedChanges: false,
+            ),
+          ),
+        );
+
+        // This should NOT throw 'value ES not found in items'
+        await tester.pumpWidget(createWidgetUnderTest(testUser));
+        await tester.pumpAndSettle();
+
+        // The dropdown should exist and render successfully
+        expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+      });
+
+      testWidgets('falls back to default country when value is unrecognized', (tester) async {
+        final unknownPreferences = const LocalePreferencesEntity(
+          locale: Locale('en'),
+          country: 'UNKNOWN',
+          timeZone: 'UTC',
+          lastSyncedAt: null,
+        );
+
+        when(() => mockLocalePrefsBloc.state).thenReturn(
+          LocalePreferencesState.loaded(
+            preferences: unknownPreferences,
+            hasUnsavedChanges: false,
+          ),
+        );
+        when(() => mockLocalePrefsBloc.stream).thenAnswer(
+          (_) => Stream<LocalePreferencesState>.value(
+            LocalePreferencesState.loaded(
+              preferences: unknownPreferences,
+              hasUnsavedChanges: false,
+            ),
+          ),
+        );
+
+        await tester.pumpWidget(createWidgetUnderTest(testUser));
+        await tester.pumpAndSettle();
+
+        // Should render without crash, falling back to 'United States'
+        expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+      });
+
+      testWidgets('displays correct country when value is a valid name', (tester) async {
+        final validPreferences = const LocalePreferencesEntity(
+          locale: Locale('es'),
+          country: 'Spain',
+          timeZone: 'Europe/Madrid',
+          lastSyncedAt: null,
+        );
+
+        when(() => mockLocalePrefsBloc.state).thenReturn(
+          LocalePreferencesState.loaded(
+            preferences: validPreferences,
+            hasUnsavedChanges: false,
+          ),
+        );
+        when(() => mockLocalePrefsBloc.stream).thenAnswer(
+          (_) => Stream<LocalePreferencesState>.value(
+            LocalePreferencesState.loaded(
+              preferences: validPreferences,
+              hasUnsavedChanges: false,
+            ),
+          ),
+        );
+
+        await tester.pumpWidget(createWidgetUnderTest(testUser));
+        await tester.pumpAndSettle();
+
+        // Should render successfully with 'Spain' selected
+        expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+        expect(find.text('Spain'), findsOneWidget);
+      });
+    });
   });
 }
