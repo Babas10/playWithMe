@@ -6,6 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
@@ -23,6 +26,10 @@ class MockAuthenticationBloc
     extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
+class MockInvitationBloc
+    extends MockBloc<InvitationEvent, InvitationState>
+    implements InvitationBloc {}
+
 class FakeFriendEvent extends Fake implements FriendEvent {}
 
 class FakeFriendState extends Fake implements FriendState {}
@@ -34,6 +41,7 @@ class FakeAuthenticationState extends Fake implements AuthenticationState {}
 void main() {
   late MockFriendBloc mockFriendBloc;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockInvitationBloc mockInvitationBloc;
 
   final testUser = UserEntity(
     uid: 'test-user-123',
@@ -61,6 +69,8 @@ void main() {
   setUp(() {
     mockFriendBloc = MockFriendBloc();
     mockAuthBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
 
     when(() => mockFriendBloc.state).thenReturn(const FriendState.initial());
     when(() => mockAuthBloc.state)
@@ -85,6 +95,7 @@ void main() {
         providers: [
           BlocProvider<FriendBloc>.value(value: mockFriendBloc),
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
         ],
         child: const AddFriendPage(),
       ),

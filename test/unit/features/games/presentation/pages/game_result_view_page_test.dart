@@ -1,18 +1,41 @@
 // Tests player name resolution in GameResultViewPage widget.
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
+import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_result_view_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
+
+class MockInvitationBloc extends Mock implements InvitationBloc {}
+class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 void main() {
   group('GameResultViewPage', () {
     late GameModel gameWithResult;
     late Map<String, UserModel> players;
+    late MockInvitationBloc mockInvitationBloc;
+    late MockAuthenticationBloc mockAuthBloc;
 
     setUp(() {
+      mockInvitationBloc = MockInvitationBloc();
+      mockAuthBloc = MockAuthenticationBloc();
+      when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+      when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+      when(() => mockAuthBloc.state).thenReturn(
+        AuthenticationAuthenticated(
+          UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+        ),
+      );
+      when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
+
       // Create test users
       players = {
         'user1': const UserModel(
@@ -91,9 +114,15 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: GameResultViewPage(
-            game: gameWithResult,
-            players: players,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+              BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            ],
+            child: GameResultViewPage(
+              game: gameWithResult,
+              players: players,
+            ),
           ),
         ),
       );
@@ -116,9 +145,15 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: GameResultViewPage(
-            game: gameWithResult,
-            players: null, // No player data
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+              BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            ],
+            child: GameResultViewPage(
+              game: gameWithResult,
+              players: null, // No player data
+            ),
           ),
         ),
       );
@@ -147,9 +182,15 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: GameResultViewPage(
-            game: gameWithResult,
-            players: partialPlayers,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+              BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            ],
+            child: GameResultViewPage(
+              game: gameWithResult,
+              players: partialPlayers,
+            ),
           ),
         ),
       );
@@ -172,9 +213,15 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: GameResultViewPage(
-            game: gameWithResult,
-            players: players,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+              BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            ],
+            child: GameResultViewPage(
+              game: gameWithResult,
+              players: players,
+            ),
           ),
         ),
       );
@@ -197,9 +244,15 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: GameResultViewPage(
-            game: gameWithoutResult,
-            players: players,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+              BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            ],
+            child: GameResultViewPage(
+              game: gameWithoutResult,
+              players: players,
+            ),
           ),
         ),
       );
@@ -219,9 +272,15 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: GameResultViewPage(
-            game: gameWithResult,
-            players: players,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+              BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            ],
+            child: GameResultViewPage(
+              game: gameWithResult,
+              players: players,
+            ),
           ),
         ),
       );
@@ -245,9 +304,15 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: GameResultViewPage(
-            game: gameWithResult,
-            players: players,
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+              BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            ],
+            child: GameResultViewPage(
+              game: gameWithResult,
+              players: players,
+            ),
           ),
         ),
       );

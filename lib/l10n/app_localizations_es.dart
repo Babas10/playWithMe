@@ -1645,4 +1645,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get noTrainingSessionsScheduled =>
       'No hay sesiones de entrenamiento programadas';
+
+  @override
+  String get stats => 'Estadísticas';
+
+  @override
+  String get myStats => 'Mis Estadísticas';
 }

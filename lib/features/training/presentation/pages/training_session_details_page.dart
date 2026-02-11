@@ -85,7 +85,7 @@ class _TrainingSessionDetailsPageState
               appBar: PlayWithMeAppBar.build(
                 context: context,
                 title: l10n.training,
-                showUserActions: false,
+                showUserActions: true,
               ),
               body: const Center(child: CircularProgressIndicator()),
             );
@@ -96,7 +96,7 @@ class _TrainingSessionDetailsPageState
               appBar: PlayWithMeAppBar.build(
                 context: context,
                 title: l10n.training,
-                showUserActions: false,
+                showUserActions: true,
               ),
               body: Center(
                 child: Text(l10n.trainingNotFound),

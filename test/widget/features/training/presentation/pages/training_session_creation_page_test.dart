@@ -6,6 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -20,6 +23,7 @@ class MockTrainingSessionCreationBloc
     implements TrainingSessionCreationBloc {}
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 class FakeTrainingSessionCreationEvent extends Fake
     implements TrainingSessionCreationEvent {}
@@ -30,6 +34,7 @@ class FakeTrainingSessionCreationState extends Fake
 void main() {
   late MockTrainingSessionCreationBloc mockCreationBloc;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockInvitationBloc mockInvitationBloc;
 
   const testUserId = 'test-user-123';
   const testGroupId = 'test-group-123';
@@ -43,6 +48,9 @@ void main() {
   setUp(() {
     mockCreationBloc = MockTrainingSessionCreationBloc();
     mockAuthBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
 
     when(() => mockCreationBloc.state)
         .thenReturn(const TrainingSessionCreationInitial());
@@ -81,6 +89,7 @@ void main() {
           BlocProvider<TrainingSessionCreationBloc>.value(
               value: mockCreationBloc),
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
         ],
         child: const TrainingSessionCreationPage(
           groupId: testGroupId,

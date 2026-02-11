@@ -9,6 +9,7 @@ import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import '../helpers/test_helpers.dart';
 import '../features/auth/data/mock_auth_repository.dart';
@@ -160,9 +161,9 @@ void main() {
       await tester.pump(); // Rebuild with authenticated state
 
       // Should transition to HomePage (Authenticated state)
-      // Note: Welcome message removed in Story #301, home now shows stats
+      // Bottom nav now has: Home, Stats, Groups, Community (Profile is in AppBar)
       expect(find.byType(Scaffold), findsWidgets); // HomePage rendered
-      expect(find.byIcon(Icons.logout), findsOneWidget);
+      expect(find.byType(BottomNavigationBar), findsOneWidget);
 
       // Should no longer show login screen elements
       expect(find.text('Welcome Back!'), findsNothing);
@@ -187,8 +188,15 @@ void main() {
       mockRepo.setCurrentUser(testUser);
 
       await tester.pumpWidget(
-        BlocProvider<AuthenticationBloc>(
-          create: (context) => sl<AuthenticationBloc>(),
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>(
+              create: (context) => sl<AuthenticationBloc>(),
+            ),
+            BlocProvider<InvitationBloc>(
+              create: (context) => sl<InvitationBloc>(),
+            ),
+          ],
           child: const MaterialApp(
             localizationsDelegates: [
               AppLocalizations.delegate,
@@ -202,12 +210,16 @@ void main() {
         ),
       );
 
-      await tester.pump(); // Allow initial build
+      await tester.pump(); // Initial build
+      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
+      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit user value
+      await tester.pump(); // Rebuild with authenticated state
 
       expect(find.byType(AppBar), findsOneWidget);
+      // First tab (Home) shows app title as AppBar title
       expect(find.text('PlayWithMe'), findsOneWidget);
-      // Stats widgets are now displayed instead of welcome message
-      // Note: Stats may be loading or empty in test environment
+      // Bottom navigation has 4 tabs: Home, Stats, Groups, Community (Profile is in AppBar)
+      expect(find.byType(BottomNavigationBar), findsOneWidget);
       expect(find.byType(Scaffold), findsOneWidget);
     });
 
@@ -218,8 +230,15 @@ void main() {
       mockRepo.setCurrentUser(testUser);
 
       await tester.pumpWidget(
-        BlocProvider<AuthenticationBloc>(
-          create: (context) => sl<AuthenticationBloc>(),
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>(
+              create: (context) => sl<AuthenticationBloc>(),
+            ),
+            BlocProvider<InvitationBloc>(
+              create: (context) => sl<InvitationBloc>(),
+            ),
+          ],
           child: const MaterialApp(
             localizationsDelegates: [
               AppLocalizations.delegate,
@@ -237,7 +256,7 @@ void main() {
 
       expect(find.byType(Scaffold), findsOneWidget);
       expect(find.byType(AppBar), findsOneWidget);
-      // Stats widgets are loaded instead of old layout
+      // Home tab widgets are loaded
       // Note: Stats may be loading or empty in test environment
     });
 

@@ -276,7 +276,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
               appBar: PlayWithMeAppBar.build(
                 context: context,
                 title: 'Group Details',
-                showUserActions: false,
+                showUserActions: true,
               ),
               body: const Center(
                 child: Text('Please log in to view group details'),

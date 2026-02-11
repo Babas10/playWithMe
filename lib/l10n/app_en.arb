@@ -2350,5 +2350,15 @@
   "noTrainingSessionsScheduled": "No training sessions scheduled",
   "@noTrainingSessionsScheduled": {
     "description": "Message shown when user has no upcoming training sessions"
+  },
+
+  "stats": "Stats",
+  "@stats": {
+    "description": "Stats navigation tab label"
+  },
+
+  "myStats": "My Stats",
+  "@myStats": {
+    "description": "My Stats page title"
   }
 }
