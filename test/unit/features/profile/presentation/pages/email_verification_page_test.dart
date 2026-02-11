@@ -5,6 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
+import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
@@ -15,6 +20,8 @@ import 'package:play_with_me/features/profile/presentation/pages/email_verificat
 class MockEmailVerificationBloc
     extends Mock
     implements EmailVerificationBloc {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
+class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 // Fake classes for mocktail
 class FakeEmailVerificationEvent extends Fake
@@ -25,6 +32,8 @@ class FakeEmailVerificationState extends Fake
 
 void main() {
   late MockEmailVerificationBloc mockBloc;
+  late MockInvitationBloc mockInvitationBloc;
+  late MockAuthenticationBloc mockAuthBloc;
 
   setUpAll(() {
     registerFallbackValue(FakeEmailVerificationEvent());
@@ -33,6 +42,16 @@ void main() {
 
   setUp(() {
     mockBloc = MockEmailVerificationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    mockAuthBloc = MockAuthenticationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(() => mockAuthBloc.state).thenReturn(
+      AuthenticationAuthenticated(
+        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+      ),
+    );
+    when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
   });
 
   Widget createWidgetUnderTest() {
@@ -46,8 +65,12 @@ void main() {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [Locale('en')],
-        home: BlocProvider<EmailVerificationBloc>.value(
-          value: mockBloc,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<EmailVerificationBloc>.value(value: mockBloc),
+            BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+            BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          ],
           child: const EmailVerificationPage(),
         ),
       ),

@@ -1628,4 +1628,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noTrainingSessionsScheduled => 'No training sessions scheduled';
+
+  @override
+  String get stats => 'Stats';
+
+  @override
+  String get myStats => 'My Stats';
 }

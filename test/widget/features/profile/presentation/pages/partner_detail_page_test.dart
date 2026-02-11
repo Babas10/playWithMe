@@ -1,20 +1,30 @@
 // Widget tests for PartnerDetailPage verifying UI rendering and state transitions.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
+import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/core/data/models/teammate_stats.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/pages/partner_detail_page.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
+class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 void main() {
   late MockUserRepository mockUserRepository;
+  late MockInvitationBloc mockInvitationBloc;
+  late MockAuthenticationBloc mockAuthBloc;
 
   const testUserId = 'test-user-123';
   const testPartnerId = 'partner-456';
@@ -89,6 +99,16 @@ void main() {
 
   setUp(() {
     mockUserRepository = MockUserRepository();
+    mockInvitationBloc = MockInvitationBloc();
+    mockAuthBloc = MockAuthenticationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(() => mockAuthBloc.state).thenReturn(
+      AuthenticationAuthenticated(
+        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+      ),
+    );
+    when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
 
     // Register mock in GetIt
     final sl = GetIt.instance;
@@ -114,9 +134,15 @@ void main() {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en')],
-      home: PartnerDetailPage(
-        userId: testUserId,
-        partnerId: testPartnerId,
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+        ],
+        child: PartnerDetailPage(
+          userId: testUserId,
+          partnerId: testPartnerId,
+        ),
       ),
     );
   }

@@ -16,6 +16,9 @@ import 'package:play_with_me/core/presentation/bloc/group_member/group_member_bl
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_event.dart';
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_state.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
@@ -29,6 +32,10 @@ class MockGroupMemberBloc
 class MockAuthenticationBloc
     extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
+
+class MockInvitationBloc
+    extends MockBloc<InvitationEvent, InvitationState>
+    implements InvitationBloc {}
 
 class MockGroupRepository extends Mock implements GroupRepository {}
 
@@ -45,6 +52,7 @@ class FakeGroupMemberState extends Fake implements GroupMemberState {}
 void main() {
   late MockGroupMemberBloc mockGroupMemberBloc;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockInvitationBloc mockInvitationBloc;
   late MockGroupRepository mockGroupRepository;
   late MockUserRepository mockUserRepository;
   late MockGameRepository mockGameRepository;
@@ -99,6 +107,8 @@ void main() {
   setUp(() {
     mockGroupMemberBloc = MockGroupMemberBloc();
     mockAuthBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
     mockGroupRepository = MockGroupRepository();
     mockUserRepository = MockUserRepository();
     mockGameRepository = MockGameRepository();
@@ -167,6 +177,7 @@ void main() {
       supportedLocales: const [Locale('en')],      home: MultiBlocProvider(
         providers: [
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
         ],
         child: GroupDetailsPage(
           groupId: testGroupId,

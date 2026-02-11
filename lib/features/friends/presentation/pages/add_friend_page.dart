@@ -50,7 +50,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             appBar: PlayWithMeAppBar.build(
               context: context,
               title: 'Add Friend',
-              showUserActions: false,
+              showUserActions: true,
             ),
             body: const Center(
               child: Text('Please log in to add friends'),

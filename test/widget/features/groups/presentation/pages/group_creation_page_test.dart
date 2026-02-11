@@ -10,6 +10,9 @@ import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_event.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_state.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
@@ -23,6 +26,10 @@ class MockAuthenticationBloc
     extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
+class MockInvitationBloc
+    extends MockBloc<InvitationEvent, InvitationState>
+    implements InvitationBloc {}
+
 class FakeGroupEvent extends Fake implements GroupEvent {}
 
 class FakeGroupState extends Fake implements GroupState {}
@@ -30,6 +37,7 @@ class FakeGroupState extends Fake implements GroupState {}
 void main() {
   late MockGroupBloc mockGroupBloc;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockInvitationBloc mockInvitationBloc;
 
   const testUserId = 'test-user-123';
 
@@ -41,6 +49,8 @@ void main() {
   setUp(() {
     mockGroupBloc = MockGroupBloc();
     mockAuthBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
 
     when(() => mockGroupBloc.state).thenReturn(const GroupInitial());
 
@@ -75,6 +85,7 @@ void main() {
         providers: [
           BlocProvider<GroupBloc>.value(value: mockGroupBloc),
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
         ],
         child: const GroupCreationPage(),
       ),
@@ -456,6 +467,8 @@ void main() {
                             BlocProvider<GroupBloc>.value(value: mockGroupBloc),
                             BlocProvider<AuthenticationBloc>.value(
                                 value: mockAuthBloc),
+                            BlocProvider<InvitationBloc>.value(
+                                value: mockInvitationBloc),
                           ],
                           child: const GroupCreationPage(),
                         ),

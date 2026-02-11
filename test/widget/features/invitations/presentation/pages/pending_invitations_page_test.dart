@@ -132,7 +132,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
-        expect(find.byIcon(Icons.mail_outline), findsOneWidget);
+        // mail_outline icon appears in both the AppBar (22px) and empty state (64px)
+        expect(find.byIcon(Icons.mail_outline), findsNWidgets(2));
         expect(find.text('No Pending Invitations'), findsOneWidget);
         expect(
           find.text(
@@ -441,7 +442,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
-        expect(find.byIcon(Icons.mail_outline), findsOneWidget);
+        // mail_outline icon appears in both the AppBar (22px) and empty state (64px)
+        expect(find.byIcon(Icons.mail_outline), findsNWidgets(2));
       });
 
       testWidgets('displays empty state title', (tester) async {

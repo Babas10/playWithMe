@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -22,6 +24,7 @@ import 'package:play_with_me/core/services/service_locator.dart';
 class MockGameRepository extends Mock implements GameRepository {}
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
@@ -38,6 +41,7 @@ class FakeRoute extends Fake implements Route<dynamic> {}
 void main() {
   late MockGameRepository mockGameRepository;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockInvitationBloc mockInvitationBloc;
 
   const testUserId = 'test-uid-123';
   const testGameId = 'test-game-123';
@@ -76,6 +80,9 @@ void main() {
   setUp(() {
     mockGameRepository = MockGameRepository();
     mockAuthBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
     sl.registerSingleton<AuthenticationBloc>(mockAuthBloc);
     sl.registerSingleton<GameRepository>(mockGameRepository);
 
@@ -96,8 +103,11 @@ void main() {
   });
 
   Widget createApp({required String gameId}) {
-    return BlocProvider<AuthenticationBloc>.value(
-      value: mockAuthBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+        BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+      ],
       child: MaterialApp(
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -117,8 +127,11 @@ void main() {
     testWidgets('can save scores when teams are tied', (tester) async {
       final mockObserver = MockNavigatorObserver();
 
-      await tester.pumpWidget(BlocProvider<AuthenticationBloc>.value(
-        value: mockAuthBloc,
+      await tester.pumpWidget(MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+        ],
         child: MaterialApp(
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -188,16 +201,19 @@ void main() {
     testWidgets('can save scores when all games are complete', (tester) async {
       final mockObserver = MockNavigatorObserver();
 
-      await tester.pumpWidget(BlocProvider<AuthenticationBloc>.value(
-        value: mockAuthBloc,
+      await tester.pumpWidget(MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+        ],
         child: MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: ScoreEntryPage(
             gameId: testGameId,
           ),

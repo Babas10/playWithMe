@@ -23,7 +23,7 @@ class PendingInvitationsPage extends StatelessWidget {
             appBar: PlayWithMeAppBar.build(
               context: context,
               title: 'Invitations',
-              showUserActions: false,
+              showUserActions: true,
             ),
             body: const Center(
               child: Text('Please log in to view invitations'),

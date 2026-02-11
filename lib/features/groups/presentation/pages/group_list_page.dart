@@ -30,7 +30,7 @@ class GroupListPage extends StatelessWidget {
             appBar: PlayWithMeAppBar.build(
               context: context,
               title: AppLocalizations.of(context)!.myGroups,
-              showUserActions: false,
+              showUserActions: true,
             ),
             body: Center(
               child: Text(AppLocalizations.of(context)!.pleaseLogInToViewGroups),

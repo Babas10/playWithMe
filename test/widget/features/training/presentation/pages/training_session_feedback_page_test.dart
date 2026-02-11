@@ -6,6 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
+import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_event.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_state.dart';
@@ -16,12 +23,22 @@ class MockTrainingFeedbackBloc
     extends MockBloc<TrainingFeedbackEvent, TrainingFeedbackState>
     implements TrainingFeedbackBloc {}
 
+class MockInvitationBloc
+    extends MockBloc<InvitationEvent, InvitationState>
+    implements InvitationBloc {}
+
+class MockAuthenticationBloc
+    extends MockBloc<AuthenticationEvent, AuthenticationState>
+    implements AuthenticationBloc {}
+
 class FakeTrainingFeedbackEvent extends Fake implements TrainingFeedbackEvent {}
 
 class FakeTrainingFeedbackState extends Fake implements TrainingFeedbackState {}
 
 void main() {
   late MockTrainingFeedbackBloc mockFeedbackBloc;
+  late MockInvitationBloc mockInvitationBloc;
+  late MockAuthenticationBloc mockAuthBloc;
 
   const testSessionId = 'test-session-123';
   const testSessionTitle = 'Morning Beach Drills';
@@ -33,6 +50,14 @@ void main() {
 
   setUp(() {
     mockFeedbackBloc = MockTrainingFeedbackBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    mockAuthBloc = MockAuthenticationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockAuthBloc.state).thenReturn(
+      AuthenticationAuthenticated(
+        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+      ),
+    );
 
     when(() => mockFeedbackBloc.state).thenReturn(const FeedbackInitial());
   });
@@ -50,8 +75,12 @@ void main() {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en')],
-      home: BlocProvider<TrainingFeedbackBloc>.value(
-        value: mockFeedbackBloc,
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<TrainingFeedbackBloc>.value(value: mockFeedbackBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+        ],
         child: const TrainingSessionFeedbackPage(
           trainingSessionId: testSessionId,
           sessionTitle: testSessionTitle,
