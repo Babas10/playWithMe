@@ -739,18 +739,21 @@ void main() {
       });
 
       group('canUserEnterResults', () {
-        test('returns true when participant and game is completed', () {
+        test('returns true when participant and game is completed with enough players', () {
           final game = createTestGame(
-            playerIds: ['user-123'],
+            playerIds: ['user-123', 'user-456'],
+            minPlayers: 2,
             status: GameStatus.completed,
           );
 
           expect(game.canUserEnterResults('user-123'), isTrue);
         });
 
-        test('returns true when creator and game is past', () {
+        test('returns true when creator and game is past with enough players', () {
           final game = createTestGame(
             createdBy: 'user-123',
+            playerIds: ['user-123', 'user-456'],
+            minPlayers: 2,
             scheduledAt: DateTime.now().subtract(const Duration(hours: 1)),
           );
 
@@ -759,7 +762,8 @@ void main() {
 
         test('returns false when result already exists', () {
           final game = createTestGame(
-            playerIds: ['user-123'],
+            playerIds: ['user-123', 'user-456'],
+            minPlayers: 2,
             status: GameStatus.completed,
             result: const GameResult(
               games: [
@@ -778,7 +782,8 @@ void main() {
 
         test('returns false when game is cancelled', () {
           final game = createTestGame(
-            playerIds: ['user-123'],
+            playerIds: ['user-123', 'user-456'],
+            minPlayers: 2,
             status: GameStatus.cancelled,
           );
 
@@ -787,8 +792,64 @@ void main() {
 
         test('returns false when game is in verification', () {
           final game = createTestGame(
-            playerIds: ['user-123'],
+            playerIds: ['user-123', 'user-456'],
+            minPlayers: 2,
             status: GameStatus.verification,
+          );
+
+          expect(game.canUserEnterResults('user-123'), isFalse);
+        });
+
+        test('returns false when creator and game is future (not past scheduled time)', () {
+          final game = createTestGame(
+            createdBy: 'user-123',
+            playerIds: ['user-123', 'user-456'],
+            minPlayers: 2,
+            scheduledAt: DateTime.now().add(const Duration(hours: 2)),
+            status: GameStatus.scheduled,
+          );
+
+          expect(game.canUserEnterResults('user-123'), isFalse);
+        });
+
+        test('returns false when game has fewer players than minPlayers', () {
+          final game = createTestGame(
+            playerIds: ['user-123'],
+            minPlayers: 4,
+            scheduledAt: DateTime.now().subtract(const Duration(hours: 1)),
+          );
+
+          expect(game.canUserEnterResults('user-123'), isFalse);
+        });
+
+        test('returns false when game has zero players despite being past', () {
+          final game = createTestGame(
+            createdBy: 'user-123',
+            playerIds: [],
+            minPlayers: 2,
+            scheduledAt: DateTime.now().subtract(const Duration(hours: 1)),
+          );
+
+          expect(game.canUserEnterResults('user-123'), isFalse);
+        });
+
+        test('returns true when game is in progress with enough players', () {
+          final game = createTestGame(
+            playerIds: ['user-123', 'user-456'],
+            minPlayers: 2,
+            status: GameStatus.inProgress,
+            scheduledAt: DateTime.now().add(const Duration(hours: 1)),
+          );
+
+          expect(game.canUserEnterResults('user-123'), isTrue);
+        });
+
+        test('returns false for non-participant even when game is ready', () {
+          final game = createTestGame(
+            createdBy: 'other-creator',
+            playerIds: ['other-user', 'another-user'],
+            minPlayers: 2,
+            status: GameStatus.completed,
           );
 
           expect(game.canUserEnterResults('user-123'), isFalse);
