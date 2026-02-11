@@ -1,19 +1,29 @@
 // Widget tests for HeadToHeadPage verifying UI rendering and state transitions.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
+import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/pages/head_to_head_page.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
+class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 void main() {
   late MockUserRepository mockUserRepository;
+  late MockInvitationBloc mockInvitationBloc;
+  late MockAuthenticationBloc mockAuthBloc;
 
   const testUserId = 'test-user-123';
   const testOpponentId = 'opponent-456';
@@ -82,6 +92,16 @@ void main() {
 
   setUp(() {
     mockUserRepository = MockUserRepository();
+    mockInvitationBloc = MockInvitationBloc();
+    mockAuthBloc = MockAuthenticationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(() => mockAuthBloc.state).thenReturn(
+      AuthenticationAuthenticated(
+        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+      ),
+    );
+    when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
 
     // Register mock in GetIt
     final sl = GetIt.instance;
@@ -99,17 +119,23 @@ void main() {
   });
 
   Widget createTestWidget() {
-    return const MaterialApp(
-      localizationsDelegates: [
+    return MaterialApp(
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [Locale('en')],
-      home: HeadToHeadPage(
-        userId: testUserId,
-        opponentId: testOpponentId,
+      supportedLocales: const [Locale('en')],
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+        ],
+        child: const HeadToHeadPage(
+          userId: testUserId,
+          opponentId: testOpponentId,
+        ),
       ),
     );
   }

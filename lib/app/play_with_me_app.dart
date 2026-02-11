@@ -13,7 +13,7 @@ import 'package:play_with_me/features/auth/presentation/pages/password_reset_pag
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
-import 'package:play_with_me/features/profile/presentation/pages/profile_page.dart';
+import 'package:play_with_me/features/profile/presentation/pages/stats_page.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/locale_preferences/locale_preferences_state.dart';
@@ -24,7 +24,6 @@ import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_event.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
-import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
 import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
 import 'package:play_with_me/features/friends/presentation/pages/my_community_page.dart';
@@ -43,6 +42,7 @@ import 'package:play_with_me/core/domain/repositories/training_session_repositor
 import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -54,6 +54,9 @@ class PlayWithMeApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthenticationBloc>(
           create: (context) => sl<AuthenticationBloc>()..add(const AuthenticationStarted()),
+        ),
+        BlocProvider<InvitationBloc>(
+          create: (context) => sl<InvitationBloc>(),
         ),
         BlocProvider<LoginBloc>(
           create: (context) => sl<LoginBloc>(),
@@ -70,7 +73,15 @@ class PlayWithMeApp extends StatelessWidget {
           )..add(const LocalePreferencesEvent.loadPreferences()),
         ),
       ],
-      child: BlocBuilder<LocalePreferencesBloc, LocalePreferencesState>(
+      child: BlocListener<AuthenticationBloc, AuthenticationState>(
+        listener: (context, state) {
+          if (state is AuthenticationAuthenticated) {
+            context.read<InvitationBloc>().add(
+              LoadPendingInvitations(userId: state.user.uid),
+            );
+          }
+        },
+        child: BlocBuilder<LocalePreferencesBloc, LocalePreferencesState>(
         builder: (context, localeState) {
           // Get the current locale from preferences or use default
           Locale currentLocale = const Locale('en');
@@ -124,11 +135,11 @@ class PlayWithMeApp extends StatelessWidget {
               '/login': (context) => const LoginPage(),
               '/register': (context) => const RegistrationPage(),
               '/forgot-password': (context) => const PasswordResetPage(),
-              '/profile': (context) => const ProfilePage(),
               '/my-community': (context) => const MyCommunityPage(),
             },
           );
         },
+      ),
       ),
     );
   }
@@ -144,10 +155,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  // Pages for bottom navigation
+  // Pages for bottom navigation: Home, Stats, Groups, Community
   late final List<Widget> _pages;
   late final GroupBloc _groupBloc;
-  late final InvitationBloc _invitationBloc;
   late final FriendRequestCountBloc _friendRequestCountBloc;
   late final PlayerStatsBloc _playerStatsBloc;
 
@@ -155,10 +165,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // Create GroupBloc, InvitationBloc, FriendRequestCountBloc, and PlayerStatsBloc and initialize them with the current user
     final authState = context.read<AuthenticationBloc>().state;
     _groupBloc = sl<GroupBloc>();
-    _invitationBloc = sl<InvitationBloc>();
     _friendRequestCountBloc = sl<FriendRequestCountBloc>();
     _playerStatsBloc = PlayerStatsBloc(
       userRepository: sl<UserRepository>(),
@@ -166,7 +174,6 @@ class _HomePageState extends State<HomePage> {
 
     if (authState is AuthenticationAuthenticated) {
       _groupBloc.add(LoadGroupsForUser(userId: authState.user.uid));
-      _invitationBloc.add(LoadPendingInvitations(userId: authState.user.uid));
       _friendRequestCountBloc.add(
         FriendRequestCountEvent.startListening(userId: authState.user.uid),
       );
@@ -178,6 +185,7 @@ class _HomePageState extends State<HomePage> {
 
     _pages = [
       const _HomeTab(),
+      const StatsPage(),
       BlocProvider<GroupBloc>.value(
         value: _groupBloc,
         child: const GroupListPage(),
@@ -209,21 +217,16 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BlocProvider<InvitationBloc>.value(
-              value: _invitationBloc,
-              child: const PendingInvitationsPage(),
-            ),
+            builder: (_) => const PendingInvitationsPage(),
           ),
         );
         break;
       case 'game_created':
-        // Navigate to game details (not yet implemented in this story)
         debugPrint('Game created notification tapped: ${data['gameId']}');
         break;
       case 'member_joined':
       case 'member_left':
       case 'role_changed':
-        // Navigate to group details (not yet implemented in this story)
         debugPrint('Group event notification tapped for group: $groupId');
         break;
       default:
@@ -234,7 +237,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _groupBloc.close();
-    _invitationBloc.close();
     _friendRequestCountBloc.close();
     _playerStatsBloc.close();
     super.dispose();
@@ -246,132 +248,40 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  String _getAppBarTitle(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (_selectedIndex) {
+      case 0:
+        return l10n.appTitle;
+      case 1:
+        return l10n.myStats;
+      case 2:
+        return l10n.myGroups;
+      case 3:
+        return l10n.myCommunity;
+      default:
+        return l10n.appTitle;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<InvitationBloc>.value(value: _invitationBloc),
         BlocProvider<FriendRequestCountBloc>.value(value: _friendRequestCountBloc),
         BlocProvider<PlayerStatsBloc>.value(value: _playerStatsBloc),
       ],
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: AppColors.appBarBackground,
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          toolbarHeight: 52,
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.sports_volleyball,
-                color: AppColors.secondary,
-                size: 24,
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  _selectedIndex == 0
-                      ? AppLocalizations.of(context)!.appTitle
-                      : _selectedIndex == 1
-                          ? AppLocalizations.of(context)!.myGroups
-                          : AppLocalizations.of(context)!.myCommunity,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.secondary,
-                        letterSpacing: -0.5,
-                      ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          centerTitle: false,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1),
-            child: Container(
-              color: AppColors.divider,
-              height: 1,
-            ),
-          ),
-          actions: [
-            // Invitation badge
-            BlocBuilder<InvitationBloc, InvitationState>(
-              builder: (context, state) {
-                int pendingCount = 0;
-                if (state is InvitationsLoaded) {
-                  pendingCount = state.invitations.length;
-                }
-
-                return Stack(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.mail_outline, size: 22),
-                      tooltip: 'Invitations',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider<InvitationBloc>.value(
-                              value: _invitationBloc,
-                              child: const PendingInvitationsPage(),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    if (pendingCount > 0)
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            pendingCount > 9 ? '9+' : '$pendingCount',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.person_outline, size: 22),
-              tooltip: AppLocalizations.of(context)!.profile,
-              onPressed: () {
-                Navigator.pushNamed(context, '/profile');
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.logout, size: 22),
-              tooltip: AppLocalizations.of(context)!.signOut,
-              onPressed: () {
-                context.read<AuthenticationBloc>().add(
-                  const AuthenticationLogoutRequested(),
-                );
-              },
-            ),
-          ],
+        appBar: PlayWithMeAppBar.build(
+          context: context,
+          title: _getAppBarTitle(context),
         ),
         body: IndexedStack(
           index: _selectedIndex,
           children: _pages,
         ),
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
           backgroundColor: AppColors.bottomNavBackground,
           selectedItemColor: AppColors.navLabelColor,
           unselectedItemColor: AppColors.navLabelColor,
@@ -387,7 +297,11 @@ class _HomePageState extends State<HomePage> {
               label: AppLocalizations.of(context)!.home,
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.group),
+              icon: const Icon(Icons.bar_chart),
+              label: AppLocalizations.of(context)!.stats,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.group_work),
               label: AppLocalizations.of(context)!.groups,
             ),
             BottomNavigationBarItem(

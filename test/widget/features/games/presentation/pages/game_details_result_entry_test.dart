@@ -9,6 +9,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
@@ -22,10 +25,14 @@ import '../../../../../unit/core/data/repositories/mock_user_repository.dart';
 class MockAuthenticationBloc extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
+class MockInvitationBloc extends MockBloc<InvitationEvent, InvitationState>
+    implements InvitationBloc {}
+
 void main() {
   late MockGameRepository mockGameRepository;
   late MockUserRepository mockUserRepository;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockInvitationBloc mockInvitationBloc;
   final sl = GetIt.instance;
 
   const creatorId = 'user-creator';
@@ -44,6 +51,8 @@ void main() {
     mockGameRepository = MockGameRepository();
     mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
 
     if (sl.isRegistered<GameRepository>()) {
       sl.unregister<GameRepository>();
@@ -61,16 +70,20 @@ void main() {
   });
 
   Widget createWidgetUnderTest(String gameId) {
-    return MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+        BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
       ],
-      supportedLocales: const [Locale('en')],      home: BlocProvider<AuthenticationBloc>.value(
-        value: mockAuthBloc,
-        child: GameDetailsPage(
+      child: MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
+        home: GameDetailsPage(
           gameId: gameId,
           gameRepository: mockGameRepository,
           userRepository: mockUserRepository,

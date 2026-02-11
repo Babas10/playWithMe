@@ -1,5 +1,5 @@
+// Profile page displaying user identity, account information and settings.
 import 'package:flutter/material.dart';
-import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
@@ -15,50 +15,40 @@ import 'package:play_with_me/features/profile/presentation/widgets/profile_heade
 import 'package:play_with_me/features/profile/presentation/widgets/profile_info_card.dart';
 import 'package:play_with_me/features/notifications/presentation/pages/notification_settings_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
-import 'package:play_with_me/core/domain/repositories/user_repository.dart';
-import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_bloc.dart';
-import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_event.dart';
-import 'package:play_with_me/features/profile/presentation/bloc/player_stats/player_stats_state.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/expanded_stats_section.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/next_game_card.dart';
-import 'package:play_with_me/features/games/presentation/pages/game_history_screen.dart';
-import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/features/games/presentation/pages/game_history_screen.dart';
 
-/// Profile page displaying user information and account details
+/// Profile tab content displaying user identity and account settings.
+///
+/// This page answers: "Who am I and how do I manage my account?"
+/// It shows:
+/// - Profile header (avatar, name, email)
+/// - Account information card (verification status)
+/// - Settings & actions (Account Settings, Notifications, Game History, Sign Out)
+///
+/// All statistics have been moved to the dedicated StatsPage.
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PlayWithMeAppBar.build(
-        context: context,
-        title: AppLocalizations.of(context)!.profile,
-      ),
-      body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-        builder: (context, state) {
-          if (state is AuthenticationAuthenticated) {
-            return BlocProvider(
-              create: (context) => PlayerStatsBloc(
-                userRepository: sl<UserRepository>(),
-              )..add(LoadPlayerStats(state.user.uid)),
-              child: _ProfileContent(state: state),
-            );
-          }
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, state) {
+        if (state is AuthenticationAuthenticated) {
+          return _ProfileContent(state: state);
+        }
 
-          if (state is AuthenticationUnknown) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          // Unauthenticated state - should not happen on profile page
-          return Center(
-            child: Text(AppLocalizations.of(context)!.pleaseLogIn),
+        if (state is AuthenticationUnknown) {
+          return const Center(
+            child: CircularProgressIndicator(),
           );
-        },
-      ),
+        }
+
+        // Unauthenticated state - should not happen on profile page
+        return Center(
+          child: Text(AppLocalizations.of(context)!.pleaseLogIn),
+        );
+      },
     );
   }
 }
@@ -83,97 +73,6 @@ class _ProfileContent extends StatelessWidget {
           ProfileInfoCard(
             user: state.user,
             onVerificationTap: () => _navigateToEmailVerification(context),
-          ),
-          
-          const SizedBox(height: 16),
-
-          // Player Stats (Expanded)
-          BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
-            builder: (context, statsState) {
-              if (statsState is PlayerStatsLoading) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-
-              if (statsState is PlayerStatsError) {
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 48,
-                            color: Theme.of(context).colorScheme.error,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Error loading stats',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            statsState.message,
-                            style: Theme.of(context).textTheme.bodySmall,
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }
-
-              if (statsState is PlayerStatsLoaded) {
-                return ExpandedStatsSection(
-                  user: statsState.user,
-                  ratingHistory: statsState.history,
-                );
-              }
-
-              return const SizedBox.shrink();
-            },
-          ),
-
-          const SizedBox(height: 16),
-
-          // Next Game Card
-          StreamBuilder(
-            stream: sl<GameRepository>().getNextGameForUser(state.user.uid),
-            builder: (context, snapshot) {
-              // Show loading state only initially, not on every rebuild
-              if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                return const SizedBox.shrink();
-              }
-
-              final nextGame = snapshot.data;
-
-              return NextGameCard(
-                game: nextGame,
-                userId: state.user.uid,
-                onTap: nextGame != null
-                    ? () {
-                        final gameRepository = sl<GameRepository>();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (newContext) => RepositoryProvider.value(
-                              value: gameRepository,
-                              child: GameDetailsPage(
-                                gameId: nextGame.id,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                    : null,
-              );
-            },
           ),
 
           const SizedBox(height: 16),
@@ -269,7 +168,6 @@ class _ProfileContent extends StatelessWidget {
                   .read<AuthenticationBloc>()
                   .add(const AuthenticationLogoutRequested());
               Navigator.of(dialogContext).pop();
-              Navigator.of(context).pop(); // Return to previous screen
             },
             child: Text(l10n.signOut),
           ),

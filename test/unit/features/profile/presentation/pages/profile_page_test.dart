@@ -1,4 +1,4 @@
-// Verifies that ProfilePage displays user profile information correctly using AuthenticationBloc
+// Verifies that ProfilePage displays user identity and account settings correctly
 
 import 'dart:async';
 
@@ -14,12 +14,11 @@ import 'package:play_with_me/features/profile/presentation/pages/profile_page.da
 import 'package:play_with_me/features/profile/presentation/widgets/profile_header.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_info_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/profile_actions.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/expanded_stats_section.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 import 'package:get_it/get_it.dart';
-import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
-import '../../../../core/data/repositories/mock_user_repository.dart';
 import '../../../../core/data/repositories/mock_game_repository.dart';
 
 // Fake AuthenticationBloc for testing
@@ -48,13 +47,9 @@ class FakeAuthenticationBloc extends Fake implements AuthenticationBloc {
 
 void main() {
   setUp(() {
-    if (GetIt.I.isRegistered<UserRepository>()) {
-      GetIt.I.unregister<UserRepository>();
-    }
     if (GetIt.I.isRegistered<GameRepository>()) {
       GetIt.I.unregister<GameRepository>();
     }
-    GetIt.I.registerSingleton<UserRepository>(MockUserRepository());
     GetIt.I.registerSingleton<GameRepository>(MockGameRepository());
   });
 
@@ -75,7 +70,7 @@ void main() {
       supportedLocales: const [Locale('en')],
       home: BlocProvider<AuthenticationBloc>.value(
         value: fakeBloc,
-        child: const ProfilePage(),
+        child: const Scaffold(body: ProfilePage()),
       ),
     );
   }
@@ -97,19 +92,18 @@ void main() {
         createWidgetUnderTest(state: AuthenticationAuthenticated(testUser)),
       );
 
-      // Verify AppBar
-      expect(find.byType(AppBar), findsOneWidget);
-      expect(find.text('Profile'), findsOneWidget);
-
-      // Verify components are present
+      // Verify components are present (ProfilePage is now a tab, no own AppBar)
       expect(find.byType(ProfileHeader), findsOneWidget);
       expect(find.byType(ProfileInfoCard), findsOneWidget);
       expect(find.byType(ProfileActions), findsOneWidget);
 
       // Verify user information is displayed
       expect(find.text('Test User'), findsOneWidget);
-      // Email appears twice: once in ProfileHeader and once in ProfileInfoCard (with verification status)
+      // Email appears twice: once in ProfileHeader and once in ProfileInfoCard
       expect(find.text('test@example.com'), findsNWidgets(2));
+
+      // Verify stats are NOT shown on profile page (moved to Stats tab)
+      expect(find.byType(ExpandedStatsSection), findsNothing);
     });
 
     testWidgets('displays loading indicator when authentication is unknown', (tester) async {

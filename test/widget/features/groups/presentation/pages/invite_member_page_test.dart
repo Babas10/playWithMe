@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -18,18 +20,23 @@ class MockFriendRepository extends Mock implements FriendRepository {}
 class MockGroupRepository extends Mock implements GroupRepository {}
 class MockInvitationRepository extends Mock implements InvitationRepository {}
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 void main() {
   late MockFriendRepository mockFriendRepository;
   late MockGroupRepository mockGroupRepository;
   late MockInvitationRepository mockInvitationRepository;
   late MockAuthenticationBloc mockAuthenticationBloc;
+  late MockInvitationBloc mockInvitationBloc;
 
   setUp(() {
     mockFriendRepository = MockFriendRepository();
     mockGroupRepository = MockGroupRepository();
     mockInvitationRepository = MockInvitationRepository();
     mockAuthenticationBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
 
     // Default group data setup
     when(() => mockGroupRepository.getGroupById(any())).thenAnswer(
@@ -68,8 +75,11 @@ void main() {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en')],
-      home: BlocProvider<AuthenticationBloc>.value(
-        value: mockAuthenticationBloc,
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthenticationBloc>.value(value: mockAuthenticationBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+        ],
         child: InviteMemberPage(
           groupId: 'test-group',
           groupName: 'Test Group',
