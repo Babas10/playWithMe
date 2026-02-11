@@ -7,6 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -21,6 +24,10 @@ class MockGameCreationBloc
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
+class MockInvitationBloc
+    extends MockBloc<InvitationEvent, InvitationState>
+    implements InvitationBloc {}
+
 class FakeGameCreationEvent extends Fake implements GameCreationEvent {}
 
 class FakeGameCreationState extends Fake implements GameCreationState {}
@@ -28,6 +35,7 @@ class FakeGameCreationState extends Fake implements GameCreationState {}
 void main() {
   late MockGameCreationBloc mockGameCreationBloc;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockInvitationBloc mockInvitationBloc;
 
   const testUserId = 'test-user-123';
   const testGroupId = 'test-group-123';
@@ -41,6 +49,8 @@ void main() {
   setUp(() {
     mockGameCreationBloc = MockGameCreationBloc();
     mockAuthBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
 
     when(() => mockGameCreationBloc.state)
         .thenReturn(const GameCreationInitial());
@@ -77,6 +87,7 @@ void main() {
         providers: [
           BlocProvider<GameCreationBloc>.value(value: mockGameCreationBloc),
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
         ],
         child: const GameCreationPage(
           groupId: testGroupId,

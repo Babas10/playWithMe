@@ -1,9 +1,15 @@
 // Widget tests for NotificationSettingsPage - validates UI rendering and user interactions
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
+import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
+import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/features/notifications/domain/entities/notification_preferences_entity.dart';
 import 'package:play_with_me/features/notifications/domain/repositories/notification_repository.dart';
@@ -12,6 +18,8 @@ import 'package:play_with_me/features/notifications/presentation/pages/notificat
 // Mocks
 class MockNotificationRepository extends Mock
     implements NotificationRepository {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
+class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 // Fakes
 class FakeNotificationPreferencesEntity extends Fake
@@ -19,6 +27,8 @@ class FakeNotificationPreferencesEntity extends Fake
 
 void main() {
   late MockNotificationRepository mockRepository;
+  late MockInvitationBloc mockInvitationBloc;
+  late MockAuthenticationBloc mockAuthBloc;
 
   setUpAll(() {
     registerFallbackValue(FakeNotificationPreferencesEntity());
@@ -26,6 +36,16 @@ void main() {
 
   setUp(() {
     mockRepository = MockNotificationRepository();
+    mockInvitationBloc = MockInvitationBloc();
+    mockAuthBloc = MockAuthenticationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(() => mockAuthBloc.state).thenReturn(
+      AuthenticationAuthenticated(
+        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+      ),
+    );
+    when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
 
     // Register mock repository in GetIt
     final getIt = GetIt.instance;
@@ -47,15 +67,21 @@ void main() {
   });
 
   Widget createWidgetUnderTest() {
-    return const MaterialApp(
-      localizationsDelegates: [
+    return MaterialApp(
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [Locale('en')],
-      home: NotificationSettingsPage(),
+      supportedLocales: const [Locale('en')],
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+        ],
+        child: const NotificationSettingsPage(),
+      ),
     );
   }
 

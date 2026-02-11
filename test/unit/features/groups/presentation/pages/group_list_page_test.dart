@@ -8,6 +8,8 @@ import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_event.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_state.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
@@ -21,6 +23,7 @@ import '../../../../helpers/test_helpers.dart';
 // Mock classes
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 class MockGroupBloc extends Mock implements GroupBloc {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 // Fakes for mocktail
 class FakeGroupEvent extends Fake implements GroupEvent {}
@@ -30,6 +33,7 @@ class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntit
 void main() {
   late MockAuthenticationBloc mockAuthBloc;
   late MockGroupBloc mockGroupBloc;
+  late MockInvitationBloc mockInvitationBloc;
 
   setUpAll(() {
     registerFallbackValue(FakeGroupEvent());
@@ -43,6 +47,9 @@ void main() {
 
     mockAuthBloc = MockAuthenticationBloc();
     mockGroupBloc = MockGroupBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
 
     // Default auth bloc state
     when(() => mockAuthBloc.state).thenReturn(
@@ -79,6 +86,7 @@ void main() {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+        BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
       ],
       child: MaterialApp(
         localizationsDelegates: const [

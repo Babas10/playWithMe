@@ -498,5 +498,7 @@
   "nextGame": "Prochain match",
   "noGamesScheduled": "Aucun match organisé pour le moment",
   "nextTrainingSession": "Prochaine séance d'entraînement",
-  "noTrainingSessionsScheduled": "Aucune séance d'entraînement prévue"
+  "noTrainingSessionsScheduled": "Aucune séance d'entraînement prévue",
+  "stats": "Stats",
+  "myStats": "Mes Stats"
 }

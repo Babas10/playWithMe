@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -20,11 +22,13 @@ import '../../../../../unit/core/data/repositories/mock_user_repository.dart';
 
 // Mock classes
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 void main() {
   late MockGameRepository mockGameRepository;
   late MockUserRepository mockUserRepository;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockInvitationBloc mockInvitationBloc;
   late GameDetailsBloc gameDetailsBloc;
 
   const testUserId = 'test-uid-123';
@@ -34,6 +38,9 @@ void main() {
     mockGameRepository = MockGameRepository();
     mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
 
     // Add test users to mock repository
     mockUserRepository.addUser(TestUserData.testUser);
@@ -88,6 +95,7 @@ void main() {
       home: MultiBlocProvider(
         providers: [
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
         ],
         child: GameDetailsPage(
           gameId: gameId,

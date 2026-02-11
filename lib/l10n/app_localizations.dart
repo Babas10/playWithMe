@@ -3049,6 +3049,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No training sessions scheduled'**
   String get noTrainingSessionsScheduled;
+
+  /// Stats navigation tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get stats;
+
+  /// My Stats page title
+  ///
+  /// In en, this message translates to:
+  /// **'My Stats'**
+  String get myStats;
 }
 
 class _AppLocalizationsDelegate

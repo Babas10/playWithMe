@@ -157,7 +157,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
             appBar: PlayWithMeAppBar.build(
               context: context,
               title: 'Invite Members',
-              showUserActions: false,
+              showUserActions: true,
             ),
             body: const Center(
               child: Text('Please log in to invite members'),
@@ -171,7 +171,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
             appBar: PlayWithMeAppBar.build(
               context: context,
               title: 'Invite Members',
-              showUserActions: false,
+              showUserActions: true,
             ),
             body: const Center(
               child: Text('Friend list not available'),

@@ -498,5 +498,7 @@
   "nextGame": "Prossima partita",
   "noGamesScheduled": "Nessuna partita organizzata ancora",
   "nextTrainingSession": "Prossimo allenamento",
-  "noTrainingSessionsScheduled": "Nessun allenamento programmato"
+  "noTrainingSessionsScheduled": "Nessun allenamento programmato",
+  "stats": "Statistiche",
+  "myStats": "Le Mie Statistiche"
 }

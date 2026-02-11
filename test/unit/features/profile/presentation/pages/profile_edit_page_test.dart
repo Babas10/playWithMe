@@ -9,6 +9,8 @@ import 'package:play_with_me/core/domain/repositories/image_storage_repository.d
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/services/image_picker_service.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
@@ -28,6 +30,7 @@ class MockImageStorageRepository extends Mock implements ImageStorageRepository 
 class MockImagePickerService extends Mock implements ImagePickerService {}
 class MockLocalePreferencesRepository extends Mock implements LocalePreferencesRepository {}
 class MockLocalePreferencesBloc extends Mock implements LocalePreferencesBloc {}
+class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 // Fakes for fallback values
 class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntity {}
@@ -38,6 +41,7 @@ void main() {
   late MockAuthRepository mockAuthRepository;
   late MockAuthenticationBloc mockAuthBloc;
   late MockLocalePreferencesBloc mockLocalePrefsBloc;
+  late MockInvitationBloc mockInvitationBloc;
 
   setUpAll(() {
     // Register fallback values for mocktail matchers
@@ -99,6 +103,9 @@ void main() {
     mockAuthRepository = MockAuthRepository();
     mockAuthBloc = MockAuthenticationBloc();
     mockLocalePrefsBloc = MockLocalePreferencesBloc();
+    mockInvitationBloc = MockInvitationBloc();
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
 
     // Stub the locale preferences bloc with default behavior
     when(() => mockLocalePrefsBloc.state).thenReturn(
@@ -134,6 +141,7 @@ void main() {
         child: MultiBlocProvider(
           providers: [
             BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
             BlocProvider<LocalePreferencesBloc>.value(value: mockLocalePrefsBloc),
           ],
           child: ProfileEditPage(user: user),
