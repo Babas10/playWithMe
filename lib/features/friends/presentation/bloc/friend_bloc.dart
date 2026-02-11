@@ -33,61 +33,37 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     FriendLoadRequested event,
     Emitter<FriendState> emit,
   ) async {
+    emit(const FriendState.loading());
+
+    final currentUser = _authRepository.currentUser;
+    if (currentUser == null) {
+      emit(const FriendState.error(message: 'User not authenticated'));
+      return;
+    }
+
+    // Load friends and pending requests in parallel with individual
+    // error handling. This prevents Android's ExecutionException from
+    // causing all data to be lost when one Cloud Function call fails
+    // (see GitHub issue #454).
+    final results = await Future.wait([
+      _safeCall(() => _friendRepository.getFriends(currentUser.uid), <UserEntity>[]),
+      _safeCall(() => _friendRepository.getPendingRequests(type: FriendRequestType.received), <FriendshipEntity>[]),
+      _safeCall(() => _friendRepository.getPendingRequests(type: FriendRequestType.sent), <FriendshipEntity>[]),
+    ]);
+
+    emit(FriendState.loaded(
+      friends: results[0] as List<UserEntity>,
+      receivedRequests: results[1] as List<FriendshipEntity>,
+      sentRequests: results[2] as List<FriendshipEntity>,
+    ));
+  }
+
+  /// Executes [fn] and returns its result, or [fallback] on any error.
+  Future<T> _safeCall<T>(Future<T> Function() fn, T fallback) async {
     try {
-      emit(const FriendState.loading());
-
-      final currentUser = _authRepository.currentUser;
-      if (currentUser == null) {
-        emit(const FriendState.error(message: 'User not authenticated'));
-        return;
-      }
-
-      // Load friends and pending requests in parallel
-      // Handle case where cloud functions might not be implemented yet
-      try {
-        final results = await Future.wait([
-          _friendRepository.getFriends(currentUser.uid),
-          _friendRepository.getPendingRequests(
-            type: FriendRequestType.received,
-          ),
-          _friendRepository.getPendingRequests(
-            type: FriendRequestType.sent,
-          ),
-        ]);
-
-        emit(FriendState.loaded(
-          friends: results[0] as List<UserEntity>,
-          receivedRequests: results[1] as List<FriendshipEntity>,
-          sentRequests: results[2] as List<FriendshipEntity>,
-        ));
-      } catch (e) {
-        // Log the actual error for debugging
-        print('❌ Error loading friends: $e');
-        // If cloud function doesn't exist or returns error, just show empty state
-        emit(const FriendState.loaded(
-          friends: [],
-          receivedRequests: [],
-          sentRequests: [],
-        ));
-      }
-    } on FriendshipException catch (e) {
-      // Log the actual error for debugging
-      print('❌ FriendshipException loading friends: ${e.message}');
-      // Show empty state instead of error for missing cloud functions
-      emit(const FriendState.loaded(
-        friends: [],
-        receivedRequests: [],
-        sentRequests: [],
-      ));
-    } catch (e) {
-      // Log the actual error for debugging
-      print('❌ Unexpected error loading friends: $e');
-      // Show empty state instead of error for any other issues
-      emit(const FriendState.loaded(
-        friends: [],
-        receivedRequests: [],
-        sentRequests: [],
-      ));
+      return await fn();
+    } catch (_) {
+      return fallback;
     }
   }
 
