@@ -165,6 +165,28 @@ service cloud.firestore {
       // Only admins can delete groups
       allow delete: if isAuthenticated() &&
                        request.auth.uid in resource.data.adminIds;
+
+      // ============================================
+      // Group Invite Links (Epic 17 — Story 17.1)
+      // ============================================
+
+      // Invite documents: only group members can read, only Cloud Functions can write
+      match /invites/{inviteId} {
+        allow read: if isAuthenticated() &&
+                       request.auth.uid in get(/databases/$(database)/documents/groups/$(groupId)).data.memberIds;
+        allow write: if false; // Only via Cloud Functions (Admin SDK)
+      }
+    }
+
+    // ============================================
+    // Invite Token Lookup (Epic 17 — Story 17.1)
+    // ============================================
+
+    // Token lookup: authenticated users can read (for deep link resolution),
+    // only Cloud Functions can write
+    match /invite_tokens/{token} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only via Cloud Functions (Admin SDK)
     }
 
     // ============================================
