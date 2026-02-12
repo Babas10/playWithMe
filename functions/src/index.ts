@@ -96,3 +96,11 @@ export {
 // Export scheduled functions for game auto-abort
 export {autoAbortGames} from "./autoAbortGames";
 
+// Epic 17: Invite-Based Onboarding (Story 17.3)
+export {
+  createGroupInvite,
+  validateInviteToken,
+  joinGroupViaInvite,
+  revokeGroupInvite,
+} from "./invites";
+
