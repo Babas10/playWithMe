@@ -25,6 +25,8 @@ import 'package:play_with_me/features/games/presentation/pages/game_creation_pag
 import 'package:play_with_me/features/games/presentation/pages/games_list_page.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
 import 'package:play_with_me/features/training/presentation/pages/training_session_creation_page.dart';
+import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_bloc.dart';
+import 'package:play_with_me/features/groups/presentation/widgets/invite_link_section.dart';
 
 class GroupDetailsPage extends StatelessWidget {
   final String groupId;
@@ -42,8 +44,11 @@ class GroupDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<GroupMemberBloc>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<GroupMemberBloc>()),
+        BlocProvider(create: (context) => sl<GroupInviteLinkBloc>()),
+      ],
       child: _GroupDetailsPageContent(
         groupId: groupId,
         groupRepositoryOverride: groupRepositoryOverride,
@@ -401,6 +406,12 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
             // Group header
             _buildGroupHeader(context),
             const Divider(),
+
+            // Invite link section (visible only for eligible members)
+            if (_group!.canUserInviteOthers(currentUserId))
+              InviteLinkSection(groupId: widget.groupId),
+            if (_group!.canUserInviteOthers(currentUserId))
+              const Divider(),
 
             // Members section
             Padding(

@@ -1657,4 +1657,42 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get myStats => 'Meine Statistiken';
+
+  @override
+  String get generateInviteLink => 'Einladungslink erstellen';
+
+  @override
+  String get copyLink => 'Link kopieren';
+
+  @override
+  String get shareLink => 'Teilen';
+
+  @override
+  String get linkCopied => 'Link in die Zwischenablage kopiert';
+
+  @override
+  String get inviteLinkSectionTitle => 'Mitglieder einladen';
+
+  @override
+  String get inviteLinkDescription =>
+      'Teile diesen Link, um Personen einzuladen, der Gruppe beizutreten.';
+
+  @override
+  String get revokeInvite => 'Einladung widerrufen';
+
+  @override
+  String get inviteRevoked => 'Einladungslink widerrufen';
+
+  @override
+  String get generateInviteError =>
+      'Einladungslink konnte nicht erstellt werden';
+
+  @override
+  String get revokeInviteError =>
+      'Einladungslink konnte nicht widerrufen werden';
+
+  @override
+  String inviteLinkShareMessage(String url) {
+    return 'Tritt meiner Gruppe auf PlayWithMe bei! $url';
+  }
 }
