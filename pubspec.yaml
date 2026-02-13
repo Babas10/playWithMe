@@ -78,6 +78,9 @@ dependencies:
   # Sharing
   share_plus: ^10.1.4
 
+  # Deep Linking
+  app_links: ^6.4.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

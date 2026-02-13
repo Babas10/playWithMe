@@ -52,6 +52,10 @@ import 'package:play_with_me/features/training/presentation/bloc/training_sessio
 import 'package:play_with_me/features/training/presentation/bloc/exercise/exercise_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_bloc.dart';
 import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_bloc.dart';
+import 'package:play_with_me/core/services/pending_invite_storage.dart';
+import 'package:play_with_me/core/services/deep_link_service.dart';
+import 'package:play_with_me/core/services/app_links_deep_link_service.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -216,6 +220,18 @@ Future<void> initializeDependencies() async {
     );
   }
 
+  if (!sl.isRegistered<PendingInviteStorage>()) {
+    sl.registerLazySingleton<PendingInviteStorage>(
+      () => PendingInviteStorage(prefs: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<DeepLinkService>()) {
+    sl.registerLazySingleton<DeepLinkService>(
+      () => AppLinksDeepLinkService(),
+    );
+  }
+
   // Register BLoCs only if not already registered
   if (!sl.isRegistered<AuthenticationBloc>()) {
     sl.registerFactory<AuthenticationBloc>(
@@ -353,6 +369,15 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<GroupInviteLinkBloc>()) {
     sl.registerFactory<GroupInviteLinkBloc>(
       () => GroupInviteLinkBloc(repository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<DeepLinkBloc>()) {
+    sl.registerFactory<DeepLinkBloc>(
+      () => DeepLinkBloc(
+        deepLinkService: sl(),
+        pendingInviteStorage: sl(),
+      ),
     );
   }
 }

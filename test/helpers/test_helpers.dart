@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
+import 'package:play_with_me/core/services/deep_link_service.dart';
+import 'package:play_with_me/core/services/pending_invite_storage.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
@@ -8,6 +12,10 @@ import 'package:play_with_me/features/auth/presentation/bloc/registration/regist
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
 import '../unit/features/auth/data/mock_auth_repository.dart';
 import '../unit/core/data/repositories/mock_user_repository.dart';
+
+class MockDeepLinkService extends Mock implements DeepLinkService {}
+
+class MockPendingInviteStorage extends Mock implements PendingInviteStorage {}
 
 // Global test repository instances for control during tests
 MockAuthRepository? _globalMockRepo;
@@ -60,6 +68,26 @@ Future<void> initializeTestDependencies({
 
   sl.registerFactory<PasswordResetBloc>(
     () => PasswordResetBloc(authRepository: sl<AuthRepository>()),
+  );
+
+  // Register deep link services and bloc
+  final mockDeepLinkService = MockDeepLinkService();
+  final mockPendingInviteStorage = MockPendingInviteStorage();
+  when(() => mockDeepLinkService.inviteTokenStream)
+      .thenAnswer((_) => const Stream.empty());
+  when(() => mockDeepLinkService.getInitialInviteToken())
+      .thenAnswer((_) async => null);
+  when(() => mockPendingInviteStorage.retrieve())
+      .thenAnswer((_) async => null);
+
+  sl.registerLazySingleton<DeepLinkService>(() => mockDeepLinkService);
+  sl.registerLazySingleton<PendingInviteStorage>(
+      () => mockPendingInviteStorage);
+  sl.registerFactory<DeepLinkBloc>(
+    () => DeepLinkBloc(
+      deepLinkService: sl<DeepLinkService>(),
+      pendingInviteStorage: sl<PendingInviteStorage>(),
+    ),
   );
 }
 

@@ -2,14 +2,15 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:play_with_me/app/route_generator.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_event.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/features/auth/presentation/pages/login_page.dart';
-import 'package:play_with_me/features/auth/presentation/pages/registration_page.dart';
-import 'package:play_with_me/features/auth/presentation/pages/password_reset_page.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
@@ -66,6 +67,9 @@ class PlayWithMeApp extends StatelessWidget {
         ),
         BlocProvider<PasswordResetBloc>(
           create: (context) => sl<PasswordResetBloc>(),
+        ),
+        BlocProvider<DeepLinkBloc>(
+          create: (context) => sl<DeepLinkBloc>()..add(const InitializeDeepLinks()),
         ),
         BlocProvider<LocalePreferencesBloc>(
           create: (context) => LocalePreferencesBloc(
@@ -131,12 +135,7 @@ class PlayWithMeApp extends StatelessWidget {
                 }
               },
             ),
-            routes: {
-              '/login': (context) => const LoginPage(),
-              '/register': (context) => const RegistrationPage(),
-              '/forgot-password': (context) => const PasswordResetPage(),
-              '/my-community': (context) => const MyCommunityPage(),
-            },
+            onGenerateRoute: RouteGenerator.generateRoute,
           );
         },
       ),

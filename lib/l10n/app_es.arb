@@ -511,5 +511,7 @@
   "inviteRevoked": "Enlace de invitación revocado",
   "generateInviteError": "No se pudo generar el enlace de invitación",
   "revokeInviteError": "No se pudo revocar el enlace de invitación",
-  "inviteLinkShareMessage": "¡Únete a mi grupo en PlayWithMe! {url}"
+  "inviteLinkShareMessage": "¡Únete a mi grupo en PlayWithMe! {url}",
+  "pageNotFound": "Página no encontrada",
+  "pageNotFoundMessage": "La página solicitada no se pudo encontrar."
 }
