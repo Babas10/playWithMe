@@ -513,5 +513,21 @@
   "revokeInviteError": "Impossible de révoquer le lien d'invitation",
   "inviteLinkShareMessage": "Rejoins mon groupe sur PlayWithMe ! {url}",
   "pageNotFound": "Page introuvable",
-  "pageNotFoundMessage": "La page demandée est introuvable."
+  "pageNotFoundMessage": "La page demandée est introuvable.",
+  "inviteOnboardingTitle": "Vous êtes invité !",
+  "inviteOnboardingSubtitle": "Vous êtes invité à rejoindre :",
+  "createAccount": "Créer un compte",
+  "iHaveAnAccount": "J'ai un compte",
+  "joinGroup": "Rejoindre le groupe",
+  "joinGroupConfirmation": "Rejoindre le groupe ?",
+  "invitedBy": "Invité par {name}",
+  "membersCount": "{count} membres",
+  "inviteExpired": "Ce lien d'invitation a expiré",
+  "inviteLinkRevoked": "Ce lien d'invitation n'est plus valide",
+  "inviteLimitReached": "Ce lien d'invitation a atteint sa limite d'utilisation",
+  "groupJoinedSuccess": "Bienvenue dans {groupName} !",
+  "alreadyAMember": "Vous êtes déjà membre de ce groupe",
+  "continueToApp": "Continuer vers l'application",
+  "validatingInvite": "Validation de l'invitation...",
+  "joiningGroup": "Rejoint le groupe..."
 }
