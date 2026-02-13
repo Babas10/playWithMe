@@ -20,6 +20,7 @@ import 'package:play_with_me/core/domain/repositories/training_feedback_reposito
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
 import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
+import 'package:play_with_me/core/domain/repositories/group_invite_link_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_user_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_group_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_game_repository.dart';
@@ -29,6 +30,7 @@ import 'package:play_with_me/core/data/repositories/firestore_training_feedback_
 import 'package:play_with_me/core/data/repositories/firebase_image_storage_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_invitation_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_friend_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_group_invite_link_repository.dart';
 import 'package:play_with_me/core/services/image_picker_service.dart';
 import 'package:play_with_me/core/presentation/bloc/user/user_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
@@ -49,6 +51,7 @@ import 'package:play_with_me/features/training/presentation/bloc/training_sessio
 import 'package:play_with_me/features/training/presentation/bloc/training_session_participation/training_session_participation_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/exercise/exercise_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_bloc.dart';
+import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -183,6 +186,14 @@ Future<void> initializeDependencies() async {
         functions: sl(),
         firestore: sl(),
         auth: sl(),
+      ),
+    );
+  }
+
+  if (!sl.isRegistered<GroupInviteLinkRepository>()) {
+    sl.registerLazySingleton<GroupInviteLinkRepository>(
+      () => FirestoreGroupInviteLinkRepository(
+        functions: sl(),
       ),
     );
   }
@@ -336,6 +347,12 @@ Future<void> initializeDependencies() async {
       () => TrainingSessionParticipationBloc(
         trainingSessionRepository: sl(),
       ),
+    );
+  }
+
+  if (!sl.isRegistered<GroupInviteLinkBloc>()) {
+    sl.registerFactory<GroupInviteLinkBloc>(
+      () => GroupInviteLinkBloc(repository: sl()),
     );
   }
 }

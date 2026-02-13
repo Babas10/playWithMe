@@ -500,5 +500,16 @@
   "nextTrainingSession": "Prossimo allenamento",
   "noTrainingSessionsScheduled": "Nessun allenamento programmato",
   "stats": "Statistiche",
-  "myStats": "Le Mie Statistiche"
+  "myStats": "Le Mie Statistiche",
+  "generateInviteLink": "Genera link di invito",
+  "copyLink": "Copia link",
+  "shareLink": "Condividi",
+  "linkCopied": "Link copiato negli appunti",
+  "inviteLinkSectionTitle": "Invita membri",
+  "inviteLinkDescription": "Condividi questo link per invitare persone a unirsi al gruppo.",
+  "revokeInvite": "Revoca invito",
+  "inviteRevoked": "Link di invito revocato",
+  "generateInviteError": "Impossibile generare il link di invito",
+  "revokeInviteError": "Impossibile revocare il link di invito",
+  "inviteLinkShareMessage": "Unisciti al mio gruppo su PlayWithMe! {url}"
 }
