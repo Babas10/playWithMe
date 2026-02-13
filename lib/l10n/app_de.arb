@@ -513,5 +513,21 @@
   "revokeInviteError": "Einladungslink konnte nicht widerrufen werden",
   "inviteLinkShareMessage": "Tritt meiner Gruppe auf PlayWithMe bei! {url}",
   "pageNotFound": "Seite nicht gefunden",
-  "pageNotFoundMessage": "Die angeforderte Seite konnte nicht gefunden werden."
+  "pageNotFoundMessage": "Die angeforderte Seite konnte nicht gefunden werden.",
+  "inviteOnboardingTitle": "Du wurdest eingeladen!",
+  "inviteOnboardingSubtitle": "Du wurdest eingeladen beizutreten:",
+  "createAccount": "Konto erstellen",
+  "iHaveAnAccount": "Ich habe ein Konto",
+  "joinGroup": "Gruppe beitreten",
+  "joinGroupConfirmation": "Gruppe beitreten?",
+  "invitedBy": "Eingeladen von {name}",
+  "membersCount": "{count} Mitglieder",
+  "inviteExpired": "Dieser Einladungslink ist abgelaufen",
+  "inviteLinkRevoked": "Dieser Einladungslink ist nicht mehr gültig",
+  "inviteLimitReached": "Dieser Einladungslink hat sein Nutzungslimit erreicht",
+  "groupJoinedSuccess": "Willkommen bei {groupName}!",
+  "alreadyAMember": "Du bist bereits Mitglied dieser Gruppe",
+  "continueToApp": "Weiter zur App",
+  "validatingInvite": "Einladung wird überprüft...",
+  "joiningGroup": "Gruppe wird beigetreten..."
 }

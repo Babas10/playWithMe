@@ -6,7 +6,12 @@ import 'package:play_with_me/app/route_generator.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_event.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_state.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_event.dart';
+import 'package:play_with_me/features/invitations/presentation/pages/invite_onboarding_page.dart';
+import 'package:play_with_me/features/invitations/presentation/pages/join_group_confirmation_page.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -49,6 +54,9 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 class PlayWithMeApp extends StatelessWidget {
   const PlayWithMeApp({super.key});
 
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -71,20 +79,74 @@ class PlayWithMeApp extends StatelessWidget {
         BlocProvider<DeepLinkBloc>(
           create: (context) => sl<DeepLinkBloc>()..add(const InitializeDeepLinks()),
         ),
+        BlocProvider<InviteJoinBloc>(
+          create: (context) => sl<InviteJoinBloc>(),
+        ),
         BlocProvider<LocalePreferencesBloc>(
           create: (context) => LocalePreferencesBloc(
             repository: sl<LocalePreferencesRepository>(),
           )..add(const LocalePreferencesEvent.loadPreferences()),
         ),
       ],
-      child: BlocListener<AuthenticationBloc, AuthenticationState>(
-        listener: (context, state) {
-          if (state is AuthenticationAuthenticated) {
-            context.read<InvitationBloc>().add(
-              LoadPendingInvitations(userId: state.user.uid),
-            );
-          }
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<AuthenticationBloc, AuthenticationState>(
+            listener: (context, state) {
+              if (state is AuthenticationAuthenticated) {
+                context.read<InvitationBloc>().add(
+                  LoadPendingInvitations(userId: state.user.uid),
+                );
+                // Process pending invite after login/registration
+                context
+                    .read<InviteJoinBloc>()
+                    .add(const ProcessPendingInvite());
+              }
+            },
+          ),
+          BlocListener<DeepLinkBloc, DeepLinkState>(
+            listener: (context, deepLinkState) {
+              if (deepLinkState is DeepLinkPendingInvite) {
+                final authState =
+                    context.read<AuthenticationBloc>().state;
+                final navigator = PlayWithMeApp.navigatorKey.currentState;
+                if (navigator == null) return;
+
+                if (authState is AuthenticationAuthenticated) {
+                  // Authenticated: validate and show join confirmation
+                  context
+                      .read<InviteJoinBloc>()
+                      .add(ValidateInviteToken(deepLinkState.token));
+                  navigator.push(
+                    MaterialPageRoute(
+                      builder: (_) => MultiBlocProvider(
+                        providers: [
+                          BlocProvider.value(
+                            value: context.read<InviteJoinBloc>(),
+                          ),
+                        ],
+                        child: JoinGroupConfirmationPage(
+                          token: deepLinkState.token,
+                        ),
+                      ),
+                    ),
+                  );
+                } else if (authState is AuthenticationUnauthenticated) {
+                  // Unauthenticated: show invite onboarding page
+                  navigator.push(
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<InviteJoinBloc>(),
+                        child: InviteOnboardingPage(
+                          token: deepLinkState.token,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+        ],
         child: BlocBuilder<LocalePreferencesBloc, LocalePreferencesState>(
         builder: (context, localeState) {
           // Get the current locale from preferences or use default
@@ -94,6 +156,7 @@ class PlayWithMeApp extends StatelessWidget {
           }
 
           return MaterialApp(
+            navigatorKey: PlayWithMeApp.navigatorKey,
             title: 'PlayWithMe${EnvironmentConfig.appSuffix}',
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(
