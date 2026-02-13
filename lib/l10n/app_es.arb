@@ -513,5 +513,21 @@
   "revokeInviteError": "No se pudo revocar el enlace de invitación",
   "inviteLinkShareMessage": "¡Únete a mi grupo en PlayWithMe! {url}",
   "pageNotFound": "Página no encontrada",
-  "pageNotFoundMessage": "La página solicitada no se pudo encontrar."
+  "pageNotFoundMessage": "La página solicitada no se pudo encontrar.",
+  "inviteOnboardingTitle": "¡Has sido invitado!",
+  "inviteOnboardingSubtitle": "Has sido invitado a unirte a:",
+  "createAccount": "Crear cuenta",
+  "iHaveAnAccount": "Tengo una cuenta",
+  "joinGroup": "Unirse al grupo",
+  "joinGroupConfirmation": "¿Unirse al grupo?",
+  "invitedBy": "Invitado por {name}",
+  "membersCount": "{count} miembros",
+  "inviteExpired": "Este enlace de invitación ha expirado",
+  "inviteLinkRevoked": "Este enlace de invitación ya no es válido",
+  "inviteLimitReached": "Este enlace de invitación ha alcanzado su límite de uso",
+  "groupJoinedSuccess": "¡Bienvenido a {groupName}!",
+  "alreadyAMember": "Ya eres miembro de este grupo",
+  "continueToApp": "Continuar a la app",
+  "validatingInvite": "Validando invitación...",
+  "joiningGroup": "Uniéndose al grupo..."
 }

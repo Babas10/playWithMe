@@ -680,7 +680,7 @@ abstract class AppLocalizations {
   /// **'Email Sent!'**
   String get emailSent;
 
-  /// Create account page title
+  /// Button text to create a new account
   ///
   /// In en, this message translates to:
   /// **'Create Account'**
@@ -2384,7 +2384,7 @@ abstract class AppLocalizations {
   /// **'Assign All Players to Continue'**
   String get assignAllPlayersToContinue;
 
-  /// Invitation info showing inviter name
+  /// Label showing who sent the invite
   ///
   /// In en, this message translates to:
   /// **'Invited by {name}'**
@@ -3139,6 +3139,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The requested page could not be found.'**
   String get pageNotFoundMessage;
+
+  /// Title on the invite onboarding page
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve been invited!'**
+  String get inviteOnboardingTitle;
+
+  /// Subtitle on the invite onboarding page
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve been invited to join:'**
+  String get inviteOnboardingSubtitle;
+
+  /// Button text for existing users to log in
+  ///
+  /// In en, this message translates to:
+  /// **'I have an account'**
+  String get iHaveAnAccount;
+
+  /// Button text to join a group via invite
+  ///
+  /// In en, this message translates to:
+  /// **'Join Group'**
+  String get joinGroup;
+
+  /// Title on the join group confirmation page
+  ///
+  /// In en, this message translates to:
+  /// **'Join Group?'**
+  String get joinGroupConfirmation;
+
+  /// Label showing the number of group members
+  ///
+  /// In en, this message translates to:
+  /// **'{count} members'**
+  String membersCount(int count);
+
+  /// Error message when invite link has expired
+  ///
+  /// In en, this message translates to:
+  /// **'This invite link has expired'**
+  String get inviteExpired;
+
+  /// Error message when invite link has been revoked
+  ///
+  /// In en, this message translates to:
+  /// **'This invite link is no longer valid'**
+  String get inviteLinkRevoked;
+
+  /// Error message when invite link usage limit is reached
+  ///
+  /// In en, this message translates to:
+  /// **'This invite link has reached its usage limit'**
+  String get inviteLimitReached;
+
+  /// Success message after joining a group
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to {groupName}!'**
+  String groupJoinedSuccess(String groupName);
+
+  /// Message when user is already a member of the group
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re already a member of this group'**
+  String get alreadyAMember;
+
+  /// Button text to continue to the main app
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to app'**
+  String get continueToApp;
+
+  /// Loading message while validating an invite token
+  ///
+  /// In en, this message translates to:
+  /// **'Validating invite...'**
+  String get validatingInvite;
+
+  /// Loading message while joining a group
+  ///
+  /// In en, this message translates to:
+  /// **'Joining group...'**
+  String get joiningGroup;
 }
 
 class _AppLocalizationsDelegate

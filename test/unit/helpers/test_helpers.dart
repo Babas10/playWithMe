@@ -18,6 +18,11 @@ import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
+import 'package:play_with_me/core/services/deep_link_service.dart';
+import 'package:play_with_me/core/services/pending_invite_storage.dart';
+import 'package:play_with_me/core/domain/repositories/group_invite_link_repository.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import '../features/auth/data/mock_auth_repository.dart';
 import '../core/data/repositories/mock_group_repository.dart';
 
@@ -32,6 +37,16 @@ class MockInvitationRepository extends Mock implements InvitationRepository {}
 
 // Mock for FriendRepository
 class MockFriendRepository extends Mock implements FriendRepository {}
+
+// Mock for DeepLinkService
+class MockDeepLinkService extends Mock implements DeepLinkService {}
+
+// Mock for PendingInviteStorage
+class MockPendingInviteStorage extends Mock implements PendingInviteStorage {}
+
+// Mock for GroupInviteLinkRepository
+class MockGroupInviteLinkRepository extends Mock
+    implements GroupInviteLinkRepository {}
 
 // Fake for UserModel (required for mocktail's any() matcher)
 class FakeUserModel extends Fake implements UserModel {}
@@ -163,6 +178,41 @@ Future<void> initializeTestDependencies({
   sl.registerFactory<FriendRequestCountBloc>(
     () => FriendRequestCountBloc(
       friendRepository: sl<FriendRepository>(),
+    ),
+  );
+
+  // Register deep link services and bloc
+  final mockDeepLinkService = MockDeepLinkService();
+  final mockPendingInviteStorage = MockPendingInviteStorage();
+  when(() => mockDeepLinkService.inviteTokenStream)
+      .thenAnswer((_) => const Stream.empty());
+  when(() => mockDeepLinkService.getInitialInviteToken())
+      .thenAnswer((_) async => null);
+  when(() => mockPendingInviteStorage.retrieve())
+      .thenAnswer((_) async => null);
+  when(() => mockPendingInviteStorage.store(any()))
+      .thenAnswer((_) async {});
+  when(() => mockPendingInviteStorage.clear())
+      .thenAnswer((_) async {});
+
+  sl.registerLazySingleton<DeepLinkService>(() => mockDeepLinkService);
+  sl.registerLazySingleton<PendingInviteStorage>(
+      () => mockPendingInviteStorage);
+  sl.registerFactory<DeepLinkBloc>(
+    () => DeepLinkBloc(
+      deepLinkService: sl<DeepLinkService>(),
+      pendingInviteStorage: sl<PendingInviteStorage>(),
+    ),
+  );
+
+  // Register InviteJoinBloc with mock repository
+  final mockGroupInviteLinkRepo = MockGroupInviteLinkRepository();
+  sl.registerLazySingleton<GroupInviteLinkRepository>(
+      () => mockGroupInviteLinkRepo);
+  sl.registerFactory<InviteJoinBloc>(
+    () => InviteJoinBloc(
+      repository: sl<GroupInviteLinkRepository>(),
+      pendingInviteStorage: sl<PendingInviteStorage>(),
     ),
   );
 }

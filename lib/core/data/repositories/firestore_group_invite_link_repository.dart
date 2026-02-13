@@ -65,6 +65,62 @@ class FirestoreGroupInviteLinkRepository implements GroupInviteLinkRepository {
     }
   }
 
+  @override
+  Future<({
+    String groupId,
+    String groupName,
+    String? groupDescription,
+    String? groupPhotoUrl,
+    int groupMemberCount,
+    String inviterName,
+    String? inviterPhotoUrl,
+  })> validateInviteToken({required String token}) async {
+    try {
+      final callable = _functions.httpsCallable('validateInviteToken');
+      final result = await callable.call({'token': token});
+      final data = Map<String, dynamic>.from(result.data as Map);
+
+      return (
+        groupId: data['groupId'] as String,
+        groupName: data['groupName'] as String,
+        groupDescription: data['groupDescription'] as String?,
+        groupPhotoUrl: data['groupPhotoUrl'] as String?,
+        groupMemberCount: data['groupMemberCount'] as int,
+        inviterName: data['inviterName'] as String,
+        inviterPhotoUrl: data['inviterPhotoUrl'] as String?,
+      );
+    } on FirebaseFunctionsException catch (e) {
+      throw _handleError(e);
+    } catch (e) {
+      throw GroupInviteLinkException(
+          'Failed to validate invite token: $e');
+    }
+  }
+
+  @override
+  Future<({
+    String groupId,
+    String groupName,
+    bool alreadyMember,
+  })> joinGroupViaInvite({required String token}) async {
+    try {
+      final callable = _functions.httpsCallable('joinGroupViaInvite');
+      final result = await callable.call({'token': token});
+      final data = Map<String, dynamic>.from(result.data as Map);
+
+      return (
+        groupId: data['groupId'] as String,
+        groupName: data['groupName'] as String,
+        alreadyMember: data['alreadyMember'] as bool,
+      );
+    } on FirebaseFunctionsException catch (e) {
+      throw _handleError(e);
+    } catch (e) {
+      throw GroupInviteLinkException(
+          'Failed to join group via invite: $e');
+    }
+  }
+
   GroupInviteLinkException _handleError(FirebaseFunctionsException e) {
     switch (e.code) {
       case 'not-found':

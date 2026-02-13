@@ -56,6 +56,7 @@ import 'package:play_with_me/core/services/pending_invite_storage.dart';
 import 'package:play_with_me/core/services/deep_link_service.dart';
 import 'package:play_with_me/core/services/app_links_deep_link_service.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -369,6 +370,15 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<GroupInviteLinkBloc>()) {
     sl.registerFactory<GroupInviteLinkBloc>(
       () => GroupInviteLinkBloc(repository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<InviteJoinBloc>()) {
+    sl.registerFactory<InviteJoinBloc>(
+      () => InviteJoinBloc(
+        repository: sl(),
+        pendingInviteStorage: sl(),
+      ),
     );
   }
 
