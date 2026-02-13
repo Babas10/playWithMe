@@ -2360,5 +2360,63 @@
   "myStats": "My Stats",
   "@myStats": {
     "description": "My Stats page title"
+  },
+
+  "generateInviteLink": "Generate Invite Link",
+  "@generateInviteLink": {
+    "description": "Button label to generate a shareable group invite link"
+  },
+
+  "copyLink": "Copy Link",
+  "@copyLink": {
+    "description": "Button label to copy the invite link to clipboard"
+  },
+
+  "shareLink": "Share",
+  "@shareLink": {
+    "description": "Button label to open native share sheet for the invite link"
+  },
+
+  "linkCopied": "Link copied to clipboard",
+  "@linkCopied": {
+    "description": "Snackbar message after invite link is copied"
+  },
+
+  "inviteLinkSectionTitle": "Invite Members",
+  "@inviteLinkSectionTitle": {
+    "description": "Section title for invite link generation area"
+  },
+
+  "inviteLinkDescription": "Share this link to invite people to join the group.",
+  "@inviteLinkDescription": {
+    "description": "Description text in the invite link section"
+  },
+
+  "revokeInvite": "Revoke Invite",
+  "@revokeInvite": {
+    "description": "Button label to revoke an invite link"
+  },
+
+  "inviteRevoked": "Invite link revoked",
+  "@inviteRevoked": {
+    "description": "Snackbar message after invite link is revoked"
+  },
+
+  "generateInviteError": "Failed to generate invite link",
+  "@generateInviteError": {
+    "description": "Error message when invite link generation fails"
+  },
+
+  "revokeInviteError": "Failed to revoke invite link",
+  "@revokeInviteError": {
+    "description": "Error message when invite link revocation fails"
+  },
+
+  "inviteLinkShareMessage": "Join my group on PlayWithMe! {url}",
+  "@inviteLinkShareMessage": {
+    "description": "Message shared via native share sheet with the invite link",
+    "placeholders": {
+      "url": {"type": "String"}
+    }
   }
 }

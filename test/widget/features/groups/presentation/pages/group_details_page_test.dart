@@ -24,6 +24,10 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/features/groups/presentation/pages/group_details_page.dart';
+import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_bloc.dart';
+import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_event.dart';
+import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_state.dart';
+import 'package:play_with_me/core/domain/repositories/group_invite_link_repository.dart';
 
 class MockGroupMemberBloc
     extends MockBloc<GroupMemberEvent, GroupMemberState>
@@ -45,6 +49,13 @@ class MockGameRepository extends Mock implements GameRepository {}
 
 class MockFriendRepository extends Mock implements FriendRepository {}
 
+class MockGroupInviteLinkBloc
+    extends MockBloc<GroupInviteLinkEvent, GroupInviteLinkState>
+    implements GroupInviteLinkBloc {}
+
+class MockGroupInviteLinkRepository extends Mock
+    implements GroupInviteLinkRepository {}
+
 class FakeGroupMemberEvent extends Fake implements GroupMemberEvent {}
 
 class FakeGroupMemberState extends Fake implements GroupMemberState {}
@@ -57,6 +68,7 @@ void main() {
   late MockUserRepository mockUserRepository;
   late MockGameRepository mockGameRepository;
   late MockFriendRepository mockFriendRepository;
+  late MockGroupInviteLinkBloc mockGroupInviteLinkBloc;
 
   const testUserId = 'test-user-123';
   const testGroupId = 'test-group-123';
@@ -113,6 +125,9 @@ void main() {
     mockUserRepository = MockUserRepository();
     mockGameRepository = MockGameRepository();
     mockFriendRepository = MockFriendRepository();
+    mockGroupInviteLinkBloc = MockGroupInviteLinkBloc();
+    when(() => mockGroupInviteLinkBloc.state)
+        .thenReturn(const GroupInviteLinkInitial());
 
     when(() => mockGroupMemberBloc.state)
         .thenReturn(const GroupMemberInitial());
@@ -148,6 +163,11 @@ void main() {
     }
     sl.registerFactory<GroupMemberBloc>(() => mockGroupMemberBloc);
 
+    if (sl.isRegistered<GroupInviteLinkBloc>()) {
+      sl.unregister<GroupInviteLinkBloc>();
+    }
+    sl.registerFactory<GroupInviteLinkBloc>(() => mockGroupInviteLinkBloc);
+
     if (sl.isRegistered<FriendRepository>()) {
       sl.unregister<FriendRepository>();
     }
@@ -160,6 +180,9 @@ void main() {
 
     if (sl.isRegistered<GroupMemberBloc>()) {
       sl.unregister<GroupMemberBloc>();
+    }
+    if (sl.isRegistered<GroupInviteLinkBloc>()) {
+      sl.unregister<GroupInviteLinkBloc>();
     }
     if (sl.isRegistered<FriendRepository>()) {
       sl.unregister<FriendRepository>();

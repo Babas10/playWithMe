@@ -16,7 +16,8 @@ class ErrorMessages {
         e is InvitationException ||
         e is UserException ||
         e is ExerciseException ||
-        e is ImageStorageException) {
+        e is ImageStorageException ||
+        e is GroupInviteLinkException) {
       return (e.toString(), _isRetryableByCode(_getExceptionCode(e)));
     }
     // Check FirebaseFunctionsException first as it may extend FirebaseException
@@ -38,6 +39,7 @@ class ErrorMessages {
     if (e is UserException) return e.code;
     if (e is ExerciseException) return e.code;
     if (e is ImageStorageException) return e.code;
+    if (e is GroupInviteLinkException) return e.code;
     return null;
   }
 
@@ -277,6 +279,19 @@ class InvitationErrorMessages {
         'You cannot invite yourself to a group',
         false,
       );
+    }
+
+    // Fall back to generic error message handling
+    return ErrorMessages.getErrorMessage(e);
+  }
+}
+
+/// Group invite link-specific error messages.
+class GroupInviteLinkErrorMessages {
+  /// Get error message for group invite link operations.
+  static (String message, bool isRetryable) getErrorMessage(Exception e) {
+    if (e is GroupInviteLinkException) {
+      return (e.message, ErrorMessages._isRetryableByCode(e.code));
     }
 
     // Fall back to generic error message handling

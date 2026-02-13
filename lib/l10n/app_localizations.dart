@@ -3061,6 +3061,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My Stats'**
   String get myStats;
+
+  /// Button label to generate a shareable group invite link
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Invite Link'**
+  String get generateInviteLink;
+
+  /// Button label to copy the invite link to clipboard
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Link'**
+  String get copyLink;
+
+  /// Button label to open native share sheet for the invite link
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareLink;
+
+  /// Snackbar message after invite link is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied to clipboard'**
+  String get linkCopied;
+
+  /// Section title for invite link generation area
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Members'**
+  String get inviteLinkSectionTitle;
+
+  /// Description text in the invite link section
+  ///
+  /// In en, this message translates to:
+  /// **'Share this link to invite people to join the group.'**
+  String get inviteLinkDescription;
+
+  /// Button label to revoke an invite link
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke Invite'**
+  String get revokeInvite;
+
+  /// Snackbar message after invite link is revoked
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link revoked'**
+  String get inviteRevoked;
+
+  /// Error message when invite link generation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to generate invite link'**
+  String get generateInviteError;
+
+  /// Error message when invite link revocation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to revoke invite link'**
+  String get revokeInviteError;
+
+  /// Message shared via native share sheet with the invite link
+  ///
+  /// In en, this message translates to:
+  /// **'Join my group on PlayWithMe! {url}'**
+  String inviteLinkShareMessage(String url);
 }
 
 class _AppLocalizationsDelegate

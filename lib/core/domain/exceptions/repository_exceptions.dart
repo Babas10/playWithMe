@@ -77,3 +77,14 @@ class ImageStorageException implements Exception {
   @override
   String toString() => message;
 }
+
+/// Exception thrown by GroupInviteLinkRepository operations.
+class GroupInviteLinkException implements Exception {
+  final String message;
+  final String? code;
+
+  GroupInviteLinkException(this.message, {this.code});
+
+  @override
+  String toString() => message;
+}
