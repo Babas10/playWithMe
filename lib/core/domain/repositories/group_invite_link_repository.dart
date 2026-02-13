@@ -21,4 +21,26 @@ abstract class GroupInviteLinkRepository {
     required String groupId,
     required String inviteId,
   });
+
+  /// Validates an invite token and returns group info for the pre-join screen.
+  ///
+  /// Throws [GroupInviteLinkException] on failure (expired, revoked, limit reached).
+  Future<({
+    String groupId,
+    String groupName,
+    String? groupDescription,
+    String? groupPhotoUrl,
+    int groupMemberCount,
+    String inviterName,
+    String? inviterPhotoUrl,
+  })> validateInviteToken({required String token});
+
+  /// Joins the authenticated user to the group via invite token.
+  ///
+  /// Throws [GroupInviteLinkException] on failure.
+  Future<({
+    String groupId,
+    String groupName,
+    bool alreadyMember,
+  })> joinGroupViaInvite({required String token});
 }

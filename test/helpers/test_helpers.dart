@@ -10,12 +10,26 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/password_reset/password_reset_bloc.dart';
+import 'package:play_with_me/core/domain/repositories/group_invite_link_repository.dart';
+import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
+import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
+import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
+import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
 import '../unit/features/auth/data/mock_auth_repository.dart';
 import '../unit/core/data/repositories/mock_user_repository.dart';
 
 class MockDeepLinkService extends Mock implements DeepLinkService {}
 
 class MockPendingInviteStorage extends Mock implements PendingInviteStorage {}
+
+class MockGroupInviteLinkRepository extends Mock
+    implements GroupInviteLinkRepository {}
+
+class MockInvitationRepository extends Mock implements InvitationRepository {}
+
+class MockLocalePreferencesRepository extends Mock
+    implements LocalePreferencesRepository {}
 
 // Global test repository instances for control during tests
 MockAuthRepository? _globalMockRepo;
@@ -70,6 +84,21 @@ Future<void> initializeTestDependencies({
     () => PasswordResetBloc(authRepository: sl<AuthRepository>()),
   );
 
+  // Register InvitationBloc with mock repository
+  final mockInvitationRepo = MockInvitationRepository();
+  sl.registerLazySingleton<InvitationRepository>(() => mockInvitationRepo);
+  sl.registerFactory<InvitationBloc>(
+    () => InvitationBloc(invitationRepository: sl<InvitationRepository>()),
+  );
+
+  // Register LocalePreferencesRepository mock
+  final mockLocalePreferencesRepo = MockLocalePreferencesRepository();
+  when(() => mockLocalePreferencesRepo.loadPreferences()).thenAnswer(
+    (_) async => LocalePreferencesEntity.defaultPreferences(),
+  );
+  sl.registerLazySingleton<LocalePreferencesRepository>(
+      () => mockLocalePreferencesRepo);
+
   // Register deep link services and bloc
   final mockDeepLinkService = MockDeepLinkService();
   final mockPendingInviteStorage = MockPendingInviteStorage();
@@ -86,6 +115,17 @@ Future<void> initializeTestDependencies({
   sl.registerFactory<DeepLinkBloc>(
     () => DeepLinkBloc(
       deepLinkService: sl<DeepLinkService>(),
+      pendingInviteStorage: sl<PendingInviteStorage>(),
+    ),
+  );
+
+  // Register InviteJoinBloc with mock repository
+  final mockGroupInviteLinkRepo = MockGroupInviteLinkRepository();
+  sl.registerLazySingleton<GroupInviteLinkRepository>(
+      () => mockGroupInviteLinkRepo);
+  sl.registerFactory<InviteJoinBloc>(
+    () => InviteJoinBloc(
+      repository: sl<GroupInviteLinkRepository>(),
       pendingInviteStorage: sl<PendingInviteStorage>(),
     ),
   );

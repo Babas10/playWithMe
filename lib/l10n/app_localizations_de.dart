@@ -324,7 +324,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get emailSent => 'E-Mail Gesendet!';
 
   @override
-  String get createAccount => 'Konto Erstellen';
+  String get createAccount => 'Konto erstellen';
 
   @override
   String get accountCreatedSuccess =>
@@ -1702,4 +1702,51 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get pageNotFoundMessage =>
       'Die angeforderte Seite konnte nicht gefunden werden.';
+
+  @override
+  String get inviteOnboardingTitle => 'Du wurdest eingeladen!';
+
+  @override
+  String get inviteOnboardingSubtitle => 'Du wurdest eingeladen beizutreten:';
+
+  @override
+  String get iHaveAnAccount => 'Ich habe ein Konto';
+
+  @override
+  String get joinGroup => 'Gruppe beitreten';
+
+  @override
+  String get joinGroupConfirmation => 'Gruppe beitreten?';
+
+  @override
+  String membersCount(int count) {
+    return '$count Mitglieder';
+  }
+
+  @override
+  String get inviteExpired => 'Dieser Einladungslink ist abgelaufen';
+
+  @override
+  String get inviteLinkRevoked => 'Dieser Einladungslink ist nicht mehr gültig';
+
+  @override
+  String get inviteLimitReached =>
+      'Dieser Einladungslink hat sein Nutzungslimit erreicht';
+
+  @override
+  String groupJoinedSuccess(String groupName) {
+    return 'Willkommen bei $groupName!';
+  }
+
+  @override
+  String get alreadyAMember => 'Du bist bereits Mitglied dieser Gruppe';
+
+  @override
+  String get continueToApp => 'Weiter zur App';
+
+  @override
+  String get validatingInvite => 'Einladung wird überprüft...';
+
+  @override
+  String get joiningGroup => 'Gruppe wird beigetreten...';
 }

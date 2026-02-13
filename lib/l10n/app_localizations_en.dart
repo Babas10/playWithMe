@@ -1676,4 +1676,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pageNotFoundMessage => 'The requested page could not be found.';
+
+  @override
+  String get inviteOnboardingTitle => 'You\'ve been invited!';
+
+  @override
+  String get inviteOnboardingSubtitle => 'You\'ve been invited to join:';
+
+  @override
+  String get iHaveAnAccount => 'I have an account';
+
+  @override
+  String get joinGroup => 'Join Group';
+
+  @override
+  String get joinGroupConfirmation => 'Join Group?';
+
+  @override
+  String membersCount(int count) {
+    return '$count members';
+  }
+
+  @override
+  String get inviteExpired => 'This invite link has expired';
+
+  @override
+  String get inviteLinkRevoked => 'This invite link is no longer valid';
+
+  @override
+  String get inviteLimitReached =>
+      'This invite link has reached its usage limit';
+
+  @override
+  String groupJoinedSuccess(String groupName) {
+    return 'Welcome to $groupName!';
+  }
+
+  @override
+  String get alreadyAMember => 'You\'re already a member of this group';
+
+  @override
+  String get continueToApp => 'Continue to app';
+
+  @override
+  String get validatingInvite => 'Validating invite...';
+
+  @override
+  String get joiningGroup => 'Joining group...';
 }
