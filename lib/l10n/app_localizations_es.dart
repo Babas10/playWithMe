@@ -1688,4 +1688,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String inviteLinkShareMessage(String url) {
     return '¡Únete a mi grupo en PlayWithMe! $url';
   }
+
+  @override
+  String get pageNotFound => 'Página no encontrada';
+
+  @override
+  String get pageNotFoundMessage =>
+      'La página solicitada no se pudo encontrar.';
 }

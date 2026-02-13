@@ -1699,4 +1699,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String inviteLinkShareMessage(String url) {
     return 'Rejoins mon groupe sur PlayWithMe ! $url';
   }
+
+  @override
+  String get pageNotFound => 'Page introuvable';
+
+  @override
+  String get pageNotFoundMessage => 'La page demandée est introuvable.';
 }
