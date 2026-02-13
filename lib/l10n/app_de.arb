@@ -511,5 +511,7 @@
   "inviteRevoked": "Einladungslink widerrufen",
   "generateInviteError": "Einladungslink konnte nicht erstellt werden",
   "revokeInviteError": "Einladungslink konnte nicht widerrufen werden",
-  "inviteLinkShareMessage": "Tritt meiner Gruppe auf PlayWithMe bei! {url}"
+  "inviteLinkShareMessage": "Tritt meiner Gruppe auf PlayWithMe bei! {url}",
+  "pageNotFound": "Seite nicht gefunden",
+  "pageNotFoundMessage": "Die angeforderte Seite konnte nicht gefunden werden."
 }

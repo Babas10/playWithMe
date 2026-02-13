@@ -2418,5 +2418,15 @@
     "placeholders": {
       "url": {"type": "String"}
     }
+  },
+
+  "pageNotFound": "Page Not Found",
+  "@pageNotFound": {
+    "description": "Title shown when navigating to an unknown route"
+  },
+
+  "pageNotFoundMessage": "The requested page could not be found.",
+  "@pageNotFoundMessage": {
+    "description": "Message shown when navigating to an unknown route"
   }
 }
