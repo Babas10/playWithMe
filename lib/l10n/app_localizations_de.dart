@@ -1695,4 +1695,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String inviteLinkShareMessage(String url) {
     return 'Tritt meiner Gruppe auf PlayWithMe bei! $url';
   }
+
+  @override
+  String get pageNotFound => 'Seite nicht gefunden';
+
+  @override
+  String get pageNotFoundMessage =>
+      'Die angeforderte Seite konnte nicht gefunden werden.';
 }

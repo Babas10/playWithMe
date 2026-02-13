@@ -3127,6 +3127,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Join my group on PlayWithMe! {url}'**
   String inviteLinkShareMessage(String url);
+
+  /// Title shown when navigating to an unknown route
+  ///
+  /// In en, this message translates to:
+  /// **'Page Not Found'**
+  String get pageNotFound;
+
+  /// Message shown when navigating to an unknown route
+  ///
+  /// In en, this message translates to:
+  /// **'The requested page could not be found.'**
+  String get pageNotFoundMessage;
 }
 
 class _AppLocalizationsDelegate
