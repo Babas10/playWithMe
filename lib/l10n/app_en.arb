@@ -2622,5 +2622,30 @@
   "creatingAccount": "Creating account...",
   "@creatingAccount": {
     "description": "Loading message while creating account"
+  },
+
+  "verifyEmailWarning": "Verify your email to keep your account. {daysRemaining} days left.",
+  "@verifyEmailWarning": {
+    "description": "Warning banner message for unverified email during grace period",
+    "placeholders": {
+      "daysRemaining": {
+        "type": "int"
+      }
+    }
+  },
+
+  "verifyNow": "Verify Now",
+  "@verifyNow": {
+    "description": "Button label to trigger email verification resend"
+  },
+
+  "dismiss": "Dismiss",
+  "@dismiss": {
+    "description": "Button label to dismiss the verification warning banner"
+  },
+
+  "emailVerifiedSuccess": "Email verified successfully!",
+  "@emailVerifiedSuccess": {
+    "description": "Success message shown when email verification is confirmed"
   }
 }

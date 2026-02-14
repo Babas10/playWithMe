@@ -3349,6 +3349,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creating account...'**
   String get creatingAccount;
+
+  /// Warning banner message for unverified email during grace period
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email to keep your account. {daysRemaining} days left.'**
+  String verifyEmailWarning(int daysRemaining);
+
+  /// Button label to trigger email verification resend
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Now'**
+  String get verifyNow;
+
+  /// Button label to dismiss the verification warning banner
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
+
+  /// Success message shown when email verification is confirmed
+  ///
+  /// In en, this message translates to:
+  /// **'Email verified successfully!'**
+  String get emailVerifiedSuccess;
 }
 
 class _AppLocalizationsDelegate

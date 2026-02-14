@@ -551,5 +551,10 @@
   "weakPasswordError": "La password è troppo debole. Usa almeno 8 caratteri.",
   "invalidEmailError": "Inserisci un indirizzo email valido.",
   "networkError": "Impossibile connettersi. Controlla la tua connessione e riprova.",
-  "creatingAccount": "Creazione account..."
+  "creatingAccount": "Creazione account...",
+
+  "verifyEmailWarning": "Verifica la tua email per mantenere il tuo account. {daysRemaining} giorni rimanenti.",
+  "verifyNow": "Verifica ora",
+  "dismiss": "Chiudi",
+  "emailVerifiedSuccess": "Email verificata con successo!"
 }
