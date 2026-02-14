@@ -2517,5 +2517,110 @@
   "joiningGroup": "Joining group...",
   "@joiningGroup": {
     "description": "Loading message while joining a group"
+  },
+
+  "createAccountToJoin": "Create your account to join:",
+  "@createAccountToJoin": {
+    "description": "Header text on invite registration page"
+  },
+
+  "fullNameHint": "Full Name",
+  "@fullNameHint": {
+    "description": "Hint text for full name field"
+  },
+
+  "fullNameRequired": "Full name is required",
+  "@fullNameRequired": {
+    "description": "Validation error when full name is empty"
+  },
+
+  "fullNameTooShort": "Full name must be at least 2 characters",
+  "@fullNameTooShort": {
+    "description": "Validation error when full name is too short"
+  },
+
+  "displayNameHintRequired": "Display Name",
+  "@displayNameHintRequired": {
+    "description": "Hint text for required display name field"
+  },
+
+  "displayNameRequired": "Display name is required",
+  "@displayNameRequired": {
+    "description": "Validation error when display name is empty"
+  },
+
+  "displayNameTooShortInvite": "Display name must be at least 3 characters",
+  "@displayNameTooShortInvite": {
+    "description": "Validation error when display name is too short on invite registration"
+  },
+
+  "displayNameTooLongInvite": "Display name must be at most 30 characters",
+  "@displayNameTooLongInvite": {
+    "description": "Validation error when display name is too long on invite registration"
+  },
+
+  "passwordRequirementsHint": "At least 8 characters, 1 uppercase letter, 1 number",
+  "@passwordRequirementsHint": {
+    "description": "Helper text explaining password requirements"
+  },
+
+  "passwordTooShortInvite": "Password must be at least 8 characters",
+  "@passwordTooShortInvite": {
+    "description": "Validation error when password is too short on invite registration"
+  },
+
+  "passwordMissingUppercase": "Password must contain at least 1 uppercase letter",
+  "@passwordMissingUppercase": {
+    "description": "Validation error when password has no uppercase letter"
+  },
+
+  "passwordMissingNumber": "Password must contain at least 1 number",
+  "@passwordMissingNumber": {
+    "description": "Validation error when password has no number"
+  },
+
+  "createAccountAndJoin": "Create Account & Join",
+  "@createAccountAndJoin": {
+    "description": "Button text to create account and join group"
+  },
+
+  "alreadyHaveAccountLogin": "Already have an account? Log in",
+  "@alreadyHaveAccountLogin": {
+    "description": "Link text for existing users on invite registration page"
+  },
+
+  "accountCreatedJoiningGroup": "Account created! Joining group...",
+  "@accountCreatedJoiningGroup": {
+    "description": "Loading message after account creation while joining group"
+  },
+
+  "inviteExpiredDuringRegistration": "The invite link has expired, but your account was created successfully.",
+  "@inviteExpiredDuringRegistration": {
+    "description": "Message when invite expires during registration"
+  },
+
+  "emailAlreadyInUse": "An account with this email already exists. Try logging in instead.",
+  "@emailAlreadyInUse": {
+    "description": "Error when email is already registered"
+  },
+
+  "weakPasswordError": "Password is too weak. Use at least 8 characters.",
+  "@weakPasswordError": {
+    "description": "Error when password is too weak"
+  },
+
+  "invalidEmailError": "Please enter a valid email address.",
+  "@invalidEmailError": {
+    "description": "Error when email format is invalid"
+  },
+
+  "networkError": "Unable to connect. Please check your connection and try again.",
+  "@networkError": {
+    "description": "Error when network connection fails"
+  },
+
+  "creatingAccount": "Creating account...",
+  "@creatingAccount": {
+    "description": "Loading message while creating account"
   }
 }

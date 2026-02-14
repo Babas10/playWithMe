@@ -529,5 +529,27 @@
   "alreadyAMember": "Ya eres miembro de este grupo",
   "continueToApp": "Continuar a la app",
   "validatingInvite": "Validando invitación...",
-  "joiningGroup": "Uniéndose al grupo..."
+  "joiningGroup": "Uniéndose al grupo...",
+
+  "createAccountToJoin": "Crea tu cuenta para unirte:",
+  "fullNameHint": "Nombre completo",
+  "fullNameRequired": "El nombre completo es obligatorio",
+  "fullNameTooShort": "El nombre completo debe tener al menos 2 caracteres",
+  "displayNameHintRequired": "Nombre de usuario",
+  "displayNameRequired": "El nombre de usuario es obligatorio",
+  "displayNameTooShortInvite": "El nombre de usuario debe tener al menos 3 caracteres",
+  "displayNameTooLongInvite": "El nombre de usuario debe tener como máximo 30 caracteres",
+  "passwordRequirementsHint": "Al menos 8 caracteres, 1 mayúscula, 1 número",
+  "passwordTooShortInvite": "La contraseña debe tener al menos 8 caracteres",
+  "passwordMissingUppercase": "La contraseña debe contener al menos 1 letra mayúscula",
+  "passwordMissingNumber": "La contraseña debe contener al menos 1 número",
+  "createAccountAndJoin": "Crear cuenta y unirse",
+  "alreadyHaveAccountLogin": "¿Ya tienes una cuenta? Inicia sesión",
+  "accountCreatedJoiningGroup": "¡Cuenta creada! Uniéndose al grupo...",
+  "inviteExpiredDuringRegistration": "El enlace de invitación ha expirado, pero tu cuenta fue creada exitosamente.",
+  "emailAlreadyInUse": "Ya existe una cuenta con este correo electrónico. Intenta iniciar sesión.",
+  "weakPasswordError": "La contraseña es demasiado débil. Usa al menos 8 caracteres.",
+  "invalidEmailError": "Por favor ingresa una dirección de correo electrónico válida.",
+  "networkError": "No se puede conectar. Verifica tu conexión e inténtalo de nuevo.",
+  "creatingAccount": "Creando cuenta..."
 }

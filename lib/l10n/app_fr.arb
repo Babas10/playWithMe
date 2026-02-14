@@ -529,5 +529,27 @@
   "alreadyAMember": "Vous êtes déjà membre de ce groupe",
   "continueToApp": "Continuer vers l'application",
   "validatingInvite": "Validation de l'invitation...",
-  "joiningGroup": "Rejoint le groupe..."
+  "joiningGroup": "Rejoint le groupe...",
+
+  "createAccountToJoin": "Créez votre compte pour rejoindre :",
+  "fullNameHint": "Nom complet",
+  "fullNameRequired": "Le nom complet est requis",
+  "fullNameTooShort": "Le nom complet doit comporter au moins 2 caractères",
+  "displayNameHintRequired": "Nom d'affichage",
+  "displayNameRequired": "Le nom d'affichage est requis",
+  "displayNameTooShortInvite": "Le nom d'affichage doit comporter au moins 3 caractères",
+  "displayNameTooLongInvite": "Le nom d'affichage doit comporter au maximum 30 caractères",
+  "passwordRequirementsHint": "Au moins 8 caractères, 1 majuscule, 1 chiffre",
+  "passwordTooShortInvite": "Le mot de passe doit comporter au moins 8 caractères",
+  "passwordMissingUppercase": "Le mot de passe doit contenir au moins 1 majuscule",
+  "passwordMissingNumber": "Le mot de passe doit contenir au moins 1 chiffre",
+  "createAccountAndJoin": "Créer un compte et rejoindre",
+  "alreadyHaveAccountLogin": "Vous avez déjà un compte ? Connectez-vous",
+  "accountCreatedJoiningGroup": "Compte créé ! Rejoindre le groupe...",
+  "inviteExpiredDuringRegistration": "Le lien d'invitation a expiré, mais votre compte a été créé avec succès.",
+  "emailAlreadyInUse": "Un compte avec cet email existe déjà. Essayez de vous connecter.",
+  "weakPasswordError": "Le mot de passe est trop faible. Utilisez au moins 8 caractères.",
+  "invalidEmailError": "Veuillez entrer une adresse email valide.",
+  "networkError": "Impossible de se connecter. Veuillez vérifier votre connexion et réessayer.",
+  "creatingAccount": "Création du compte..."
 }
