@@ -1742,4 +1742,80 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get joiningGroup => 'Uniéndose al grupo...';
+
+  @override
+  String get createAccountToJoin => 'Crea tu cuenta para unirte:';
+
+  @override
+  String get fullNameHint => 'Nombre completo';
+
+  @override
+  String get fullNameRequired => 'El nombre completo es obligatorio';
+
+  @override
+  String get fullNameTooShort =>
+      'El nombre completo debe tener al menos 2 caracteres';
+
+  @override
+  String get displayNameHintRequired => 'Nombre de usuario';
+
+  @override
+  String get displayNameRequired => 'El nombre de usuario es obligatorio';
+
+  @override
+  String get displayNameTooShortInvite =>
+      'El nombre de usuario debe tener al menos 3 caracteres';
+
+  @override
+  String get displayNameTooLongInvite =>
+      'El nombre de usuario debe tener como máximo 30 caracteres';
+
+  @override
+  String get passwordRequirementsHint =>
+      'Al menos 8 caracteres, 1 mayúscula, 1 número';
+
+  @override
+  String get passwordTooShortInvite =>
+      'La contraseña debe tener al menos 8 caracteres';
+
+  @override
+  String get passwordMissingUppercase =>
+      'La contraseña debe contener al menos 1 letra mayúscula';
+
+  @override
+  String get passwordMissingNumber =>
+      'La contraseña debe contener al menos 1 número';
+
+  @override
+  String get createAccountAndJoin => 'Crear cuenta y unirse';
+
+  @override
+  String get alreadyHaveAccountLogin => '¿Ya tienes una cuenta? Inicia sesión';
+
+  @override
+  String get accountCreatedJoiningGroup =>
+      '¡Cuenta creada! Uniéndose al grupo...';
+
+  @override
+  String get inviteExpiredDuringRegistration =>
+      'El enlace de invitación ha expirado, pero tu cuenta fue creada exitosamente.';
+
+  @override
+  String get emailAlreadyInUse =>
+      'Ya existe una cuenta con este correo electrónico. Intenta iniciar sesión.';
+
+  @override
+  String get weakPasswordError =>
+      'La contraseña es demasiado débil. Usa al menos 8 caracteres.';
+
+  @override
+  String get invalidEmailError =>
+      'Por favor ingresa una dirección de correo electrónico válida.';
+
+  @override
+  String get networkError =>
+      'No se puede conectar. Verifica tu conexión e inténtalo de nuevo.';
+
+  @override
+  String get creatingAccount => 'Creando cuenta...';
 }
