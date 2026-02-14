@@ -5,6 +5,7 @@ import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_event.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_state.dart';
+import 'package:play_with_me/features/invitations/presentation/pages/invite_registration_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class InviteOnboardingPage extends StatelessWidget {
@@ -99,8 +100,15 @@ class InviteOnboardingPage extends StatelessWidget {
         const Spacer(),
         FilledButton(
           onPressed: () {
-            // Navigate to registration (Story 17.7 will implement InviteRegistrationPage)
-            Navigator.of(context).pushNamed('/register');
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => InviteRegistrationPage(
+                  token: token,
+                  groupName: state.groupName,
+                  inviterName: state.inviterName,
+                ),
+              ),
+            );
           },
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(48),

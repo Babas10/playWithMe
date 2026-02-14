@@ -1749,4 +1749,80 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get joiningGroup => 'Gruppe wird beigetreten...';
+
+  @override
+  String get createAccountToJoin => 'Erstellen Sie Ihr Konto zum Beitreten:';
+
+  @override
+  String get fullNameHint => 'Vollständiger Name';
+
+  @override
+  String get fullNameRequired => 'Vollständiger Name ist erforderlich';
+
+  @override
+  String get fullNameTooShort =>
+      'Der vollständige Name muss mindestens 2 Zeichen lang sein';
+
+  @override
+  String get displayNameHintRequired => 'Anzeigename';
+
+  @override
+  String get displayNameRequired => 'Anzeigename ist erforderlich';
+
+  @override
+  String get displayNameTooShortInvite =>
+      'Der Anzeigename muss mindestens 3 Zeichen lang sein';
+
+  @override
+  String get displayNameTooLongInvite =>
+      'Der Anzeigename darf höchstens 30 Zeichen lang sein';
+
+  @override
+  String get passwordRequirementsHint =>
+      'Mindestens 8 Zeichen, 1 Großbuchstabe, 1 Zahl';
+
+  @override
+  String get passwordTooShortInvite =>
+      'Das Passwort muss mindestens 8 Zeichen lang sein';
+
+  @override
+  String get passwordMissingUppercase =>
+      'Das Passwort muss mindestens 1 Großbuchstaben enthalten';
+
+  @override
+  String get passwordMissingNumber =>
+      'Das Passwort muss mindestens 1 Zahl enthalten';
+
+  @override
+  String get createAccountAndJoin => 'Konto erstellen und beitreten';
+
+  @override
+  String get alreadyHaveAccountLogin => 'Bereits ein Konto? Anmelden';
+
+  @override
+  String get accountCreatedJoiningGroup =>
+      'Konto erstellt! Gruppe beitreten...';
+
+  @override
+  String get inviteExpiredDuringRegistration =>
+      'Der Einladungslink ist abgelaufen, aber Ihr Konto wurde erfolgreich erstellt.';
+
+  @override
+  String get emailAlreadyInUse =>
+      'Ein Konto mit dieser E-Mail existiert bereits. Versuchen Sie sich anzumelden.';
+
+  @override
+  String get weakPasswordError =>
+      'Das Passwort ist zu schwach. Verwenden Sie mindestens 8 Zeichen.';
+
+  @override
+  String get invalidEmailError =>
+      'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
+
+  @override
+  String get networkError =>
+      'Verbindung nicht möglich. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.';
+
+  @override
+  String get creatingAccount => 'Konto wird erstellt...';
 }

@@ -3223,6 +3223,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Joining group...'**
   String get joiningGroup;
+
+  /// Header text on invite registration page
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account to join:'**
+  String get createAccountToJoin;
+
+  /// Hint text for full name field
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullNameHint;
+
+  /// Validation error when full name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Full name is required'**
+  String get fullNameRequired;
+
+  /// Validation error when full name is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Full name must be at least 2 characters'**
+  String get fullNameTooShort;
+
+  /// Hint text for required display name field
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get displayNameHintRequired;
+
+  /// Validation error when display name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Display name is required'**
+  String get displayNameRequired;
+
+  /// Validation error when display name is too short on invite registration
+  ///
+  /// In en, this message translates to:
+  /// **'Display name must be at least 3 characters'**
+  String get displayNameTooShortInvite;
+
+  /// Validation error when display name is too long on invite registration
+  ///
+  /// In en, this message translates to:
+  /// **'Display name must be at most 30 characters'**
+  String get displayNameTooLongInvite;
+
+  /// Helper text explaining password requirements
+  ///
+  /// In en, this message translates to:
+  /// **'At least 8 characters, 1 uppercase letter, 1 number'**
+  String get passwordRequirementsHint;
+
+  /// Validation error when password is too short on invite registration
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get passwordTooShortInvite;
+
+  /// Validation error when password has no uppercase letter
+  ///
+  /// In en, this message translates to:
+  /// **'Password must contain at least 1 uppercase letter'**
+  String get passwordMissingUppercase;
+
+  /// Validation error when password has no number
+  ///
+  /// In en, this message translates to:
+  /// **'Password must contain at least 1 number'**
+  String get passwordMissingNumber;
+
+  /// Button text to create account and join group
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account & Join'**
+  String get createAccountAndJoin;
+
+  /// Link text for existing users on invite registration page
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Log in'**
+  String get alreadyHaveAccountLogin;
+
+  /// Loading message after account creation while joining group
+  ///
+  /// In en, this message translates to:
+  /// **'Account created! Joining group...'**
+  String get accountCreatedJoiningGroup;
+
+  /// Message when invite expires during registration
+  ///
+  /// In en, this message translates to:
+  /// **'The invite link has expired, but your account was created successfully.'**
+  String get inviteExpiredDuringRegistration;
+
+  /// Error when email is already registered
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email already exists. Try logging in instead.'**
+  String get emailAlreadyInUse;
+
+  /// Error when password is too weak
+  ///
+  /// In en, this message translates to:
+  /// **'Password is too weak. Use at least 8 characters.'**
+  String get weakPasswordError;
+
+  /// Error when email format is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address.'**
+  String get invalidEmailError;
+
+  /// Error when network connection fails
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to connect. Please check your connection and try again.'**
+  String get networkError;
+
+  /// Loading message while creating account
+  ///
+  /// In en, this message translates to:
+  /// **'Creating account...'**
+  String get creatingAccount;
 }
 
 class _AppLocalizationsDelegate

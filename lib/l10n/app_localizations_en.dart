@@ -1723,4 +1723,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get joiningGroup => 'Joining group...';
+
+  @override
+  String get createAccountToJoin => 'Create your account to join:';
+
+  @override
+  String get fullNameHint => 'Full Name';
+
+  @override
+  String get fullNameRequired => 'Full name is required';
+
+  @override
+  String get fullNameTooShort => 'Full name must be at least 2 characters';
+
+  @override
+  String get displayNameHintRequired => 'Display Name';
+
+  @override
+  String get displayNameRequired => 'Display name is required';
+
+  @override
+  String get displayNameTooShortInvite =>
+      'Display name must be at least 3 characters';
+
+  @override
+  String get displayNameTooLongInvite =>
+      'Display name must be at most 30 characters';
+
+  @override
+  String get passwordRequirementsHint =>
+      'At least 8 characters, 1 uppercase letter, 1 number';
+
+  @override
+  String get passwordTooShortInvite => 'Password must be at least 8 characters';
+
+  @override
+  String get passwordMissingUppercase =>
+      'Password must contain at least 1 uppercase letter';
+
+  @override
+  String get passwordMissingNumber => 'Password must contain at least 1 number';
+
+  @override
+  String get createAccountAndJoin => 'Create Account & Join';
+
+  @override
+  String get alreadyHaveAccountLogin => 'Already have an account? Log in';
+
+  @override
+  String get accountCreatedJoiningGroup => 'Account created! Joining group...';
+
+  @override
+  String get inviteExpiredDuringRegistration =>
+      'The invite link has expired, but your account was created successfully.';
+
+  @override
+  String get emailAlreadyInUse =>
+      'An account with this email already exists. Try logging in instead.';
+
+  @override
+  String get weakPasswordError =>
+      'Password is too weak. Use at least 8 characters.';
+
+  @override
+  String get invalidEmailError => 'Please enter a valid email address.';
+
+  @override
+  String get networkError =>
+      'Unable to connect. Please check your connection and try again.';
+
+  @override
+  String get creatingAccount => 'Creating account...';
 }
