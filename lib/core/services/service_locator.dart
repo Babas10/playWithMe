@@ -55,6 +55,7 @@ import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link
 import 'package:play_with_me/core/services/pending_invite_storage.dart';
 import 'package:play_with_me/core/services/deep_link_service.dart';
 import 'package:play_with_me/core/services/app_links_deep_link_service.dart';
+import 'package:play_with_me/core/presentation/bloc/account_status/account_status_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_registration/invite_registration_bloc.dart';
@@ -390,6 +391,12 @@ Future<void> initializeDependencies() async {
         repository: sl(),
         pendingInviteStorage: sl(),
       ),
+    );
+  }
+
+  if (!sl.isRegistered<AccountStatusBloc>()) {
+    sl.registerFactory<AccountStatusBloc>(
+      () => AccountStatusBloc(authRepository: sl()),
     );
   }
 

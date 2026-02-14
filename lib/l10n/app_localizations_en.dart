@@ -1794,4 +1794,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creatingAccount => 'Creating account...';
+
+  @override
+  String verifyEmailWarning(int daysRemaining) {
+    return 'Verify your email to keep your account. $daysRemaining days left.';
+  }
+
+  @override
+  String get verifyNow => 'Verify Now';
+
+  @override
+  String get dismiss => 'Dismiss';
+
+  @override
+  String get emailVerifiedSuccess => 'Email verified successfully!';
 }

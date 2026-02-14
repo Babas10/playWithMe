@@ -551,5 +551,10 @@
   "weakPasswordError": "Das Passwort ist zu schwach. Verwenden Sie mindestens 8 Zeichen.",
   "invalidEmailError": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
   "networkError": "Verbindung nicht möglich. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-  "creatingAccount": "Konto wird erstellt..."
+  "creatingAccount": "Konto wird erstellt...",
+
+  "verifyEmailWarning": "Bestätigen Sie Ihre E-Mail, um Ihr Konto zu behalten. Noch {daysRemaining} Tage.",
+  "verifyNow": "Jetzt bestätigen",
+  "dismiss": "Schließen",
+  "emailVerifiedSuccess": "E-Mail erfolgreich bestätigt!"
 }
