@@ -563,5 +563,11 @@
   "accountStatusActive": "Aktiv",
   "accountStatusPendingVerification": "Bestätigung ausstehend",
   "accountStatusRestricted": "Eingeschränkt",
-  "accountStatusScheduledForDeletion": "Löschung geplant"
+  "accountStatusScheduledForDeletion": "Löschung geplant",
+
+  "accountDeletionWarning": "Das Konto wird in {daysRemaining} Tagen gelöscht.",
+  "featureRestricted": "Diese Funktion erfordert eine E-Mail-Bestätigung.",
+  "verifyToUnlock": "Bestätigen Sie Ihre E-Mail, um diese Funktion zu nutzen.",
+  "featureRestrictedTitle": "Funktion eingeschränkt",
+  "verifyEmail": "E-Mail bestätigen"
 }
