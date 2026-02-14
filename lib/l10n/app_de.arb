@@ -556,5 +556,12 @@
   "verifyEmailWarning": "Bestätigen Sie Ihre E-Mail, um Ihr Konto zu behalten. Noch {daysRemaining} Tage.",
   "verifyNow": "Jetzt bestätigen",
   "dismiss": "Schließen",
-  "emailVerifiedSuccess": "E-Mail erfolgreich bestätigt!"
+  "emailVerifiedSuccess": "E-Mail erfolgreich bestätigt!",
+
+  "accountRestricted": "Ihr Konto ist eingeschränkt. Bestätigen Sie Ihre E-Mail, um den vollen Zugang wiederherzustellen. {daysUntilDeletion} Tage bis zur Kontolöschung.",
+  "accountScheduledForDeletion": "Ihr Konto ist zur Löschung vorgesehen. Bestätigen Sie jetzt Ihre E-Mail, um Ihr Konto zu behalten.",
+  "accountStatusActive": "Aktiv",
+  "accountStatusPendingVerification": "Bestätigung ausstehend",
+  "accountStatusRestricted": "Eingeschränkt",
+  "accountStatusScheduledForDeletion": "Löschung geplant"
 }
