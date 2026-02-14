@@ -57,6 +57,7 @@ import 'package:play_with_me/core/services/deep_link_service.dart';
 import 'package:play_with_me/core/services/app_links_deep_link_service.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_registration/invite_registration_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -370,6 +371,16 @@ Future<void> initializeDependencies() async {
   if (!sl.isRegistered<GroupInviteLinkBloc>()) {
     sl.registerFactory<GroupInviteLinkBloc>(
       () => GroupInviteLinkBloc(repository: sl()),
+    );
+  }
+
+  if (!sl.isRegistered<InviteRegistrationBloc>()) {
+    sl.registerFactory<InviteRegistrationBloc>(
+      () => InviteRegistrationBloc(
+        authRepository: sl(),
+        groupInviteLinkRepository: sl(),
+        pendingInviteStorage: sl(),
+      ),
     );
   }
 

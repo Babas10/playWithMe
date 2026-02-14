@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_event.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_state.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_registration/invite_registration_bloc.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_registration/invite_registration_event.dart';
+import 'package:play_with_me/features/invitations/presentation/bloc/invite_registration/invite_registration_state.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/invite_onboarding_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
@@ -16,20 +20,40 @@ class MockInviteJoinBloc
     extends MockBloc<InviteJoinEvent, InviteJoinState>
     implements InviteJoinBloc {}
 
+class MockInviteRegistrationBloc
+    extends MockBloc<InviteRegistrationEvent, InviteRegistrationState>
+    implements InviteRegistrationBloc {}
+
 void main() {
   late MockInviteJoinBloc mockBloc;
 
   setUpAll(() {
     registerFallbackValue(const ValidateInviteToken(''));
     registerFallbackValue(const InviteJoinInitial());
+    registerFallbackValue(const InviteRegistrationFormReset());
+    registerFallbackValue(const InviteRegistrationInitial());
   });
 
   setUp(() {
     mockBloc = MockInviteJoinBloc();
+
+    // Register mock InviteRegistrationBloc in GetIt for navigation tests
+    final sl = GetIt.instance;
+    if (sl.isRegistered<InviteRegistrationBloc>()) {
+      sl.unregister<InviteRegistrationBloc>();
+    }
+    final mockRegBloc = MockInviteRegistrationBloc();
+    when(() => mockRegBloc.state)
+        .thenReturn(const InviteRegistrationInitial());
+    sl.registerFactory<InviteRegistrationBloc>(() => mockRegBloc);
   });
 
   tearDown(() {
     mockBloc.close();
+    final sl = GetIt.instance;
+    if (sl.isRegistered<InviteRegistrationBloc>()) {
+      sl.unregister<InviteRegistrationBloc>();
+    }
   });
 
   Widget createTestWidget({String token = 'test-token'}) {
@@ -106,14 +130,12 @@ void main() {
         expect(find.text('I have an account'), findsOneWidget);
       });
 
-      testWidgets('create account button navigates to /register',
+      testWidgets('create account button navigates to InviteRegistrationPage',
           (tester) async {
         when(() => mockBloc.state).thenReturn(validatedState);
 
-        final navigatorKey = GlobalKey<NavigatorState>();
         await tester.pumpWidget(
           MaterialApp(
-            navigatorKey: navigatorKey,
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -121,9 +143,6 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [Locale('en')],
-            routes: {
-              '/register': (_) => const Scaffold(body: Text('Register Page')),
-            },
             home: BlocProvider<InviteJoinBloc>.value(
               value: mockBloc,
               child: const InviteOnboardingPage(token: 'test-token'),
@@ -134,7 +153,9 @@ void main() {
         await tester.tap(find.text('Create Account'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Register Page'), findsOneWidget);
+        // Verifies navigation to InviteRegistrationPage with group context
+        expect(find.text('Create your account to join:'), findsOneWidget);
+        expect(find.text('Beach Volleyball Crew'), findsOneWidget);
       });
 
       testWidgets('login button navigates to /login', (tester) async {
