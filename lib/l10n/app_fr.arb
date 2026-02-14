@@ -551,5 +551,10 @@
   "weakPasswordError": "Le mot de passe est trop faible. Utilisez au moins 8 caractères.",
   "invalidEmailError": "Veuillez entrer une adresse email valide.",
   "networkError": "Impossible de se connecter. Veuillez vérifier votre connexion et réessayer.",
-  "creatingAccount": "Création du compte..."
+  "creatingAccount": "Création du compte...",
+
+  "verifyEmailWarning": "Vérifiez votre email pour conserver votre compte. {daysRemaining} jours restants.",
+  "verifyNow": "Vérifier maintenant",
+  "dismiss": "Fermer",
+  "emailVerifiedSuccess": "Email vérifié avec succès !"
 }

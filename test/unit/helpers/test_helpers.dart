@@ -18,6 +18,7 @@ import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/profile/domain/repositories/locale_preferences_repository.dart';
+import 'package:play_with_me/core/presentation/bloc/account_status/account_status_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 import 'package:play_with_me/core/services/deep_link_service.dart';
 import 'package:play_with_me/core/services/pending_invite_storage.dart';
@@ -214,6 +215,11 @@ Future<void> initializeTestDependencies({
       repository: sl<GroupInviteLinkRepository>(),
       pendingInviteStorage: sl<PendingInviteStorage>(),
     ),
+  );
+
+  // Register AccountStatusBloc factory that uses the mock auth repository
+  sl.registerFactory<AccountStatusBloc>(
+    () => AccountStatusBloc(authRepository: sl<AuthRepository>()),
   );
 }
 

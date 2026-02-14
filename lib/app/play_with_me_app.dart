@@ -4,10 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/app/route_generator.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
+import 'package:play_with_me/core/presentation/bloc/account_status/account_status_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/account_status/account_status_event.dart';
+import 'package:play_with_me/core/presentation/bloc/account_status/account_status_state.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_event.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_state.dart';
+import 'package:play_with_me/core/presentation/widgets/email_verification_banner.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_event.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/invite_onboarding_page.dart';
@@ -222,6 +228,8 @@ class _HomePageState extends State<HomePage> {
   late final GroupBloc _groupBloc;
   late final FriendRequestCountBloc _friendRequestCountBloc;
   late final PlayerStatsBloc _playerStatsBloc;
+  late final AccountStatusBloc _accountStatusBloc;
+  late final EmailVerificationBloc _emailVerificationBloc;
 
   @override
   void initState() {
@@ -233,6 +241,10 @@ class _HomePageState extends State<HomePage> {
     _playerStatsBloc = PlayerStatsBloc(
       userRepository: sl<UserRepository>(),
     );
+    _accountStatusBloc = sl<AccountStatusBloc>();
+    _emailVerificationBloc = EmailVerificationBloc(
+      authRepository: sl(),
+    );
 
     if (authState is AuthenticationAuthenticated) {
       _groupBloc.add(LoadGroupsForUser(userId: authState.user.uid));
@@ -240,6 +252,7 @@ class _HomePageState extends State<HomePage> {
         FriendRequestCountEvent.startListening(userId: authState.user.uid),
       );
       _playerStatsBloc.add(LoadPlayerStats(authState.user.uid));
+      _accountStatusBloc.add(const CheckAccountStatus());
 
       // Initialize notification service
       _initializeNotifications();
@@ -301,6 +314,8 @@ class _HomePageState extends State<HomePage> {
     _groupBloc.close();
     _friendRequestCountBloc.close();
     _playerStatsBloc.close();
+    _accountStatusBloc.close();
+    _emailVerificationBloc.close();
     super.dispose();
   }
 
@@ -332,15 +347,44 @@ class _HomePageState extends State<HomePage> {
       providers: [
         BlocProvider<FriendRequestCountBloc>.value(value: _friendRequestCountBloc),
         BlocProvider<PlayerStatsBloc>.value(value: _playerStatsBloc),
+        BlocProvider<AccountStatusBloc>.value(value: _accountStatusBloc),
+        BlocProvider<EmailVerificationBloc>.value(value: _emailVerificationBloc),
       ],
       child: Scaffold(
         appBar: PlayWithMeAppBar.build(
           context: context,
           title: _getAppBarTitle(context),
         ),
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: _pages,
+        body: Column(
+          children: [
+            BlocBuilder<AccountStatusBloc, AccountStatusState>(
+              builder: (context, accountState) {
+                if (accountState is AccountStatusPending &&
+                    !accountState.isDismissed) {
+                  return EmailVerificationBanner(
+                    daysRemaining: accountState.daysRemaining,
+                    onVerifyNow: () {
+                      context.read<EmailVerificationBloc>().add(
+                        const EmailVerificationEvent.sendVerificationEmail(),
+                      );
+                    },
+                    onDismiss: () {
+                      context.read<AccountStatusBloc>().add(
+                        const DismissAccountWarning(),
+                      );
+                    },
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: _pages,
+              ),
+            ),
+          ],
         ),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
