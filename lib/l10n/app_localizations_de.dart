@@ -1839,4 +1839,25 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get emailVerifiedSuccess => 'E-Mail erfolgreich bestätigt!';
+
+  @override
+  String accountRestricted(int daysUntilDeletion) {
+    return 'Ihr Konto ist eingeschränkt. Bestätigen Sie Ihre E-Mail, um den vollen Zugang wiederherzustellen. $daysUntilDeletion Tage bis zur Kontolöschung.';
+  }
+
+  @override
+  String get accountScheduledForDeletion =>
+      'Ihr Konto ist zur Löschung vorgesehen. Bestätigen Sie jetzt Ihre E-Mail, um Ihr Konto zu behalten.';
+
+  @override
+  String get accountStatusActive => 'Aktiv';
+
+  @override
+  String get accountStatusPendingVerification => 'Bestätigung ausstehend';
+
+  @override
+  String get accountStatusRestricted => 'Eingeschränkt';
+
+  @override
+  String get accountStatusScheduledForDeletion => 'Löschung geplant';
 }

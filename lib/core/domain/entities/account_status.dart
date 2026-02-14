@@ -1,3 +1,5 @@
+import 'package:json_annotation/json_annotation.dart';
+
 /// Account status based on email verification and account age.
 ///
 /// Used to enforce the grace period policy:
@@ -6,15 +8,19 @@
 /// - 30+ days: Scheduled for deletion
 enum AccountStatus {
   /// Email verified OR within 7-day grace period with verified email
+  @JsonValue('active')
   active,
 
   /// Within 7-day grace period, email not verified
+  @JsonValue('pendingVerification')
   pendingVerification,
 
   /// Past 7 days, email not verified
+  @JsonValue('restricted')
   restricted,
 
   /// Past 30 days, email not verified
+  @JsonValue('scheduledForDeletion')
   scheduledForDeletion,
 }
 

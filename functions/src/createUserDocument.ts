@@ -43,6 +43,11 @@ export const createUserDocument = functions.auth.user().onCreate(async (user) =>
       ? "anonymous"
       : user.providerData.map(p => p.providerId).join(", ");
 
+    // Compute grace period expiration (7 days from now)
+    const now = new Date();
+    const gracePeriodExpiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const isVerified = user.emailVerified || false;
+
     // Create user document with complete profile structure
     const userData = {
       // Core identity
@@ -51,8 +56,16 @@ export const createUserDocument = functions.auth.user().onCreate(async (user) =>
       photoUrl: user.photoURL || null,
 
       // Auth metadata
-      isEmailVerified: user.emailVerified || false,
+      isEmailVerified: isVerified,
       isAnonymous: user.providerData.length === 0,
+
+      // Account status fields (Story 17.8.2)
+      emailVerifiedAt: isVerified
+        ? admin.firestore.FieldValue.serverTimestamp()
+        : null,
+      accountStatus: isVerified ? "active" : "pendingVerification",
+      gracePeriodExpiresAt: admin.firestore.Timestamp.fromDate(gracePeriodExpiresAt),
+      deletionScheduledAt: null,
 
       // Timestamps
       createdAt: admin.firestore.FieldValue.serverTimestamp(),

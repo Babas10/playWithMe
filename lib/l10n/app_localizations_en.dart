@@ -1808,4 +1808,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emailVerifiedSuccess => 'Email verified successfully!';
+
+  @override
+  String accountRestricted(int daysUntilDeletion) {
+    return 'Your account is restricted. Verify your email to regain full access. $daysUntilDeletion days until account deletion.';
+  }
+
+  @override
+  String get accountScheduledForDeletion =>
+      'Your account is scheduled for deletion. Verify your email now to keep your account.';
+
+  @override
+  String get accountStatusActive => 'Active';
+
+  @override
+  String get accountStatusPendingVerification => 'Pending Verification';
+
+  @override
+  String get accountStatusRestricted => 'Restricted';
+
+  @override
+  String get accountStatusScheduledForDeletion => 'Scheduled for Deletion';
 }

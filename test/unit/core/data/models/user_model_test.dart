@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/domain/entities/account_status.dart';
 
 void main() {
   group('UserModel', () {
@@ -64,6 +65,11 @@ void main() {
         expect(user.dateOfBirth, null);
         expect(user.location, null);
         expect(user.bio, null);
+        // Account status fields (Story 17.8.2)
+        expect(user.emailVerifiedAt, null);
+        expect(user.accountStatus, AccountStatus.pendingVerification);
+        expect(user.gracePeriodExpiresAt, null);
+        expect(user.deletionScheduledAt, null);
         expect(user.groupIds, []);
         expect(user.gameIds, []);
         expect(user.notificationsEnabled, true);
@@ -1036,6 +1042,162 @@ void main() {
         final restored = UserModel.fromJson(json);
 
         expect(restored.teammateStats, stats);
+      });
+    });
+
+    // Story 17.8.2: Tests for account status fields
+    group('Account status fields (Story 17.8.2)', () {
+      test('has default accountStatus of pendingVerification', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'email@test.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+        );
+
+        expect(user.accountStatus, AccountStatus.pendingVerification);
+        expect(user.emailVerifiedAt, null);
+        expect(user.gracePeriodExpiresAt, null);
+        expect(user.deletionScheduledAt, null);
+      });
+
+      test('serializes account status fields to JSON', () {
+        final verifiedAt = DateTime(2024, 6, 1, 10, 0, 0);
+        final graceExpires = DateTime(2024, 6, 8, 10, 0, 0);
+        final user = testUser.copyWith(
+          accountStatus: AccountStatus.active,
+          emailVerifiedAt: verifiedAt,
+          gracePeriodExpiresAt: graceExpires,
+          deletionScheduledAt: null,
+        );
+
+        final json = user.toJson();
+
+        expect(json['accountStatus'], 'active');
+        expect(json['emailVerifiedAt'], isA<Timestamp>());
+        expect(json['gracePeriodExpiresAt'], isA<Timestamp>());
+        expect(json['deletionScheduledAt'], null);
+      });
+
+      test('deserializes account status fields from JSON with Timestamp', () {
+        final verifiedAt = DateTime(2024, 6, 1, 10, 0, 0);
+        final graceExpires = DateTime(2024, 6, 8, 10, 0, 0);
+        final deletionDate = DateTime(2024, 7, 1, 10, 0, 0);
+        final json = {
+          'uid': 'test-uid',
+          'email': 'test@example.com',
+          'isEmailVerified': false,
+          'isAnonymous': false,
+          'accountStatus': 'restricted',
+          'emailVerifiedAt': Timestamp.fromDate(verifiedAt),
+          'gracePeriodExpiresAt': Timestamp.fromDate(graceExpires),
+          'deletionScheduledAt': Timestamp.fromDate(deletionDate),
+        };
+
+        final user = UserModel.fromJson(json);
+
+        expect(user.accountStatus, AccountStatus.restricted);
+        expect(user.emailVerifiedAt, verifiedAt);
+        expect(user.gracePeriodExpiresAt, graceExpires);
+        expect(user.deletionScheduledAt, deletionDate);
+      });
+
+      test('deserializes all AccountStatus enum values from JSON', () {
+        for (final status in AccountStatus.values) {
+          final json = {
+            'uid': 'test-uid',
+            'email': 'test@example.com',
+            'isEmailVerified': false,
+            'isAnonymous': false,
+            'accountStatus': status.name,
+          };
+
+          final user = UserModel.fromJson(json);
+          expect(user.accountStatus, status);
+        }
+      });
+
+      test('backward compatibility - missing account status fields default correctly', () {
+        final json = {
+          'uid': 'legacy-user',
+          'email': 'legacy@test.com',
+          'isEmailVerified': true,
+          'isAnonymous': false,
+        };
+
+        final user = UserModel.fromJson(json);
+
+        expect(user.accountStatus, AccountStatus.pendingVerification);
+        expect(user.emailVerifiedAt, null);
+        expect(user.gracePeriodExpiresAt, null);
+        expect(user.deletionScheduledAt, null);
+      });
+
+      test('toFirestore includes account status fields', () {
+        final graceExpires = DateTime(2024, 6, 8, 10, 0, 0);
+        final user = testUser.copyWith(
+          accountStatus: AccountStatus.pendingVerification,
+          gracePeriodExpiresAt: graceExpires,
+        );
+
+        final firestoreData = user.toFirestore();
+
+        expect(firestoreData['accountStatus'], 'pendingVerification');
+        expect(firestoreData['gracePeriodExpiresAt'], isA<Timestamp>());
+        expect(firestoreData.containsKey('uid'), false);
+      });
+
+      test('fromFirestore parses account status fields correctly', () {
+        final verifiedAt = DateTime(2024, 6, 1, 10, 0, 0);
+        final graceExpires = DateTime(2024, 6, 8, 10, 0, 0);
+        final data = {
+          'email': 'status@test.com',
+          'displayName': 'Status Test User',
+          'isEmailVerified': true,
+          'isAnonymous': false,
+          'accountStatus': 'active',
+          'emailVerifiedAt': Timestamp.fromDate(verifiedAt),
+          'gracePeriodExpiresAt': Timestamp.fromDate(graceExpires),
+          'deletionScheduledAt': null,
+        };
+
+        final mockDoc = MockDocumentSnapshot('status-test-uid', data);
+        final user = UserModel.fromFirestore(mockDoc);
+
+        expect(user.uid, 'status-test-uid');
+        expect(user.accountStatus, AccountStatus.active);
+        expect(user.emailVerifiedAt, verifiedAt);
+        expect(user.gracePeriodExpiresAt, graceExpires);
+        expect(user.deletionScheduledAt, null);
+      });
+
+      test('copyWith updates account status fields correctly', () {
+        final newVerifiedAt = DateTime(2024, 6, 15, 8, 0, 0);
+        final updatedUser = testUser.copyWith(
+          accountStatus: AccountStatus.active,
+          emailVerifiedAt: newVerifiedAt,
+        );
+
+        expect(updatedUser.accountStatus, AccountStatus.active);
+        expect(updatedUser.emailVerifiedAt, newVerifiedAt);
+        expect(updatedUser.uid, testUser.uid);
+        expect(updatedUser.email, testUser.email);
+      });
+
+      test('serializes scheduledForDeletion status correctly', () {
+        final deletionDate = DateTime(2024, 7, 1, 10, 0, 0);
+        final user = testUser.copyWith(
+          accountStatus: AccountStatus.scheduledForDeletion,
+          deletionScheduledAt: deletionDate,
+        );
+
+        final json = user.toJson();
+        expect(json['accountStatus'], 'scheduledForDeletion');
+        expect(json['deletionScheduledAt'], isA<Timestamp>());
+
+        final restored = UserModel.fromJson(json);
+        expect(restored.accountStatus, AccountStatus.scheduledForDeletion);
+        expect(restored.deletionScheduledAt, deletionDate);
       });
     });
   });
