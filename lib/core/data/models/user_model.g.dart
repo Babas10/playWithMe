@@ -18,6 +18,16 @@ _$UserModelImpl _$$UserModelImplFromJson(
   lastSignInAt: const TimestampConverter().fromJson(json['lastSignInAt']),
   updatedAt: const TimestampConverter().fromJson(json['updatedAt']),
   isAnonymous: json['isAnonymous'] as bool,
+  emailVerifiedAt: const TimestampConverter().fromJson(json['emailVerifiedAt']),
+  accountStatus:
+      $enumDecodeNullable(_$AccountStatusEnumMap, json['accountStatus']) ??
+      AccountStatus.pendingVerification,
+  gracePeriodExpiresAt: const TimestampConverter().fromJson(
+    json['gracePeriodExpiresAt'],
+  ),
+  deletionScheduledAt: const TimestampConverter().fromJson(
+    json['deletionScheduledAt'],
+  ),
   firstName: json['firstName'] as String?,
   lastName: json['lastName'] as String?,
   phoneNumber: json['phoneNumber'] as String?,
@@ -90,6 +100,16 @@ Map<String, dynamic> _$$UserModelImplToJson(
   'lastSignInAt': const TimestampConverter().toJson(instance.lastSignInAt),
   'updatedAt': const TimestampConverter().toJson(instance.updatedAt),
   'isAnonymous': instance.isAnonymous,
+  'emailVerifiedAt': const TimestampConverter().toJson(
+    instance.emailVerifiedAt,
+  ),
+  'accountStatus': _$AccountStatusEnumMap[instance.accountStatus]!,
+  'gracePeriodExpiresAt': const TimestampConverter().toJson(
+    instance.gracePeriodExpiresAt,
+  ),
+  'deletionScheduledAt': const TimestampConverter().toJson(
+    instance.deletionScheduledAt,
+  ),
   'firstName': instance.firstName,
   'lastName': instance.lastName,
   'phoneNumber': instance.phoneNumber,
@@ -126,6 +146,13 @@ Map<String, dynamic> _$$UserModelImplToJson(
   'bestWin': instance.bestWin,
   'pointStats': instance.pointStats,
   'roleBasedStats': instance.roleBasedStats,
+};
+
+const _$AccountStatusEnumMap = {
+  AccountStatus.active: 'active',
+  AccountStatus.pendingVerification: 'pendingVerification',
+  AccountStatus.restricted: 'restricted',
+  AccountStatus.scheduledForDeletion: 'scheduledForDeletion',
 };
 
 const _$UserPrivacyLevelEnumMap = {

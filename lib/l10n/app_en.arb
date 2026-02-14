@@ -2647,5 +2647,41 @@
   "emailVerifiedSuccess": "Email verified successfully!",
   "@emailVerifiedSuccess": {
     "description": "Success message shown when email verification is confirmed"
+  },
+
+  "accountRestricted": "Your account is restricted. Verify your email to regain full access. {daysUntilDeletion} days until account deletion.",
+  "@accountRestricted": {
+    "description": "Warning message shown when account is restricted due to unverified email past grace period",
+    "placeholders": {
+      "daysUntilDeletion": {
+        "type": "int",
+        "description": "Number of days until account is permanently deleted"
+      }
+    }
+  },
+
+  "accountScheduledForDeletion": "Your account is scheduled for deletion. Verify your email now to keep your account.",
+  "@accountScheduledForDeletion": {
+    "description": "Warning message shown when account is past 30 days without email verification"
+  },
+
+  "accountStatusActive": "Active",
+  "@accountStatusActive": {
+    "description": "Label for active account status"
+  },
+
+  "accountStatusPendingVerification": "Pending Verification",
+  "@accountStatusPendingVerification": {
+    "description": "Label for pending verification account status"
+  },
+
+  "accountStatusRestricted": "Restricted",
+  "@accountStatusRestricted": {
+    "description": "Label for restricted account status"
+  },
+
+  "accountStatusScheduledForDeletion": "Scheduled for Deletion",
+  "@accountStatusScheduledForDeletion": {
+    "description": "Label for scheduled-for-deletion account status"
   }
 }

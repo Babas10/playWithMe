@@ -556,5 +556,12 @@
   "verifyEmailWarning": "Verifica la tua email per mantenere il tuo account. {daysRemaining} giorni rimanenti.",
   "verifyNow": "Verifica ora",
   "dismiss": "Chiudi",
-  "emailVerifiedSuccess": "Email verificata con successo!"
+  "emailVerifiedSuccess": "Email verificata con successo!",
+
+  "accountRestricted": "Il tuo account è limitato. Verifica la tua email per riottenere l'accesso completo. {daysUntilDeletion} giorni alla cancellazione dell'account.",
+  "accountScheduledForDeletion": "Il tuo account è in programma per la cancellazione. Verifica la tua email ora per mantenere il tuo account.",
+  "accountStatusActive": "Attivo",
+  "accountStatusPendingVerification": "Verifica in sospeso",
+  "accountStatusRestricted": "Limitato",
+  "accountStatusScheduledForDeletion": "Cancellazione programmata"
 }

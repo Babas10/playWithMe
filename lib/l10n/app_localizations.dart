@@ -3373,6 +3373,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Email verified successfully!'**
   String get emailVerifiedSuccess;
+
+  /// Warning message shown when account is restricted due to unverified email past grace period
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is restricted. Verify your email to regain full access. {daysUntilDeletion} days until account deletion.'**
+  String accountRestricted(int daysUntilDeletion);
+
+  /// Warning message shown when account is past 30 days without email verification
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is scheduled for deletion. Verify your email now to keep your account.'**
+  String get accountScheduledForDeletion;
+
+  /// Label for active account status
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get accountStatusActive;
+
+  /// Label for pending verification account status
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Verification'**
+  String get accountStatusPendingVerification;
+
+  /// Label for restricted account status
+  ///
+  /// In en, this message translates to:
+  /// **'Restricted'**
+  String get accountStatusRestricted;
+
+  /// Label for scheduled-for-deletion account status
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled for Deletion'**
+  String get accountStatusScheduledForDeletion;
 }
 
 class _AppLocalizationsDelegate
