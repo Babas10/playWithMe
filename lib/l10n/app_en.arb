@@ -2683,5 +2683,36 @@
   "accountStatusScheduledForDeletion": "Scheduled for Deletion",
   "@accountStatusScheduledForDeletion": {
     "description": "Label for scheduled-for-deletion account status"
+  },
+
+  "accountDeletionWarning": "Account will be deleted in {daysRemaining} days.",
+  "@accountDeletionWarning": {
+    "description": "Warning message showing days until account deletion for restricted users",
+    "placeholders": {
+      "daysRemaining": {
+        "type": "int",
+        "description": "Number of days remaining before account deletion"
+      }
+    }
+  },
+
+  "featureRestricted": "This feature requires email verification.",
+  "@featureRestricted": {
+    "description": "Message shown when a restricted user tries to use a blocked feature"
+  },
+
+  "verifyToUnlock": "Verify your email to use this feature.",
+  "@verifyToUnlock": {
+    "description": "Explanation message in the restriction dialog"
+  },
+
+  "featureRestrictedTitle": "Feature Restricted",
+  "@featureRestrictedTitle": {
+    "description": "Title of the dialog shown when a restricted user tries a blocked action"
+  },
+
+  "verifyEmail": "Verify Email",
+  "@verifyEmail": {
+    "description": "Button label to verify email in restriction dialog"
   }
 }

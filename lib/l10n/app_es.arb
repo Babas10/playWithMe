@@ -563,5 +563,11 @@
   "accountStatusActive": "Activa",
   "accountStatusPendingVerification": "Verificación pendiente",
   "accountStatusRestricted": "Restringida",
-  "accountStatusScheduledForDeletion": "Eliminación programada"
+  "accountStatusScheduledForDeletion": "Eliminación programada",
+
+  "accountDeletionWarning": "La cuenta será eliminada en {daysRemaining} días.",
+  "featureRestricted": "Esta función requiere verificación de email.",
+  "verifyToUnlock": "Verifica tu email para usar esta función.",
+  "featureRestrictedTitle": "Función restringida",
+  "verifyEmail": "Verificar email"
 }

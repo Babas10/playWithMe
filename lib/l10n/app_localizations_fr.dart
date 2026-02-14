@@ -1863,4 +1863,23 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get accountStatusScheduledForDeletion => 'Suppression prévue';
+
+  @override
+  String accountDeletionWarning(int daysRemaining) {
+    return 'Le compte sera supprimé dans $daysRemaining jours.';
+  }
+
+  @override
+  String get featureRestricted =>
+      'Cette fonctionnalité nécessite la vérification de l\'email.';
+
+  @override
+  String get verifyToUnlock =>
+      'Vérifiez votre email pour utiliser cette fonctionnalité.';
+
+  @override
+  String get featureRestrictedTitle => 'Fonctionnalité restreinte';
+
+  @override
+  String get verifyEmail => 'Vérifier l\'email';
 }
