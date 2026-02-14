@@ -1829,4 +1829,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountStatusScheduledForDeletion => 'Scheduled for Deletion';
+
+  @override
+  String accountDeletionWarning(int daysRemaining) {
+    return 'Account will be deleted in $daysRemaining days.';
+  }
+
+  @override
+  String get featureRestricted => 'This feature requires email verification.';
+
+  @override
+  String get verifyToUnlock => 'Verify your email to use this feature.';
+
+  @override
+  String get featureRestrictedTitle => 'Feature Restricted';
+
+  @override
+  String get verifyEmail => 'Verify Email';
 }

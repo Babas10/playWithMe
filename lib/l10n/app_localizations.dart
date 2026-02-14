@@ -3409,6 +3409,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scheduled for Deletion'**
   String get accountStatusScheduledForDeletion;
+
+  /// Warning message showing days until account deletion for restricted users
+  ///
+  /// In en, this message translates to:
+  /// **'Account will be deleted in {daysRemaining} days.'**
+  String accountDeletionWarning(int daysRemaining);
+
+  /// Message shown when a restricted user tries to use a blocked feature
+  ///
+  /// In en, this message translates to:
+  /// **'This feature requires email verification.'**
+  String get featureRestricted;
+
+  /// Explanation message in the restriction dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email to use this feature.'**
+  String get verifyToUnlock;
+
+  /// Title of the dialog shown when a restricted user tries a blocked action
+  ///
+  /// In en, this message translates to:
+  /// **'Feature Restricted'**
+  String get featureRestrictedTitle;
+
+  /// Button label to verify email in restriction dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Email'**
+  String get verifyEmail;
 }
 
 class _AppLocalizationsDelegate

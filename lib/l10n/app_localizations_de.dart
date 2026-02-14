@@ -1860,4 +1860,23 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get accountStatusScheduledForDeletion => 'Löschung geplant';
+
+  @override
+  String accountDeletionWarning(int daysRemaining) {
+    return 'Das Konto wird in $daysRemaining Tagen gelöscht.';
+  }
+
+  @override
+  String get featureRestricted =>
+      'Diese Funktion erfordert eine E-Mail-Bestätigung.';
+
+  @override
+  String get verifyToUnlock =>
+      'Bestätigen Sie Ihre E-Mail, um diese Funktion zu nutzen.';
+
+  @override
+  String get featureRestrictedTitle => 'Funktion eingeschränkt';
+
+  @override
+  String get verifyEmail => 'E-Mail bestätigen';
 }

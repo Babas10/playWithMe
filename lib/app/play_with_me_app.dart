@@ -11,6 +11,7 @@ import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dar
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_event.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_state.dart';
 import 'package:play_with_me/core/presentation/widgets/email_verification_banner.dart';
+import 'package:play_with_me/core/presentation/widgets/restricted_mode_banner.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
@@ -371,6 +372,16 @@ class _HomePageState extends State<HomePage> {
                     onDismiss: () {
                       context.read<AccountStatusBloc>().add(
                         const DismissAccountWarning(),
+                      );
+                    },
+                  );
+                }
+                if (accountState is AccountStatusRestricted) {
+                  return RestrictedModeBanner(
+                    daysUntilDeletion: accountState.daysUntilDeletion,
+                    onVerifyEmail: () {
+                      context.read<EmailVerificationBloc>().add(
+                        const EmailVerificationEvent.sendVerificationEmail(),
                       );
                     },
                   );
