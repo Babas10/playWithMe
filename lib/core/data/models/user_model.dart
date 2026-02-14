@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Story 302.7
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:play_with_me/core/domain/entities/account_status.dart';
 
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
@@ -17,6 +18,12 @@ class UserModel with _$UserModel {
     @TimestampConverter() DateTime? lastSignInAt,
     @TimestampConverter() DateTime? updatedAt,
     required bool isAnonymous,
+    // Account status fields (Story 17.8.2)
+    @TimestampConverter() DateTime? emailVerifiedAt,
+    @Default(AccountStatus.pendingVerification)
+    AccountStatus accountStatus,
+    @TimestampConverter() DateTime? gracePeriodExpiresAt,
+    @TimestampConverter() DateTime? deletionScheduledAt,
     // Extended fields for full user profile
     String? firstName,
     String? lastName,
@@ -80,16 +87,26 @@ class UserModel with _$UserModel {
   /// Factory constructor for creating from Firebase Auth User (Story 302.7)
   /// Used for new users where Firestore document doesn't exist yet
   factory UserModel.fromFirebaseUser(User firebaseUser) {
+    final creationTime = firebaseUser.metadata.creationTime;
+    final isVerified = firebaseUser.emailVerified;
     return UserModel(
       uid: firebaseUser.uid,
       email: firebaseUser.email ?? '',
       displayName: firebaseUser.displayName,
       photoUrl: firebaseUser.photoURL,
-      isEmailVerified: firebaseUser.emailVerified,
-      createdAt: firebaseUser.metadata.creationTime,
+      isEmailVerified: isVerified,
+      createdAt: creationTime,
       lastSignInAt: firebaseUser.metadata.lastSignInTime,
       isAnonymous: firebaseUser.isAnonymous,
-      // All other fields use default values from factory constructor
+      // Account status fields (Story 17.8.2)
+      emailVerifiedAt: isVerified ? creationTime : null,
+      accountStatus: isVerified
+          ? AccountStatus.active
+          : AccountStatus.pendingVerification,
+      gracePeriodExpiresAt: creationTime != null
+          ? creationTime.add(const Duration(days: gracePeriodDays))
+          : null,
+      deletionScheduledAt: null,
     );
   }
 
