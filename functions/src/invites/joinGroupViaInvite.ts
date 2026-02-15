@@ -1,5 +1,5 @@
 // Cloud Function for joining a group via invite token
-// Epic 17 — Story 17.3
+// Epic 17 — Story 17.3, 17.9 (Idempotent Group Join Logic)
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {
@@ -119,17 +119,6 @@ export async function joinGroupViaInviteHandler(
         }
       }
 
-      // Validate usage limit not reached
-      if (
-        inviteData.usageLimit !== null &&
-        inviteData.usageCount >= inviteData.usageLimit
-      ) {
-        throw new functions.https.HttpsError(
-          "failed-precondition",
-          "This invite link has reached its usage limit."
-        );
-      }
-
       // Validate group exists
       if (!groupDoc.exists) {
         throw new functions.https.HttpsError(
@@ -141,13 +130,25 @@ export async function joinGroupViaInviteHandler(
       const groupData = groupDoc.data() as GroupData;
       groupName = groupData.name;
 
-      // Check if user is already a member (idempotent no-op)
+      // Idempotency check: if user is already a member, return immediately
+      // without checking usage limit or capacity — re-joining is always a no-op
       if (groupData.memberIds.includes(uid)) {
         alreadyMember = true;
         return; // No writes needed
       }
 
-      // Check group capacity
+      // Validate usage limit not reached (only for new joins)
+      if (
+        inviteData.usageLimit !== null &&
+        inviteData.usageCount >= inviteData.usageLimit
+      ) {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "This invite link has reached its usage limit."
+        );
+      }
+
+      // Check group capacity (only for new joins)
       if (groupData.memberIds.length >= groupData.maxMembers) {
         throw new functions.https.HttpsError(
           "failed-precondition",
