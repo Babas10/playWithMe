@@ -1,5 +1,5 @@
 // Unit tests for joinGroupViaInvite Cloud Function
-// Epic 17 — Story 17.3
+// Epic 17 — Story 17.3, 17.9 (Idempotent Group Join Logic)
 
 import * as admin from "firebase-admin";
 import {joinGroupViaInviteHandler} from "../../../src/invites/joinGroupViaInvite";
@@ -304,6 +304,19 @@ describe("joinGroupViaInvite Cloud Function", () => {
       );
     });
 
+    it("should throw not-found if group does not exist", async () => {
+      mockGroupDoc.exists = false;
+
+      await expect(
+        joinGroupViaInviteHandler(
+          {token: "abc123"},
+          {auth: {uid: "newuser"}} as any
+        )
+      ).rejects.toThrow(
+        "The group associated with this invite no longer exists."
+      );
+    });
+
     it("should throw failed-precondition if group is at capacity", async () => {
       mockGroupDoc.data = () => ({
         name: "Beach Volleyball",
@@ -348,6 +361,70 @@ describe("joinGroupViaInvite Cloud Function", () => {
       // Transaction update should not have been called
       expect(mockTransaction.update).not.toHaveBeenCalled();
     });
+
+    it("should return alreadyMember true even when usage limit is reached", async () => {
+      // User is already a member AND usage limit is maxed out
+      mockInviteDoc.data = () => ({
+        token: "testtoken123",
+        createdBy: "inviter-user",
+        expiresAt: null,
+        revoked: false,
+        usageLimit: 5,
+        usageCount: 5,
+        groupId: "group-456",
+      });
+
+      const result = await joinGroupViaInviteHandler(
+        {token: "abc123"},
+        {auth: {uid: "creator123"}} as any
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.alreadyMember).toBe(true);
+      expect(mockTransaction.update).not.toHaveBeenCalled();
+    });
+
+    it("should return alreadyMember true even when group is at capacity", async () => {
+      // User is already a member AND group is at max capacity
+      mockGroupDoc.data = () => ({
+        name: "Beach Volleyball",
+        createdBy: "creator123",
+        memberIds: ["creator123", "member2"],
+        adminIds: ["creator123"],
+        maxMembers: 2,
+        allowMembersToInviteOthers: true,
+      });
+
+      const result = await joinGroupViaInviteHandler(
+        {token: "abc123"},
+        {auth: {uid: "creator123"}} as any
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.alreadyMember).toBe(true);
+      expect(mockTransaction.update).not.toHaveBeenCalled();
+    });
+
+    it("should return alreadyMember true for user added via different path", async () => {
+      // User was added directly (not via invite) but now uses invite link
+      mockGroupDoc.data = () => ({
+        name: "Beach Volleyball",
+        createdBy: "creator123",
+        memberIds: ["creator123", "member2", "direct-add-user"],
+        adminIds: ["creator123"],
+        maxMembers: 20,
+        allowMembersToInviteOthers: true,
+      });
+
+      const result = await joinGroupViaInviteHandler(
+        {token: "abc123"},
+        {auth: {uid: "direct-add-user"}} as any
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.alreadyMember).toBe(true);
+      expect(mockTransaction.update).not.toHaveBeenCalled();
+    });
   });
 
   describe("Successful Join", () => {
@@ -371,6 +448,37 @@ describe("joinGroupViaInvite Cloud Function", () => {
 
       // Should have 2 update calls: group and invite
       expect(mockTransaction.update).toHaveBeenCalledTimes(2);
+    });
+
+    it("should use arrayUnion with correct uid for membership", async () => {
+      await joinGroupViaInviteHandler(
+        {token: "abc123"},
+        {auth: {uid: "newuser"}} as any
+      );
+
+      expect(admin.firestore.FieldValue.arrayUnion).toHaveBeenCalledWith(
+        "newuser"
+      );
+    });
+
+    it("should increment usageCount by exactly 1", async () => {
+      await joinGroupViaInviteHandler(
+        {token: "abc123"},
+        {auth: {uid: "newuser"}} as any
+      );
+
+      expect(admin.firestore.FieldValue.increment).toHaveBeenCalledWith(1);
+    });
+
+    it("should set lastActivity to server timestamp", async () => {
+      await joinGroupViaInviteHandler(
+        {token: "abc123"},
+        {auth: {uid: "newuser"}} as any
+      );
+
+      expect(
+        admin.firestore.FieldValue.serverTimestamp
+      ).toHaveBeenCalled();
     });
   });
 
