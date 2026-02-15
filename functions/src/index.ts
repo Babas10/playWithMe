@@ -104,3 +104,9 @@ export {
   revokeGroupInvite,
 } from "./invites";
 
+// Story 17.8.4: Scheduled account status enforcement & cleanup
+export {
+  updateAccountStatuses,
+  cleanupUnverifiedAccounts,
+} from "./scheduled";
+
