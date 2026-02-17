@@ -1,6 +1,8 @@
 // Landing page for unauthenticated users who opened an invite link.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_event.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_event.dart';
@@ -16,10 +18,11 @@ class InviteOnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final bloc = context.read<InviteJoinBloc>();
 
-    return BlocProvider(
-      create: (context) => context.read<InviteJoinBloc>()
-        ..add(ValidateInviteToken(token)),
+    // Use BlocProvider.value to avoid closing the shared bloc on dispose.
+    return BlocProvider.value(
+      value: bloc..add(ValidateInviteToken(token)),
       child: Scaffold(
         body: SafeArea(
           child: Padding(
@@ -118,7 +121,8 @@ class InviteOnboardingPage extends StatelessWidget {
         const SizedBox(height: 12),
         OutlinedButton(
           onPressed: () {
-            Navigator.of(context).pushNamed('/login');
+            // Pop back to root — MaterialApp.home already shows LoginPage
+            Navigator.of(context).popUntil((route) => route.isFirst);
           },
           style: OutlinedButton.styleFrom(
             minimumSize: const Size.fromHeight(48),
@@ -191,10 +195,10 @@ class InviteOnboardingPage extends StatelessWidget {
           const SizedBox(height: 32),
           OutlinedButton(
             onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/login',
-                (route) => false,
-              );
+              // Clear the deep link state so invalid tokens don't persist
+              context.read<DeepLinkBloc>().add(const ClearPendingInvite());
+              // Pop back to root (MaterialApp.home already shows LoginPage)
+              Navigator.of(context).popUntil((route) => route.isFirst);
             },
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
