@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PendingInviteStorage {
   static const String _key = 'pending_invite_token';
+  static const String _consumedKey = 'consumed_invite_token';
 
   final SharedPreferences _prefs;
 
@@ -18,5 +19,15 @@ class PendingInviteStorage {
 
   Future<void> clear() async {
     await _prefs.remove(_key);
+  }
+
+  /// Mark a token as consumed so it won't be re-processed on hot restart.
+  Future<void> markConsumed(String token) async {
+    await _prefs.setString(_consumedKey, token);
+  }
+
+  /// Check if a token has already been consumed.
+  bool isConsumed(String token) {
+    return _prefs.getString(_consumedKey) == token;
   }
 }

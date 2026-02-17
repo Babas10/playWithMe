@@ -87,6 +87,8 @@ class InviteJoinBloc extends Bloc<InviteJoinEvent, InviteJoinState> {
     try {
       final result =
           await _repository.validateInviteToken(token: token);
+      // Clear storage — token is now held in BLoC state
+      await _pendingInviteStorage.clear();
       emit(InviteJoinValidated(
         groupId: result.groupId,
         groupName: result.groupName,

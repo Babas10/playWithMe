@@ -7,6 +7,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_event.dart';
+import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_state.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_event.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_state.dart';
@@ -24,18 +27,26 @@ class MockInviteRegistrationBloc
     extends MockBloc<InviteRegistrationEvent, InviteRegistrationState>
     implements InviteRegistrationBloc {}
 
+class MockDeepLinkBloc extends MockBloc<DeepLinkEvent, DeepLinkState>
+    implements DeepLinkBloc {}
+
 void main() {
   late MockInviteJoinBloc mockBloc;
+  late MockDeepLinkBloc mockDeepLinkBloc;
 
   setUpAll(() {
     registerFallbackValue(const ValidateInviteToken(''));
     registerFallbackValue(const InviteJoinInitial());
     registerFallbackValue(const InviteRegistrationFormReset());
     registerFallbackValue(const InviteRegistrationInitial());
+    registerFallbackValue(const ClearPendingInvite());
+    registerFallbackValue(const DeepLinkInitial());
   });
 
   setUp(() {
     mockBloc = MockInviteJoinBloc();
+    mockDeepLinkBloc = MockDeepLinkBloc();
+    when(() => mockDeepLinkBloc.state).thenReturn(const DeepLinkInitial());
 
     // Register mock InviteRegistrationBloc in GetIt for navigation tests
     final sl = GetIt.instance;
@@ -65,8 +76,11 @@ void main() {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en')],
-      home: BlocProvider<InviteJoinBloc>.value(
-        value: mockBloc,
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<InviteJoinBloc>.value(value: mockBloc),
+          BlocProvider<DeepLinkBloc>.value(value: mockDeepLinkBloc),
+        ],
         child: InviteOnboardingPage(token: token),
       ),
     );
@@ -143,8 +157,11 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [Locale('en')],
-            home: BlocProvider<InviteJoinBloc>.value(
-              value: mockBloc,
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider<InviteJoinBloc>.value(value: mockBloc),
+                BlocProvider<DeepLinkBloc>.value(value: mockDeepLinkBloc),
+              ],
               child: const InviteOnboardingPage(token: 'test-token'),
             ),
           ),
@@ -158,9 +175,11 @@ void main() {
         expect(find.text('Beach Volleyball Crew'), findsOneWidget);
       });
 
-      testWidgets('login button navigates to /login', (tester) async {
+      testWidgets('login button pops back to root', (tester) async {
         when(() => mockBloc.state).thenReturn(validatedState);
 
+        // Build with a root page and push InviteOnboardingPage on top,
+        // so popUntil(isFirst) pops back to the root.
         await tester.pumpWidget(
           MaterialApp(
             localizationsDelegates: const [
@@ -170,20 +189,47 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [Locale('en')],
-            routes: {
-              '/login': (_) => const Scaffold(body: Text('Login Page')),
-            },
-            home: BlocProvider<InviteJoinBloc>.value(
-              value: mockBloc,
-              child: const InviteOnboardingPage(token: 'test-token'),
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider<InviteJoinBloc>.value(value: mockBloc),
+                BlocProvider<DeepLinkBloc>.value(value: mockDeepLinkBloc),
+              ],
+              child: Builder(
+                builder: (context) {
+                  // Schedule a navigation push after the first frame
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => MultiBlocProvider(
+                          providers: [
+                            BlocProvider<InviteJoinBloc>.value(
+                                value: mockBloc),
+                            BlocProvider<DeepLinkBloc>.value(
+                                value: mockDeepLinkBloc),
+                          ],
+                          child: const InviteOnboardingPage(
+                              token: 'test-token'),
+                        ),
+                      ),
+                    );
+                  });
+                  return const Scaffold(body: Text('Root Page'));
+                },
+              ),
             ),
           ),
         );
 
+        await tester.pumpAndSettle();
+
+        // InviteOnboardingPage should be visible now
+        expect(find.text('I have an account'), findsOneWidget);
+
         await tester.tap(find.text('I have an account'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Login Page'), findsOneWidget);
+        // After popUntil(isFirst), we should be back at the root page
+        expect(find.text('Root Page'), findsOneWidget);
       });
     });
 
@@ -200,11 +246,14 @@ void main() {
         expect(find.text('Continue to app'), findsOneWidget);
       });
 
-      testWidgets('continue button navigates to /login', (tester) async {
+      testWidgets('continue button clears deep link and pops to root',
+          (tester) async {
         when(() => mockBloc.state).thenReturn(
           const InviteJoinInvalidToken(reason: 'Expired'),
         );
 
+        // Build with a root page and push InviteOnboardingPage on top,
+        // so popUntil(isFirst) pops back to the root.
         await tester.pumpWidget(
           MaterialApp(
             localizationsDelegates: const [
@@ -214,20 +263,50 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [Locale('en')],
-            routes: {
-              '/login': (_) => const Scaffold(body: Text('Login Page')),
-            },
-            home: BlocProvider<InviteJoinBloc>.value(
-              value: mockBloc,
-              child: const InviteOnboardingPage(token: 'test-token'),
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider<InviteJoinBloc>.value(value: mockBloc),
+                BlocProvider<DeepLinkBloc>.value(value: mockDeepLinkBloc),
+              ],
+              child: Builder(
+                builder: (context) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => MultiBlocProvider(
+                          providers: [
+                            BlocProvider<InviteJoinBloc>.value(
+                                value: mockBloc),
+                            BlocProvider<DeepLinkBloc>.value(
+                                value: mockDeepLinkBloc),
+                          ],
+                          child: const InviteOnboardingPage(
+                              token: 'test-token'),
+                        ),
+                      ),
+                    );
+                  });
+                  return const Scaffold(body: Text('Root Page'));
+                },
+              ),
             ),
           ),
         );
 
+        await tester.pumpAndSettle();
+
+        // InviteOnboardingPage should be visible now
+        expect(find.text('Continue to app'), findsOneWidget);
+
         await tester.tap(find.text('Continue to app'));
         await tester.pumpAndSettle();
 
-        expect(find.text('Login Page'), findsOneWidget);
+        // Verify ClearPendingInvite was dispatched to DeepLinkBloc
+        verify(() => mockDeepLinkBloc.add(const ClearPendingInvite()))
+            .called(1);
+
+        // After popUntil(isFirst), we should be back at the root page
+        expect(find.text('Root Page'), findsOneWidget);
       });
     });
 
