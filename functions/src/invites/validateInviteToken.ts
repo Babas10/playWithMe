@@ -25,15 +25,9 @@ export async function validateInviteTokenHandler(
   data: ValidateInviteTokenRequest,
   context: functions.https.CallableContext
 ): Promise<ValidateInviteTokenResponse> {
-  // 1. Authentication check
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
-      "unauthenticated",
-      "You must be logged in to validate an invite link."
-    );
-  }
-
-  const uid = context.auth.uid;
+  // 1. Authentication is optional — unauthenticated users can preview
+  //    invite details before creating an account (Story 17.7).
+  const uid = context.auth?.uid ?? "anonymous";
 
   // 2. Validate token input
   if (!data || typeof data.token !== "string" || !data.token.trim()) {
