@@ -103,10 +103,69 @@ class PlayWithMeApp extends StatelessWidget {
                 context.read<InvitationBloc>().add(
                   LoadPendingInvitations(userId: state.user.uid),
                 );
-                // Process pending invite after login/registration
-                context
-                    .read<InviteJoinBloc>()
-                    .add(const ProcessPendingInvite());
+                // Check for pending invite token (from "I Have an Account" flow).
+                // If found, navigate to join confirmation and clear the stack.
+                final deepLinkState = context.read<DeepLinkBloc>().state;
+                if (deepLinkState is DeepLinkPendingInvite) {
+                  context.read<DeepLinkBloc>().add(const ClearPendingInvite());
+                  final token = deepLinkState.token;
+                  context
+                      .read<InviteJoinBloc>()
+                      .add(ValidateInviteToken(token));
+                  final navigator = PlayWithMeApp.navigatorKey.currentState;
+                  if (navigator != null) {
+                    navigator.pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => MultiBlocProvider(
+                          providers: [
+                            BlocProvider.value(
+                              value: context.read<InviteJoinBloc>(),
+                            ),
+                          ],
+                          child: JoinGroupConfirmationPage(
+                            token: token,
+                          ),
+                        ),
+                      ),
+                      (route) => route.isFirst,
+                    );
+                  }
+                } else {
+                  // No pending invite — normal login
+                  context
+                      .read<InviteJoinBloc>()
+                      .add(const ProcessPendingInvite());
+                }
+              } else if (state is AuthenticationUnauthenticated) {
+                // Clear all pushed routes so LoginPage (MaterialApp.home) is visible
+                final navigator = PlayWithMeApp.navigatorKey.currentState;
+                navigator?.popUntil((route) => route.isFirst);
+
+                // Check if there's a pending invite from a deep link (cold start)
+                final deepLinkState = context.read<DeepLinkBloc>().state;
+                if (deepLinkState is DeepLinkPendingInvite) {
+                  final navigator = PlayWithMeApp.navigatorKey.currentState;
+                  if (navigator != null) {
+                    // Don't clear — token must survive the login/registration flow
+                    navigator.push(
+                      MaterialPageRoute(
+                        builder: (_) => MultiBlocProvider(
+                          providers: [
+                            BlocProvider.value(
+                              value: context.read<InviteJoinBloc>(),
+                            ),
+                            BlocProvider.value(
+                              value: context.read<DeepLinkBloc>(),
+                            ),
+                          ],
+                          child: InviteOnboardingPage(
+                            token: deepLinkState.token,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                }
               }
             },
           ),
@@ -119,7 +178,8 @@ class PlayWithMeApp extends StatelessWidget {
                 if (navigator == null) return;
 
                 if (authState is AuthenticationAuthenticated) {
-                  // Authenticated: validate and show join confirmation
+                  // Authenticated: clear state and show join confirmation
+                  context.read<DeepLinkBloc>().add(const ClearPendingInvite());
                   context
                       .read<InviteJoinBloc>()
                       .add(ValidateInviteToken(deepLinkState.token));
@@ -138,11 +198,18 @@ class PlayWithMeApp extends StatelessWidget {
                     ),
                   );
                 } else if (authState is AuthenticationUnauthenticated) {
-                  // Unauthenticated: show invite onboarding page
+                  // Unauthenticated: show onboarding but keep token for login flow
                   navigator.push(
                     MaterialPageRoute(
-                      builder: (_) => BlocProvider.value(
-                        value: context.read<InviteJoinBloc>(),
+                      builder: (_) => MultiBlocProvider(
+                        providers: [
+                          BlocProvider.value(
+                            value: context.read<InviteJoinBloc>(),
+                          ),
+                          BlocProvider.value(
+                            value: context.read<DeepLinkBloc>(),
+                          ),
+                        ],
                         child: InviteOnboardingPage(
                           token: deepLinkState.token,
                         ),

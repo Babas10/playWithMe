@@ -138,13 +138,12 @@ describe("validateInviteToken Cloud Function", () => {
   });
 
   describe("Authentication", () => {
-    it("should throw unauthenticated error if not logged in", async () => {
-      await expect(
-        validateInviteTokenHandler(
-          {token: "abc123"},
-          {auth: null} as any
-        )
-      ).rejects.toThrow("You must be logged in to validate an invite link.");
+    it("should allow unauthenticated users to validate tokens", async () => {
+      const result = await validateInviteTokenHandler(
+        {token: "abc123"},
+        {auth: null} as any
+      );
+      expect(result.valid).toBe(true);
     });
   });
 

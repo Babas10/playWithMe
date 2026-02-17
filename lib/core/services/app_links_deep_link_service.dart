@@ -13,13 +13,17 @@ class AppLinksDeepLinkService implements DeepLinkService {
 
   AppLinksDeepLinkService({AppLinks? appLinks})
       : _appLinks = appLinks ?? AppLinks() {
+    debugPrint('[DeepLinkService] Service created, starting listener...');
     _listenForLinks();
   }
 
   void _listenForLinks() {
+    debugPrint('[DeepLinkService] Subscribing to uriLinkStream...');
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (uri) {
+        debugPrint('[DeepLinkService] Foreground link received: $uri');
         final token = _extractToken(uri);
+        debugPrint('[DeepLinkService] Extracted token: $token');
         if (token != null) {
           _tokenController.add(token);
         }
@@ -37,6 +41,7 @@ class AppLinksDeepLinkService implements DeepLinkService {
   Future<String?> getInitialInviteToken() async {
     try {
       final initialUri = await _appLinks.getInitialLink();
+      debugPrint('[DeepLinkService] Initial link: $initialUri');
       if (initialUri != null) {
         return _extractToken(initialUri);
       }
@@ -47,14 +52,26 @@ class AppLinksDeepLinkService implements DeepLinkService {
   }
 
   String? _extractToken(Uri uri) {
-    // Match paths like /invite/{token}
+    debugPrint('[DeepLinkService] Parsing URI: $uri');
     final segments = uri.pathSegments;
+
+    // HTTPS: https://playwithme.app/invite/{token}
+    //   host=playwithme.app, pathSegments=[invite, token]
     if (segments.length == 2 && segments[0] == 'invite') {
       final token = segments[1];
-      if (token.isNotEmpty) {
-        return token;
-      }
+      if (token.isNotEmpty) return token;
     }
+
+    // Custom scheme: playwithme://invite/{token}
+    //   host=invite, pathSegments=[token]
+    if (uri.scheme == 'playwithme' &&
+        uri.host == 'invite' &&
+        segments.length == 1) {
+      final token = segments[0];
+      if (token.isNotEmpty) return token;
+    }
+
+    debugPrint('[DeepLinkService] Could not extract token from URI');
     return null;
   }
 

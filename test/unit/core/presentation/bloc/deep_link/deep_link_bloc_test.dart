@@ -43,6 +43,7 @@ void main() {
         setUp: () {
           when(() => mockStorage.retrieve())
               .thenAnswer((_) async => 'stored-token');
+          when(() => mockStorage.clear()).thenAnswer((_) async {});
           when(() => mockDeepLinkService.inviteTokenStream)
               .thenAnswer((_) => const Stream.empty());
         },
@@ -63,8 +64,8 @@ void main() {
           when(() => mockStorage.retrieve()).thenAnswer((_) async => null);
           when(() => mockDeepLinkService.getInitialInviteToken())
               .thenAnswer((_) async => 'initial-token');
-          when(() => mockStorage.store('initial-token'))
-              .thenAnswer((_) async {});
+          when(() => mockStorage.isConsumed('initial-token'))
+              .thenReturn(false);
           when(() => mockDeepLinkService.inviteTokenStream)
               .thenAnswer((_) => const Stream.empty());
         },
@@ -73,9 +74,6 @@ void main() {
         expect: () => [
           const DeepLinkPendingInvite(token: 'initial-token'),
         ],
-        verify: (_) {
-          verify(() => mockStorage.store('initial-token')).called(1);
-        },
       );
 
       blocTest<DeepLinkBloc, DeepLinkState>(

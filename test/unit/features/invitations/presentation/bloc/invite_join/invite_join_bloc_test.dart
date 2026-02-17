@@ -198,6 +198,7 @@ void main() {
               .thenAnswer((_) async => 'pending-token');
           when(() => mockRepo.validateInviteToken(token: 'pending-token'))
               .thenAnswer((_) async => validResult);
+          when(() => mockStorage.clear()).thenAnswer((_) async {});
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const ProcessPendingInvite()),
