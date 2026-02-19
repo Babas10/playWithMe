@@ -627,12 +627,16 @@ void main() {
               'email': 'user1@example.com',
               'displayName': 'User 1',
               'photoUrl': null,
+              'firstName': 'User',
+              'lastName': 'One',
             },
             {
               'uid': 'user-2',
               'email': 'user2@example.com',
               'displayName': 'User 2',
               'photoUrl': null,
+              'firstName': 'User',
+              'lastName': 'Two',
             },
           ],
         });
@@ -641,6 +645,8 @@ void main() {
 
         expect(result.length, 2);
         expect(result.map((u) => u.displayName), containsAll(['User 1', 'User 2']));
+        expect(result[0].firstName, 'User');
+        expect(result[0].lastName, 'One');
         verify(() => mockFunctions.httpsCallable('getUsersByIds')).called(1);
       });
 
@@ -842,12 +848,16 @@ void main() {
               'email': 'user1@example.com',
               'displayName': 'User 1',
               'photoUrl': null,
+              'firstName': 'User',
+              'lastName': 'One',
             },
             {
               'uid': 'user-2',
               'email': 'user2@example.com',
               'displayName': 'User 2',
               'photoUrl': null,
+              'firstName': 'User',
+              'lastName': 'Two',
             },
           ],
         });
@@ -856,6 +866,39 @@ void main() {
 
         expect(result.length, 2);
         expect(result.map((u) => u.uid), containsAll(['user-1', 'user-2']));
+        expect(result[0].firstName, 'User');
+        expect(result[0].lastName, 'One');
+        expect(result[1].firstName, 'User');
+        expect(result[1].lastName, 'Two');
+      });
+
+      test('returns users with firstName/lastName even when displayName is null', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+
+        when(() => mockFunctions.httpsCallable('getUsersByIds'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'users': [
+            {
+              'uid': 'user-1',
+              'email': 'user1@example.com',
+              'displayName': null,
+              'photoUrl': null,
+              'firstName': 'Etienne',
+              'lastName': 'Dubois',
+            },
+          ],
+        });
+
+        final result = await repository.getUsersByIds(['user-1']);
+
+        expect(result.length, 1);
+        expect(result.first.displayName, isNull);
+        expect(result.first.firstName, 'Etienne');
+        expect(result.first.lastName, 'Dubois');
+        expect(result.first.fullDisplayName, 'Etienne Dubois');
       });
 
       test('throws UserException on Cloud Function error', () async {
