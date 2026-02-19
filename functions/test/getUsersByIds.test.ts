@@ -127,6 +127,8 @@ describe("getUsersByIds", () => {
           displayName: "User One",
           email: "user1@example.com",
           photoUrl: "https://example.com/photo1.jpg",
+          firstName: "User",
+          lastName: "One",
           // Sensitive fields that should not be returned
           passwordHash: "secret",
           tokens: ["token1"],
@@ -139,6 +141,8 @@ describe("getUsersByIds", () => {
           displayName: "User Two",
           email: "user2@example.com",
           photoUrl: null,
+          firstName: "User",
+          lastName: "Two",
         }),
       },
       {
@@ -172,18 +176,24 @@ describe("getUsersByIds", () => {
       displayName: "User One",
       email: "user1@example.com",
       photoUrl: "https://example.com/photo1.jpg",
+      firstName: "User",
+      lastName: "One",
     });
     expect(result.users[1]).toEqual({
       uid: "user2",
       displayName: "User Two",
       email: "user2@example.com",
       photoUrl: null,
+      firstName: "User",
+      lastName: "Two",
     });
     expect(result.users[2]).toEqual({
       uid: "user3",
       displayName: null,
       email: "user3@example.com",
       photoUrl: null,
+      firstName: null,
+      lastName: null,
     });
 
     // Verify sensitive fields are NOT returned
@@ -209,6 +219,8 @@ describe("getUsersByIds", () => {
           displayName: "User One",
           email: "user1@example.com",
           photoUrl: null,
+          firstName: "User",
+          lastName: "One",
         }),
       },
       {
@@ -223,6 +235,8 @@ describe("getUsersByIds", () => {
           displayName: "User Three",
           email: "user3@example.com",
           photoUrl: null,
+          firstName: "User",
+          lastName: "Three",
         }),
       },
     ];

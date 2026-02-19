@@ -449,7 +449,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                           child: member.photoUrl == null
                               ? Text(
                                   _getInitials(
-                                      member.displayName ?? member.email),
+                                      member.fullDisplayName),
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF004E64)),
@@ -457,7 +457,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                               : null,
                         ),
                         title: Text(
-                          member.displayName ?? member.email,
+                          member.fullDisplayName,
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                         trailing: const SizedBox(
