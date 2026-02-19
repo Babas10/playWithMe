@@ -51,6 +51,7 @@ export {
   getFriendships, // Story 11.13
   verifyFriendship, // Story 11.14
   batchCheckFriendship, // Story 11.17
+  batchCheckFriendRequestStatus,
 } from "./friendships";
 
 // Export friendship cache update triggers (Firestore triggers)
