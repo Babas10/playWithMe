@@ -37,7 +37,7 @@ class MemberListItemWithFriendship extends StatelessWidget {
             user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
         child: user.photoUrl == null
             ? Text(
-                _getInitials(user.displayName ?? user.email),
+                _getInitials(user.fullDisplayName),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF004E64),
@@ -49,7 +49,7 @@ class MemberListItemWithFriendship extends StatelessWidget {
         children: [
           Flexible(
             child: Text(
-              user.displayName ?? user.email,
+              user.fullDisplayName,
               style: const TextStyle(fontWeight: FontWeight.w500),
               overflow: TextOverflow.ellipsis,
             ),
@@ -92,7 +92,7 @@ class MemberListItemWithFriendship extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (user.displayName != null) Text(user.email),
+          if (user.fullDisplayName != user.email) Text(user.email),
           if (!isCurrentUser) _buildFriendshipStatus(context),
         ],
       ),
