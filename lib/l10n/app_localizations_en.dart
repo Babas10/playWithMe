@@ -1737,6 +1737,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullNameTooShort => 'Full name must be at least 2 characters';
 
   @override
+  String get firstNameHint => 'First Name';
+
+  @override
+  String get firstNameRequired => 'First name is required';
+
+  @override
+  String get firstNameTooShort => 'First name must be at least 2 characters';
+
+  @override
+  String get lastNameHint => 'Last Name';
+
+  @override
+  String get lastNameRequired => 'Last name is required';
+
+  @override
+  String get lastNameTooShort => 'Last name must be at least 2 characters';
+
+  @override
   String get displayNameHintRequired => 'Display Name';
 
   @override

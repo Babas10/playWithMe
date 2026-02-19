@@ -104,6 +104,9 @@ export {
   revokeGroupInvite,
 } from "./invites";
 
+// User profile updates
+export {updateUserNames} from "./updateUserNames";
+
 // Story 17.8.4: Scheduled account status enforcement & cleanup
 export {
   updateAccountStatuses,

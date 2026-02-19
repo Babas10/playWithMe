@@ -1764,6 +1764,26 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der vollständige Name muss mindestens 2 Zeichen lang sein';
 
   @override
+  String get firstNameHint => 'Vorname';
+
+  @override
+  String get firstNameRequired => 'Vorname ist erforderlich';
+
+  @override
+  String get firstNameTooShort =>
+      'Der Vorname muss mindestens 2 Zeichen lang sein';
+
+  @override
+  String get lastNameHint => 'Nachname';
+
+  @override
+  String get lastNameRequired => 'Nachname ist erforderlich';
+
+  @override
+  String get lastNameTooShort =>
+      'Der Nachname muss mindestens 2 Zeichen lang sein';
+
+  @override
   String get displayNameHintRequired => 'Anzeigename';
 
   @override

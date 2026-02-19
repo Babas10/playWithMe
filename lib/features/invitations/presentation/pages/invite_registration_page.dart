@@ -32,7 +32,8 @@ class InviteRegistrationPage extends StatefulWidget {
 
 class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
   final _formKey = GlobalKey<FormState>();
-  final _fullNameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _displayNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -42,7 +43,8 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
 
   @override
   void dispose() {
-    _fullNameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _displayNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -73,7 +75,9 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
                   children: [
                     _buildGroupContextBanner(blocContext, l10n),
                     const SizedBox(height: 24),
-                    _buildFullNameField(l10n),
+                    _buildFirstNameField(l10n),
+                    const SizedBox(height: 16),
+                    _buildLastNameField(l10n),
                     const SizedBox(height: 16),
                     _buildDisplayNameField(l10n),
                     const SizedBox(height: 16),
@@ -145,18 +149,36 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
     );
   }
 
-  Widget _buildFullNameField(AppLocalizations l10n) {
+  Widget _buildFirstNameField(AppLocalizations l10n) {
     return AuthFormField(
-      controller: _fullNameController,
-      hintText: l10n.fullNameHint,
+      controller: _firstNameController,
+      hintText: l10n.firstNameHint,
       textInputAction: TextInputAction.next,
       prefixIcon: Icons.badge,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return l10n.fullNameRequired;
+          return l10n.firstNameRequired;
         }
         if (value.trim().length < 2) {
-          return l10n.fullNameTooShort;
+          return l10n.firstNameTooShort;
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildLastNameField(AppLocalizations l10n) {
+    return AuthFormField(
+      controller: _lastNameController,
+      hintText: l10n.lastNameHint,
+      textInputAction: TextInputAction.next,
+      prefixIcon: Icons.badge_outlined,
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return l10n.lastNameRequired;
+        }
+        if (value.trim().length < 2) {
+          return l10n.lastNameTooShort;
         }
         return null;
       },
@@ -302,7 +324,8 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
     if (_formKey.currentState!.validate()) {
       blocContext.read<InviteRegistrationBloc>().add(
             InviteRegistrationSubmitted(
-              fullName: _fullNameController.text.trim(),
+              firstName: _firstNameController.text.trim(),
+              lastName: _lastNameController.text.trim(),
               displayName: _displayNameController.text.trim(),
               email: _emailController.text.trim(),
               password: _passwordController.text,

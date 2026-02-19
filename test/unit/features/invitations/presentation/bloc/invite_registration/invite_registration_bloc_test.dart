@@ -46,7 +46,8 @@ void main() {
   }
 
   const validEvent = InviteRegistrationSubmitted(
-    fullName: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     displayName: 'JohnD',
     email: 'john@example.com',
     password: 'Password1',
@@ -67,6 +68,10 @@ void main() {
         )).thenAnswer((_) async => FakeUserEntity());
     when(() => mockAuthRepo.updateUserProfile(
           displayName: any(named: 'displayName'),
+        )).thenAnswer((_) async {});
+    when(() => mockAuthRepo.updateUserNames(
+          firstName: any(named: 'firstName'),
+          lastName: any(named: 'lastName'),
         )).thenAnswer((_) async {});
     when(() => mockAuthRepo.sendEmailVerification())
         .thenAnswer((_) async {});
@@ -105,6 +110,10 @@ void main() {
             verify(() => mockAuthRepo.updateUserProfile(
                   displayName: 'JohnD',
                 )).called(1);
+            verify(() => mockAuthRepo.updateUserNames(
+                  firstName: 'John',
+                  lastName: 'Doe',
+                )).called(1);
             verify(() => mockAuthRepo.sendEmailVerification()).called(1);
             verify(() =>
                     mockInviteRepo.joinGroupViaInvite(token: 'test-token'))
@@ -123,6 +132,43 @@ void main() {
             when(() => mockAuthRepo.updateUserProfile(
                   displayName: any(named: 'displayName'),
                 )).thenThrow(Exception('Profile update failed'));
+            when(() => mockAuthRepo.updateUserNames(
+                  firstName: any(named: 'firstName'),
+                  lastName: any(named: 'lastName'),
+                )).thenAnswer((_) async {});
+            when(() => mockAuthRepo.sendEmailVerification())
+                .thenAnswer((_) async {});
+            when(() =>
+                    mockInviteRepo.joinGroupViaInvite(token: any(named: 'token')))
+                .thenAnswer((_) async => joinResult);
+            when(() => mockStorage.clear()).thenAnswer((_) async {});
+          },
+          build: buildBloc,
+          act: (bloc) => bloc.add(validEvent),
+          expect: () => [
+            const InviteRegistrationCreatingAccount(),
+            const InviteRegistrationJoiningGroup(),
+            const InviteRegistrationSuccess(
+              groupId: 'group-123',
+              groupName: 'Beach Volleyball Crew',
+            ),
+          ],
+        );
+
+        blocTest<InviteRegistrationBloc, InviteRegistrationState>(
+          'succeeds even when updateUserNames fails',
+          setUp: () {
+            when(() => mockAuthRepo.createUserWithEmailAndPassword(
+                  email: any(named: 'email'),
+                  password: any(named: 'password'),
+                )).thenAnswer((_) async => FakeUserEntity());
+            when(() => mockAuthRepo.updateUserProfile(
+                  displayName: any(named: 'displayName'),
+                )).thenAnswer((_) async {});
+            when(() => mockAuthRepo.updateUserNames(
+                  firstName: any(named: 'firstName'),
+                  lastName: any(named: 'lastName'),
+                )).thenThrow(Exception('Names update failed'));
             when(() => mockAuthRepo.sendEmailVerification())
                 .thenAnswer((_) async {});
             when(() =>
@@ -152,6 +198,10 @@ void main() {
             when(() => mockAuthRepo.updateUserProfile(
                   displayName: any(named: 'displayName'),
                 )).thenAnswer((_) async {});
+            when(() => mockAuthRepo.updateUserNames(
+                  firstName: any(named: 'firstName'),
+                  lastName: any(named: 'lastName'),
+                )).thenAnswer((_) async {});
             when(() => mockAuthRepo.sendEmailVerification())
                 .thenThrow(Exception('Verification failed'));
             when(() =>
@@ -174,10 +224,11 @@ void main() {
 
       group('validation errors', () {
         blocTest<InviteRegistrationBloc, InviteRegistrationState>(
-          'emits failure when full name is empty',
+          'emits failure when first name is empty',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: '',
+            firstName: '',
+            lastName: 'Doe',
             displayName: 'JohnD',
             email: 'john@example.com',
             password: 'Password1',
@@ -187,15 +238,16 @@ void main() {
           expect: () => [
             const InviteRegistrationCreatingAccount(),
             const InviteRegistrationFailure(
-                message: 'Full name is required'),
+                message: 'First name is required'),
           ],
         );
 
         blocTest<InviteRegistrationBloc, InviteRegistrationState>(
-          'emits failure when full name is too short',
+          'emits failure when first name is too short',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'J',
+            firstName: 'J',
+            lastName: 'Doe',
             displayName: 'JohnD',
             email: 'john@example.com',
             password: 'Password1',
@@ -205,7 +257,45 @@ void main() {
           expect: () => [
             const InviteRegistrationCreatingAccount(),
             const InviteRegistrationFailure(
-                message: 'Full name must be at least 2 characters'),
+                message: 'First name must be at least 2 characters'),
+          ],
+        );
+
+        blocTest<InviteRegistrationBloc, InviteRegistrationState>(
+          'emits failure when last name is empty',
+          build: buildBloc,
+          act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
+            firstName: 'John',
+            lastName: '',
+            displayName: 'JohnD',
+            email: 'john@example.com',
+            password: 'Password1',
+            confirmPassword: 'Password1',
+            token: 'test-token',
+          )),
+          expect: () => [
+            const InviteRegistrationCreatingAccount(),
+            const InviteRegistrationFailure(
+                message: 'Last name is required'),
+          ],
+        );
+
+        blocTest<InviteRegistrationBloc, InviteRegistrationState>(
+          'emits failure when last name is too short',
+          build: buildBloc,
+          act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
+            firstName: 'John',
+            lastName: 'D',
+            displayName: 'JohnD',
+            email: 'john@example.com',
+            password: 'Password1',
+            confirmPassword: 'Password1',
+            token: 'test-token',
+          )),
+          expect: () => [
+            const InviteRegistrationCreatingAccount(),
+            const InviteRegistrationFailure(
+                message: 'Last name must be at least 2 characters'),
           ],
         );
 
@@ -213,7 +303,8 @@ void main() {
           'emits failure when display name is empty',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: '',
             email: 'john@example.com',
             password: 'Password1',
@@ -231,7 +322,8 @@ void main() {
           'emits failure when display name is too short',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: 'JD',
             email: 'john@example.com',
             password: 'Password1',
@@ -249,7 +341,8 @@ void main() {
           'emits failure when display name is too long',
           build: buildBloc,
           act: (bloc) => bloc.add(InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: 'A' * 31,
             email: 'john@example.com',
             password: 'Password1',
@@ -267,7 +360,8 @@ void main() {
           'emits failure when email is empty',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: 'JohnD',
             email: '',
             password: 'Password1',
@@ -285,7 +379,8 @@ void main() {
           'emits failure when email is invalid',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: 'JohnD',
             email: 'not-an-email',
             password: 'Password1',
@@ -303,7 +398,8 @@ void main() {
           'emits failure when password is too short',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: 'JohnD',
             email: 'john@example.com',
             password: 'Pass1',
@@ -321,7 +417,8 @@ void main() {
           'emits failure when password has no uppercase',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: 'JohnD',
             email: 'john@example.com',
             password: 'password1',
@@ -340,7 +437,8 @@ void main() {
           'emits failure when password has no number',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: 'JohnD',
             email: 'john@example.com',
             password: 'Password',
@@ -359,7 +457,8 @@ void main() {
           'emits failure when passwords do not match',
           build: buildBloc,
           act: (bloc) => bloc.add(const InviteRegistrationSubmitted(
-            fullName: 'John Doe',
+            firstName: 'John',
+            lastName: 'Doe',
             displayName: 'JohnD',
             email: 'john@example.com',
             password: 'Password1',
@@ -467,6 +566,10 @@ void main() {
             when(() => mockAuthRepo.updateUserProfile(
                   displayName: any(named: 'displayName'),
                 )).thenAnswer((_) async {});
+            when(() => mockAuthRepo.updateUserNames(
+                  firstName: any(named: 'firstName'),
+                  lastName: any(named: 'lastName'),
+                )).thenAnswer((_) async {});
             when(() => mockAuthRepo.sendEmailVerification())
                 .thenAnswer((_) async {});
             when(() =>
@@ -498,6 +601,10 @@ void main() {
                 )).thenAnswer((_) async => FakeUserEntity());
             when(() => mockAuthRepo.updateUserProfile(
                   displayName: any(named: 'displayName'),
+                )).thenAnswer((_) async {});
+            when(() => mockAuthRepo.updateUserNames(
+                  firstName: any(named: 'firstName'),
+                  lastName: any(named: 'lastName'),
                 )).thenAnswer((_) async {});
             when(() => mockAuthRepo.sendEmailVerification())
                 .thenAnswer((_) async {});

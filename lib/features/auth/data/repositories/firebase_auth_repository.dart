@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:play_with_me/features/auth/data/models/user_model.dart';
@@ -8,9 +9,13 @@ import 'package:play_with_me/features/auth/domain/repositories/auth_repository.d
 
 class FirebaseAuthRepository implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
+  final FirebaseFunctions _functions;
 
-  FirebaseAuthRepository({FirebaseAuth? firebaseAuth})
-      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+  FirebaseAuthRepository({
+    FirebaseAuth? firebaseAuth,
+    FirebaseFunctions? functions,
+  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+        _functions = functions ?? FirebaseFunctions.instance;
 
   @override
   UserEntity? get currentUser {
@@ -179,6 +184,27 @@ class FirebaseAuthRepository implements AuthRepository {
     } catch (e) {
       debugPrint('❌ Error updating user profile: $e');
       throw Exception('Failed to update user profile: $e');
+    }
+  }
+
+  @override
+  Future<void> updateUserNames({
+    required String firstName,
+    required String lastName,
+  }) async {
+    try {
+      final callable = _functions.httpsCallable('updateUserNames');
+      await callable.call<dynamic>({
+        'firstName': firstName,
+        'lastName': lastName,
+      });
+      debugPrint('✅ User names updated in Firestore');
+    } on FirebaseFunctionsException catch (e) {
+      debugPrint('❌ Cloud Function error updating user names: ${e.code} - ${e.message}');
+      throw Exception('Failed to update user names: ${e.message}');
+    } catch (e) {
+      debugPrint('❌ Error updating user names: $e');
+      throw Exception('Failed to update user names: $e');
     }
   }
 

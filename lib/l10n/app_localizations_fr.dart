@@ -1767,6 +1767,26 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le nom complet doit comporter au moins 2 caractères';
 
   @override
+  String get firstNameHint => 'Prénom';
+
+  @override
+  String get firstNameRequired => 'Le prénom est requis';
+
+  @override
+  String get firstNameTooShort =>
+      'Le prénom doit comporter au moins 2 caractères';
+
+  @override
+  String get lastNameHint => 'Nom de famille';
+
+  @override
+  String get lastNameRequired => 'Le nom de famille est requis';
+
+  @override
+  String get lastNameTooShort =>
+      'Le nom de famille doit comporter au moins 2 caractères';
+
+  @override
   String get displayNameHintRequired => 'Nom d\'affichage';
 
   @override
