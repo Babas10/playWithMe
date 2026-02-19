@@ -528,7 +528,7 @@
 
   "displayNameOptionalHint": "Display Name (Optional)",
   "@displayNameOptionalHint": {
-    "description": "Display name optional field hint"
+    "description": "Display name optional field hint (deprecated - use displayNameHintRequired)"
   },
 
   "confirmPassword": "Confirm Password",
@@ -2537,6 +2537,36 @@
   "fullNameTooShort": "Full name must be at least 2 characters",
   "@fullNameTooShort": {
     "description": "Validation error when full name is too short"
+  },
+
+  "firstNameHint": "First Name",
+  "@firstNameHint": {
+    "description": "Hint text for first name field"
+  },
+
+  "firstNameRequired": "First name is required",
+  "@firstNameRequired": {
+    "description": "Validation error when first name is empty"
+  },
+
+  "firstNameTooShort": "First name must be at least 2 characters",
+  "@firstNameTooShort": {
+    "description": "Validation error when first name is too short"
+  },
+
+  "lastNameHint": "Last Name",
+  "@lastNameHint": {
+    "description": "Hint text for last name field"
+  },
+
+  "lastNameRequired": "Last name is required",
+  "@lastNameRequired": {
+    "description": "Validation error when last name is empty"
+  },
+
+  "lastNameTooShort": "Last name must be at least 2 characters",
+  "@lastNameTooShort": {
+    "description": "Validation error when last name is too short"
   },
 
   "displayNameHintRequired": "Display Name",

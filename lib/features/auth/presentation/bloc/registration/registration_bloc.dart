@@ -39,17 +39,23 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
       debugPrint('✅ RegistrationBloc: User created: ${user.email}');
 
-      // Update display name if provided
-      String? displayName;
-      if (event.displayName != null && event.displayName!.trim().isNotEmpty) {
-        try {
-          displayName = event.displayName!.trim();
-          await _authRepository.updateUserProfile(displayName: displayName);
-          debugPrint('✅ RegistrationBloc: Display name updated');
-        } catch (e) {
-          debugPrint('⚠️ RegistrationBloc: Failed to update display name: $e');
-          // Don't fail registration if display name update fails
-        }
+      // Update display name
+      try {
+        await _authRepository.updateUserProfile(displayName: event.displayName.trim());
+        debugPrint('✅ RegistrationBloc: Display name updated');
+      } catch (e) {
+        debugPrint('⚠️ RegistrationBloc: Failed to update display name: $e');
+      }
+
+      // Persist firstName and lastName to Firestore via Cloud Function
+      try {
+        await _authRepository.updateUserNames(
+          firstName: event.firstName.trim(),
+          lastName: event.lastName.trim(),
+        );
+        debugPrint('✅ RegistrationBloc: First/last name persisted to Firestore');
+      } catch (e) {
+        debugPrint('⚠️ RegistrationBloc: Failed to persist names: $e');
       }
 
       // NOTE: Firestore user document is automatically created by the Cloud Function
@@ -63,17 +69,14 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
         debugPrint('✅ RegistrationBloc: Email verification sent');
       } catch (e) {
         debugPrint('⚠️ RegistrationBloc: Failed to send email verification: $e');
-        // Don't fail registration if email verification fails
       }
 
       emit(const RegistrationSuccess());
     } catch (error) {
       String errorMessage = error.toString();
-      // Remove "Exception: " prefix if present
       if (errorMessage.startsWith('Exception: ')) {
         errorMessage = errorMessage.substring(11);
       }
-      // Also handle nested exceptions like "Exception: Exception: message"
       if (errorMessage.startsWith('Exception: ')) {
         errorMessage = errorMessage.substring(11);
       }
@@ -92,6 +95,34 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
   /// Validate registration input
   String? _validateInput(RegistrationSubmitted event) {
+    if (event.firstName.trim().isEmpty) {
+      return 'First name is required';
+    }
+
+    if (event.firstName.trim().length < 2) {
+      return 'First name must be at least 2 characters';
+    }
+
+    if (event.lastName.trim().isEmpty) {
+      return 'Last name is required';
+    }
+
+    if (event.lastName.trim().length < 2) {
+      return 'Last name must be at least 2 characters';
+    }
+
+    if (event.displayName.trim().isEmpty) {
+      return 'Display name is required';
+    }
+
+    if (event.displayName.trim().length < 3) {
+      return 'Display name must be at least 3 characters';
+    }
+
+    if (event.displayName.trim().length > 30) {
+      return 'Display name must be at most 30 characters';
+    }
+
     if (event.email.trim().isEmpty) {
       return 'Email cannot be empty';
     }
@@ -104,16 +135,20 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       return 'Password cannot be empty';
     }
 
-    if (event.password.length < 6) {
-      return 'Password must be at least 6 characters long';
+    if (event.password.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+
+    if (!event.password.contains(RegExp(r'[A-Z]'))) {
+      return 'Password must contain at least 1 uppercase letter';
+    }
+
+    if (!event.password.contains(RegExp(r'[0-9]'))) {
+      return 'Password must contain at least 1 number';
     }
 
     if (event.password != event.confirmPassword) {
       return 'Passwords do not match';
-    }
-
-    if (event.displayName != null && event.displayName!.trim().length > 50) {
-      return 'Display name must be less than 50 characters';
     }
 
     return null;

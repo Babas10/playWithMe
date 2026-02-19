@@ -9,10 +9,10 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 const USERS = [
-  { email: 'test1@mysta.com', displayName: 'Test Player 1', password: 'password123' },
-  { email: 'test2@mysta.com', displayName: 'Test Player 2', password: 'password123' },
-  { email: 'test3@mysta.com', displayName: 'Test Player 3', password: 'password123' },
-  { email: 'test4@mysta.com', displayName: 'Test Player 4', password: 'password123' },
+  { email: 'test1@mysta.com', displayName: 'Test Player 1', firstName: 'Test', lastName: 'Player1', password: 'password123' },
+  { email: 'test2@mysta.com', displayName: 'Test Player 2', firstName: 'Test', lastName: 'Player2', password: 'password123' },
+  { email: 'test3@mysta.com', displayName: 'Test Player 3', firstName: 'Test', lastName: 'Player3', password: 'password123' },
+  { email: 'test4@mysta.com', displayName: 'Test Player 4', firstName: 'Test', lastName: 'Player4', password: 'password123' },
 ];
 
 async function getOrCreateUser(userData: any) {
@@ -22,7 +22,46 @@ async function getOrCreateUser(userData: any) {
     return userRecord;
   } catch (error: any) {
     if (error.code === 'auth/user-not-found') {
-      const userRecord = await auth.createUser(userData);
+      const userRecord = await auth.createUser({
+        email: userData.email,
+        password: userData.password,
+        displayName: userData.displayName,
+        emailVerified: true,
+      });
+
+      // Create Firestore user document with firstName/lastName
+      await db.collection('users').doc(userRecord.uid).set({
+        email: userData.email,
+        displayName: userData.displayName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        photoUrl: null,
+        isEmailVerified: true,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastSignInAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        isAnonymous: false,
+        groupIds: [],
+        gameIds: [],
+        friendIds: [],
+        friendCount: 0,
+        notificationsEnabled: true,
+        emailNotifications: true,
+        pushNotifications: true,
+        privacyLevel: 'public',
+        showEmail: true,
+        showPhoneNumber: true,
+        gamesPlayed: 0,
+        gamesWon: 0,
+        gamesLost: 0,
+        totalScore: 0,
+        currentStreak: 0,
+        recentGameIds: [],
+        teammateStats: {},
+        eloRating: 1600.0,
+        eloGamesPlayed: 0,
+      });
+
       console.log(`Created user ${userData.email}: ${userRecord.uid}`);
       return userRecord;
     }

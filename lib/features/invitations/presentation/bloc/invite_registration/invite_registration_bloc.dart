@@ -60,7 +60,19 @@ class InviteRegistrationBloc
             '⚠️ InviteRegistrationBloc: Failed to update display name: $e');
       }
 
-      // Step 3: Send email verification (non-blocking)
+      // Step 3: Persist firstName and lastName to Firestore
+      try {
+        await _authRepository.updateUserNames(
+          firstName: event.firstName.trim(),
+          lastName: event.lastName.trim(),
+        );
+        debugPrint('✅ InviteRegistrationBloc: First/last name persisted');
+      } catch (e) {
+        debugPrint(
+            '⚠️ InviteRegistrationBloc: Failed to persist names: $e');
+      }
+
+      // Step 4: Send email verification (non-blocking)
       try {
         await _authRepository.sendEmailVerification();
         debugPrint('✅ InviteRegistrationBloc: Verification email sent');
@@ -69,7 +81,7 @@ class InviteRegistrationBloc
             '⚠️ InviteRegistrationBloc: Failed to send verification: $e');
       }
 
-      // Step 4: Join group via invite token
+      // Step 5: Join group via invite token
       emit(const InviteRegistrationJoiningGroup());
       debugPrint(
           '🔐 InviteRegistrationBloc: Joining group with token: ${event.token}');
@@ -79,7 +91,7 @@ class InviteRegistrationBloc
           token: event.token,
         );
 
-        // Step 5: Clear pending invite
+        // Step 6: Clear pending invite
         await _pendingInviteStorage.clear();
         debugPrint(
             '✅ InviteRegistrationBloc: Joined group ${joinResult.groupName}');
@@ -122,11 +134,17 @@ class InviteRegistrationBloc
   }
 
   String? _validateInput(InviteRegistrationSubmitted event) {
-    if (event.fullName.trim().isEmpty) {
-      return 'Full name is required';
+    if (event.firstName.trim().isEmpty) {
+      return 'First name is required';
     }
-    if (event.fullName.trim().length < 2) {
-      return 'Full name must be at least 2 characters';
+    if (event.firstName.trim().length < 2) {
+      return 'First name must be at least 2 characters';
+    }
+    if (event.lastName.trim().isEmpty) {
+      return 'Last name is required';
+    }
+    if (event.lastName.trim().length < 2) {
+      return 'Last name must be at least 2 characters';
     }
     if (event.displayName.trim().isEmpty) {
       return 'Display name is required';
