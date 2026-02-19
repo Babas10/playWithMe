@@ -10,19 +10,23 @@ abstract class RegistrationEvent extends Equatable {
 /// Event to submit registration form
 class RegistrationSubmitted extends RegistrationEvent {
   const RegistrationSubmitted({
+    required this.firstName,
+    required this.lastName,
+    required this.displayName,
     required this.email,
     required this.password,
     required this.confirmPassword,
-    this.displayName,
   });
 
+  final String firstName;
+  final String lastName;
+  final String displayName;
   final String email;
   final String password;
   final String confirmPassword;
-  final String? displayName;
 
   @override
-  List<Object?> get props => [email, password, confirmPassword, displayName];
+  List<Object?> get props => [firstName, lastName, displayName, email, password, confirmPassword];
 }
 
 /// Event to reset the registration form state

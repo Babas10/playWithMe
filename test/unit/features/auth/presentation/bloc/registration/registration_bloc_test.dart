@@ -26,30 +26,146 @@ void main() {
     });
 
     group('RegistrationSubmitted', () {
+      const validFirstName = 'John';
+      const validLastName = 'Doe';
+      const validDisplayName = 'JohnD';
       const validEmail = 'test@example.com';
-      const validPassword = 'password123';
-      const validDisplayName = 'Test User';
+      const validPassword = 'Password1';
+
+      group('First Name Validation', () {
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationFailure] when first name is empty',
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: '',
+            lastName: validLastName,
+            displayName: validDisplayName,
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('First name is required'),
+          ],
+        );
+
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationFailure] when first name is too short',
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: 'J',
+            lastName: validLastName,
+            displayName: validDisplayName,
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('First name must be at least 2 characters'),
+          ],
+        );
+      });
+
+      group('Last Name Validation', () {
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationFailure] when last name is empty',
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: '',
+            displayName: validDisplayName,
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('Last name is required'),
+          ],
+        );
+
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationFailure] when last name is too short',
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: 'D',
+            displayName: validDisplayName,
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('Last name must be at least 2 characters'),
+          ],
+        );
+      });
+
+      group('Display Name Validation', () {
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationFailure] when display name is empty',
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: '',
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('Display name is required'),
+          ],
+        );
+
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationFailure] when display name is too short',
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: 'JD',
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('Display name must be at least 3 characters'),
+          ],
+        );
+
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationFailure] when display name exceeds 30 characters',
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: 'A' * 31,
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('Display name must be at most 30 characters'),
+          ],
+        );
+      });
 
       group('Email Validation', () {
         blocTest<RegistrationBloc, RegistrationState>(
           'emits [RegistrationLoading, RegistrationFailure] when email is empty',
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: '',
-            password: validPassword,
-            confirmPassword: validPassword,
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationFailure('Email cannot be empty'),
-          ],
-        );
-
-        blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationFailure] when email is only whitespace',
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(const RegistrationSubmitted(
-            email: '   ',
             password: validPassword,
             confirmPassword: validPassword,
           )),
@@ -63,35 +179,10 @@ void main() {
           'emits [RegistrationLoading, RegistrationFailure] when email is invalid format',
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: 'invalid-email',
-            password: validPassword,
-            confirmPassword: validPassword,
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationFailure('Please enter a valid email address'),
-          ],
-        );
-
-        blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationFailure] when email has no domain',
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(const RegistrationSubmitted(
-            email: 'test@',
-            password: validPassword,
-            confirmPassword: validPassword,
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationFailure('Please enter a valid email address'),
-          ],
-        );
-
-        blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationFailure] when email has no username',
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(const RegistrationSubmitted(
-            email: '@example.com',
             password: validPassword,
             confirmPassword: validPassword,
           )),
@@ -107,6 +198,9 @@ void main() {
           'emits [RegistrationLoading, RegistrationFailure] when password is empty',
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: validEmail,
             password: '',
             confirmPassword: '',
@@ -118,30 +212,53 @@ void main() {
         );
 
         blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationFailure] when password is only whitespace',
+          'emits [RegistrationLoading, RegistrationFailure] when password is less than 8 characters',
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: validEmail,
-            password: '   ',
-            confirmPassword: '   ',
+            password: 'Pass1',
+            confirmPassword: 'Pass1',
           )),
           expect: () => [
             const RegistrationLoading(),
-            const RegistrationFailure('Password cannot be empty'),
+            const RegistrationFailure('Password must be at least 8 characters'),
           ],
         );
 
         blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationFailure] when password is less than 6 characters',
+          'emits [RegistrationLoading, RegistrationFailure] when password has no uppercase',
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: validEmail,
-            password: '12345',
-            confirmPassword: '12345',
+            password: 'password1',
+            confirmPassword: 'password1',
           )),
           expect: () => [
             const RegistrationLoading(),
-            const RegistrationFailure('Password must be at least 6 characters long'),
+            const RegistrationFailure('Password must contain at least 1 uppercase letter'),
+          ],
+        );
+
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationFailure] when password has no number',
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
+            email: validEmail,
+            password: 'Password',
+            confirmPassword: 'Password',
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('Password must contain at least 1 number'),
           ],
         );
       });
@@ -151,50 +268,16 @@ void main() {
           'emits [RegistrationLoading, RegistrationFailure] when passwords do not match',
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: validEmail,
             password: validPassword,
-            confirmPassword: 'differentpassword',
+            confirmPassword: 'DifferentPassword1',
           )),
           expect: () => [
             const RegistrationLoading(),
             const RegistrationFailure('Passwords do not match'),
-          ],
-        );
-      });
-
-      group('Display Name Validation', () {
-        blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationFailure] when display name exceeds 50 characters',
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(RegistrationSubmitted(
-            email: validEmail,
-            password: validPassword,
-            confirmPassword: validPassword,
-            displayName: 'A' * 51,
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationFailure('Display name must be less than 50 characters'),
-          ],
-        );
-
-        blocTest<RegistrationBloc, RegistrationState>(
-          'accepts display name with exactly 50 characters',
-          setUp: () {
-            mockAuthRepository.setCreateUserWithEmailAndPasswordBehavior(
-              ({required String email, required String password}) async => TestUserData.testUser,
-            );
-          },
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(RegistrationSubmitted(
-            email: validEmail,
-            password: validPassword,
-            confirmPassword: validPassword,
-            displayName: 'A' * 50,
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationSuccess(),
           ],
         );
       });
@@ -209,87 +292,16 @@ void main() {
           },
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
-            email: validEmail,
-            password: validPassword,
-            confirmPassword: validPassword,
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationSuccess(),
-          ],
-        );
-
-        blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationSuccess] when registration succeeds with display name',
-          setUp: () {
-            mockAuthRepository.setCreateUserWithEmailAndPasswordBehavior(
-              ({required String email, required String password}) async => TestUserData.testUser,
-            );
-          },
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(const RegistrationSubmitted(
-            email: validEmail,
-            password: validPassword,
-            confirmPassword: validPassword,
+            firstName: validFirstName,
+            lastName: validLastName,
             displayName: validDisplayName,
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationSuccess(),
-          ],
-        );
-
-        blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationSuccess] when registration succeeds with empty display name',
-          setUp: () {
-            mockAuthRepository.setCreateUserWithEmailAndPasswordBehavior(
-              ({required String email, required String password}) async => TestUserData.testUser,
-            );
-          },
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(const RegistrationSubmitted(
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
-            displayName: '',
           )),
           expect: () => [
             const RegistrationLoading(),
             const RegistrationSuccess(),
-          ],
-        );
-
-        blocTest<RegistrationBloc, RegistrationState>(
-          'emits [RegistrationLoading, RegistrationSuccess] when registration succeeds with whitespace display name',
-          setUp: () {
-            mockAuthRepository.setCreateUserWithEmailAndPasswordBehavior(
-              ({required String email, required String password}) async => TestUserData.testUser,
-            );
-          },
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(const RegistrationSubmitted(
-            email: validEmail,
-            password: validPassword,
-            confirmPassword: validPassword,
-            displayName: '   ',
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationSuccess(),
-          ],
-        );
-
-        blocTest<RegistrationBloc, RegistrationState>(
-          'fails validation when email has leading/trailing whitespace',
-          build: () => registrationBloc,
-          act: (bloc) => bloc.add(const RegistrationSubmitted(
-            email: '  test@example.com  ',
-            password: validPassword,
-            confirmPassword: validPassword,
-          )),
-          expect: () => [
-            const RegistrationLoading(),
-            const RegistrationFailure('Please enter a valid email address'),
           ],
         );
 
@@ -302,6 +314,9 @@ void main() {
           },
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: 'test+tag@example.com',
             password: validPassword,
             confirmPassword: validPassword,
@@ -324,6 +339,9 @@ void main() {
           },
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
@@ -344,6 +362,9 @@ void main() {
           },
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
@@ -369,10 +390,38 @@ void main() {
           },
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationSuccess(),
+          ],
+        );
+
+        blocTest<RegistrationBloc, RegistrationState>(
+          'emits [RegistrationLoading, RegistrationSuccess] even when updateUserNames fails',
+          setUp: () {
+            mockAuthRepository.setCreateUserWithEmailAndPasswordBehavior(
+              ({required String email, required String password}) async => TestUserData.testUser,
+            );
+            mockAuthRepository.setUpdateUserNamesBehavior(
+              ({required String firstName, required String lastName}) async =>
+                throw Exception('Failed to persist names'),
+            );
+          },
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
             displayName: validDisplayName,
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -392,6 +441,9 @@ void main() {
           },
           build: () => registrationBloc,
           act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
@@ -438,21 +490,14 @@ void main() {
     group('Event props', () {
       test('RegistrationSubmitted props contains all fields', () {
         const event = RegistrationSubmitted(
+          firstName: 'John',
+          lastName: 'Doe',
+          displayName: 'JohnD',
           email: 'test@example.com',
-          password: 'password',
-          confirmPassword: 'password',
-          displayName: 'Test',
+          password: 'Password1',
+          confirmPassword: 'Password1',
         );
-        expect(event.props, ['test@example.com', 'password', 'password', 'Test']);
-      });
-
-      test('RegistrationSubmitted props with null displayName', () {
-        const event = RegistrationSubmitted(
-          email: 'test@example.com',
-          password: 'password',
-          confirmPassword: 'password',
-        );
-        expect(event.props, ['test@example.com', 'password', 'password', null]);
+        expect(event.props, ['John', 'Doe', 'JohnD', 'test@example.com', 'Password1', 'Password1']);
       });
 
       test('RegistrationFormReset props is empty', () {
@@ -515,16 +560,20 @@ void main() {
       test('RegistrationSubmitted instances with same values are equal', () {
         expect(
           const RegistrationSubmitted(
+            firstName: 'John',
+            lastName: 'Doe',
+            displayName: 'JohnD',
             email: 'test@example.com',
-            password: 'password',
-            confirmPassword: 'password',
-            displayName: 'Test',
+            password: 'Password1',
+            confirmPassword: 'Password1',
           ),
           const RegistrationSubmitted(
+            firstName: 'John',
+            lastName: 'Doe',
+            displayName: 'JohnD',
             email: 'test@example.com',
-            password: 'password',
-            confirmPassword: 'password',
-            displayName: 'Test',
+            password: 'Password1',
+            confirmPassword: 'Password1',
           ),
         );
       });
@@ -532,14 +581,20 @@ void main() {
       test('RegistrationSubmitted instances with different values are not equal', () {
         expect(
           const RegistrationSubmitted(
+            firstName: 'John',
+            lastName: 'Doe',
+            displayName: 'JohnD',
             email: 'test1@example.com',
-            password: 'password',
-            confirmPassword: 'password',
+            password: 'Password1',
+            confirmPassword: 'Password1',
           ),
           isNot(const RegistrationSubmitted(
+            firstName: 'John',
+            lastName: 'Doe',
+            displayName: 'JohnD',
             email: 'test2@example.com',
-            password: 'password',
-            confirmPassword: 'password',
+            password: 'Password1',
+            confirmPassword: 'Password1',
           )),
         );
       });

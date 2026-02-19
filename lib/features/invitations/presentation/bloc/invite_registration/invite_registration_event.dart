@@ -10,7 +10,8 @@ sealed class InviteRegistrationEvent extends Equatable {
 
 /// Event to submit the invite registration form.
 class InviteRegistrationSubmitted extends InviteRegistrationEvent {
-  final String fullName;
+  final String firstName;
+  final String lastName;
   final String displayName;
   final String email;
   final String password;
@@ -18,7 +19,8 @@ class InviteRegistrationSubmitted extends InviteRegistrationEvent {
   final String token;
 
   const InviteRegistrationSubmitted({
-    required this.fullName,
+    required this.firstName,
+    required this.lastName,
     required this.displayName,
     required this.email,
     required this.password,
@@ -28,7 +30,8 @@ class InviteRegistrationSubmitted extends InviteRegistrationEvent {
 
   @override
   List<Object?> get props => [
-        fullName,
+        firstName,
+        lastName,
         displayName,
         email,
         password,

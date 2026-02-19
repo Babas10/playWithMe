@@ -51,6 +51,8 @@ async function backfillUserDocuments(projectId: string) {
           await userDocRef.set({
             email: userRecord.email || "",
             displayName: userRecord.displayName || null,
+            firstName: null,
+            lastName: null,
             photoUrl: userRecord.photoURL || null,
             isEmailVerified: userRecord.emailVerified || false,
             isAnonymous: userRecord.providerData.length === 0,

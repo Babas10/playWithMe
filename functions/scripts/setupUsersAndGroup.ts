@@ -23,8 +23,15 @@ interface TestUser {
   uid: string;
   email: string;
   displayName: string;
+  firstName: string;
+  lastName: string;
   password: string;
 }
+
+const LAST_NAMES = [
+  "One", "Two", "Three", "Four", "Five",
+  "Six", "Seven", "Eight", "Nine", "Ten",
+];
 
 /**
  * Clear all Firestore collections
@@ -98,45 +105,58 @@ async function createTestUsers(): Promise<TestUser[]> {
   for (let i = 1; i <= 10; i++) {
     const email = `test${i}@mysta.com`;
     const displayName = `Test${i}`;
+    const firstName = "Test";
+    const lastName = LAST_NAMES[i - 1];
 
     // Create Firebase Auth user
     const userRecord = await admin.auth().createUser({
       email,
       password,
       displayName,
+      emailVerified: true,
     });
+
+    const now = admin.firestore.Timestamp.now();
 
     // Create Firestore user document
     await db.collection("users").doc(userRecord.uid).set({
       email,
       displayName,
+      firstName,
+      lastName,
       photoUrl: null,
-      createdAt: admin.firestore.Timestamp.now(),
-      updatedAt: admin.firestore.Timestamp.now(),
-      bio: "",
-      location: null,
+      isEmailVerified: true,
+      createdAt: now,
+      lastSignInAt: now,
+      updatedAt: now,
+      isAnonymous: false,
+      groupIds: [],
+      gameIds: [],
+      friendIds: [],
+      friendCount: 0,
+      notificationsEnabled: true,
+      emailNotifications: true,
+      pushNotifications: true,
+      privacyLevel: "public",
+      showEmail: true,
+      showPhoneNumber: true,
       gamesPlayed: 0,
       gamesWon: 0,
       gamesLost: 0,
-      eloRating: 1600,
-      eloGamesPlayed: 0,
+      totalScore: 0,
       currentStreak: 0,
-      longestWinStreak: 0,
-      longestLoseStreak: 0,
-      friendIds: [],
-      groupIds: [],
-      notificationSettings: {
-        gameInvites: true,
-        groupInvites: true,
-        friendRequests: true,
-        gameReminders: true,
-      },
+      recentGameIds: [],
+      teammateStats: {},
+      eloRating: 1600.0,
+      eloGamesPlayed: 0,
     });
 
     users.push({
       uid: userRecord.uid,
       email,
       displayName,
+      firstName,
+      lastName,
       password,
     });
 
@@ -257,6 +277,8 @@ async function exportTestConfig(
       uid: u.uid,
       email: u.email,
       displayName: u.displayName,
+      firstName: u.firstName,
+      lastName: u.lastName,
       password: u.password,
     })),
     groupId,
