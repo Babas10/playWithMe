@@ -40,6 +40,11 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.index == 1 && !_tabController.indexIsChanging) {
+        context.read<FriendBloc>().add(const FriendEvent.loadRequested());
+      }
+    });
   }
 
   @override
@@ -266,7 +271,9 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
               child: const AddFriendPage(),
             ),
           ),
-        );
+        ).then((_) {
+          friendBloc.add(const FriendEvent.loadRequested());
+        });
       },
       icon: const Icon(Icons.person_add),
       label: Text(l10n.addFriend),
