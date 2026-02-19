@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -21,8 +22,10 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _displayNameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
@@ -30,8 +33,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _displayNameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -94,6 +99,57 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 const SizedBox(height: 32),
                 AuthFormField(
+                  controller: _firstNameController,
+                  hintText: l10n.firstNameHint,
+                  textInputAction: TextInputAction.next,
+                  prefixIcon: Icons.badge,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.firstNameRequired;
+                    }
+                    if (value.trim().length < 2) {
+                      return l10n.firstNameTooShort;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                AuthFormField(
+                  controller: _lastNameController,
+                  hintText: l10n.lastNameHint,
+                  textInputAction: TextInputAction.next,
+                  prefixIcon: Icons.badge_outlined,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.lastNameRequired;
+                    }
+                    if (value.trim().length < 2) {
+                      return l10n.lastNameTooShort;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                AuthFormField(
+                  controller: _displayNameController,
+                  hintText: l10n.displayNameHintRequired,
+                  textInputAction: TextInputAction.next,
+                  prefixIcon: Icons.person,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.displayNameRequired;
+                    }
+                    if (value.trim().length < 3) {
+                      return l10n.displayNameTooShortInvite;
+                    }
+                    if (value.trim().length > 30) {
+                      return l10n.displayNameTooLongInvite;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                AuthFormField(
                   controller: _emailController,
                   hintText: l10n.emailHint,
                   keyboardType: TextInputType.emailAddress,
@@ -105,19 +161,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                       return l10n.validEmailRequired;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                AuthFormField(
-                  controller: _displayNameController,
-                  hintText: l10n.displayNameOptionalHint,
-                  textInputAction: TextInputAction.next,
-                  prefixIcon: Icons.person,
-                  validator: (value) {
-                    if (value != null && value.trim().length > 50) {
-                      return l10n.displayNameTooLong;
                     }
                     return null;
                   },
@@ -143,13 +186,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     if (value == null || value.trim().isEmpty) {
                       return l10n.passwordRequired;
                     }
-                    if (value.length < 6) {
-                      return l10n.passwordTooShort;
+                    if (value.length < 8) {
+                      return l10n.passwordTooShortInvite;
+                    }
+                    if (!value.contains(RegExp(r'[A-Z]'))) {
+                      return l10n.passwordMissingUppercase;
+                    }
+                    if (!value.contains(RegExp(r'[0-9]'))) {
+                      return l10n.passwordMissingNumber;
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Text(
+                    l10n.passwordRequirementsHint,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textMuted,
+                        ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 AuthFormField(
                   controller: _confirmPasswordController,
                   hintText: l10n.confirmPassword,
@@ -223,12 +282,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (_formKey.currentState!.validate()) {
       context.read<RegistrationBloc>().add(
             RegistrationSubmitted(
-              email: _emailController.text,
+              firstName: _firstNameController.text.trim(),
+              lastName: _lastNameController.text.trim(),
+              displayName: _displayNameController.text.trim(),
+              email: _emailController.text.trim(),
               password: _passwordController.text,
               confirmPassword: _confirmPasswordController.text,
-              displayName: _displayNameController.text.trim().isNotEmpty
-                  ? _displayNameController.text.trim()
-                  : null,
             ),
           );
     }

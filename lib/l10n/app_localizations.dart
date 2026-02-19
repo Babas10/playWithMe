@@ -716,7 +716,7 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get passwordHint;
 
-  /// Display name optional field hint
+  /// Display name optional field hint (deprecated - use displayNameHintRequired)
   ///
   /// In en, this message translates to:
   /// **'Display Name (Optional)'**
@@ -3247,6 +3247,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Full name must be at least 2 characters'**
   String get fullNameTooShort;
+
+  /// Hint text for first name field
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get firstNameHint;
+
+  /// Validation error when first name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'First name is required'**
+  String get firstNameRequired;
+
+  /// Validation error when first name is too short
+  ///
+  /// In en, this message translates to:
+  /// **'First name must be at least 2 characters'**
+  String get firstNameTooShort;
+
+  /// Hint text for last name field
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name'**
+  String get lastNameHint;
+
+  /// Validation error when last name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Last name is required'**
+  String get lastNameRequired;
+
+  /// Validation error when last name is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Last name must be at least 2 characters'**
+  String get lastNameTooShort;
 
   /// Hint text for required display name field
   ///
