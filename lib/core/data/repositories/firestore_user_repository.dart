@@ -120,6 +120,8 @@ class FirestoreUserRepository implements UserRepository {
           email: userData['email'] as String,
           displayName: userData['displayName'] as String?,
           photoUrl: userData['photoUrl'] as String?,
+          firstName: userData['firstName'] as String?,
+          lastName: userData['lastName'] as String?,
           isEmailVerified: false, // Not returned by Cloud Function
           isAnonymous: false, // Not returned by Cloud Function
         );
@@ -373,6 +375,8 @@ class FirestoreUserRepository implements UserRepository {
           email: userData['email'] as String,
           displayName: userData['displayName'] as String?,
           photoUrl: userData['photoUrl'] as String?,
+          firstName: userData['firstName'] as String?,
+          lastName: userData['lastName'] as String?,
           isEmailVerified: false, // Not returned by Cloud Function
           isAnonymous: false, // Not returned by Cloud Function
         );
