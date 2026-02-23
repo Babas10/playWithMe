@@ -16,6 +16,8 @@ export interface PublicUserData {
   displayName: string | null;
   email: string;
   photoUrl: string | null;
+  firstName: string | null;
+  lastName: string | null;
 }
 
 /**
@@ -108,6 +110,8 @@ export async function getUsersByIdsHandler(
             displayName: userData.displayName || null,
             email: userData.email || "",
             photoUrl: userData.photoUrl || null,
+            firstName: userData.firstName || null,
+            lastName: userData.lastName || null,
           });
         }
       }
