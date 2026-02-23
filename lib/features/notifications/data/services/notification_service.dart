@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 
 /// Background message handler (must be top-level function)
 @pragma('vm:entry-point')
@@ -87,11 +87,13 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_channel);
 
+    // Register token-refresh listener BEFORE fetching the initial token to
+    // avoid a race condition where the FCM token is generated (and the refresh
+    // event fires) while _initializeFcmToken() is awaiting APNS retries.
+    _fcm.onTokenRefresh.listen(_saveTokenToFirestore);
+
     // Get and save FCM token with platform-specific handling
     await _initializeFcmToken();
-
-    // Listen for token refresh
-    _fcm.onTokenRefresh.listen(_saveTokenToFirestore);
 
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
@@ -110,25 +112,39 @@ class NotificationService {
       final isIOS = !kIsWeb && Platform.isIOS;
 
       if (isIOS) {
-        // On iOS, we need to ensure APNS token is available first
-        print('iOS detected: Checking APNS token availability...');
+        // On iOS the FCM token depends on APNS; request it first.
+        print('[NotificationService] iOS detected: waiting for APNS token...');
 
-        // Try to get APNS token with retries
+        // Retry up to 5 times with 1-second delays.  The OS can take a
+        // moment to deliver the APNS token on the first launch or after a
+        // reinstall.
         String? apnsToken;
-        for (int i = 0; i < 3; i++) {
+        const maxRetries = 5;
+        for (int i = 0; i < maxRetries; i++) {
           apnsToken = await _fcm.getAPNSToken();
           if (apnsToken != null) {
-            print('✅ APNS token obtained: ${apnsToken.substring(0, 10)}...');
+            print('[NotificationService] ✅ APNS token obtained.');
             break;
           }
-          print('⏳ APNS token not available yet, waiting... (attempt ${i + 1}/3)');
+          print(
+            '[NotificationService] ⏳ APNS token not ready '
+            '(attempt ${i + 1}/$maxRetries).',
+          );
           await Future.delayed(const Duration(seconds: 1));
         }
 
         if (apnsToken == null) {
-          print('⚠️ APNS token not available after retries.');
-          print('   This is normal on iOS Simulator (push notifications not supported).');
-          print('   FCM token will be saved when available via onTokenRefresh.');
+          // Normal on the iOS Simulator (APNS is not supported there).
+          // On a physical device this means either:
+          //   • the aps-environment entitlement is missing, or
+          //   • the APNs key/certificate is not configured in Firebase.
+          // The onTokenRefresh listener registered above will save the token
+          // once it becomes available without requiring an app restart.
+          print(
+            '[NotificationService] ⚠️ APNS token unavailable after '
+            '$maxRetries attempts. FCM token will be persisted via '
+            'onTokenRefresh when the APNS token becomes available.',
+          );
           return;
         }
       }
@@ -147,7 +163,9 @@ class NotificationService {
     }
   }
 
-  /// Save FCM token to Firestore
+  /// Save FCM token to Firestore.
+  ///
+  /// Package-private for testing via [saveTokenToFirestoreForTest].
   Future<void> _saveTokenToFirestore(String token) async {
     final userId = _auth.currentUser?.uid;
     if (userId == null) return;
@@ -157,6 +175,13 @@ class NotificationService {
       'lastTokenUpdate': FieldValue.serverTimestamp(),
     });
   }
+
+  /// Exposes [_saveTokenToFirestore] for unit tests.
+  ///
+  /// Not part of the public API — do not call from production code.
+  @visibleForTesting
+  Future<void> saveTokenToFirestoreForTest(String token) =>
+      _saveTokenToFirestore(token);
 
   /// Handle foreground messages by showing local notification
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
