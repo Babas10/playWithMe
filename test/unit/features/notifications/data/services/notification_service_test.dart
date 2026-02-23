@@ -1,6 +1,4 @@
 // Unit tests for NotificationService - validates FCM initialization, token management, and message handling
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -155,5 +153,138 @@ void main() {
       verifyNever(() => mockFcm.getToken());
       verifyNever(() => mockDocument.update(any()));
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // initialize() — permission-denied path
+  //
+  // The remainder of initialize() calls static FirebaseMessaging methods
+  // (onMessage, onMessageOpenedApp, onBackgroundMessage) which require a live
+  // Firebase instance and cannot be mocked in unit tests. Those paths are
+  // covered by integration tests.
+  // ---------------------------------------------------------------------------
+  group('NotificationService - initialize', () {
+    test(
+      'returns early without fetching or saving token when permission is denied',
+      () async {
+        // Arrange
+        final mockSettings = MockNotificationSettings();
+        when(() => mockSettings.authorizationStatus)
+            .thenReturn(AuthorizationStatus.denied);
+        when(
+          () => mockFcm.requestPermission(
+            alert: any(named: 'alert'),
+            announcement: any(named: 'announcement'),
+            badge: any(named: 'badge'),
+            carPlay: any(named: 'carPlay'),
+            criticalAlert: any(named: 'criticalAlert'),
+            provisional: any(named: 'provisional'),
+            sound: any(named: 'sound'),
+          ),
+        ).thenAnswer((_) async => mockSettings);
+
+        // Act
+        await notificationService.initialize(onMessageTapped: (_) {});
+
+        // Assert — no token fetch, no Firestore write
+        verifyNever(() => mockFcm.getToken());
+        verifyNever(() => mockDocument.update(any()));
+      },
+    );
+
+    test(
+      'returns early without initializing local notifications when permission is denied',
+      () async {
+        // Arrange
+        final mockSettings = MockNotificationSettings();
+        when(() => mockSettings.authorizationStatus)
+            .thenReturn(AuthorizationStatus.denied);
+        when(
+          () => mockFcm.requestPermission(
+            alert: any(named: 'alert'),
+            announcement: any(named: 'announcement'),
+            badge: any(named: 'badge'),
+            carPlay: any(named: 'carPlay'),
+            criticalAlert: any(named: 'criticalAlert'),
+            provisional: any(named: 'provisional'),
+            sound: any(named: 'sound'),
+          ),
+        ).thenAnswer((_) async => mockSettings);
+
+        // Act
+        await notificationService.initialize(onMessageTapped: (_) {});
+
+        // Assert — local notifications plugin is never touched
+        verifyNever(
+          () => mockLocalNotifications.initialize(
+            any(),
+            onDidReceiveNotificationResponse: any(
+              named: 'onDidReceiveNotificationResponse',
+            ),
+          ),
+        );
+      },
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // saveTokenToFirestoreForTest — token persistence logic
+  //
+  // _saveTokenToFirestore is only reachable from initialize() (blocked by
+  // static Firebase calls) or from the onTokenRefresh listener.  The
+  // @visibleForTesting wrapper lets us verify the persistence contract
+  // directly without a full Firebase environment.
+  // ---------------------------------------------------------------------------
+  group('NotificationService - saveTokenToFirestoreForTest', () {
+    test(
+      'saves token to Firestore with arrayUnion and lastTokenUpdate '
+      'when user is authenticated',
+      () async {
+        // Arrange
+        when(() => mockDocument.update(any())).thenAnswer((_) async {});
+
+        // Act
+        await notificationService.saveTokenToFirestoreForTest('new-fcm-token');
+
+        // Assert
+        verify(
+          () => mockDocument.update({
+            'fcmTokens': FieldValue.arrayUnion(['new-fcm-token']),
+            'lastTokenUpdate': FieldValue.serverTimestamp(),
+          }),
+        ).called(1);
+      },
+    );
+
+    test(
+      'does not write to Firestore when user is not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
+
+        // Act
+        await notificationService.saveTokenToFirestoreForTest('some-token');
+
+        // Assert
+        verifyNever(() => mockDocument.update(any()));
+      },
+    );
+
+    test(
+      'saves token to the correct Firestore path for the authenticated user',
+      () async {
+        // Arrange
+        const userId = 'user-abc-123';
+        when(() => mockUser.uid).thenReturn(userId);
+        when(() => mockDocument.update(any())).thenAnswer((_) async {});
+
+        // Act
+        await notificationService.saveTokenToFirestoreForTest('token-xyz');
+
+        // Assert — document path uses the authenticated user's uid
+        verify(() => mockCollection.doc(userId)).called(1);
+        verify(() => mockDocument.update(any())).called(1);
+      },
+    );
   });
 }
