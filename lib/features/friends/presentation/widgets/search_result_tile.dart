@@ -12,6 +12,8 @@ class SearchResultTile extends StatelessWidget {
   final VoidCallback? onSendRequest;
   final VoidCallback? onAcceptRequest;
 
+  final bool isSelfSearch;
+
   const SearchResultTile({
     super.key,
     required this.user,
@@ -19,6 +21,7 @@ class SearchResultTile extends StatelessWidget {
     required this.hasPendingRequest,
     this.requestDirection,
     required this.searchedEmail,
+    this.isSelfSearch = false,
     this.onSendRequest,
     this.onAcceptRequest,
   });
@@ -29,7 +32,7 @@ class SearchResultTile extends StatelessWidget {
     final theme = Theme.of(context);
 
     // Handle case where user searches for their own email
-    if (user == null && searchedEmail.isNotEmpty) {
+    if (user == null && isSelfSearch) {
       return Card(
         margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Padding(
