@@ -1405,4 +1405,192 @@ void main() {
       );
     });
   });
+
+  group('Friendship status caching', () {
+    group('batchCheckFriendship cache', () {
+      test('returns cached result on second call without hitting Cloud Function', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult();
+
+        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'friendships': {'user1': true},
+        });
+
+        // First call — hits Cloud Function.
+        final first = await repository.batchCheckFriendship(['user1']);
+        expect(first['user1'], true);
+
+        // Second call — should return from cache.
+        final second = await repository.batchCheckFriendship(['user1']);
+        expect(second['user1'], true);
+
+        // Cloud Function called only once.
+        verify(() => mockFunctions.httpsCallable('batchCheckFriendship')).called(1);
+      });
+
+      test('only fetches cache-missing UIDs on partial cache hit', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult1 = MockHttpsCallableResult();
+        final mockResult2 = MockHttpsCallableResult();
+
+        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+            .thenReturn(mockCallable);
+
+        when(() => mockCallable.call({'userIds': ['user1']}))
+            .thenAnswer((_) async => mockResult1);
+        when(() => mockResult1.data).thenReturn({
+          'friendships': {'user1': true},
+        });
+
+        await repository.batchCheckFriendship(['user1']);
+
+        when(() => mockCallable.call({'userIds': ['user2']}))
+            .thenAnswer((_) async => mockResult2);
+        when(() => mockResult2.data).thenReturn({
+          'friendships': {'user2': false},
+        });
+
+        final result = await repository.batchCheckFriendship(['user1', 'user2']);
+
+        expect(result['user1'], true);
+        expect(result['user2'], false);
+        // user-1 from cache, user-2 from Cloud Function.
+        verify(() => mockCallable.call({'userIds': ['user1']})).called(1);
+        verify(() => mockCallable.call({'userIds': ['user2']})).called(1);
+      });
+    });
+
+    group('batchCheckFriendRequestStatus cache', () {
+      test('returns cached result on second call without hitting Cloud Function', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult();
+
+        when(() => mockFunctions.httpsCallable('batchCheckFriendRequestStatus'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'requestStatuses': {'user1': 'sentByMe'},
+        });
+
+        final first = await repository.batchCheckFriendRequestStatus(['user1']);
+        expect(first['user1'], FriendRequestStatus.sentByMe);
+
+        final second = await repository.batchCheckFriendRequestStatus(['user1']);
+        expect(second['user1'], FriendRequestStatus.sentByMe);
+
+        verify(() => mockFunctions.httpsCallable('batchCheckFriendRequestStatus')).called(1);
+      });
+    });
+
+    group('cache invalidation on mutating operations', () {
+      Future<void> _populateCaches() async {
+        // Use separate callables so the stubs don't interfere with each other.
+        final mockFriendshipCallable = MockHttpsCallable();
+        final mockFriendshipResult = MockHttpsCallableResult();
+
+        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+            .thenReturn(mockFriendshipCallable);
+        when(() => mockFriendshipCallable.call(any()))
+            .thenAnswer((_) async => mockFriendshipResult);
+        when(() => mockFriendshipResult.data).thenReturn({
+          'friendships': {'user1': true},
+        });
+
+        await repository.batchCheckFriendship(['user1']);
+
+        final mockStatusCallable = MockHttpsCallable();
+        final mockStatusResult = MockHttpsCallableResult();
+
+        when(() => mockFunctions.httpsCallable('batchCheckFriendRequestStatus'))
+            .thenReturn(mockStatusCallable);
+        when(() => mockStatusCallable.call(any()))
+            .thenAnswer((_) async => mockStatusResult);
+        when(() => mockStatusResult.data).thenReturn({
+          'requestStatuses': {'user1': 'none'},
+        });
+
+        await repository.batchCheckFriendRequestStatus(['user1']);
+      }
+
+      test('acceptFriendRequest clears friendship caches', () async {
+        await _populateCaches();
+
+        // Mock the Firestore update for acceptFriendRequest.
+        final mockCollRef = MockCollectionReference();
+        final mockDocRef = MockDocumentReference();
+
+        when(() => mockFirestore.collection('friendships')).thenReturn(mockCollRef);
+        when(() => mockCollRef.doc('friendship-123')).thenReturn(mockDocRef);
+        when(() => mockDocRef.update(any())).thenAnswer((_) async {});
+
+        await repository.acceptFriendRequest('friendship-123');
+
+        // After clearing the cache, a fresh Cloud Function call is required.
+        final mockCallable2 = MockHttpsCallable();
+        final mockResult2 = MockHttpsCallableResult();
+        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+            .thenReturn(mockCallable2);
+        when(() => mockCallable2.call(any())).thenAnswer((_) async => mockResult2);
+        when(() => mockResult2.data).thenReturn({
+          'friendships': {'user1': false},
+        });
+
+        await repository.batchCheckFriendship(['user1']);
+        verify(() => mockCallable2.call(any())).called(1);
+      });
+
+      test('declineFriendRequest clears friendship caches', () async {
+        await _populateCaches();
+
+        final mockCollRef = MockCollectionReference();
+        final mockDocRef = MockDocumentReference();
+
+        when(() => mockFirestore.collection('friendships')).thenReturn(mockCollRef);
+        when(() => mockCollRef.doc('friendship-456')).thenReturn(mockDocRef);
+        when(() => mockDocRef.update(any())).thenAnswer((_) async {});
+
+        await repository.declineFriendRequest('friendship-456');
+
+        final mockCallable2 = MockHttpsCallable();
+        final mockResult2 = MockHttpsCallableResult();
+        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+            .thenReturn(mockCallable2);
+        when(() => mockCallable2.call(any())).thenAnswer((_) async => mockResult2);
+        when(() => mockResult2.data).thenReturn({
+          'friendships': {'user1': false},
+        });
+
+        await repository.batchCheckFriendship(['user1']);
+        verify(() => mockCallable2.call(any())).called(1);
+      });
+
+      test('removeFriend clears friendship caches', () async {
+        await _populateCaches();
+
+        final mockCollRef = MockCollectionReference();
+        final mockDocRef = MockDocumentReference();
+
+        when(() => mockFirestore.collection('friendships')).thenReturn(mockCollRef);
+        when(() => mockCollRef.doc('friendship-789')).thenReturn(mockDocRef);
+        when(() => mockDocRef.delete()).thenAnswer((_) async {});
+
+        await repository.removeFriend('friendship-789');
+
+        final mockCallable2 = MockHttpsCallable();
+        final mockResult2 = MockHttpsCallableResult();
+        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
+            .thenReturn(mockCallable2);
+        when(() => mockCallable2.call(any())).thenAnswer((_) async => mockResult2);
+        when(() => mockResult2.data).thenReturn({
+          'friendships': {'user1': false},
+        });
+
+        await repository.batchCheckFriendship(['user1']);
+        verify(() => mockCallable2.call(any())).called(1);
+      });
+    });
+  });
 }

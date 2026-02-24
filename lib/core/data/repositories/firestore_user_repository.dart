@@ -21,6 +21,10 @@ class FirestoreUserRepository implements UserRepository {
 
   static const String _collection = 'users';
 
+  /// In-memory cache: uid → (user, fetchedAt). TTL: 10 minutes.
+  final Map<String, ({UserModel user, DateTime fetchedAt})> _userCache = {};
+  static const Duration _userCacheTtl = Duration(minutes: 10);
+
   FirestoreUserRepository({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
@@ -102,35 +106,60 @@ class FirestoreUserRepository implements UserRepository {
     if (uids.isEmpty) return [];
 
     try {
-      // Use Cloud Function for secure cross-user query
-      final callable = _functions.httpsCallable('getUsersByIds');
-      final result = await callable.call({
-        'userIds': uids,
-      });
+      final now = DateTime.now();
 
-      // Convert result.data to Map<String, dynamic> safely
-      final data = Map<String, dynamic>.from(result.data as Map);
-      final usersData = List<Map<String, dynamic>>.from(
-        (data['users'] as List).map((u) => Map<String, dynamic>.from(u as Map))
-      );
-
-      return usersData.map((userData) {
-        return UserModel(
-          uid: userData['uid'] as String,
-          email: userData['email'] as String,
-          displayName: userData['displayName'] as String?,
-          photoUrl: userData['photoUrl'] as String?,
-          firstName: userData['firstName'] as String?,
-          lastName: userData['lastName'] as String?,
-          isEmailVerified: false, // Not returned by Cloud Function
-          isAnonymous: false, // Not returned by Cloud Function
-        );
+      // Separate cache hits from misses
+      final missing = uids.where((id) {
+        final cached = _userCache[id];
+        return cached == null || now.difference(cached.fetchedAt) > _userCacheTtl;
       }).toList();
+
+      if (missing.isNotEmpty) {
+        // Use Cloud Function for secure cross-user query
+        final callable = _functions.httpsCallable('getUsersByIds');
+        final result = await callable.call({'userIds': missing});
+
+        // Convert result.data to Map<String, dynamic> safely
+        final data = Map<String, dynamic>.from(result.data as Map);
+        final usersData = List<Map<String, dynamic>>.from(
+          (data['users'] as List).map((u) => Map<String, dynamic>.from(u as Map))
+        );
+
+        for (final userData in usersData) {
+          final user = UserModel(
+            uid: userData['uid'] as String,
+            email: userData['email'] as String,
+            displayName: userData['displayName'] as String?,
+            photoUrl: userData['photoUrl'] as String?,
+            firstName: userData['firstName'] as String?,
+            lastName: userData['lastName'] as String?,
+            isEmailVerified: false, // Not returned by Cloud Function
+            isAnonymous: false, // Not returned by Cloud Function
+          );
+          _userCache[user.uid] = (user: user, fetchedAt: now);
+        }
+      }
+
+      // Return all requested uids from cache (preserves original order)
+      return uids
+          .where((id) => _userCache.containsKey(id))
+          .map((id) => _userCache[id]!.user)
+          .toList();
     } on FirebaseFunctionsException catch (e) {
       throw UserException('Failed to get users: ${e.message ?? e.code}');
     } catch (e) {
       throw UserException('Failed to get users: $e');
     }
+  }
+
+  /// Evicts a specific UID from the user profile cache (e.g., after a profile update).
+  void invalidateUserCache(String uid) {
+    _userCache.remove(uid);
+  }
+
+  /// Clears the entire user profile cache.
+  void clearUserCache() {
+    _userCache.clear();
   }
 
   @override

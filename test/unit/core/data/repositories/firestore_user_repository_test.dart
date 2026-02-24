@@ -919,6 +919,91 @@ void main() {
           )),
         );
       });
+
+      test('returns cached result on second call without hitting Cloud Function', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+
+        when(() => mockFunctions.httpsCallable('getUsersByIds'))
+            .thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'users': [
+            {
+              'uid': 'user-1',
+              'email': 'user1@example.com',
+              'displayName': 'User 1',
+              'photoUrl': null,
+              'firstName': 'User',
+              'lastName': 'One',
+            },
+          ],
+        });
+
+        // First call — hits Cloud Function.
+        final first = await repository.getUsersByIds(['user-1']);
+        expect(first.length, 1);
+
+        // Second call — should return from cache without calling Cloud Function again.
+        final second = await repository.getUsersByIds(['user-1']);
+        expect(second.length, 1);
+        expect(second.first.uid, 'user-1');
+
+        // Cloud Function should have been called exactly once.
+        verify(() => mockFunctions.httpsCallable('getUsersByIds')).called(1);
+      });
+
+      test('only fetches cache-missing UIDs on partial cache hit', () async {
+        final mockCallable = MockHttpsCallable();
+        final mockResult1 = MockHttpsCallableResult<Map<String, dynamic>>();
+        final mockResult2 = MockHttpsCallableResult<Map<String, dynamic>>();
+
+        when(() => mockFunctions.httpsCallable('getUsersByIds'))
+            .thenReturn(mockCallable);
+
+        // First call: fetch user-1 only.
+        when(() => mockCallable.call({'userIds': ['user-1']}))
+            .thenAnswer((_) async => mockResult1);
+        when(() => mockResult1.data).thenReturn({
+          'users': [
+            {
+              'uid': 'user-1',
+              'email': 'user1@example.com',
+              'displayName': 'User 1',
+              'photoUrl': null,
+              'firstName': null,
+              'lastName': null,
+            },
+          ],
+        });
+
+        await repository.getUsersByIds(['user-1']);
+
+        // Second call: user-1 is cached; only user-2 should be fetched.
+        when(() => mockCallable.call({'userIds': ['user-2']}))
+            .thenAnswer((_) async => mockResult2);
+        when(() => mockResult2.data).thenReturn({
+          'users': [
+            {
+              'uid': 'user-2',
+              'email': 'user2@example.com',
+              'displayName': 'User 2',
+              'photoUrl': null,
+              'firstName': null,
+              'lastName': null,
+            },
+          ],
+        });
+
+        final result = await repository.getUsersByIds(['user-1', 'user-2']);
+
+        expect(result.length, 2);
+        expect(result.map((u) => u.uid), containsAll(['user-1', 'user-2']));
+
+        // user-1 was served from cache; user-2 required a new Cloud Function call.
+        verify(() => mockCallable.call({'userIds': ['user-1']})).called(1);
+        verify(() => mockCallable.call({'userIds': ['user-2']})).called(1);
+      });
     });
 
     group('getHeadToHeadStats', () {

@@ -55,6 +55,19 @@ class FirestoreGroupRepository implements GroupRepository {
   }
 
   @override
+  Stream<GroupModel?> watchGroupById(String groupId) {
+    try {
+      return _firestore
+          .collection(_collection)
+          .doc(groupId)
+          .snapshots()
+          .map((doc) => doc.exists ? GroupModel.fromFirestore(doc) : null);
+    } catch (e) {
+      throw GroupException('Failed to watch group: $e');
+    }
+  }
+
+  @override
   Future<List<GroupModel>> getGroupsByIds(List<String> groupIds) async {
     if (groupIds.isEmpty) return [];
 
