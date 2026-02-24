@@ -402,13 +402,15 @@ void main() {
         expect(find.byType(ListView), findsOneWidget);
       });
 
-      testWidgets('displays result when user not found', (tester) async {
+      testWidgets('displays user-not-found message when user not found',
+          (tester) async {
         when(() => mockFriendBloc.state).thenReturn(
           const FriendState.searchResult(
             user: null,
             isFriend: false,
             hasPendingRequest: false,
             searchedEmail: 'notfound@example.com',
+            isSelfSearch: false,
           ),
         );
 
@@ -416,6 +418,28 @@ void main() {
         await tester.pump();
 
         expect(find.byType(ListView), findsOneWidget);
+        expect(find.byIcon(Icons.person_search), findsOneWidget);
+        expect(find.textContaining('notfound@example.com'), findsOneWidget);
+      });
+
+      testWidgets('displays cannot-add-yourself message when searching own email',
+          (tester) async {
+        when(() => mockFriendBloc.state).thenReturn(
+          const FriendState.searchResult(
+            user: null,
+            isFriend: false,
+            hasPendingRequest: false,
+            searchedEmail: 'test@example.com',
+            isSelfSearch: true,
+          ),
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        expect(find.byType(ListView), findsOneWidget);
+        expect(find.byIcon(Icons.info_outline), findsOneWidget);
+        expect(find.text('You cannot add yourself as a friend'), findsOneWidget);
       });
     });
 

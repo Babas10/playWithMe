@@ -31,6 +31,7 @@ class FriendState with _$FriendState {
     required bool hasPendingRequest,
     String? requestDirection,
     required String searchedEmail,
+    @Default(false) bool isSelfSearch,
   }) = FriendSearchResult;
 
   /// Status check result state

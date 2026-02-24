@@ -120,7 +120,7 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
                   loading: () {},
                   loaded: (friends, receivedRequests, sentRequests) {},
                   searchLoading: () {},
-                  searchResult: (user, isFriend, hasPendingRequest, requestDirection, searchedEmail) {},
+                  searchResult: (user, isFriend, hasPendingRequest, requestDirection, searchedEmail, isSelfSearch) {},
                   statusResult: (status) {},
                   error: (message) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -202,7 +202,7 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
                 );
               },
               searchLoading: () => const Center(child: CircularProgressIndicator()),
-              searchResult: (user, isFriend, hasPendingRequest, requestDirection, searchedEmail) =>
+              searchResult: (user, isFriend, hasPendingRequest, requestDirection, searchedEmail, isSelfSearch) =>
                   const Center(child: CircularProgressIndicator()),
               statusResult: (status) => const Center(child: CircularProgressIndicator()),
               error: (message) {
