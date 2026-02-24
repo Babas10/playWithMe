@@ -121,6 +121,32 @@ void main() {
       });
     });
 
+    group('watchGroupById', () {
+      test('emits group when document exists', () async {
+        final testGroup = GroupModel(
+          id: '',
+          name: 'Watched Group',
+          createdBy: 'user-123',
+          createdAt: DateTime(2024, 1, 1),
+          memberIds: const ['user-123'],
+        );
+        final groupId = await repository.createGroup(testGroup);
+
+        final stream = repository.watchGroupById(groupId);
+
+        await expectLater(
+          stream,
+          emits(isA<GroupModel>().having((g) => g.name, 'name', 'Watched Group')),
+        );
+      });
+
+      test('emits null when document does not exist', () async {
+        final stream = repository.watchGroupById('non-existent-id');
+
+        await expectLater(stream, emits(isNull));
+      });
+    });
+
     group('getGroupById', () {
       test('returns group when it exists', () async {
         final testGroup = GroupModel(

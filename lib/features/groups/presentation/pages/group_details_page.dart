@@ -1,4 +1,7 @@
 // Displays detailed information about a group including members and admin actions
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
@@ -81,6 +84,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   late final UserRepository _userRepository;
   late final FriendRepository _friendRepository;
   late final GameRepository _gameRepository;
+
   GroupModel? _group;
   List<UserModel> _members = [];
   Map<String, bool> _friendshipStatus = {};
@@ -89,6 +93,12 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   bool _isLoadingFriendships = true;
   String? _error;
 
+  /// Tracks which member UIDs were used for the last full data load.
+  /// Used to detect when new members join and trigger incremental re-fetches.
+  Set<String> _lastLoadedMemberIds = {};
+
+  StreamSubscription<GroupModel?>? _groupSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -96,42 +106,115 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     _userRepository = widget.userRepositoryOverride ?? sl<UserRepository>();
     _friendRepository = sl<FriendRepository>();
     _gameRepository = widget.gameRepositoryOverride ?? sl<GameRepository>();
-    _loadGroupDetails();
+    _subscribeToGroup();
   }
 
-  Future<void> _loadGroupDetails() async {
+  @override
+  void dispose() {
+    _groupSubscription?.cancel();
+    super.dispose();
+  }
+
+  /// Subscribes to the group document stream for real-time updates.
+  void _subscribeToGroup() {
     setState(() {
       _isLoading = true;
       _error = null;
     });
 
+    _groupSubscription?.cancel();
+    _groupSubscription = _groupRepository
+        .watchGroupById(widget.groupId)
+        .listen(
+          _onGroupUpdate,
+          onError: (Object e) {
+            if (mounted) {
+              setState(() {
+                _error = 'Failed to load group details: $e';
+                _isLoading = false;
+              });
+            }
+          },
+        );
+  }
+
+  /// Called each time the Firestore group document changes.
+  void _onGroupUpdate(GroupModel? group) {
+    if (!mounted) return;
+
+    if (group == null) {
+      setState(() {
+        _error = 'Group not found';
+        _isLoading = false;
+      });
+      return;
+    }
+
+    final newMemberIds = Set<String>.from(group.memberIds);
+    final memberIdsChanged = !setEquals(newMemberIds, _lastLoadedMemberIds);
+
+    setState(() {
+      _group = group;
+    });
+
+    // Only reload members + friendship data when the member set changes.
+    // On first load, _lastLoadedMemberIds is empty so this always triggers.
+    if (memberIdsChanged) {
+      _loadMembersAndFriendships(group);
+    }
+  }
+
+  /// Loads member profiles and friendship statuses in parallel using Future.wait.
+  Future<void> _loadMembersAndFriendships(GroupModel group) async {
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) return;
+
+    final currentUserId = authState.user.uid;
+    final otherMemberIds = group.memberIds
+        .where((id) => id != currentUserId)
+        .toList();
+
+    setState(() {
+      _isLoadingFriendships = true;
+    });
+
     try {
-      // Load group
-      final group = await _groupRepository.getGroupById(widget.groupId);
-      if (group == null) {
-        setState(() {
-          _error = 'Group not found';
-          _isLoading = false;
-        });
-        return;
-      }
+      // Fire all three network calls in parallel — the major performance win.
+      final results = await Future.wait<dynamic>([
+        _userRepository.getUsersByIds(group.memberIds),
+        _friendRepository.batchCheckFriendship(otherMemberIds),
+        otherMemberIds.isNotEmpty
+            ? _friendRepository.batchCheckFriendRequestStatus(otherMemberIds)
+            : Future<Map<String, FriendRequestStatus>>.value({}),
+      ]);
 
-      // Load members
-      final members = await _userRepository.getUsersByIds(group.memberIds);
+      if (!mounted) return;
 
       setState(() {
-        _group = group;
-        _members = members;
+        _members = results[0] as List<UserModel>;
+        _friendshipStatus = results[1] as Map<String, bool>;
+        _requestStatus = results[2] as Map<String, FriendRequestStatus>;
+        _lastLoadedMemberIds = Set<String>.from(group.memberIds);
         _isLoading = false;
+        _isLoadingFriendships = false;
       });
-
-      // Load friendship status for all members
-      await _loadFriendshipStatus();
     } catch (e) {
+      if (!mounted) return;
       setState(() {
-        _error = 'Failed to load group details: $e';
         _isLoading = false;
+        _isLoadingFriendships = false;
       });
+    }
+  }
+
+  /// Forces a full data refresh (used by pull-to-refresh).
+  Future<void> _refreshGroupDetails() async {
+    // Clear the member-id tracking so _onGroupUpdate always triggers a reload.
+    _lastLoadedMemberIds = {};
+    if (_group != null) {
+      await _loadMembersAndFriendships(_group!);
+    } else {
+      _subscribeToGroup();
     }
   }
 
@@ -140,6 +223,14 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
       await _friendRepository.sendFriendRequest(targetUserId);
 
       if (!mounted) return;
+
+      // Best-effort: invalidate the friendship status cache for this user so
+      // the next load reflects the newly sent request immediately.
+      try {
+        (_friendRepository as dynamic).invalidateFriendshipCacheForUser(targetUserId);
+      } catch (_) {
+        // Cache invalidation is best-effort; proceed regardless.
+      }
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -150,8 +241,10 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
         ),
       );
 
-      // Refresh friendship status
-      await _loadFriendshipStatus();
+      // Reload friendship statuses to reflect the sent request.
+      if (_group != null) {
+        await _loadMembersAndFriendships(_group!);
+      }
     } catch (e) {
       if (!mounted) return;
 
@@ -163,71 +256,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
           duration: const Duration(seconds: 3),
         ),
       );
-    }
-  }
-
-  Future<void> _loadFriendshipStatus() async {
-    if (_members.isEmpty) return;
-
-    final authState = context.read<AuthenticationBloc>().state;
-    if (authState is! AuthenticationAuthenticated) return;
-
-    final currentUserId = authState.user.uid;
-
-    // Filter out current user from members list
-    final otherMembers = _members
-        .where((member) => member.uid != currentUserId)
-        .map((member) => member.uid)
-        .toList();
-
-    if (otherMembers.isEmpty) {
-      setState(() {
-        _isLoadingFriendships = false;
-      });
-      return;
-    }
-
-    setState(() {
-      _isLoadingFriendships = true;
-    });
-
-    try {
-      // Batch check friendships
-      final friendships =
-          await _friendRepository.batchCheckFriendship(otherMembers);
-
-      // Get list of non-friends to check request status
-      final nonFriends = otherMembers
-          .where((memberId) => !(friendships[memberId] ?? false))
-          .toList();
-
-      // Batch check request status for non-friends only
-      final Map<String, FriendRequestStatus> requestStatuses = {};
-      if (nonFriends.isNotEmpty) {
-        try {
-          final batchRequestStatuses =
-              await _friendRepository.batchCheckFriendRequestStatus(nonFriends);
-          requestStatuses.addAll(batchRequestStatuses);
-        } catch (e) {
-          // If batch check fails, default all non-friends to none
-          for (final memberId in nonFriends) {
-            requestStatuses[memberId] = FriendRequestStatus.none;
-          }
-        }
-      }
-
-      setState(() {
-        _friendshipStatus = friendships;
-        _requestStatus = requestStatuses;
-        _isLoadingFriendships = false;
-      });
-    } catch (e) {
-      // On error, default to empty status
-      setState(() {
-        _friendshipStatus = {};
-        _requestStatus = {};
-        _isLoadingFriendships = false;
-      });
     }
   }
 
@@ -258,14 +286,13 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     return BlocListener<GroupMemberBloc, GroupMemberState>(
       listener: (context, state) {
         if (state is MemberPromotedSuccess) {
+          // The Firestore stream will automatically reflect the admin change.
           _showSuccessMessage('Member promoted to admin');
-          _loadGroupDetails();
         } else if (state is MemberDemotedSuccess) {
           _showSuccessMessage('Member demoted to regular member');
-          _loadGroupDetails();
         } else if (state is MemberRemovedSuccess) {
+          // The Firestore stream will push the updated memberIds.
           _showSuccessMessage('Member removed from group');
-          _loadGroupDetails();
         } else if (state is UserLeftGroupSuccess) {
           _showSuccessMessage('You have left the group');
           // Navigate back to group list
@@ -379,7 +406,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: _loadGroupDetails,
+              onPressed: _subscribeToGroup,
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
             ),
@@ -397,7 +424,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     final currentUserId = authState.user.uid;
 
     return RefreshIndicator(
-      onRefresh: _loadGroupDetails,
+      onRefresh: _refreshGroupDetails,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
@@ -476,7 +503,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                       currentUserId: currentUserId,
                       isFriend: isFriend,
                       requestStatus: requestStatus,
-                      onRefresh: _loadFriendshipStatus,
+                      onRefresh: () async {
+                        if (_group != null) await _loadMembersAndFriendships(_group!);
+                      },
                       onSendFriendRequest: _sendFriendRequest,
                     );
                   },
@@ -570,8 +599,11 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
         ),
       ),
     ).then((_) {
-      // Refresh group details after returning from invite page
-      _loadGroupDetails();
+      // The Firestore stream will automatically reflect any new members.
+      // Force a friendship-status refresh so newly invited members appear correctly.
+      if (mounted && _group != null) {
+        _loadMembersAndFriendships(_group!);
+      }
     });
   }
 
