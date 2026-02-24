@@ -34,6 +34,7 @@ mixin _$FriendState {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -57,6 +58,7 @@ mixin _$FriendState {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -80,6 +82,7 @@ mixin _$FriendState {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -203,6 +206,7 @@ class _$FriendInitialImpl implements FriendInitial {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -230,6 +234,7 @@ class _$FriendInitialImpl implements FriendInitial {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -257,6 +262,7 @@ class _$FriendInitialImpl implements FriendInitial {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -382,6 +388,7 @@ class _$FriendLoadingImpl implements FriendLoading {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -409,6 +416,7 @@ class _$FriendLoadingImpl implements FriendLoading {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -436,6 +444,7 @@ class _$FriendLoadingImpl implements FriendLoading {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -645,6 +654,7 @@ class _$FriendLoadedImpl implements FriendLoaded {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -672,6 +682,7 @@ class _$FriendLoadedImpl implements FriendLoaded {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -699,6 +710,7 @@ class _$FriendLoadedImpl implements FriendLoaded {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -839,6 +851,7 @@ class _$FriendSearchLoadingImpl implements FriendSearchLoading {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -866,6 +879,7 @@ class _$FriendSearchLoadingImpl implements FriendSearchLoading {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -893,6 +907,7 @@ class _$FriendSearchLoadingImpl implements FriendSearchLoading {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -973,6 +988,7 @@ abstract class _$$FriendSearchResultImplCopyWith<$Res> {
     bool hasPendingRequest,
     String? requestDirection,
     String searchedEmail,
+    bool isSelfSearch,
   });
 
   $UserEntityCopyWith<$Res>? get user;
@@ -997,6 +1013,7 @@ class __$$FriendSearchResultImplCopyWithImpl<$Res>
     Object? hasPendingRequest = null,
     Object? requestDirection = freezed,
     Object? searchedEmail = null,
+    Object? isSelfSearch = null,
   }) {
     return _then(
       _$FriendSearchResultImpl(
@@ -1020,6 +1037,10 @@ class __$$FriendSearchResultImplCopyWithImpl<$Res>
             ? _value.searchedEmail
             : searchedEmail // ignore: cast_nullable_to_non_nullable
                   as String,
+        isSelfSearch: null == isSelfSearch
+            ? _value.isSelfSearch
+            : isSelfSearch // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -1048,6 +1069,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
     required this.hasPendingRequest,
     this.requestDirection,
     required this.searchedEmail,
+    this.isSelfSearch = false,
   });
 
   @override
@@ -1060,10 +1082,13 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
   final String? requestDirection;
   @override
   final String searchedEmail;
+  @override
+  @JsonKey()
+  final bool isSelfSearch;
 
   @override
   String toString() {
-    return 'FriendState.searchResult(user: $user, isFriend: $isFriend, hasPendingRequest: $hasPendingRequest, requestDirection: $requestDirection, searchedEmail: $searchedEmail)';
+    return 'FriendState.searchResult(user: $user, isFriend: $isFriend, hasPendingRequest: $hasPendingRequest, requestDirection: $requestDirection, searchedEmail: $searchedEmail, isSelfSearch: $isSelfSearch)';
   }
 
   @override
@@ -1079,7 +1104,9 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
             (identical(other.requestDirection, requestDirection) ||
                 other.requestDirection == requestDirection) &&
             (identical(other.searchedEmail, searchedEmail) ||
-                other.searchedEmail == searchedEmail));
+                other.searchedEmail == searchedEmail) &&
+            (identical(other.isSelfSearch, isSelfSearch) ||
+                other.isSelfSearch == isSelfSearch));
   }
 
   @override
@@ -1090,6 +1117,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
     hasPendingRequest,
     requestDirection,
     searchedEmail,
+    isSelfSearch,
   );
 
   /// Create a copy of FriendState
@@ -1121,6 +1149,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -1133,6 +1162,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       hasPendingRequest,
       requestDirection,
       searchedEmail,
+      isSelfSearch,
     );
   }
 
@@ -1154,6 +1184,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -1166,6 +1197,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       hasPendingRequest,
       requestDirection,
       searchedEmail,
+      isSelfSearch,
     );
   }
 
@@ -1187,6 +1219,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -1201,6 +1234,7 @@ class _$FriendSearchResultImpl implements FriendSearchResult {
         hasPendingRequest,
         requestDirection,
         searchedEmail,
+        isSelfSearch,
       );
     }
     return orElse();
@@ -1263,6 +1297,7 @@ abstract class FriendSearchResult implements FriendState {
     required final bool hasPendingRequest,
     final String? requestDirection,
     required final String searchedEmail,
+    final bool isSelfSearch,
   }) = _$FriendSearchResultImpl;
 
   UserEntity? get user;
@@ -1270,6 +1305,7 @@ abstract class FriendSearchResult implements FriendState {
   bool get hasPendingRequest;
   String? get requestDirection;
   String get searchedEmail;
+  bool get isSelfSearch;
 
   /// Create a copy of FriendState
   /// with the given fields replaced by the non-null parameter values.
@@ -1378,6 +1414,7 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -1405,6 +1442,7 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -1432,6 +1470,7 @@ class _$FriendStatusResultImpl implements FriendStatusResult {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -1594,6 +1633,7 @@ class _$FriendErrorImpl implements FriendError {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -1621,6 +1661,7 @@ class _$FriendErrorImpl implements FriendError {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -1648,6 +1689,7 @@ class _$FriendErrorImpl implements FriendError {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,
@@ -1812,6 +1854,7 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )
     searchResult,
     required TResult Function(FriendshipStatusResult status) statusResult,
@@ -1839,6 +1882,7 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult? Function(FriendshipStatusResult status)? statusResult,
@@ -1866,6 +1910,7 @@ class _$FriendActionSuccessImpl implements FriendActionSuccess {
       bool hasPendingRequest,
       String? requestDirection,
       String searchedEmail,
+      bool isSelfSearch,
     )?
     searchResult,
     TResult Function(FriendshipStatusResult status)? statusResult,

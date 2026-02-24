@@ -510,7 +510,7 @@ void main() {
       );
 
       blocTest<FriendBloc, FriendState>(
-        'emits [searchLoading, searchResult] with null user when searching own email',
+        'emits [searchLoading, searchResult] with isSelfSearch true when searching own email',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
           return friendBloc;
@@ -526,6 +526,35 @@ void main() {
             hasPendingRequest: false,
             requestDirection: null,
             searchedEmail: 'test@example.com',
+            isSelfSearch: true,
+          ),
+        ],
+      );
+
+      blocTest<FriendBloc, FriendState>(
+        'emits [searchLoading, searchResult] with isSelfSearch false when user not found',
+        build: () {
+          when(() => mockAuthRepository.currentUser).thenReturn(testUser);
+          when(() => mockFriendRepository.searchUserByEmail('unknown@example.com'))
+              .thenAnswer((_) async => UserSearchResult(
+                    user: null,
+                    isFriend: false,
+                    hasPendingRequest: false,
+                  ));
+          return friendBloc;
+        },
+        act: (bloc) => bloc.add(
+          const FriendEvent.searchRequested(email: 'unknown@example.com'),
+        ),
+        expect: () => [
+          const FriendState.searchLoading(),
+          const FriendState.searchResult(
+            user: null,
+            isFriend: false,
+            hasPendingRequest: false,
+            requestDirection: null,
+            searchedEmail: 'unknown@example.com',
+            isSelfSearch: false,
           ),
         ],
       );

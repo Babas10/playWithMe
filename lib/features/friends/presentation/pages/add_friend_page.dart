@@ -181,7 +181,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
               _buildEmptyState(context, l10n),
           searchLoading: () => const Center(child: CircularProgressIndicator()),
           searchResult: (user, isFriend, hasPendingRequest, requestDirection,
-              searchedEmail) {
+              searchedEmail, isSelfSearch) {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -191,6 +191,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   hasPendingRequest: hasPendingRequest,
                   requestDirection: requestDirection,
                   searchedEmail: searchedEmail,
+                  isSelfSearch: isSelfSearch,
                   onSendRequest: user != null
                       ? () {
                           context.read<FriendBloc>().add(
