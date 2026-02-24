@@ -199,6 +199,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
           hasPendingRequest: false,
           requestDirection: null,
           searchedEmail: event.email,
+          isSelfSearch: true,
         ));
         return;
       }
