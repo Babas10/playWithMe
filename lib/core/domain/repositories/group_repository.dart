@@ -1,8 +1,11 @@
 import '../../data/models/group_model.dart';
 
 abstract class GroupRepository {
-  /// Get group by ID
+  /// Get group by ID (one-time fetch)
   Future<GroupModel?> getGroupById(String groupId);
+
+  /// Watch group by ID as a real-time stream (snapshots)
+  Stream<GroupModel?> watchGroupById(String groupId);
 
   /// Get multiple groups by IDs
   Future<List<GroupModel>> getGroupsByIds(List<String> groupIds);

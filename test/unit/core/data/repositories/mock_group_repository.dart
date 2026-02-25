@@ -50,6 +50,11 @@ class MockGroupRepository implements GroupRepository {
   }
 
   @override
+  Stream<GroupModel?> watchGroupById(String groupId) {
+    return _groupsController.stream.map((_) => _groups[groupId]);
+  }
+
+  @override
   Future<List<GroupModel>> getGroupsByIds(List<String> groupIds) async {
     return groupIds
         .map((id) => _groups[id])

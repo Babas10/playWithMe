@@ -1,4 +1,6 @@
 // Widget tests for GroupDetailsPage verifying UI rendering and user interactions.
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -146,6 +148,9 @@ void main() {
     );
 
     // Setup default repository responses
+    // The page now uses watchGroupById (stream) instead of getGroupById.
+    when(() => mockGroupRepository.watchGroupById(testGroupId))
+        .thenAnswer((_) => Stream.value(testGroup));
     when(() => mockGroupRepository.getGroupById(testGroupId))
         .thenAnswer((_) async => testGroup);
     when(() => mockUserRepository.getUsersByIds(any()))
@@ -228,22 +233,20 @@ void main() {
       });
 
       testWidgets('shows loading indicator initially', (tester) async {
-        // Delay the group loading - use a completer so we can control when it completes
-        when(() => mockGroupRepository.getGroupById(testGroupId))
-            .thenAnswer((_) async {
-          await Future.delayed(const Duration(seconds: 1));
-          return testGroup;
-        });
+        // Use a StreamController that never emits to keep the page in loading state.
+        final streamController = StreamController<GroupModel?>();
+        when(() => mockGroupRepository.watchGroupById(testGroupId))
+            .thenAnswer((_) => streamController.stream);
 
         await tester.pumpWidget(createTestWidget());
-        // Pump frames but don't settle (async still running)
         await tester.pump();
-        await tester.pump(const Duration(milliseconds: 100));
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-        // Now complete the future to avoid pending timer warnings
-        await tester.pumpAndSettle(const Duration(seconds: 2));
+        // Clean up: emit a value and close the controller.
+        streamController.add(testGroup);
+        await tester.pumpAndSettle();
+        await streamController.close();
       });
 
       testWidgets('shows group name after loading', (tester) async {
@@ -288,8 +291,9 @@ void main() {
 
     group('Error State', () {
       testWidgets('shows error message when group not found', (tester) async {
-        when(() => mockGroupRepository.getGroupById(testGroupId))
-            .thenAnswer((_) async => null);
+        // Stream emits null to signal group not found.
+        when(() => mockGroupRepository.watchGroupById(testGroupId))
+            .thenAnswer((_) => Stream.value(null));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -299,8 +303,9 @@ void main() {
 
       testWidgets('shows error state with retry button on load failure',
           (tester) async {
-        when(() => mockGroupRepository.getGroupById(testGroupId))
-            .thenThrow(Exception('Network error'));
+        // Stream emits an error to trigger the error state.
+        when(() => mockGroupRepository.watchGroupById(testGroupId))
+            .thenAnswer((_) => Stream.error(Exception('Network error')));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -311,17 +316,15 @@ void main() {
       });
 
       testWidgets('retry button reloads group details', (tester) async {
-        // First call throws error, second call returns data
+        // First subscription: error stream. Second subscription: success stream.
         var callCount = 0;
-        when(() => mockGroupRepository.getGroupById(testGroupId)).thenAnswer(
-          (_) async {
-            callCount++;
-            if (callCount == 1) {
-              throw Exception('Network error');
-            }
-            return testGroup;
-          },
-        );
+        when(() => mockGroupRepository.watchGroupById(testGroupId)).thenAnswer((_) {
+          callCount++;
+          if (callCount == 1) {
+            return Stream.error(Exception('Network error'));
+          }
+          return Stream.value(testGroup);
+        });
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -329,7 +332,7 @@ void main() {
         // Should show error state
         expect(find.text('Retry'), findsOneWidget);
 
-        // Tap retry
+        // Tap retry — this calls _subscribeToGroup() which re-subscribes
         await tester.tap(find.text('Retry'));
         await tester.pumpAndSettle();
 
