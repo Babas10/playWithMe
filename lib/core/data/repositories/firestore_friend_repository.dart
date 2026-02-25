@@ -14,6 +14,14 @@ class FirestoreFriendRepository implements FriendRepository {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
 
+  /// Cache for batchCheckFriendship results: uid → (isFriend, fetchedAt). TTL: 5 minutes.
+  final Map<String, ({bool isFriend, DateTime fetchedAt})> _friendshipCache = {};
+
+  /// Cache for batchCheckFriendRequestStatus results: uid → (status, fetchedAt). TTL: 5 minutes.
+  final Map<String, ({FriendRequestStatus status, DateTime fetchedAt})> _requestStatusCache = {};
+
+  static const Duration _friendshipCacheTtl = Duration(minutes: 5);
+
   FirestoreFriendRepository({
     required FirebaseFunctions functions,
     required FirebaseFirestore firestore,
@@ -49,6 +57,10 @@ class FirestoreFriendRepository implements FriendRepository {
         'status': 'accepted',
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      // Accepting a request changes friendship status — clear caches
+      _friendshipCache.clear();
+      _requestStatusCache.clear();
     } on FriendshipException {
       rethrow;
     } on FirebaseException catch (e) {
@@ -83,6 +95,10 @@ class FirestoreFriendRepository implements FriendRepository {
         'status': 'declined',
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      // Declining a request changes status — clear caches
+      _friendshipCache.clear();
+      _requestStatusCache.clear();
     } on FriendshipException {
       rethrow;
     } on FirebaseException catch (e) {
@@ -114,6 +130,10 @@ class FirestoreFriendRepository implements FriendRepository {
       // Delete friendship document
       // Security rules ensure only initiator or recipient can delete
       await _firestore.collection('friendships').doc(friendshipId).delete();
+
+      // Removing a friend changes friendship status — clear caches
+      _friendshipCache.clear();
+      _requestStatusCache.clear();
     } on FriendshipException {
       rethrow;
     } on FirebaseException catch (e) {
@@ -403,15 +423,35 @@ class FirestoreFriendRepository implements FriendRepository {
         );
       }
 
-      // Call Cloud Function (Story 11.17)
-      final callable = _functions.httpsCallable('batchCheckFriendship');
-      final result = await callable.call({'userIds': userIds});
+      final now = DateTime.now();
 
-      final data = Map<String, dynamic>.from(result.data as Map);
-      final friendships = Map<String, dynamic>.from(data['friendships'] as Map);
+      // Separate cache hits from misses
+      final missing = userIds.where((id) {
+        final cached = _friendshipCache[id];
+        return cached == null || now.difference(cached.fetchedAt) > _friendshipCacheTtl;
+      }).toList();
 
-      // Convert to Map<String, bool>
-      return friendships.map((key, value) => MapEntry(key, value as bool));
+      if (missing.isNotEmpty) {
+        // Call Cloud Function (Story 11.17) for cache misses only
+        final callable = _functions.httpsCallable('batchCheckFriendship');
+        final result = await callable.call({'userIds': missing});
+
+        final data = Map<String, dynamic>.from(result.data as Map);
+        final friendships = Map<String, dynamic>.from(data['friendships'] as Map);
+
+        for (final entry in friendships.entries) {
+          _friendshipCache[entry.key] = (
+            isFriend: entry.value as bool,
+            fetchedAt: now,
+          );
+        }
+      }
+
+      // Return results for all requested userIds from cache
+      return {
+        for (final id in userIds)
+          if (_friendshipCache.containsKey(id)) id: _friendshipCache[id]!.isFriend,
+      };
     } on FirebaseFunctionsException catch (e) {
       throw _handleError(e);
     } on FriendshipException {
@@ -516,32 +556,47 @@ class FirestoreFriendRepository implements FriendRepository {
         );
       }
 
-      // Call Cloud Function (Story 11.19)
-      final callable = _functions.httpsCallable('batchCheckFriendRequestStatus');
-      final result = await callable.call({'userIds': userIds});
+      final now = DateTime.now();
 
-      final data = Map<String, dynamic>.from(result.data as Map);
-      final requestStatuses =
-          Map<String, dynamic>.from(data['requestStatuses'] as Map);
+      // Separate cache hits from misses
+      final missing = userIds.where((id) {
+        final cached = _requestStatusCache[id];
+        return cached == null || now.difference(cached.fetchedAt) > _friendshipCacheTtl;
+      }).toList();
 
-      // Convert string values to FriendRequestStatus enum
-      return requestStatuses.map((key, value) {
-        final statusString = value as String;
-        FriendRequestStatus status;
-        switch (statusString) {
-          case 'sentByMe':
-            status = FriendRequestStatus.sentByMe;
-            break;
-          case 'receivedFromThem':
-            status = FriendRequestStatus.receivedFromThem;
-            break;
-          case 'none':
-          default:
-            status = FriendRequestStatus.none;
-            break;
+      if (missing.isNotEmpty) {
+        // Call Cloud Function (Story 11.19) for cache misses only
+        final callable = _functions.httpsCallable('batchCheckFriendRequestStatus');
+        final result = await callable.call({'userIds': missing});
+
+        final data = Map<String, dynamic>.from(result.data as Map);
+        final requestStatuses =
+            Map<String, dynamic>.from(data['requestStatuses'] as Map);
+
+        for (final entry in requestStatuses.entries) {
+          final statusString = entry.value as String;
+          FriendRequestStatus status;
+          switch (statusString) {
+            case 'sentByMe':
+              status = FriendRequestStatus.sentByMe;
+              break;
+            case 'receivedFromThem':
+              status = FriendRequestStatus.receivedFromThem;
+              break;
+            case 'none':
+            default:
+              status = FriendRequestStatus.none;
+              break;
+          }
+          _requestStatusCache[entry.key] = (status: status, fetchedAt: now);
         }
-        return MapEntry(key, status);
-      });
+      }
+
+      // Return results for all requested userIds from cache
+      return {
+        for (final id in userIds)
+          if (_requestStatusCache.containsKey(id)) id: _requestStatusCache[id]!.status,
+      };
     } on FirebaseFunctionsException catch (e) {
       throw _handleError(e);
     } on FriendshipException {
@@ -549,6 +604,18 @@ class FirestoreFriendRepository implements FriendRepository {
     } catch (e) {
       throw FriendshipException('Failed to check friend request statuses: $e');
     }
+  }
+
+  /// Clears friendship status caches for a specific user (e.g., after sending a friend request).
+  void invalidateFriendshipCacheForUser(String userId) {
+    _friendshipCache.remove(userId);
+    _requestStatusCache.remove(userId);
+  }
+
+  /// Clears all friendship status caches.
+  void clearFriendshipCache() {
+    _friendshipCache.clear();
+    _requestStatusCache.clear();
   }
 
   @override
