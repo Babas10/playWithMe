@@ -57,7 +57,7 @@ void main() {
     group('Firebase Project IDs', () {
       test('should return correct Firebase project ID for development', () {
         EnvironmentConfig.setEnvironment(Environment.dev);
-        expect(EnvironmentConfig.firebaseProjectId, 'playwithme-dev');
+        expect(EnvironmentConfig.firebaseProjectId, 'gatherli-dev');
       });
 
       test('should return correct Firebase project ID for staging', () {
@@ -67,7 +67,7 @@ void main() {
 
       test('should return correct Firebase project ID for production', () {
         EnvironmentConfig.setEnvironment(Environment.prod);
-        expect(EnvironmentConfig.firebaseProjectId, 'playwithme-prod');
+        expect(EnvironmentConfig.firebaseProjectId, 'gatherli-prod');
       });
     });
 
@@ -94,7 +94,7 @@ void main() {
         expect(EnvironmentConfig.environment, Environment.prod);
         expect(EnvironmentConfig.isProduction, true);
         expect(EnvironmentConfig.environmentName, 'Production');
-        expect(EnvironmentConfig.firebaseProjectId, 'playwithme-prod');
+        expect(EnvironmentConfig.firebaseProjectId, 'gatherli-prod');
         expect(EnvironmentConfig.appSuffix, '');
       });
     });
