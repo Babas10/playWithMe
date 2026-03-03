@@ -55,16 +55,16 @@ class AppLinksDeepLinkService implements DeepLinkService {
     debugPrint('[DeepLinkService] Parsing URI: $uri');
     final segments = uri.pathSegments;
 
-    // HTTPS: https://playwithme.app/invite/{token}
-    //   host=playwithme.app, pathSegments=[invite, token]
+    // HTTPS: https://gatherli.org/invite/{token}
+    //   host=gatherli.org, pathSegments=[invite, token]
     if (segments.length == 2 && segments[0] == 'invite') {
       final token = segments[1];
       if (token.isNotEmpty) return token;
     }
 
-    // Custom scheme: playwithme://invite/{token}
+    // Custom scheme: gatherli://invite/{token}
     //   host=invite, pathSegments=[token]
-    if (uri.scheme == 'playwithme' &&
+    if (uri.scheme == 'gatherli' &&
         uri.host == 'invite' &&
         segments.length == 1) {
       final token = segments[0];
