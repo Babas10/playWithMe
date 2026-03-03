@@ -10,14 +10,14 @@ void main(List<String> arguments) {
   if (arguments.isEmpty) {
     print('Usage: dart tools/generate_firebase_config.dart <environment>');
     print('Example: dart tools/generate_firebase_config.dart dev');
-    print('Available environments: dev, stg, prod');
+    print('Available environments: dev, prod');
     exit(1);
   }
 
   final environment = arguments[0];
-  if (!['dev', 'stg', 'prod'].contains(environment)) {
+  if (!['dev', 'prod'].contains(environment)) {
     print('Error: Invalid environment "$environment"');
-    print('Available environments: dev, stg, prod');
+    print('Available environments: dev, prod');
     exit(1);
   }
 
@@ -157,12 +157,10 @@ String _capitalize(String text) {
 String _getDisplayName(String environment) {
   switch (environment) {
     case 'dev':
-      return 'PlayWithMe (Development)';
-    case 'stg':
-      return 'PlayWithMe (Staging)';
+      return 'Gatherli (Development)';
     case 'prod':
-      return 'PlayWithMe';
+      return 'Gatherli';
     default:
-      return 'PlayWithMe ($environment)';
+      return 'Gatherli ($environment)';
   }
 }

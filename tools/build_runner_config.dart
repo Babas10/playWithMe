@@ -18,8 +18,6 @@ void main(List<String> arguments) {
   if (flavor != null) {
     if (flavor.toLowerCase().contains('dev')) {
       environment = 'dev';
-    } else if (flavor.toLowerCase().contains('stg')) {
-      environment = 'stg';
     } else if (flavor.toLowerCase().contains('prod')) {
       environment = 'prod';
     }
