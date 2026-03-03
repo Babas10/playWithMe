@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
-        android:label="play_with_me"
+        android:label="Gatherli"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -46,7 +46,7 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
                     android:scheme="https"
-                    android:host="playwithme.app"
+                    android:host="gatherli.org"
                     android:pathPrefix="/invite"/>
             </intent-filter>
 
@@ -56,7 +56,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
-                    android:scheme="playwithme"
+                    android:scheme="gatherli"
                     android:host="invite"/>
             </intent-filter>
         </activity>
