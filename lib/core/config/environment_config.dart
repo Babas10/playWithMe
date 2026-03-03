@@ -27,11 +27,11 @@ class EnvironmentConfig {
   static String get firebaseProjectId {
     switch (_environment) {
       case Environment.dev:
-        return 'playwithme-dev';
+        return 'gatherli-dev';
       case Environment.stg:
         return 'playwithme-stg';
       case Environment.prod:
-        return 'playwithme-prod';
+        return 'gatherli-prod';
     }
   }
 
