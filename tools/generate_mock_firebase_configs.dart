@@ -5,7 +5,7 @@
 ///
 /// Usage: dart tools/generate_mock_firebase_configs.dart
 ///
-/// Creates mock config files for dev, stg, and prod environments with fake but
+/// Creates mock config files for dev and prod environments with fake but
 /// structurally valid Firebase configuration data.
 
 import 'dart:io';
@@ -15,12 +15,10 @@ void main() {
 
   try {
     generateMockDevConfig();
-    generateMockStgConfig();
     generateMockProdConfig();
 
     print('✅ Mock Firebase configurations generated successfully!');
     print('   - lib/core/config/firebase_config_dev.dart');
-    print('   - lib/core/config/firebase_config_stg.dart');
     print('   - lib/core/config/firebase_config_prod.dart');
     print('');
     print('🔒 Note: These are MOCK configurations for CI testing only.');
@@ -58,64 +56,20 @@ class FirebaseConfigDev extends FirebaseConfigBase {
   String get messagingSenderId => '123456789';
 
   @override
-  String get androidPackageName => 'com.playwithme.play_with_me.dev';
+  String get androidPackageName => 'com.gatherli.app.dev';
 
   @override
-  String get iosBundleId => 'com.playwithme.playWithMe.dev';
+  String get iosBundleId => 'com.gatherli.app.dev';
 
   @override
   String get environment => 'dev';
 
   @override
-  String get displayName => 'PlayWithMe (Mock Dev)';
+  String get displayName => 'Gatherli (Mock Dev)';
 }
 ''';
 
   final file = File('lib/core/config/firebase_config_dev.dart');
-  file.writeAsStringSync(content);
-}
-
-void generateMockStgConfig() {
-  final content = '''// MOCK FILE - FOR CI TESTING ONLY
-// This is a mock Firebase configuration file generated for CI environments
-// Real configurations are securely excluded from the repository
-
-import 'firebase_config_base.dart';
-
-class FirebaseConfigStg extends FirebaseConfigBase {
-  @override
-  String get projectId => 'mock-project-stg';
-
-  @override
-  String get storageBucket => 'mock-project-stg.firebasestorage.app';
-
-  @override
-  String get androidAppId => '1:123456789:android:stgdef123456789';
-
-  @override
-  String get iosAppId => '1:123456789:ios:stgdef123456789';
-
-  @override
-  String get apiKey => 'mock-api-key-for-ci-staging';
-
-  @override
-  String get messagingSenderId => '123456789';
-
-  @override
-  String get androidPackageName => 'com.playwithme.play_with_me.stg';
-
-  @override
-  String get iosBundleId => 'com.playwithme.playWithMe.stg';
-
-  @override
-  String get environment => 'stg';
-
-  @override
-  String get displayName => 'PlayWithMe (Mock Staging)';
-}
-''';
-
-  final file = File('lib/core/config/firebase_config_stg.dart');
   file.writeAsStringSync(content);
 }
 
@@ -146,16 +100,16 @@ class FirebaseConfigProd extends FirebaseConfigBase {
   String get messagingSenderId => '123456789';
 
   @override
-  String get androidPackageName => 'com.playwithme.play_with_me';
+  String get androidPackageName => 'com.gatherli.app';
 
   @override
-  String get iosBundleId => 'com.playwithme.playWithMe';
+  String get iosBundleId => 'com.gatherli.app';
 
   @override
   String get environment => 'prod';
 
   @override
-  String get displayName => 'PlayWithMe (Mock Production)';
+  String get displayName => 'Gatherli (Mock Production)';
 }
 ''';
 
