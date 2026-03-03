@@ -56,10 +56,10 @@ class FirebaseConfigDev extends FirebaseConfigBase {
   String get messagingSenderId => '123456789';
 
   @override
-  String get androidPackageName => 'com.gatherli.app.dev';
+  String get androidPackageName => 'org.gatherli.app.dev';
 
   @override
-  String get iosBundleId => 'com.gatherli.app.dev';
+  String get iosBundleId => 'org.gatherli.app.dev';
 
   @override
   String get environment => 'dev';
@@ -100,10 +100,10 @@ class FirebaseConfigProd extends FirebaseConfigBase {
   String get messagingSenderId => '123456789';
 
   @override
-  String get androidPackageName => 'com.gatherli.app';
+  String get androidPackageName => 'org.gatherli.app';
 
   @override
-  String get iosBundleId => 'com.gatherli.app';
+  String get iosBundleId => 'org.gatherli.app';
 
   @override
   String get environment => 'prod';
