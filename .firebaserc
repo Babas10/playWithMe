@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "playwithme-stg"
+    "default": "gatherli-dev",
+    "dev": "gatherli-dev",
+    "prod": "gatherli-prod"
   }
 }

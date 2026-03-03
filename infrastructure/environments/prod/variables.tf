@@ -1,13 +1,13 @@
 variable "project_id" {
   description = "The Firebase project ID for production environment"
   type        = string
-  default     = "playwithme-prod"
+  default     = "gatherli-prod"
 }
 
 variable "project_display_name" {
   description = "The display name for the Firebase project"
   type        = string
-  default     = "PlayWithMe - Production"
+  default     = "Gatherli - Production"
 }
 
 variable "environment" {
