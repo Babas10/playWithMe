@@ -27,19 +27,6 @@ void main() {
         expect(options.authDomain, equals(CITestHelper.getExpectedAuthDomain(Environment.dev)));
       });
 
-      test('returns staging options when environment is stg', () {
-        // Arrange
-        EnvironmentConfig.setEnvironment(Environment.stg);
-
-        // Act
-        final options = FirebaseOptionsProvider.getFirebaseOptions();
-
-        // Assert
-        expect(options.projectId, equals(CITestHelper.getExpectedProjectId(Environment.stg)));
-        expect(options.storageBucket, equals(CITestHelper.getExpectedStorageBucket(Environment.stg)));
-        expect(options.authDomain, equals(CITestHelper.getExpectedAuthDomain(Environment.stg)));
-      });
-
       test('returns prod options when environment is prod', () {
         // Arrange
         EnvironmentConfig.setEnvironment(Environment.prod);
@@ -95,20 +82,6 @@ void main() {
         expect(summary['storageBucket'], equals(CITestHelper.getExpectedStorageBucket(Environment.dev)));
       });
 
-      test('returns correct summary for staging environment', () {
-        // Arrange
-        EnvironmentConfig.setEnvironment(Environment.stg);
-
-        // Act
-        final summary = FirebaseOptionsProvider.getConfigurationSummary();
-
-        // Assert
-        expect(summary['environment'], equals('Staging'));
-        expect(summary['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.stg)));
-        expect(summary['hasPlaceholders'], equals('false'));
-        expect(summary['storageBucket'], equals(CITestHelper.getExpectedStorageBucket(Environment.stg)));
-      });
-
       test('returns correct summary for production environment', () {
         // Arrange
         EnvironmentConfig.setEnvironment(Environment.prod);
@@ -126,7 +99,7 @@ void main() {
 
     group('Firebase options consistency', () {
       test('all environments have consistent structure', () {
-        final environments = [Environment.dev, Environment.stg, Environment.prod];
+        final environments = [Environment.dev, Environment.prod];
 
         for (final env in environments) {
           EnvironmentConfig.setEnvironment(env);
@@ -146,19 +119,15 @@ void main() {
         EnvironmentConfig.setEnvironment(Environment.dev);
         final devOptions = FirebaseOptionsProvider.getFirebaseOptions();
 
-        EnvironmentConfig.setEnvironment(Environment.stg);
-        final stgOptions = FirebaseOptionsProvider.getFirebaseOptions();
-
         EnvironmentConfig.setEnvironment(Environment.prod);
         final prodOptions = FirebaseOptionsProvider.getFirebaseOptions();
 
         // Assert all project IDs are unique
         final projectIds = [
           devOptions.projectId,
-          stgOptions.projectId,
           prodOptions.projectId,
         ];
-        expect(projectIds.toSet().length, equals(3));
+        expect(projectIds.toSet().length, equals(2));
       });
     });
   });

@@ -120,8 +120,6 @@ class EnvironmentIndicator extends StatelessWidget {
     switch (EnvironmentConfig.environment) {
       case Environment.dev:
         return Colors.red.shade600;
-      case Environment.stg:
-        return Colors.orange.shade600;
       case Environment.prod:
         return Colors.green.shade600;
     }
@@ -131,8 +129,6 @@ class EnvironmentIndicator extends StatelessWidget {
     switch (EnvironmentConfig.environment) {
       case Environment.dev:
         return Icons.code;
-      case Environment.stg:
-        return Icons.science;
       case Environment.prod:
         return Icons.public;
     }

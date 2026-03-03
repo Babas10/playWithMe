@@ -8,8 +8,6 @@ echo "Scheme: ${CONFIGURATION}"
 # Determine the flavor based on environment or configuration
 if [[ "${CONFIGURATION}" == *"dev"* ]] || [[ "${FLUTTER_BUILD_MODE}" == *"dev"* ]]; then
     FLAVOR="dev"
-elif [[ "${CONFIGURATION}" == *"stg"* ]] || [[ "${FLUTTER_BUILD_MODE}" == *"stg"* ]]; then
-    FLAVOR="stg"
 elif [[ "${CONFIGURATION}" == *"prod"* ]] || [[ "${FLUTTER_BUILD_MODE}" == *"prod"* ]]; then
     FLAVOR="prod"
 else

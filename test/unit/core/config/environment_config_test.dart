@@ -14,16 +14,6 @@ void main() {
 
         expect(EnvironmentConfig.environment, Environment.dev);
         expect(EnvironmentConfig.isDevelopment, true);
-        expect(EnvironmentConfig.isStaging, false);
-        expect(EnvironmentConfig.isProduction, false);
-      });
-
-      test('should set and get staging environment', () {
-        EnvironmentConfig.setEnvironment(Environment.stg);
-
-        expect(EnvironmentConfig.environment, Environment.stg);
-        expect(EnvironmentConfig.isDevelopment, false);
-        expect(EnvironmentConfig.isStaging, true);
         expect(EnvironmentConfig.isProduction, false);
       });
 
@@ -32,7 +22,6 @@ void main() {
 
         expect(EnvironmentConfig.environment, Environment.prod);
         expect(EnvironmentConfig.isDevelopment, false);
-        expect(EnvironmentConfig.isStaging, false);
         expect(EnvironmentConfig.isProduction, true);
       });
     });
@@ -41,11 +30,6 @@ void main() {
       test('should return correct environment name for development', () {
         EnvironmentConfig.setEnvironment(Environment.dev);
         expect(EnvironmentConfig.environmentName, 'Development');
-      });
-
-      test('should return correct environment name for staging', () {
-        EnvironmentConfig.setEnvironment(Environment.stg);
-        expect(EnvironmentConfig.environmentName, 'Staging');
       });
 
       test('should return correct environment name for production', () {
@@ -60,11 +44,6 @@ void main() {
         expect(EnvironmentConfig.firebaseProjectId, 'gatherli-dev');
       });
 
-      test('should return correct Firebase project ID for staging', () {
-        EnvironmentConfig.setEnvironment(Environment.stg);
-        expect(EnvironmentConfig.firebaseProjectId, 'playwithme-stg');
-      });
-
       test('should return correct Firebase project ID for production', () {
         EnvironmentConfig.setEnvironment(Environment.prod);
         expect(EnvironmentConfig.firebaseProjectId, 'gatherli-prod');
@@ -75,11 +54,6 @@ void main() {
       test('should return correct app suffix for development', () {
         EnvironmentConfig.setEnvironment(Environment.dev);
         expect(EnvironmentConfig.appSuffix, ' (Dev)');
-      });
-
-      test('should return correct app suffix for staging', () {
-        EnvironmentConfig.setEnvironment(Environment.stg);
-        expect(EnvironmentConfig.appSuffix, ' (Staging)');
       });
 
       test('should return empty app suffix for production', () {
