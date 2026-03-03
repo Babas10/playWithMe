@@ -25,7 +25,7 @@ void main() {
 
     test('Firebase configuration is valid for all environments with real configs', () {
       // Test all environments have valid configurations
-      final environments = [Environment.dev, Environment.stg, Environment.prod];
+      final environments = [Environment.dev, Environment.prod];
 
       for (final env in environments) {
         // Arrange
@@ -81,7 +81,6 @@ void main() {
       // Test switching between environments with real configurations
       final testCases = [
         (Environment.dev, CITestHelper.getExpectedProjectId(Environment.dev), 'Development'),
-        (Environment.stg, CITestHelper.getExpectedProjectId(Environment.stg), 'Staging'),
         (Environment.prod, CITestHelper.getExpectedProjectId(Environment.prod), 'Production'),
       ];
 
@@ -128,7 +127,6 @@ void main() {
       // Verify that real Firebase configurations contain the expected project IDs
       final expectedProjects = {
         Environment.dev: CITestHelper.getExpectedProjectId(Environment.dev),
-        Environment.stg: CITestHelper.getExpectedProjectId(Environment.stg),
         Environment.prod: CITestHelper.getExpectedProjectId(Environment.prod),
       };
 
@@ -178,19 +176,17 @@ void main() {
       // Verify all configurations are unique
       final projectIds = [
         testData['dev_project'],
-        testData['stg_project'],
         testData['prod_project'],
       ];
 
-      expect(projectIds.toSet().length, equals(3),
+      expect(projectIds.toSet().length, equals(2),
           reason: 'All environments should have unique project IDs');
       expect(projectIds.contains(CITestHelper.getExpectedProjectId(Environment.dev)), isTrue);
-      expect(projectIds.contains(CITestHelper.getExpectedProjectId(Environment.stg)), isTrue);
       expect(projectIds.contains(CITestHelper.getExpectedProjectId(Environment.prod)), isTrue);
     });
 
     test('Firebase configuration accessibility in all environments', () {
-      final environments = [Environment.dev, Environment.stg, Environment.prod];
+      final environments = [Environment.dev, Environment.prod];
 
       for (final env in environments) {
         EnvironmentConfig.setEnvironment(env);
@@ -211,7 +207,6 @@ void main() {
     test('Environment indicators display correct project IDs', () {
       final testCases = [
         (Environment.dev, CITestHelper.getExpectedProjectId(Environment.dev)),
-        (Environment.stg, CITestHelper.getExpectedProjectId(Environment.stg)),
         (Environment.prod, CITestHelper.getExpectedProjectId(Environment.prod)),
       ];
 

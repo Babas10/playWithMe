@@ -59,20 +59,8 @@ void main() {
         // Assert
         expect(info['isInitialized'], isFalse);
         expect(info['environment'], equals('Development'));
-        expect(info['projectId'], equals('playwithme-dev'));
+        expect(info['projectId'], equals('gatherli-dev'));
         expect(info['appName'], isNull);
-      });
-
-      test('returns correct environment information for staging', () {
-        // Arrange
-        EnvironmentConfig.setEnvironment(Environment.stg);
-
-        // Act
-        final info = FirebaseService.getConnectionInfo();
-
-        // Assert
-        expect(info['environment'], equals('Staging'));
-        expect(info['projectId'], equals('playwithme-stg'));
       });
 
       test('returns correct environment information for production', () {
@@ -84,7 +72,7 @@ void main() {
 
         // Assert
         expect(info['environment'], equals('Production'));
-        expect(info['projectId'], equals('playwithme-prod'));
+        expect(info['projectId'], equals('gatherli-prod'));
       });
     });
 
@@ -144,9 +132,8 @@ void main() {
     group('environment consistency', () {
       test('connection info reflects current environment configuration', () {
         final environments = [
-          (Environment.dev, 'Development', 'playwithme-dev'),
-          (Environment.stg, 'Staging', 'playwithme-stg'),
-          (Environment.prod, 'Production', 'playwithme-prod'),
+          (Environment.dev, 'Development', 'gatherli-dev'),
+          (Environment.prod, 'Production', 'gatherli-prod'),
         ];
 
         for (final (env, expectedName, expectedProjectId) in environments) {

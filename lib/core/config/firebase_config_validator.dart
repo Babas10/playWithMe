@@ -5,23 +5,20 @@ import 'dart:io';
 class FirebaseConfigValidator {
   /// Expected bundle IDs for Android configurations
   static const Map<String, String> expectedAndroidBundleIds = {
-    'dev': 'com.playwithme.play_with_me.dev',
-    'stg': 'com.playwithme.play_with_me.stg',
-    'prod': 'com.playwithme.play_with_me',
+    'dev': 'org.gatherli.app.dev',
+    'prod': 'org.gatherli.app',
   };
 
   /// Expected bundle IDs for iOS configurations
   static const Map<String, String> expectediOSBundleIds = {
-    'dev': 'com.playwithme.playWithMe.dev',
-    'stg': 'com.playwithme.playWithMe.stg',
-    'prod': 'com.playwithme.playWithMe',
+    'dev': 'org.gatherli.app.dev',
+    'prod': 'org.gatherli.app',
   };
 
   /// Expected Firebase project IDs
   static const Map<String, String> expectedProjectIds = {
-    'dev': 'playwithme-dev',
-    'stg': 'playwithme-stg',
-    'prod': 'playwithme-prod',
+    'dev': 'gatherli-dev',
+    'prod': 'gatherli-prod',
   };
 
   /// Validates an Android google-services.json configuration
@@ -156,7 +153,7 @@ class FirebaseConfigValidator {
   /// Validates all Firebase configurations for all environments
   static Future<Map<String, ConfigValidationResult>> validateAllConfigs() async {
     final results = <String, ConfigValidationResult>{};
-    const environments = ['dev', 'stg', 'prod'];
+    const environments = ['dev', 'prod'];
 
     for (final env in environments) {
       // Validate Android config

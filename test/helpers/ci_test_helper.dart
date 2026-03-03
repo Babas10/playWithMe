@@ -25,8 +25,6 @@ class CITestHelper {
     switch (environment) {
       case Environment.dev:
         return 'gatherli-dev';
-      case Environment.stg:
-        return 'playwithme-stg';
       case Environment.prod:
         return 'gatherli-prod';
     }
@@ -48,7 +46,6 @@ class CITestHelper {
   static Map<String, String> getExpectedProjectIds() {
     return {
       'dev': getExpectedProjectId(Environment.dev),
-      'stg': getExpectedProjectId(Environment.stg),
       'prod': getExpectedProjectId(Environment.prod),
     };
   }

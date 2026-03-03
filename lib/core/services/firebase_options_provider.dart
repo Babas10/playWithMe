@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/config/firebase_config_dev.dart';
-import 'package:play_with_me/core/config/firebase_config_stg.dart';
 import 'package:play_with_me/core/config/firebase_config_prod.dart';
 
 /// Provides Firebase options for different environments
@@ -17,8 +16,6 @@ class FirebaseOptionsProvider {
     switch (environment) {
       case Environment.dev:
         return _getDevOptions();
-      case Environment.stg:
-        return _getStagingOptions();
       case Environment.prod:
         return _getProdOptions();
     }
@@ -27,21 +24,6 @@ class FirebaseOptionsProvider {
   /// Development environment Firebase options
   static FirebaseOptions _getDevOptions() {
     final config = FirebaseConfigDev();
-    return FirebaseOptions(
-      apiKey: config.apiKey,
-      appId: defaultTargetPlatform == TargetPlatform.android
-          ? config.androidAppId
-          : config.iosAppId,
-      messagingSenderId: config.messagingSenderId,
-      projectId: config.projectId,
-      storageBucket: config.storageBucket,
-      authDomain: '${config.projectId}.firebaseapp.com',
-    );
-  }
-
-  /// Staging environment Firebase options
-  static FirebaseOptions _getStagingOptions() {
-    final config = FirebaseConfigStg();
     return FirebaseOptions(
       apiKey: config.apiKey,
       appId: defaultTargetPlatform == TargetPlatform.android
