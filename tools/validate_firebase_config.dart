@@ -43,8 +43,8 @@ Future<bool> validateAndroidConfigs() async {
   var valid = true;
   const environments = ['dev', 'prod'];
   const expectedBundleIds = {
-    'dev': 'com.gatherli.app.dev',
-    'prod': 'com.gatherli.app',
+    'dev': 'org.gatherli.app.dev',
+    'prod': 'org.gatherli.app',
   };
   const expectedProjectIds = {
     'dev': 'gatherli-dev',
@@ -118,8 +118,8 @@ Future<bool> validateiOSConfigs() async {
   var valid = true;
   const environments = ['dev', 'prod'];
   const expectedBundleIds = {
-    'dev': 'com.gatherli.app.dev',
-    'prod': 'com.gatherli.app',
+    'dev': 'org.gatherli.app.dev',
+    'prod': 'org.gatherli.app',
   };
   const expectedProjectIds = {
     'dev': 'gatherli-dev',
