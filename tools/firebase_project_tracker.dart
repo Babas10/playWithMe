@@ -52,9 +52,8 @@ void printUsage() {
   print('  --help      Show this help message');
   print('');
   print('This tool helps track the Firebase projects required for Story 0.2.1:');
-  print('  - playwithme-dev (Development)');
-  print('  - playwithme-stg (Staging)');
-  print('  - playwithme-prod (Production)');
+  print('  - gatherli-dev (Development)');
+  print('  - gatherli-prod (Production)');
 }
 
 Future<void> recordProjects() async {
@@ -67,16 +66,15 @@ Future<void> recordProjects() async {
     'projects': <String, dynamic>{},
   };
 
-  const environments = ['dev', 'stg', 'prod'];
+  const environments = ['dev', 'prod'];
   const environmentNames = {
     'dev': 'Development',
-    'stg': 'Staging',
     'prod': 'Production',
   };
 
   for (final env in environments) {
     print('🏗️  ${environmentNames[env]} Environment');
-    print('Expected project ID: playwithme-$env\n');
+    print('Expected project ID: gatherli-$env\n');
 
     stdout.write('Have you created the Firebase project for $env? (y/n): ');
     final created = stdin.readLineSync()?.toLowerCase();
@@ -88,8 +86,8 @@ Future<void> recordProjects() async {
       if (projectId?.isNotEmpty == true) {
         projectData['projects'][env] = {
           'project_id': projectId,
-          'expected_id': 'playwithme-$env',
-          'matches_expected': projectId == 'playwithme-$env',
+          'expected_id': 'gatherli-$env',
+          'matches_expected': projectId == 'gatherli-$env',
           'created_at': DateTime.now().toIso8601String(),
           'status': 'created',
         };
@@ -99,7 +97,7 @@ Future<void> recordProjects() async {
       }
     } else {
       projectData['projects'][env] = {
-        'expected_id': 'playwithme-$env',
+        'expected_id': 'gatherli-$env',
         'status': 'pending',
         'created_at': null,
       };
@@ -144,15 +142,14 @@ Future<void> showStatus() async {
 Future<void> showSummary(Map<String, dynamic> data) async {
   final projects = data['projects'] as Map<String, dynamic>? ?? {};
   var createdCount = 0;
-  var totalCount = 3;
+  var totalCount = 2;
 
   print('\n📋 Project Status Summary');
   print('========================');
 
-  const environments = ['dev', 'stg', 'prod'];
+  const environments = ['dev', 'prod'];
   const environmentNames = {
     'dev': 'Development',
-    'stg': 'Staging',
     'prod': 'Production',
   };
 
@@ -171,17 +168,17 @@ Future<void> showSummary(Map<String, dynamic> data) async {
         if (matchesExpected) {
           print('   ID Match: ✅ Matches expected');
         } else {
-          print('   ID Match: ⚠️  Different from expected (playwithme-$env)');
+          print('   ID Match: ⚠️  Different from expected (gatherli-$env)');
         }
         createdCount++;
         break;
       case 'pending':
         print('   Status: 📋 Pending creation');
-        print('   Expected: playwithme-$env');
+        print('   Expected: gatherli-$env');
         break;
       default:
         print('   Status: ❌ Not started');
-        print('   Expected: playwithme-$env');
+        print('   Expected: gatherli-$env');
     }
   }
 
@@ -215,7 +212,7 @@ Future<void> verifyProjects() async {
     final projects = data['projects'] as Map<String, dynamic>;
 
     var allValid = true;
-    const environments = ['dev', 'stg', 'prod'];
+    const environments = ['dev', 'prod'];
 
     for (final env in environments) {
       final project = projects[env] as Map<String, dynamic>?;
@@ -232,7 +229,7 @@ Future<void> verifyProjects() async {
       print('✅ $env environment: $projectId');
 
       if (!matchesExpected) {
-        print('   ⚠️  Project ID differs from expected (playwithme-$env)');
+        print('   ⚠️  Project ID differs from expected (gatherli-$env)');
         print('   ℹ️  You\'ll need to update Flutter configuration accordingly');
       }
     }

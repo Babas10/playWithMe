@@ -40,7 +40,7 @@ void printUsage() {
   print('configuration files with real ones from your Firebase projects.');
   print('');
   print('Prerequisites:');
-  print('  - Firebase projects created: playwithme-dev, playwithme-stg, playwithme-prod');
+  print('  - Firebase projects created: gatherli-dev, gatherli-prod');
   print('  - Configuration files downloaded from Firebase Console');
 }
 
@@ -50,10 +50,8 @@ Future<bool> checkPrerequisites() async {
   // Check if placeholder files exist
   const configFiles = [
     'android/app/src/dev/google-services.json',
-    'android/app/src/stg/google-services.json',
     'android/app/src/prod/google-services.json',
     'ios/Runner/Firebase/dev/GoogleService-Info.plist',
-    'ios/Runner/Firebase/stg/GoogleService-Info.plist',
     'ios/Runner/Firebase/prod/GoogleService-Info.plist',
   ];
 
@@ -89,11 +87,10 @@ Future<void> guideReplacementProcess() async {
 }
 
 Future<void> replaceAndroidConfigs() async {
-  const environments = ['dev', 'stg', 'prod'];
+  const environments = ['dev', 'prod'];
   const projectNames = {
-    'dev': 'playwithme-dev',
-    'stg': 'playwithme-stg',
-    'prod': 'playwithme-prod',
+    'dev': 'gatherli-dev',
+    'prod': 'gatherli-prod',
   };
 
   for (final env in environments) {
@@ -121,11 +118,10 @@ Future<void> replaceAndroidConfigs() async {
 }
 
 Future<void> replaceiOSConfigs() async {
-  const environments = ['dev', 'stg', 'prod'];
+  const environments = ['dev', 'prod'];
   const projectNames = {
-    'dev': 'playwithme-dev',
-    'stg': 'playwithme-stg',
-    'prod': 'playwithme-prod',
+    'dev': 'gatherli-dev',
+    'prod': 'gatherli-prod',
   };
 
   for (final env in environments) {

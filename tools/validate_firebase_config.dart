@@ -41,16 +41,14 @@ void main() async {
 
 Future<bool> validateAndroidConfigs() async {
   var valid = true;
-  const environments = ['dev', 'stg', 'prod'];
+  const environments = ['dev', 'prod'];
   const expectedBundleIds = {
-    'dev': 'com.playwithme.play_with_me.dev',
-    'stg': 'com.playwithme.play_with_me.stg',
-    'prod': 'com.playwithme.play_with_me',
+    'dev': 'com.gatherli.app.dev',
+    'prod': 'com.gatherli.app',
   };
   const expectedProjectIds = {
-    'dev': 'playwithme-dev',
-    'stg': 'playwithme-stg',
-    'prod': 'playwithme-prod',
+    'dev': 'gatherli-dev',
+    'prod': 'gatherli-prod',
   };
 
   for (final env in environments) {
@@ -118,16 +116,14 @@ Future<bool> validateAndroidConfigs() async {
 
 Future<bool> validateiOSConfigs() async {
   var valid = true;
-  const environments = ['dev', 'stg', 'prod'];
+  const environments = ['dev', 'prod'];
   const expectedBundleIds = {
-    'dev': 'com.playwithme.playWithMe.dev',
-    'stg': 'com.playwithme.playWithMe.stg',
-    'prod': 'com.playwithme.playWithMe',
+    'dev': 'com.gatherli.app.dev',
+    'prod': 'com.gatherli.app',
   };
   const expectedProjectIds = {
-    'dev': 'playwithme-dev',
-    'stg': 'playwithme-stg',
-    'prod': 'playwithme-prod',
+    'dev': 'gatherli-dev',
+    'prod': 'gatherli-prod',
   };
 
   for (final env in environments) {
