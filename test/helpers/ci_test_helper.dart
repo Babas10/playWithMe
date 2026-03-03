@@ -24,11 +24,11 @@ class CITestHelper {
     // Real project IDs used in both CI and local environments
     switch (environment) {
       case Environment.dev:
-        return 'playwithme-dev';
+        return 'gatherli-dev';
       case Environment.stg:
         return 'playwithme-stg';
       case Environment.prod:
-        return 'playwithme-prod';
+        return 'gatherli-prod';
     }
   }
 
