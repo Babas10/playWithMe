@@ -1,4 +1,4 @@
-package com.playwithme.play_with_me
+package org.gatherli.app
 
 import io.flutter.embedding.android.FlutterActivity
 

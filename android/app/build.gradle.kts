@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.playwithme.play_with_me"
+    namespace = "org.gatherli.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.playwithme.play_with_me"
+        applicationId = "org.gatherli.app"
         minSdk = 23  // Firebase requires minimum API 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -35,11 +35,6 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-        }
-        create("stg") {
-            dimension = "environment"
-            applicationIdSuffix = ".stg"
-            versionNameSuffix = "-stg"
         }
         create("prod") {
             dimension = "environment"
