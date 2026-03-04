@@ -9,10 +9,10 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get appTitle => 'PlayWithMe';
+  String get appTitle => 'Gatherli';
 
   @override
-  String get welcomeMessage => 'Bienvenue sur PlayWithMe !';
+  String get welcomeMessage => 'Bienvenue sur Gatherli !';
 
   @override
   String get beachVolleyballOrganizer =>
@@ -745,7 +745,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get continueAsGuest => 'Continuer en tant qu\'Invité';
 
   @override
-  String get joinPlayWithMe => 'Rejoignez PlayWithMe !';
+  String get joinPlayWithMe => 'Rejoignez Gatherli !';
 
   @override
   String get createAccountSubtitle =>
@@ -1697,7 +1697,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String inviteLinkShareMessage(String url) {
-    return 'Rejoins mon groupe sur PlayWithMe ! $url';
+    return 'Rejoins mon groupe sur Gatherli ! $url';
   }
 
   @override

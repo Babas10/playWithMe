@@ -1,11 +1,11 @@
 {
   "@@locale": "en",
-  "appTitle": "PlayWithMe",
+  "appTitle": "Gatherli",
   "@appTitle": {
     "description": "The application title"
   },
 
-  "welcomeMessage": "Welcome to PlayWithMe!",
+  "welcomeMessage": "Welcome to Gatherli!",
   "@welcomeMessage": {
     "description": "Welcome message on home page"
   },
@@ -1171,7 +1171,7 @@
     "description": "Button to continue without account"
   },
 
-  "joinPlayWithMe": "Join PlayWithMe!",
+  "joinPlayWithMe": "Join Gatherli!",
   "@joinPlayWithMe": {
     "description": "Heading on registration page"
   },
@@ -2412,7 +2412,7 @@
     "description": "Error message when invite link revocation fails"
   },
 
-  "inviteLinkShareMessage": "Join my group on PlayWithMe! {url}",
+  "inviteLinkShareMessage": "Join my group on Gatherli! {url}",
   "@inviteLinkShareMessage": {
     "description": "Message shared via native share sheet with the invite link",
     "placeholders": {
