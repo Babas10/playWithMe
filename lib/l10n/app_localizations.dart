@@ -107,13 +107,13 @@ abstract class AppLocalizations {
   /// The application title
   ///
   /// In en, this message translates to:
-  /// **'PlayWithMe'**
+  /// **'Gatherli'**
   String get appTitle;
 
   /// Welcome message on home page
   ///
   /// In en, this message translates to:
-  /// **'Welcome to PlayWithMe!'**
+  /// **'Welcome to Gatherli!'**
   String get welcomeMessage;
 
   /// App description subtitle
@@ -1475,7 +1475,7 @@ abstract class AppLocalizations {
   /// Heading on registration page
   ///
   /// In en, this message translates to:
-  /// **'Join PlayWithMe!'**
+  /// **'Join Gatherli!'**
   String get joinPlayWithMe;
 
   /// Subtitle on registration page
@@ -3125,7 +3125,7 @@ abstract class AppLocalizations {
   /// Message shared via native share sheet with the invite link
   ///
   /// In en, this message translates to:
-  /// **'Join my group on PlayWithMe! {url}'**
+  /// **'Join my group on Gatherli! {url}'**
   String inviteLinkShareMessage(String url);
 
   /// Title shown when navigating to an unknown route

@@ -80,7 +80,7 @@ void main() {
       testWidgets('renders welcome text', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        expect(find.text('Join PlayWithMe!'), findsOneWidget);
+        expect(find.text('Join Gatherli!'), findsOneWidget);
         expect(
           find.text('Create your account to start organizing volleyball games'),
           findsOneWidget,

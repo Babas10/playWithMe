@@ -231,7 +231,7 @@ class PlayWithMeApp extends StatelessWidget {
 
           return MaterialApp(
             navigatorKey: PlayWithMeApp.navigatorKey,
-            title: 'PlayWithMe${EnvironmentConfig.appSuffix}',
+            title: 'Gatherli${EnvironmentConfig.appSuffix}',
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(
                 seedColor: AppColors.primary,
@@ -731,7 +731,7 @@ class _SplashScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'PlayWithMe${EnvironmentConfig.appSuffix}',
+              'Gatherli${EnvironmentConfig.appSuffix}',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 32),
