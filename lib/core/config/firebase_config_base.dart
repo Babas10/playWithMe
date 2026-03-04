@@ -25,7 +25,7 @@ abstract class FirebaseConfigBase {
   /// iOS bundle identifier
   String get iosBundleId;
 
-  /// Environment name (dev, stg, prod)
+  /// Environment name (dev, prod)
   String get environment;
 
   /// Display name for the app in this environment
@@ -36,9 +36,6 @@ abstract class FirebaseConfigBase {
 
   /// Whether this is a development environment
   bool get isDevelopment => environment == 'dev';
-
-  /// Whether this is a staging environment
-  bool get isStaging => environment == 'stg';
 
   @override
   String toString() {

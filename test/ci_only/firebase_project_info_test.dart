@@ -6,12 +6,12 @@ void main() {
     test('should create instance with required fields', () {
       final projectInfo = FirebaseProjectInfo(
         environment: 'dev',
-        expectedProjectId: 'playwithme-dev',
+        expectedProjectId: 'gatherli-dev',
         status: FirebaseProjectStatus.created,
       );
 
       expect(projectInfo.environment, 'dev');
-      expect(projectInfo.expectedProjectId, 'playwithme-dev');
+      expect(projectInfo.expectedProjectId, 'gatherli-dev');
       expect(projectInfo.status, FirebaseProjectStatus.created);
       expect(projectInfo.matchesExpected, false); // default value
       expect(projectInfo.actualProjectId, null);
@@ -22,16 +22,16 @@ void main() {
       final createdAt = DateTime.now();
       final projectInfo = FirebaseProjectInfo(
         environment: 'prod',
-        expectedProjectId: 'playwithme-prod',
-        actualProjectId: 'playwithme-prod',
+        expectedProjectId: 'gatherli-prod',
+        actualProjectId: 'gatherli-prod',
         status: FirebaseProjectStatus.created,
         createdAt: createdAt,
         matchesExpected: true,
       );
 
       expect(projectInfo.environment, 'prod');
-      expect(projectInfo.expectedProjectId, 'playwithme-prod');
-      expect(projectInfo.actualProjectId, 'playwithme-prod');
+      expect(projectInfo.expectedProjectId, 'gatherli-prod');
+      expect(projectInfo.actualProjectId, 'gatherli-prod');
       expect(projectInfo.status, FirebaseProjectStatus.created);
       expect(projectInfo.matchesExpected, true);
       expect(projectInfo.createdAt, createdAt);
@@ -40,18 +40,18 @@ void main() {
     group('JSON serialization', () {
       test('should serialize to JSON correctly', () {
         final projectInfo = FirebaseProjectInfo(
-          environment: 'stg',
-          expectedProjectId: 'playwithme-stg',
-          actualProjectId: 'playwithme-stg-custom',
+          environment: 'dev',
+          expectedProjectId: 'gatherli-dev',
+          actualProjectId: 'gatherli-dev-custom',
           status: FirebaseProjectStatus.created,
           matchesExpected: false,
         );
 
         final json = projectInfo.toJson();
 
-        expect(json['environment'], 'stg');
-        expect(json['expectedProjectId'], 'playwithme-stg');
-        expect(json['actualProjectId'], 'playwithme-stg-custom');
+        expect(json['environment'], 'dev');
+        expect(json['expectedProjectId'], 'gatherli-dev');
+        expect(json['actualProjectId'], 'gatherli-dev-custom');
         expect(json['status'], 'created');
         expect(json['matchesExpected'], false);
       });
@@ -59,8 +59,8 @@ void main() {
       test('should deserialize from JSON correctly', () {
         final json = {
           'environment': 'dev',
-          'expectedProjectId': 'playwithme-dev',
-          'actualProjectId': 'playwithme-dev',
+          'expectedProjectId': 'gatherli-dev',
+          'actualProjectId': 'gatherli-dev',
           'status': 'created',
           'matchesExpected': true,
         };
@@ -68,8 +68,8 @@ void main() {
         final projectInfo = FirebaseProjectInfo.fromJson(json);
 
         expect(projectInfo.environment, 'dev');
-        expect(projectInfo.expectedProjectId, 'playwithme-dev');
-        expect(projectInfo.actualProjectId, 'playwithme-dev');
+        expect(projectInfo.expectedProjectId, 'gatherli-dev');
+        expect(projectInfo.actualProjectId, 'gatherli-dev');
         expect(projectInfo.status, FirebaseProjectStatus.created);
         expect(projectInfo.matchesExpected, true);
       });
@@ -82,12 +82,12 @@ void main() {
       final projects = [
         FirebaseProjectInfo(
           environment: 'dev',
-          expectedProjectId: 'playwithme-dev',
+          expectedProjectId: 'gatherli-dev',
           status: FirebaseProjectStatus.created,
         ),
         FirebaseProjectInfo(
-          environment: 'stg',
-          expectedProjectId: 'playwithme-stg',
+          environment: 'prod',
+          expectedProjectId: 'gatherli-prod',
           status: FirebaseProjectStatus.pending,
         ),
       ];
@@ -110,7 +110,7 @@ void main() {
         final projects = [
           FirebaseProjectInfo(
             environment: 'dev',
-            expectedProjectId: 'playwithme-dev',
+            expectedProjectId: 'gatherli-dev',
             status: FirebaseProjectStatus.created,
           ),
         ];
@@ -136,7 +136,7 @@ void main() {
           'projects': [
             {
               'environment': 'dev',
-              'expectedProjectId': 'playwithme-dev',
+              'expectedProjectId': 'gatherli-dev',
               'status': 'created',
               'matchesExpected': true,
             }
@@ -176,16 +176,15 @@ void main() {
     });
   });
 
-  group('Story 0.2.1 Requirements', () {
+  group('Gatherli Requirements', () {
     test('should support all required project environments', () {
-      const requiredEnvironments = ['dev', 'stg', 'prod'];
+      const requiredEnvironments = ['dev', 'prod'];
       const expectedProjectIds = [
-        'playwithme-dev',
-        'playwithme-stg',
-        'playwithme-prod',
+        'gatherli-dev',
+        'gatherli-prod',
       ];
 
-      final projects = List.generate(3, (index) {
+      final projects = List.generate(2, (index) {
         return FirebaseProjectInfo(
           environment: requiredEnvironments[index],
           expectedProjectId: expectedProjectIds[index],
@@ -193,7 +192,7 @@ void main() {
         );
       });
 
-      expect(projects.length, 3);
+      expect(projects.length, 2);
       expect(projects.map((p) => p.environment).toList(), requiredEnvironments);
       expect(projects.map((p) => p.expectedProjectId).toList(), expectedProjectIds);
     });
@@ -202,22 +201,15 @@ void main() {
       final allCreated = [
         FirebaseProjectInfo(
           environment: 'dev',
-          expectedProjectId: 'playwithme-dev',
-          actualProjectId: 'playwithme-dev',
-          status: FirebaseProjectStatus.created,
-          matchesExpected: true,
-        ),
-        FirebaseProjectInfo(
-          environment: 'stg',
-          expectedProjectId: 'playwithme-stg',
-          actualProjectId: 'playwithme-stg',
+          expectedProjectId: 'gatherli-dev',
+          actualProjectId: 'gatherli-dev',
           status: FirebaseProjectStatus.created,
           matchesExpected: true,
         ),
         FirebaseProjectInfo(
           environment: 'prod',
-          expectedProjectId: 'playwithme-prod',
-          actualProjectId: 'playwithme-prod',
+          expectedProjectId: 'gatherli-prod',
+          actualProjectId: 'gatherli-prod',
           status: FirebaseProjectStatus.created,
           matchesExpected: true,
         ),
@@ -231,7 +223,6 @@ void main() {
       final allMatch = allCreated.every((p) => p.matchesExpected);
       expect(allMatch, true);
 
-      // Story 0.2.1 Definition of Done criteria met
       expect(allComplete && allMatch, true);
     });
   });
