@@ -85,7 +85,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
       await tester.pump(); // Rebuild with new state
       MaterialApp materialApp = tester.widget(find.byType(MaterialApp));
-      expect(materialApp.title, 'PlayWithMe');
+      expect(materialApp.title, 'Gatherli');
 
       // Test development
       EnvironmentConfig.setEnvironment(Environment.dev);
@@ -96,7 +96,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
       await tester.pump(); // Rebuild with new state
       materialApp = tester.widget(find.byType(MaterialApp));
-      expect(materialApp.title, 'PlayWithMe (Dev)');
+      expect(materialApp.title, 'Gatherli (Dev)');
     });
 
     testWidgets('should properly handle authentication state transitions (Unknown → Unauthenticated → UI update)', (WidgetTester tester) async {
@@ -191,7 +191,7 @@ void main() {
 
       expect(find.byType(AppBar), findsOneWidget);
       // First tab (Home) shows app title as AppBar title
-      expect(find.text('PlayWithMe'), findsOneWidget);
+      expect(find.text('Gatherli'), findsOneWidget);
       // Bottom navigation has 4 tabs: Home, Stats, Groups, Community (Profile is in AppBar)
       expect(find.byType(BottomNavigationBar), findsOneWidget);
       expect(find.byType(Scaffold), findsOneWidget);
