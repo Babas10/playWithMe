@@ -8,8 +8,6 @@ class FirebaseConfigFactory {
     switch (EnvironmentConfig.environment) {
       case Environment.dev:
         return _getDevConfig();
-      case Environment.stg:
-        return _getStagingConfig();
       case Environment.prod:
         return _getProductionConfig();
     }
@@ -25,21 +23,6 @@ class FirebaseConfigFactory {
       throw Exception(
         'Development Firebase configuration not found!\n'
         'Please run: dart tools/generate_firebase_config.dart dev\n'
-        'Make sure you have placed google-services.json and GoogleService-Info.plist files in the correct locations.\n'
-        'Error: $e'
-      );
-    }
-  }
-
-  static FirebaseConfigBase _getStagingConfig() {
-    try {
-      // Import will be available after running: dart tools/generate_firebase_config.dart stg
-      final config = _loadGeneratedConfig('stg');
-      return config;
-    } catch (e) {
-      throw Exception(
-        'Staging Firebase configuration not found!\n'
-        'Please run: dart tools/generate_firebase_config.dart stg\n'
         'Make sure you have placed google-services.json and GoogleService-Info.plist files in the correct locations.\n'
         'Error: $e'
       );

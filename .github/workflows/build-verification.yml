@@ -10,7 +10,7 @@ on:
         required: false
         default: 'android,web'
       flavors:
-        description: 'Flavors to build (comma-separated: dev,stg,prod)'
+        description: 'Flavors to build (comma-separated: dev,prod)'
         required: false
         default: 'dev'
 
@@ -45,15 +45,6 @@ jobs:
           FIREBASE_DEV_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_DEV_MESSAGING_SENDER_ID }}
           FIREBASE_DEV_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_DEV_ANDROID_PACKAGE_NAME }}
           FIREBASE_DEV_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_DEV_IOS_BUNDLE_ID }}
-          # Staging environment secrets
-          FIREBASE_STG_PROJECT_ID: ${{ secrets.FIREBASE_STG_PROJECT_ID }}
-          FIREBASE_STG_STORAGE_BUCKET: ${{ secrets.FIREBASE_STG_STORAGE_BUCKET }}
-          FIREBASE_STG_ANDROID_APP_ID: ${{ secrets.FIREBASE_STG_ANDROID_APP_ID }}
-          FIREBASE_STG_IOS_APP_ID: ${{ secrets.FIREBASE_STG_IOS_APP_ID }}
-          FIREBASE_STG_API_KEY: ${{ secrets.FIREBASE_STG_API_KEY }}
-          FIREBASE_STG_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_STG_MESSAGING_SENDER_ID }}
-          FIREBASE_STG_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_STG_ANDROID_PACKAGE_NAME }}
-          FIREBASE_STG_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_STG_IOS_BUNDLE_ID }}
           # Production environment secrets
           FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
           FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
@@ -66,7 +57,6 @@ jobs:
         run: |
           echo "Generating Firebase configurations from GitHub Secrets..."
           dart run tools/generate_firebase_config_from_secrets.dart dev
-          dart run tools/generate_firebase_config_from_secrets.dart stg
           dart run tools/generate_firebase_config_from_secrets.dart prod
           echo "✅ Firebase configurations generated securely from secrets"
 
@@ -76,7 +66,6 @@ jobs:
           name: firebase-configs
           path: |
             lib/core/config/firebase_config_dev.dart
-            lib/core/config/firebase_config_stg.dart
             lib/core/config/firebase_config_prod.dart
             android/app/google-services.json
           retention-days: 1

@@ -1,3 +1,4 @@
+// Validates FirebaseConfigValidator correctly checks Gatherli bundle IDs and project IDs.
 import 'dart:convert';
 import 'dart:io';
 
@@ -22,16 +23,16 @@ void main() {
         final configFile = File('${tempDir.path}/google-services.json');
         final validConfig = {
           'project_info': {
-            'project_id': 'playwithme-dev',
-            'project_number': '123456789',
-            'storage_bucket': 'playwithme-dev.firebasestorage.app',
+            'project_id': 'gatherli-dev',
+            'project_number': '19710393704',
+            'storage_bucket': 'gatherli-dev.firebasestorage.app',
           },
           'client': [
             {
               'client_info': {
-                'mobilesdk_app_id': '1:123456789:android:abcdef123456',
+                'mobilesdk_app_id': '1:19710393704:android:abcdef123456',
                 'android_client_info': {
-                  'package_name': 'com.playwithme.play_with_me.dev',
+                  'package_name': 'org.gatherli.app.dev',
                 }
               },
               'api_key': [
@@ -65,7 +66,7 @@ void main() {
             {
               'client_info': {
                 'android_client_info': {
-                  'package_name': 'com.playwithme.play_with_me.dev',
+                  'package_name': 'org.gatherli.app.dev',
                 }
               },
               'api_key': [
@@ -90,7 +91,7 @@ void main() {
         final configFile = File('${tempDir.path}/google-services.json');
         final invalidConfig = {
           'project_info': {
-            'project_id': 'playwithme-dev',
+            'project_id': 'gatherli-dev',
           },
           'client': [
             {
@@ -121,13 +122,13 @@ void main() {
         final configFile = File('${tempDir.path}/google-services.json');
         final configWithPlaceholder = {
           'project_info': {
-            'project_id': 'playwithme-dev',
+            'project_id': 'gatherli-dev',
           },
           'client': [
             {
               'client_info': {
                 'android_client_info': {
-                  'package_name': 'com.playwithme.play_with_me.dev',
+                  'package_name': 'org.gatherli.app.dev',
                 }
               },
               'api_key': [
@@ -182,9 +183,9 @@ void main() {
 	<key>API_KEY</key>
 	<string>AIzaSyRealApiKeyWithoutPlaceholder123456</string>
 	<key>PROJECT_ID</key>
-	<string>playwithme-dev</string>
+	<string>gatherli-dev</string>
 	<key>BUNDLE_ID</key>
-	<string>com.playwithme.playWithMe.dev</string>
+	<string>org.gatherli.app.dev</string>
 </dict>
 </plist>''';
 
@@ -208,7 +209,7 @@ void main() {
 	<key>PROJECT_ID</key>
 	<string>wrong-project-id</string>
 	<key>BUNDLE_ID</key>
-	<string>com.playwithme.playWithMe.dev</string>
+	<string>org.gatherli.app.dev</string>
 	<key>API_KEY</key>
 	<string>real-key</string>
 </dict>
@@ -231,7 +232,7 @@ void main() {
 <plist version="1.0">
 <dict>
 	<key>PROJECT_ID</key>
-	<string>playwithme-dev</string>
+	<string>gatherli-dev</string>
 	<key>BUNDLE_ID</key>
 	<string>com.wrong.bundle.id</string>
 	<key>API_KEY</key>
@@ -256,9 +257,9 @@ void main() {
 <plist version="1.0">
 <dict>
 	<key>PROJECT_ID</key>
-	<string>playwithme-dev</string>
+	<string>gatherli-dev</string>
 	<key>BUNDLE_ID</key>
-	<string>com.playwithme.playWithMe.dev</string>
+	<string>org.gatherli.app.dev</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDEV-placeholder-key-for-development-ios</string>
 </dict>
@@ -278,21 +279,21 @@ void main() {
 
     group('Expected Constants', () {
       test('should have correct expected bundle IDs for Android', () {
-        expect(FirebaseConfigValidator.expectedAndroidBundleIds['dev'], 'com.playwithme.play_with_me.dev');
-        expect(FirebaseConfigValidator.expectedAndroidBundleIds['stg'], 'com.playwithme.play_with_me.stg');
-        expect(FirebaseConfigValidator.expectedAndroidBundleIds['prod'], 'com.playwithme.play_with_me');
+        expect(FirebaseConfigValidator.expectedAndroidBundleIds['dev'], 'org.gatherli.app.dev');
+        expect(FirebaseConfigValidator.expectedAndroidBundleIds['prod'], 'org.gatherli.app');
+        expect(FirebaseConfigValidator.expectedAndroidBundleIds.containsKey('stg'), isFalse);
       });
 
       test('should have correct expected bundle IDs for iOS', () {
-        expect(FirebaseConfigValidator.expectediOSBundleIds['dev'], 'com.playwithme.playWithMe.dev');
-        expect(FirebaseConfigValidator.expectediOSBundleIds['stg'], 'com.playwithme.playWithMe.stg');
-        expect(FirebaseConfigValidator.expectediOSBundleIds['prod'], 'com.playwithme.playWithMe');
+        expect(FirebaseConfigValidator.expectediOSBundleIds['dev'], 'org.gatherli.app.dev');
+        expect(FirebaseConfigValidator.expectediOSBundleIds['prod'], 'org.gatherli.app');
+        expect(FirebaseConfigValidator.expectediOSBundleIds.containsKey('stg'), isFalse);
       });
 
       test('should have correct expected project IDs', () {
-        expect(FirebaseConfigValidator.expectedProjectIds['dev'], 'playwithme-dev');
-        expect(FirebaseConfigValidator.expectedProjectIds['stg'], 'playwithme-stg');
-        expect(FirebaseConfigValidator.expectedProjectIds['prod'], 'playwithme-prod');
+        expect(FirebaseConfigValidator.expectedProjectIds['dev'], 'gatherli-dev');
+        expect(FirebaseConfigValidator.expectedProjectIds['prod'], 'gatherli-prod');
+        expect(FirebaseConfigValidator.expectedProjectIds.containsKey('stg'), isFalse);
       });
     });
 

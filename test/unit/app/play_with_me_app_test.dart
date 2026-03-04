@@ -62,21 +62,6 @@ void main() {
       expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
     });
 
-    testWidgets('should render correctly in staging environment', (WidgetTester tester) async {
-      EnvironmentConfig.setEnvironment(Environment.stg);
-      await tester.pumpWidget(const PlayWithMeApp());
-
-      // Wait for AuthenticationBloc to process initial auth state and stream subscription
-      await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
-      await tester.pump(); // Rebuild with new state
-
-      // App shows authentication screen regardless of environment
-      expect(find.text('Welcome Back!'), findsOneWidget);
-      expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
-    });
-
     testWidgets('should have correct theme colors', (WidgetTester tester) async {
       await tester.pumpWidget(const PlayWithMeApp());
 
@@ -112,17 +97,6 @@ void main() {
       await tester.pump(); // Rebuild with new state
       materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.title, 'PlayWithMe (Dev)');
-
-      // Test staging
-      EnvironmentConfig.setEnvironment(Environment.stg);
-      await tester.pumpWidget(const PlayWithMeApp());
-      // Wait for AuthenticationBloc to process initial auth state and stream subscription
-      await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
-      await tester.pump(); // Rebuild with new state
-      materialApp = tester.widget(find.byType(MaterialApp));
-      expect(materialApp.title, 'PlayWithMe (Staging)');
     });
 
     testWidgets('should properly handle authentication state transitions (Unknown → Unauthenticated → UI update)', (WidgetTester tester) async {
@@ -313,54 +287,6 @@ void main() {
       BoxDecoration decoration = envContainer!.decoration as BoxDecoration;
       final border = decoration.border as Border;
       expect(border.top.color, Colors.red);
-
-      // Test staging environment (orange)
-      // Clean up and reinitialize for staging test
-      await tester.pumpWidget(Container()); // Clear the widget tree
-      await tester.pump();
-
-      EnvironmentConfig.setEnvironment(Environment.stg);
-      mockRepo.setCurrentUser(testUser); // Ensure user is still set
-
-      await tester.pumpWidget(BlocProvider<AuthenticationBloc>(
-        create: (context) => sl<AuthenticationBloc>(),
-        child: const MaterialApp(
-          localizationsDelegates: [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: [Locale('en')],
-          home: HomePage(),
-        ),
-      ));
-      await tester.pump();
-
-      // Verify staging environment text
-      expect(find.text('Environment: Staging'), findsOneWidget);
-
-      // Find the environment container for staging
-      final stagingContainers = tester.widgetList<Container>(find.byType(Container));
-      Container? stagingEnvContainer;
-      for (final container in stagingContainers) {
-        if (container.decoration is BoxDecoration) {
-          final decoration = container.decoration as BoxDecoration;
-          if (decoration.border != null && decoration.border is Border) {
-            final border = decoration.border as Border;
-            // Check if it's a uniform border (Border.all) with orange color
-            if (border.top.color == Colors.orange) {
-              stagingEnvContainer = container;
-              break;
-            }
-          }
-        }
-      }
-
-      expect(stagingEnvContainer, isNotNull, reason: 'Should find container with orange border for staging environment');
-      BoxDecoration stagingDecoration = stagingEnvContainer!.decoration as BoxDecoration;
-      final stagingBorder = stagingDecoration.border as Border;
-      expect(stagingBorder.top.color, Colors.orange);
 
       // Test production environment (green)
       // Clean up and reinitialize for production test
