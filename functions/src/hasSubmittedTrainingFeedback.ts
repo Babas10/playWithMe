@@ -21,7 +21,7 @@ interface HasSubmittedTrainingFeedbackResponse {
 // ============================================================================
 
 // Salt for participant hash (must match submitTrainingFeedback.ts)
-const PARTICIPANT_HASH_SALT = process.env.PARTICIPANT_HASH_SALT || "playwithme-feedback-salt-v1";
+const PARTICIPANT_HASH_SALT = process.env.PARTICIPANT_HASH_SALT || "gatherli-feedback-salt-v1";
 
 // ============================================================================
 // Helper Functions
@@ -63,11 +63,10 @@ async function feedbackExists(
 // Main Cloud Function
 // ============================================================================
 
-export const hasSubmittedTrainingFeedback = functions.https.onCall(
-  async (
-    data: HasSubmittedTrainingFeedbackRequest,
-    context: functions.https.CallableContext
-  ): Promise<HasSubmittedTrainingFeedbackResponse> => {
+export async function hasSubmittedTrainingFeedbackHandler(
+  data: HasSubmittedTrainingFeedbackRequest,
+  context: functions.https.CallableContext
+): Promise<HasSubmittedTrainingFeedbackResponse> {
     // ============================================================================
     // 1. Authentication Check
     // ============================================================================
@@ -130,5 +129,8 @@ export const hasSubmittedTrainingFeedback = functions.https.onCall(
         "Failed to check feedback status. Please try again."
       );
     }
-  }
+}
+
+export const hasSubmittedTrainingFeedback = functions.https.onCall(
+  hasSubmittedTrainingFeedbackHandler
 );

@@ -1,6 +1,6 @@
-# PlayWithMe Cloud Functions
+# Gatherli Cloud Functions
 
-This directory contains Firebase Cloud Functions for the PlayWithMe app.
+This directory contains Firebase Cloud Functions for the Gatherli app.
 
 ## Functions
 
