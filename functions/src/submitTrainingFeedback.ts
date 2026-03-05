@@ -27,7 +27,7 @@ interface SubmitTrainingFeedbackResponse {
 
 // Salt for participant hash (should be configured per environment in production)
 // In production, this should be stored in Cloud Secret Manager
-const PARTICIPANT_HASH_SALT = process.env.PARTICIPANT_HASH_SALT || "playwithme-feedback-salt-v1";
+const PARTICIPANT_HASH_SALT = process.env.PARTICIPANT_HASH_SALT || "gatherli-feedback-salt-v1";
 
 // ============================================================================
 // Helper Functions
@@ -96,11 +96,10 @@ async function feedbackExists(
 // Main Cloud Function
 // ============================================================================
 
-export const submitTrainingFeedback = functions.https.onCall(
-  async (
-    data: SubmitTrainingFeedbackRequest,
-    context: functions.https.CallableContext
-  ): Promise<SubmitTrainingFeedbackResponse> => {
+export async function submitTrainingFeedbackHandler(
+  data: SubmitTrainingFeedbackRequest,
+  context: functions.https.CallableContext
+): Promise<SubmitTrainingFeedbackResponse> {
     // ============================================================================
     // 1. Authentication Check
     // ============================================================================
@@ -305,5 +304,8 @@ export const submitTrainingFeedback = functions.https.onCall(
         "Failed to submit feedback. Please try again."
       );
     }
-  }
+}
+
+export const submitTrainingFeedback = functions.https.onCall(
+  submitTrainingFeedbackHandler
 );
