@@ -13,7 +13,7 @@ import {
 // Constants
 // ============================================================================
 
-const BASE_URL = "https://playwithme.app/invite";
+const BASE_URL = "https://gatherli.org/invite";
 
 // ============================================================================
 // Cloud Function Handler
