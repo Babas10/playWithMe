@@ -1,11 +1,11 @@
 {
-    "name": "play_with_me",
-    "short_name": "play_with_me",
+    "name": "Gatherli",
+    "short_name": "Gatherli",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Organize and join games with your group.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

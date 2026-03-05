@@ -29,7 +29,7 @@ void main() {
     cleanupTestDependencies();
   });
 
-  testWidgets('PlayWithMe app login page shows correct authentication UI elements', (WidgetTester tester) async {
+  testWidgets('Gatherli app login page shows correct authentication UI elements', (WidgetTester tester) async {
     // Create a test app with the real LoginPage and proper BLoC setup
     await tester.pumpWidget(
       MaterialApp(
