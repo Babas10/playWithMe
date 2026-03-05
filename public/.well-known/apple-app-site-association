@@ -1,0 +1,18 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "2FN99DA6RR.org.gatherli.app",
+          "2FN99DA6RR.org.gatherli.app.dev"
+        ],
+        "components": [
+          {
+            "/": "/invite/*",
+            "comment": "Matches all Gatherli group invite deep links"
+          }
+        ]
+      }
+    ]
+  }
+}

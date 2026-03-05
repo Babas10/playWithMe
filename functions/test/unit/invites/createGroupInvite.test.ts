@@ -278,7 +278,7 @@ describe("createGroupInvite Cloud Function", () => {
       expect(result.inviteId).toBe("invite-abc123");
       expect(result.token).toBe("mocktoken12345678901234567890ab");
       expect(result.deepLinkUrl).toBe(
-        "https://playwithme.app/invite/mocktoken12345678901234567890ab"
+        "https://gatherli.org/invite/mocktoken12345678901234567890ab"
       );
       expect(result.expiresAt).toBeNull();
     });
