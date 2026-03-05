@@ -94,7 +94,7 @@ void main() {
     testWidgets('shows generated link with copy and share buttons',
         (tester) async {
       when(() => mockBloc.state).thenReturn(const GroupInviteLinkGenerated(
-        deepLinkUrl: 'https://playwithme.app/invite/abc123',
+        deepLinkUrl: 'https://gatherli.org/invite/abc123',
         inviteId: 'invite-456',
       ));
 
@@ -102,7 +102,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('https://playwithme.app/invite/abc123'),
+        find.text('https://gatherli.org/invite/abc123'),
         findsOneWidget,
       );
       expect(find.text('Copy Link'), findsOneWidget);
@@ -112,7 +112,7 @@ void main() {
 
     testWidgets('copy button copies link to clipboard', (tester) async {
       when(() => mockBloc.state).thenReturn(const GroupInviteLinkGenerated(
-        deepLinkUrl: 'https://playwithme.app/invite/abc123',
+        deepLinkUrl: 'https://gatherli.org/invite/abc123',
         inviteId: 'invite-456',
       ));
 
@@ -151,7 +151,7 @@ void main() {
     testWidgets('revoke button dispatches RevokeInvite event',
         (tester) async {
       when(() => mockBloc.state).thenReturn(const GroupInviteLinkGenerated(
-        deepLinkUrl: 'https://playwithme.app/invite/abc123',
+        deepLinkUrl: 'https://gatherli.org/invite/abc123',
         inviteId: 'invite-456',
       ));
 
@@ -228,7 +228,7 @@ void main() {
 
     testWidgets('shows copy and share icons', (tester) async {
       when(() => mockBloc.state).thenReturn(const GroupInviteLinkGenerated(
-        deepLinkUrl: 'https://playwithme.app/invite/test',
+        deepLinkUrl: 'https://gatherli.org/invite/test',
         inviteId: 'inv-1',
       ));
 

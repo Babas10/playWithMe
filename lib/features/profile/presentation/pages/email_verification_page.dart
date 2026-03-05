@@ -436,7 +436,7 @@ class EmailVerificationPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Contact support at support@playwithme.com',
+                'Contact support at support@gatherli.org',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.primary,
                 ),
