@@ -34,7 +34,7 @@ void main() {
       const groupId = 'group-123';
       const inviteId = 'invite-456';
       const token = 'abc123token';
-      const deepLinkUrl = 'https://playwithme.app/invite/abc123token';
+      const deepLinkUrl = 'https://gatherli.org/invite/abc123token';
 
       blocTest<GroupInviteLinkBloc, GroupInviteLinkState>(
         'emits [loading, generated] when invite is created successfully',

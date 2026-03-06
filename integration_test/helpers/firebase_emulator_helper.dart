@@ -12,7 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 /// - Managing test state
 class FirebaseEmulatorHelper {
   static bool _initialized = false;
-  static const String _testProjectId = 'playwithme-dev';
+  static const String _testProjectId = 'gatherli-dev';
 
   // Emulator host configuration
   static const String emulatorHost = 'localhost';

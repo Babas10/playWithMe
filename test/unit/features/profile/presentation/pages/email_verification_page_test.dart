@@ -233,7 +233,7 @@ void main() {
             findsOneWidget);
         expect(find.text('Check your internet connection'), findsOneWidget);
         expect(find.text('Still having issues?'), findsOneWidget);
-        expect(find.text('Contact support at support@playwithme.com'),
+        expect(find.text('Contact support at support@gatherli.org'),
             findsOneWidget);
       });
     });

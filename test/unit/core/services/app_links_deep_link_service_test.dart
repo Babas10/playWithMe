@@ -95,7 +95,7 @@ void main() {
 
       test('returns null for unknown scheme', () async {
         when(() => mockAppLinks.getInitialLink()).thenAnswer(
-          (_) async => Uri.parse('playwithme://invite/abc123'),
+          (_) async => Uri.parse('unknown://invite/abc123'),
         );
         final service = buildService();
         final token = await service.getInitialInviteToken();
