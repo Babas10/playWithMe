@@ -29,10 +29,12 @@
       text-align: center;
     }
 
-    .icon {
-      font-size: 56px;
-      line-height: 1;
-      margin-bottom: 20px;
+    .logo {
+      width: 88px;
+      height: 88px;
+      border-radius: 20px;
+      margin: 0 auto 20px;
+      display: block;
     }
 
     h1 {
@@ -50,79 +52,98 @@
       margin-bottom: 28px;
     }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 15px 20px;
-      border-radius: 12px;
-      border: none;
-      font-size: 16px;
-      font-weight: 600;
+    /* Store badge buttons */
+    .badge-btn {
+      display: block;
       cursor: pointer;
-      text-decoration: none;
-      transition: opacity .15s ease;
-      color: #fff;
-      background: #1565C0;
+      border: none;
+      background: none;
+      padding: 0;
+      margin: 0 auto;
+      transition: opacity .15s ease, transform .1s ease;
     }
 
-    .btn:hover { opacity: .88; }
-    .btn:active { opacity: .75; }
+    .badge-btn:hover  { opacity: .88; }
+    .badge-btn:active { opacity: .75; transform: scale(.97); }
 
-    .btn:disabled {
-      opacity: .55;
+    .badge-btn:disabled {
+      opacity: .45;
       cursor: not-allowed;
+      transform: none;
+    }
+
+    .badge-img {
+      height: 52px;
+      width: auto;
+      display: block;
+    }
+
+    /* Android redirecting state */
+    .redirecting-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
 
     .spinner {
       display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255,255,255,.4);
-      border-top-color: #fff;
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #1565C0;
       border-radius: 50%;
-      animation: spin .7s linear infinite;
+      animation: spin .75s linear infinite;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .redirecting { color: #718096; font-size: 14px; margin-bottom: 0; }
+    .redirecting-text { color: #718096; font-size: 14px; margin-bottom: 0; }
+
+    /* Fallback: two badges stacked */
+    .badge-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
   </style>
 </head>
 <body>
 <div class="card">
-  <div class="icon">&#127936;</div>
+  <img class="logo" src="/icon-192.png" alt="Gatherli">
 
   <!-- iOS: shown, requires user tap to write clipboard -->
   <div id="ios-view" style="display:none">
     <h1>You've been invited to Gatherli</h1>
     <p>Tap below to download the app and join your group.</p>
-    <button class="btn" id="ios-btn" onclick="handleIos()">
-      Get Gatherli on the App Store
+    <button class="badge-btn" id="ios-btn" onclick="handleIos()" aria-label="Download on the App Store">
+      <img class="badge-img" src="/badge-app-store.svg" alt="Download on the App Store">
     </button>
   </div>
 
   <!-- Android: shown briefly while auto-redirecting -->
   <div id="android-view" style="display:none">
     <h1>Opening the Play Store…</h1>
-    <p class="redirecting">You are being redirected to Google Play to install Gatherli.</p>
-    <button class="btn" disabled>
-      <span class="spinner"></span> Redirecting…
-    </button>
+    <p class="redirecting-text">Redirecting you to Google Play to install Gatherli.</p>
+    <div class="redirecting-wrap">
+      <span class="spinner"></span>
+      <img class="badge-img" src="/badge-google-play.png" alt="Get it on Google Play" style="opacity:.45">
+    </div>
   </div>
 
   <!-- Desktop / unknown: no auto-redirect, show both store links -->
   <div id="fallback-view" style="display:none">
     <h1>You've been invited to Gatherli</h1>
     <p>Download the app on your phone to join your group.</p>
-    <a class="btn" id="fallback-ios" href="#" style="margin-bottom:10px; display:flex">
-      Download on the App Store (iOS)
-    </a>
-    <a class="btn" id="fallback-android" href="#" style="display:flex; background:#01875f">
-      Get it on Google Play (Android)
-    </a>
+    <div class="badge-stack">
+      <a id="fallback-ios" href="#" aria-label="Download on the App Store">
+        <img class="badge-img" src="/badge-app-store.svg" alt="Download on the App Store">
+      </a>
+      <a id="fallback-android" href="#" aria-label="Get it on Google Play">
+        <img class="badge-img" src="/badge-google-play.png" alt="Get it on Google Play">
+      </a>
+    </div>
   </div>
 </div>
 
@@ -170,10 +191,7 @@
   // ── iOS: clipboard write on user tap, then App Store redirect ─────────────
   window.handleIos = function () {
     var btn = document.getElementById('ios-btn');
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Opening App Store…';
-    }
+    if (btn) btn.disabled = true;
 
     var deepLink = token ? CUSTOM_SCHEME + token : '';
 
@@ -184,7 +202,7 @@
     if (deepLink && navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(deepLink)
         .then(goToAppStore)
-        .catch(goToAppStore); // proceed even if clipboard is denied
+        .catch(goToAppStore); // proceed even if clipboard write is denied
     } else {
       goToAppStore();
     }
