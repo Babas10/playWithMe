@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
-  <!-- White rounded square background -->
-  <rect width="96" height="96" rx="22" ry="22" fill="#FFFFFF"/>
+  <!-- White rounded square background with blue border -->
+  <rect width="96" height="96" rx="22" ry="22" fill="#FFFFFF" stroke="#004E64" stroke-width="3"/>
   <!-- sports_volleyball icon scaled to 60px centered (offset 18,18), in app blue #004E64 -->
   <g transform="translate(18,18) scale(2.5)" fill="#004E64">
     <path d="M6,4.01C3.58,5.84,2,8.73,2,12c0,1.46,0.32,2.85,0.89,4.11L6,14.31V4.01z"/>
