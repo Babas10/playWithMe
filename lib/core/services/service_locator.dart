@@ -55,6 +55,10 @@ import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link
 import 'package:play_with_me/core/services/pending_invite_storage.dart';
 import 'package:play_with_me/core/services/deep_link_service.dart';
 import 'package:play_with_me/core/services/app_links_deep_link_service.dart';
+import 'package:play_with_me/core/services/deferred_deep_link/deferred_deep_link_service.dart';
+import 'package:play_with_me/core/services/deferred_deep_link/android_deferred_deep_link_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 import 'package:play_with_me/core/presentation/bloc/account_status/account_status_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
@@ -233,6 +237,16 @@ Future<void> initializeDependencies() async {
     sl.registerLazySingleton<DeepLinkService>(
       () => AppLinksDeepLinkService(),
     );
+  }
+
+  // Deferred deep link service — Android only.
+  // kIsWeb guard is required because dart:io Platform is not available on web.
+  if (!kIsWeb && Platform.isAndroid) {
+    if (!sl.isRegistered<DeferredDeepLinkService>()) {
+      sl.registerLazySingleton<DeferredDeepLinkService>(
+        () => AndroidDeferredDeepLinkService(),
+      );
+    }
   }
 
   // Register BLoCs only if not already registered
