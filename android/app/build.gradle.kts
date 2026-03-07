@@ -57,4 +57,5 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    implementation("com.android.installreferrer:installreferrer:2.2")
 }
