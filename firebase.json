@@ -17,7 +17,13 @@
         ]
       }
     ],
-    "cleanUrls": true
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/invite/**",
+        "destination": "/invite.html"
+      }
+    ]
   },
   "functions": [
     {
