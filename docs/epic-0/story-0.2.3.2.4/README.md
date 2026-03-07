@@ -6,7 +6,7 @@ Updated widget test expectations to align with the new authentication-based app 
 
 ## Problem
 
-Widget tests were expecting old UI elements ("Welcome to PlayWithMe!", static environment text) but the app now shows authentication flow (splash → login → authenticated states).
+Widget tests were expecting old UI elements ("Welcome to Gatherli!", static environment text) but the app now shows authentication flow (splash → login → authenticated states).
 
 ## Solution
 
@@ -30,7 +30,7 @@ All widget tests now pass (10/10) and properly validate:
 
 ## Test Coverage
 
-- ✅ PlayWithMeApp renders correctly in all environments with authentication flow
+- ✅ GatherliApp renders correctly in all environments with authentication flow
 - ✅ Authentication state transitions work properly (Unknown → Unauthenticated → Authenticated)
 - ✅ LoginPage shows correct authentication UI elements
 - ✅ Environment-specific tests work with authentication flow

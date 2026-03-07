@@ -39,9 +39,9 @@ For each flavor configuration, update the bundle identifier:
 2. **Go to Build Settings tab**
 3. **Find "Product Bundle Identifier"**
 4. **Set the correct bundle ID for each configuration**:
-   - `Debug-dev`, `Release-dev`, `Profile-dev` → `com.playwithme.playWithMe.dev`
-   - `Debug-stg`, `Release-stg`, `Profile-stg` → `com.playwithme.playWithMe.stg`
-   - `Debug-prod`, `Release-prod`, `Profile-prod` → `com.playwithme.playWithMe`
+   - `Debug-dev`, `Release-dev`, `Profile-dev` → `org.gatherli.app.dev`
+   - `Debug-stg`, `Release-stg`, `Profile-stg` → `org.gatherli.app.stg`
+   - `Debug-prod`, `Release-prod`, `Profile-prod` → `org.gatherli.app`
 
 ### 4. Add Firebase Config Copy Script
 

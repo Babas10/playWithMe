@@ -200,7 +200,7 @@ firebase emulators:start --only functions
 # Build and deploy
 cd functions
 npm run build
-firebase deploy --only functions:searchUserByEmail --project playwithme-prod
+firebase deploy --only functions:searchUserByEmail --project gatherli-prod
 ```
 
 ## Performance

@@ -32,7 +32,7 @@ Location: `functions/scripts/reset-data.ts`
 
 ### Safety Features
 
-- ✅ **Environment Check**: Only runs on `playwithme-dev`
+- ✅ **Environment Check**: Only runs on `gatherli-dev`
 - ✅ **Explicit Warning**: Shows clear warning before execution
 - ✅ **Progress Logging**: Reports deletion counts for each collection
 - ✅ **Error Handling**: Catches and reports errors gracefully
@@ -47,10 +47,10 @@ npx ts-node scripts/reset-data.ts
 ### Expected Output
 
 ```
-⚠️  WARNING: You are about to delete ALL data from playwithme-dev
+⚠️  WARNING: You are about to delete ALL data from gatherli-dev
    This operation cannot be undone!
 
-🗑️  Starting data reset for playwithme-dev...
+🗑️  Starting data reset for gatherli-dev...
 
 📋 Deleting friendships collection...
 ✅ Deleted 15 friendship documents

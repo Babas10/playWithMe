@@ -94,9 +94,9 @@ The notification data includes `gameId` which the Flutter app uses to navigate d
 
 The Cloud Function has been deployed to all environments:
 
-- ✅ `playwithme-dev`
-- ✅ `playwithme-stg`
-- ✅ `playwithme-prod`
+- ✅ `gatherli-dev`
+- ✅ `gatherli-stg`
+- ✅ `gatherli-prod`
 
 **Deployment Command:**
 ```bash

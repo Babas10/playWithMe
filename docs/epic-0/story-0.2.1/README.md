@@ -2,7 +2,7 @@
 
 ## 📋 **Story Overview**
 
-This story implements a complete multi-environment setup for the PlayWithMe Flutter app using real Firebase projects instead of placeholder configurations.
+This story implements a complete multi-environment setup for the Gatherli Flutter app using real Firebase projects instead of placeholder configurations.
 
 ## 🎯 **Objectives Completed**
 
@@ -28,9 +28,9 @@ This folder contains all documentation created for Story 0.2.1:
 
 ### **1. Firebase Projects**
 Three separate Firebase projects were created:
-- **playwithme-dev** - Development environment
-- **playwithme-stg** - Staging environment
-- **playwithme-prod** - Production environment
+- **gatherli-dev** - Development environment
+- **gatherli-stg** - Staging environment
+- **gatherli-prod** - Production environment
 
 ### **2. Flutter Flavors**
 Implemented flavor system for both platforms:
@@ -166,14 +166,14 @@ dependencies:
 
 ## 🎉 **Story 0.2.1 - COMPLETE!**
 
-This story successfully establishes a production-ready, secure, multi-environment Firebase setup for the PlayWithMe app. The implementation follows best practices for:
+This story successfully establishes a production-ready, secure, multi-environment Firebase setup for the Gatherli app. The implementation follows best practices for:
 
 - **Security** (no sensitive data in version control)
 - **Maintainability** (clear documentation and tooling)
 - **Scalability** (easy to add new environments)
 - **Developer Experience** (simple commands, clear error messages)
 
-The PlayWithMe app is now ready for development across three distinct environments with proper Firebase integration on both iOS and Android platforms.
+The Gatherli app is now ready for development across three distinct environments with proper Firebase integration on both iOS and Android platforms.
 
 ---
 

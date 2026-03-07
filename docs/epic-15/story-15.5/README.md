@@ -269,15 +269,15 @@ All 3 architecture tests passing:
 **Deployment Commands**:
 ```bash
 # Deploy to dev
-firebase use playwithme-dev
+firebase use gatherli-dev
 firebase deploy --only functions:onGameStatusChanged
 
 # Deploy to staging
-firebase use playwithme-stg
+firebase use gatherli-stg
 firebase deploy --only functions:onGameStatusChanged
 
 # Deploy to production
-firebase use playwithme-prod
+firebase use gatherli-prod
 firebase deploy --only functions:onGameStatusChanged
 ```
 

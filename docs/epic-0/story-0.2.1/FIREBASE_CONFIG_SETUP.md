@@ -1,6 +1,6 @@
 # Firebase Configuration Setup
 
-This document explains how to configure Firebase for the PlayWithMe app's multi-environment setup using **dynamic configuration generation**.
+This document explains how to configure Firebase for the Gatherli app's multi-environment setup using **dynamic configuration generation**.
 
 ## ⚠️ Security Notice
 
@@ -22,9 +22,9 @@ Firebase configuration files contain **sensitive API keys and project IDs** that
 
 Create three separate Firebase projects:
 
-1. **playwithme-dev** - Development environment
-2. **playwithme-stg** - Staging environment
-3. **playwithme-prod** - Production environment
+1. **gatherli-dev** - Development environment
+2. **gatherli-stg** - Staging environment
+3. **gatherli-prod** - Production environment
 
 ## Setup Instructions
 
@@ -38,17 +38,17 @@ Create three separate Firebase projects:
 
 For each Firebase project, add an Android app with these package names:
 
-- **Dev**: `com.playwithme.playWithMe.dev`
-- **Staging**: `com.playwithme.playWithMe.stg`
-- **Production**: `com.playwithme.playWithMe`
+- **Dev**: `org.gatherli.app.dev`
+- **Staging**: `org.gatherli.app.stg`
+- **Production**: `org.gatherli.app`
 
 ### 3. Configure iOS Apps
 
 For each Firebase project, add an iOS app with these bundle IDs:
 
-- **Dev**: `com.playwithme.playWithMe.dev`
-- **Staging**: `com.playwithme.playWithMe.stg`
-- **Production**: `com.playwithme.playWithMe`
+- **Dev**: `org.gatherli.app.dev`
+- **Staging**: `org.gatherli.app.stg`
+- **Production**: `org.gatherli.app`
 
 ### 4. Download Configuration Files
 
@@ -56,16 +56,16 @@ Download the configuration files from Firebase Console and place them in these *
 
 #### Android Configuration Files
 ```
-android/app/src/dev/google-services.json     # From playwithme-dev
-android/app/src/stg/google-services.json     # From playwithme-stg
-android/app/src/prod/google-services.json    # From playwithme-prod
+android/app/src/dev/google-services.json     # From gatherli-dev
+android/app/src/stg/google-services.json     # From gatherli-stg
+android/app/src/prod/google-services.json    # From gatherli-prod
 ```
 
 #### iOS Configuration Files
 ```
-ios/Runner/Firebase/dev/GoogleService-Info.plist    # From playwithme-dev
-ios/Runner/Firebase/stg/GoogleService-Info.plist    # From playwithme-stg
-ios/Runner/Firebase/prod/GoogleService-Info.plist   # From playwithme-prod
+ios/Runner/Firebase/dev/GoogleService-Info.plist    # From gatherli-dev
+ios/Runner/Firebase/stg/GoogleService-Info.plist    # From gatherli-stg
+ios/Runner/Firebase/prod/GoogleService-Info.plist   # From gatherli-prod
 ```
 
 ### 5. Generate Configuration Files

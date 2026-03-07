@@ -1,4 +1,4 @@
-# PlayWithMe - Manual Testing Checklist
+# Gatherli - Manual Testing Checklist
 
 **Story**: 16.5 - Create Manual Testing Checklist
 **Version**: 1.1
@@ -39,16 +39,16 @@ Create the following test accounts for comprehensive testing:
 
 | Account | Email | Password | Purpose |
 |---------|-------|----------|---------|
-| User A (Primary) | `tester.a@playwithme.test` | `TestPass123!` | Main test user |
-| User B (Friend) | `tester.b@playwithme.test` | `TestPass123!` | Friend/opponent |
-| User C (Stranger) | `tester.c@playwithme.test` | `TestPass123!` | Non-friend user |
-| User D (Admin) | `tester.d@playwithme.test` | `TestPass123!` | Group admin tests |
+| User A (Primary) | `tester.a@gatherli.test` | `TestPass123!` | Main test user |
+| User B (Friend) | `tester.b@gatherli.test` | `TestPass123!` | Friend/opponent |
+| User C (Stranger) | `tester.c@gatherli.test` | `TestPass123!` | Non-friend user |
+| User D (Admin) | `tester.d@gatherli.test` | `TestPass123!` | Group admin tests |
 
 ### 1.3 Test Data Setup Steps
 
 ```bash
 # Start Firebase Emulators (for local testing)
-firebase emulators:start --only auth,firestore,functions --project playwithme-dev
+firebase emulators:start --only auth,firestore,functions --project gatherli-dev
 
 # Clear existing test data (if needed)
 # Use Firebase Console or emulator UI to clear collections

@@ -211,9 +211,9 @@ Comprehensive widget tests (11 tests, 100% passing):
 ## Deployment Notes
 
 **Deployed to all environments:**
-- ✅ `playwithme-dev`
-- ✅ `playwithme-stg`
-- ✅ `playwithme-prod`
+- ✅ `gatherli-dev`
+- ✅ `gatherli-stg`
+- ✅ `gatherli-prod`
 
 **Deployment Command:**
 ```bash
