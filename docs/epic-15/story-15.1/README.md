@@ -134,9 +134,9 @@ class TrainingSessionModel with _$TrainingSessionModel {
 - `internal` - Server error
 
 **Deployment:**
-- ✅ Deployed to `playwithme-dev`
-- ✅ Deployed to `playwithme-stg`
-- ✅ Deployed to `playwithme-prod`
+- ✅ Deployed to `gatherli-dev`
+- ✅ Deployed to `gatherli-stg`
+- ✅ Deployed to `gatherli-prod`
 
 ---
 
@@ -208,9 +208,9 @@ match /trainingSessions/{sessionId} {
 - ✅ Deletes restricted to creator only
 
 **Deployment:**
-- ✅ Deployed to `playwithme-dev`
-- ✅ Deployed to `playwithme-stg`
-- ✅ Deployed to `playwithme-prod`
+- ✅ Deployed to `gatherli-dev`
+- ✅ Deployed to `gatherli-stg`
+- ✅ Deployed to `gatherli-prod`
 
 ---
 

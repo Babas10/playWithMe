@@ -259,7 +259,7 @@ functions/
 
 **Deployment:**
 ```bash
-$ firebase functions:list --project playwithme-dev
+$ firebase functions:list --project gatherli-dev
 ┌────────────────────────┬─────────┬──────────┬─────────────┐
 │ Function               │ Version │ Trigger  │ Location    │
 ├────────────────────────┼─────────┼──────────┼─────────────┤
@@ -348,7 +348,7 @@ $ firebase functions:list --project playwithme-dev
 - ✅ Added `checkPendingInvitation` Cloud Function for secure duplicate checking
 - ✅ Updated `invite_member_page.dart` to use Cloud Function instead of direct Firestore query
 - ✅ Reverted Firestore rules to strict permissions (invitation owner only)
-- ✅ Deployed both Cloud Functions to playwithme-dev
+- ✅ Deployed both Cloud Functions to gatherli-dev
 - ✅ Added comprehensive unit tests for Cloud Functions
 - ✅ Updated documentation (README, GitHub issue, CLAUDE.md)
 - 🔒 Security: Zero data leakage, centralized backend logic

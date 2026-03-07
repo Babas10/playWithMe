@@ -1,7 +1,7 @@
 # Story 18.1 — Pre-flight: Name & Domain Availability Check
 
 **Research Date:** 2026-02-27
-**Epic:** 18 — App Rename: PlayWithMe → ?
+**Epic:** 18 — App Rename: Gatherli → ?
 **Issue:** #507
 
 ---

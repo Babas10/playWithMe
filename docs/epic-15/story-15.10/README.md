@@ -112,9 +112,9 @@ const feedbackData = {
 
 ### Deployment
 Cloud Function deployed to all environments:
-- ✅ **Development** (playwithme-dev)
-- ✅ **Staging** (playwithme-stg)
-- ✅ **Production** (playwithme-prod)
+- ✅ **Development** (gatherli-dev)
+- ✅ **Staging** (gatherli-stg)
+- ✅ **Production** (gatherli-prod)
 
 ### Manual Testing Required
 Since this is a Cloud Function fix with no Flutter changes, manual testing should verify:

@@ -15,21 +15,21 @@ Firebase configuration files contain sensitive API keys and project identifiers 
 
 ### Step 1: Download Firebase Config Files
 1. Go to [Firebase Console](https://console.firebase.google.com)
-2. Select your project (playwithme-dev, playwithme-stg, or playwithme-prod)
+2. Select your project (gatherli-dev, gatherli-stg, or gatherli-prod)
 3. Go to Project Settings → General tab
 4. Download configuration files for your platforms
 
 ### Step 2: Place Files in Correct Locations
 ```bash
 # Android files
-android/app/src/dev/google-services.json      # From playwithme-dev
-android/app/src/stg/google-services.json      # From playwithme-stg
-android/app/src/prod/google-services.json     # From playwithme-prod
+android/app/src/dev/google-services.json      # From gatherli-dev
+android/app/src/stg/google-services.json      # From gatherli-stg
+android/app/src/prod/google-services.json     # From gatherli-prod
 
 # iOS files
-ios/Runner/Firebase/dev/GoogleService-Info.plist    # From playwithme-dev
-ios/Runner/Firebase/stg/GoogleService-Info.plist    # From playwithme-stg
-ios/Runner/Firebase/prod/GoogleService-Info.plist   # From playwithme-prod
+ios/Runner/Firebase/dev/GoogleService-Info.plist    # From gatherli-dev
+ios/Runner/Firebase/stg/GoogleService-Info.plist    # From gatherli-stg
+ios/Runner/Firebase/prod/GoogleService-Info.plist   # From gatherli-prod
 ```
 
 ### Step 3: Generate Type-Safe Configuration
@@ -83,14 +83,14 @@ If Firebase configuration files are accidentally committed:
 Ensure downloaded configuration files have correct bundle IDs:
 
 ### Android
-- Dev: `com.playwithme.play_with_me.dev`
-- Staging: `com.playwithme.play_with_me.stg`
-- Production: `com.playwithme.play_with_me`
+- Dev: `org.gatherli.app.dev`
+- Staging: `org.gatherli.app.stg`
+- Production: `org.gatherli.app`
 
 ### iOS
-- Dev: `com.playwithme.playWithMe.dev`
-- Staging: `com.playwithme.playWithMe.stg`
-- Production: `com.playwithme.playWithMe`
+- Dev: `org.gatherli.app.dev`
+- Staging: `org.gatherli.app.stg`
+- Production: `org.gatherli.app`
 
 ## 🔄 Team Setup
 

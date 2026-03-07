@@ -74,9 +74,9 @@ functions/test/unit/scheduled/
 ## Deployment
 
 Both functions are deployed to all 3 environments in dry-run mode:
-- `playwithme-dev`
-- `playwithme-stg`
-- `playwithme-prod`
+- `gatherli-dev`
+- `gatherli-stg`
+- `gatherli-prod`
 
 To enable live mode, change `DRY_RUN = false` in `cleanupUnverifiedAccounts.ts` and redeploy.
 

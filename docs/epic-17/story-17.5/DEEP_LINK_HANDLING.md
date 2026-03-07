@@ -8,8 +8,8 @@ Implements deep link handling for invite links using native App Links (Android) 
 
 ### Link Format
 ```
-https://playwithme.app/invite/{token}
-playwithme://invite/{token}  (fallback custom scheme)
+https://gatherli.org/invite/{token}
+gatherli://invite/{token}  (fallback custom scheme)
 ```
 
 ### Components
@@ -53,13 +53,13 @@ Replaced `routes:` map with `onGenerateRoute` in `play_with_me_app.dart`:
 ## Platform Configuration
 
 ### Android
-- Intent filter for `https://playwithme.app/invite/*` with `autoVerify=true`
-- Custom URL scheme fallback: `playwithme://invite/*`
+- Intent filter for `https://gatherli.org/invite/*` with `autoVerify=true`
+- Custom URL scheme fallback: `gatherli://invite/*`
 - Digital Asset Links file (`assetlinks.json`) needs deployment to web host
 
 ### iOS
-- Associated Domains entitlement: `applinks:playwithme.app`
-- Custom URL scheme: `playwithme`
+- Associated Domains entitlement: `applinks:gatherli.org`
+- Custom URL scheme: `gatherli`
 - Apple App Site Association file needs deployment to web host
 
 ## Testing

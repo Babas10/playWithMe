@@ -46,37 +46,37 @@ pip list | grep -E "firebase|pydantic|pytest"
 
 ```bash
 # Deploy Python functions to dev
-firebase deploy --only functions:python-functions --project playwithme-dev
+firebase deploy --only functions:python-functions --project gatherli-dev
 
 # View deployment logs
-firebase functions:log --project playwithme-dev
+firebase functions:log --project gatherli-dev
 ```
 
 ### Staging Environment
 
 ```bash
 # Deploy Python functions to staging
-firebase deploy --only functions:python-functions --project playwithme-stg
+firebase deploy --only functions:python-functions --project gatherli-stg
 
 # View deployment logs
-firebase functions:log --project playwithme-stg
+firebase functions:log --project gatherli-stg
 ```
 
 ### Production Environment
 
 ```bash
 # Deploy Python functions to production
-firebase deploy --only functions:python-functions --project playwithme-prod
+firebase deploy --only functions:python-functions --project gatherli-prod
 
 # View deployment logs
-firebase functions:log --project playwithme-prod
+firebase functions:log --project gatherli-prod
 ```
 
 ### Deploy All Functions (TypeScript + Python)
 
 ```bash
 # Deploy all functions to a specific environment
-firebase deploy --only functions --project playwithme-dev
+firebase deploy --only functions --project gatherli-dev
 ```
 
 ## Pre-Deployment Checklist
@@ -94,7 +94,7 @@ firebase deploy --only functions --project playwithme-dev
 
 ```bash
 # List deployed functions
-firebase functions:list --project playwithme-dev
+firebase functions:list --project gatherli-dev
 
 # Expected output shows:
 # calculate_elo_ratings | v2 | google.cloud.firestore.document.v1.updated | us-central1 | 256 | python311
@@ -147,10 +147,10 @@ firebase functions:list --project playwithme-dev
 
 ```bash
 # Watch live logs
-firebase functions:log --project playwithme-dev --follow
+firebase functions:log --project gatherli-dev --follow
 
 # Filter by function name
-firebase functions:log --project playwithme-dev --only calculate_elo_ratings
+firebase functions:log --project gatherli-dev --only calculate_elo_ratings
 ```
 
 ## Monitoring
@@ -176,13 +176,13 @@ firebase functions:log --project playwithme-dev --only calculate_elo_ratings
 
 ```bash
 # Find errors
-firebase functions:log --project playwithme-prod | grep -i error
+firebase functions:log --project gatherli-prod | grep -i error
 
 # Find specific game
-firebase functions:log --project playwithme-prod | grep "game_id.*YOUR_GAME_ID"
+firebase functions:log --project gatherli-prod | grep "game_id.*YOUR_GAME_ID"
 
 # Count executions
-firebase functions:log --project playwithme-prod | grep "ELO calculation completed" | wc -l
+firebase functions:log --project gatherli-prod | grep "ELO calculation completed" | wc -l
 ```
 
 ## Rollback Procedures
@@ -191,7 +191,7 @@ firebase functions:log --project playwithme-prod | grep "ELO calculation complet
 
 ```bash
 # Remove function from environment
-firebase functions:delete calculate_elo_ratings --project playwithme-prod
+firebase functions:delete calculate_elo_ratings --project gatherli-prod
 
 # Confirm deletion when prompted
 ```
@@ -208,7 +208,7 @@ git log --oneline functions/python/
 git checkout <previous-commit> -- functions/python/
 
 # Redeploy
-firebase deploy --only functions:python-functions --project playwithme-prod
+firebase deploy --only functions:python-functions --project gatherli-prod
 
 # After fixing, restore current code
 git checkout HEAD -- functions/python/

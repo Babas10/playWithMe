@@ -16,19 +16,19 @@ The project includes a `storage.rules` file in the root directory. You need to d
 cd /path/to/playWithMe
 
 # Deploy storage rules to dev environment
-firebase deploy --only storage:rules --project playwithme-dev
+firebase deploy --only storage:rules --project gatherli-dev
 
 # Deploy to staging (when ready)
-firebase deploy --only storage:rules --project playwithme-stg
+firebase deploy --only storage:rules --project gatherli-stg
 
 # Deploy to production (when ready)
-firebase deploy --only storage:rules --project playwithme-prod
+firebase deploy --only storage:rules --project gatherli-prod
 ```
 
 #### Option B: Manual Deployment via Firebase Console
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project (e.g., `playwithme-dev`)
+2. Select your project (e.g., `gatherli-dev`)
 3. Navigate to **Storage** → **Rules**
 4. Copy the content from `storage.rules` file
 5. Paste it into the rules editor
@@ -108,7 +108,7 @@ function hasNotUploadedRecently() {
 After successful uploads, your storage will look like this:
 
 ```
-gs://playwithme-dev.appspot.com/
+gs://gatherli-dev.appspot.com/
 └── avatars/
     └── {userId}/
         └── avatar_1634567890123.jpg

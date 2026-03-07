@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the implementation of the Continuous Integration and Continuous Deployment (CI/CD) pipeline for the PlayWithMe project using GitHub Actions.
+This document describes the implementation of the Continuous Integration and Continuous Deployment (CI/CD) pipeline for the Gatherli project using GitHub Actions.
 
 ## Goal
 

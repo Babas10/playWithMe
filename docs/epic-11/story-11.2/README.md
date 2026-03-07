@@ -8,7 +8,7 @@
 
 ## 📋 Overview
 
-This story implements 6 Firebase Callable Functions that provide secure, server-side management of friendship relationships in the PlayWithMe social graph. All functions include comprehensive validation, error handling, and structured error responses.
+This story implements 6 Firebase Callable Functions that provide secure, server-side management of friendship relationships in the Gatherli social graph. All functions include comprehensive validation, error handling, and structured error responses.
 
 ---
 
@@ -405,13 +405,13 @@ Functions are automatically deployed via Firebase:
 npm run build
 
 # Deploy to dev
-firebase deploy --only functions --project playwithme-dev
+firebase deploy --only functions --project gatherli-dev
 
 # Deploy to staging
-firebase deploy --only functions --project playwithme-stg
+firebase deploy --only functions --project gatherli-stg
 
 # Deploy to production
-firebase deploy --only functions --project playwithme-prod
+firebase deploy --only functions --project gatherli-prod
 ```
 
 ---

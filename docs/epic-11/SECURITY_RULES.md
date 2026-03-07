@@ -424,17 +424,17 @@ firebase emulators:start --only firestore
 
 ```bash
 # Deploy to dev
-firebase deploy --only firestore:rules --project playwithme-dev
+firebase deploy --only firestore:rules --project gatherli-dev
 
 # Verify deployment
-firebase firestore:rules --project playwithme-dev
+firebase firestore:rules --project gatherli-dev
 ```
 
 #### 2. **Staging Environment**
 
 ```bash
 # Deploy to staging
-firebase deploy --only firestore:rules --project playwithme-stg
+firebase deploy --only firestore:rules --project gatherli-stg
 
 # Test with staging app
 flutter run --flavor stg -t lib/main_stg.dart
@@ -449,10 +449,10 @@ flutter run --flavor stg -t lib/main_stg.dart
 cat firestore.rules
 
 # Deploy to production
-firebase deploy --only firestore:rules --project playwithme-prod
+firebase deploy --only firestore:rules --project gatherli-prod
 
 # Monitor for errors
-firebase firestore:logs --project playwithme-prod
+firebase firestore:logs --project gatherli-prod
 ```
 
 ### Rollback Procedure
@@ -461,13 +461,13 @@ If rules cause issues in production:
 
 ```bash
 # List recent deployments
-firebase firestore:rules:list --project playwithme-prod
+firebase firestore:rules:list --project gatherli-prod
 
 # Get previous version
-firebase firestore:rules:get <release-id> --project playwithme-prod > firestore.rules.backup
+firebase firestore:rules:get <release-id> --project gatherli-prod > firestore.rules.backup
 
 # Deploy previous version
-firebase deploy --only firestore:rules --project playwithme-prod
+firebase deploy --only firestore:rules --project gatherli-prod
 ```
 
 ### Validation Checklist

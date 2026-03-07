@@ -301,9 +301,9 @@ For each function:
 
 ## Deployment Checklist
 
-- [ ] Functions deployed to `playwithme-dev`
-- [ ] Functions deployed to `playwithme-stg`
-- [ ] Functions deployed to `playwithme-prod`
+- [ ] Functions deployed to `gatherli-dev`
+- [ ] Functions deployed to `gatherli-stg`
+- [ ] Functions deployed to `gatherli-prod`
 - [ ] Function logs monitored for errors
 - [ ] Test notifications sent successfully
 - [ ] Invalid token cleanup working

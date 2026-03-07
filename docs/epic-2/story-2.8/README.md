@@ -2,7 +2,7 @@
 
 ## Overview
 
-This story implements comprehensive push notification functionality for the PlayWithMe app using Firebase Cloud Messaging (FCM). Users can receive notifications for various group-related events and customize their notification preferences.
+This story implements comprehensive push notification functionality for the Gatherli app using Firebase Cloud Messaging (FCM). Users can receive notifications for various group-related events and customize their notification preferences.
 
 ## Features Implemented
 
@@ -184,13 +184,13 @@ functions/src/
 **Deploy Cloud Functions**:
 ```bash
 # Deploy to development
-firebase deploy --only functions --project playwithme-dev
+firebase deploy --only functions --project gatherli-dev
 
 # Deploy to staging
-firebase deploy --only functions --project playwithme-stg
+firebase deploy --only functions --project gatherli-stg
 
 # Deploy to production
-firebase deploy --only functions --project playwithme-prod
+firebase deploy --only functions --project gatherli-prod
 ```
 
 **Test Notifications Locally**:
