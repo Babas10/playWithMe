@@ -58,6 +58,7 @@ import 'package:play_with_me/core/services/app_links_deep_link_service.dart';
 import 'package:play_with_me/core/services/deferred_deep_link/deferred_deep_link_service.dart';
 import 'package:play_with_me/core/services/deferred_deep_link/android_deferred_deep_link_service.dart';
 import 'package:play_with_me/core/services/deferred_deep_link/ios_deferred_deep_link_service.dart';
+import 'package:play_with_me/core/services/deferred_deep_link/deferred_deep_link_orchestrator.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:play_with_me/core/presentation/bloc/account_status/account_status_bloc.dart';
@@ -254,6 +255,21 @@ Future<void> initializeDependencies() async {
         () => IosDeferredDeepLinkService(),
       );
     }
+  }
+
+  // Orchestrator is always registered — it is a no-op when no platform service
+  // is available (web, desktop). Resolves the service lazily so the guard above
+  // has already run and registered it (or not) by the time this runs.
+  if (!sl.isRegistered<DeferredDeepLinkOrchestrator>()) {
+    sl.registerLazySingleton<DeferredDeepLinkOrchestrator>(
+      () => DeferredDeepLinkOrchestrator(
+        service: sl.isRegistered<DeferredDeepLinkService>()
+            ? sl<DeferredDeepLinkService>()
+            : null,
+        storage: sl<PendingInviteStorage>(),
+        prefs: sl<SharedPreferences>(),
+      ),
+    );
   }
 
   // Register BLoCs only if not already registered
