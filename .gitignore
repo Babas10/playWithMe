@@ -94,3 +94,4 @@ htmlcov/
 *.egg-info/
 dist/
 build/
+.firebase/
