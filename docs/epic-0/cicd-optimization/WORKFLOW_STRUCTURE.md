@@ -2,7 +2,7 @@
 
 **Updated:** November 2025
 
-This document explains the simplified 2-workflow structure for the PlayWithMe project.
+This document explains the simplified 2-workflow structure for the Gatherli project.
 
 ---
 

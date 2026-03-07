@@ -6,7 +6,7 @@
 
 ## Overview
 
-This story implements comprehensive offline support and error handling for the PlayWithMe app, ensuring users have a seamless experience even with poor connectivity or network errors.
+This story implements comprehensive offline support and error handling for the Gatherli app, ensuring users have a seamless experience even with poor connectivity or network errors.
 
 ## Objectives
 

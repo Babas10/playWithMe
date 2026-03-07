@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-This story implements a comprehensive account settings and preferences system for the PlayWithMe app. Due to the breadth of functionality and different technical concerns, this story has been decomposed into **5 focused substories** to ensure maintainability, clear testing boundaries, and manageable implementation scope.
+This story implements a comprehensive account settings and preferences system for the Gatherli app. Due to the breadth of functionality and different technical concerns, this story has been decomposed into **5 focused substories** to ensure maintainability, clear testing boundaries, and manageable implementation scope.
 
 **Parent Story**: #[Story 1.4.5]
 **Epic**: User Profile Management (Epic 1.4)

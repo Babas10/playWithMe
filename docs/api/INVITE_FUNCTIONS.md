@@ -525,19 +525,19 @@ console.error('[revokeGroupInvite] Error', { uid, groupId, inviteId, error });
 ### Primary Format
 
 ```
-https://playwithme.page.link/invite?token={token}
+https://gatherli.page.link/invite?token={token}
 ```
 
 ### Fallback Format (if Dynamic Links not configured)
 
 ```
-https://playwithme.app/invite/{token}
+https://gatherli.org/invite/{token}
 ```
 
 ### URL Construction (in `createGroupInvite`)
 
 ```typescript
-const BASE_URL = 'https://playwithme.app/invite';
+const BASE_URL = 'https://gatherli.org/invite';
 const deepLinkUrl = `${BASE_URL}/${token}`;
 ```
 
@@ -613,9 +613,9 @@ When implemented, each function must have:
 
 | Environment | Deploy Rule |
 |-------------|------------|
-| `playwithme-dev` | Deploy on merge to `main` |
-| `playwithme-stg` | Manual deploy after QA validation |
-| `playwithme-prod` | Deploy via CI/CD pipeline after staging approval |
+| `gatherli-dev` | Deploy on merge to `main` |
+| `gatherli-stg` | Manual deploy after QA validation |
+| `gatherli-prod` | Deploy via CI/CD pipeline after staging approval |
 
 ---
 

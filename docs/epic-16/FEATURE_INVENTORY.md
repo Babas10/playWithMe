@@ -1,4 +1,4 @@
-# PlayWithMe - Feature Inventory
+# Gatherli - Feature Inventory
 
 **Document Version**: 1.0
 **Last Updated**: January 2026
@@ -21,7 +21,7 @@
 
 ## Overview
 
-PlayWithMe is a Flutter mobile app for organizing beach volleyball games and training sessions. The app follows a **BLoC with Repository Pattern** architecture and uses **Firebase** as the backend.
+Gatherli is a Flutter mobile app for organizing beach volleyball games and training sessions. The app follows a **BLoC with Repository Pattern** architecture and uses **Firebase** as the backend.
 
 ### Quick Stats
 

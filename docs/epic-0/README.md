@@ -1,10 +1,10 @@
 # Epic 0: Project Setup and Infrastructure
 
-This epic focuses on establishing the foundational infrastructure for the PlayWithMe app, including development environment setup, Firebase integration, and multi-environment configuration.
+This epic focuses on establishing the foundational infrastructure for the Gatherli app, including development environment setup, Firebase integration, and multi-environment configuration.
 
 ## 🎯 **Epic Overview**
 
-Epic 0 ensures that the development team has a robust, secure, and scalable foundation for building the PlayWithMe beach volleyball app. This includes setting up proper development workflows, environment management, and cloud infrastructure.
+Epic 0 ensures that the development team has a robust, secure, and scalable foundation for building the Gatherli beach volleyball app. This includes setting up proper development workflows, environment management, and cloud infrastructure.
 
 ## 📋 **Stories**
 

@@ -71,7 +71,7 @@ test/integration/
 #### 1. Start Firebase Emulators
 
 ```bash
-firebase emulators:start --only auth,firestore --project playwithme-dev
+firebase emulators:start --only auth,firestore --project gatherli-dev
 ```
 
 **Expected output:**
@@ -358,4 +358,4 @@ The integration tests validate these security rules:
 ---
 
 **Last Updated:** 2025-10-25
-**Maintainer:** PlayWithMe Development Team
+**Maintainer:** Gatherli Development Team

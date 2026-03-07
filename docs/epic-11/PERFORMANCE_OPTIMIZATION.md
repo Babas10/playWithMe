@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the caching and denormalization strategy implemented to minimize Firestore costs and improve performance for social graph queries in the PlayWithMe application.
+This document describes the caching and denormalization strategy implemented to minimize Firestore costs and improve performance for social graph queries in the Gatherli application.
 
 ## Problem Statement
 

@@ -1,6 +1,6 @@
 # Local Testing Guide
 
-This guide explains how to run tests locally in the PlayWithMe project following the unit/integration test separation implemented in Story 0.3.2.
+This guide explains how to run tests locally in the Gatherli project following the unit/integration test separation implemented in Story 0.3.2.
 
 ## 🎯 Test Organization
 

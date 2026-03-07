@@ -3,7 +3,7 @@
 **Story**: 16.3 - Test Coverage Analysis
 **Date**: January 2026
 
-This document provides an actionable prioritized list of tests to add to the PlayWithMe project.
+This document provides an actionable prioritized list of tests to add to the Gatherli project.
 
 ---
 

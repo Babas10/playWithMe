@@ -1,11 +1,11 @@
 Perfect — here’s the updated **final `CLAUDE.md`** including the new section **“9. Claude Behavior & Interaction Guidelines”**, which defines how Claude should think, ask, and act when implementing new stories.
-This version now reads as a **complete, production-ready instruction manual** for Claude as the AI engineer on *PlayWithMe*.
+This version now reads as a **complete, production-ready instruction manual** for Claude as the AI engineer on *Gatherli*.
 
 ---
 
 # CLAUDE.md — Project Brief & Engineering Standards
 
-**Project:** *PlayWithMe – Beach Volleyball App*
+**Project:** *Gatherli – Sports Group App*
 **Role:** Claude (AI Engineer)
 
 ---
@@ -13,7 +13,7 @@ This version now reads as a **complete, production-ready instruction manual** fo
 ## 🧭 Purpose of this Document
 
 This document provides Claude with all context, standards, and conventions needed to autonomously implement new stories from GitHub Issues.
-It defines how to build, test, and document features for the **PlayWithMe** app with consistent quality, security, and maintainability.
+It defines how to build, test, and document features for the **Gatherli** app with consistent quality, security, and maintainability.
 
 Claude must:
 
@@ -25,7 +25,7 @@ Claude must:
 
 ## 🏐 1. Project Vision
 
-**PlayWithMe** is a Flutter mobile app that helps people organize and play beach volleyball games.
+**Gatherli** is a Flutter mobile app that helps people organize and join sports games with their group.
 
 ### Core Features
 
@@ -64,9 +64,8 @@ Claude must:
 
 | Environment       | Purpose                               |
 | ----------------- | ------------------------------------- |
-| `playwithme-dev`  | Local development & integration tests |
-| `playwithme-stg`  | Internal staging/testing              |
-| `playwithme-prod` | Production (live users)               |
+| `gatherli-dev`  | Local development & integration tests |
+| `gatherli-prod` | Production (live users)               |
 
 ---
 
@@ -368,7 +367,7 @@ The app supports **5 languages**: English (EN), French (FR), German (DE), Spanis
 1. **Add the string to all 5 ARB files:**
    ```json
    // app_en.arb
-   "welcomeMessage": "Welcome to PlayWithMe",
+   "welcomeMessage": "Welcome to Gatherli",
    "@welcomeMessage": {
      "description": "Welcome message shown on home page"
    }
@@ -1074,7 +1073,7 @@ flutter test test/widget/
 
 ```bash
 # Step 1: Start Firebase Emulators
-firebase emulators:start --only auth,firestore --project playwithme-dev
+firebase emulators:start --only auth,firestore --project gatherli-dev
 
 # Step 2: Run integration tests (in another terminal)
 flutter drive \
@@ -1396,7 +1395,7 @@ Claude may proceed **without approval** if:
 
 ## 📱 10. Current App State (v0.1.0)
 
-As of **October 2025**, the PlayWithMe app has completed its foundational infrastructure phase. Here's what's currently implemented:
+As of **October 2025**, the Gatherli app has completed its foundational infrastructure phase. Here's what's currently implemented:
 
 ### **✅ Completed Foundation (Epic 0)**
 
@@ -1423,7 +1422,7 @@ As of **October 2025**, the PlayWithMe app has completed its foundational infras
 - Automated CI/CD pipeline with linting and test validation
 
 **🔒 Security & Configuration:**
-- Environment-specific Firebase projects: `playwithme-dev`, `playwithme-stg`, `playwithme-prod`
+- Environment-specific Firebase projects: `gatherli-dev`, `gatherli-prod`
 - Secure configuration management with comprehensive `.gitignore` rules
 - Pre-commit security checklist to prevent credential leaks
 - Environment files (`.env`, `.env.*`) and API keys blocked from commits
@@ -1454,9 +1453,6 @@ With the foundation complete, the app is ready for **Epic 1: Core Features** dev
 # Run development environment
 flutter run --flavor dev -t lib/main_dev.dart
 
-# Run staging environment
-flutter run --flavor stg -t lib/main_stg.dart
-
 # Run production environment
 flutter run --flavor prod -t lib/main_prod.dart
 
@@ -1477,7 +1473,7 @@ flutter analyze
 - **Version**: v0.1.0 (Foundation Release)
 - **Test Coverage**: 90%+ (maintained)
 - **Platforms**: Android, iOS, Web
-- **Environments**: 3 (dev, staging, production)
+- **Environments**: 2 (dev, production)
 - **Lines of Code**: ~2,000+ (infrastructure and tests)
 
 The foundation is solid and ready for feature development!
