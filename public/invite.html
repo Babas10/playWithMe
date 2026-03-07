@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Join Gatherli</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+      max-width: 400px;
+      width: 100%;
+      padding: 40px 28px 36px;
+      text-align: center;
+    }
+
+    .icon {
+      font-size: 56px;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+
+    p {
+      font-size: 15px;
+      color: #4a5568;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity .15s ease;
+      color: #fff;
+      background: #1565C0;
+    }
+
+    .btn:hover { opacity: .88; }
+    .btn:active { opacity: .75; }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .redirecting { color: #718096; font-size: 14px; margin-bottom: 0; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">&#127936;</div>
+
+  <!-- iOS: shown, requires user tap to write clipboard -->
+  <div id="ios-view" style="display:none">
+    <h1>You've been invited to Gatherli</h1>
+    <p>Tap below to download the app and join your group.</p>
+    <button class="btn" id="ios-btn" onclick="handleIos()">
+      Get Gatherli on the App Store
+    </button>
+  </div>
+
+  <!-- Android: shown briefly while auto-redirecting -->
+  <div id="android-view" style="display:none">
+    <h1>Opening the Play Store…</h1>
+    <p class="redirecting">You are being redirected to Google Play to install Gatherli.</p>
+    <button class="btn" disabled>
+      <span class="spinner"></span> Redirecting…
+    </button>
+  </div>
+
+  <!-- Desktop / unknown: no auto-redirect, show both store links -->
+  <div id="fallback-view" style="display:none">
+    <h1>You've been invited to Gatherli</h1>
+    <p>Download the app on your phone to join your group.</p>
+    <a class="btn" id="fallback-ios" href="#" style="margin-bottom:10px; display:flex">
+      Download on the App Store (iOS)
+    </a>
+    <a class="btn" id="fallback-android" href="#" style="display:flex; background:#01875f">
+      Get it on Google Play (Android)
+    </a>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ── Constants ──────────────────────────────────────────────────────────────
+  // TODO: replace with real App Store ID once Gatherli is published
+  var APP_STORE_URL  = 'https://apps.apple.com/app/gatherli/id000000000';
+  var PLAY_STORE_ID  = 'org.gatherli.app';
+  var CUSTOM_SCHEME  = 'gatherli://invite/';
+
+  // ── Token extraction ───────────────────────────────────────────────────────
+  // Path is /invite/{token}. Split and take the last non-empty segment.
+  var segments = window.location.pathname.split('/').filter(Boolean);
+  var token = segments[segments.length - 1] || '';
+  // Reject obviously invalid tokens (must be /invite/{something})
+  if (token === 'invite') token = '';
+
+  // ── Platform detection ─────────────────────────────────────────────────────
+  var ua = navigator.userAgent || '';
+  var isIOS     = /ipad|iphone|ipod/i.test(ua) && !window.MSStream;
+  var isAndroid = /android/i.test(ua);
+
+  // ── Route ──────────────────────────────────────────────────────────────────
+  if (isAndroid) {
+    showAndroid();
+    redirectAndroid();
+  } else if (isIOS) {
+    showIOS();
+  } else {
+    showFallback();
+  }
+
+  // ── Android: auto-redirect with Play Install Referrer ─────────────────────
+  function redirectAndroid() {
+    var referrer = token
+      ? encodeURIComponent('invite_token=' + token)
+      : '';
+    var url = 'https://play.google.com/store/apps/details?id=' + PLAY_STORE_ID;
+    if (referrer) url += '&referrer=' + referrer;
+    // replace() so the redirect page is not in browser history
+    window.location.replace(url);
+  }
+
+  // ── iOS: clipboard write on user tap, then App Store redirect ─────────────
+  window.handleIos = function () {
+    var btn = document.getElementById('ios-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Opening App Store…';
+    }
+
+    var deepLink = token ? CUSTOM_SCHEME + token : '';
+
+    function goToAppStore() {
+      window.location.href = APP_STORE_URL;
+    }
+
+    if (deepLink && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(deepLink)
+        .then(goToAppStore)
+        .catch(goToAppStore); // proceed even if clipboard is denied
+    } else {
+      goToAppStore();
+    }
+  };
+
+  // ── View helpers ───────────────────────────────────────────────────────────
+  function showAndroid() {
+    document.getElementById('android-view').style.display = 'block';
+  }
+
+  function showIOS() {
+    document.getElementById('ios-view').style.display = 'block';
+  }
+
+  function showFallback() {
+    document.getElementById('fallback-view').style.display = 'block';
+    var referrer = token ? encodeURIComponent('invite_token=' + token) : '';
+    var androidUrl = 'https://play.google.com/store/apps/details?id=' + PLAY_STORE_ID
+      + (referrer ? '&referrer=' + referrer : '');
+    var el = document.getElementById('fallback-android');
+    if (el) el.href = androidUrl;
+    var iosEl = document.getElementById('fallback-ios');
+    if (iosEl) iosEl.href = APP_STORE_URL;
+  }
+}());
+</script>
+</body>
+</html>

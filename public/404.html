@@ -2,9 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Gatherli</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gatherli — Page Not Found</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0;
+      background: #f0f4f8; color: #4a5568; text-align: center;
+    }
+  </style>
+  <script>
+    // Safety-net: if someone lands here via an /invite/ path (hosting cache miss
+    // or misconfigured rewrite), forward them to the invite redirect page.
+    if (/^\/invite\//.test(window.location.pathname)) {
+      window.location.replace(window.location.pathname);
+    }
+  </script>
 </head>
 <body>
-  <p>Page not found.</p>
+  <div>
+    <p style="font-size:48px; margin-bottom:16px">&#127936;</p>
+    <h1 style="font-size:20px; font-weight:700; color:#1a202c; margin-bottom:8px">Page not found</h1>
+    <p style="font-size:15px">This link is no longer valid or does not exist.</p>
+  </div>
 </body>
 </html>
