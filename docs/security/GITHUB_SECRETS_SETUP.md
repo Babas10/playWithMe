@@ -1,6 +1,6 @@
 # GitHub Secrets Setup for CI/CD Pipeline
 
-This document explains how to set up GitHub Secrets for the PlayWithMe CI/CD pipeline to use real Firebase configurations in continuous integration.
+This document explains how to set up GitHub Secrets for the Gatherli CI/CD pipeline to use real Firebase configurations in continuous integration.
 
 ## Overview
 
@@ -56,7 +56,7 @@ The following secrets are required for each environment (dev, stg, prod):
 For each environment, you need to extract the configuration values from your Firebase project:
 
 1. **Go to Firebase Console**: [https://console.firebase.google.com/](https://console.firebase.google.com/)
-2. **Select the project** (e.g., `playwithme-dev`)
+2. **Select the project** (e.g., `gatherli-dev`)
 3. **Navigate to Project Settings** → General tab
 4. **Copy the project configuration**:
    - **Project ID**: Found in "Project settings" section
@@ -80,14 +80,14 @@ For each environment, you need to extract the configuration values from your Fir
 
 ```bash
 # Development Environment Example
-FIREBASE_DEV_PROJECT_ID=playwithme-dev
-FIREBASE_DEV_STORAGE_BUCKET=playwithme-dev.firebasestorage.app
+FIREBASE_DEV_PROJECT_ID=gatherli-dev
+FIREBASE_DEV_STORAGE_BUCKET=gatherli-dev.firebasestorage.app
 FIREBASE_DEV_ANDROID_APP_ID=1:123456789:android:abcdef123456
 FIREBASE_DEV_IOS_APP_ID=1:123456789:ios:abcdef123456
 FIREBASE_DEV_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 FIREBASE_DEV_MESSAGING_SENDER_ID=123456789
-FIREBASE_DEV_ANDROID_PACKAGE_NAME=com.playwithme.play_with_me.dev
-FIREBASE_DEV_IOS_BUNDLE_ID=com.playwithme.playWithMe.dev
+FIREBASE_DEV_ANDROID_PACKAGE_NAME=org.gatherli.app.dev
+FIREBASE_DEV_IOS_BUNDLE_ID=org.gatherli.app.dev
 ```
 
 ### Step 3: Verify Secrets Setup
@@ -104,7 +104,7 @@ The CI/CD pipeline uses the secure script `tools/generate_firebase_config_from_s
 
 1. **Generate Firebase Service Account Key**:
    - Go to [Firebase Console](https://console.firebase.google.com/)
-   - Select your project (e.g., `playwithme-dev`)
+   - Select your project (e.g., `gatherli-dev`)
    - Navigate to Project Settings → Service Accounts
    - Click "Generate new private key"
    - Download the JSON file
@@ -124,7 +124,7 @@ The service account JSON should look like this:
 ```json
 {
   "type": "service_account",
-  "project_id": "playwithme-dev",
+  "project_id": "gatherli-dev",
   "private_key_id": "...",
   "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
   "client_email": "...",
@@ -192,8 +192,8 @@ You can validate your setup by:
 
 The pipeline generates configurations for three environments:
 
-- **dev**: `playwithme-dev` project
-- **stg**: `playwithme-stg` project
-- **prod**: `playwithme-prod` project
+- **dev**: `gatherli-dev` project
+- **stg**: `gatherli-stg` project
+- **prod**: `gatherli-prod` project
 
 Each environment uses its own Firebase project to ensure proper isolation during testing and deployment.

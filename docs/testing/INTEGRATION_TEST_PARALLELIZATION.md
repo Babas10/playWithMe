@@ -125,7 +125,7 @@ jobs:
       # Step 9: Start Firebase Emulators
       - name: 🚀 Start Firebase Emulators
         run: |
-          firebase emulators:start --only auth,firestore --project playwithme-dev &
+          firebase emulators:start --only auth,firestore --project gatherli-dev &
           EMULATOR_PID=$!
           echo "EMULATOR_PID=$EMULATOR_PID" >> $GITHUB_ENV
 
@@ -276,7 +276,7 @@ steps:
     run: |
       firebase emulators:start \
         --only auth,firestore \
-        --project playwithme-dev \
+        --project gatherli-dev \
         --port=${{ matrix.port }} &
 
   - name: Run Test

@@ -302,9 +302,9 @@ firebase deploy --only functions:onGameCreated
 ```
 
 **Environments:**
-- `playwithme-dev` - Development
-- `playwithme-stg` - Staging
-- `playwithme-prod` - Production
+- `gatherli-dev` - Development
+- `gatherli-stg` - Staging
+- `gatherli-prod` - Production
 
 ## Error Scenarios
 

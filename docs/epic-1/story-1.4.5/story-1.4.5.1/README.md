@@ -430,7 +430,7 @@ dependencies:
 10. Add proper error handling and success messages
 
 ### Phase 4: App Integration
-11. Update `PlayWithMeApp` to use saved locale for app-wide language
+11. Update `GatherliApp` to use saved locale for app-wide language
 12. Ensure locale persists across app restarts
 13. Test language changes apply correctly
 

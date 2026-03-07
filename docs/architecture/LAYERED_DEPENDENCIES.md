@@ -1,6 +1,6 @@
 # Layered Dependency Model
 
-**PlayWithMe** follows a strict **layered architecture** with one-way dependencies to maintain clear separation of concerns, prevent circular dependencies, and enable independent scaling of each layer.
+**Gatherli** follows a strict **layered architecture** with one-way dependencies to maintain clear separation of concerns, prevent circular dependencies, and enable independent scaling of each layer.
 
 ## 🏗️ Architecture Overview
 

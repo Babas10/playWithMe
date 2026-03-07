@@ -1,7 +1,7 @@
 # iOS Apple Developer Account Setup — Gatherli
 
 **Date:** March 2026
-**Context:** Epic 18 — App Rename: PlayWithMe → Gatherli
+**Context:** Epic 18 — App Rename: Gatherli → Gatherli
 
 This document covers all steps taken to configure the Apple Developer account, iOS signing,
 and Firebase push notification integration for the Gatherli app.

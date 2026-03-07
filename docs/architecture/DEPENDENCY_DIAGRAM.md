@@ -1,6 +1,6 @@
 # Architecture Dependency Diagrams
 
-Visual representations of the **PlayWithMe** layered architecture and data flow patterns.
+Visual representations of the **Gatherli** layered architecture and data flow patterns.
 
 ---
 

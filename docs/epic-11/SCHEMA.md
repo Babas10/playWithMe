@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the Firestore data model for the "My Community" social graph system. The friendship system serves as the foundation for user relationships in the PlayWithMe app.
+This document describes the Firestore data model for the "My Community" social graph system. The friendship system serves as the foundation for user relationships in the Gatherli app.
 
 ## Collection: `/friendships/{friendshipId}`
 

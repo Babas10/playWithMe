@@ -516,7 +516,7 @@ The following features are **NOT** implemented in this story but the data model 
 **Verify deployment:**
 ```bash
 # Check if functions are deployed
-firebase functions:list --project playwithme-dev
+firebase functions:list --project gatherli-dev
 
 # Expected output should include:
 # ✓ joinTrainingSession (callable)
@@ -526,13 +526,13 @@ firebase functions:list --project playwithme-dev
 **Deploy to all environments:**
 ```bash
 # Development
-firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession --project playwithme-dev
+firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession --project gatherli-dev
 
 # Staging
-firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession --project playwithme-stg
+firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession --project gatherli-stg
 
 # Production
-firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession --project playwithme-prod
+firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession --project gatherli-prod
 ```
 
 ### Firestore Indexes

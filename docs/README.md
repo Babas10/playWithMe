@@ -1,4 +1,4 @@
-# PlayWithMe Documentation
+# Gatherli Documentation
 
 This directory contains comprehensive documentation organized by Epic and Story.
 
@@ -17,7 +17,7 @@ docs/
 ## 🎯 **Epic Overview**
 
 ### **Epic 0: Project Setup and Infrastructure**
-Foundation setup for the PlayWithMe app including development environment, Firebase integration, and multi-environment configuration.
+Foundation setup for the Gatherli app including development environment, Firebase integration, and multi-environment configuration.
 
 **Completed Stories:**
 - ✅ **Story 0.2.1**: [Create Real Firebase Projects](./epic-0/story-0.2.1/) - Multi-environment Firebase setup with secure configuration management
@@ -27,7 +27,7 @@ Foundation setup for the PlayWithMe app including development environment, Fireb
 - 📋 **Story 0.3.x**: Additional infrastructure setup
 
 ### **Epic 1: Core Features**
-Implementation of core PlayWithMe functionality including user management, groups, and game organization.
+Implementation of core Gatherli functionality including user management, groups, and game organization.
 
 **Upcoming Stories:**
 - 📋 **Story 1.1**: User Authentication and Profile Management
@@ -50,17 +50,14 @@ Implementation of core PlayWithMe functionality including user management, group
 ```bash
 # Firebase config generation
 dart tools/generate_firebase_config.dart dev
-dart tools/generate_firebase_config.dart stg
 dart tools/generate_firebase_config.dart prod
 
 # Flutter builds
 flutter run --flavor dev -t lib/main_dev.dart
-flutter run --flavor stg -t lib/main_stg.dart
 flutter run --flavor prod -t lib/main_prod.dart
 
 # Android builds
 flutter build apk --flavor dev -t lib/main_dev.dart
-flutter build apk --flavor stg -t lib/main_stg.dart
 flutter build apk --flavor prod -t lib/main_prod.dart
 ```
 

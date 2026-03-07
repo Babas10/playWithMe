@@ -313,15 +313,15 @@ testWidgets('Complete training session flow: join → exercise → complete → 
 
 ```bash
 # Development
-firebase use playwithme-dev
+firebase use gatherli-dev
 firebase deploy --only functions:onParticipantJoined,functions:onParticipantLeft
 
 # Staging
-firebase use playwithme-stg
+firebase use gatherli-stg
 firebase deploy --only functions:onParticipantJoined,functions:onParticipantLeft
 
 # Production
-firebase use playwithme-prod
+firebase use gatherli-prod
 firebase deploy --only functions:onParticipantJoined,functions:onParticipantLeft
 ```
 

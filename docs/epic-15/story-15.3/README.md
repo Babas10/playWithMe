@@ -356,17 +356,17 @@ countStream.listen((count) {
 
 ```bash
 # Deploy Cloud Functions to dev
-firebase use playwithme-dev
+firebase use gatherli-dev
 firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession
 
 # Deploy Firestore rules to dev
 firebase deploy --only firestore:rules
 
 # Repeat for staging and production
-firebase use playwithme-stg
+firebase use gatherli-stg
 firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession,firestore:rules
 
-firebase use playwithme-prod
+firebase use gatherli-prod
 firebase deploy --only functions:joinTrainingSession,functions:leaveTrainingSession,firestore:rules
 ```
 

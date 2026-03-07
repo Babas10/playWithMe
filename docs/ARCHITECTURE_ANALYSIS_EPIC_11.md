@@ -1,4 +1,4 @@
-# PlayWithMe App - Current Architecture Analysis
+# Gatherli App - Current Architecture Analysis
 
 **Date**: November 2, 2025  
 **Branch**: feature/story-2.5-offline-error-handling  

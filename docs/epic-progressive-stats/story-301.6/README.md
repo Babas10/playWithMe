@@ -157,9 +157,9 @@ PerformanceOverviewCard displays best win
 ## Deployment
 
 Functions deployed to all environments:
-- ✅ Development (`playwithme-dev`)
-- ✅ Staging (`playwithme-stg`)
-- ✅ Production (`playwithme-prod`)
+- ✅ Development (`gatherli-dev`)
+- ✅ Staging (`gatherli-stg`)
+- ✅ Production (`gatherli-prod`)
 
 No Firestore security rule changes needed (Cloud Functions use Admin SDK).
 
