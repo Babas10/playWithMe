@@ -57,6 +57,7 @@ import 'package:play_with_me/core/services/deep_link_service.dart';
 import 'package:play_with_me/core/services/app_links_deep_link_service.dart';
 import 'package:play_with_me/core/services/deferred_deep_link/deferred_deep_link_service.dart';
 import 'package:play_with_me/core/services/deferred_deep_link/android_deferred_deep_link_service.dart';
+import 'package:play_with_me/core/services/deferred_deep_link/ios_deferred_deep_link_service.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show Platform;
 import 'package:play_with_me/core/presentation/bloc/account_status/account_status_bloc.dart';
@@ -239,12 +240,18 @@ Future<void> initializeDependencies() async {
     );
   }
 
-  // Deferred deep link service — Android only.
+  // Deferred deep link service — platform-specific.
   // kIsWeb guard is required because dart:io Platform is not available on web.
   if (!kIsWeb && Platform.isAndroid) {
     if (!sl.isRegistered<DeferredDeepLinkService>()) {
       sl.registerLazySingleton<DeferredDeepLinkService>(
         () => AndroidDeferredDeepLinkService(),
+      );
+    }
+  } else if (!kIsWeb && Platform.isIOS) {
+    if (!sl.isRegistered<DeferredDeepLinkService>()) {
+      sl.registerLazySingleton<DeferredDeepLinkService>(
+        () => IosDeferredDeepLinkService(),
       );
     }
   }
