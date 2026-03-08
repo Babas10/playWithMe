@@ -22,6 +22,10 @@ class FirestoreFriendRepository implements FriendRepository {
 
   static const Duration _friendshipCacheTtl = Duration(minutes: 5);
 
+  /// Tracks which authenticated user the caches belong to.
+  /// When the user changes (logout/login), caches are invalidated automatically.
+  String? _cacheOwnerId;
+
   FirestoreFriendRepository({
     required FirebaseFunctions functions,
     required FirebaseFirestore firestore,
@@ -410,6 +414,15 @@ class FirestoreFriendRepository implements FriendRepository {
         throw FriendshipException('User not authenticated');
       }
 
+      // Invalidate stale caches when the authenticated user changes (e.g., after
+      // logout/login). Without this guard, a singleton repository would serve
+      // friendship data from the previous user's session.
+      if (_cacheOwnerId != currentUserId) {
+        _friendshipCache.clear();
+        _requestStatusCache.clear();
+        _cacheOwnerId = currentUserId;
+      }
+
       // Handle empty list early
       if (userIds.isEmpty) {
         return {};
@@ -543,6 +556,14 @@ class FirestoreFriendRepository implements FriendRepository {
         throw FriendshipException('User not authenticated');
       }
 
+      // Same user-change guard as batchCheckFriendship: clear stale caches on
+      // user switch so request statuses from a previous session are not served.
+      if (_cacheOwnerId != currentUserId) {
+        _friendshipCache.clear();
+        _requestStatusCache.clear();
+        _cacheOwnerId = currentUserId;
+      }
+
       // Handle empty list early
       if (userIds.isEmpty) {
         return {};
@@ -612,10 +633,11 @@ class FirestoreFriendRepository implements FriendRepository {
     _requestStatusCache.remove(userId);
   }
 
-  /// Clears all friendship status caches.
+  /// Clears all friendship status caches and resets the cache owner.
   void clearFriendshipCache() {
     _friendshipCache.clear();
     _requestStatusCache.clear();
+    _cacheOwnerId = null;
   }
 
   @override
