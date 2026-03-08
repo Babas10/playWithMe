@@ -12,7 +12,7 @@
 import * as admin from "firebase-admin";
 
 admin.initializeApp({
-  projectId: "playwithme-dev",
+  projectId: "gatherli-dev",
 });
 
 const db = admin.firestore();
@@ -116,7 +116,7 @@ async function main() {
   const startTime = Date.now();
 
   console.log("=".repeat(70));
-  console.log("🗑️  PLAYWITHME - DELETE ALL DATA");
+  console.log("🗑️  GATHERLI - DELETE ALL DATA");
   console.log("=".repeat(70));
   console.log("\n⚠️  WARNING: This will DELETE ALL DATA in the dev environment!\n");
 

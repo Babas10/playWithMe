@@ -294,6 +294,8 @@ void main() {
               email: testEmail,
               password: testPassword,
             )).thenAnswer((_) async => mockUserCredential);
+        when(() => mockUser.getIdToken(true))
+            .thenAnswer((_) async => 'mock-id-token');
 
         final result = await repository.createUserWithEmailAndPassword(
           email: testEmail,

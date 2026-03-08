@@ -4,7 +4,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A badge widget that displays the current win or loss streak.
 ///
-/// Only displays when the streak is >= 2 (positive or negative).
+/// Only displays when the streak is >= 1 (positive or negative).
 /// - Winning streaks: 🔥 emoji with green color
 /// - Losing streaks: ❄️ emoji with blue/grey color
 class WinStreakBadge extends StatelessWidget {
@@ -15,7 +15,7 @@ class WinStreakBadge extends StatelessWidget {
     required this.currentStreak,
   });
 
-  bool get shouldDisplay => currentStreak.abs() >= 2;
+  bool get shouldDisplay => currentStreak.abs() >= 1;
 
   bool get isWinningStreak => currentStreak > 0;
 

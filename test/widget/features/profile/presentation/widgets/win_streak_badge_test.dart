@@ -7,7 +7,7 @@ import 'package:play_with_me/features/profile/presentation/widgets/win_streak_ba
 
 void main() {
   group('WinStreakBadge Widget Tests', () {
-    testWidgets('does not display for streak less than 2', (tester) async {
+    testWidgets('displays for winning streak of 1', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
       localizationsDelegates: const [
@@ -24,12 +24,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(Card), findsNothing);
-      expect(find.byType(SizedBox), findsOneWidget); // SizedBox.shrink()
+      expect(find.byType(Card), findsOneWidget);
+      expect(find.text('🔥'), findsOneWidget);
     });
 
-    testWidgets('does not display for negative streak less than -2',
-        (tester) async {
+    testWidgets('displays for losing streak of -1', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
       localizationsDelegates: const [
@@ -46,7 +45,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(Card), findsNothing);
+      expect(find.byType(Card), findsOneWidget);
+      expect(find.text('❄️'), findsOneWidget);
     });
 
     testWidgets('does not display for zero streak', (tester) async {
