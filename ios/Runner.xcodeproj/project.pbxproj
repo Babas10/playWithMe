@@ -128,15 +128,15 @@
 				40944E250321FAF5B52DF8ED /* Pods-RunnerTests.release.xcconfig */,
 				028667BC6C7453D54135EEFA /* Pods-RunnerTests.profile.xcconfig */,
 				86DCB644D4B3BFA07D229D3E /* Pods-Runner.debug-prod.xcconfig */,
-					AAAA328D774FFED310A41819 /* Pods-Runner.release-prod.xcconfig */,
+				AAAA328D774FFED310A41819 /* Pods-Runner.release-prod.xcconfig */,
 				8299069D4E60107A2BA4965A /* Pods-Runner.release-dev.xcconfig */,
-					87A84472A412B2CEFD25CD7A /* Pods-Runner.profile-prod.xcconfig */,
-					89E24D585AD690A94C09E230 /* Pods-Runner.profile-dev.xcconfig */,
+				87A84472A412B2CEFD25CD7A /* Pods-Runner.profile-prod.xcconfig */,
+				89E24D585AD690A94C09E230 /* Pods-Runner.profile-dev.xcconfig */,
 				4C4735CDF70969769F58EB40 /* Pods-RunnerTests.debug-prod.xcconfig */,
-					D28B111DF21F40BACBF2DEE8 /* Pods-RunnerTests.release-prod.xcconfig */,
+				D28B111DF21F40BACBF2DEE8 /* Pods-RunnerTests.release-prod.xcconfig */,
 				2597421543C12E4129F5AF8C /* Pods-RunnerTests.release-dev.xcconfig */,
-					4CBEA2D6A61113DD66D87448 /* Pods-RunnerTests.profile-prod.xcconfig */,
-					2620827DE7D3460F2DAA1102 /* Pods-RunnerTests.profile-dev.xcconfig */,
+				4CBEA2D6A61113DD66D87448 /* Pods-RunnerTests.profile-prod.xcconfig */,
+				2620827DE7D3460F2DAA1102 /* Pods-RunnerTests.profile-dev.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -308,13 +308,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -382,13 +378,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1369,11 +1361,11 @@
 			buildConfigurations = (
 				331C8088294A63A400263BE5 /* Debug */,
 				BEC6F6B72E84B59800187B2A /* Debug-prod */,
-					BEC6F6B12E84AEDB00187B2A /* Debug-dev */,
+				BEC6F6B12E84AEDB00187B2A /* Debug-dev */,
 				331C8089294A63A400263BE5 /* Release */,
 				BEC6F6BD2E84B5AC00187B2A /* Release-prod */,
 				BEC6F6C02E84B5B200187B2A /* Release-dev */,
-					331C808A294A63A400263BE5 /* Profile */,
+				331C808A294A63A400263BE5 /* Profile */,
 				BEC6F6C92E84B5D000187B2A /* Profile-prod */,
 				BEC6F6C32E84B5C100187B2A /* Profile-dev */,
 			);

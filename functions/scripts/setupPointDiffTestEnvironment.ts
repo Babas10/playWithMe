@@ -32,7 +32,7 @@ import * as path from "path";
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  projectId: "playwithme-dev", // ⚠️ Only dev environment
+  projectId: "gatherli-dev", // ⚠️ Only dev environment
 });
 
 const db = admin.firestore();
@@ -803,8 +803,8 @@ async function setupPointDiffTestEnvironment() {
 
 // Confirm project before running
 const projectId = admin.app().options.projectId;
-if (projectId !== "playwithme-dev") {
-  console.error("❌ ERROR: This script can only run on playwithme-dev!");
+if (projectId !== "gatherli-dev") {
+  console.error("❌ ERROR: This script can only run on gatherli-dev!");
   console.error(`   Current project: ${projectId}`);
   process.exit(1);
 }

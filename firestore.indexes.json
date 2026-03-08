@@ -47,6 +47,24 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
+          "fieldPath": "initiatorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "friendships",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
           "fieldPath": "recipientId",
           "order": "ASCENDING"
         },

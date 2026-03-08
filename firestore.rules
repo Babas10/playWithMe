@@ -11,12 +11,6 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    /// Check if user is a member of the specified group
-    function isGroupMember(groupId) {
-      return isAuthenticated() &&
-             request.auth.uid in get(/databases/$(database)/documents/groups/$(groupId)).data.memberIds;
-    }
-
     /// Check if user is an admin of the specified group
     function isGroupAdmin(groupId) {
       return isAuthenticated() &&

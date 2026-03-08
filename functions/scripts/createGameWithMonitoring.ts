@@ -4,7 +4,7 @@ import { getTestUser, getTestGroupId } from "./testConfigLoader";
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
   admin.initializeApp({
-    projectId: "playwithme-dev",
+    projectId: "gatherli-dev",
   });
 }
 
@@ -180,9 +180,9 @@ async function createGameWithMonitoring() {
   console.log("   Cloud Function did not complete processing");
   console.log("\n💡 Next steps:");
   console.log("   1. Check Cloud Function logs:");
-  console.log(`      firebase functions:log --only onGameStatusChanged --project playwithme-dev`);
+  console.log(`      firebase functions:log --only onGameStatusChanged --project gatherli-dev`);
   console.log("\n   2. Check if function is running:");
-  console.log(`      firebase functions:list --project playwithme-dev | grep onGameStatusChanged`);
+  console.log(`      firebase functions:list --project gatherli-dev | grep onGameStatusChanged`);
 }
 
 if (require.main === module) {

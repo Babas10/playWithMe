@@ -38,7 +38,7 @@ import * as crypto from "crypto";
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  projectId: "playwithme-dev", // ⚠️ Only dev environment
+  projectId: "gatherli-dev", // ⚠️ Only dev environment
 });
 
 const db = admin.firestore();
@@ -47,7 +47,7 @@ const auth = admin.auth();
 const DEFAULT_PASSWORD = "test1010";
 
 // Salt for participant hash (must match Cloud Functions)
-const PARTICIPANT_HASH_SALT = process.env.PARTICIPANT_HASH_SALT || "playwithme-feedback-salt-v1";
+const PARTICIPANT_HASH_SALT = process.env.PARTICIPANT_HASH_SALT || "gatherli-feedback-salt-v1";
 
 /**
  * Generate anonymous participant hash
@@ -959,8 +959,8 @@ async function setupTrainingSessionTestEnvironment() {
 
 // Confirm project before running
 const projectId = admin.app().options.projectId;
-if (projectId !== "playwithme-dev") {
-  console.error("❌ ERROR: This script can only run on playwithme-dev!");
+if (projectId !== "gatherli-dev") {
+  console.error("❌ ERROR: This script can only run on gatherli-dev!");
   process.exit(1);
 }
 

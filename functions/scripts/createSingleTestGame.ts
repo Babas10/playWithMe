@@ -2,7 +2,7 @@ import * as admin from "firebase-admin";
 import { getTestUser, getTestGroupId } from "./testConfigLoader";
 
 admin.initializeApp({
-  projectId: "playwithme-dev",
+  projectId: "gatherli-dev",
 });
 
 async function createSingleTestGame() {
@@ -79,7 +79,7 @@ async function createSingleTestGame() {
     console.log(`\n✅ SUCCESS! ELO was calculated by Cloud Function`);
   } else {
     console.log(`\n❌ ELO not calculated yet. Check Cloud Function logs:`);
-    console.log(`   firebase functions:log --project playwithme-dev`);
+    console.log(`   firebase functions:log --project gatherli-dev`);
   }
 
   console.log('\n');

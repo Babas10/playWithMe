@@ -4,7 +4,7 @@ import { getTestGroupId } from "./testConfigLoader";
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
     admin.initializeApp({
-        projectId: "playwithme-dev"
+        projectId: "gatherli-dev"
     });
 }
 
