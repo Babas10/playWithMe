@@ -12,7 +12,7 @@
 import * as admin from "firebase-admin";
 
 admin.initializeApp({
-  projectId: "playwithme-dev",
+  projectId: "gatherli-dev",
 });
 
 const db = admin.firestore();

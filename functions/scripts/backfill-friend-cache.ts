@@ -18,13 +18,13 @@ import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  projectId: 'playwithme-dev', // ⚠️ Only dev environment
+  projectId: 'gatherli-dev', // ⚠️ Only dev environment
 });
 
 async function backfillFriendCache() {
   const db = admin.firestore();
 
-  console.log('🔄 Starting friend cache backfill for playwithme-dev...\n');
+  console.log('🔄 Starting friend cache backfill for gatherli-dev...\n');
 
   try {
     // 1. Get all accepted friendships
@@ -151,8 +151,8 @@ async function backfillFriendCache() {
 
 // Safety check
 const projectId = admin.app().options.projectId;
-if (projectId !== 'playwithme-dev') {
-  console.error('❌ ERROR: This script can only run on playwithme-dev!');
+if (projectId !== 'gatherli-dev') {
+  console.error('❌ ERROR: This script can only run on gatherli-dev!');
   console.error(`   Current project: ${projectId}`);
   process.exit(1);
 }

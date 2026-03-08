@@ -118,15 +118,6 @@ interface BatchCheckFriendRequestStatusResponse {
 // ============================================================================
 
 /**
- * Check if a user exists in Firestore
- */
-async function userExists(userId: string): Promise<boolean> {
-  const db = admin.firestore();
-  const userDoc = await db.collection("users").doc(userId).get();
-  return userDoc.exists;
-}
-
-/**
  * Get user profile data
  */
 async function getUserProfile(userId: string): Promise<UserProfile | null> {
@@ -147,7 +138,8 @@ async function getUserProfile(userId: string): Promise<UserProfile | null> {
 }
 
 /**
- * Check if a friendship exists between two users (in either direction)
+ * Check if a friendship exists between two users (in either direction).
+ * Both directional queries run in parallel.
  */
 async function findExistingFriendship(
   userId1: string,
@@ -156,28 +148,21 @@ async function findExistingFriendship(
   const db = admin.firestore();
   const friendshipsRef = db.collection("friendships");
 
-  // Check direction 1: userId1 -> userId2
-  const query1 = await friendshipsRef
-    .where("initiatorId", "==", userId1)
-    .where("recipientId", "==", userId2)
-    .limit(1)
-    .get();
+  const [query1, query2] = await Promise.all([
+    friendshipsRef
+      .where("initiatorId", "==", userId1)
+      .where("recipientId", "==", userId2)
+      .limit(1)
+      .get(),
+    friendshipsRef
+      .where("initiatorId", "==", userId2)
+      .where("recipientId", "==", userId1)
+      .limit(1)
+      .get(),
+  ]);
 
-  if (!query1.empty) {
-    return query1.docs[0];
-  }
-
-  // Check direction 2: userId2 -> userId1
-  const query2 = await friendshipsRef
-    .where("initiatorId", "==", userId2)
-    .where("recipientId", "==", userId1)
-    .limit(1)
-    .get();
-
-  if (!query2.empty) {
-    return query2.docs[0];
-  }
-
+  if (!query1.empty) return query1.docs[0];
+  if (!query2.empty) return query2.docs[0];
   return null;
 }
 
@@ -229,18 +214,25 @@ export async function sendFriendRequestHandler(
   }
 
   try {
-    // Rate limiting: Check recent requests from this user
-    // Story 11.19: Prevent spam by limiting to 10 requests per hour
+    // Run all independent reads in parallel: rate-limit check, both user
+    // profiles, and existing-friendship check (2 directions internally).
     const db = admin.firestore();
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-    const recentRequests = await db
-      .collection("friendships")
-      .where("initiatorId", "==", currentUserId)
-      .where("createdAt", ">", oneHourAgo)
-      .where("status", "==", "pending")
-      .get();
+    const [recentRequests, initiatorProfileRaw, recipientProfile, existingFriendship] =
+      await Promise.all([
+        db
+          .collection("friendships")
+          .where("initiatorId", "==", currentUserId)
+          .where("createdAt", ">", oneHourAgo)
+          .where("status", "==", "pending")
+          .get(),
+        getUserProfile(currentUserId),
+        getUserProfile(targetUserId),
+        findExistingFriendship(currentUserId, targetUserId),
+      ]);
 
+    // Rate limiting check
     if (recentRequests.size >= 10) {
       functions.logger.warn("Rate limit exceeded for friend requests", {
         userId: currentUserId,
@@ -252,9 +244,8 @@ export async function sendFriendRequestHandler(
       );
     }
 
-    // Check if target user exists
-    const targetExists = await userExists(targetUserId);
-    if (!targetExists) {
+    // Validate recipient exists
+    if (!recipientProfile) {
       functions.logger.warn("Target user not found", {
         from: currentUserId,
         targetUserId,
@@ -265,17 +256,7 @@ export async function sendFriendRequestHandler(
       );
     }
 
-    functions.logger.debug("Target user exists, checking for existing friendship", {
-      from: currentUserId,
-      to: targetUserId,
-    });
-
     // Check for existing friendship
-    const existingFriendship = await findExistingFriendship(
-      currentUserId,
-      targetUserId
-    );
-
     if (existingFriendship) {
       const friendshipData = existingFriendship.data();
       const status = friendshipData.status;
@@ -309,21 +290,20 @@ export async function sendFriendRequestHandler(
       });
     }
 
-    // Get user profiles for denormalized names
-    const initiatorProfile = await getUserProfile(currentUserId);
-    const recipientProfile = await getUserProfile(targetUserId);
-
-    if (!initiatorProfile || !recipientProfile) {
-      functions.logger.error("Failed to retrieve user profiles", {
-        from: currentUserId,
-        to: targetUserId,
-        hasInitiator: !!initiatorProfile,
-        hasRecipient: !!recipientProfile,
+    // Resolve initiator profile — fall back to Auth data if the Firestore
+    // document hasn't been created yet by the createUserDocument trigger.
+    let initiatorProfile = initiatorProfileRaw;
+    if (!initiatorProfile) {
+      functions.logger.warn("Initiator Firestore profile not yet created, falling back to Auth data", {
+        uid: currentUserId,
       });
-      throw new functions.https.HttpsError(
-        "internal",
-        "Failed to retrieve user profiles"
-      );
+      const authUser = await admin.auth().getUser(currentUserId);
+      initiatorProfile = {
+        uid: authUser.uid,
+        displayName: authUser.displayName || null,
+        email: authUser.email || "",
+        photoUrl: authUser.photoURL || null,
+      };
     }
 
     // Create new friendship document

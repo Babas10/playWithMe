@@ -2,7 +2,7 @@ import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin for REAL project
 admin.initializeApp({
-  projectId: 'playwithme-dev'
+  projectId: 'gatherli-dev'
 });
 
 const db = admin.firestore();
@@ -71,7 +71,7 @@ async function getOrCreateUser(userData: any) {
 
 async function main() {
   try {
-    console.log('Connecting to REAL project: playwithme-dev...');
+    console.log('Connecting to REAL project: gatherli-dev...');
 
     // 1. Get Users
     console.log('Verifying users...');
@@ -147,7 +147,7 @@ async function main() {
       eloCalculated: false,
     });
 
-    console.log(`\n✅ REAL Game Created Successfully in playwithme-dev!`);
+    console.log(`\n✅ REAL Game Created Successfully in gatherli-dev!`);
     console.log(`Game ID: ${gameRef.id}`);
     console.log(`Group ID: ${groupId}`);
     console.log(`Time: ${scheduledTime.toLocaleTimeString()}`);

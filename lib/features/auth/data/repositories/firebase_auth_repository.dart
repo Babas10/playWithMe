@@ -73,6 +73,10 @@ class FirebaseAuthRepository implements AuthRepository {
         throw Exception('User creation failed: User is null');
       }
 
+      // Force a token refresh so the first ID token is fully signed before
+      // any Cloud Function call (avoids "no kid claim" rejection).
+      await credential.user!.getIdToken(true);
+
       debugPrint('✅ Successfully created user: ${credential.user!.email}');
       return UserModel.fromFirebaseUser(credential.user!).toEntity();
     } on FirebaseAuthException catch (e) {
