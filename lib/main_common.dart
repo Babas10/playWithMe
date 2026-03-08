@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:play_with_me/app/play_with_me_app.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/core/services/firebase_service.dart';
+import 'package:play_with_me/core/services/deferred_deep_link/deferred_deep_link_orchestrator.dart';
 
 Future<void> mainCommon() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +13,11 @@ Future<void> mainCommon() async {
 
     // Initialize dependency injection
     await initializeDependencies();
+
+    // Run the deferred deep link check once on first launch.
+    // Stores any recovered token in PendingInviteStorage before runApp() so
+    // that DeepLinkBloc.InitializeDeepLinks picks it up automatically.
+    await sl<DeferredDeepLinkOrchestrator>().checkOnce();
 
     runApp(const PlayWithMeApp());
 
