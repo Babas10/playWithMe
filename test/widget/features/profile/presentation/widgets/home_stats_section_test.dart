@@ -150,12 +150,12 @@ void main() {
       expect(find.textContaining('3 wins'), findsOneWidget);
     });
 
-    testWidgets('shows no streak text when streak < 2', (tester) async {
+    testWidgets('shows streak text when streak is 1', (tester) async {
       final userWithSmallStreak = testUser.copyWith(currentStreak: 1);
 
       await pumpHomeStatsSection(tester, user: userWithSmallStreak);
 
-      expect(find.text('None'), findsOneWidget);
+      expect(find.textContaining('1 wins'), findsOneWidget);
     });
 
     testWidgets('shows losing streak with weather emoji for negative streak <= -2', (tester) async {

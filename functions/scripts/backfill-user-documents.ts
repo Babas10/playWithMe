@@ -8,7 +8,7 @@
  *   npx ts-node scripts/backfill-user-documents.ts <project-id>
  *
  * Example:
- *   npx ts-node scripts/backfill-user-documents.ts playwithme-dev
+ *   npx ts-node scripts/backfill-user-documents.ts gatherli-dev
  */
 
 import * as admin from "firebase-admin";
@@ -92,7 +92,7 @@ if (!projectId) {
   console.log("\nUsage:");
   console.log("  npx ts-node scripts/backfill-user-documents.ts <project-id>");
   console.log("\nExample:");
-  console.log("  npx ts-node scripts/backfill-user-documents.ts playwithme-dev\n");
+  console.log("  npx ts-node scripts/backfill-user-documents.ts gatherli-dev\n");
   process.exit(1);
 }
 

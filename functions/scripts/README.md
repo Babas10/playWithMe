@@ -1,4 +1,4 @@
-# PlayWithMe Test Scripts
+# Gatherli Test Scripts
 
 Quick-run scripts for setting up and managing test data in the Firebase dev environment.
 
@@ -219,13 +219,13 @@ After running `setupTestEnvironment.ts`:
 
 ## 🔒 Safety
 
-All scripts target **playwithme-dev** only and will fail if run against other projects.
+All scripts target **gatherli-dev** only and will fail if run against other projects.
 
 **Project validation check:**
 ```typescript
 const projectId = admin.app().options.projectId;
-if (projectId !== "playwithme-dev") {
-  console.error("❌ ERROR: This script can only run on playwithme-dev!");
+if (projectId !== "gatherli-dev") {
+  console.error("❌ ERROR: This script can only run on gatherli-dev!");
   process.exit(1);
 }
 ```
@@ -246,7 +246,7 @@ if (projectId !== "playwithme-dev") {
 **"Test config not found"**
 → Run `npx ts-node scripts/setupTestEnvironment.ts` first
 
-**"This script can only run on playwithme-dev"**
+**"This script can only run on gatherli-dev"**
 → Check Firebase project with `firebase use` and switch to dev if needed
 
 **Auth users exist but no Firestore documents**
@@ -267,7 +267,7 @@ import { getTestUser, getTestGroupId, printTestConfig } from './testConfigLoader
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
   admin.initializeApp({
-    projectId: "playwithme-dev",
+    projectId: "gatherli-dev",
   });
 }
 
@@ -303,5 +303,5 @@ if (require.main === module) {
 ## 🔗 Related Documentation
 
 - [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup)
-- [PlayWithMe Testing Guide](../../docs/testing/LOCAL_TESTING_GUIDE.md)
+- [Gatherli Testing Guide](../../docs/testing/LOCAL_TESTING_GUIDE.md)
 - [Story 301.8: Nemesis Detection](https://github.com/Babas10/playWithMe/issues/313)

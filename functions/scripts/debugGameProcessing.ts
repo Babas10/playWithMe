@@ -3,7 +3,7 @@ import * as admin from "firebase-admin";
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
   admin.initializeApp({
-    projectId: "playwithme-dev",
+    projectId: "gatherli-dev",
   });
 }
 
@@ -143,11 +143,11 @@ async function debugGameProcessing() {
   console.log("\n" + "=".repeat(60));
   console.log("\n💡 Next Steps:");
   console.log("  1. Check Cloud Function logs:");
-  console.log("     firebase functions:log --only onGameStatusChanged --project playwithme-dev");
+  console.log("     firebase functions:log --only onGameStatusChanged --project gatherli-dev");
   console.log("\n  2. Monitor logs in real-time:");
-  console.log("     firebase functions:log --only onGameStatusChanged --project playwithme-dev --follow");
+  console.log("     firebase functions:log --only onGameStatusChanged --project gatherli-dev --follow");
   console.log("\n  3. Check if function is deployed:");
-  console.log("     firebase functions:list --project playwithme-dev");
+  console.log("     firebase functions:list --project gatherli-dev");
   console.log("");
 }
 

@@ -4,7 +4,7 @@ import * as path from "path";
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  projectId: "playwithme-dev",
+  projectId: "gatherli-dev",
 });
 
 const db = admin.firestore();

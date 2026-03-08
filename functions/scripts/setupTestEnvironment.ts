@@ -22,7 +22,7 @@ import * as path from "path";
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  projectId: "playwithme-dev", // ⚠️ Only dev environment
+  projectId: "gatherli-dev", // ⚠️ Only dev environment
 });
 
 const db = admin.firestore();
@@ -622,7 +622,7 @@ async function setupTestEnvironment() {
 
   console.log("\n");
   console.log("=".repeat(70));
-  console.log("🏐 PLAYWITHME TEST ENVIRONMENT SETUP");
+  console.log("🏐 GATHERLI TEST ENVIRONMENT SETUP");
   console.log("=".repeat(70));
   console.log("\n⚠️  WARNING: This will DELETE ALL DATA in the dev environment!\n");
 
@@ -678,8 +678,8 @@ async function setupTestEnvironment() {
 
 // Confirm project before running
 const projectId = admin.app().options.projectId;
-if (projectId !== "playwithme-dev") {
-  console.error("❌ ERROR: This script can only run on playwithme-dev!");
+if (projectId !== "gatherli-dev") {
+  console.error("❌ ERROR: This script can only run on gatherli-dev!");
   console.error(`   Current project: ${projectId}`);
   process.exit(1);
 }
