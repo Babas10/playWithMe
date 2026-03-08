@@ -33,7 +33,9 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
           .timeout(
             const Duration(seconds: 5),
             onTimeout: (sink) {
-              sink.addError(TimeoutException('Failed to load user data'));
+              // Treat timeout as "document not found yet" so the new-user
+              // fallback path below can handle it gracefully.
+              sink.add(null);
             },
           )
           .first;

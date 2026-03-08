@@ -32,7 +32,7 @@ class HomeStatsSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     final trendData = _calculateTrend();
-    final hasStreak = user.currentStreak.abs() >= 2;
+    final hasStreak = user.currentStreak.abs() >= 1;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),

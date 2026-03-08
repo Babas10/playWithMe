@@ -14,7 +14,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 admin.initializeApp({
-  projectId: "playwithme-dev",
+  projectId: "gatherli-dev",
 });
 
 const db = admin.firestore();
@@ -303,7 +303,7 @@ async function main() {
   const startTime = Date.now();
 
   console.log("=".repeat(70));
-  console.log("🏐 PLAYWITHME USERS & GROUP SETUP");
+  console.log("🏐 GATHERLI USERS & GROUP SETUP");
   console.log("=".repeat(70));
   console.log("\n⚠️  WARNING: This will DELETE ALL DATA in the dev environment!\n");
 
