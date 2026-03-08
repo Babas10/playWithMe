@@ -19,13 +19,22 @@ class DeferredDeepLinkOrchestrator {
   /// SharedPreferences key that marks the deferred check as completed.
   static const checkedKey = 'deferred_deep_link_checked';
 
+  /// Maximum time to wait for the platform service before giving up.
+  /// Prevents a misbehaving Play Store / clipboard API from freezing startup.
+  /// Overridable in tests via the [timeoutDuration] constructor parameter.
+  static const defaultTimeout = Duration(seconds: 5);
+
+  final Duration _timeoutDuration;
+
   DeferredDeepLinkOrchestrator({
     required DeferredDeepLinkService? service,
     required PendingInviteStorage storage,
     required SharedPreferences prefs,
+    Duration? timeoutDuration,
   })  : _service = service,
         _storage = storage,
-        _prefs = prefs;
+        _prefs = prefs,
+        _timeoutDuration = timeoutDuration ?? defaultTimeout;
 
   /// Runs the deferred token check once on first launch.
   ///
@@ -33,10 +42,11 @@ class DeferredDeepLinkOrchestrator {
   /// service from being called again. Returns the recovered token, or null
   /// if no token was found or the check was skipped.
   ///
-  /// Silent on all errors — the invite flow degrades gracefully.
+  /// Times out after [_timeout] and degrades gracefully on all errors.
   Future<String?> checkOnce() async {
     // No-op on web or any platform without a registered service.
-    if (_service == null) return null;
+    final service = _service;
+    if (service == null) return null;
 
     // Guard: only run once ever.
     if (_prefs.getBool(checkedKey) == true) return null;
@@ -45,7 +55,9 @@ class DeferredDeepLinkOrchestrator {
     await _prefs.setBool(checkedKey, true);
 
     try {
-      final token = await _service!.retrieveDeferredToken();
+      final token = await service
+          .retrieveDeferredToken()
+          .timeout(_timeoutDuration, onTimeout: () => null);
       if (token != null) {
         await _storage.store(token);
       }

@@ -31,30 +31,48 @@ class MainActivity : FlutterActivity() {
      * The referrer string is set by invite.html (Story 19.1) as
      * `invite_token=<token>` in the Play Store URL. The Play Install Referrer
      * API makes it available on first launch only.
+     *
+     * A 5-second timeout prevents the app from hanging at startup if the
+     * Play Store service is unavailable (e.g. airplane mode, no Play Store).
      */
     private fun fetchReferrerString(result: MethodChannel.Result) {
+        val mainHandler = Handler(Looper.getMainLooper())
         val referrerClient = InstallReferrerClient.newBuilder(this).build()
+
+        // Track whether the result has already been delivered to avoid
+        // calling result.success() twice (once from callback, once from timeout).
+        var resultDelivered = false
+
+        // Safety timeout: deliver null if the Play Store service never responds.
+        val timeoutRunnable = Runnable {
+            if (!resultDelivered) {
+                resultDelivered = true
+                result.success(null)
+                try { referrerClient.endConnection() } catch (_: Exception) {}
+            }
+        }
+        mainHandler.postDelayed(timeoutRunnable, 5_000L)
 
         referrerClient.startConnection(object : InstallReferrerStateListener {
             override fun onInstallReferrerSetupFinished(responseCode: Int) {
-                val mainHandler = Handler(Looper.getMainLooper())
-                when (responseCode) {
-                    InstallReferrerClient.InstallReferrerResponse.OK -> {
-                        val referrer =
-                            referrerClient.installReferrer?.installReferrer
-                        mainHandler.post { result.success(referrer) }
-                        referrerClient.endConnection()
-                    }
-                    else -> {
-                        // Not installed via Play Store, or referrer unavailable.
-                        mainHandler.post { result.success(null) }
-                        referrerClient.endConnection()
-                    }
+                mainHandler.removeCallbacks(timeoutRunnable)
+                if (resultDelivered) return
+                resultDelivered = true
+
+                val referrer = if (responseCode == InstallReferrerClient.InstallReferrerResponse.OK) {
+                    referrerClient.installReferrer?.installReferrer
+                } else {
+                    null // Not installed via Play Store, or referrer unavailable.
                 }
+                mainHandler.post { result.success(referrer) }
+                referrerClient.endConnection()
             }
 
             override fun onInstallReferrerServiceDisconnected() {
-                Handler(Looper.getMainLooper()).post { result.success(null) }
+                mainHandler.removeCallbacks(timeoutRunnable)
+                if (resultDelivered) return
+                resultDelivered = true
+                mainHandler.post { result.success(null) }
             }
         })
     }
