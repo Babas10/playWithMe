@@ -182,16 +182,22 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                       const SizedBox(height: 24),
 
                       // Friend selector (only if repository is provided)
+                      // Wrapped in SizedBox because this Column is inside
+                      // SingleChildScrollView (unbounded height); FriendSelectorWidget
+                      // uses Expanded internally which requires a bounded parent.
                       if (widget.friendRepository != null) ...[
-                        FriendSelectorWidget(
-                          currentUserId: authState.user.uid,
-                          friendRepository: widget.friendRepository!,
-                          onSelectionChanged: (selectedIds) {
-                            setState(() {
-                              _selectedFriendIds = selectedIds;
-                            });
-                          },
-                          initialSelection: _selectedFriendIds,
+                        SizedBox(
+                          height: 320,
+                          child: FriendSelectorWidget(
+                            currentUserId: authState.user.uid,
+                            friendRepository: widget.friendRepository!,
+                            onSelectionChanged: (selectedIds) {
+                              setState(() {
+                                _selectedFriendIds = selectedIds;
+                              });
+                            },
+                            initialSelection: _selectedFriendIds,
+                          ),
                         ),
                         const SizedBox(height: 24),
                       ],

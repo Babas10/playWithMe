@@ -170,11 +170,15 @@ class PlayWithMeAppBar {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
         title: Text(l10n.signOut),
         content: Text(l10n.signOutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.secondary,
+            ),
             child: Text(l10n.cancel),
           ),
           FilledButton(
@@ -184,6 +188,9 @@ class PlayWithMeAppBar {
                   .add(const AuthenticationLogoutRequested());
               Navigator.of(dialogContext).pop();
             },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.secondary,
+            ),
             child: Text(l10n.signOut),
           ),
         ],

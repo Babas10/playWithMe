@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/performance_overview_card.dart';
-import 'package:play_with_me/features/profile/presentation/widgets/momentum_consistency_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/partners_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/rivals_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/role_based_performance_card.dart';
@@ -12,7 +11,6 @@ import 'package:play_with_me/features/profile/presentation/widgets/role_based_pe
 ///
 /// This is the "Explore" level of progressive disclosure, showing:
 /// - Performance Overview (current/peak ELO, win rate, best win, point diff)
-/// - Momentum & Consistency (streak + monthly improvement chart)
 /// - Partners (best partner stats)
 /// - Rivals (nemesis stats)
 /// - Role-Based Performance (weak-link/carry win rates, collapsible)
@@ -35,12 +33,6 @@ class ExpandedStatsSection extends StatelessWidget {
       children: [
         // Performance Overview Card
         PerformanceOverviewCard(user: user),
-
-        // Momentum & Consistency Card
-        MomentumConsistencyCard(
-          user: user,
-          ratingHistory: ratingHistory,
-        ),
 
         // Partners Card
         PartnersCard(user: user),

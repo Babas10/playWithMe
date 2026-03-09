@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/best_elo_record.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// Highlight card displaying the best ELO achieved in the selected time period.
@@ -99,7 +100,7 @@ class BestEloHighlightCard extends StatelessWidget {
               Icon(
                 Icons.emoji_events,
                 size: 20,
-                color: Colors.amber[700],
+                color: AppColors.primary,
               ),
               const SizedBox(width: 12),
               // Content

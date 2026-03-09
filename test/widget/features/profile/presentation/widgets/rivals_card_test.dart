@@ -379,8 +379,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('🆚 '), findsOneWidget);
-        expect(find.text('Rival'), findsOneWidget);
+        expect(find.text('RIVAL'), findsOneWidget);
       });
 
       testWidgets('displays correct icons for nemesis data', (tester) async {
@@ -419,7 +418,6 @@ void main() {
         // Check for stats icons
         expect(find.byIcon(Icons.sports_score), findsOneWidget);
         expect(find.byIcon(Icons.percent), findsOneWidget);
-        expect(find.byIcon(Icons.info_outline), findsOneWidget);
       });
     });
   });

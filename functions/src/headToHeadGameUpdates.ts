@@ -73,13 +73,19 @@ async function processHeadToHeadUpdates(gameId: string, gameData: any): Promise<
   const individualGames = gameData.result.games;
   const eloUpdates = gameData.eloUpdates;
 
-  // Calculate total points for each team across all individual games
+  // Calculate total points for each team across all sets within each game.
+  // Game objects contain a `sets` array with `teamAPoints` / `teamBPoints`
+  // per set — matching the structure used in statsTracking.ts.
   let teamAPoints = 0;
   let teamBPoints = 0;
 
   individualGames.forEach((game: any) => {
-    teamAPoints += game.teamAScore || 0;
-    teamBPoints += game.teamBScore || 0;
+    if (game.sets && Array.isArray(game.sets)) {
+      game.sets.forEach((set: any) => {
+        teamAPoints += set.teamAPoints || 0;
+        teamBPoints += set.teamBPoints || 0;
+      });
+    }
   });
 
   // Determine overall winner

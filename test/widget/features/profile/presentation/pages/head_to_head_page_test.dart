@@ -229,7 +229,7 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.sports_kabaddi), findsOneWidget);
+        expect(find.byType(CircleAvatar), findsOneWidget);
       });
     });
 
@@ -265,7 +265,7 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.text('Head-to-Head Record'), findsOneWidget);
+        expect(find.text('HEAD-TO-HEAD RECORD'), findsOneWidget);
       });
 
       testWidgets('shows games played count', (tester) async {
@@ -311,7 +311,7 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.text('Point Differential'), findsOneWidget);
+        expect(find.text('POINT DIFFERENTIAL'), findsOneWidget);
       });
 
       testWidgets('shows average point differential', (tester) async {
@@ -360,7 +360,7 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.text('Matchup Margins'), findsOneWidget);
+        expect(find.text('MATCHUP MARGINS'), findsOneWidget);
       });
 
       testWidgets('shows biggest victory margin', (tester) async {
@@ -405,7 +405,7 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.text('Recent Matchups'), findsOneWidget);
+        expect(find.text('RECENT MATCHUPS'), findsOneWidget);
       });
 
       testWidgets('shows current streak badge when on streak', (tester) async {

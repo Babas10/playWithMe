@@ -15,6 +15,7 @@ import 'package:play_with_me/features/profile/presentation/widgets/best_elo_high
 import 'package:play_with_me/features/profile/presentation/widgets/monthly_improvement_chart.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/ranking_stats_cards.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A card widget displaying momentum and consistency metrics.
@@ -35,8 +36,6 @@ class MomentumConsistencyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -50,97 +49,108 @@ class MomentumConsistencyCard extends StatelessWidget {
           )..add(LoadPlayerStats(user.uid)), // Story 302.5: Load stats (ranking auto-loads via listener)
         ),
       ],
-      child: Card(
-        margin: const EdgeInsets.all(16.0),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Text(
-                AppLocalizations.of(context)!.momentumAndConsistency,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section label — uppercase, muted, letter-spaced
+            Text(
+              AppLocalizations.of(context)!.momentumAndConsistency.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textMuted,
+                letterSpacing: 0.8,
               ),
-              const SizedBox(height: 16),
-              // Current Streak
-              _buildStreakSection(context),
-              const SizedBox(height: 24),
-              // Monthly Progress with Time Period Selector
-              Text(
-                AppLocalizations.of(context)!.eloProgress,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            ),
+            const SizedBox(height: 12),
+            // Streak white card
+            Card(
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: _buildStreakSection(context),
               ),
-              const SizedBox(height: 12),
-              // Ranking Stats Cards (Story 302.5) - Displayed above time period selector
-              BlocListener<PlayerStatsBloc, PlayerStatsState>(
-                listener: (context, statsState) {
-                  // Auto-load ranking when stats are loaded
-                  if (statsState is PlayerStatsLoaded &&
-                      statsState.ranking == null) {
-                    context
-                        .read<PlayerStatsBloc>()
-                        .add(LoadRanking(user.uid));
+            ),
+            const SizedBox(height: 20),
+            // ELO Progress section label
+            Text(
+              AppLocalizations.of(context)!.eloProgress.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textMuted,
+                letterSpacing: 0.8,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Ranking Stats Cards — sit directly on gray background (Story 302.5)
+            BlocListener<PlayerStatsBloc, PlayerStatsState>(
+              listener: (context, statsState) {
+                if (statsState is PlayerStatsLoaded &&
+                    statsState.ranking == null) {
+                  context.read<PlayerStatsBloc>().add(LoadRanking(user.uid));
+                }
+              },
+              child: BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
+                builder: (context, statsState) {
+                  if (statsState is PlayerStatsLoaded) {
+                    return Column(
+                      children: [
+                        RankingStatsCards(
+                          ranking: statsState.ranking,
+                          currentStreak: user.currentStreak,
+                          onAddFriendsTap: () {
+                            Navigator.pushNamed(context, '/friends');
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    );
                   }
+                  return const SizedBox.shrink();
                 },
-                child: BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
-                  builder: (context, statsState) {
-                    if (statsState is PlayerStatsLoaded) {
-                      return Column(
-                        children: [
-                          RankingStatsCards(
-                            ranking: statsState.ranking,
-                            onAddFriendsTap: () {
-                              // Navigate to friends page
-                              Navigator.pushNamed(context, '/friends');
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
               ),
-              // Time Period Selector (Story 302.3)
-              BlocBuilder<EloHistoryBloc, EloHistoryState>(
-                builder: (context, state) {
-                  if (state is! EloHistoryLoaded) return const SizedBox.shrink();
+            ),
+            // Period selector + chart + best ELO — white card (Story 302.3/4/6)
+            BlocBuilder<EloHistoryBloc, EloHistoryState>(
+              builder: (context, state) {
+                if (state is! EloHistoryLoaded) return const SizedBox.shrink();
 
-                  return Column(
-                    children: [
-                      TimePeriodSelector(
-                        selectedPeriod: state.selectedPeriod,
-                        onPeriodChanged: (period) {
-                          context.read<EloHistoryBloc>().add(
-                                EloHistoryEvent.filterByPeriod(period),
-                              );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      // Enhanced Chart (Story 302.4)
-                      MonthlyImprovementChart(
-                        ratingHistory: state.filteredHistory,
-                        currentElo: user.eloRating,
-                        timePeriod: state.selectedPeriod,
-                      ),
-                      const SizedBox(height: 16),
-                      // Best ELO Highlight Card (Story 302.6)
-                      BestEloHighlightCard(
-                        bestElo: state.bestEloInPeriod,
-                        timePeriod: state.selectedPeriod,
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
+                return Card(
+                  margin: EdgeInsets.zero,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        TimePeriodSelector(
+                          selectedPeriod: state.selectedPeriod,
+                          onPeriodChanged: (period) {
+                            context.read<EloHistoryBloc>().add(
+                                  EloHistoryEvent.filterByPeriod(period),
+                                );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        MonthlyImprovementChart(
+                          ratingHistory: state.filteredHistory,
+                          currentElo: user.eloRating,
+                          timePeriod: state.selectedPeriod,
+                        ),
+                        const SizedBox(height: 16),
+                        BestEloHighlightCard(
+                          bestElo: state.bestEloInPeriod,
+                          timePeriod: state.selectedPeriod,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );
@@ -158,114 +168,124 @@ class MomentumConsistencyCard extends StatelessWidget {
     final streakValue = user.currentStreak.abs();
     final streakColor = isWinning ? Colors.green : Colors.red;
     final streakIcon = isWinning ? Icons.trending_up : Icons.trending_down;
-    final streakEmoji = isWinning ? '🔥' : '❄️';
-    final streakLabel = isWinning ? AppLocalizations.of(context)!.winStreak : AppLocalizations.of(context)!.lossStreak;
+    final streakLabel = isWinning
+        ? AppLocalizations.of(context)!.winStreak
+        : AppLocalizations.of(context)!.lossStreak;
 
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: streakColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: streakColor.withOpacity(0.3),
-          width: 2,
+    // Short streak (1–2 games): subtle inline chip — no need for a loud alert
+    if (streakValue < 3) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: streakColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: streakColor.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(streakIcon, size: 16, color: streakColor),
+              const SizedBox(width: 6),
+              Text(
+                '$streakValue',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: streakColor,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                streakLabel,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: streakColor.withValues(alpha: 0.85),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          // Emoji
-          Text(
-            streakEmoji,
-            style: const TextStyle(fontSize: 40),
-          ),
-          const SizedBox(width: 16),
-          // Streak info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  streakLabel,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: streakColor,
-                    fontWeight: FontWeight.w600,
+      );
+    }
+
+    // Significant streak (3+ games): prominent colored text, no inner container
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                streakLabel,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: streakColor.withValues(alpha: 0.8),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    streakValue.toString(),
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: streakColor,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      streakValue.toString(),
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: streakColor,
-                      ),
+                  const SizedBox(width: 8),
+                  Text(
+                    AppLocalizations.of(context)!
+                        .gamesCount(streakValue)
+                        .replaceFirst('$streakValue ', ''),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: streakColor.withValues(alpha: 0.8),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      AppLocalizations.of(context)!.gamesCount(streakValue).replaceFirst('$streakValue ', ''),
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: streakColor.withOpacity(0.8),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          // Icon
-          Icon(
-            streakIcon,
-            size: 32,
-            color: streakColor,
-          ),
-        ],
-      ),
+        ),
+        Icon(streakIcon, size: 32, color: streakColor),
+      ],
     );
   }
 
   Widget _buildNoStreakState(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.bolt,
-            size: 32,
-            color: theme.colorScheme.onSurface.withOpacity(0.3),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.noActiveStreak,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
-                  ),
+    return Row(
+      children: [
+        Icon(Icons.bolt, size: 28,
+            color: AppColors.textMuted.withValues(alpha: 0.35)),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.noActiveStreak,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textMuted,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  AppLocalizations.of(context)!.winNextGameToStartStreak,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
-                  ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                AppLocalizations.of(context)!.winNextGameToStartStreak,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textMuted.withValues(alpha: 0.7),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -65,7 +65,7 @@ void main() {
     }
     sl.registerSingleton<UserRepository>(mockUserRepository);
 
-    // Stub methods used by internal blocs in MomentumConsistencyCard
+    // Stub repository methods used by internal blocs
     when(() => mockUserRepository.getUserStream(any()))
         .thenAnswer((_) => Stream.value(testUserModel));
     when(() => mockUserRepository.getRatingHistory(any(), limit: any(named: 'limit')))
@@ -133,10 +133,7 @@ void main() {
       expect(find.byType(ExpandedStatsSection), findsOneWidget);
 
       // Verify Performance Overview section is present
-      expect(find.text('Performance Overview'), findsOneWidget);
-
-      // Verify Momentum & Consistency section is present
-      expect(find.text('Momentum & Consistency'), findsOneWidget);
+      expect(find.text('PERFORMANCE OVERVIEW'), findsOneWidget);
     });
 
     testWidgets('displays error message when stats fail to load', (tester) async {
