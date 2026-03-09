@@ -1,6 +1,7 @@
 // Profile page displaying user identity, account information and settings.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
@@ -154,11 +155,15 @@ class _ProfileContent extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
         title: Text(l10n.signOut),
         content: Text(l10n.signOutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.secondary,
+            ),
             child: Text(l10n.cancel),
           ),
           FilledButton(
@@ -169,6 +174,9 @@ class _ProfileContent extends StatelessWidget {
                   .add(const AuthenticationLogoutRequested());
               Navigator.of(dialogContext).pop();
             },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.secondary,
+            ),
             child: Text(l10n.signOut),
           ),
         ],

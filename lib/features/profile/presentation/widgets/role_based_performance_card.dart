@@ -1,17 +1,16 @@
 // Role-based performance card showing adaptability stats across different team contexts.
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
-/// A collapsible card widget displaying role-based performance metrics.
+/// Adaptability stats section: gray background, gray section label, white card.
 ///
 /// Shows win rates when player is:
-/// - Weak-Link: Lowest ELO on team (playing with stronger teammates)
 /// - Carry: Highest ELO on team (leading/carrying the team)
+/// - Weak-Link: Lowest ELO on team (playing with stronger teammates)
 /// - Balanced: Middle or tied ELO (balanced team composition)
-///
-/// Purpose: Show adaptability and resilience with positive framing.
-class RoleBasedPerformanceCard extends StatefulWidget {
+class RoleBasedPerformanceCard extends StatelessWidget {
   final UserModel user;
 
   const RoleBasedPerformanceCard({
@@ -20,101 +19,37 @@ class RoleBasedPerformanceCard extends StatefulWidget {
   });
 
   @override
-  State<RoleBasedPerformanceCard> createState() =>
-      _RoleBasedPerformanceCardState();
-}
-
-class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
-  bool _isExpanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final stats = widget.user.roleBasedStats;
-
-    // Check if there's any role-based data
+    final stats = user.roleBasedStats;
     final hasData = stats != null && stats.hasData;
 
-    return Card(
-      margin: const EdgeInsets.all(16.0),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header (always visible)
-          InkWell(
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.psychology,
-                          color: theme.colorScheme.primary,
-                        ),
-                        const SizedBox(width: 12),
-                        Flexible(
-                          child: Text(
-                            AppLocalizations.of(context)!.adaptabilityStats,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.advanced,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Icon(
-                        _isExpanded
-                            ? Icons.expand_less
-                            : Icons.expand_more,
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          // Section label — uppercase, muted, letter-spaced
+          Text(
+            AppLocalizations.of(context)!.adaptabilityStats.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textMuted,
+              letterSpacing: 0.8,
             ),
           ),
-          // Expandable content
-          if (_isExpanded) ...[
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+          const SizedBox(height: 12),
+          // White card — always expanded
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
               child: hasData
-                  ? _buildStatsContent(context, stats as RoleBasedStats)
+                  ? _buildStatsContent(context, stats)
                   : _buildEmptyState(context),
             ),
-          ],
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -126,52 +61,48 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Description
         Text(
           AppLocalizations.of(context)!.seeHowYouPerform,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          style: TextStyle(
+            fontSize: 13,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         const SizedBox(height: 20),
 
-        // Carry Stats (if available)
-        if (stats.carry.games > 0) ...  [
+        if (stats.carry.games > 0) ...[
           _RoleStatRow(
             role: AppLocalizations.of(context)!.leadingTheTeam,
             icon: Icons.emoji_events,
-            color: Colors.amber,
+            color: AppColors.primary,
             stats: stats.carry,
             description: AppLocalizations.of(context)!.whenHighestRated,
           ),
           const SizedBox(height: 16),
         ],
 
-        // Weak Link Stats (reframed positively)
         if (stats.weakLink.games > 0) ...[
           _RoleStatRow(
             role: AppLocalizations.of(context)!.playingWithStrongerPartners,
             icon: Icons.people,
-            color: Colors.blue,
+            color: AppColors.secondary,
             stats: stats.weakLink,
             description: AppLocalizations.of(context)!.whenMoreExperiencedTeammates,
           ),
           const SizedBox(height: 16),
         ],
 
-        // Balanced Stats
         if (stats.balanced.games > 0) ...[
           _RoleStatRow(
             role: AppLocalizations.of(context)!.balancedTeams,
             icon: Icons.balance,
-            color: Colors.green,
+            color: AppColors.primary,
             stats: stats.balanced,
             description: AppLocalizations.of(context)!.whenSimilarlyRatedTeammates,
           ),
           const SizedBox(height: 16),
         ],
 
-        // Insight Message
         _InsightMessage(insight: stats.getInsight()),
       ],
     );
@@ -183,48 +114,46 @@ class _RoleBasedPerformanceCardState extends State<RoleBasedPerformanceCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Description
         Text(
           AppLocalizations.of(context)!.seeHowYouPerform,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          style: TextStyle(
+            fontSize: 13,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
-        const SizedBox(height: 20),
-        // Empty state placeholder
-        Container(
-          padding: const EdgeInsets.all(24.0),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(
-                  Icons.analytics_outlined,
-                  size: 48,
-                  color: theme.colorScheme.onSurface.withOpacity(0.3),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  AppLocalizations.of(context)!.adaptabilityStatsLocked,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  AppLocalizations.of(context)!.playMoreGamesToSeeRoles,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Icon(
+              Icons.analytics_outlined,
+              size: 32,
+              color: AppColors.textMuted.withValues(alpha: 0.35),
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.adaptabilityStatsLocked,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    AppLocalizations.of(context)!.playMoreGamesToSeeRoles,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -268,12 +197,15 @@ class _RoleStatRow extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('${stats.recordString} (${stats.games} games)'),
+            Text(
+              '${stats.recordString} (${stats.games} games)',
+              style: const TextStyle(color: AppColors.secondary),
+            ),
             Text(
               stats.winRateString,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                color: stats.winRate >= 0.5 ? Colors.green : Colors.orange,
+                color: AppColors.secondary,
               ),
             ),
           ],
@@ -294,7 +226,7 @@ class _InsightMessage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
+        color: AppColors.secondary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -302,7 +234,7 @@ class _InsightMessage extends StatelessWidget {
           const Icon(
             Icons.lightbulb_outline,
             size: 20,
-            color: Colors.blue,
+            color: AppColors.secondary,
           ),
           const SizedBox(width: 8),
           Expanded(

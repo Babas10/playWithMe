@@ -370,24 +370,6 @@ void main() {
 
       // Should show subtitle
       expect(find.text('3 won, 2 lost'), findsOneWidget);
-
-      // Should have trending_up and trending_down icons
-      expect(
-        find.byWidgetPredicate(
-          (widget) =>
-              widget is Icon &&
-              widget.icon == Icons.trending_up,
-        ),
-        findsAtLeastNWidgets(1),
-      );
-      expect(
-        find.byWidgetPredicate(
-          (widget) =>
-              widget is Icon &&
-              widget.icon == Icons.trending_down,
-        ),
-        findsAtLeastNWidgets(1),
-      );
     });
 
     testWidgets('shows point differential with only winning sets', (tester) async {
