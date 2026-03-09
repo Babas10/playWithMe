@@ -253,8 +253,8 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
               return CheckboxListTile(
                 value: isSelected,
                 onChanged: (_) => _toggleSelection(friend.uid),
-                activeColor: AppColors.primary,
-                checkColor: AppColors.secondary,
+                activeColor: AppColors.secondary,
+                checkColor: Colors.white,
                 title: Text(
                   friend.displayNameOrEmail,
                   style: TextStyle(
