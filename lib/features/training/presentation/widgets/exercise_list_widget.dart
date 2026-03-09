@@ -162,8 +162,13 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Exercises (${state.exercises.length})',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      'EXERCISES (${state.exercises.length})',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textMuted,
+                        letterSpacing: 0.8,
+                      ),
                     ),
                     if (state.canModify)
                       ElevatedButton.icon(
