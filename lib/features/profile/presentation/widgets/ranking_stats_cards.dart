@@ -1,33 +1,34 @@
-// Displays three ranking stat cards: global rank, percentile, and friends rank (Story 302.5).
+// Displays four ranking stat cards: global rank, percentile, friends rank, and streak (Story 302.5).
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_ranking.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
-/// Three stat cards showing global rank, percentile, and friends rank.
+/// Four stat cards showing global rank, percentile, friends rank, and current streak.
 ///
 /// Displayed above the ELO progress chart.
 class RankingStatsCards extends StatelessWidget {
   final UserRanking? ranking;
+  final int currentStreak;
   final VoidCallback? onAddFriendsTap;
 
   const RankingStatsCards({
     super.key,
     required this.ranking,
+    this.currentStreak = 0,
     this.onAddFriendsTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Empty state: No ranking data
     if (ranking == null) {
       return _buildEmptyState(context);
     }
 
-    // Always use horizontal layout on mobile (most phones are 360-430px wide)
-    // Only stack vertically on very narrow screens (< 280px)
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Stack vertically only on very narrow screens
         if (constraints.maxWidth < 280) {
           return Column(
             children: [
@@ -39,23 +40,26 @@ class RankingStatsCards extends StatelessWidget {
                 ranking: ranking!,
                 onAddFriendsTap: onAddFriendsTap,
               ),
+              const SizedBox(height: 8),
+              _StreakCard(currentStreak: currentStreak),
             ],
           );
         }
 
-        // Horizontal layout for normal mobile and wider screens
         return Row(
           children: [
             Expanded(child: _GlobalRankCard(ranking: ranking!)),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Expanded(child: _PercentileCard(ranking: ranking!)),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Expanded(
               child: _FriendsRankCard(
                 ranking: ranking!,
                 onAddFriendsTap: onAddFriendsTap,
               ),
             ),
+            const SizedBox(width: 6),
+            Expanded(child: _StreakCard(currentStreak: currentStreak)),
           ],
         );
       },
@@ -101,14 +105,14 @@ class _GlobalRankCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _RankingStatCard(
       icon: Icons.public,
-      iconColor: Colors.blue,
+      iconColor: AppColors.secondary,
       label: AppLocalizations.of(context)!.globalRank,
       value: ranking.globalRankDisplay,
     );
   }
 }
 
-/// Percentile card
+/// Percentile card — uses a gaussian curve painter instead of a Material icon.
 class _PercentileCard extends StatelessWidget {
   final UserRanking ranking;
 
@@ -117,8 +121,11 @@ class _PercentileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _RankingStatCard(
-      icon: Icons.trending_up,
-      iconColor: Colors.green,
+      customIcon: const SizedBox(
+        width: 18,
+        height: 18,
+        child: CustomPaint(painter: _GaussianCurvePainter(color: AppColors.secondary)),
+      ),
       label: AppLocalizations.of(context)!.percentile,
       value: ranking.percentileDisplay,
     );
@@ -137,11 +144,10 @@ class _FriendsRankCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Empty state: No friends
     if (ranking.friendsRank == null || ranking.totalFriends == null) {
       return _RankingStatCard(
         icon: Icons.people,
-        iconColor: Colors.orange,
+        iconColor: AppColors.secondary,
         label: AppLocalizations.of(context)!.friendsRank,
         value: AppLocalizations.of(context)!.addFriendsAction,
         isActionable: true,
@@ -151,30 +157,67 @@ class _FriendsRankCard extends StatelessWidget {
 
     return _RankingStatCard(
       icon: Icons.people,
-      iconColor: Colors.orange,
+      iconColor: AppColors.secondary,
       label: AppLocalizations.of(context)!.friendsRank,
       value: ranking.friendsRankDisplay!,
     );
   }
 }
 
-/// Base stat card widget
+/// Streak card — shows current win/loss streak as a signed number.
+///
+/// Positive = win streak (+N), negative = loss streak (-N), zero = none (-).
+/// Icon and value are always blue (AppColors.secondary) for visual consistency.
+class _StreakCard extends StatelessWidget {
+  final int currentStreak;
+
+  const _StreakCard({required this.currentStreak});
+
+  @override
+  Widget build(BuildContext context) {
+    final String streakValue;
+
+    if (currentStreak > 0) {
+      streakValue = '+$currentStreak';
+    } else if (currentStreak < 0) {
+      streakValue = '$currentStreak';
+    } else {
+      streakValue = '-';
+    }
+
+    return _RankingStatCard(
+      icon: Icons.trending_up,
+      iconColor: AppColors.secondary,
+      label: AppLocalizations.of(context)!.streakLabel,
+      value: streakValue,
+      valueColor: AppColors.secondary,
+    );
+  }
+}
+
+/// Base stat card widget — white background, shadow, centered content.
+///
+/// Accepts either [icon] + [iconColor] or [customIcon] for the top slot.
 class _RankingStatCard extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
+  final IconData? icon;
+  final Color? iconColor;
+  final Widget? customIcon;
   final String label;
   final String value;
+  final Color? valueColor;
   final bool isActionable;
   final VoidCallback? onTap;
 
   const _RankingStatCard({
-    required this.icon,
-    required this.iconColor,
+    this.icon,
+    this.iconColor,
+    this.customIcon,
     required this.label,
     required this.value,
+    this.valueColor,
     this.isActionable = false,
     this.onTap,
-  });
+  }) : assert(icon != null || customIcon != null, 'Provide icon or customIcon');
 
   @override
   Widget build(BuildContext context) {
@@ -182,9 +225,9 @@ class _RankingStatCard extends StatelessWidget {
 
     final card = Container(
       height: 85,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: theme.colorScheme.outline.withValues(alpha: 0.2),
@@ -201,29 +244,34 @@ class _RankingStatCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 20, color: iconColor),
+          customIcon ?? Icon(icon, size: 18, color: iconColor),
           const SizedBox(height: 4),
           Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
-              fontSize: 11,
+              fontSize: 10,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
           Flexible(
-            child: Text(
-              value,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: isActionable
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                value,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: valueColor ??
+                      (isActionable
+                          ? theme.colorScheme.primary
+                          : AppColors.secondary),
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -240,4 +288,54 @@ class _RankingStatCard extends StatelessWidget {
 
     return card;
   }
+}
+
+/// Draws a gaussian (bell curve) shape using a real normal distribution formula.
+///
+/// Samples the gaussian PDF across the canvas width and strokes the resulting path.
+class _GaussianCurvePainter extends CustomPainter {
+  final Color color;
+
+  const _GaussianCurvePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+
+    const steps = 60;
+    // Map canvas x [0, width] to gaussian domain [-3.5, 3.5]
+    const xMin = -3.5;
+    const xMax = 3.5;
+    final gaussianHeight = _gaussian(0); // peak value at x=0
+
+    final path = Path();
+    for (int i = 0; i <= steps; i++) {
+      final t = i / steps;
+      final x = xMin + t * (xMax - xMin);
+      final y = _gaussian(x);
+
+      // Flip y: canvas y=0 is top, gaussian peak should be at top
+      final cx = t * size.width;
+      final cy = size.height - (y / gaussianHeight) * size.height * 0.9;
+
+      if (i == 0) {
+        path.moveTo(cx, cy);
+      } else {
+        path.lineTo(cx, cy);
+      }
+    }
+
+    canvas.drawPath(path, paint);
+  }
+
+  static double _gaussian(double x) {
+    return math.exp(-0.5 * x * x);
+  }
+
+  @override
+  bool shouldRepaint(_GaussianCurvePainter old) => old.color != color;
 }
