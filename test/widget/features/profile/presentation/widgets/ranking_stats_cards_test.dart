@@ -85,7 +85,7 @@ void main() {
 
       expect(find.text('Percentile'), findsOneWidget);
       expect(find.text('Top 2.8%'), findsOneWidget);
-      expect(find.byIcon(Icons.trending_up), findsOneWidget);
+      expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
     });
 
     testWidgets('displays friends rank when available', (tester) async {
@@ -280,16 +280,102 @@ void main() {
         ),
       );
 
-      // Find all icon widgets
-      final iconFinders = [
-        find.byIcon(Icons.public),
-        find.byIcon(Icons.trending_up),
-        find.byIcon(Icons.people),
-      ];
+      // Find all icon widgets (trending_up now appears twice: percentile→ssid_chart, streak→trending_up)
+      expect(find.byIcon(Icons.public), findsOneWidget);
+      expect(find.byType(CustomPaint), findsAtLeastNWidgets(1)); // gaussian curve for percentile
+      expect(find.byIcon(Icons.people), findsOneWidget);
+      expect(find.byIcon(Icons.trending_up), findsOneWidget);
+    });
 
-      for (final finder in iconFinders) {
-        expect(finder, findsOneWidget);
-      }
+    testWidgets('displays win streak as positive number', (tester) async {
+      final ranking = UserRanking(
+        globalRank: 42,
+        totalUsers: 1500,
+        percentile: 97.2,
+        calculatedAt: DateTime(2024, 1, 1),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: RankingStatsCards(
+              ranking: ranking,
+              currentStreak: 5,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Streak'), findsOneWidget);
+      expect(find.text('+5'), findsOneWidget);
+      expect(find.byIcon(Icons.trending_up), findsOneWidget);
+    });
+
+    testWidgets('displays loss streak as negative number', (tester) async {
+      final ranking = UserRanking(
+        globalRank: 42,
+        totalUsers: 1500,
+        percentile: 97.2,
+        calculatedAt: DateTime(2024, 1, 1),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: RankingStatsCards(
+              ranking: ranking,
+              currentStreak: -3,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Streak'), findsOneWidget);
+      expect(find.text('-3'), findsOneWidget);
+    });
+
+    testWidgets('displays dash when streak is zero', (tester) async {
+      final ranking = UserRanking(
+        globalRank: 42,
+        totalUsers: 1500,
+        percentile: 97.2,
+        calculatedAt: DateTime(2024, 1, 1),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: RankingStatsCards(
+              ranking: ranking,
+              currentStreak: 0,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Streak'), findsOneWidget);
+      expect(find.text('-'), findsOneWidget);
     });
 
     testWidgets('all three cards rendered when ranking has all data', (tester) async {

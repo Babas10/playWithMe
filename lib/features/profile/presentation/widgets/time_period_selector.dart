@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/domain/entities/time_period.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 /// A horizontal selector for choosing time periods (Story 302.3).
@@ -81,6 +82,7 @@ class _PeriodChip extends StatelessWidget {
         onSelected: (_) => onTap(),
         backgroundColor: theme.colorScheme.surface,
         selectedColor: theme.colorScheme.primary,
+        checkmarkColor: AppColors.secondary,
         labelStyle: TextStyle(
           color: isSelected
               ? theme.colorScheme.onPrimary

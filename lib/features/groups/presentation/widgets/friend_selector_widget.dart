@@ -129,15 +129,16 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
         ),
         const SizedBox(height: 16),
 
-        // Content
-        if (_isLoading)
-          _buildLoadingState()
-        else if (_errorMessage != null)
-          _buildErrorState()
-        else if (_friends == null || _friends!.isEmpty)
-          _buildEmptyState()
-        else
-          _buildFriendList(),
+        // Content — expands to fill the space above the Send button
+        Expanded(
+          child: _isLoading
+              ? _buildLoadingState()
+              : _errorMessage != null
+                  ? _buildErrorState()
+                  : (_friends == null || _friends!.isEmpty)
+                      ? _buildEmptyState()
+                      : _buildFriendList(),
+        ),
       ],
     );
   }
@@ -235,15 +236,14 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
             ],
           ),
 
-        // Friend list
-        Container(
-          constraints: const BoxConstraints(maxHeight: 300),
+        // Friend list — fills all remaining vertical space
+        Expanded(
+          child: Container(
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(8),
           ),
           child: ListView.separated(
-            shrinkWrap: true,
             itemCount: _friends!.length,
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
@@ -290,6 +290,7 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
               );
             },
           ),
+        ),
         ),
       ],
     );

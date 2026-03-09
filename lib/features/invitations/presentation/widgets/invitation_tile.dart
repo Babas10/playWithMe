@@ -1,5 +1,6 @@
 // Widget for displaying a single invitation with accept/decline actions
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/invitation_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -82,9 +83,9 @@ class InvitationTile extends StatelessWidget {
                 OutlinedButton(
                   onPressed: isLoading ? null : onDecline,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.error,
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.error,
+                    foregroundColor: AppColors.secondary,
+                    side: const BorderSide(
+                      color: AppColors.secondary,
                     ),
                   ),
                   child: Text(AppLocalizations.of(context)!.decline),

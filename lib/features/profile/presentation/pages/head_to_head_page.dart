@@ -1,5 +1,6 @@
 // Head-to-head rivalry screen showing comprehensive opponent statistics.
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/head_to_head_stats.dart';
@@ -29,6 +30,7 @@ class HeadToHeadPage extends StatelessWidget {
           opponentId: opponentId,
         )),
       child: Scaffold(
+        backgroundColor: AppColors.scaffoldBackground,
         appBar: PlayWithMeAppBar.build(
           context: context,
           title: 'Head-to-Head',
@@ -43,9 +45,11 @@ class HeadToHeadPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text(message, textAlign: TextAlign.center),
+                    const Icon(Icons.error_outline, size: 40, color: Colors.red),
+                    const SizedBox(height: 12),
+                    Text(message,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 13)),
                   ],
                 ),
               ),
@@ -56,352 +60,295 @@ class HeadToHeadPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadedView(
-    BuildContext context,
-    HeadToHeadStats stats,
-  ) {
+  Widget _buildLoadedView(BuildContext context, HeadToHeadStats stats) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Opponent header
           _buildOpponentHeader(context, stats),
-          const SizedBox(height: 24),
-
-          // Rivalry intensity
-          _buildRivalryCard(context, stats),
           const SizedBox(height: 16),
+          _buildSection(
+            context,
+            label: 'RIVALRY',
+            child: _buildRivalryContent(context, stats),
+          ),
+          _buildSection(
+            context,
+            label: 'HEAD-TO-HEAD RECORD',
+            child: _buildRecordContent(context, stats),
+          ),
+          _buildSection(
+            context,
+            label: 'POINT DIFFERENTIAL',
+            child: _buildPointDifferentialContent(context, stats),
+          ),
+          _buildSection(
+            context,
+            label: 'MATCHUP MARGINS',
+            child: _buildMarginsContent(context, stats),
+          ),
+          _buildSection(
+            context,
+            label: 'RECENT MATCHUPS',
+            child: _buildRecentMatchupsContent(context, stats),
+          ),
+        ],
+      ),
+    );
+  }
 
-          // Overall record
-          _buildRecordCard(context, stats),
+  /// Gray uppercase label + white card — matches homepage/stats pattern.
+  Widget _buildSection(
+    BuildContext context, {
+    required String label,
+    required Widget child,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textMuted,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: child,
+            ),
+          ),
           const SizedBox(height: 16),
-
-          // Point differential
-          _buildPointDifferentialCard(context, stats),
-          const SizedBox(height: 16),
-
-          // Matchup margins
-          _buildMarginsCard(context, stats),
-          const SizedBox(height: 16),
-
-          // Recent matchups
-          _buildRecentMatchupsCard(context, stats),
         ],
       ),
     );
   }
 
   Widget _buildOpponentHeader(BuildContext context, HeadToHeadStats stats) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: theme.colorScheme.errorContainer,
-                  backgroundImage:
-                      stats.opponentPhotoUrl != null ? NetworkImage(stats.opponentPhotoUrl!) : null,
-                  child: stats.opponentPhotoUrl == null
-                      ? Icon(Icons.person, size: 40, color: theme.colorScheme.onErrorContainer)
-                      : null,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Icon(Icons.sports_kabaddi, size: 16, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    stats.opponentDisplayName,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (stats.opponentName != null && stats.opponentEmail != null)
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: AppColors.secondary.withValues(alpha: 0.1),
+                backgroundImage: stats.opponentPhotoUrl != null
+                    ? NetworkImage(stats.opponentPhotoUrl!)
+                    : null,
+                child: stats.opponentPhotoUrl == null
+                    ? const Icon(Icons.person, size: 30, color: AppColors.secondary)
+                    : null,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      stats.opponentEmail!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRivalryCard(BuildContext context, HeadToHeadStats stats) {
-    final theme = Theme.of(context);
-
-    return Card(
-      color: Colors.red.withOpacity(0.05),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Text(
-              stats.rivalryIntensity,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              stats.matchupAdvantage,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecordCard(BuildContext context, HeadToHeadStats stats) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Head-to-Head Record',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatColumn(
-                  context,
-                  'Matchups',
-                  stats.gamesPlayed.toString(),
-                  Colors.blue,
-                ),
-                _buildStatColumn(
-                  context,
-                  'Win Rate',
-                  '${stats.winRate.toStringAsFixed(1)}%',
-                  stats.winRate >= 50 ? Colors.green : Colors.red,
-                ),
-                _buildStatColumn(
-                  context,
-                  'Record',
-                  stats.recordString,
-                  Colors.orange,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPointDifferentialCard(BuildContext context, HeadToHeadStats stats) {
-    final theme = Theme.of(context);
-    final avgDiff = stats.avgPointDifferential;
-    final isPositive = avgDiff >= 0;
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Point Differential',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatColumn(
-                  context,
-                  'Avg Per Game',
-                  stats.formattedPointDifferential,
-                  isPositive ? Colors.green : Colors.red,
-                ),
-                _buildStatColumn(
-                  context,
-                  'Points For',
-                  stats.avgPointsScored.toStringAsFixed(1),
-                  Colors.blue,
-                ),
-                _buildStatColumn(
-                  context,
-                  'Points Against',
-                  stats.avgPointsAllowed.toStringAsFixed(1),
-                  Colors.orange,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMarginsCard(BuildContext context, HeadToHeadStats stats) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Matchup Margins',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatColumn(
-                  context,
-                  'Biggest Win',
-                  '+${stats.largestVictoryMargin}',
-                  Colors.green,
-                ),
-                _buildStatColumn(
-                  context,
-                  'Worst Loss',
-                  '-${stats.largestDefeatMargin}',
-                  Colors.red,
-                ),
-                _buildStatColumn(
-                  context,
-                  'ELO vs Them',
-                  stats.formattedEloChange,
-                  stats.eloChange >= 0 ? Colors.green : Colors.red,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecentMatchupsCard(BuildContext context, HeadToHeadStats stats) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Recent Matchups',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (stats.currentStreak.abs() > 0)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: stats.isOnWinningStreak
-                          ? Colors.green.withOpacity(0.1)
-                          : Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      '${stats.currentStreak.abs()} ${stats.isOnWinningStreak ? "W" : "L"} Streak',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: stats.isOnWinningStreak ? Colors.green : Colors.red,
+                      stats.opponentDisplayName,
+                      style: const TextStyle(
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.onSurface,
                       ),
                     ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (stats.recentMatchups.isEmpty)
-              Center(
-                child: Text(
-                  'No recent matchups',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
+                    if (stats.opponentName != null && stats.opponentEmail != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        stats.opponentEmail!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textMuted.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-              )
-            else
-              ...stats.recentMatchups.map((matchup) => _buildMatchupTile(context, matchup)),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildMatchupTile(BuildContext context, HeadToHeadGameResult matchup) {
-    final theme = Theme.of(context);
+  Widget _buildRivalryContent(BuildContext context, HeadToHeadStats stats) {
+    return Column(
+      children: [
+        Text(
+          stats.rivalryIntensity,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.secondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          stats.matchupAdvantage,
+          style: TextStyle(
+            fontSize: 13,
+            color: AppColors.textMuted.withValues(alpha: 0.8),
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecordContent(BuildContext context, HeadToHeadStats stats) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildStatColumn(
+          'Matchups',
+          stats.gamesPlayed.toString(),
+          AppColors.secondary,
+        ),
+        _buildStatColumn(
+          'Win Rate',
+          '${stats.winRate.toStringAsFixed(1)}%',
+          stats.winRate >= 50 ? Colors.green : Colors.red,
+        ),
+        _buildStatColumn(
+          'Record',
+          stats.recordString,
+          AppColors.secondary,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPointDifferentialContent(
+      BuildContext context, HeadToHeadStats stats) {
+    final isPositive = stats.avgPointDifferential >= 0;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildStatColumn(
+          'Avg Per Game',
+          stats.formattedPointDifferential,
+          isPositive ? Colors.green : Colors.red,
+        ),
+        _buildStatColumn(
+          'Points For',
+          stats.avgPointsScored.toStringAsFixed(1),
+          AppColors.secondary,
+        ),
+        _buildStatColumn(
+          'Points Against',
+          stats.avgPointsAllowed.toStringAsFixed(1),
+          AppColors.secondary,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMarginsContent(BuildContext context, HeadToHeadStats stats) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildStatColumn(
+          'Biggest Win',
+          '+${stats.largestVictoryMargin}',
+          Colors.green,
+        ),
+        _buildStatColumn(
+          'Worst Loss',
+          '-${stats.largestDefeatMargin}',
+          Colors.red,
+        ),
+        _buildStatColumn(
+          'ELO vs Them',
+          stats.formattedEloChange,
+          stats.eloChange >= 0 ? Colors.green : Colors.red,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecentMatchupsContent(
+      BuildContext context, HeadToHeadStats stats) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (stats.currentStreak.abs() > 0) ...[
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: stats.isOnWinningStreak
+                    ? Colors.green.withValues(alpha: 0.1)
+                    : Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${stats.currentStreak.abs()} ${stats.isOnWinningStreak ? "W" : "L"} Streak',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: stats.isOnWinningStreak ? Colors.green : Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (stats.recentMatchups.isEmpty)
+          Text(
+            'No recent matchups',
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.textMuted.withValues(alpha: 0.7),
+            ),
+          )
+        else
+          ...stats.recentMatchups
+              .map((matchup) => _buildMatchupTile(matchup)),
+      ],
+    );
+  }
+
+  Widget _buildMatchupTile(HeadToHeadGameResult matchup) {
     final resultColor = matchup.won ? Colors.green : Colors.red;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: resultColor.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: resultColor.withOpacity(0.3),
-          width: 2,
-        ),
+        border: Border.all(color: resultColor.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 34,
+            height: 34,
             decoration: BoxDecoration(
-              color: resultColor.withOpacity(0.1),
+              color: resultColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 matchup.resultLetter,
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: TextStyle(
+                  fontSize: 14,
                   color: resultColor,
                   fontWeight: FontWeight.bold,
                 ),
@@ -417,23 +364,27 @@ class HeadToHeadPage extends StatelessWidget {
                   children: [
                     Text(
                       matchup.scoreDisplay,
-                      style: theme.textTheme.titleSmall?.copyWith(
+                      style: const TextStyle(
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
+                        color: AppColors.onSurface,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Text(
                       '(${matchup.formattedPointDifferential})',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   'ELO: ${matchup.formattedEloChange}',
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  style: TextStyle(
+                    fontSize: 11,
                     color: matchup.eloChange >= 0 ? Colors.green : Colors.red,
                   ),
                 ),
@@ -445,19 +396,14 @@ class HeadToHeadPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatColumn(
-    BuildContext context,
-    String label,
-    String value,
-    Color color,
-  ) {
-    final theme = Theme.of(context);
-
+  /// Stat column: large value + small label below.
+  Widget _buildStatColumn(String label, String value, Color color) {
     return Column(
       children: [
         Text(
           value,
-          style: theme.textTheme.headlineMedium?.copyWith(
+          style: TextStyle(
+            fontSize: 22,
             fontWeight: FontWeight.bold,
             color: color,
           ),
@@ -465,8 +411,9 @@ class HeadToHeadPage extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppColors.textMuted,
           ),
         ),
       ],
