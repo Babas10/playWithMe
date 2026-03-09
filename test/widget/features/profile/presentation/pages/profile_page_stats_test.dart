@@ -98,7 +98,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Check if Performance Overview section is present (from ExpandedStatsSection)
-    expect(find.text('Performance Overview'), findsOneWidget);
+    expect(find.text('PERFORMANCE OVERVIEW'), findsOneWidget);
 
     // Check if Current ELO is present
     expect(find.text('Current ELO'), findsOneWidget);
@@ -112,7 +112,6 @@ void main() {
     expect(find.text('Games Played'), findsOneWidget);
     expect(find.text('10'), findsOneWidget);
 
-    // Check for Momentum & Consistency section
-    expect(find.text('Momentum & Consistency'), findsOneWidget);
+    // Momentum & Consistency section was removed in UI polish (story 18.13)
   });
 }

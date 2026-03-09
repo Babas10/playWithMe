@@ -129,8 +129,9 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
         ),
         const SizedBox(height: 16),
 
-        // Content — expands to fill the space above the Send button
-        Expanded(
+        // Content — constrained height to work in both bounded and unbounded parents
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 300),
           child: _isLoading
               ? _buildLoadingState()
               : _errorMessage != null
@@ -236,8 +237,8 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
             ],
           ),
 
-        // Friend list — fills all remaining vertical space
-        Expanded(
+        // Friend list
+        Flexible(
           child: Container(
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade300),
@@ -253,8 +254,8 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
               return CheckboxListTile(
                 value: isSelected,
                 onChanged: (_) => _toggleSelection(friend.uid),
-                activeColor: AppColors.primary,
-                checkColor: AppColors.secondary,
+                activeColor: AppColors.secondary,
+                checkColor: Colors.white,
                 title: Text(
                   friend.displayNameOrEmail,
                   style: TextStyle(

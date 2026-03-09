@@ -47,7 +47,7 @@ void main() {
       expect(find.text('Play at least 1 game to unlock'), findsOneWidget);
 
       // Should NOT show performance stats
-      expect(find.text('Performance Overview'), findsNothing);
+      expect(find.text('PERFORMANCE OVERVIEW'), findsNothing);
       expect(find.text('Current ELO'), findsNothing);
       expect(find.text('Peak ELO'), findsNothing);
     });
@@ -85,7 +85,7 @@ void main() {
       expect(find.byType(EmptyStatsPlaceholder), findsNothing);
 
       // Should show performance stats
-      expect(find.text('Performance Overview'), findsOneWidget);
+      expect(find.text('PERFORMANCE OVERVIEW'), findsOneWidget);
       expect(find.text('Current ELO'), findsOneWidget);
       expect(find.text('1650'), findsOneWidget);
       expect(find.text('Peak ELO'), findsOneWidget);
@@ -126,7 +126,7 @@ void main() {
 
       // Should show performance stats (not empty state)
       expect(find.byType(EmptyStatsPlaceholder), findsNothing);
-      expect(find.text('Performance Overview'), findsOneWidget);
+      expect(find.text('PERFORMANCE OVERVIEW'), findsOneWidget);
       expect(find.text('Games Played'), findsOneWidget);
       expect(find.text('1'), findsOneWidget);
     });
