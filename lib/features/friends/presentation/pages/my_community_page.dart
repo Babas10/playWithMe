@@ -42,7 +42,13 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       if (_tabController.index == 1 && !_tabController.indexIsChanging) {
-        context.read<FriendBloc>().add(const FriendEvent.loadRequested());
+        // Only load if we don't have data yet — the initial page load already
+        // fetches both friends and requests, so avoid a redundant reload that
+        // would flash the UI back to a loading spinner.
+        final state = context.read<FriendBloc>().state;
+        if (state is FriendInitial || state is FriendError) {
+          context.read<FriendBloc>().add(const FriendEvent.loadRequested());
+        }
       }
     });
   }
