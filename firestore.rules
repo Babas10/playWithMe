@@ -94,9 +94,10 @@ service cloud.firestore {
     // ============================================
 
     match /friendships/{friendshipId} {
-      // ❌ DENY all list/where queries - must use Cloud Functions (Story 11.7)
-      // Client apps must use getFriendships() Cloud Function for queries
-      allow list: if false;
+      // ✅ ALLOW list only for the recipient (to power real-time pending request badge)
+      // Initiator-based queries (e.g., getFriendships()) still go through Cloud Functions
+      allow list: if isAuthenticated() &&
+                     resource.data.recipientId == request.auth.uid;
 
       // ✅ ALLOW get only for friendships user is part of
       allow get: if isAuthenticated() &&
