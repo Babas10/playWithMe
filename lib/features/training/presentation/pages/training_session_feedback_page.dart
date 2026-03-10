@@ -158,7 +158,7 @@ class _TrainingSessionFeedbackPageState
           children: [
             // Session title card
             Card(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -234,7 +234,7 @@ class _TrainingSessionFeedbackPageState
                 hintText: l10n.shareYourThoughts,
                 border: const OutlineInputBorder(),
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.surface,
+                fillColor: Colors.white,
               ),
             ),
             const SizedBox(height: 32),

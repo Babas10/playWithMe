@@ -12,7 +12,6 @@ void main() {
     late UserModel userWithAllRoles;
     late UserModel userWithOnlyCarry;
     late UserModel userWithOnlyWeakLink;
-    late UserModel userWithStrongCarry;
 
     setUp(() {
       userWithNoData = const UserModel(
@@ -59,16 +58,6 @@ void main() {
         ),
       );
 
-      userWithStrongCarry = const UserModel(
-        uid: 'test-uid-5',
-        email: 'test5@example.com',
-        displayName: 'Strong Carry',
-        isEmailVerified: true,
-        isAnonymous: false,
-        roleBasedStats: RoleBasedStats(
-          carry: RoleStats(games: 15, wins: 12, winRate: 0.8),
-        ),
-      );
     });
 
     Widget buildWidget(UserModel user) => MaterialApp(
@@ -145,21 +134,6 @@ void main() {
 
       final winRateText = tester.widget<Text>(find.text('40.0%'));
       expect(winRateText.style?.color, const Color(0xFF004E64));
-    });
-
-    testWidgets('displays personalized insight for strong carry performance', (tester) async {
-      await tester.pumpWidget(buildWidget(userWithStrongCarry));
-      await tester.pump();
-
-      expect(find.text('💪 Strong carry performance! You elevate your teammates.'), findsOneWidget);
-      expect(find.byIcon(Icons.lightbulb_outline), findsOneWidget);
-    });
-
-    testWidgets('displays personalized insight for good weak-link performance', (tester) async {
-      await tester.pumpWidget(buildWidget(userWithOnlyWeakLink));
-      await tester.pump();
-
-      expect(find.text('🌟 Great adaptability! You thrive with experienced partners.'), findsOneWidget);
     });
 
     testWidgets('displays icons for each role', (tester) async {

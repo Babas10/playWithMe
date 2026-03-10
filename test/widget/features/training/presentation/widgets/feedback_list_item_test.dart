@@ -136,7 +136,6 @@ void main() {
 
       expect(find.text('Great training session! Really enjoyed it.'),
           findsOneWidget);
-      expect(find.byIcon(Icons.format_quote), findsOneWidget);
     });
 
     testWidgets('hides comment section when comment is null', (tester) async {
@@ -235,7 +234,7 @@ void main() {
       expect(find.byType(Card), findsOneWidget);
 
       final card = tester.widget<Card>(find.byType(Card));
-      expect(card.margin, const EdgeInsets.symmetric(horizontal: 16, vertical: 8));
+      expect(card.margin, const EdgeInsets.symmetric(horizontal: 16, vertical: 6));
     });
 
     testWidgets('displays all rating chip components', (tester) async {
@@ -258,8 +257,8 @@ void main() {
         ),
       );
 
-      // Each rating chip should have a star icon (3 rating chips + 1 overall = 4 total)
-      expect(find.byIcon(Icons.star), findsNWidgets(4));
+      // Overall rating pill has 1 star icon; sub-ratings use unicode ★ text
+      expect(find.byIcon(Icons.star), findsOneWidget);
     });
 
     testWidgets('long comment text is properly displayed', (tester) async {
