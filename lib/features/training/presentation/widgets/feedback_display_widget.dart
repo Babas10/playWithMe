@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 
 import '../../../../core/domain/repositories/training_feedback_repository.dart';
 import '../../../../core/services/service_locator.dart';
@@ -213,17 +214,20 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
             ),
           ),
 
-        // Section header
+        // Section header — uppercase gray label matching homepage/stats page style
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
             child: Row(
               children: [
-                const Icon(Icons.reviews, size: 24),
-                const SizedBox(width: 8),
-                Text(
-                  'Individual Feedback',
-                  style: Theme.of(context).textTheme.titleLarge,
+                const Text(
+                  'INDIVIDUAL FEEDBACK',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textMuted,
+                    letterSpacing: 0.8,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Container(
@@ -232,14 +236,14 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
+                    color: AppColors.primary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${aggregation.totalCount}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      color: AppColors.secondary,
                     ),
                   ),
                 ),

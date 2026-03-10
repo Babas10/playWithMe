@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/training_feedback_model.dart';
 import 'package:play_with_me/core/domain/repositories/training_feedback_repository.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/training/presentation/widgets/feedback_summary_card.dart';
 
 void main() {
@@ -20,7 +21,7 @@ void main() {
       );
 
       expect(find.byType(Card), findsNothing);
-      expect(find.text('Feedback Summary'), findsNothing);
+      expect(find.text('FEEDBACK SUMMARY'), findsNothing);
     });
 
     testWidgets('displays overall average rating correctly', (tester) async {
@@ -58,7 +59,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Feedback Summary'), findsOneWidget);
+      expect(find.text('FEEDBACK SUMMARY'), findsOneWidget);
       expect(find.text('Based on 2 ratings'), findsOneWidget);
 
       // Overall average should be (5+4+5 + 4+5+4) / 6 = 4.5
@@ -242,7 +243,7 @@ void main() {
       expect(find.text('Based on 2 ratings'), findsOneWidget);
     });
 
-    testWidgets('rating color is green for high ratings (>= 4.5)',
+    testWidgets('rating bars use brand blue (AppColors.secondary) for high ratings',
         (tester) async {
       final feedback = [
         TrainingFeedbackModel(
@@ -274,11 +275,11 @@ void main() {
 
       for (final indicator in indicators) {
         final valueColor = indicator.valueColor as AlwaysStoppedAnimation<Color>;
-        expect(valueColor.value, Colors.green);
+        expect(valueColor.value, AppColors.secondary);
       }
     });
 
-    testWidgets('rating color is orange for medium ratings (2.5 to < 3.5)',
+    testWidgets('rating bars use brand blue (AppColors.secondary) for medium ratings',
         (tester) async {
       final feedback = [
         TrainingFeedbackModel(
@@ -309,7 +310,7 @@ void main() {
 
       for (final indicator in indicators) {
         final valueColor = indicator.valueColor as AlwaysStoppedAnimation<Color>;
-        expect(valueColor.value, Colors.orange);
+        expect(valueColor.value, AppColors.secondary);
       }
     });
   });
