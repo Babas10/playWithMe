@@ -1,0 +1,44 @@
+name: Extract Version from Git Tag
+description: >
+  Extracts VERSION_NAME and BUILD_NUMBER from the Git tag that triggered the workflow.
+  VERSION_NAME = tag without the leading "v" (e.g. v1.0.0-beta → 1.0.0-beta).
+  BUILD_NUMBER = GitHub Actions run number (always incrementing, required by both stores).
+
+outputs:
+  version_name:
+    description: Version name derived from the Git tag (e.g. 1.0.0-beta)
+    value: ${{ steps.extract.outputs.version_name }}
+  build_number:
+    description: Build number from GitHub Actions run number
+    value: ${{ steps.extract.outputs.build_number }}
+
+runs:
+  using: composite
+  steps:
+    - name: Extract version and build number
+      id: extract
+      shell: bash
+      run: |
+        # Strip the leading "v" from the tag name
+        # GITHUB_REF format: refs/tags/v1.0.0-beta
+        TAG="${GITHUB_REF#refs/tags/}"
+        VERSION_NAME="${TAG#v}"
+        BUILD_NUMBER="${{ github.run_number }}"
+
+        # Validate that VERSION_NAME is non-empty
+        if [ -z "$VERSION_NAME" ]; then
+          echo "❌ Could not extract version from GITHUB_REF: $GITHUB_REF"
+          exit 1
+        fi
+
+        echo "🏷️  Tag:          $TAG"
+        echo "📦  Version name: $VERSION_NAME"
+        echo "🔢  Build number: $BUILD_NUMBER"
+
+        # Export as step outputs
+        echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+        echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
+        # Export as environment variables for subsequent steps in the same job
+        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+        echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
