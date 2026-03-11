@@ -1,0 +1,173 @@
+name: CD — Production (App Store + Google Play)
+
+# Triggered by production tags only: v1.0.0, v1.2.3, etc.
+# The regex pattern explicitly excludes pre-release suffixes (-beta, -rc, etc.).
+# Builds and uploads the prod flavor to:
+#   - Google Play Production track (Android) — goes live immediately
+#   - App Store Connect (iOS) — enters Apple review (~1-2 days), then goes live
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  # ─── Job 1: Tests ────────────────────────────────────────────────────────────
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+
+      - name: 🔧 Generate Mock Firebase Configs (for tests)
+        run: dart run tools/generate_mock_firebase_configs.dart
+
+      - name: 📊 Run Static Analysis
+        run: flutter analyze
+
+      - name: 🧪 Run Unit & Widget Tests
+        run: flutter test test/unit/ test/widget/
+
+  # ─── Job 2: Deploy Android ───────────────────────────────────────────────────
+  deploy_android:
+    name: 🤖 Build & Upload Android (Play Production)
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: 'stable'
+          cache: true
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 💾 Setup Gradle Build Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android/build-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/buildSrc/**/*.kt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+
+      - name: 🏷️ Extract Version from Tag
+        uses: ./.github/actions/extract-version
+
+      - name: 🔧 Generate Firebase Prod Config
+        env:
+          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
+          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
+          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
+          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
+          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
+          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
+          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
+          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
+        run: dart run tools/generate_firebase_config_from_secrets.dart prod
+
+      - name: 🔑 Decode Android Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode \
+            > android/app/release.jks
+
+      - name: 🔨 Build Release AAB (prod flavor)
+        env:
+          ANDROID_KEYSTORE_PATH: release.jks
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |
+          flutter build appbundle --release --flavor prod \
+            -t lib/main_prod.dart \
+            --build-name=${{ env.VERSION_NAME }} \
+            --build-number=${{ env.BUILD_NUMBER }}
+
+      - name: 🔑 Decode Google Play Service Account
+        run: |
+          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode \
+            > service-account.json
+
+      - name: 🚀 Upload to Google Play Production
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service-account.json
+          packageName: org.gatherli.app
+          releaseFiles: build/app/outputs/bundle/prodRelease/app-prod-release.aab
+          track: production
+          status: completed
+          releaseName: ${{ env.VERSION_NAME }}
+
+  # ─── Job 3: Deploy iOS ───────────────────────────────────────────────────────
+  deploy_ios:
+    name: 🍎 Build & Upload iOS (App Store Connect)
+    needs: test
+    runs-on: macos-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+
+      - name: 🏷️ Extract Version from Tag
+        uses: ./.github/actions/extract-version
+
+      - name: 🔧 Generate Firebase Prod Config
+        env:
+          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
+          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
+          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
+          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
+          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
+          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
+          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
+          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
+        run: dart run tools/generate_firebase_config_from_secrets.dart prod
+
+      - name: 🔑 Install App Store Connect API Key
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}" | base64 --decode \
+            > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+
+      - name: 🔨 Build & Upload IPA to App Store Connect (prod flavor)
+        run: |
+          flutter build ipa --release --flavor prod \
+            -t lib/main_prod.dart \
+            --build-name=${{ env.VERSION_NAME }} \
+            --build-number=${{ env.BUILD_NUMBER }} \
+            --export-options-plist=ios/ExportOptions.plist
