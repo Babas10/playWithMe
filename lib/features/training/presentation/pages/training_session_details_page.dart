@@ -175,13 +175,16 @@ class _TrainingSessionDetailsPageState
                   // Session info header
                   _buildSessionHeader(context, session, isOrganizer),
 
-                  // Tabs
+                  // Tabs — icon turns yellow when selected, text stays gray
                   TabBar(
+                    labelColor: AppColors.navLabelColor,
+                    unselectedLabelColor: AppColors.navLabelColor,
+                    indicatorColor: AppColors.primary,
                     tabs: [
-                      Tab(text: l10n.participants, icon: const Icon(Icons.people)),
-                      Tab(text: l10n.exercises, icon: const Icon(Icons.fitness_center)),
+                      _TrainingTab(tabIndex: 0, icon: Icons.people, label: l10n.participants),
+                      _TrainingTab(tabIndex: 1, icon: Icons.fitness_center, label: l10n.exercises),
                       if (showFeedbackTab)
-                        Tab(text: l10n.feedback, icon: const Icon(Icons.feedback_outlined)),
+                        _TrainingTab(tabIndex: 2, icon: Icons.feedback_outlined, label: l10n.feedback),
                     ],
                   ),
 
@@ -230,7 +233,7 @@ class _TrainingSessionDetailsPageState
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -272,7 +275,7 @@ class _TrainingSessionDetailsPageState
                   Icon(
                     isOrganizer ? Icons.star : Icons.person_outline,
                     size: 16,
-                    color: isOrganizer ? Colors.amber : null,
+                    color: AppColors.secondary,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -293,7 +296,7 @@ class _TrainingSessionDetailsPageState
           // Date/Time
           Row(
             children: [
-              Icon(Icons.calendar_today, size: 16, color: AppColors.primary),
+              Icon(Icons.calendar_today, size: 16, color: AppColors.secondary),
               const SizedBox(width: 4),
               Text(
                 DateFormat('MMM dd, yyyy • HH:mm').format(session.startTime),
@@ -305,7 +308,7 @@ class _TrainingSessionDetailsPageState
           // Location
           Row(
             children: [
-              Icon(Icons.location_on, size: 16, color: AppColors.primary),
+              Icon(Icons.location_on, size: 16, color: AppColors.secondary),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -323,7 +326,7 @@ class _TrainingSessionDetailsPageState
               final l10n = AppLocalizations.of(context)!;
               return Row(
                 children: [
-                  Icon(Icons.people, size: 16, color: AppColors.primary),
+                  Icon(Icons.people, size: 16, color: AppColors.secondary),
                   const SizedBox(width: 4),
                   Text(
                     l10n.participantsCount(session.participantIds.length, session.maxParticipants),
@@ -358,14 +361,14 @@ class _TrainingSessionDetailsPageState
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.withAlpha(26),
+                color: AppColors.secondary.withAlpha(26),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.withAlpha(77)),
+                border: Border.all(color: AppColors.secondary.withAlpha(77)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.note, size: 16, color: Colors.blue),
+                  const Icon(Icons.note, size: 16, color: AppColors.secondary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -582,17 +585,14 @@ class _TrainingSessionDetailsPageState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.people, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      l10n.participation,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
+                Text(
+                  l10n.participation.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textMuted,
+                    letterSpacing: 0.8,
+                  ),
                 ),
                 const Divider(),
                 _buildParticipationRow(l10n.current, '${session.participantIds.length}'),
@@ -799,6 +799,39 @@ class _TrainingSessionDetailsPageState
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Tab widget that shows a yellow icon when selected, gray when not selected.
+/// Text label always stays gray (matches the app's bottom nav bar pattern).
+/// Explicit Icon.color takes precedence over the inherited IconTheme from TabBar.
+class _TrainingTab extends StatelessWidget {
+  final int tabIndex;
+  final IconData icon;
+  final String label;
+
+  const _TrainingTab({
+    required this.tabIndex,
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = DefaultTabController.of(context);
+    return AnimatedBuilder(
+      animation: controller.animation!,
+      builder: (context, _) {
+        final isSelected = controller.index == tabIndex;
+        return Tab(
+          icon: Icon(
+            icon,
+            color: isSelected ? AppColors.primary : AppColors.navLabelColor,
+          ),
+          text: label,
+        );
+      },
     );
   }
 }
