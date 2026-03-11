@@ -1,0 +1,68 @@
+name: Validate Version Tag
+
+# Runs on every v* tag push BEFORE the CD pipelines.
+# Ensures the new tag is strictly greater than the latest existing tag,
+# preventing accidental releases of older versions.
+#
+# Works for both beta and production tags:
+#   v1.0.0-beta  →  validated against latest tag
+#   v1.0.0       →  validated against latest tag
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  validate_version:
+    name: 🔍 Validate Version is Incremental
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository (full history for tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Validate version tag is incremental
+        run: |
+          NEW_TAG="${GITHUB_REF#refs/tags/}"
+          echo "🏷️  New tag: $NEW_TAG"
+
+          # Fetch all existing tags
+          git fetch --tags --force
+
+          # Get all v* tags except the new one, sorted by version
+          ALL_TAGS=$(git tag --list 'v*' | grep -v "^${NEW_TAG}$" | sort -V)
+
+          if [ -z "$ALL_TAGS" ]; then
+            echo "✅ No previous tags found — this is the first release."
+            exit 0
+          fi
+
+          LATEST_TAG=$(echo "$ALL_TAGS" | tail -1)
+          echo "📦  Latest existing tag: $LATEST_TAG"
+
+          # Compare: new tag must sort strictly after the latest tag
+          HIGHER=$(printf '%s\n%s' "$LATEST_TAG" "$NEW_TAG" | sort -V | tail -1)
+
+          if [ "$NEW_TAG" = "$LATEST_TAG" ]; then
+            echo ""
+            echo "❌ ERROR: Tag $NEW_TAG already exists."
+            echo "   You cannot re-release the same version."
+            exit 1
+          fi
+
+          if [ "$HIGHER" != "$NEW_TAG" ]; then
+            echo ""
+            echo "❌ ERROR: $NEW_TAG is not greater than the latest tag $LATEST_TAG."
+            echo "   Releases must be incremental."
+            echo ""
+            echo "   If you need to release a hotfix for an older version:"
+            echo "   1. git checkout -b hotfix/vX.Y.Z <good-tag>"
+            echo "   2. Apply the fix and commit"
+            echo "   3. Tag with a version higher than $LATEST_TAG"
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ Version validation passed: $NEW_TAG > $LATEST_TAG"
