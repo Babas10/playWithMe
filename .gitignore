@@ -79,6 +79,17 @@ lib/core/config/firebase_config_prod.dart
 **/*_key.json
 **/secrets.json
 
+# Android signing
+*.jks
+*.keystore
+android/app/release.jks
+
+# iOS signing
+*.p8
+*.mobileprovision
+*.cer
+*.p12
+
 # Node modules
 node_modules/
 infrastructure/terraform/.terraform/
