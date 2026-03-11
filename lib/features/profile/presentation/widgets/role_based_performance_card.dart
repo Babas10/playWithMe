@@ -102,8 +102,6 @@ class RoleBasedPerformanceCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
         ],
-
-        _InsightMessage(insight: stats.getInsight()),
       ],
     );
   }
@@ -211,40 +209,6 @@ class _RoleStatRow extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-/// Personalized insight message based on role performance.
-class _InsightMessage extends StatelessWidget {
-  final String insight;
-
-  const _InsightMessage({required this.insight});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.secondary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.lightbulb_outline,
-            size: 20,
-            color: AppColors.secondary,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              insight,
-              style: const TextStyle(fontSize: 13, fontStyle: FontStyle.italic),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
