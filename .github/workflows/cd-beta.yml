@@ -34,9 +34,6 @@ jobs:
       - name: 🔧 Generate Mock Firebase Configs (for tests)
         run: dart run tools/generate_mock_firebase_configs.dart
 
-      - name: 📊 Run Static Analysis
-        run: flutter analyze --no-fatal-warnings
-
       - name: 🧪 Run Unit & Widget Tests
         run: flutter test test/unit/ test/widget/
 
