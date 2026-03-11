@@ -21,6 +21,21 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
+    // Release signing config — credentials injected from environment variables in CI.
+    // Locally, the release build falls back to debug signing if env vars are not set.
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("ANDROID_KEYSTORE_PATH") ?: "release.jks"
+            val keystoreFile = file(keystorePath)
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = System.getenv("ANDROID_STORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD") ?: ""
+            }
+        }
+    }
+
     defaultConfig {
         applicationId = "org.gatherli.app"
         minSdk = 23  // Firebase requires minimum API 23
@@ -44,9 +59,19 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            val releaseConfig = signingConfigs.getByName("release")
+            // Use release signing if keystore is available (CI), otherwise fall back to debug
+            signingConfig = if (releaseConfig.storeFile?.exists() == true) {
+                releaseConfig
+            } else {
+                signingConfigs.getByName("debug")
+            }
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
