@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb, visibleForTesting;
 
 /// Background message handler (must be top-level function)
 @pragma('vm:entry-point')
@@ -13,7 +13,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // This handler runs in a separate isolate
   // No Firebase.initializeApp() needed here as it's already initialized
   // by the main app
-  print('Background message: ${message.notification?.title}');
+  debugPrint('Background message: ${message.notification?.title}');
 }
 
 /// Service responsible for handling Firebase Cloud Messaging and local notifications
@@ -56,7 +56,7 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.denied) {
-      print('User declined notification permission');
+      debugPrint('User declined notification permission');
       return;
     }
 
@@ -113,7 +113,7 @@ class NotificationService {
 
       if (isIOS) {
         // On iOS the FCM token depends on APNS; request it first.
-        print('[NotificationService] iOS detected: waiting for APNS token...');
+        debugPrint('[NotificationService] iOS detected: waiting for APNS token...');
 
         // Retry up to 5 times with 1-second delays.  The OS can take a
         // moment to deliver the APNS token on the first launch or after a
@@ -123,10 +123,10 @@ class NotificationService {
         for (int i = 0; i < maxRetries; i++) {
           apnsToken = await _fcm.getAPNSToken();
           if (apnsToken != null) {
-            print('[NotificationService] ✅ APNS token obtained.');
+            debugPrint('[NotificationService] ✅ APNS token obtained.');
             break;
           }
-          print(
+          debugPrint(
             '[NotificationService] ⏳ APNS token not ready '
             '(attempt ${i + 1}/$maxRetries).',
           );
@@ -140,7 +140,7 @@ class NotificationService {
           //   • the APNs key/certificate is not configured in Firebase.
           // The onTokenRefresh listener registered above will save the token
           // once it becomes available without requiring an app restart.
-          print(
+          debugPrint(
             '[NotificationService] ⚠️ APNS token unavailable after '
             '$maxRetries attempts. FCM token will be persisted via '
             'onTokenRefresh when the APNS token becomes available.',
@@ -152,14 +152,14 @@ class NotificationService {
       // Get FCM token
       final token = await _fcm.getToken();
       if (token != null) {
-        print('✅ FCM token obtained: ${token.substring(0, 20)}...');
+        debugPrint('✅ FCM token obtained: ${token.substring(0, 20)}...');
         await _saveTokenToFirestore(token);
       } else {
-        print('⚠️ FCM token is null, will retry on token refresh');
+        debugPrint('⚠️ FCM token is null, will retry on token refresh');
       }
     } catch (e) {
-      print('⚠️ Error initializing FCM token: $e');
-      print('   Token will be saved when available via onTokenRefresh.');
+      debugPrint('⚠️ Error initializing FCM token: $e');
+      debugPrint('   Token will be saved when available via onTokenRefresh.');
     }
   }
 
@@ -185,7 +185,7 @@ class NotificationService {
 
   /// Handle foreground messages by showing local notification
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
-    print('Foreground message: ${message.notification?.title}');
+    debugPrint('Foreground message: ${message.notification?.title}');
 
     final notification = message.notification;
     final android = message.notification?.android;

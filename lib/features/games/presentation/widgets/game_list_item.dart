@@ -107,16 +107,16 @@ class GameListItem extends StatelessWidget {
 
   Color? _getCardBackgroundColor(BuildContext context) {
     if (game.status == GameStatus.cancelled) {
-      return Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5);
+      return Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
     }
     
     switch (game.status) {
       case GameStatus.verification:
         return AppColors.primary.withValues(alpha: 0.1);
       case GameStatus.completed:
-        return Colors.green.withOpacity(0.05);
+        return Colors.green.withValues(alpha: 0.05);
       case GameStatus.inProgress:
-        return Colors.orange.withOpacity(0.05);
+        return Colors.orange.withValues(alpha: 0.05);
       default:
         return null;
     }
@@ -300,8 +300,8 @@ class GameListItem extends StatelessWidget {
                   value: progress,
                   minHeight: 6,
                   backgroundColor: isPast
-                      ? Theme.of(context).colorScheme.surfaceVariant
-                      : Theme.of(context).colorScheme.surfaceVariant,
+                      ? Theme.of(context).colorScheme.surfaceContainerHighest
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     isPast
                         ? Theme.of(context).colorScheme.onSurfaceVariant

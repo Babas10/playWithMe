@@ -115,6 +115,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
   }
 
   Future<void> _showDateRangePicker() async {
+    final bloc = context.read<GameHistoryBloc>();
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2020),
@@ -125,16 +126,17 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
     );
 
     if (picked != null) {
+      if (!context.mounted) return;
       setState(() {
         _startDate = picked.start;
         _endDate = picked.end;
       });
-      context.read<GameHistoryBloc>().add(
-            GameHistoryEvent.dateRangeChanged(
-              startDate: picked.start,
-              endDate: picked.end,
-            ),
-          );
+      bloc.add(
+        GameHistoryEvent.dateRangeChanged(
+          startDate: picked.start,
+          endDate: picked.end,
+        ),
+      );
     }
   }
 
@@ -265,7 +267,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Theme.of(context).colorScheme.surfaceVariant,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Row(
         children: [
           Text(l10n.activeFilters),

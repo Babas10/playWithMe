@@ -50,10 +50,10 @@ class GameHistoryCard extends StatelessWidget {
                     ),
                 ],
               ),
-              if (game.location.name != null) ...[
+              if (game.location.name.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(
-                  game.location.name!,
+                  game.location.name,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -161,8 +161,8 @@ class GameHistoryCard extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isWinner
-            ? theme.colorScheme.primaryContainer.withOpacity(0.3)
-            : theme.colorScheme.surfaceVariant.withOpacity(0.3),
+            ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: isWinner
             ? Border.all(color: theme.colorScheme.primary, width: 2)

@@ -1,4 +1,5 @@
 // Tests Firebase integration compatibility with real configurations - Unit test version for CI/CD
+// ignore_for_file: avoid_print
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/config/environment_config.dart';
 import 'package:play_with_me/core/services/firebase_service.dart';

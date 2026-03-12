@@ -40,7 +40,7 @@ class ELOTrendIndicator extends StatelessWidget {
             Text(
               l10n.eloRatingLabel,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -90,7 +90,7 @@ class ELOTrendIndicator extends StatelessWidget {
               Text(
                 l10n.lastNGames(trendData['gamesCount'] as int),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
             ] else if (recentHistory.isEmpty) ...[
@@ -98,7 +98,7 @@ class ELOTrendIndicator extends StatelessWidget {
               Text(
                 l10n.noGamesPlayedYet,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
             ],

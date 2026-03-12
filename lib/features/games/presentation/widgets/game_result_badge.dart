@@ -32,7 +32,7 @@ class GameResultBadge extends StatelessWidget {
         .take(2)
         .map((id) {
           final player = players![id];
-          return player?.displayName ?? player?.email?.split('@').first ?? 'Player';
+          return player?.displayName ?? player?.email.split('@').first ?? 'Player';
         })
         .toList();
 

@@ -68,8 +68,9 @@ class _TrainingSessionCreationPageState
       helpText: l10n.selectStartDate,
     );
 
-    if (date == null || !mounted) return;
+    if (date == null || !context.mounted) return;
 
+    // ignore: use_build_context_synchronously
     final time = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 14, minute: 0),
@@ -111,7 +112,7 @@ class _TrainingSessionCreationPageState
       helpText: l10n.selectEndTime,
     );
 
-    if (time == null || !mounted) return;
+    if (time == null || !context.mounted) return;
 
     final dateTime = DateTime(
       _selectedStartTime!.year,
@@ -286,7 +287,7 @@ class _TrainingSessionCreationPageState
                               ? null
                               : () => _selectStartTime(context),
                           tileColor:
-                              Theme.of(context).colorScheme.surfaceVariant,
+                              Theme.of(context).colorScheme.surfaceContainerHighest,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -302,7 +303,7 @@ class _TrainingSessionCreationPageState
                               ? null
                               : () => _selectEndTime(context),
                           tileColor:
-                              Theme.of(context).colorScheme.surfaceVariant,
+                              Theme.of(context).colorScheme.surfaceContainerHighest,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

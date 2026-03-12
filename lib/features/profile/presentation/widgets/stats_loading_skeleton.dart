@@ -55,9 +55,9 @@ class _StatsLoadingSkeletonState extends State<StatsLoadingSkeleton>
               begin: Alignment(-1.0 - _controller.value * 2, 0.0),
               end: Alignment(1.0 + _controller.value * 2, 0.0),
               colors: [
-                theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
               ],
               stops: const [0.0, 0.5, 1.0],
             ),
@@ -127,7 +127,7 @@ class _StatItemSkeleton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.1),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

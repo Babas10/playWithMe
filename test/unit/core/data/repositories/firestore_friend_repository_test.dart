@@ -21,17 +21,21 @@ class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 
 class MockUser extends Mock implements User {}
 
+// ignore: subtype_of_sealed_class
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 
 class MockQuerySnapshot extends Mock
     implements QuerySnapshot<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockQueryDocumentSnapshot extends Mock
     implements QueryDocumentSnapshot<Map<String, dynamic>> {}
 
@@ -871,11 +875,7 @@ void main() {
           .thenAnswer((_) async => mockResult);
 
       // Generate response with all users as non-friends
-      final friendships = Map.fromIterable(
-        exactly100Users,
-        key: (user) => user,
-        value: (_) => false,
-      );
+      final friendships = {for (final user in exactly100Users) user: false};
 
       when(() => mockResult.data).thenReturn({
         'friendships': friendships,
@@ -1486,7 +1486,7 @@ void main() {
     });
 
     group('cache invalidation on mutating operations', () {
-      Future<void> _populateCaches() async {
+      Future<void> populateCaches() async {
         // Use separate callables so the stubs don't interfere with each other.
         final mockFriendshipCallable = MockHttpsCallable();
         final mockFriendshipResult = MockHttpsCallableResult();
@@ -1516,7 +1516,7 @@ void main() {
       }
 
       test('acceptFriendRequest clears friendship caches', () async {
-        await _populateCaches();
+        await populateCaches();
 
         // Mock the Firestore update for acceptFriendRequest.
         final mockCollRef = MockCollectionReference();
@@ -1543,7 +1543,7 @@ void main() {
       });
 
       test('declineFriendRequest clears friendship caches', () async {
-        await _populateCaches();
+        await populateCaches();
 
         final mockCollRef = MockCollectionReference();
         final mockDocRef = MockDocumentReference();
@@ -1568,7 +1568,7 @@ void main() {
       });
 
       test('removeFriend clears friendship caches', () async {
-        await _populateCaches();
+        await populateCaches();
 
         final mockCollRef = MockCollectionReference();
         final mockDocRef = MockDocumentReference();

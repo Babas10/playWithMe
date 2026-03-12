@@ -41,7 +41,7 @@ class WinStreakBadge extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      color: streakColor.withOpacity(0.1),
+      color: streakColor.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: Row(

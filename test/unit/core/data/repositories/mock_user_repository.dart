@@ -1,4 +1,5 @@
 // Mock repository for UserRepository used in testing
+// ignore_for_file: avoid_print
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart'; // Story 302.7

@@ -29,7 +29,7 @@ void main() {
       'User can decline friend request',
       () async {
         // 1. Create two test users
-        final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'user1@test.com',
           password: 'password123',
           displayName: 'User One',
@@ -92,7 +92,7 @@ void main() {
       'Declined request no longer appears in pending requests',
       () async {
         // 1. Create two test users
-        final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'user1@test.com',
           password: 'password123',
           displayName: 'User One',
@@ -162,7 +162,7 @@ void main() {
       'User can send new request after previous was declined',
       () async {
         // 1. Create two test users
-        final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'user1@test.com',
           password: 'password123',
           displayName: 'User One',
@@ -284,7 +284,7 @@ void main() {
       'Search shows no pending request after decline',
       () async {
         // 1. Create two test users
-        final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'user1@test.com',
           password: 'password123',
           displayName: 'User One',

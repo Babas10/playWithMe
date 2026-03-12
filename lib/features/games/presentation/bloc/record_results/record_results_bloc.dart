@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
@@ -63,7 +64,7 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
           }
         } catch (e) {
           // If fetching users fails, continue without user data
-          print('Failed to load user data: $e');
+          debugPrint('Failed to load user data: $e');
         }
       }
 

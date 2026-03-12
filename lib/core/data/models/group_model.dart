@@ -12,7 +12,9 @@ class GroupModel with _$GroupModel {
     String? description,
     String? photoUrl,
     required String createdBy,
+    // ignore: invalid_annotation_target
     @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required DateTime createdAt,
+    // ignore: invalid_annotation_target
     @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? updatedAt,
     @Default([]) List<String> memberIds,
     @Default([]) List<String> adminIds,
@@ -27,6 +29,7 @@ class GroupModel with _$GroupModel {
     @Default(true) bool notifyMembersOfNewGames,
     // Group stats
     @Default(0) int totalGamesPlayed,
+    // ignore: invalid_annotation_target
     @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? lastActivity,
   }) = _GroupModel;
 
