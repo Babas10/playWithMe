@@ -18,3 +18,6 @@
 -keepclassmembers class * {
     @com.google.firebase.firestore.PropertyName <fields>;
 }
+
+# Suppress warnings for optional Play Core classes referenced by Flutter internals
+-dontwarn com.google.android.play.core.**
