@@ -192,16 +192,43 @@ jobs:
           FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
         run: dart run tools/generate_firebase_config_from_secrets.dart prod
 
-      - name: 🔑 Install App Store Connect API Key
+      - name: 🔑 Install Distribution Certificate
+        run: |
+          CERT_PATH=$RUNNER_TEMP/distribution.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          echo "${{ secrets.IOS_DISTRIBUTION_CERT_BASE64 }}" | base64 --decode > "$CERT_PATH"
+          security create-keychain -p "" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "" "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -P "${{ secrets.IOS_DISTRIBUTION_CERT_PASSWORD }}" \
+            -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+
+      - name: 🔑 Install Provisioning Profile
+        run: |
+          PP_PATH=$RUNNER_TEMP/profile.mobileprovision
+          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > "$PP_PATH"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          UUID=$(grep -a -o '<string>[0-9A-Fa-f\-]\{36\}</string>' "$PP_PATH" | head -1 | sed 's/<string>//;s/<\/string>//')
+          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/"$UUID".mobileprovision
+
+      - name: 🔑 Install App Store Connect API Key (for upload)
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}" | base64 --decode \
             > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
 
       - name: 🔨 Build & Upload IPA to TestFlight (prod flavor)
+        env:
+          IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
         run: |
           flutter build ipa --release --flavor prod \
             -t lib/main_prod.dart \
             --build-name=${{ env.VERSION_NAME }} \
             --build-number=${{ env.BUILD_NUMBER }} \
             --export-options-plist=ios/ExportOptions.plist
+
+      - name: 🧹 Clean up keychain and provisioning profile
+        if: always()
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
