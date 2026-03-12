@@ -80,6 +80,9 @@ jobs:
       - name: 🏷️ Extract Version from Tag
         uses: ./.github/actions/extract-version
 
+      - name: 🔧 Generate Mock Firebase Dev Config (required by firebase_options_provider.dart)
+        run: dart run tools/generate_mock_firebase_configs.dart
+
       - name: 🔧 Generate Firebase Prod Config
         env:
           FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
@@ -146,6 +149,9 @@ jobs:
 
       - name: 🏷️ Extract Version from Tag
         uses: ./.github/actions/extract-version
+
+      - name: 🔧 Generate Mock Firebase Dev Config (required by firebase_options_provider.dart)
+        run: dart run tools/generate_mock_firebase_configs.dart
 
       - name: 🔧 Generate Firebase Prod Config
         env:
