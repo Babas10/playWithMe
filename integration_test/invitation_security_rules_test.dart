@@ -240,7 +240,7 @@ void main() {
           displayName: 'Invitee User',
         );
 
-        final otherUser = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'other@test.com',
           password: 'password123',
           displayName: 'Other User',
@@ -552,7 +552,7 @@ void main() {
           displayName: 'Invitee User',
         );
 
-        final otherUser = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'other@test.com',
           password: 'password123',
           displayName: 'Other User',

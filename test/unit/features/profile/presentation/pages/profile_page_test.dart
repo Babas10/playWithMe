@@ -24,7 +24,7 @@ import '../../../../core/data/repositories/mock_game_repository.dart';
 // Fake AuthenticationBloc for testing
 class FakeAuthenticationBloc extends Fake implements AuthenticationBloc {
   final _controller = StreamController<AuthenticationState>.broadcast();
-  AuthenticationState _state;
+  final AuthenticationState _state;
 
   FakeAuthenticationBloc(this._state);
 

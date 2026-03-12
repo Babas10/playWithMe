@@ -1,4 +1,5 @@
 // Helper class for setting up and managing Firebase Emulator in integration tests
+// ignore_for_file: avoid_print
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';

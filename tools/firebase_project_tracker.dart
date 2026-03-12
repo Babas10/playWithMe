@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+// ignore_for_file: avoid_print
 
 import 'dart:convert';
 import 'dart:io';
@@ -182,7 +183,7 @@ Future<void> showSummary(Map<String, dynamic> data) async {
     }
   }
 
-  print('\n' + '=' * 40);
+  print('\n${'=' * 40}');
   print('Progress: $createdCount/$totalCount projects created');
 
   if (createdCount == totalCount) {
@@ -234,7 +235,7 @@ Future<void> verifyProjects() async {
       }
     }
 
-    print('\n' + '=' * 50);
+    print('\n${'=' * 50}');
 
     if (allValid) {
       print('✅ Verification successful!');

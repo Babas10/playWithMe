@@ -110,7 +110,7 @@ void main() {
       'Accepted request no longer appears in pending requests',
       () async {
         // 1. Create two test users
-        final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'user1@test.com',
           password: 'password123',
           displayName: 'User One',
@@ -181,7 +181,7 @@ void main() {
       'Search result shows users are friends after acceptance',
       () async {
         // 1. Create two test users
-        final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'user1@test.com',
           password: 'password123',
           displayName: 'User One',
@@ -240,7 +240,7 @@ void main() {
       'Users cannot send new request to existing friends',
       () async {
         // 1. Create two test users and establish friendship
-        final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'user1@test.com',
           password: 'password123',
           displayName: 'User One',

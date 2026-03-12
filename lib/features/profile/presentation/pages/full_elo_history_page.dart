@@ -125,7 +125,7 @@ class FullEloHistoryPage extends StatelessWidget {
             Icon(
               Icons.timeline,
               size: 64,
-              color: theme.colorScheme.onSurface.withOpacity(0.3),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
@@ -136,7 +136,7 @@ class FullEloHistoryPage extends StatelessWidget {
             Text(
               'Play some games to see your rating history',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -157,7 +157,7 @@ class FullEloHistoryPage extends StatelessWidget {
         // Stats summary
         Container(
           padding: const EdgeInsets.all(16.0),
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -302,7 +302,7 @@ class FullEloHistoryPage extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -337,7 +337,7 @@ class FullEloHistoryPage extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: resultColor.withOpacity(0.1),
+                  color: resultColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   border: Border.all(color: resultColor, width: 2),
                 ),
@@ -370,7 +370,7 @@ class FullEloHistoryPage extends StatelessWidget {
                     Text(
                       DateFormat('MMM d, y').format(entry.timestamp),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -403,7 +403,7 @@ class FullEloHistoryPage extends StatelessWidget {
                   Text(
                     entry.formattedNewRating,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],

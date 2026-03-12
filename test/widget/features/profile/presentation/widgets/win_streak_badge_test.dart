@@ -196,8 +196,8 @@ void main() {
 
       final card = tester.widget<Card>(find.byType(Card));
       expect(
-        (card.color as Color).value,
-        Colors.green.withOpacity(0.1).value,
+        (card.color as Color).toARGB32(),
+        Colors.green.withValues(alpha: 0.1).toARGB32(),
       );
     });
 
@@ -220,8 +220,8 @@ void main() {
 
       final card = tester.widget<Card>(find.byType(Card));
       expect(
-        (card.color as Color).value,
-        Colors.blue.withOpacity(0.1).value,
+        (card.color as Color).toARGB32(),
+        Colors.blue.withValues(alpha: 0.1).toARGB32(),
       );
     });
   });

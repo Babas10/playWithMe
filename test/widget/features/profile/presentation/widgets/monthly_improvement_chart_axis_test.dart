@@ -115,7 +115,7 @@ void main() {
 
       final context = tester.element(find.byType(MonthlyImprovementChart));
       final theme = Theme.of(context);
-      final expectedColor = theme.colorScheme.outline.withOpacity(0.3);
+      final expectedColor = theme.colorScheme.outline.withValues(alpha: 0.3);
 
       final chart = tester.widget<LineChart>(find.byType(LineChart));
       final borderData = chart.data.borderData;

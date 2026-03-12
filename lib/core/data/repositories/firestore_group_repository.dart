@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../domain/exceptions/repository_exceptions.dart';
 import '../../domain/repositories/group_repository.dart';
@@ -99,18 +100,18 @@ class FirestoreGroupRepository implements GroupRepository {
   @override
   Stream<List<GroupModel>> getGroupsForUser(String userId) {
     try {
-      print('🔍 [GroupRepository] getGroupsForUser called for userId: $userId');
+      debugPrint('🔍 [GroupRepository] getGroupsForUser called for userId: $userId');
       return _firestore
           .collection(_collection)
           .where('memberIds', arrayContains: userId)
           .orderBy('lastActivity', descending: true)
           .snapshots()
           .handleError((error) {
-            print('❌ [GroupRepository] Stream error: $error');
-            print('   Error type: ${error.runtimeType}');
+            debugPrint('❌ [GroupRepository] Stream error: $error');
+            debugPrint('   Error type: ${error.runtimeType}');
             if (error is FirebaseException) {
-              print('   Firebase error code: ${error.code}');
-              print('   Firebase error message: ${error.message}');
+              debugPrint('   Firebase error code: ${error.code}');
+              debugPrint('   Firebase error message: ${error.message}');
             }
             // If index is missing, catch the error and provide helpful message
             if (error is FirebaseException &&
@@ -123,35 +124,35 @@ class FirestoreGroupRepository implements GroupRepository {
             throw GroupException('Failed to get groups for user: $error');
           })
           .map((snapshot) {
-            print('📊 [GroupRepository] Snapshot received with ${snapshot.docs.length} documents');
+            debugPrint('📊 [GroupRepository] Snapshot received with ${snapshot.docs.length} documents');
             try {
               final groups = snapshot.docs
                   .where((doc) => doc.exists)
                   .map((doc) {
-                    print('   Processing doc: ${doc.id}');
+                    debugPrint('   Processing doc: ${doc.id}');
                     try {
                       final group = GroupModel.fromFirestore(doc);
-                      print('   ✅ Successfully parsed: ${group.name}');
+                      debugPrint('   ✅ Successfully parsed: ${group.name}');
                       return group;
                     } catch (e, stackTrace) {
-                      print('   ❌ Failed to parse doc ${doc.id}: $e');
-                      print('   Stack trace: $stackTrace');
-                      print('   Doc data: ${doc.data()}');
+                      debugPrint('   ❌ Failed to parse doc ${doc.id}: $e');
+                      debugPrint('   Stack trace: $stackTrace');
+                      debugPrint('   Doc data: ${doc.data()}');
                       rethrow;
                     }
                   })
                   .toList();
-              print('✅ [GroupRepository] Returning ${groups.length} groups');
+              debugPrint('✅ [GroupRepository] Returning ${groups.length} groups');
               return groups;
             } catch (e, stackTrace) {
-              print('❌ [GroupRepository] Error in map: $e');
-              print('   Stack trace: $stackTrace');
+              debugPrint('❌ [GroupRepository] Error in map: $e');
+              debugPrint('   Stack trace: $stackTrace');
               rethrow;
             }
           });
     } catch (e, stackTrace) {
-      print('❌ [GroupRepository] Exception in getGroupsForUser: $e');
-      print('   Stack trace: $stackTrace');
+      debugPrint('❌ [GroupRepository] Exception in getGroupsForUser: $e');
+      debugPrint('   Stack trace: $stackTrace');
       throw GroupException('Failed to get groups for user: $e');
     }
   }
