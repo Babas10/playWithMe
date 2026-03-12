@@ -350,7 +350,7 @@ class MonthlyImprovementChart extends StatelessWidget {
                                 currentYear.toString(),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 10,
-                                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                                  color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                                 ),
                               ),
                             )
@@ -373,11 +373,11 @@ class MonthlyImprovementChart extends StatelessWidget {
               show: true,
               border: Border(
                 left: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   width: 1,
                 ),
                 bottom: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -414,8 +414,8 @@ class MonthlyImprovementChart extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      theme.colorScheme.primary.withOpacity(0.3),
-                      theme.colorScheme.primary.withOpacity(0.05),
+                      theme.colorScheme.primary.withValues(alpha: 0.3),
+                      theme.colorScheme.primary.withValues(alpha: 0.05),
                     ],
                   ),
                 ),

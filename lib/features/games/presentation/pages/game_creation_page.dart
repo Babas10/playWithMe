@@ -64,6 +64,7 @@ class _GameCreationPageState extends State<GameCreationPage> {
     final initialDate = now.add(const Duration(days: 1));
 
     final l10n = AppLocalizations.of(context)!;
+    final bloc = context.read<GameCreationBloc>();
     final date = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -72,8 +73,9 @@ class _GameCreationPageState extends State<GameCreationPage> {
       helpText: l10n.selectGameDate,
     );
 
-    if (date == null || !mounted) return;
+    if (date == null || !context.mounted) return;
 
+    // ignore: use_build_context_synchronously
     final time = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 14, minute: 0),
@@ -94,7 +96,7 @@ class _GameCreationPageState extends State<GameCreationPage> {
       _selectedDateTime = dateTime;
     });
 
-    context.read<GameCreationBloc>().add(SetDateTime(dateTime: dateTime));
+    bloc.add(SetDateTime(dateTime: dateTime));
   }
 
   void _handleSubmit(BuildContext context, String userId) {

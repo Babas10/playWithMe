@@ -14,7 +14,7 @@ void main() {
   const testGroupId = 'group-123';
   const testUserId = 'user-123';
 
-  GameModel _createTestGame({
+  GameModel createTestGame({
     required String id,
     required String title,
     required String groupId,
@@ -41,7 +41,7 @@ void main() {
     );
   }
 
-  TrainingSessionModel _createTestTrainingSession({
+  TrainingSessionModel createTestTrainingSession({
     required String id,
     required String title,
     required String groupId,
@@ -109,7 +109,7 @@ void main() {
       'emits [Loading, Loaded] with upcoming games when games exist in future',
       build: () {
         final mockGameRepository = MockGameRepository();
-        final futureGame = _createTestGame(
+        final futureGame = createTestGame(
           id: 'game-1',
           title: 'Future Game',
           groupId: testGroupId,
@@ -138,7 +138,7 @@ void main() {
       'emits [Loading, Loaded] with past games when games exist in past',
       build: () {
         final mockGameRepository = MockGameRepository();
-        final pastGame = _createTestGame(
+        final pastGame = createTestGame(
           id: 'game-1',
           title: 'Past Game',
           groupId: testGroupId,
@@ -167,25 +167,25 @@ void main() {
       'separates upcoming and past games correctly',
       build: () {
         final mockGameRepository = MockGameRepository();
-        final pastGame1 = _createTestGame(
+        final pastGame1 = createTestGame(
           id: 'game-1',
           title: 'Past Game 1',
           groupId: testGroupId,
           scheduledAt: DateTime.now().subtract(const Duration(days: 3)),
         );
-        final pastGame2 = _createTestGame(
+        final pastGame2 = createTestGame(
           id: 'game-2',
           title: 'Past Game 2',
           groupId: testGroupId,
           scheduledAt: DateTime.now().subtract(const Duration(days: 1)),
         );
-        final futureGame1 = _createTestGame(
+        final futureGame1 = createTestGame(
           id: 'game-3',
           title: 'Future Game 1',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
         );
-        final futureGame2 = _createTestGame(
+        final futureGame2 = createTestGame(
           id: 'game-4',
           title: 'Future Game 2',
           groupId: testGroupId,
@@ -217,19 +217,19 @@ void main() {
       'sorts upcoming games by scheduledAt (ascending)',
       build: () {
         final mockGameRepository = MockGameRepository();
-        final game1 = _createTestGame(
+        final game1 = createTestGame(
           id: 'game-1',
           title: 'Game Far Future',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 5)),
         );
-        final game2 = _createTestGame(
+        final game2 = createTestGame(
           id: 'game-2',
           title: 'Game Near Future',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
         );
-        final game3 = _createTestGame(
+        final game3 = createTestGame(
           id: 'game-3',
           title: 'Game Mid Future',
           groupId: testGroupId,
@@ -260,19 +260,19 @@ void main() {
       'sorts past games by scheduledAt (descending - most recent first)',
       build: () {
         final mockGameRepository = MockGameRepository();
-        final game1 = _createTestGame(
+        final game1 = createTestGame(
           id: 'game-1',
           title: 'Game Long Ago',
           groupId: testGroupId,
           scheduledAt: DateTime.now().subtract(const Duration(days: 5)),
         );
-        final game2 = _createTestGame(
+        final game2 = createTestGame(
           id: 'game-2',
           title: 'Game Recently',
           groupId: testGroupId,
           scheduledAt: DateTime.now().subtract(const Duration(days: 1)),
         );
-        final game3 = _createTestGame(
+        final game3 = createTestGame(
           id: 'game-3',
           title: 'Game Moderately Ago',
           groupId: testGroupId,
@@ -303,19 +303,19 @@ void main() {
       'filters games by groupId correctly',
       build: () {
         final mockGameRepository = MockGameRepository();
-        final game1 = _createTestGame(
+        final game1 = createTestGame(
           id: 'game-1',
           title: 'Group 1 Game',
           groupId: 'group-1',
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
         );
-        final game2 = _createTestGame(
+        final game2 = createTestGame(
           id: 'game-2',
           title: 'Group 123 Game',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
         );
-        final game3 = _createTestGame(
+        final game3 = createTestGame(
           id: 'game-3',
           title: 'Group 2 Game',
           groupId: 'group-2',
@@ -347,7 +347,7 @@ void main() {
       build: () {
         final mockGameRepository = MockGameRepository();
         final now = DateTime.now();
-        final gameNow = _createTestGame(
+        final gameNow = createTestGame(
           id: 'game-now',
           title: 'Game Right Now',
           groupId: testGroupId,
@@ -375,7 +375,7 @@ void main() {
       'RefreshGamesList triggers reload with same groupId and userId',
       build: () {
         final mockGameRepository = MockGameRepository();
-        final game = _createTestGame(
+        final game = createTestGame(
           id: 'game-1',
           title: 'Test Game',
           groupId: testGroupId,
@@ -413,14 +413,14 @@ void main() {
         final mockGameRepository = MockGameRepository();
         final mockTrainingRepository = MockTrainingSessionRepository();
         
-        final futureGame = _createTestGame(
+        final futureGame = createTestGame(
           id: 'game-1',
           title: 'Future Game',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 2)),
         );
         
-        final futureTraining = _createTestTrainingSession(
+        final futureTraining = createTestTrainingSession(
           id: 'training-1',
           title: 'Future Training',
           groupId: testGroupId,
@@ -453,21 +453,21 @@ void main() {
         final mockGameRepository = MockGameRepository();
         final mockTrainingRepository = MockTrainingSessionRepository();
         
-        final farFutureGame = _createTestGame(
+        final farFutureGame = createTestGame(
           id: 'game-1',
           title: 'Far Future Game',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 5)),
         );
         
-        final nearFutureTraining = _createTestTrainingSession(
+        final nearFutureTraining = createTestTrainingSession(
           id: 'training-1',
           title: 'Near Future Training',
           groupId: testGroupId,
           startTime: DateTime.now().add(const Duration(days: 1)),
         );
         
-        final midFutureGame = _createTestGame(
+        final midFutureGame = createTestGame(
           id: 'game-2',
           title: 'Mid Future Game',
           groupId: testGroupId,
@@ -502,28 +502,28 @@ void main() {
         final mockGameRepository = MockGameRepository();
         final mockTrainingRepository = MockTrainingSessionRepository();
         
-        final pastGame = _createTestGame(
+        final pastGame = createTestGame(
           id: 'game-past',
           title: 'Past Game',
           groupId: testGroupId,
           scheduledAt: DateTime.now().subtract(const Duration(days: 2)),
         );
         
-        final pastTraining = _createTestTrainingSession(
+        final pastTraining = createTestTrainingSession(
           id: 'training-past',
           title: 'Past Training',
           groupId: testGroupId,
           startTime: DateTime.now().subtract(const Duration(days: 1)),
         );
         
-        final futureGame = _createTestGame(
+        final futureGame = createTestGame(
           id: 'game-future',
           title: 'Future Game',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
         );
         
-        final futureTraining = _createTestTrainingSession(
+        final futureTraining = createTestTrainingSession(
           id: 'training-future',
           title: 'Future Training',
           groupId: testGroupId,
@@ -570,28 +570,28 @@ void main() {
         final mockGameRepository = MockGameRepository();
         final mockTrainingRepository = MockTrainingSessionRepository();
         
-        final group123Game = _createTestGame(
+        final group123Game = createTestGame(
           id: 'game-123',
           title: 'Group 123 Game',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
         );
         
-        final otherGroupGame = _createTestGame(
+        final otherGroupGame = createTestGame(
           id: 'game-other',
           title: 'Other Group Game',
           groupId: 'other-group',
           scheduledAt: DateTime.now().add(const Duration(days: 1)),
         );
         
-        final group123Training = _createTestTrainingSession(
+        final group123Training = createTestTrainingSession(
           id: 'training-123',
           title: 'Group 123 Training',
           groupId: testGroupId,
           startTime: DateTime.now().add(const Duration(days: 1)),
         );
         
-        final otherGroupTraining = _createTestTrainingSession(
+        final otherGroupTraining = createTestTrainingSession(
           id: 'training-other',
           title: 'Other Group Training',
           groupId: 'other-group',

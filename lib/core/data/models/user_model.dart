@@ -103,9 +103,7 @@ class UserModel with _$UserModel {
       accountStatus: isVerified
           ? AccountStatus.active
           : AccountStatus.pendingVerification,
-      gracePeriodExpiresAt: creationTime != null
-          ? creationTime.add(const Duration(days: gracePeriodDays))
-          : null,
+      gracePeriodExpiresAt: creationTime?.add(const Duration(days: gracePeriodDays)),
       deletionScheduledAt: null,
     );
   }
@@ -398,6 +396,7 @@ class BestWinRecord with _$BestWinRecord {
     required double eloGained,
 
     /// Date when this win occurred
+    // ignore: invalid_annotation_target
     @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) required DateTime date,
 
     /// Game title or description for display

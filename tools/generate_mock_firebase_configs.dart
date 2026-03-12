@@ -1,12 +1,13 @@
 #!/usr/bin/env dart
+// ignore_for_file: avoid_print
 
-/// Generates mock Firebase configuration files for CI environments
-/// This allows tests to compile and run without exposing real Firebase credentials
-///
-/// Usage: dart tools/generate_mock_firebase_configs.dart
-///
-/// Creates mock config files for dev and prod environments with fake but
-/// structurally valid Firebase configuration data.
+// Generates mock Firebase configuration files for CI environments
+// This allows tests to compile and run without exposing real Firebase credentials
+//
+// Usage: dart tools/generate_mock_firebase_configs.dart
+//
+// Creates mock config files for dev and prod environments with fake but
+// structurally valid Firebase configuration data.
 
 import 'dart:io';
 

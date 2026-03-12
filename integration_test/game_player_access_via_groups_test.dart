@@ -1,5 +1,6 @@
 // Integration test validating Games access players only via Groups, not friendships
 // Tests the layered architecture: Games → Groups → My Community
+// ignore_for_file: avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';

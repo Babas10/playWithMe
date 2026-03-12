@@ -43,7 +43,7 @@ class CompactStatCard extends StatelessWidget {
                   child: Text(
                     label,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -74,7 +74,7 @@ class CompactStatCard extends StatelessWidget {
               Text(
                 subLabel!,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: subLabelColor ?? theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: subLabelColor ?? theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 overflow: TextOverflow.ellipsis,
               ),

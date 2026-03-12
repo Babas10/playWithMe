@@ -58,7 +58,7 @@ class StatsErrorPlaceholder extends StatelessWidget {
             Icon(
               icon,
               size: 56,
-              color: theme.colorScheme.error.withOpacity(0.7),
+              color: theme.colorScheme.error.withValues(alpha: 0.7),
             ),
             const SizedBox(height: 20),
             // Title
@@ -75,7 +75,7 @@ class StatsErrorPlaceholder extends StatelessWidget {
             Text(
               message,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,
             ),
@@ -123,13 +123,13 @@ class CompactStatsError extends StatelessWidget {
             Icon(
               Icons.error_outline,
               size: 20,
-              color: theme.colorScheme.error.withOpacity(0.7),
+              color: theme.colorScheme.error.withValues(alpha: 0.7),
             ),
             const SizedBox(height: 4),
             Text(
               message,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.error.withOpacity(0.7),
+                color: theme.colorScheme.error.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,

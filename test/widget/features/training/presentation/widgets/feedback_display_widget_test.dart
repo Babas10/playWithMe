@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:play_with_me/core/data/models/training_feedback_model.dart';
 import 'package:play_with_me/core/domain/repositories/training_feedback_repository.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/feedback/training_feedback_event.dart';
@@ -19,11 +18,9 @@ class MockTrainingFeedbackRepository extends Mock
 
 void main() {
   late MockTrainingFeedbackBloc mockBloc;
-  late MockTrainingFeedbackRepository mockRepository;
 
   setUp(() {
     mockBloc = MockTrainingFeedbackBloc();
-    mockRepository = MockTrainingFeedbackRepository();
 
     // Register fallback values for events
     registerFallbackValue(const FeedbackInitial());

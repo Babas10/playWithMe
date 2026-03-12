@@ -1,5 +1,6 @@
 // Script to manually create Firestore user documents for testing
 // Run with: dart run create_test_users.dart
+// ignore_for_file: avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';

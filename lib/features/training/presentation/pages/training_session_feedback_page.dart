@@ -70,9 +70,10 @@ class _TrainingSessionFeedbackPageState
               ),
             );
             // Navigate back after short delay
+            final navigator = Navigator.of(context);
             Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {
-                Navigator.pop(context);
+                navigator.pop();
               }
             });
           } else if (state is FeedbackError) {

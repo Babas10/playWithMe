@@ -718,7 +718,7 @@ class TimestampConverter implements JsonConverter<DateTime?, Object?> {
   }
 }
 
-/// Custom converter for List<SetScore> to handle proper JSON serialization
+/// Custom converter for List&lt;SetScore&gt; to handle proper JSON serialization
 class SetScoreListConverter implements JsonConverter<List<SetScore>, List<dynamic>> {
   const SetScoreListConverter();
 
@@ -733,7 +733,7 @@ class SetScoreListConverter implements JsonConverter<List<SetScore>, List<dynami
   }
 }
 
-/// Custom converter for List<IndividualGame> to handle proper JSON serialization
+/// Custom converter for List&lt;IndividualGame&gt; to handle proper JSON serialization
 class IndividualGameListConverter implements JsonConverter<List<IndividualGame>, List<dynamic>> {
   const IndividualGameListConverter();
 
