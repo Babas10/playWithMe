@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart'; // Story 302.7
@@ -54,7 +55,7 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
           },
           onError: (error) {
             // Log error but don't crash
-            print('PlayerStatsBloc: Error in user stream: $error');
+            debugPrint('PlayerStatsBloc: Error in user stream: $error');
           },
         );
       } else {
@@ -147,7 +148,7 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
       ));
     } catch (e) {
       // Story 302.7: Set error flag instead of silently failing
-      print('PlayerStatsBloc: Failed to load ranking: $e');
+      debugPrint('PlayerStatsBloc: Failed to load ranking: $e');
       emit(currentState.copyWith(
         rankingLoadFailed: true,
       ));

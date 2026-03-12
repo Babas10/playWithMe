@@ -12,7 +12,6 @@ import 'package:play_with_me/features/games/presentation/widgets/set_scores_disp
 GameModel _createGame({
   GameStatus status = GameStatus.scheduled,
   String? userId,
-  bool isFull = false,
   bool allowWaitlist = true,
   GameResult? result,
 }) {

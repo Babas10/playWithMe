@@ -420,6 +420,7 @@ void main() {
 }
 
 // Mock DocumentSnapshot for testing
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot implements DocumentSnapshot {
   final String _id;
   final Map<String, dynamic> _data;

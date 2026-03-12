@@ -10,7 +10,6 @@ class MockInvitationRepository implements InvitationRepository {
   final BehaviorSubject<List<InvitationModel>> _invitationsController =
       BehaviorSubject<List<InvitationModel>>.seeded([]);
   final Map<String, Map<String, InvitationModel>> _invitationsByUser = {};
-  String _lastCreatedInvitationId = '';
 
   MockInvitationRepository();
 
@@ -67,7 +66,6 @@ class MockInvitationRepository implements InvitationRepository {
     );
 
     addInvitation(invitation);
-    _lastCreatedInvitationId = invitationId;
     return invitationId;
   }
 

@@ -38,7 +38,7 @@ class BestEloHighlightCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       elevation: 0,
-      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -50,7 +50,7 @@ class BestEloHighlightCard extends StatelessWidget {
             Icon(
               Icons.emoji_events_outlined,
               size: 18,
-              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(width: 8),
             Text(
@@ -74,7 +74,7 @@ class BestEloHighlightCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: theme.colorScheme.primary.withOpacity(0.2),
+          color: theme.colorScheme.primary.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -88,8 +88,8 @@ class BestEloHighlightCard extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                theme.colorScheme.primary.withOpacity(0.04),
-                theme.colorScheme.primary.withOpacity(0.01),
+                theme.colorScheme.primary.withValues(alpha: 0.04),
+                theme.colorScheme.primary.withValues(alpha: 0.01),
               ],
             ),
           ),
@@ -119,7 +119,7 @@ class BestEloHighlightCard extends StatelessWidget {
                     Text(
                       dateFormatter.format(bestElo!.date),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                         fontSize: 11,
                       ),
                     ),

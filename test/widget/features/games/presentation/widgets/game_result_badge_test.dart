@@ -6,14 +6,7 @@ import 'package:play_with_me/features/games/presentation/widgets/game_result_bad
 void main() {
   group('GameResultBadge', () {
     testWidgets('displays winner name and score correctly for Team A', (tester) async {
-      final result = const GameResult(
-        games: [], // Empty games list is enough for this test as we only check scoreDescription
-        overallWinner: 'teamA',
-      );
-      // We need to mock scoreDescription getter or construct result such that it returns a valid description
-      // Since scoreDescription is a getter, we can't easily mock it without a mock class or valid data.
-      // Let's create a valid result.
-      
+      // We need to construct a result with valid data so scoreDescription returns a valid description.
       final validResult = const GameResult(
         games: [
           IndividualGame(

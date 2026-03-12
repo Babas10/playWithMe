@@ -1,7 +1,6 @@
 // Integration test for batch friend request status checking
 // Tests real Firestore interactions using Firebase Emulator for Story 11.19
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -142,7 +141,7 @@ void main() {
       'Should handle large batch of users (50 users)',
       () async {
         // 1. Create current user
-        final currentUser = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'current@test.com',
           password: 'password123',
           displayName: 'Current User',
@@ -268,7 +267,7 @@ void main() {
       'Should handle mix of friends and non-friends correctly',
       () async {
         // 1. Create test users
-        final currentUser = await FirebaseEmulatorHelper.createCompleteTestUser(
+        await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'current@test.com',
           password: 'password123',
           displayName: 'Current User',

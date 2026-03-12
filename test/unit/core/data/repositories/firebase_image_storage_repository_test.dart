@@ -34,7 +34,6 @@ void main() {
   late MockFirebaseStorage mockStorage;
   late MockReference mockRef;
   late MockReference mockUserRef;
-  late MockUploadTask mockUploadTask;
   late MockTaskSnapshot mockSnapshot;
   late MockListResult mockListResult;
   late FirebaseImageStorageRepository repository;
@@ -43,7 +42,6 @@ void main() {
     mockStorage = MockFirebaseStorage();
     mockRef = MockReference();
     mockUserRef = MockReference();
-    mockUploadTask = MockUploadTask();
     mockSnapshot = MockTaskSnapshot();
     mockListResult = MockListResult();
     repository = FirebaseImageStorageRepository(storage: mockStorage);

@@ -382,7 +382,7 @@ class _PlayersCard extends StatelessWidget {
                               color: Theme.of(context)
                                   .colorScheme
                                   .onSurface
-                                  .withOpacity(0.6),
+                                  .withValues(alpha: 0.6),
                             ),
                       ),
                     ),
@@ -448,7 +448,7 @@ class _PlayersCard extends StatelessWidget {
                       contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
                         backgroundColor:
-                            Theme.of(context).colorScheme.surface.withOpacity(0.5),
+                            Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
                         child: Text('${entry.key + 1}'),
                       ),
                       title: Text(displayName),
@@ -1046,7 +1046,7 @@ class _VerificationSection extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: bannerColor.withOpacity(0.1),
+            color: bannerColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: bannerColor),
           ),

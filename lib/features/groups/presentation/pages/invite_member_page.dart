@@ -38,7 +38,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
 
   Set<String> _selectedFriendIds = {};
   List<String> _memberIds = [];
-  List<String> _invitedUserIds = [];
+  final List<String> _invitedUserIds = [];
   bool _isSendingInvitations = false;
 
   @override
@@ -74,6 +74,9 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
       return;
     }
 
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
     setState(() {
       _isSendingInvitations = true;
     });
@@ -106,7 +109,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
 
       if (mounted) {
         if (successCount > 0) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          scaffoldMessenger.showSnackBar(
             SnackBar(
               content: Text(
                 successCount == 1
@@ -125,13 +128,13 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
           // Navigate back after short delay
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
-              Navigator.of(context).pop();
+              navigator.pop();
             }
           });
         }
 
         if (failureCount > 0) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          scaffoldMessenger.showSnackBar(
             SnackBar(
               content: Text('Failed to send $failureCount invitation(s)'),
               backgroundColor: AppColors.primary,
@@ -216,7 +219,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
               Expanded(
                 child: FriendSelectorWidget(
                   currentUserId: authState.user.uid,
-                  friendRepository: _friendRepository!,
+                  friendRepository: _friendRepository,
                   onSelectionChanged: (selectedIds) {
                     setState(() {
                       _selectedFriendIds = selectedIds;

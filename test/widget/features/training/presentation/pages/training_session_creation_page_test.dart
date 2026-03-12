@@ -7,7 +7,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
-import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';

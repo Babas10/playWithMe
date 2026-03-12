@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+// ignore_for_file: avoid_print
 
 import 'dart:convert';
 import 'dart:io';
@@ -27,7 +28,7 @@ void main() async {
   allValid &= await validateiOSConfigs();
 
   // Summary
-  print('\n' + '=' * 50);
+  print('\n${'=' * 50}');
   if (allValid) {
     print('✅ All Firebase configurations are valid!');
     print('You can proceed with building and testing your flavors.');

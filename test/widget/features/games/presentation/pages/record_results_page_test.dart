@@ -1,6 +1,5 @@
 // Widget tests for RecordResultsPage verifying UI and interaction.
 
-import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -13,15 +12,12 @@ import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
-import 'package:play_with_me/features/games/presentation/bloc/record_results/record_results_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/record_results/record_results_event.dart';
 import 'package:play_with_me/features/games/presentation/bloc/record_results/record_results_state.dart';
 import 'package:play_with_me/features/games/presentation/pages/record_results_page.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
-import 'package:play_with_me/features/games/presentation/pages/score_entry_page.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
-import 'package:play_with_me/core/services/service_locator.dart';
 
 // Mock classes
 class MockGameRepository extends Mock implements GameRepository {}
