@@ -15,6 +15,10 @@
         <key>org.gatherli.app</key>
         <string>$(IOS_PROVISIONING_PROFILE_NAME)</string>
     </dict>
+    <key>apiKey</key>
+    <string>$(APP_STORE_CONNECT_API_KEY_ID)</string>
+    <key>apiIssuer</key>
+    <string>$(APP_STORE_CONNECT_API_ISSUER_ID)</string>
     <key>stripSwiftSymbols</key>
     <true/>
     <key>uploadBitcode</key>
