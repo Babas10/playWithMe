@@ -220,6 +220,8 @@ jobs:
       - name: 🔨 Build & Upload IPA to App Store Connect (prod flavor)
         env:
           IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
         run: |
           flutter build ipa --release --flavor prod \
             -t lib/main_prod.dart \
