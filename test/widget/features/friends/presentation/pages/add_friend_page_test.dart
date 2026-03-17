@@ -480,30 +480,54 @@ void main() {
     });
 
     group('Success Handling', () {
-      testWidgets('shows success snackbar after friend request sent',
+      testWidgets('shows green tick icon after friend request sent',
+          (tester) async {
+        // Start with searchResult so _lastSearchSnapshot is captured on initial build
+        final searchResultState = FriendState.searchResult(
+          user: searchedUser,
+          isFriend: false,
+          hasPendingRequest: false,
+          searchedEmail: 'found@example.com',
+        );
+        whenListen(
+          mockFriendBloc,
+          Stream.fromIterable([
+            const FriendState.actionSuccess(
+                message: 'Friend request sent successfully'),
+          ]),
+          initialState: searchResultState,
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(); // Build with initial searchResult state
+        await tester.pumpAndSettle(); // Process actionSuccess
+
+        expect(find.byIcon(Icons.check_circle), findsOneWidget);
+        expect(find.byType(SnackBar), findsNothing);
+      });
+
+      testWidgets('does not show snackbar on success', (tester) async {
+        whenListen(
+          mockFriendBloc,
+          Stream.fromIterable([
+            const FriendState.initial(),
+            const FriendState.actionSuccess(message: 'Success!'),
+          ]),
+          initialState: const FriendState.initial(),
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        expect(find.byType(SnackBar), findsNothing);
+      });
+
+      testWidgets('does not auto-clear search after successful action',
           (tester) async {
         whenListen(
           mockFriendBloc,
           Stream.fromIterable([
             const FriendState.initial(),
-            const FriendState.actionSuccess(
-                message: 'Friend request sent successfully'),
-          ]),
-          initialState: const FriendState.initial(),
-        );
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
-
-        expect(find.text('Friend request sent successfully'), findsOneWidget);
-        expect(find.byType(SnackBar), findsOneWidget);
-      });
-
-      testWidgets('snackbar has green background on success', (tester) async {
-        whenListen(
-          mockFriendBloc,
-          Stream.fromIterable([
-            const FriendState.initial(),
             const FriendState.actionSuccess(message: 'Success!'),
           ]),
           initialState: const FriendState.initial(),
@@ -512,25 +536,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-        expect(snackBar.backgroundColor, Colors.green);
-      });
-
-      testWidgets('clears search after successful action', (tester) async {
-        whenListen(
-          mockFriendBloc,
-          Stream.fromIterable([
-            const FriendState.initial(),
-            const FriendState.actionSuccess(message: 'Success!'),
-          ]),
-          initialState: const FriendState.initial(),
-        );
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
-
-        verify(() => mockFriendBloc.add(const FriendEvent.searchCleared()))
-            .called(1);
+        verifyNever(
+            () => mockFriendBloc.add(const FriendEvent.searchCleared()));
       });
     });
   });

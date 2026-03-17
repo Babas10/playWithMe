@@ -667,7 +667,7 @@ void main() {
 
     // Story 14.5.3: Tests for ELO rating fields
     group('ELO rating fields (Story 14.5.3)', () {
-      test('has default ELO rating of 1600', () {
+      test('has default ELO rating of 1200', () {
         const user = UserModel(
           uid: 'uid',
           email: 'email@test.com',
@@ -675,8 +675,8 @@ void main() {
           isAnonymous: false,
         );
 
-        expect(user.eloRating, 1600.0);
-        expect(user.eloPeak, 1600.0);
+        expect(user.eloRating, 1200.0);
+        expect(user.eloPeak, 1200.0);
         expect(user.eloGamesPlayed, 0);
         expect(user.eloLastUpdated, null);
         expect(user.eloPeakDate, null);
@@ -736,8 +736,8 @@ void main() {
 
         final user = UserModel.fromJson(json);
 
-        expect(user.eloRating, 1600.0);
-        expect(user.eloPeak, 1600.0);
+        expect(user.eloRating, 1200.0);
+        expect(user.eloPeak, 1200.0);
         expect(user.eloGamesPlayed, 0);
         expect(user.eloLastUpdated, null);
         expect(user.eloPeakDate, null);

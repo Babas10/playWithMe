@@ -341,7 +341,8 @@ void main() {
     });
 
     group('Success Handling', () {
-      testWidgets('shows success snackbar on group creation', (tester) async {
+      testWidgets('navigates back on group creation without snackbar',
+          (tester) async {
         final createdGroup = GroupModel(
           id: 'new-group-id',
           name: 'Beach Volleyball Crew',
@@ -366,14 +367,15 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
 
-        expect(find.text('Group created successfully!'), findsOneWidget);
-        expect(find.byType(SnackBar), findsOneWidget);
+        // No success snackbar — the group appearing in the list is the feedback
+        expect(find.byType(SnackBar), findsNothing);
 
-        // Complete the pending timer from Future.delayed in the source
+        // Complete the pending navigation timer
         await tester.pump(const Duration(milliseconds: 600));
       });
 
-      testWidgets('success snackbar has green background', (tester) async {
+      testWidgets('does not show success snackbar on group creation',
+          (tester) async {
         final createdGroup = GroupModel(
           id: 'new-group-id',
           name: 'Beach Volleyball Crew',
@@ -397,8 +399,7 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
 
-        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-        expect(snackBar.backgroundColor, Colors.green);
+        expect(find.byType(SnackBar), findsNothing);
 
         // Complete the pending timer
         await tester.pump(const Duration(milliseconds: 600));

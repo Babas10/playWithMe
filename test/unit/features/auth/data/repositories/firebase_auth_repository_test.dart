@@ -16,6 +16,8 @@ class MockFirebaseFunctions extends Mock implements FirebaseFunctions {}
 
 class MockUser extends Mock implements User {}
 
+class FakeActionCodeSettings extends Fake implements ActionCodeSettings {}
+
 class MockUserCredential extends Mock implements UserCredential {}
 
 class MockUserMetadata extends Mock implements UserMetadata {}
@@ -26,6 +28,10 @@ FirebaseAuthException createAuthException(String code, {String? message}) {
 }
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeActionCodeSettings());
+  });
+
   late MockFirebaseAuth mockFirebaseAuth;
   late MockFirebaseFunctions mockFunctions;
   late MockUser mockUser;
@@ -523,14 +529,14 @@ void main() {
     group('sendEmailVerification', () {
       test('completes successfully when verification email is sent', () async {
         when(() => mockFirebaseAuth.currentUser).thenReturn(mockUser);
-        when(() => mockUser.sendEmailVerification()).thenAnswer((_) async {});
+        when(() => mockUser.sendEmailVerification(any())).thenAnswer((_) async {});
 
         await expectLater(
           repository.sendEmailVerification(),
           completes,
         );
 
-        verify(() => mockUser.sendEmailVerification()).called(1);
+        verify(() => mockUser.sendEmailVerification(any())).called(1);
       });
 
       test('throws exception when no user is signed in', () async {
@@ -548,7 +554,7 @@ void main() {
 
       test('maps too-many-requests FirebaseAuthException', () async {
         when(() => mockFirebaseAuth.currentUser).thenReturn(mockUser);
-        when(() => mockUser.sendEmailVerification())
+        when(() => mockUser.sendEmailVerification(any()))
             .thenThrow(createAuthException('too-many-requests'));
 
         expect(
@@ -563,7 +569,7 @@ void main() {
 
       test('wraps generic exceptions', () async {
         when(() => mockFirebaseAuth.currentUser).thenReturn(mockUser);
-        when(() => mockUser.sendEmailVerification())
+        when(() => mockUser.sendEmailVerification(any()))
             .thenThrow(Exception('Network error'));
 
         expect(
