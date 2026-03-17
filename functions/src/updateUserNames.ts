@@ -70,6 +70,7 @@ export const updateUserNames = functions.https.onCall(async (data, context) => {
     await userRef.update({
       firstName: trimmedFirstName,
       lastName: trimmedLastName,
+      displayName: `${trimmedFirstName} ${trimmedLastName}`,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 

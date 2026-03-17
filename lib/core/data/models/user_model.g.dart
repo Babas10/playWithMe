@@ -69,9 +69,9 @@ _$UserModelImpl _$$UserModelImplFromJson(
       const [],
   lastGameDate: const TimestampConverter().fromJson(json['lastGameDate']),
   teammateStats: json['teammateStats'] as Map<String, dynamic>? ?? const {},
-  eloRating: (json['eloRating'] as num?)?.toDouble() ?? 1600.0,
+  eloRating: (json['eloRating'] as num?)?.toDouble() ?? 1200.0,
   eloLastUpdated: const TimestampConverter().fromJson(json['eloLastUpdated']),
-  eloPeak: (json['eloPeak'] as num?)?.toDouble() ?? 1600.0,
+  eloPeak: (json['eloPeak'] as num?)?.toDouble() ?? 1200.0,
   eloPeakDate: const TimestampConverter().fromJson(json['eloPeakDate']),
   eloGamesPlayed: (json['eloGamesPlayed'] as num?)?.toInt() ?? 0,
   nemesis: json['nemesis'] == null

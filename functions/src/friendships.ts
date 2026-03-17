@@ -714,23 +714,34 @@ export async function getFriendsHandler(
       friendIds: Array.from(friendUserIds),
     });
 
-    // Fetch friend profiles
-    const friendProfiles: UserProfile[] = [];
+    // Fetch friend profiles — all batches fired in parallel
     const usersRef = db.collection("users");
-
-    // Firestore 'in' query limited to 10 items, so batch if needed
     const friendIdsArray = Array.from(friendUserIds);
+
+    // Build all batch queries (Firestore 'in' limited to 10 items per query)
+    const batchQueries = [];
     for (let i = 0; i < friendIdsArray.length; i += 10) {
       const batch = friendIdsArray.slice(i, i + 10);
-      const usersSnapshot = await usersRef
-        .where(admin.firestore.FieldPath.documentId(), "in", batch)
-        .get();
+      batchQueries.push(
+        usersRef.where(admin.firestore.FieldPath.documentId(), "in", batch).get()
+      );
+    }
 
-      usersSnapshot.docs.forEach((doc) => {
+    // Execute all batch queries in parallel instead of sequentially
+    const batchSnapshots = await Promise.all(batchQueries);
+
+    const friendProfiles: UserProfile[] = [];
+    batchSnapshots.forEach((snapshot) => {
+      snapshot.docs.forEach((doc) => {
         const userData = doc.data();
+        const displayName =
+          userData.displayName ||
+          (userData.firstName && userData.lastName
+            ? `${userData.firstName} ${userData.lastName}`
+            : null);
         friendProfiles.push({
           uid: doc.id,
-          displayName: userData.displayName || null,
+          displayName,
           email: userData.email,
           photoUrl: userData.photoUrl || null,
           isEmailVerified: userData.isEmailVerified || false,
@@ -740,7 +751,7 @@ export async function getFriendsHandler(
           lastSignInAt: userData.lastSignInAt?.toDate().toISOString() || null,
         });
       });
-    }
+    });
 
     functions.logger.info("Successfully retrieved friends list", {
       userId: targetUserId,
@@ -1265,14 +1276,17 @@ export async function getFriendshipsHandler(
     const userProfiles = new Map<string, UserProfile>();
     const usersRef = db.collection("users");
 
-    // Firestore 'in' query limited to 10 items, so batch if needed
+    // Build all batch queries and execute in parallel
+    const batchQueries: Promise<FirebaseFirestore.QuerySnapshot>[] = [];
     for (let i = 0; i < otherUserIds.length; i += 10) {
       const batch = otherUserIds.slice(i, i + 10);
-      const usersSnapshot = await usersRef
-        .where(admin.firestore.FieldPath.documentId(), "in", batch)
-        .get();
-
-      usersSnapshot.docs.forEach((doc) => {
+      batchQueries.push(
+        usersRef.where(admin.firestore.FieldPath.documentId(), "in", batch).get()
+      );
+    }
+    const batchSnapshots = await Promise.all(batchQueries);
+    batchSnapshots.forEach((snapshot) => {
+      snapshot.docs.forEach((doc) => {
         const userData = doc.data();
         userProfiles.set(doc.id, {
           uid: doc.id,
@@ -1285,7 +1299,7 @@ export async function getFriendshipsHandler(
           lastSignInAt: userData.lastSignInAt?.toDate().toISOString() || null,
         });
       });
-    }
+    });
 
     // Build response with denormalized user info
     const friendshipsWithUsers: FriendshipWithUser[] = friendshipsData.map((friendship) => {
@@ -1665,47 +1679,46 @@ export async function batchCheckFriendRequestStatusHandler(
       requestStatuses[userId] = "none";
     }
 
-    // 3. Query 1: Check for requests sent by current user (where they are initiator)
-    // Using 'in' query to batch check multiple recipients
-    // Firestore 'in' limited to 10 items, so batch in chunks
+    // 3 & 4. Build all batches for both directions and execute all in parallel
+    const sentBatchQueries = [];
+    const receivedBatchQueries = [];
     for (let i = 0; i < data.userIds.length; i += 10) {
       const userIdBatch = data.userIds.slice(i, i + 10);
-
-      const sentRequests = await db
-        .collection("friendships")
-        .where("initiatorId", "==", currentUserId)
-        .where("recipientId", "in", userIdBatch)
-        .where("status", "==", "pending")
-        .get();
-
-      sentRequests.docs.forEach((doc) => {
-        const docData = doc.data();
-        const recipientId = docData.recipientId;
-        requestStatuses[recipientId] = "sentByMe";
-      });
+      sentBatchQueries.push(
+        db.collection("friendships")
+          .where("initiatorId", "==", currentUserId)
+          .where("recipientId", "in", userIdBatch)
+          .where("status", "==", "pending")
+          .get()
+      );
+      receivedBatchQueries.push(
+        db.collection("friendships")
+          .where("initiatorId", "in", userIdBatch)
+          .where("recipientId", "==", currentUserId)
+          .where("status", "==", "pending")
+          .get()
+      );
     }
 
-    // 4. Query 2: Check for requests received by current user (where they are recipient)
-    for (let i = 0; i < data.userIds.length; i += 10) {
-      const userIdBatch = data.userIds.slice(i, i + 10);
+    const [sentSnapshots, receivedSnapshots] = await Promise.all([
+      Promise.all(sentBatchQueries),
+      Promise.all(receivedBatchQueries),
+    ]);
 
-      const receivedRequests = await db
-        .collection("friendships")
-        .where("initiatorId", "in", userIdBatch)
-        .where("recipientId", "==", currentUserId)
-        .where("status", "==", "pending")
-        .get();
+    sentSnapshots.forEach((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        requestStatuses[doc.data().recipientId] = "sentByMe";
+      });
+    });
 
-      receivedRequests.docs.forEach((doc) => {
-        const docData = doc.data();
-        const initiatorId = docData.initiatorId;
-        // Only set if not already marked as sentByMe
-        // (shouldn't happen, but just in case)
+    receivedSnapshots.forEach((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        const initiatorId = doc.data().initiatorId;
         if (requestStatuses[initiatorId] === "none") {
           requestStatuses[initiatorId] = "receivedFromThem";
         }
       });
-    }
+    });
 
     const sentCount = Object.values(requestStatuses).filter(
       (s) => s === "sentByMe"

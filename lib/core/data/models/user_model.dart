@@ -55,9 +55,9 @@ class UserModel with _$UserModel {
     @TimestampConverter() DateTime? lastGameDate,
     @Default({}) Map<String, dynamic> teammateStats,
     // ELO Rating fields (Story 14.5.3)
-    @Default(1600.0) double eloRating,
+    @Default(1200.0) double eloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
-    @Default(1600.0) double eloPeak,
+    @Default(1200.0) double eloPeak,
     @TimestampConverter() DateTime? eloPeakDate,
     @Default(0) int eloGamesPlayed,
     // Nemesis/Rival tracking (Story 301.8)
