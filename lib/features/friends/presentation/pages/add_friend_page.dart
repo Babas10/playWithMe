@@ -19,6 +19,10 @@ class AddFriendPage extends StatefulWidget {
 
 class _AddFriendPageState extends State<AddFriendPage> {
   final TextEditingController _searchController = TextEditingController();
+  // Tracks the last search result so we can keep showing it after actionSuccess
+  _SearchResultSnapshot? _lastSearchSnapshot;
+  // Once true, the builder shows the green tick regardless of BLoC state changes
+  bool _requestSent = false;
 
   @override
   void dispose() {
@@ -31,6 +35,10 @@ class _AddFriendPageState extends State<AddFriendPage> {
     if (query.isEmpty) {
       return;
     }
+    setState(() {
+      _lastSearchSnapshot = null;
+      _requestSent = false;
+    });
     context.read<FriendBloc>().add(
           FriendEvent.searchRequested(email: query),
         );
@@ -38,6 +46,10 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
   void _clearSearch() {
     _searchController.clear();
+    setState(() {
+      _lastSearchSnapshot = null;
+      _requestSent = false;
+    });
     context.read<FriendBloc>().add(const FriendEvent.searchCleared());
   }
 
@@ -160,20 +172,21 @@ class _AddFriendPageState extends State<AddFriendPage> {
               ),
             );
           },
-          actionSuccess: (message) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(message),
-                backgroundColor: Colors.green,
-              ),
-            );
-            // Clear search after successful friend request
-            _searchController.clear();
-            context.read<FriendBloc>().add(const FriendEvent.searchCleared());
+          actionSuccess: (_) {
+            // Set local flag so the green tick persists across subsequent loading/loaded states
+            setState(() {
+              _requestSent = true;
+            });
           },
         );
       },
       builder: (context, state) {
+        // If a request was already sent, keep showing the tile with green tick
+        // regardless of subsequent BLoC state changes (loading → loaded).
+        if (_requestSent && _lastSearchSnapshot != null) {
+          return _buildSearchResultTile(context, l10n, _lastSearchSnapshot!, isInvited: true);
+        }
+
         return state.when(
           initial: () => _buildEmptyState(context, l10n),
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -182,47 +195,67 @@ class _AddFriendPageState extends State<AddFriendPage> {
           searchLoading: () => const Center(child: CircularProgressIndicator()),
           searchResult: (user, isFriend, hasPendingRequest, requestDirection,
               searchedEmail, isSelfSearch) {
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                SearchResultTile(
-                  user: user,
-                  isFriend: isFriend,
-                  hasPendingRequest: hasPendingRequest,
-                  requestDirection: requestDirection,
-                  searchedEmail: searchedEmail,
-                  isSelfSearch: isSelfSearch,
-                  onSendRequest: user != null
-                      ? () {
-                          context.read<FriendBloc>().add(
-                                FriendEvent.requestSent(targetUserId: user.uid),
-                              );
-                        }
-                      : null,
-                  onAcceptRequest: user != null && requestDirection == 'received'
-                      ? () {
-                          // Navigate to requests tab in My Community
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.checkRequestsTab),
-                              action: SnackBarAction(
-                                label: l10n.ok,
-                                onPressed: () {},
-                              ),
-                            ),
-                          );
-                        }
-                      : null,
-                ),
-              ],
+            // Capture snapshot so we can keep showing it after actionSuccess
+            _lastSearchSnapshot = _SearchResultSnapshot(
+              user: user,
+              isFriend: isFriend,
+              hasPendingRequest: hasPendingRequest,
+              requestDirection: requestDirection,
+              searchedEmail: searchedEmail,
+              isSelfSearch: isSelfSearch,
             );
+            return _buildSearchResultTile(context, l10n, _lastSearchSnapshot!, isInvited: false);
           },
           statusResult: (status) => _buildEmptyState(context, l10n),
           error: (message) => _buildEmptyState(context, l10n),
-          actionSuccess: (message) => _buildEmptyState(context, l10n),
+          actionSuccess: (_) => _buildEmptyState(context, l10n),
         );
       },
+    );
+  }
+
+  Widget _buildSearchResultTile(
+    BuildContext context,
+    AppLocalizations l10n,
+    _SearchResultSnapshot snapshot, {
+    required bool isInvited,
+  }) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        SearchResultTile(
+          user: snapshot.user,
+          isFriend: snapshot.isFriend,
+          hasPendingRequest: snapshot.hasPendingRequest,
+          requestDirection: snapshot.requestDirection,
+          searchedEmail: snapshot.searchedEmail,
+          isSelfSearch: snapshot.isSelfSearch,
+          isInvited: isInvited,
+          onSendRequest: snapshot.user != null && !isInvited
+              ? () {
+                  context.read<FriendBloc>().add(
+                        FriendEvent.requestSent(targetUserId: snapshot.user!.uid),
+                      );
+                }
+              : null,
+          onAcceptRequest: snapshot.user != null &&
+                  snapshot.requestDirection == 'received' &&
+                  !isInvited
+              ? () {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.checkRequestsTab),
+                      action: SnackBarAction(
+                        label: l10n.ok,
+                        onPressed: () {},
+                      ),
+                    ),
+                  );
+                }
+              : null,
+        ),
+      ],
     );
   }
 
@@ -256,4 +289,23 @@ class _AddFriendPageState extends State<AddFriendPage> {
       ),
     );
   }
+}
+
+/// Snapshot of a search result to preserve across BLoC state transitions.
+class _SearchResultSnapshot {
+  final dynamic user;
+  final bool isFriend;
+  final bool hasPendingRequest;
+  final String? requestDirection;
+  final String searchedEmail;
+  final bool isSelfSearch;
+
+  _SearchResultSnapshot({
+    required this.user,
+    required this.isFriend,
+    required this.hasPendingRequest,
+    required this.requestDirection,
+    required this.searchedEmail,
+    required this.isSelfSearch,
+  });
 }

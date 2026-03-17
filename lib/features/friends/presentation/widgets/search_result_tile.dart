@@ -11,6 +11,7 @@ class SearchResultTile extends StatelessWidget {
   final String searchedEmail;
   final VoidCallback? onSendRequest;
   final VoidCallback? onAcceptRequest;
+  final bool isInvited;
 
   final bool isSelfSearch;
 
@@ -22,6 +23,7 @@ class SearchResultTile extends StatelessWidget {
     this.requestDirection,
     required this.searchedEmail,
     this.isSelfSearch = false,
+    this.isInvited = false,
     this.onSendRequest,
     this.onAcceptRequest,
   });
@@ -119,6 +121,11 @@ class SearchResultTile extends StatelessWidget {
   }
 
   Widget _buildActionButton(BuildContext context, AppLocalizations l10n) {
+    // Request just sent — show green tick
+    if (isInvited) {
+      return const Icon(Icons.check_circle, color: Colors.green, size: 28);
+    }
+
     // Already friends
     if (isFriend) {
       return Chip(

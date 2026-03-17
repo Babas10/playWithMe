@@ -841,9 +841,9 @@ class _$UserModelImpl extends _UserModel {
     final List<String> recentGameIds = const [],
     @TimestampConverter() this.lastGameDate,
     final Map<String, dynamic> teammateStats = const {},
-    this.eloRating = 1600.0,
+    this.eloRating = 1200.0,
     @TimestampConverter() this.eloLastUpdated,
-    this.eloPeak = 1600.0,
+    this.eloPeak = 1200.0,
     @TimestampConverter() this.eloPeakDate,
     this.eloGamesPlayed = 0,
     this.nemesis,
@@ -1696,6 +1696,7 @@ mixin _$BestWinRecord {
   double get eloGained => throw _privateConstructorUsedError;
 
   /// Date when this win occurred
+  // ignore: invalid_annotation_target
   @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
   DateTime get date => throw _privateConstructorUsedError;
 
@@ -1904,6 +1905,7 @@ class _$BestWinRecordImpl extends _BestWinRecord {
   final double eloGained;
 
   /// Date when this win occurred
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
   final DateTime date;
@@ -2002,6 +2004,7 @@ abstract class _BestWinRecord extends BestWinRecord {
   double get eloGained;
 
   /// Date when this win occurred
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
   DateTime get date;
