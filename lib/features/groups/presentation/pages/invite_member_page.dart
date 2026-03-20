@@ -38,7 +38,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
 
   Set<String> _selectedFriendIds = {};
   List<String> _memberIds = [];
-  final List<String> _invitedUserIds = [];
+  final Set<String> _invitedUserIds = {};
   bool _isSendingInvitations = false;
 
   @override
@@ -75,7 +75,6 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
     }
 
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
 
     setState(() {
       _isSendingInvitations = true;
@@ -109,27 +108,9 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
 
       if (mounted) {
         if (successCount > 0) {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text(
-                successCount == 1
-                    ? 'Invitation sent successfully'
-                    : '$successCount invitations sent successfully',
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
-
-          // Clear selection and navigate back on success
+          // Green ticks next to each invited person provide the success feedback
           setState(() {
             _selectedFriendIds.clear();
-          });
-
-          // Navigate back after short delay
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              navigator.pop();
-            }
           });
         }
 
@@ -226,6 +207,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
                     });
                   },
                   initialSelection: _selectedFriendIds,
+                  invitedUserIds: _invitedUserIds,
                 ),
               ),
 

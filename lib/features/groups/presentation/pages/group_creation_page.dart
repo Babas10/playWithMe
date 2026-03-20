@@ -82,17 +82,8 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
           if (state is GroupCreated) {
-            // Show success message
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Group created successfully!'),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 2),
-              ),
-            );
-
-            // Navigate back after short delay
-            Future.delayed(const Duration(milliseconds: 500), () {
+            // Navigate back immediately — the group appearing in the list is the feedback
+            Future.delayed(const Duration(milliseconds: 100), () {
               if (context.mounted) {
                 Navigator.of(context).pop(state.group);
               }
