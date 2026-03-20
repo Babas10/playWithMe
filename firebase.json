@@ -22,6 +22,10 @@
       {
         "source": "/invite/**",
         "destination": "/invite.html"
+      },
+      {
+        "source": "/auth/action",
+        "destination": "/auth/action.html"
       }
     ]
   },
