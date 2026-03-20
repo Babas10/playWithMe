@@ -108,17 +108,20 @@ export async function calculateUserRankingHandler(
       const friendsWithHigherElo: number[] = [];
       const friendsWithElo: number[] = [];
 
-      // Process friends in batches of 10
+      // Build all batch queries and execute in parallel
+      const batchQueries = [];
       for (let i = 0; i < friendIds.length; i += 10) {
         const batch = friendIds.slice(i, i + 10);
-
-        const friendsSnapshot = await db
-          .collection("users")
-          .where(admin.firestore.FieldPath.documentId(), "in", batch)
-          .select("eloRating", "eloGamesPlayed")
-          .get();
-
-        friendsSnapshot.docs.forEach((doc) => {
+        batchQueries.push(
+          db.collection("users")
+            .where(admin.firestore.FieldPath.documentId(), "in", batch)
+            .select("eloRating", "eloGamesPlayed")
+            .get()
+        );
+      }
+      const batchSnapshots = await Promise.all(batchQueries);
+      batchSnapshots.forEach((snapshot) => {
+        snapshot.docs.forEach((doc) => {
           const friendData = doc.data();
           const friendElo = friendData.eloRating || 1600;
           const friendGamesPlayed = friendData.eloGamesPlayed || 0;
@@ -131,7 +134,7 @@ export async function calculateUserRankingHandler(
             }
           }
         });
-      }
+      });
 
       // Only set ranking if user has friends with ELO ratings
       if (friendsWithElo.length > 0) {

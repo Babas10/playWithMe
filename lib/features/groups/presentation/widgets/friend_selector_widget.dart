@@ -10,6 +10,7 @@ class FriendSelectorWidget extends StatefulWidget {
   final FriendRepository friendRepository;
   final ValueChanged<Set<String>> onSelectionChanged;
   final Set<String>? initialSelection;
+  final Set<String> invitedUserIds;
 
   const FriendSelectorWidget({
     super.key,
@@ -17,6 +18,7 @@ class FriendSelectorWidget extends StatefulWidget {
     required this.friendRepository,
     required this.onSelectionChanged,
     this.initialSelection,
+    this.invitedUserIds = const {},
   });
 
   @override
@@ -249,6 +251,42 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
             itemBuilder: (context, index) {
               final friend = _friends![index];
               final isSelected = _selectedFriendIds.contains(friend.uid);
+              final isInvited = widget.invitedUserIds.contains(friend.uid);
+
+              if (isInvited) {
+                // Show green tick — already invited, not selectable
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.25),
+                    backgroundImage: friend.photoUrl != null
+                        ? NetworkImage(friend.photoUrl!)
+                        : null,
+                    child: friend.photoUrl == null
+                        ? Text(
+                            friend.displayNameOrEmail[0].toUpperCase(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.secondary,
+                            ),
+                          )
+                        : null,
+                  ),
+                  title: Text(
+                    friend.displayNameOrEmail,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                  subtitle: friend.displayName != null
+                      ? Text(
+                          friend.email,
+                          style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                        )
+                      : null,
+                  trailing: const Icon(Icons.check_circle, color: Colors.green, size: 28),
+                );
+              }
 
               return CheckboxListTile(
                 value: isSelected,

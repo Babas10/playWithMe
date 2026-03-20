@@ -130,7 +130,15 @@ class FirebaseAuthRepository implements AuthRepository {
     }
 
     try {
-      await user.sendEmailVerification();
+      final actionCodeSettings = ActionCodeSettings(
+        url: 'https://gatherli.org/verified',
+        handleCodeInApp: false,
+        iOSBundleId: 'org.gatherli.app',
+        androidPackageName: 'org.gatherli.app',
+        androidInstallApp: true,
+        androidMinimumVersion: '1',
+      );
+      await user.sendEmailVerification(actionCodeSettings);
       debugPrint('✅ Email verification sent to: ${user.email}');
     } on FirebaseAuthException catch (e) {
       debugPrint('❌ Firebase Auth Error sending email verification: ${e.code} - ${e.message}');

@@ -89,21 +89,22 @@ export async function getUsersByIdsHandler(
   const users: PublicUserData[] = [];
 
   try {
-    // Firestore 'in' queries are limited to 10 items per batch
-    const batchSize = 10;
+    // Build all batch queries and execute in parallel
+    const batchQueries = [];
+    for (let i = 0; i < userIds.length; i += 10) {
+      const batch = userIds.slice(i, i + 10);
+      batchQueries.push(
+        db.collection("users")
+          .where(admin.firestore.FieldPath.documentId(), "in", batch)
+          .get()
+      );
+    }
 
-    for (let i = 0; i < userIds.length; i += batchSize) {
-      const batch = userIds.slice(i, i + batchSize);
-
-      const snapshot = await db
-        .collection("users")
-        .where(admin.firestore.FieldPath.documentId(), "in", batch)
-        .get();
-
+    const snapshots = await Promise.all(batchQueries);
+    for (const snapshot of snapshots) {
       for (const doc of snapshot.docs) {
         if (doc.exists) {
           const userData = doc.data();
-
           // Return only public/non-sensitive data
           users.push({
             uid: doc.id,

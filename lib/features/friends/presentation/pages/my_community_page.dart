@@ -136,13 +136,8 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
                       ),
                     );
                   },
-                  actionSuccess: (message) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(message),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                  actionSuccess: (_) {
+                    // Success feedback is shown as a green tick in the relevant page
                   },
                 );
               },

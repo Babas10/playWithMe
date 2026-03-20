@@ -75,6 +75,21 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
           // Only emit error if we can't find the auth user either
           emit(PlayerStatsError('User not found'));
         }
+
+        // Always set up the stream subscription so the UI updates as soon as
+        // the Firestore document is created (e.g. after the createUserDocument
+        // trigger completes asynchronously post-registration).
+        await _userSubscription?.cancel();
+        _userSubscription = _userRepository.getUserStream(event.userId).listen(
+          (user) {
+            if (user != null) {
+              add(UpdateUserStats(user));
+            }
+          },
+          onError: (error) {
+            debugPrint('PlayerStatsBloc: Error in user stream: $error');
+          },
+        );
       }
     } catch (e) {
       emit(PlayerStatsError('Failed to load player stats: ${e.toString()}'));
