@@ -1889,4 +1889,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get verifyEmail => 'Verificar email';
+
+  @override
+  String get orLater => 'o más tarde';
 }

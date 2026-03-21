@@ -2744,5 +2744,9 @@
   "verifyEmail": "Verify Email",
   "@verifyEmail": {
     "description": "Button label to verify email in restriction dialog"
+  },
+  "orLater": "or later",
+  "@orLater": {
+    "description": "Suffix shown in time picker when today is selected, indicating the minimum selectable time"
   }
 }

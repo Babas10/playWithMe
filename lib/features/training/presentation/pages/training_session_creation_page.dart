@@ -1,5 +1,7 @@
 // Training session creation page - simplified version for Story 15.4
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
@@ -58,23 +60,167 @@ class _TrainingSessionCreationPageState
   Future<void> _selectStartTime(BuildContext context) async {
     final now = DateTime.now();
     final initialDate = now.add(const Duration(days: 1));
+    const blue = AppColors.secondary;
 
     final l10n = AppLocalizations.of(context)!;
+
     final date = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: now,
       lastDate: now.add(const Duration(days: 365)),
       helpText: l10n.selectStartDate,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
+              headerBackgroundColor: Colors.white,
+              headerForegroundColor: blue,
+              dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return blue;
+                return null;
+              }),
+              dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return Colors.white;
+                return null;
+              }),
+              dayShape: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    side: const BorderSide(color: blue, width: 2),
+                  );
+                }
+                return null;
+              }),
+              todayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return blue;
+                return null;
+              }),
+              todayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return Colors.white;
+                return null;
+              }),
+              todayBorder: const BorderSide(color: Colors.transparent),
+              yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return blue;
+                return null;
+              }),
+              yearBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return Colors.white;
+                return null;
+              }),
+              yearShape: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    side: const BorderSide(color: blue, width: 2),
+                  );
+                }
+                return null;
+              }),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: blue),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (date == null || !context.mounted) return;
 
+    final isToday = date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
+    final minPickerTime = isToday ? now : null;
+    DateTime pickerTime = isToday
+        ? DateTime(date.year, date.month, date.day, now.hour, now.minute)
+            .add(const Duration(hours: 1))
+        : DateTime(date.year, date.month, date.day, 14, 0);
+
+    TimeOfDay? time;
+
     // ignore: use_build_context_synchronously
-    final time = await showTimePicker(
+    await showDialog<void>(
       context: context,
-      initialTime: const TimeOfDay(hour: 14, minute: 0),
-      helpText: l10n.selectStartTime,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text(l10n.cancel,
+                          style:
+                              const TextStyle(color: blue, fontSize: 16)),
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          l10n.selectStartTime,
+                          style: const TextStyle(
+                            color: blue,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (isToday)
+                          Text(
+                            '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} ${l10n.orLater}',
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 12),
+                          ),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        time = TimeOfDay(
+                          hour: pickerTime.hour,
+                          minute: pickerTime.minute,
+                        );
+                        Navigator.pop(dialogContext);
+                      },
+                      child: Text(
+                        l10n.ok,
+                        style: const TextStyle(
+                          color: blue,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 200,
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.time,
+                  initialDateTime: pickerTime,
+                  minimumDate: minPickerTime,
+                  use24hFormat: true,
+                  onDateTimeChanged: (dt) => pickerTime = dt,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
 
     if (time == null || !mounted) return;
@@ -83,8 +229,8 @@ class _TrainingSessionCreationPageState
       date.year,
       date.month,
       date.day,
-      time.hour,
-      time.minute,
+      time!.hour,
+      time!.minute,
     );
 
     setState(() {
@@ -95,7 +241,9 @@ class _TrainingSessionCreationPageState
   }
 
   Future<void> _selectEndTime(BuildContext context) async {
+    const blue = AppColors.secondary;
     final l10n = AppLocalizations.of(context)!;
+
     if (_selectedStartTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.pleaseSelectStartTimeFirst)),
@@ -103,13 +251,87 @@ class _TrainingSessionCreationPageState
       return;
     }
 
-    final time = await showTimePicker(
+    // End time must be after start time
+    DateTime pickerTime = _selectedEndTime ??
+        _selectedStartTime!.add(const Duration(hours: 2));
+
+    TimeOfDay? time;
+
+    await showDialog<void>(
       context: context,
-      initialTime: TimeOfDay(
-        hour: _selectedEndTime?.hour ?? 16,
-        minute: _selectedEndTime?.minute ?? 0,
-      ),
-      helpText: l10n.selectEndTime,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text(l10n.cancel,
+                          style:
+                              const TextStyle(color: blue, fontSize: 16)),
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          l10n.selectEndTime,
+                          style: const TextStyle(
+                            color: blue,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          '${_selectedStartTime!.hour.toString().padLeft(2, '0')}:${_selectedStartTime!.minute.toString().padLeft(2, '0')} ${l10n.orLater}',
+                          style: const TextStyle(
+                              color: Colors.grey, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        time = TimeOfDay(
+                          hour: pickerTime.hour,
+                          minute: pickerTime.minute,
+                        );
+                        Navigator.pop(dialogContext);
+                      },
+                      child: Text(
+                        l10n.ok,
+                        style: const TextStyle(
+                          color: blue,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 200,
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.time,
+                  initialDateTime: pickerTime,
+                  minimumDate: _selectedStartTime,
+                  use24hFormat: true,
+                  onDateTimeChanged: (dt) => pickerTime = dt,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
 
     if (time == null || !context.mounted) return;
@@ -118,8 +340,8 @@ class _TrainingSessionCreationPageState
       _selectedStartTime!.year,
       _selectedStartTime!.month,
       _selectedStartTime!.day,
-      time.hour,
-      time.minute,
+      time!.hour,
+      time!.minute,
     );
 
     setState(() {
