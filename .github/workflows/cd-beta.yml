@@ -63,12 +63,6 @@ jobs:
       - name: 📦 Install Functions Dependencies
         run: npm --prefix functions ci
 
-      - name: 🔍 Print Service Account Email (debug)
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print('SA email:', d.get('client_email','unknown'))"
-
       - name: 🚀 Deploy Functions + Firestore Rules & Indexes to gatherli-prod
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
