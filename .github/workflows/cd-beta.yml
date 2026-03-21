@@ -296,7 +296,7 @@ jobs:
               <key>method</key>
               <string>app-store</string>
               <key>destination</key>
-              <string>upload</string>
+              <string>export</string>
               <key>signingStyle</key>
               <string>manual</string>
               <key>signingCertificate</key>
@@ -306,10 +306,6 @@ jobs:
                   <key>org.gatherli.app</key>
                   <string>${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}</string>
               </dict>
-              <key>apiKey</key>
-              <string>${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}</string>
-              <key>apiIssuer</key>
-              <string>${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}</string>
               <key>stripSwiftSymbols</key>
               <true/>
               <key>uploadBitcode</key>
@@ -320,7 +316,7 @@ jobs:
           </plist>
           EOF
 
-      - name: 🔨 Build & Upload IPA to TestFlight (prod flavor)
+      - name: 🔨 Build IPA (prod flavor)
         env:
           IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
         run: |
@@ -329,6 +325,14 @@ jobs:
             --build-name=${{ env.VERSION_NAME }} \
             --build-number=${{ env.BUILD_NUMBER }} \
             --export-options-plist=ios/ExportOptions.plist
+
+      - name: 🚀 Upload IPA to TestFlight
+        run: |
+          xcrun altool --upload-app \
+            --type ios \
+            -f "$(find build/ios/ipa -name '*.ipa' | head -1)" \
+            --apiKey "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" \
+            --apiIssuer "${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}"
 
       - name: 🧹 Clean up keychain and provisioning profile
         if: always()
