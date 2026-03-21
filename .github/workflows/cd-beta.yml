@@ -190,7 +190,7 @@ jobs:
   deploy_ios:
     name: 🍎 Build & Upload iOS (TestFlight)
     needs: [test, deploy_functions]
-    runs-on: macos-latest
+    runs-on: macos-15
 
     steps:
       - name: 📥 Checkout Repository
@@ -320,9 +320,11 @@ jobs:
         env:
           IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
         run: |
+          # Strip beta suffix for iOS: 0.4.0-beta12 → 0.4.0 (CFBundleShortVersionString must be numeric X.Y.Z)
+          IOS_VERSION=$(echo "${{ env.VERSION_NAME }}" | sed 's/-beta[0-9]*//')
           flutter build ipa --release --flavor prod \
             -t lib/main_prod.dart \
-            --build-name=${{ env.VERSION_NAME }} \
+            --build-name=$IOS_VERSION \
             --build-number=${{ env.BUILD_NUMBER }} \
             --export-options-plist=ios/ExportOptions.plist
 
