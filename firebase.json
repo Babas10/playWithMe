@@ -33,7 +33,7 @@
     {
       "source": "functions",
       "codebase": "typescript-functions",
-      "runtime": "nodejs20",
+      "runtime": "nodejs22",
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
