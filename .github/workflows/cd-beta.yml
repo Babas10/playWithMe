@@ -321,6 +321,8 @@ jobs:
           EOF
 
       - name: 🔨 Build & Upload IPA to TestFlight (prod flavor)
+        env:
+          IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
         run: |
           flutter build ipa --release --flavor prod \
             -t lib/main_prod.dart \
