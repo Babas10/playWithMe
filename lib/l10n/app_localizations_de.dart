@@ -1899,4 +1899,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get verifyEmail => 'E-Mail bestätigen';
+
+  @override
+  String get orLater => 'oder später';
 }

@@ -327,6 +327,121 @@ void main() {
           findsNWidgets(2),
         );
       });
+
+      testWidgets('shows time picker as centered Dialog after date confirmed',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        // Open date picker
+        final dateTimeTile = find.ancestor(
+          of: find.byIcon(Icons.calendar_today),
+          matching: find.byType(ListTile),
+        );
+        await tester.tap(dateTimeTile);
+        await tester.pumpAndSettle();
+        expect(find.byType(DatePickerDialog), findsOneWidget);
+
+        // Confirm the date (OK button on date picker)
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // Time picker must appear as a centered Dialog, not a bottom sheet
+        expect(find.byType(Dialog), findsOneWidget);
+        expect(find.byType(BottomSheet), findsNothing);
+      });
+
+      testWidgets('time picker dialog shows title, cancel and ok buttons',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        // Open and confirm date picker
+        final dateTimeTile = find.ancestor(
+          of: find.byIcon(Icons.calendar_today),
+          matching: find.byType(ListTile),
+        );
+        await tester.tap(dateTimeTile);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // Time dialog should have a title, Cancel and OK
+        expect(find.text('Select Game Time'), findsOneWidget);
+        expect(find.text('Cancel'), findsOneWidget);
+        expect(find.text('OK'), findsOneWidget);
+      });
+
+      testWidgets('canceling time picker does not update date time',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        // Open and confirm date picker
+        final dateTimeTile = find.ancestor(
+          of: find.byIcon(Icons.calendar_today),
+          matching: find.byType(ListTile),
+        );
+        await tester.tap(dateTimeTile);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // Cancel the time picker
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // SetDateTime must not have been called
+        verifyNever(
+          () => mockGameCreationBloc.add(any(that: isA<SetDateTime>())),
+        );
+
+        // Date time tile still shows 'Tap to select'
+        expect(find.text('Tap to select'), findsNWidgets(2));
+      });
+
+      testWidgets('confirming time picker dispatches SetDateTime with future datetime',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        // Open and confirm date picker (default is tomorrow)
+        final dateTimeTile = find.ancestor(
+          of: find.byIcon(Icons.calendar_today),
+          matching: find.byType(ListTile),
+        );
+        await tester.tap(dateTimeTile);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // Confirm the time picker
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // SetDateTime should have been called once with a future datetime
+        final captured = verify(
+          () => mockGameCreationBloc.add(captureAny(that: isA<SetDateTime>())),
+        ).captured;
+        expect(captured, hasLength(1));
+        final event = captured.first as SetDateTime;
+        expect(event.dateTime.isAfter(DateTime.now()), isTrue);
+      });
+
+      testWidgets('canceling date picker does not show time picker',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        // Open date picker and cancel
+        final dateTimeTile = find.ancestor(
+          of: find.byIcon(Icons.calendar_today),
+          matching: find.byType(ListTile),
+        );
+        await tester.tap(dateTimeTile);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // No Dialog (time picker) should appear
+        expect(find.byType(Dialog), findsNothing);
+        expect(find.text('Tap to select'), findsNWidgets(2));
+      });
     });
 
     group('Loading State', () {
