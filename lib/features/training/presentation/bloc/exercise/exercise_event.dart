@@ -10,10 +10,17 @@ abstract class ExerciseEvent extends BaseBlocEvent {
 class LoadExercises extends ExerciseEvent {
   final String trainingSessionId;
 
-  const LoadExercises({required this.trainingSessionId});
+  /// Whether the current user is the organiser of this session.
+  /// Controls visibility of add/edit/delete controls.
+  final bool isOrganiser;
+
+  const LoadExercises({
+    required this.trainingSessionId,
+    required this.isOrganiser,
+  });
 
   @override
-  List<Object?> get props => [trainingSessionId];
+  List<Object?> get props => [trainingSessionId, isOrganiser];
 }
 
 /// Event to add a new exercise

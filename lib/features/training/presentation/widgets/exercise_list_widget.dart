@@ -13,9 +13,14 @@ import 'exercise_list_item.dart';
 class ExerciseListWidget extends StatefulWidget {
   final String trainingSessionId;
 
+  /// Whether the current user is the organiser of this session.
+  /// Passed from the parent page which already holds this information.
+  final bool isOrganiser;
+
   const ExerciseListWidget({
     super.key,
     required this.trainingSessionId,
+    required this.isOrganiser,
   });
 
   @override
@@ -26,9 +31,11 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
   @override
   void initState() {
     super.initState();
-    // Load exercises when widget is created
     context.read<ExerciseBloc>().add(
-          LoadExercises(trainingSessionId: widget.trainingSessionId),
+          LoadExercises(
+            trainingSessionId: widget.trainingSessionId,
+            isOrganiser: widget.isOrganiser,
+          ),
         );
   }
 
@@ -122,6 +129,13 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
               backgroundColor: AppColors.primary,
             ),
           );
+        } else if (state is ExercisePermissionDenied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.orange,
+            ),
+          );
         } else if (state is ExerciseAdded) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -155,7 +169,7 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
         if (state is ExercisesLoaded) {
           return Column(
             children: [
-              // Header with add button
+              // Header with add button (organiser only)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -203,6 +217,12 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
                             'Tap "Add Exercise" to get started',
                             style: TextStyle(color: Colors.grey),
                           )
+                        else if (!state.isOrganiser)
+                          const Text(
+                            'The organiser has not added any exercises yet',
+                            style: TextStyle(color: Colors.grey),
+                            textAlign: TextAlign.center,
+                          )
                         else
                           const Text(
                             'Cannot add exercises after session starts',
@@ -228,8 +248,8 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
                   ),
                 ),
 
-              // Lock message
-              if (!state.canModify)
+              // Lock message (only for organiser whose session has started)
+              if (!state.canModify && state.isOrganiser)
                 Container(
                   padding: const EdgeInsets.all(16),
                   color: AppColors.primary.withValues(alpha: 0.2),
