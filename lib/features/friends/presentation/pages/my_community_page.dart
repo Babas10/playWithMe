@@ -35,6 +35,7 @@ class _MyCommunityPageContent extends StatefulWidget {
 class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _lastRequestCount = 0;
 
   @override
   void initState() {
@@ -63,7 +64,18 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
+    return BlocListener<FriendRequestCountBloc, FriendRequestCountState>(
+      listener: (context, countState) {
+        if (countState is FriendRequestCountLoaded) {
+          final newCount = countState.count;
+          if (newCount > _lastRequestCount) {
+            // A new request arrived — refresh the list so badge and content stay in sync
+            context.read<FriendBloc>().add(const FriendEvent.loadRequested());
+          }
+          _lastRequestCount = newCount;
+        }
+      },
+      child: Scaffold(
         body: Column(
           children: [
             Container(
@@ -252,7 +264,8 @@ class _MyCommunityPageContentState extends State<_MyCommunityPageContent>
           ],
         ),
         floatingActionButton: _buildAddFriendButton(context, l10n),
-      );
+      ),
+    );
   }
 
   Widget _buildAddFriendButton(BuildContext context, AppLocalizations l10n) {
