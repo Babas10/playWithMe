@@ -66,5 +66,12 @@
 	</array>
 	<key>FlutterDeepLinkingEnabled</key>
 	<false/>
+	<!-- Required by image_picker for camera and photo library access -->
+	<key>NSCameraUsageDescription</key>
+	<string>Gatherli needs camera access to let you take a profile photo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Gatherli needs access to your photo library so you can choose a profile picture.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Gatherli needs permission to save photos to your library.</string>
 </dict>
 </plist>
