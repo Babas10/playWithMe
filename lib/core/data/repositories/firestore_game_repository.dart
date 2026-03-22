@@ -1158,8 +1158,9 @@ class FirestoreGameRepository implements GameRepository {
       final result = await callable.call({
         if (groupId != null) 'groupId': groupId,
         if (userId != null) 'userId': userId,
-        if (startDate != null) 'startDate': startDate.toIso8601String(),
-        if (endDate != null) 'endDate': endDate.toIso8601String(),
+        // Use UTC so the Cloud Function receives an unambiguous timestamp
+        if (startDate != null) 'startDate': startDate.toUtc().toIso8601String(),
+        if (endDate != null) 'endDate': endDate.toUtc().toIso8601String(),
         'limit': limit,
         if (lastDocument != null) 'lastGameId': lastDocument.id,
       });

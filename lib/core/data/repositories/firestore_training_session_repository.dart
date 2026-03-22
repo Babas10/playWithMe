@@ -315,8 +315,11 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
         'description': session.description,
         'locationName': session.location.name,
         'locationAddress': session.location.address,
-        'startTime': session.startTime.toIso8601String(),
-        'endTime': session.endTime.toIso8601String(),
+        // Convert to UTC so the Cloud Function receives an unambiguous timestamp
+        // regardless of the client's local timezone. Without .toUtc() the
+        // ISO string has no offset and the server (UTC) misinterprets local time.
+        'startTime': session.startTime.toUtc().toIso8601String(),
+        'endTime': session.endTime.toUtc().toIso8601String(),
         'minParticipants': session.minParticipants,
         'maxParticipants': session.maxParticipants,
         'notes': session.notes,
