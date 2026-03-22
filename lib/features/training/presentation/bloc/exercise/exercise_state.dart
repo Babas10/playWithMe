@@ -24,15 +24,22 @@ class ExercisesLoading extends ExerciseState {
 /// Exercises loaded successfully
 class ExercisesLoaded extends ExerciseState {
   final List<ExerciseModel> exercises;
-  final bool canModify; // Whether exercises can be edited (session hasn't started)
+
+  /// True only when the current user is the organiser AND the session
+  /// hasn't started yet — controls visibility of add/edit/delete controls.
+  final bool canModify;
+
+  /// Whether the current user is the session organiser (independent of timing).
+  final bool isOrganiser;
 
   const ExercisesLoaded({
     required this.exercises,
     required this.canModify,
+    required this.isOrganiser,
   });
 
   @override
-  List<Object?> get props => [exercises, canModify];
+  List<Object?> get props => [exercises, canModify, isOrganiser];
 }
 
 /// Adding a new exercise
@@ -90,12 +97,24 @@ class ExerciseError extends ExerciseState {
   List<Object?> get props => [message];
 }
 
-/// Session locked state (cannot modify exercises)
+/// Session locked state (cannot modify exercises because session has started)
 class ExercisesLocked extends ExerciseState {
   final String message;
 
   const ExercisesLocked({
     this.message = 'Cannot modify exercises: Training session has already started',
+  });
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// Permission denied state — current user is not the session organiser
+class ExercisePermissionDenied extends ExerciseState {
+  final String message;
+
+  const ExercisePermissionDenied({
+    this.message = 'Only the session organiser can manage exercises',
   });
 
   @override

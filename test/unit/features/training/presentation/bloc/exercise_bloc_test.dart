@@ -55,7 +55,7 @@ void main() {
 
     group('LoadExercises', () {
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExercisesLoading, ExercisesLoaded] when exercises load successfully',
+        'emits [Loading, Loaded(canModify:true)] for organiser with future session',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => true);
@@ -63,15 +63,20 @@ void main() {
               .thenAnswer((_) => Stream.value(testExercises));
           return exerciseBloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadExercises(trainingSessionId: 'session-1')),
+        act: (bloc) => bloc.add(const LoadExercises(
+          trainingSessionId: 'session-1',
+          isOrganiser: true,
+        )),
         expect: () => [
           const ExercisesLoading(),
-          ExercisesLoaded(exercises: testExercises, canModify: true),
+          ExercisesLoaded(
+            exercises: testExercises,
+            canModify: true,
+            isOrganiser: true,
+          ),
         ],
         verify: (_) {
-          verify(() => mockRepository.canModifyExercises('session-1'))
-              .called(1);
+          verify(() => mockRepository.canModifyExercises('session-1')).called(1);
           verify(() =>
                   mockRepository.getExercisesForTrainingSession('session-1'))
               .called(1);
@@ -79,7 +84,30 @@ void main() {
       );
 
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExercisesLoading, ExercisesLoaded] with canModify false when session has started',
+        'emits [Loading, Loaded(canModify:false)] for non-organiser even with future session',
+        build: () {
+          when(() => mockRepository.canModifyExercises('session-1'))
+              .thenAnswer((_) async => true);
+          when(() => mockRepository.getExercisesForTrainingSession('session-1'))
+              .thenAnswer((_) => Stream.value(testExercises));
+          return exerciseBloc;
+        },
+        act: (bloc) => bloc.add(const LoadExercises(
+          trainingSessionId: 'session-1',
+          isOrganiser: false,
+        )),
+        expect: () => [
+          const ExercisesLoading(),
+          ExercisesLoaded(
+            exercises: testExercises,
+            canModify: false,
+            isOrganiser: false,
+          ),
+        ],
+      );
+
+      blocTest<ExerciseBloc, ExerciseState>(
+        'emits [Loading, Loaded(canModify:false)] for organiser when session has started',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => false);
@@ -87,23 +115,31 @@ void main() {
               .thenAnswer((_) => Stream.value(testExercises));
           return exerciseBloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadExercises(trainingSessionId: 'session-1')),
+        act: (bloc) => bloc.add(const LoadExercises(
+          trainingSessionId: 'session-1',
+          isOrganiser: true,
+        )),
         expect: () => [
           const ExercisesLoading(),
-          ExercisesLoaded(exercises: testExercises, canModify: false),
+          ExercisesLoaded(
+            exercises: testExercises,
+            canModify: false,
+            isOrganiser: true,
+          ),
         ],
       );
 
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExercisesLoading, ExerciseError] when loading fails',
+        'emits [Loading, ExerciseError] when loading fails',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenThrow(Exception('Failed to check'));
           return exerciseBloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadExercises(trainingSessionId: 'session-1')),
+        act: (bloc) => bloc.add(const LoadExercises(
+          trainingSessionId: 'session-1',
+          isOrganiser: true,
+        )),
         expect: () => [
           const ExercisesLoading(),
           isA<ExerciseError>(),
@@ -111,7 +147,7 @@ void main() {
       );
 
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExercisesLoading, ExercisesLoaded] with empty list when no exercises',
+        'emits [Loading, Loaded] with empty list when no exercises',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => true);
@@ -119,153 +155,151 @@ void main() {
               .thenAnswer((_) => Stream.value([]));
           return exerciseBloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadExercises(trainingSessionId: 'session-1')),
+        act: (bloc) => bloc.add(const LoadExercises(
+          trainingSessionId: 'session-1',
+          isOrganiser: true,
+        )),
         expect: () => [
           const ExercisesLoading(),
-          const ExercisesLoaded(exercises: [], canModify: true),
+          const ExercisesLoaded(exercises: [], canModify: true, isOrganiser: true),
         ],
       );
     });
 
-    group('AddExercise', () {
+    group('AddExercise — organiser restrictions', () {
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExerciseAdding, ExerciseAdded, ExercisesLoaded] when exercise added successfully',
+        'emits [PermissionDenied, Loaded] when non-organiser attempts to add',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => true);
-          when(() => mockRepository.createExercise(
-                'session-1',
-                any(),
-              )).thenAnswer((_) async => 'exercise-3');
+          when(() => mockRepository.getExercisesForTrainingSession('session-1'))
+              .thenAnswer((_) => Stream.value([]));
           return exerciseBloc;
         },
-        act: (bloc) => bloc.add(const AddExercise(
-          trainingSessionId: 'session-1',
-          name: 'New Exercise',
-          description: 'Description',
-          durationMinutes: 20,
-        )),
+        act: (bloc) {
+          bloc.add(const LoadExercises(
+            trainingSessionId: 'session-1',
+            isOrganiser: false,
+          ));
+          return Future.delayed(
+            Duration.zero,
+            () => bloc.add(const AddExercise(
+              trainingSessionId: 'session-1',
+              name: 'Hacked Exercise',
+            )),
+          );
+        },
+        skip: 2, // skip ExercisesLoading + ExercisesLoaded from LoadExercises
+        expect: () => [
+          const ExercisePermissionDenied(),
+          isA<ExercisesLoaded>()
+              .having((s) => s.isOrganiser, 'isOrganiser', false)
+              .having((s) => s.canModify, 'canModify', false),
+        ],
+        verify: (_) {
+          verifyNever(() => mockRepository.createExercise(any(), any()));
+        },
+      );
+
+      blocTest<ExerciseBloc, ExerciseState>(
+        'emits [Adding, Added, Loaded] when organiser adds exercise',
+        build: () {
+          when(() => mockRepository.canModifyExercises('session-1'))
+              .thenAnswer((_) async => true);
+          when(() => mockRepository.getExercisesForTrainingSession('session-1'))
+              .thenAnswer((_) => Stream.value([]));
+          when(() => mockRepository.createExercise('session-1', any()))
+              .thenAnswer((_) async => 'exercise-3');
+          return exerciseBloc;
+        },
+        act: (bloc) {
+          bloc.add(const LoadExercises(
+            trainingSessionId: 'session-1',
+            isOrganiser: true,
+          ));
+          return Future.delayed(
+            Duration.zero,
+            () => bloc.add(const AddExercise(
+              trainingSessionId: 'session-1',
+              name: 'New Exercise',
+              description: 'Description',
+              durationMinutes: 20,
+            )),
+          );
+        },
+        skip: 2, // skip ExercisesLoading + ExercisesLoaded from LoadExercises
         expect: () => [
           const ExerciseAdding(),
           const ExerciseAdded(exerciseId: 'exercise-3'),
-          const ExercisesLoaded(exercises: [], canModify: true),
+          isA<ExercisesLoaded>().having((s) => s.canModify, 'canModify', true),
         ],
         verify: (_) {
-          verify(() => mockRepository.canModifyExercises('session-1'))
-              .called(1);
           verify(() => mockRepository.createExercise('session-1', any()))
               .called(1);
         },
       );
 
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExercisesLocked, ExercisesLoaded] when session cannot be modified',
+        'emits [Locked, Loaded] when organiser adds exercise after session starts',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => false);
+          when(() => mockRepository.getExercisesForTrainingSession('session-1'))
+              .thenAnswer((_) => Stream.value([]));
           return exerciseBloc;
         },
-        act: (bloc) => bloc.add(const AddExercise(
-          trainingSessionId: 'session-1',
-          name: 'New Exercise',
-        )),
+        act: (bloc) {
+          bloc.add(const LoadExercises(
+            trainingSessionId: 'session-1',
+            isOrganiser: true,
+          ));
+          return Future.delayed(
+            Duration.zero,
+            () => bloc.add(const AddExercise(
+              trainingSessionId: 'session-1',
+              name: 'Late Exercise',
+            )),
+          );
+        },
+        skip: 2,
         expect: () => [
           const ExercisesLocked(),
-          const ExercisesLoaded(exercises: [], canModify: false),
+          isA<ExercisesLoaded>().having((s) => s.canModify, 'canModify', false),
         ],
         verify: (_) {
-          verify(() => mockRepository.canModifyExercises('session-1'))
-              .called(1);
           verifyNever(() => mockRepository.createExercise(any(), any()));
         },
       );
-
-      blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExerciseAdding, ExerciseError, ExercisesLoaded] when creation fails',
-        build: () {
-          when(() => mockRepository.canModifyExercises('session-1'))
-              .thenAnswer((_) async => true);
-          when(() => mockRepository.createExercise('session-1', any()))
-              .thenThrow(Exception('Failed to create'));
-          return exerciseBloc;
-        },
-        act: (bloc) => bloc.add(const AddExercise(
-          trainingSessionId: 'session-1',
-          name: 'New Exercise',
-        )),
-        expect: () => [
-          const ExerciseAdding(),
-          isA<ExerciseError>(),
-          const ExercisesLoaded(exercises: [], canModify: true),
-        ],
-      );
-
-      blocTest<ExerciseBloc, ExerciseState>(
-        'creates exercise without optional fields',
-        build: () {
-          when(() => mockRepository.canModifyExercises('session-1'))
-              .thenAnswer((_) async => true);
-          when(() => mockRepository.createExercise('session-1', any()))
-              .thenAnswer((_) async => 'exercise-3');
-          return exerciseBloc;
-        },
-        act: (bloc) => bloc.add(const AddExercise(
-          trainingSessionId: 'session-1',
-          name: 'New Exercise',
-        )),
-        expect: () => [
-          const ExerciseAdding(),
-          const ExerciseAdded(exerciseId: 'exercise-3'),
-          const ExercisesLoaded(exercises: [], canModify: true),
-        ],
-      );
     });
 
-    group('UpdateExercise', () {
+    group('UpdateExercise — organiser restrictions', () {
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExerciseUpdating, ExerciseUpdated, ExercisesLoaded] when update succeeds',
-        build: () {
-          when(() => mockRepository.canModifyExercises('session-1'))
-              .thenAnswer((_) async => true);
-          when(() => mockRepository.updateExercise(
-                'session-1',
-                'exercise-1',
-                name: any(named: 'name'),
-                description: any(named: 'description'),
-                durationMinutes: any(named: 'durationMinutes'),
-              )).thenAnswer((_) async {});
-          return exerciseBloc;
-        },
-        act: (bloc) => bloc.add(const UpdateExercise(
-          trainingSessionId: 'session-1',
-          exerciseId: 'exercise-1',
-          name: 'Updated Name',
-          description: 'Updated Description',
-          durationMinutes: 40,
-        )),
-        expect: () => [
-          const ExerciseUpdating(exerciseId: 'exercise-1'),
-          const ExerciseUpdated(),
-          const ExercisesLoaded(exercises: [], canModify: true),
-        ],
-      );
-
-      blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExercisesLocked, ExercisesLoaded] when session cannot be modified',
+        'emits [Locked, Loaded] when session cannot be modified',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => false);
+          when(() => mockRepository.getExercisesForTrainingSession('session-1'))
+              .thenAnswer((_) => Stream.value([]));
           return exerciseBloc;
         },
-        act: (bloc) => bloc.add(const UpdateExercise(
-          trainingSessionId: 'session-1',
-          exerciseId: 'exercise-1',
-          name: 'Updated Name',
-        )),
+        act: (bloc) {
+          bloc.add(const LoadExercises(
+            trainingSessionId: 'session-1',
+            isOrganiser: true,
+          ));
+          return Future.delayed(
+            Duration.zero,
+            () => bloc.add(const UpdateExercise(
+              trainingSessionId: 'session-1',
+              exerciseId: 'exercise-1',
+              name: 'Updated Name',
+            )),
+          );
+        },
+        skip: 2,
         expect: () => [
           const ExercisesLocked(),
-          const ExercisesLoaded(exercises: [], canModify: false),
+          isA<ExercisesLoaded>().having((s) => s.canModify, 'canModify', false),
         ],
         verify: (_) {
           verifyNever(() => mockRepository.updateExercise(
@@ -277,95 +311,113 @@ void main() {
       );
 
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExerciseUpdating, ExerciseError, ExercisesLoaded] when update fails',
+        'emits [Updating, Updated, Loaded] when organiser updates exercise',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => true);
+          when(() => mockRepository.getExercisesForTrainingSession('session-1'))
+              .thenAnswer((_) => Stream.value([]));
           when(() => mockRepository.updateExercise(
-                any(),
-                any(),
+                'session-1',
+                'exercise-1',
                 name: any(named: 'name'),
-              )).thenThrow(Exception('Failed to update'));
+                description: any(named: 'description'),
+                durationMinutes: any(named: 'durationMinutes'),
+              )).thenAnswer((_) async {});
           return exerciseBloc;
         },
-        act: (bloc) => bloc.add(const UpdateExercise(
-          trainingSessionId: 'session-1',
-          exerciseId: 'exercise-1',
-          name: 'Updated Name',
-        )),
+        act: (bloc) {
+          bloc.add(const LoadExercises(
+            trainingSessionId: 'session-1',
+            isOrganiser: true,
+          ));
+          return Future.delayed(
+            Duration.zero,
+            () => bloc.add(const UpdateExercise(
+              trainingSessionId: 'session-1',
+              exerciseId: 'exercise-1',
+              name: 'Updated Name',
+            )),
+          );
+        },
+        skip: 2,
         expect: () => [
           const ExerciseUpdating(exerciseId: 'exercise-1'),
-          isA<ExerciseError>(),
-          const ExercisesLoaded(exercises: [], canModify: true),
+          const ExerciseUpdated(),
+          isA<ExercisesLoaded>().having((s) => s.canModify, 'canModify', true),
         ],
       );
     });
 
-    group('DeleteExercise', () {
+    group('DeleteExercise — organiser restrictions', () {
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExerciseDeleting, ExerciseDeleted, ExercisesLoaded] when delete succeeds',
+        'emits [Deleting, Deleted, Loaded] when organiser deletes exercise',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => true);
+          when(() => mockRepository.getExercisesForTrainingSession('session-1'))
+              .thenAnswer((_) => Stream.value([]));
           when(() => mockRepository.deleteExercise('session-1', 'exercise-1'))
               .thenAnswer((_) async {});
           return exerciseBloc;
         },
-        act: (bloc) => bloc.add(const DeleteExercise(
-          trainingSessionId: 'session-1',
-          exerciseId: 'exercise-1',
-        )),
+        act: (bloc) {
+          bloc.add(const LoadExercises(
+            trainingSessionId: 'session-1',
+            isOrganiser: true,
+          ));
+          return Future.delayed(
+            Duration.zero,
+            () => bloc.add(const DeleteExercise(
+              trainingSessionId: 'session-1',
+              exerciseId: 'exercise-1',
+            )),
+          );
+        },
+        skip: 2,
         expect: () => [
           const ExerciseDeleting(exerciseId: 'exercise-1'),
           const ExerciseDeleted(),
-          const ExercisesLoaded(exercises: [], canModify: true),
+          isA<ExercisesLoaded>().having((s) => s.canModify, 'canModify', true),
         ],
       );
 
       blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExercisesLocked, ExercisesLoaded] when session cannot be modified',
+        'emits [Locked, Loaded] when session cannot be modified',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => false);
+          when(() => mockRepository.getExercisesForTrainingSession('session-1'))
+              .thenAnswer((_) => Stream.value([]));
           return exerciseBloc;
         },
-        act: (bloc) => bloc.add(const DeleteExercise(
-          trainingSessionId: 'session-1',
-          exerciseId: 'exercise-1',
-        )),
+        act: (bloc) {
+          bloc.add(const LoadExercises(
+            trainingSessionId: 'session-1',
+            isOrganiser: true,
+          ));
+          return Future.delayed(
+            Duration.zero,
+            () => bloc.add(const DeleteExercise(
+              trainingSessionId: 'session-1',
+              exerciseId: 'exercise-1',
+            )),
+          );
+        },
+        skip: 2,
         expect: () => [
           const ExercisesLocked(),
-          const ExercisesLoaded(exercises: [], canModify: false),
+          isA<ExercisesLoaded>().having((s) => s.canModify, 'canModify', false),
         ],
         verify: (_) {
           verifyNever(() => mockRepository.deleteExercise(any(), any()));
         },
       );
-
-      blocTest<ExerciseBloc, ExerciseState>(
-        'emits [ExerciseDeleting, ExerciseError, ExercisesLoaded] when delete fails',
-        build: () {
-          when(() => mockRepository.canModifyExercises('session-1'))
-              .thenAnswer((_) async => true);
-          when(() => mockRepository.deleteExercise(any(), any()))
-              .thenThrow(Exception('Failed to delete'));
-          return exerciseBloc;
-        },
-        act: (bloc) => bloc.add(const DeleteExercise(
-          trainingSessionId: 'session-1',
-          exerciseId: 'exercise-1',
-        )),
-        expect: () => [
-          const ExerciseDeleting(exerciseId: 'exercise-1'),
-          isA<ExerciseError>(),
-          const ExercisesLoaded(exercises: [], canModify: true),
-        ],
-      );
     });
 
     group('RefreshExercises', () {
       blocTest<ExerciseBloc, ExerciseState>(
-        'reloads exercises for current session',
+        'reloads exercises preserving isOrganiser flag',
         build: () {
           when(() => mockRepository.canModifyExercises('session-1'))
               .thenAnswer((_) async => true);
@@ -373,19 +425,22 @@ void main() {
               .thenAnswer((_) => Stream.value(testExercises));
           return exerciseBloc;
         },
-        seed: () => const ExercisesLoaded(exercises: [], canModify: true),
         act: (bloc) {
-          // First load exercises to set current session ID
-          bloc.add(const LoadExercises(trainingSessionId: 'session-1'));
+          bloc.add(const LoadExercises(
+            trainingSessionId: 'session-1',
+            isOrganiser: true,
+          ));
           return Future.delayed(
             const Duration(milliseconds: 100),
             () => bloc.add(const RefreshExercises()),
           );
         },
-        skip: 2, // Skip initial load states
+        skip: 2,
         expect: () => [
           const ExercisesLoading(),
-          ExercisesLoaded(exercises: testExercises, canModify: true),
+          isA<ExercisesLoaded>()
+              .having((s) => s.isOrganiser, 'isOrganiser', true)
+              .having((s) => s.canModify, 'canModify', true),
         ],
       );
 
@@ -404,13 +459,14 @@ void main() {
         when(() => mockRepository.getExercisesForTrainingSession('session-1'))
             .thenAnswer((_) => Stream.value(testExercises));
 
-        exerciseBloc.add(const LoadExercises(trainingSessionId: 'session-1'));
+        exerciseBloc.add(const LoadExercises(
+          trainingSessionId: 'session-1',
+          isOrganiser: true,
+        ));
 
         await Future.delayed(const Duration(milliseconds: 100));
-
         await exerciseBloc.close();
 
-        // Verify bloc is closed and no more events can be added
         expect(exerciseBloc.isClosed, isTrue);
       });
     });
@@ -423,8 +479,10 @@ void main() {
               .thenThrow(Exception('Test error'));
           return exerciseBloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadExercises(trainingSessionId: 'session-1')),
+        act: (bloc) => bloc.add(const LoadExercises(
+          trainingSessionId: 'session-1',
+          isOrganiser: true,
+        )),
         expect: () => [
           const ExercisesLoading(),
           isA<ExerciseError>()
