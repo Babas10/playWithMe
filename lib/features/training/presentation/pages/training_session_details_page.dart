@@ -200,6 +200,7 @@ class _TrainingSessionDetailsPageState
                           create: (context) => sl<ExerciseBloc>(),
                           child: ExerciseListWidget(
                             trainingSessionId: widget.trainingSessionId,
+                            isOrganiser: isOrganizer,
                           ),
                         ),
 
