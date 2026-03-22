@@ -1902,4 +1902,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get verifyEmail => 'Vérifier l\'email';
+
+  @override
+  String get orLater => 'ou plus tard';
 }

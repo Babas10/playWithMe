@@ -288,6 +288,127 @@ void main() {
         // Date picker dialog should appear
         expect(find.byType(DatePickerDialog), findsOneWidget);
       });
+
+      testWidgets('time picker opens as centered Dialog after date confirmed',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        // Tap start time tile
+        await tester.tap(find.ancestor(
+          of: find.text('Start Time'),
+          matching: find.byType(ListTile),
+        ));
+        await tester.pumpAndSettle();
+
+        // Confirm the date in the date picker
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // Time picker should be a Dialog, not a BottomSheet
+        expect(find.byType(Dialog), findsOneWidget);
+        expect(find.byType(BottomSheet), findsNothing);
+      });
+
+      testWidgets('time picker dialog has Cancel and OK buttons',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        await tester.tap(find.ancestor(
+          of: find.text('Start Time'),
+          matching: find.byType(ListTile),
+        ));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(Dialog), findsOneWidget);
+        expect(find.text('Cancel'), findsOneWidget);
+        // Two OK buttons exist: one from date picker (dismissed) and one in time dialog
+        expect(find.text('OK'), findsOneWidget);
+      });
+
+      testWidgets('canceling date picker does not open time picker',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        await tester.tap(find.ancestor(
+          of: find.text('Start Time'),
+          matching: find.byType(ListTile),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // No dialog or bottom sheet should remain open
+        expect(find.byType(Dialog), findsNothing);
+        expect(find.byType(DatePickerDialog), findsNothing);
+      });
+
+      testWidgets('canceling time picker does not update start time',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        await tester.tap(find.ancestor(
+          of: find.text('Start Time'),
+          matching: find.byType(ListTile),
+        ));
+        await tester.pumpAndSettle();
+
+        // Confirm date
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // Cancel the time picker
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // Start time subtitle should still show 'Not selected'
+        expect(find.text('Not selected'), findsWidgets);
+      });
+
+      testWidgets('tapping end time without start time shows snackbar',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        await tester.tap(find.ancestor(
+          of: find.text('End Time'),
+          matching: find.byType(ListTile),
+        ));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.byType(SnackBar), findsOneWidget);
+        expect(find.text('Please select start time first'), findsOneWidget);
+        // No Dialog should have opened
+        expect(find.byType(Dialog), findsNothing);
+      });
+
+      testWidgets('end time picker opens as Dialog after start time set',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+
+        // Set start time first
+        await tester.tap(find.ancestor(
+          of: find.text('Start Time'),
+          matching: find.byType(ListTile),
+        ));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK')); // Confirm date
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK')); // Confirm time
+        await tester.pumpAndSettle();
+
+        // Now tap end time
+        await tester.tap(find.ancestor(
+          of: find.text('End Time'),
+          matching: find.byType(ListTile),
+        ));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(Dialog), findsOneWidget);
+        expect(find.byType(BottomSheet), findsNothing);
+      });
     });
 
     group('Participant Sliders', () {

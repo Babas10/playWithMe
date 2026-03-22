@@ -3475,6 +3475,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify Email'**
   String get verifyEmail;
+
+  /// Suffix shown in time picker when today is selected, indicating the minimum selectable time
+  ///
+  /// In en, this message translates to:
+  /// **'or later'**
+  String get orLater;
 }
 
 class _AppLocalizationsDelegate
