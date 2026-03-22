@@ -809,7 +809,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get youreIn => 'Sie sind dabei';
 
   @override
-  String get onWaitlist => 'Auf Warteliste';
+  String get onWaitlist => 'WARTELISTE';
 
   @override
   String get full => 'Voll';

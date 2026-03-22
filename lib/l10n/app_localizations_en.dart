@@ -798,7 +798,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get youreIn => 'You\'re In';
 
   @override
-  String get onWaitlist => 'On Waitlist';
+  String get onWaitlist => 'WAITING LIST';
 
   @override
   String get full => 'Full';
