@@ -575,5 +575,9 @@
   "featureRestricted": "Questa funzione richiede la verifica dell'email.",
   "verifyToUnlock": "Verifica la tua email per usare questa funzione.",
   "featureRestrictedTitle": "Funzione limitata",
-  "verifyEmail": "Verifica email"
+  "verifyEmail": "Verifica email",
+  "orLater": "o più tardi",
+  "@orLater": {
+    "description": "Suffix shown in time picker when today is selected, indicating the minimum selectable time"
+  }
 }
