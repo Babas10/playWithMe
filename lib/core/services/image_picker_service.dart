@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -30,8 +30,14 @@ class ImagePickerService {
       // Convert to File
       File imageFile = File(pickedFile.path);
 
-      // Crop if requested
-      if (cropSquare) {
+      // Crop if requested.
+      // Skip cropping on Android entirely: image_cropper launches UCrop as a
+      // separate Activity. When UCrop returns (including RESULT_CANCELED on
+      // cancel), Android delivers the result to onActivityResult while the
+      // image_picker reply was already submitted, causing a fatal
+      // "Reply already submitted" crash (known image_cropper bug on Android).
+      // iOS UCImagePickerController does not have this issue.
+      if (cropSquare && !Platform.isAndroid) {
         final croppedFile = await _cropImage(imageFile);
         if (croppedFile != null) {
           imageFile = croppedFile;
@@ -39,6 +45,18 @@ class ImagePickerService {
       }
 
       return imageFile;
+    } on PlatformException catch (e) {
+      if (e.code == 'camera_access_denied') {
+        throw Exception(
+          'Camera access denied. Please enable camera access in your device settings.',
+        );
+      }
+      if (e.code == 'photo_access_denied') {
+        throw Exception(
+          'Photo library access denied. Please enable photo access in your device settings.',
+        );
+      }
+      throw Exception('Failed to pick image: ${e.message}');
     } catch (e) {
       throw Exception('Failed to pick image: $e');
     }

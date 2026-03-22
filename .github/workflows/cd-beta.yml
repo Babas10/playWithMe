@@ -69,7 +69,7 @@ jobs:
         run: |
           echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /tmp/sa.json
           export GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json
-          firebase deploy --only functions,firestore --project ${{ secrets.FIREBASE_PROD_PROJECT_ID }} --non-interactive --force
+          firebase deploy --only functions,firestore,storage --project ${{ secrets.FIREBASE_PROD_PROJECT_ID }} --non-interactive --force
           rm /tmp/sa.json
 
   # ─── Job 3: Deploy Android ───────────────────────────────────────────────────

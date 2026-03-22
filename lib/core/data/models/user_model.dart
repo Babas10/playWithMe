@@ -112,6 +112,20 @@ class UserModel with _$UserModel {
   Map<String, dynamic> toFirestore() {
     final json = toJson();
     json.remove('uid'); // Remove uid as it's the document ID
+    // json_serializable does not call .toJson() on nested freezed objects
+    // defined in the same file — fix them manually here.
+    json['nemesis'] = nemesis?.toJson();
+    json['bestWin'] = bestWin?.toJson();
+    json['pointStats'] = pointStats?.toJson();
+    // RoleBasedStats has its own nested objects (RoleStats) that also need
+    // explicit serialization for the same reason.
+    json['roleBasedStats'] = roleBasedStats == null
+        ? null
+        : {
+            'weakLink': roleBasedStats!.weakLink.toJson(),
+            'carry': roleBasedStats!.carry.toJson(),
+            'balanced': roleBasedStats!.balanced.toJson(),
+          };
     return json;
   }
 
