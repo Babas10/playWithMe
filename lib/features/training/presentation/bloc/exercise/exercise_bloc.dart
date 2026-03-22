@@ -15,6 +15,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
   String? _currentSessionId;
   List<ExerciseModel> _currentExercises = [];
   bool _canModify = true;
+  bool _isOrganiser = false;
 
   ExerciseBloc({
     required ExerciseRepository exerciseRepository,
@@ -35,14 +36,16 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
       emit(const ExercisesLoading());
 
       _currentSessionId = event.trainingSessionId;
+      _isOrganiser = event.isOrganiser;
 
-      // Check if exercises can be modified
-      _canModify = await _exerciseRepository.canModifyExercises(
+      // Check if the session time allows modifications
+      final canModifyByTime = await _exerciseRepository.canModifyExercises(
         event.trainingSessionId,
       );
 
-      // Subscribe to exercises stream using emit.forEach for proper async handling
-      // emit.forEach automatically handles stream lifecycle and cancellation
+      // Can modify only when organiser AND session hasn't started
+      _canModify = _isOrganiser && canModifyByTime;
+
       await emit.forEach<List<ExerciseModel>>(
         _exerciseRepository.getExercisesForTrainingSession(event.trainingSessionId),
         onData: (exercises) {
@@ -50,6 +53,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
           return ExercisesLoaded(
             exercises: exercises,
             canModify: _canModify,
+            isOrganiser: _isOrganiser,
           );
         },
         onError: (error, stackTrace) {
@@ -75,17 +79,28 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     Emitter<ExerciseState> emit,
   ) async {
     try {
-      // Check if modifications are allowed
-      final canModify = await _exerciseRepository.canModifyExercises(
-        event.trainingSessionId,
-      );
-
-      if (!canModify) {
-        emit(const ExercisesLocked());
-        // Reload exercises to restore previous state
+      // Organiser check — must be before any write attempt
+      if (!_isOrganiser) {
+        emit(const ExercisePermissionDenied());
         emit(ExercisesLoaded(
           exercises: _currentExercises,
           canModify: false,
+          isOrganiser: false,
+        ));
+        return;
+      }
+
+      // Time-based check
+      final canModifyByTime = await _exerciseRepository.canModifyExercises(
+        event.trainingSessionId,
+      );
+
+      if (!canModifyByTime) {
+        emit(const ExercisesLocked());
+        emit(ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: false,
+          isOrganiser: _isOrganiser,
         ));
         return;
       }
@@ -93,7 +108,7 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
       emit(const ExerciseAdding());
 
       final newExercise = ExerciseModel(
-        id: '', // Will be set by repository
+        id: '',
         name: event.name,
         description: event.description,
         durationMinutes: event.durationMinutes,
@@ -107,26 +122,26 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       emit(ExerciseAdded(exerciseId: exerciseId));
 
-      // Reload exercises to show updated list
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     } on ExerciseException catch (e) {
       emit(ExerciseError(message: e.message));
-      // Restore previous state after error
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     } catch (e) {
       emit(ExerciseError(
         message: ErrorMessages.getErrorMessage(e as Exception).$1,
       ));
-      // Restore previous state after error
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     }
   }
@@ -136,17 +151,26 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     Emitter<ExerciseState> emit,
   ) async {
     try {
-      // Check if modifications are allowed
-      final canModify = await _exerciseRepository.canModifyExercises(
-        event.trainingSessionId,
-      );
-
-      if (!canModify) {
-        emit(const ExercisesLocked());
-        // Reload exercises to restore previous state
+      if (!_isOrganiser) {
+        emit(const ExercisePermissionDenied());
         emit(ExercisesLoaded(
           exercises: _currentExercises,
           canModify: false,
+          isOrganiser: false,
+        ));
+        return;
+      }
+
+      final canModifyByTime = await _exerciseRepository.canModifyExercises(
+        event.trainingSessionId,
+      );
+
+      if (!canModifyByTime) {
+        emit(const ExercisesLocked());
+        emit(ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: false,
+          isOrganiser: _isOrganiser,
         ));
         return;
       }
@@ -163,26 +187,26 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       emit(const ExerciseUpdated());
 
-      // Reload exercises to show updated list
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     } on ExerciseException catch (e) {
       emit(ExerciseError(message: e.message));
-      // Restore previous state after error
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     } catch (e) {
       emit(ExerciseError(
         message: ErrorMessages.getErrorMessage(e as Exception).$1,
       ));
-      // Restore previous state after error
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     }
   }
@@ -192,17 +216,26 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     Emitter<ExerciseState> emit,
   ) async {
     try {
-      // Check if modifications are allowed
-      final canModify = await _exerciseRepository.canModifyExercises(
-        event.trainingSessionId,
-      );
-
-      if (!canModify) {
-        emit(const ExercisesLocked());
-        // Reload exercises to restore previous state
+      if (!_isOrganiser) {
+        emit(const ExercisePermissionDenied());
         emit(ExercisesLoaded(
           exercises: _currentExercises,
           canModify: false,
+          isOrganiser: false,
+        ));
+        return;
+      }
+
+      final canModifyByTime = await _exerciseRepository.canModifyExercises(
+        event.trainingSessionId,
+      );
+
+      if (!canModifyByTime) {
+        emit(const ExercisesLocked());
+        emit(ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: false,
+          isOrganiser: _isOrganiser,
         ));
         return;
       }
@@ -216,26 +249,26 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       emit(const ExerciseDeleted());
 
-      // Reload exercises to show updated list
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     } on ExerciseException catch (e) {
       emit(ExerciseError(message: e.message));
-      // Restore previous state after error
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     } catch (e) {
       emit(ExerciseError(
         message: ErrorMessages.getErrorMessage(e as Exception).$1,
       ));
-      // Restore previous state after error
       emit(ExercisesLoaded(
         exercises: _currentExercises,
         canModify: _canModify,
+        isOrganiser: _isOrganiser,
       ));
     }
   }
@@ -245,7 +278,10 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     Emitter<ExerciseState> emit,
   ) async {
     if (_currentSessionId != null) {
-      add(LoadExercises(trainingSessionId: _currentSessionId!));
+      add(LoadExercises(
+        trainingSessionId: _currentSessionId!,
+        isOrganiser: _isOrganiser,
+      ));
     }
   }
 }
