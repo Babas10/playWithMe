@@ -209,7 +209,7 @@ class NextGameCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          l10n.youreIn,
+          l10n.joined,
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,

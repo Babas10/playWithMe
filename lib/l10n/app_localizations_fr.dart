@@ -813,7 +813,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get youreIn => 'Vous êtes inscrit';
 
   @override
-  String get onWaitlist => 'Sur Liste d\'Attente';
+  String get onWaitlist => 'LISTE D\'ATTENTE';
 
   @override
   String get full => 'Complet';

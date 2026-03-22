@@ -1,4 +1,4 @@
-// Widget tests for NextGameCard
+// Verifies NextGameCard RSVP badge shows "JOINED" and "WAITING LIST" per Story 21.3.
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -91,8 +91,32 @@ void main() {
       await pumpNextGameCard(tester, game: game);
 
       // Assert
-      // GameListItem shows "You're In" badge when user is a player
-      expect(find.text("You're In"), findsOneWidget);
+      expect(find.text('JOINED'), findsOneWidget);
+    });
+
+    testWidgets('shows WAITING LIST badge when user is on waitlist', (tester) async {
+      // Arrange
+      final game = GameModel(
+        id: 'game-1',
+        title: 'Test Game',
+        groupId: 'group-1',
+        createdBy: 'creator-1',
+        createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        scheduledAt: DateTime.now().add(const Duration(days: 1)),
+        location: const GameLocation(name: 'Court 1'),
+        status: GameStatus.scheduled,
+        playerIds: const ['other-user-1', 'other-user-2'],
+        waitlistIds: const [testUserId],
+        maxPlayers: 2,
+        minPlayers: 2,
+      );
+
+      // Act
+      await pumpNextGameCard(tester, game: game);
+
+      // Assert
+      expect(find.text('WAITING LIST'), findsOneWidget);
+      expect(find.text('JOINED'), findsNothing);
     });
 
     testWidgets('calls onTap callback when game card is tapped', (tester) async {
