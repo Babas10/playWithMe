@@ -88,6 +88,48 @@ void main() {
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
+
+      blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
+        'accepts same-day start time that is in the future (Story 21.4)',
+        build: () => bloc,
+        act: (bloc) => bloc.add(
+          SetStartTime(startTime: DateTime.now().add(const Duration(hours: 2))),
+        ),
+        expect: () => [
+          isA<TrainingSessionCreationFormState>()
+              .having((s) => s.startTimeError, 'startTimeError', null),
+        ],
+      );
+
+      blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
+        'rejects same-day start time that is in the past (Story 21.4)',
+        build: () => bloc,
+        seed: () => TrainingSessionCreationFormState(
+          startTime: DateTime.now().subtract(const Duration(minutes: 30)),
+        ),
+        act: (bloc) => bloc.add(const ValidateTrainingForm()),
+        expect: () => [
+          isA<TrainingSessionCreationFormState>()
+              .having((s) => s.startTimeError, 'startTimeError',
+                  'Start time must be in the future'),
+        ],
+      );
+
+      blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
+        'accepts start time on a future date at any time of day (Story 21.4)',
+        build: () => bloc,
+        act: (bloc) => bloc.add(
+          SetStartTime(
+            startTime: DateTime.now()
+                .add(const Duration(days: 1))
+                .copyWith(hour: 0, minute: 1, second: 0, millisecond: 0),
+          ),
+        ),
+        expect: () => [
+          isA<TrainingSessionCreationFormState>()
+              .having((s) => s.startTimeError, 'startTimeError', null),
+        ],
+      );
     });
 
     group('SetEndTime', () {
