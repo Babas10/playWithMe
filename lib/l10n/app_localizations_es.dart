@@ -807,7 +807,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get youreIn => 'Estás Inscrito';
 
   @override
-  String get onWaitlist => 'En Lista de Espera';
+  String get onWaitlist => 'LISTA DE ESPERA';
 
   @override
   String get full => 'Lleno';

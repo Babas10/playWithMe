@@ -1595,7 +1595,7 @@ abstract class AppLocalizations {
   /// Status badge for waitlist
   ///
   /// In en, this message translates to:
-  /// **'On Waitlist'**
+  /// **'WAITING LIST'**
   String get onWaitlist;
 
   /// Status badge when game is full

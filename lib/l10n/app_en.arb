@@ -1271,7 +1271,7 @@
     "description": "Status badge for confirmed participation"
   },
 
-  "onWaitlist": "On Waitlist",
+  "onWaitlist": "WAITING LIST",
   "@onWaitlist": {
     "description": "Status badge for waitlist"
   },
