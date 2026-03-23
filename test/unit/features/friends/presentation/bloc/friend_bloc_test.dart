@@ -303,6 +303,43 @@ void main() {
           const FriendState.error(message: 'User not found'),
         ],
       );
+
+      // Story 21.5: already-exists (Cloud Function code) should show green tick
+      blocTest<FriendBloc, FriendState>(
+        'emits [actionSuccess] instead of error when request already exists (already-exists / pending request)',
+        build: () {
+          when(() => mockFriendRepository.sendFriendRequest(any()))
+              .thenThrow(FriendshipException(
+            'A friend request already exists between you and this user',
+            code: 'already-exists',
+          ));
+          return friendBloc;
+        },
+        act: (bloc) => bloc.add(
+          const FriendEvent.requestSent(targetUserId: 'target-user-id'),
+        ),
+        expect: () => [
+          const FriendState.actionSuccess(message: 'Friend request already pending'),
+        ],
+      );
+
+      blocTest<FriendBloc, FriendState>(
+        'emits [actionSuccess] instead of error when already friends (already-exists / accepted)',
+        build: () {
+          when(() => mockFriendRepository.sendFriendRequest(any()))
+              .thenThrow(FriendshipException(
+            'You are already friends with this user',
+            code: 'already-exists',
+          ));
+          return friendBloc;
+        },
+        act: (bloc) => bloc.add(
+          const FriendEvent.requestSent(targetUserId: 'target-user-id'),
+        ),
+        expect: () => [
+          const FriendState.actionSuccess(message: 'Friend request already pending'),
+        ],
+      );
     });
 
     group('FriendRequestAccepted', () {
