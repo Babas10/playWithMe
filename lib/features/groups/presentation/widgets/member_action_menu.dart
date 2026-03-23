@@ -1,5 +1,6 @@
 // Action menu for group member management (promote, demote, remove)
 import 'package:flutter/material.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 enum MemberAction {
@@ -35,6 +36,7 @@ class MemberActionMenu extends StatelessWidget {
 
     return PopupMenuButton<MemberAction>(
       onSelected: onActionSelected,
+      color: Colors.white,
       itemBuilder: (context) {
         final items = <PopupMenuEntry<MemberAction>>[];
 
@@ -45,9 +47,13 @@ class MemberActionMenu extends StatelessWidget {
               value: MemberAction.promote,
               child: Row(
                 children: [
-                  const Icon(Icons.admin_panel_settings, size: 20),
+                  const Icon(Icons.admin_panel_settings,
+                      size: 20, color: AppColors.secondary),
                   const SizedBox(width: 12),
-                  Text(l10n.promoteToAdmin),
+                  Text(
+                    l10n.promoteToAdmin,
+                    style: const TextStyle(color: AppColors.secondary),
+                  ),
                 ],
               ),
             ),
@@ -61,9 +67,13 @@ class MemberActionMenu extends StatelessWidget {
               value: MemberAction.demote,
               child: Row(
                 children: [
-                  const Icon(Icons.person, size: 20),
+                  const Icon(Icons.person,
+                      size: 20, color: AppColors.secondary),
                   const SizedBox(width: 12),
-                  Text(l10n.demoteToMember),
+                  Text(
+                    l10n.demoteToMember,
+                    style: const TextStyle(color: AppColors.secondary),
+                  ),
                 ],
               ),
             ),

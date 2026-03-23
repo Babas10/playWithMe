@@ -54,7 +54,7 @@ class TrainingSessionListItem extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: isCancelled
                                 ? Theme.of(context).colorScheme.onSurfaceVariant
-                                : null,
+                                : AppColors.secondary,
                             decoration:
                                 isCancelled ? TextDecoration.lineThrough : null,
                           ),

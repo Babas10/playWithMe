@@ -58,6 +58,7 @@ async function getGroupData(groupId: string): Promise<{
   name: string;
   createdBy: string;
   memberIds: string[];
+  adminIds: string[];
 } | null> {
   const db = admin.firestore();
   const groupDoc = await db.collection("groups").doc(groupId).get();
@@ -71,6 +72,7 @@ async function getGroupData(groupId: string): Promise<{
     name: groupData.name,
     createdBy: groupData.createdBy,
     memberIds: groupData.memberIds || [],
+    adminIds: groupData.adminIds || [],
   };
 }
 
@@ -203,6 +205,22 @@ export async function inviteToGroupHandler(
       throw new functions.https.HttpsError(
         "permission-denied",
         "You must be a member of the group to invite others"
+      );
+    }
+
+    // 4b. Check if inviter is an admin or the creator
+    const isAdmin =
+      groupData.adminIds.includes(inviterId) ||
+      groupData.createdBy === inviterId;
+
+    if (!isAdmin) {
+      functions.logger.warn("Non-admin attempting to invite to group", {
+        inviterId,
+        groupId,
+      });
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Only group admins can invite others to the group"
       );
     }
 
