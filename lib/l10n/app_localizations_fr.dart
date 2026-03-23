@@ -518,6 +518,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get createTrainingSession => 'Créer une Séance d\'Entraînement';
 
   @override
+  String get createTraining => 'Créer un entraînement';
+
+  @override
   String get pleaseLogInToCreateTraining =>
       'Veuillez vous connecter pour créer une séance';
 
@@ -1173,6 +1176,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get activities => 'Activités';
+
+  @override
+  String get members => 'Membres';
+
+  @override
+  String get inviteMember => 'Inviter un membre';
+
+  @override
+  String get inviteWithLink => 'Inviter avec un lien';
 
   @override
   String get viewAllActivities => 'Voir toutes les activités';

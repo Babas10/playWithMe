@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
+import 'package:play_with_me/core/theme/app_colors.dart';
+import 'package:play_with_me/features/groups/presentation/widgets/member_action_menu.dart';
 
 /// Displays a group member with their friendship status and action buttons
 class MemberListItemWithFriendship extends StatelessWidget {
@@ -14,6 +16,9 @@ class MemberListItemWithFriendship extends StatelessWidget {
   final FriendRequestStatus requestStatus;
   final VoidCallback? onRefresh;
   final Function(String targetUserId)? onSendFriendRequest;
+  final bool isCurrentUserAdmin;
+  final bool canDemote;
+  final Function(MemberAction action)? onMemberAction;
 
   const MemberListItemWithFriendship({
     super.key,
@@ -26,6 +31,9 @@ class MemberListItemWithFriendship extends StatelessWidget {
     required this.requestStatus,
     this.onRefresh,
     this.onSendFriendRequest,
+    this.isCurrentUserAdmin = false,
+    this.canDemote = true,
+    this.onMemberAction,
   });
 
   @override
@@ -50,7 +58,10 @@ class MemberListItemWithFriendship extends StatelessWidget {
           Flexible(
             child: Text(
               user.fullDisplayName,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppColors.secondary,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -183,6 +194,17 @@ class MemberListItemWithFriendship extends StatelessWidget {
   }
 
   Widget? _buildTrailingWidget(BuildContext context) {
+    // Admin action menu takes priority when viewer is an admin
+    if (isCurrentUserAdmin && onMemberAction != null) {
+      return MemberActionMenu(
+        isCurrentUserAdmin: isCurrentUserAdmin,
+        isTargetUserAdmin: isAdmin,
+        isTargetUserCreator: isCreator,
+        canDemote: canDemote,
+        onActionSelected: onMemberAction!,
+      );
+    }
+
     if (isFriend) {
       return null; // Already friends, no action needed
     }
@@ -199,9 +221,6 @@ class MemberListItemWithFriendship extends StatelessWidget {
     }
 
     if (requestStatus == FriendRequestStatus.receivedFromThem) {
-      // Show accept/decline buttons for incoming requests
-      // Note: This is a simplified version - full implementation would
-      // require access to the friendshipId
       return const SizedBox.shrink();
     }
 
