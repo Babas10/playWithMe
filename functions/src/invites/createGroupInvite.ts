@@ -108,10 +108,10 @@ export async function createGroupInviteHandler(
       (groupData.adminIds || []).includes(uid) ||
       groupData.createdBy === uid;
 
-    if (!groupData.allowMembersToInviteOthers && !isAdmin) {
+    if (!isAdmin) {
       throw new functions.https.HttpsError(
         "permission-denied",
-        "You do not have permission to create invite links for this group."
+        "Only group admins can create invite links."
       );
     }
 

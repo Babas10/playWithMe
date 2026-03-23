@@ -400,16 +400,12 @@ void main() {
         expect(testGroup.canUserInviteOthers('user-123'), true);
       });
 
-      test('canUserInviteOthers returns true for member when allowed', () {
-        expect(testGroup.canUserInviteOthers('user-456'), true);
+      test('canUserInviteOthers returns false for regular member', () {
+        expect(testGroup.canUserInviteOthers('user-456'), false);
       });
 
-      test('canUserInviteOthers returns false for member when not allowed', () {
-        final restrictedGroup = testGroup.copyWith(
-          allowMembersToInviteOthers: false,
-        );
-
-        expect(restrictedGroup.canUserInviteOthers('user-456'), false);
+      test('canUserInviteOthers returns false for non-member', () {
+        expect(testGroup.canUserInviteOthers('user-789'), false);
       });
     });
 

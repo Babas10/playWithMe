@@ -810,6 +810,7 @@
   "@createTrainingSession": {
     "description": "Create training session page title and button"
   },
+  "createTraining": "Create Training",
 
   "pleaseLogInToCreateTraining": "Please log in to create a training session",
   "@pleaseLogInToCreateTraining": {
@@ -1891,6 +1892,21 @@
   "activities": "Activities",
   "@activities": {
     "description": "Activities label"
+  },
+
+  "members": "Members",
+  "@members": {
+    "description": "Members tab label"
+  },
+
+  "inviteMember": "Invite Member",
+  "@inviteMember": {
+    "description": "Invite member action in members tab"
+  },
+
+  "inviteWithLink": "Invite with Link",
+  "@inviteWithLink": {
+    "description": "Invite with link action in members tab"
   },
 
   "viewAllActivities": "View all activities",

@@ -210,7 +210,7 @@ class GroupModel with _$GroupModel {
   }
 
   bool canUserInviteOthers(String userId) {
-    return isMember(userId) && (allowMembersToInviteOthers || canManage(userId));
+    return isMember(userId) && canManage(userId);
   }
 }
 

@@ -224,7 +224,7 @@ describe("createGroupInvite Cloud Function", () => {
           {auth: {uid: "user789"}} as any
         )
       ).rejects.toThrow(
-        "You do not have permission to create invite links for this group."
+        "Only group admins can create invite links."
       );
     });
 
