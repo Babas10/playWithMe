@@ -1893,6 +1893,21 @@
     "description": "Activities label"
   },
 
+  "members": "Members",
+  "@members": {
+    "description": "Members tab label"
+  },
+
+  "inviteMember": "Invite Member",
+  "@inviteMember": {
+    "description": "Invite member action in members tab"
+  },
+
+  "inviteWithLink": "Invite with Link",
+  "@inviteWithLink": {
+    "description": "Invite with link action in members tab"
+  },
+
   "viewAllActivities": "View all activities",
   "@viewAllActivities": {
     "description": "Tooltip for activities button"

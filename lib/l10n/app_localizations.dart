@@ -2258,6 +2258,24 @@ abstract class AppLocalizations {
   /// **'Activities'**
   String get activities;
 
+  /// Members tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get members;
+
+  /// Invite member action in members tab
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Member'**
+  String get inviteMember;
+
+  /// Invite with link action in members tab
+  ///
+  /// In en, this message translates to:
+  /// **'Invite with Link'**
+  String get inviteWithLink;
+
   /// Tooltip for activities button
   ///
   /// In en, this message translates to:
