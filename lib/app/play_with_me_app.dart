@@ -54,6 +54,7 @@ import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
+import 'package:play_with_me/core/presentation/widgets/global_bottom_nav_bar.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -464,71 +465,15 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: AppColors.bottomNavBackground,
-          selectedItemColor: AppColors.navLabelColor,
-          unselectedItemColor: AppColors.navLabelColor,
-          selectedIconTheme: const IconThemeData(
-            color: AppColors.primary,
-          ),
-          unselectedIconTheme: const IconThemeData(
-            color: AppColors.navLabelColor,
-          ),
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.home),
-              label: AppLocalizations.of(context)!.home,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.bar_chart),
-              label: AppLocalizations.of(context)!.stats,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.group_work),
-              label: AppLocalizations.of(context)!.groups,
-            ),
-            BottomNavigationBarItem(
-              icon: BlocBuilder<FriendRequestCountBloc, FriendRequestCountState>(
-                builder: (context, state) {
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      const Icon(Icons.people),
-                      if (state is FriendRequestCountLoaded && state.count > 0)
-                        Positioned(
-                          right: -6,
-                          top: -4,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 18,
-                              minHeight: 18,
-                            ),
-                            child: Text(
-                              state.count > 9 ? '9+' : '${state.count}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-              label: AppLocalizations.of(context)!.community,
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
+        bottomNavigationBar: BlocBuilder<FriendRequestCountBloc, FriendRequestCountState>(
+          builder: (context, state) {
+            final count = state is FriendRequestCountLoaded ? state.count : 0;
+            return GlobalBottomNavBar(
+              selectedIndex: _selectedIndex,
+              onTabSelected: _onItemTapped,
+              friendRequestCount: count,
+            );
+          },
         ),
       ),
     );

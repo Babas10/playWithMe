@@ -1169,6 +1169,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get activities => 'Aktivitäten';
 
   @override
+  String get members => 'Mitglieder';
+
+  @override
+  String get inviteMember => 'Mitglied einladen';
+
+  @override
+  String get inviteWithLink => 'Mit Link einladen';
+
+  @override
   String get viewAllActivities => 'Alle Aktivitäten anzeigen';
 
   @override
