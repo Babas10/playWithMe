@@ -285,6 +285,7 @@ describe("inviteToGroup Cloud Function", () => {
         name: "Test Group",
         createdBy: "owner123",
         memberIds: ["inviter123", "invitee123"],
+        adminIds: ["inviter123"],
       });
 
       const data = {groupId: "group123", invitedUserId: "invitee123"};
