@@ -80,6 +80,13 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
       // Reload the data to show updated state
       add(const FriendEvent.loadRequested());
     } on FriendshipException catch (e) {
+      // Story 21.5: show green tick instead of red error when request already exists
+      if (e.code == 'already-exists' || e.code == 'already-friends' || e.code == 'request-exists') {
+        emit(const FriendState.actionSuccess(
+          message: 'Friend request already pending',
+        ));
+        return;
+      }
       emit(FriendState.error(message: e.message));
     } catch (e) {
       final (message, _) = e is Exception
