@@ -1,4 +1,4 @@
-// Displays detailed information about a group including members and admin actions
+// Displays detailed information about a group with Members/Activities tab layout.
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/data/models/group_activity_item.dart';
 import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
-import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_event.dart';
@@ -19,30 +19,38 @@ import 'package:play_with_me/core/presentation/bloc/group_member/group_member_st
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
+import 'package:play_with_me/core/presentation/widgets/global_bottom_nav_bar.dart';
+import 'package:play_with_me/app/play_with_me_app.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/member_action_dialogs.dart';
+import 'package:play_with_me/features/groups/presentation/widgets/member_action_menu.dart';
 import 'package:play_with_me/features/groups/presentation/pages/invite_member_page.dart';
 import 'package:play_with_me/features/groups/presentation/widgets/member_list_item_with_friendship.dart';
-import 'package:play_with_me/features/groups/presentation/widgets/group_bottom_nav_bar.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
+import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_bloc.dart';
+import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_event.dart';
+import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_state.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_creation_page.dart';
-import 'package:play_with_me/features/games/presentation/pages/games_list_page.dart';
+import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
+import 'package:play_with_me/features/games/presentation/widgets/game_list_item.dart';
+import 'package:play_with_me/features/games/presentation/widgets/training_session_list_item.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
 import 'package:play_with_me/features/training/presentation/pages/training_session_creation_page.dart';
+import 'package:play_with_me/features/training/presentation/pages/training_session_details_page.dart';
 import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_bloc.dart';
-import 'package:play_with_me/features/groups/presentation/widgets/invite_link_section.dart';
+import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_event.dart';
+import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_state.dart';
+import 'package:play_with_me/l10n/app_localizations.dart';
 
 class GroupDetailsPage extends StatelessWidget {
   final String groupId;
   final GroupRepository? groupRepositoryOverride; // For testing
   final UserRepository? userRepositoryOverride; // For testing
-  final GameRepository? gameRepositoryOverride; // For testing
 
   const GroupDetailsPage({
     super.key,
     required this.groupId,
     this.groupRepositoryOverride,
     this.userRepositoryOverride,
-    this.gameRepositoryOverride,
   });
 
   @override
@@ -51,12 +59,21 @@ class GroupDetailsPage extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => sl<GroupMemberBloc>()),
         BlocProvider(create: (context) => sl<GroupInviteLinkBloc>()),
+        BlocProvider(
+          create: (context) {
+            final authState = context.read<AuthenticationBloc>().state;
+            final userId = authState is AuthenticationAuthenticated
+                ? authState.user.uid
+                : '';
+            return sl<GamesListBloc>()
+              ..add(LoadGamesForGroup(groupId: groupId, userId: userId));
+          },
+        ),
       ],
       child: _GroupDetailsPageContent(
         groupId: groupId,
         groupRepositoryOverride: groupRepositoryOverride,
         userRepositoryOverride: userRepositoryOverride,
-        gameRepositoryOverride: gameRepositoryOverride,
       ),
     );
   }
@@ -66,24 +83,24 @@ class _GroupDetailsPageContent extends StatefulWidget {
   final String groupId;
   final GroupRepository? groupRepositoryOverride;
   final UserRepository? userRepositoryOverride;
-  final GameRepository? gameRepositoryOverride;
 
   const _GroupDetailsPageContent({
     required this.groupId,
     this.groupRepositoryOverride,
     this.userRepositoryOverride,
-    this.gameRepositoryOverride,
   });
 
   @override
-  State<_GroupDetailsPageContent> createState() => _GroupDetailsPageContentState();
+  State<_GroupDetailsPageContent> createState() =>
+      _GroupDetailsPageContentState();
 }
 
-class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
+class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
+    with SingleTickerProviderStateMixin {
   late final GroupRepository _groupRepository;
   late final UserRepository _userRepository;
   late final FriendRepository _friendRepository;
-  late final GameRepository _gameRepository;
+  late final TabController _tabController;
 
   GroupModel? _group;
   List<UserModel> _members = [];
@@ -94,7 +111,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   String? _error;
 
   /// Tracks which member UIDs were used for the last full data load.
-  /// Used to detect when new members join and trigger incremental re-fetches.
   Set<String> _lastLoadedMemberIds = {};
 
   StreamSubscription<GroupModel?>? _groupSubscription;
@@ -102,20 +118,21 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   @override
   void initState() {
     super.initState();
-    _groupRepository = widget.groupRepositoryOverride ?? sl<GroupRepository>();
+    _groupRepository =
+        widget.groupRepositoryOverride ?? sl<GroupRepository>();
     _userRepository = widget.userRepositoryOverride ?? sl<UserRepository>();
     _friendRepository = sl<FriendRepository>();
-    _gameRepository = widget.gameRepositoryOverride ?? sl<GameRepository>();
+    _tabController = TabController(length: 2, vsync: this);
     _subscribeToGroup();
   }
 
   @override
   void dispose() {
     _groupSubscription?.cancel();
+    _tabController.dispose();
     super.dispose();
   }
 
-  /// Subscribes to the group document stream for real-time updates.
   void _subscribeToGroup() {
     setState(() {
       _isLoading = true;
@@ -138,7 +155,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
         );
   }
 
-  /// Called each time the Firestore group document changes.
   void _onGroupUpdate(GroupModel? group) {
     if (!mounted) return;
 
@@ -157,29 +173,24 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
       _group = group;
     });
 
-    // Only reload members + friendship data when the member set changes.
-    // On first load, _lastLoadedMemberIds is empty so this always triggers.
     if (memberIdsChanged) {
       _loadMembersAndFriendships(group);
     }
   }
 
-  /// Loads member profiles and friendship statuses in parallel using Future.wait.
   Future<void> _loadMembersAndFriendships(GroupModel group) async {
     final authState = context.read<AuthenticationBloc>().state;
     if (authState is! AuthenticationAuthenticated) return;
 
     final currentUserId = authState.user.uid;
-    final otherMemberIds = group.memberIds
-        .where((id) => id != currentUserId)
-        .toList();
+    final otherMemberIds =
+        group.memberIds.where((id) => id != currentUserId).toList();
 
     setState(() {
       _isLoadingFriendships = true;
     });
 
     try {
-      // Fire all three network calls in parallel — the major performance win.
       final results = await Future.wait<dynamic>([
         _userRepository.getUsersByIds(group.memberIds),
         _friendRepository.batchCheckFriendship(otherMemberIds),
@@ -207,9 +218,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     }
   }
 
-  /// Forces a full data refresh (used by pull-to-refresh).
   Future<void> _refreshGroupDetails() async {
-    // Clear the member-id tracking so _onGroupUpdate always triggers a reload.
     _lastLoadedMemberIds = {};
     if (_group != null) {
       await _loadMembersAndFriendships(_group!);
@@ -224,15 +233,11 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
 
       if (!mounted) return;
 
-      // Best-effort: invalidate the friendship status cache for this user so
-      // the next load reflects the newly sent request immediately.
       try {
-        (_friendRepository as dynamic).invalidateFriendshipCacheForUser(targetUserId);
-      } catch (_) {
-        // Cache invalidation is best-effort; proceed regardless.
-      }
+        (_friendRepository as dynamic)
+            .invalidateFriendshipCacheForUser(targetUserId);
+      } catch (_) {}
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Friend request sent successfully'),
@@ -241,14 +246,12 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
         ),
       );
 
-      // Reload friendship statuses to reflect the sent request.
       if (_group != null) {
         await _loadMembersAndFriendships(_group!);
       }
     } catch (e) {
       if (!mounted) return;
 
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to send friend request: $e'),
@@ -256,6 +259,52 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
           duration: const Duration(seconds: 3),
         ),
       );
+    }
+  }
+
+  Future<void> _handleMemberAction(
+    UserModel member,
+    MemberAction action,
+  ) async {
+    if (_group == null || !mounted) return;
+
+    switch (action) {
+      case MemberAction.promote:
+        final confirmed =
+            await showPromoteConfirmationDialog(context, member);
+        if (confirmed && mounted) {
+          context.read<GroupMemberBloc>().add(
+                PromoteMemberToAdmin(
+                  groupId: _group!.id,
+                  userId: member.uid,
+                ),
+              );
+        }
+        break;
+      case MemberAction.demote:
+        final confirmed =
+            await showDemoteConfirmationDialog(context, member);
+        if (confirmed && mounted) {
+          context.read<GroupMemberBloc>().add(
+                DemoteMemberFromAdmin(
+                  groupId: _group!.id,
+                  userId: member.uid,
+                ),
+              );
+        }
+        break;
+      case MemberAction.remove:
+        final confirmed =
+            await showRemoveMemberConfirmationDialog(context, member);
+        if (confirmed && mounted) {
+          context.read<GroupMemberBloc>().add(
+                RemoveMemberFromGroup(
+                  groupId: _group!.id,
+                  userId: member.uid,
+                ),
+              );
+        }
+        break;
     }
   }
 
@@ -283,19 +332,18 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocListener<GroupMemberBloc, GroupMemberState>(
       listener: (context, state) {
         if (state is MemberPromotedSuccess) {
-          // The Firestore stream will automatically reflect the admin change.
           _showSuccessMessage('Member promoted to admin');
         } else if (state is MemberDemotedSuccess) {
           _showSuccessMessage('Member demoted to regular member');
         } else if (state is MemberRemovedSuccess) {
-          // The Firestore stream will push the updated memberIds.
           _showSuccessMessage('Member removed from group');
         } else if (state is UserLeftGroupSuccess) {
           _showSuccessMessage('You have left the group');
-          // Navigate back to group list
           Navigator.of(context).pop();
         } else if (state is GroupMemberError) {
           _showErrorMessage(state.message);
@@ -321,7 +369,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
               context: context,
               title: 'Group Details',
               extraActions: [
-                // Menu button for Leave Group
                 if (_group != null)
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert),
@@ -331,15 +378,16 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'leave',
                         child: Row(
                           children: [
-                            Icon(Icons.exit_to_app, size: 20, color: Colors.red),
-                            SizedBox(width: 12),
+                            const Icon(Icons.exit_to_app,
+                                size: 20, color: Colors.red),
+                            const SizedBox(width: 12),
                             Text(
-                              'Leave Group',
-                              style: TextStyle(color: Colors.red),
+                              l10n.leaveGroup,
+                              style: const TextStyle(color: Colors.red),
                             ),
                           ],
                         ),
@@ -349,23 +397,10 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
               ],
             ),
             body: _buildBody(context, authState),
-            bottomNavigationBar: _group != null
-                ? StreamBuilder<int>(
-                    stream: _gameRepository.getUpcomingGamesCount(widget.groupId),
-                    builder: (context, snapshot) {
-                      final gameCount = snapshot.data ?? 0;
-                      return GroupBottomNavBar(
-                        isAdmin: _group!.isAdmin(authState.user.uid),
-                        upcomingGamesCount: gameCount,
-                        onInviteTap: () => _navigateToInvitePage(context),
-                        onCreateGameTap: () => _navigateToGameCreation(context),
-                        onCreateTrainingTap: () =>
-                            _navigateToTrainingCreation(context),
-                        onGamesListTap: () => _showGamesListComingSoon(context),
-                      );
-                    },
-                  )
-                : null,
+            bottomNavigationBar: GlobalBottomNavBar(
+              selectedIndex: 2, // Groups tab
+              onTabSelected: (index) => _onGlobalNavTapped(context, index),
+            ),
           );
         },
       ),
@@ -375,9 +410,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   Widget _buildBody(
       BuildContext context, AuthenticationAuthenticated authState) {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (_error != null) {
@@ -391,10 +424,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
               color: Theme.of(context).colorScheme.error,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Error',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('Error', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -416,103 +446,373 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     }
 
     if (_group == null) {
-      return const Center(
-        child: Text('Group not found'),
-      );
+      return const Center(child: Text('Group not found'));
     }
 
     final currentUserId = authState.user.uid;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      children: [
+        // Group header (non-scrollable)
+        _buildGroupHeader(context),
+        const Divider(height: 1),
+
+        // Tab bar
+        TabBar(
+          controller: _tabController,
+          labelColor: AppColors.textMuted,
+          unselectedLabelColor: AppColors.textMuted,
+          indicatorColor: AppColors.primary,
+          tabs: [
+            Tab(text: l10n.members),
+            Tab(text: l10n.activities),
+          ],
+        ),
+
+        // Tab content (scrollable, fills remaining space)
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildMembersTab(context, currentUserId),
+              _buildActivitiesTab(context, currentUserId),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMembersTab(BuildContext context, String currentUserId) {
+    final canInvite =
+        _group != null && _group!.canUserInviteOthers(currentUserId);
+    final currentUserIsAdmin =
+        _group != null && _group!.canManage(currentUserId);
 
     return RefreshIndicator(
       onRefresh: _refreshGroupDetails,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Group header
-            _buildGroupHeader(context),
-            const Divider(),
+      child: BlocConsumer<GroupInviteLinkBloc, GroupInviteLinkState>(
+        listener: (context, state) {
+          if (state is GroupInviteLinkGenerated) {
+            _shareInviteLink(context, state.deepLinkUrl);
+          } else if (state is GroupInviteLinkRevoked) {
+            _showSuccessMessage(AppLocalizations.of(context)!.inviteRevoked);
+          } else if (state is GroupInviteLinkError) {
+            _showErrorMessage(state.message);
+          }
+        },
+        builder: (context, inviteLinkState) {
+          return BlocBuilder<GroupMemberBloc, GroupMemberState>(
+            builder: (context, memberState) {
+              return ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                // header + invite actions (top) + members
+                itemCount: 1 + (canInvite ? 2 : 0) + _members.length,
+                itemBuilder: (context, index) {
+                  // Index 0: header
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: Text(
+                        'Members (${_members.length})',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                    );
+                  }
 
-            // Invite link section (visible only for eligible members)
-            if (_group!.canUserInviteOthers(currentUserId))
-              InviteLinkSection(groupId: widget.groupId),
-            if (_group!.canUserInviteOthers(currentUserId))
-              const Divider(),
-
-            // Members section
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Members (${_members.length})',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ),
-            BlocBuilder<GroupMemberBloc, GroupMemberState>(
-              builder: (context, memberState) {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _members.length,
-                  itemBuilder: (context, index) {
-                    final member = _members[index];
-                    final isAdmin = _group!.isAdmin(member.uid);
-                    final isCreator = _group!.createdBy == member.uid;
-                    final isCurrentUser = member.uid == currentUserId;
-                    final isFriend = _friendshipStatus[member.uid] ?? false;
-                    final requestStatus =
-                        _requestStatus[member.uid] ?? FriendRequestStatus.none;
-
-                    // Show loading indicator while friendship status loads
-                    if (_isLoadingFriendships && !isCurrentUser) {
+                  // Invite action entries at the TOP (indices 1 and 2 when canInvite)
+                  if (canInvite) {
+                    if (index == 1) {
+                      final l10n = AppLocalizations.of(context)!;
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
-                          backgroundImage: member.photoUrl != null
-                              ? NetworkImage(member.photoUrl!)
-                              : null,
-                          child: member.photoUrl == null
-                              ? Text(
-                                  _getInitials(
-                                      member.fullDisplayName),
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF004E64)),
-                                )
-                              : null,
+                          backgroundColor:
+                              AppColors.secondary.withValues(alpha: 0.1),
+                          child: Icon(Icons.person_add, color: AppColors.secondary),
                         ),
                         title: Text(
-                          member.fullDisplayName,
-                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          l10n.inviteMember,
+                          style: TextStyle(
+                            color: AppColors.secondary,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        trailing: const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
+                        onTap: () => _navigateToInvitePage(context),
                       );
                     }
+                    if (index == 2) {
+                      final l10n = AppLocalizations.of(context)!;
+                      final isGenerating =
+                          inviteLinkState is GroupInviteLinkLoading;
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor:
+                              AppColors.secondary.withValues(alpha: 0.1),
+                          child: isGenerating
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Icon(Icons.link, color: AppColors.secondary),
+                        ),
+                        title: Text(
+                          l10n.inviteWithLink,
+                          style: TextStyle(
+                            color: AppColors.secondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        onTap: isGenerating
+                            ? null
+                            : () => context.read<GroupInviteLinkBloc>().add(
+                                  GenerateInvite(groupId: widget.groupId),
+                                ),
+                      );
+                    }
+                  }
 
-                    return MemberListItemWithFriendship(
-                      user: member,
-                      isAdmin: isAdmin,
-                      isCreator: isCreator,
-                      isCurrentUser: isCurrentUser,
-                      currentUserId: currentUserId,
-                      isFriend: isFriend,
-                      requestStatus: requestStatus,
-                      onRefresh: () async {
-                        if (_group != null) await _loadMembersAndFriendships(_group!);
-                      },
-                      onSendFriendRequest: _sendFriendRequest,
+                  // Member entries (offset by header + invite actions)
+                  final memberIndex = index - 1 - (canInvite ? 2 : 0);
+                  final member = _members[memberIndex];
+                  final isAdmin = _group!.isAdmin(member.uid);
+                  final isCreator = _group!.createdBy == member.uid;
+                  final isCurrentUser = member.uid == currentUserId;
+                  final isFriend = _friendshipStatus[member.uid] ?? false;
+                  final requestStatus =
+                      _requestStatus[member.uid] ?? FriendRequestStatus.none;
+
+                  if (_isLoadingFriendships && !isCurrentUser) {
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            const Color(0xFFEACE6A).withValues(alpha: 0.25),
+                        backgroundImage: member.photoUrl != null
+                            ? NetworkImage(member.photoUrl!)
+                            : null,
+                        child: member.photoUrl == null
+                            ? Text(
+                                _getInitials(member.fullDisplayName),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF004E64),
+                                ),
+                              )
+                            : null,
+                      ),
+                      title: Text(
+                        member.fullDisplayName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                      trailing: const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     );
-                  },
-                );
-              },
+                  }
+
+                  return MemberListItemWithFriendship(
+                    user: member,
+                    isAdmin: isAdmin,
+                    isCreator: isCreator,
+                    isCurrentUser: isCurrentUser,
+                    currentUserId: currentUserId,
+                    isFriend: isFriend,
+                    requestStatus: requestStatus,
+                    isCurrentUserAdmin: currentUserIsAdmin,
+                    canDemote: true,
+                    onRefresh: () async {
+                      if (_group != null) {
+                        await _loadMembersAndFriendships(_group!);
+                      }
+                    },
+                    onSendFriendRequest: _sendFriendRequest,
+                    onMemberAction: currentUserIsAdmin && !isCurrentUser
+                        ? (action) => _handleMemberAction(member, action)
+                        : null,
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildActivitiesTab(BuildContext context, String currentUserId) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<GamesListBloc, GamesListState>(
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            context.read<GamesListBloc>().add(const RefreshGamesList());
+            await Future.delayed(const Duration(milliseconds: 500));
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Create action buttons at the top
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _navigateToGameCreation(context),
+                          icon: const Icon(Icons.sports_volleyball),
+                          label: Text(l10n.createGame),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.secondary,
+                            side: BorderSide(color: AppColors.secondary),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () =>
+                              _navigateToTrainingCreation(context),
+                          icon: const Icon(Icons.fitness_center),
+                          label: Text(l10n.createTraining),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.secondary,
+                            side: BorderSide(color: AppColors.secondary),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+
+                // Activity list
+                if (state is GamesListLoading)
+                  const Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (state is GamesListError)
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: Text(
+                        state.message,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                else if (state is GamesListEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.sports_volleyball,
+                            size: 48,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            l10n.noActivitiesYet,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.createFirstActivity,
+                            style:
+                                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else if (state is GamesListLoaded) ...[
+                  if (state.upcomingActivities.isNotEmpty) ...[
+                    _buildActivitySectionHeader(
+                        context, l10n.upcomingActivities),
+                    ...state.upcomingActivities.map((activity) =>
+                        _buildActivityItem(
+                            context, activity, state.userId, false)),
+                  ],
+                  if (state.pastActivities.isNotEmpty) ...[
+                    _buildActivitySectionHeader(context, l10n.pastActivities),
+                    ...state.pastActivities.map((activity) =>
+                        _buildActivityItem(
+                            context, activity, state.userId, true)),
+                  ],
+                  const SizedBox(height: 16),
+                ],
+              ],
             ),
-          ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildActivitySectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.secondary,
+            ),
+      ),
+    );
+  }
+
+  Widget _buildActivityItem(
+    BuildContext context,
+    GroupActivityItem activity,
+    String userId,
+    bool isPast,
+  ) {
+    return activity.when(
+      game: (game) => GameListItem(
+        game: game,
+        userId: userId,
+        isPast: isPast,
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => GameDetailsPage(gameId: game.id),
+          ),
+        ),
+      ),
+      training: (session) => TrainingSessionListItem(
+        session: session,
+        userId: userId,
+        isPast: isPast,
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                TrainingSessionDetailsPage(trainingSessionId: session.id),
+          ),
         ),
       ),
     );
@@ -521,9 +821,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
   String _getInitials(String name) {
     final parts = name.trim().split(' ');
     if (parts.isEmpty) return '?';
-    if (parts.length == 1) {
-      return parts[0].substring(0, 1).toUpperCase();
-    }
+    if (parts.length == 1) return parts[0].substring(0, 1).toUpperCase();
     return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
   }
 
@@ -533,7 +831,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Group name
           Text(
             _group!.name,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -542,8 +839,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                 ),
           ),
           const SizedBox(height: 8),
-
-          // Group description
           if (_group!.description != null && _group!.description!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -552,8 +847,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
-
-          // Member count
           Row(
             children: [
               Icon(
@@ -575,10 +868,41 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
     );
   }
 
+  void _shareInviteLink(BuildContext context, String link) {
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.linkCopied),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: l10n.shareLink,
+          onPressed: () {
+            // Share handled by invite link section logic
+          },
+        ),
+      ),
+    );
+  }
+
+  void _onGlobalNavTapped(BuildContext context, int index) {
+    switch (index) {
+      case 0: // Home
+      case 1: // Stats
+      case 3: // Community
+        // Switch the home page tab then pop back to the root route.
+        HomePage.onNavigateToTab?.call(index);
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        break;
+      case 2: // Groups — go back to the groups list
+        Navigator.of(context).pop();
+        break;
+    }
+  }
+
   void _navigateToInvitePage(BuildContext context) {
     if (_group == null) return;
 
-    // Try to get FriendRepository from DI
     FriendRepository? friendRepository;
     try {
       friendRepository = sl<FriendRepository>();
@@ -599,8 +923,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
         ),
       ),
     ).then((_) {
-      // The Firestore stream will automatically reflect any new members.
-      // Force a friendship-status refresh so newly invited members appear correctly.
       if (mounted && _group != null) {
         _loadMembersAndFriendships(_group!);
       }
@@ -619,20 +941,6 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent> {
             groupId: widget.groupId,
             groupName: _group!.name,
           ),
-        ),
-      ),
-    );
-  }
-
-  void _showGamesListComingSoon(BuildContext context) {
-    if (_group == null) return;
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GamesListPage(
-          groupId: widget.groupId,
-          groupName: _group!.name,
         ),
       ),
     );

@@ -12,7 +12,6 @@ import 'package:play_with_me/core/data/models/group_model.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
-import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group_member/group_member_event.dart';
@@ -30,6 +29,9 @@ import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link
 import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_event.dart';
 import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link/group_invite_link_state.dart';
 import 'package:play_with_me/core/domain/repositories/group_invite_link_repository.dart';
+import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_bloc.dart';
+import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_event.dart';
+import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_state.dart';
 
 class MockGroupMemberBloc
     extends MockBloc<GroupMemberEvent, GroupMemberState>
@@ -47,8 +49,6 @@ class MockGroupRepository extends Mock implements GroupRepository {}
 
 class MockUserRepository extends Mock implements UserRepository {}
 
-class MockGameRepository extends Mock implements GameRepository {}
-
 class MockFriendRepository extends Mock implements FriendRepository {}
 
 class MockGroupInviteLinkBloc
@@ -57,6 +57,11 @@ class MockGroupInviteLinkBloc
 
 class MockGroupInviteLinkRepository extends Mock
     implements GroupInviteLinkRepository {}
+
+class MockGamesListBloc extends MockBloc<GamesListEvent, GamesListState>
+    implements GamesListBloc {}
+
+class FakeGamesListEvent extends Fake implements GamesListEvent {}
 
 class FakeGroupMemberEvent extends Fake implements GroupMemberEvent {}
 
@@ -68,9 +73,9 @@ void main() {
   late MockInvitationBloc mockInvitationBloc;
   late MockGroupRepository mockGroupRepository;
   late MockUserRepository mockUserRepository;
-  late MockGameRepository mockGameRepository;
   late MockFriendRepository mockFriendRepository;
   late MockGroupInviteLinkBloc mockGroupInviteLinkBloc;
+  late MockGamesListBloc mockGamesListBloc;
 
   const testUserId = 'test-user-123';
   const testGroupId = 'test-group-123';
@@ -116,6 +121,7 @@ void main() {
   setUpAll(() {
     registerFallbackValue(FakeGroupMemberEvent());
     registerFallbackValue(FakeGroupMemberState());
+    registerFallbackValue(FakeGamesListEvent());
   });
 
   setUp(() {
@@ -125,11 +131,13 @@ void main() {
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
     mockGroupRepository = MockGroupRepository();
     mockUserRepository = MockUserRepository();
-    mockGameRepository = MockGameRepository();
     mockFriendRepository = MockFriendRepository();
     mockGroupInviteLinkBloc = MockGroupInviteLinkBloc();
     when(() => mockGroupInviteLinkBloc.state)
         .thenReturn(const GroupInviteLinkInitial());
+
+    mockGamesListBloc = MockGamesListBloc();
+    when(() => mockGamesListBloc.state).thenReturn(const GamesListEmpty(userId: testUserId));
 
     when(() => mockGroupMemberBloc.state)
         .thenReturn(const GroupMemberInitial());
@@ -155,8 +163,6 @@ void main() {
         .thenAnswer((_) async => testGroup);
     when(() => mockUserRepository.getUsersByIds(any()))
         .thenAnswer((_) async => testMembers);
-    when(() => mockGameRepository.getUpcomingGamesCount(testGroupId))
-        .thenAnswer((_) => Stream.value(2));
     when(() => mockFriendRepository.batchCheckFriendship(any()))
         .thenAnswer((_) async => {'member-2': true, 'member-3': false});
     when(() => mockFriendRepository.batchCheckFriendRequestStatus(any()))
@@ -173,6 +179,11 @@ void main() {
     }
     sl.registerFactory<GroupInviteLinkBloc>(() => mockGroupInviteLinkBloc);
 
+    if (sl.isRegistered<GamesListBloc>()) {
+      sl.unregister<GamesListBloc>();
+    }
+    sl.registerFactory<GamesListBloc>(() => mockGamesListBloc);
+
     if (sl.isRegistered<FriendRepository>()) {
       sl.unregister<FriendRepository>();
     }
@@ -188,6 +199,9 @@ void main() {
     }
     if (sl.isRegistered<GroupInviteLinkBloc>()) {
       sl.unregister<GroupInviteLinkBloc>();
+    }
+    if (sl.isRegistered<GamesListBloc>()) {
+      sl.unregister<GamesListBloc>();
     }
     if (sl.isRegistered<FriendRepository>()) {
       sl.unregister<FriendRepository>();
@@ -211,7 +225,6 @@ void main() {
           groupId: testGroupId,
           groupRepositoryOverride: mockGroupRepository,
           userRepositoryOverride: mockUserRepository,
-          gameRepositoryOverride: mockGameRepository,
         ),
       ),
     );
@@ -281,6 +294,11 @@ void main() {
     group('Members List', () {
       testWidgets('shows all member names', (tester) async {
         await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Invite entries are at the top, pushing some members below the fold.
+        // Scroll down to ensure all members are built by the lazy list.
+        await tester.drag(find.byType(ListView).first, const Offset(0, -200));
         await tester.pumpAndSettle();
 
         expect(find.text('Group Owner'), findsOneWidget);
@@ -359,15 +377,21 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.more_vert), findsOneWidget);
+        // more_vert appears in the app bar AND on member rows for admins
+        expect(find.byIcon(Icons.more_vert), findsWidgets);
       });
 
       testWidgets('shows Leave Group option in menu', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        // Tap the more menu
-        await tester.tap(find.byIcon(Icons.more_vert));
+        // Tap the app bar's more menu specifically
+        await tester.tap(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.byIcon(Icons.more_vert),
+          ),
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('Leave Group'), findsOneWidget);
@@ -376,12 +400,50 @@ void main() {
     });
 
     group('Bottom Navigation Bar', () {
-      testWidgets('shows bottom navigation bar after loading', (tester) async {
+      testWidgets('shows global bottom navigation bar after loading',
+          (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        // GroupBottomNavBar uses BottomNavigationBar internally
+        // GlobalBottomNavBar uses BottomNavigationBar internally
         expect(find.byType(BottomNavigationBar), findsOneWidget);
+      });
+
+      testWidgets('global nav shows 4 items: Home, Stats, Groups, Community',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        expect(find.text('Home'), findsOneWidget);
+        expect(find.text('Stats'), findsOneWidget);
+        expect(find.text('Groups'), findsOneWidget);
+        expect(find.text('Community'), findsOneWidget);
+      });
+
+      testWidgets('Groups tab is highlighted (selectedIndex == 2)', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        final bottomNav = tester.widget<BottomNavigationBar>(
+          find.byType(BottomNavigationBar),
+        );
+        expect(bottomNav.currentIndex, 2);
+      });
+
+      testWidgets('global bottom nav is visible while loading', (tester) async {
+        final streamController = StreamController<GroupModel?>();
+        when(() => mockGroupRepository.watchGroupById(testGroupId))
+            .thenAnswer((_) => streamController.stream);
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Nav bar is always visible, even before group data loads
+        expect(find.byType(BottomNavigationBar), findsOneWidget);
+
+        streamController.add(testGroup);
+        await tester.pumpAndSettle();
+        await streamController.close();
       });
     });
 
@@ -472,7 +534,95 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.people), findsOneWidget);
+        expect(find.byIcon(Icons.people), findsWidgets);
+      });
+    });
+
+    group('Tab Layout', () {
+      testWidgets('shows Members and Activities tabs', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        expect(find.byType(TabBar), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(TabBar),
+            matching: find.text('Members'),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byType(TabBar),
+            matching: find.text('Activities'),
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('Members tab shows member list', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Scroll to build members pushed below the fold by invite entries.
+        await tester.drag(find.byType(ListView).first, const Offset(0, -200));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Group Owner'), findsOneWidget);
+        expect(find.text('Member Two'), findsOneWidget);
+        expect(find.text('Member Three'), findsOneWidget);
+      });
+
+      testWidgets('Members tab shows Invite Member entry at the top for admins',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Entries are at the top of the list — no scrolling needed
+        expect(find.text('Invite Member'), findsOneWidget);
+      });
+
+      testWidgets('Members tab shows Invite with Link entry at the top for admins',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        expect(find.text('Invite with Link'), findsOneWidget);
+      });
+
+      testWidgets('Activities tab shows Create Game button', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Tap the Activities tab
+        await tester.tap(find.text('Activities'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Create Game'), findsOneWidget);
+      });
+
+      testWidgets('Activities tab shows Create Training button',
+          (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Activities'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Create Training'), findsOneWidget);
+      });
+
+      testWidgets('Activities tab shows empty state when no activities',
+          (tester) async {
+        when(() => mockGamesListBloc.state).thenReturn(const GamesListEmpty(userId: testUserId));
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Activities'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('No activities yet'), findsOneWidget);
       });
     });
   });

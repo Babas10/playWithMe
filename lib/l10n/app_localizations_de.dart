@@ -516,6 +516,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get createTrainingSession => 'Training Erstellen';
 
   @override
+  String get createTraining => 'Training erstellen';
+
+  @override
   String get pleaseLogInToCreateTraining =>
       'Bitte melden Sie sich an, um ein Training zu erstellen';
 
@@ -1167,6 +1170,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get activities => 'Aktivitäten';
+
+  @override
+  String get members => 'Mitglieder';
+
+  @override
+  String get inviteMember => 'Mitglied einladen';
+
+  @override
+  String get inviteWithLink => 'Mit Link einladen';
 
   @override
   String get viewAllActivities => 'Alle Aktivitäten anzeigen';

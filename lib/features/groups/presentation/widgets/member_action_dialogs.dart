@@ -4,6 +4,12 @@ import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 
+const _dialogBackground = Colors.white;
+const _dialogTitleStyle = TextStyle(
+  color: AppColors.secondary,
+  fontWeight: FontWeight.bold,
+);
+
 /// Shows a confirmation dialog for promoting a member to admin
 Future<bool> showPromoteConfirmationDialog(
   BuildContext context,
@@ -13,7 +19,8 @@ Future<bool> showPromoteConfirmationDialog(
   return await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(l10n.promoteToAdmin),
+          backgroundColor: _dialogBackground,
+          title: Text(l10n.promoteToAdmin, style: _dialogTitleStyle),
           content: Text(
             l10n.promoteConfirmMessage(member.displayName ?? member.email),
           ),
@@ -24,6 +31,9 @@ Future<bool> showPromoteConfirmationDialog(
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.secondary,
+              ),
               child: Text(l10n.promote),
             ),
           ],

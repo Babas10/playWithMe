@@ -1052,6 +1052,12 @@ abstract class AppLocalizations {
   /// **'Create Training Session'**
   String get createTrainingSession;
 
+  /// No description provided for @createTraining.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Training'**
+  String get createTraining;
+
   /// Message when user needs to log in to create training
   ///
   /// In en, this message translates to:
@@ -2257,6 +2263,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Activities'**
   String get activities;
+
+  /// Members tab label
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get members;
+
+  /// Invite member action in members tab
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Member'**
+  String get inviteMember;
+
+  /// Invite with link action in members tab
+  ///
+  /// In en, this message translates to:
+  /// **'Invite with Link'**
+  String get inviteWithLink;
 
   /// Tooltip for activities button
   ///
