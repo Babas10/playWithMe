@@ -153,6 +153,10 @@ jobs:
           status: completed
           releaseName: ${{ env.VERSION_NAME }}
 
+      - name: 🧹 Clean up Google Play service account key
+        if: always()
+        run: rm -f service-account.json
+
   # ─── Job 3: Deploy iOS ───────────────────────────────────────────────────────
   deploy_ios:
     name: 🍎 Build & Upload iOS (App Store Connect)
