@@ -1,101 +1,105 @@
 {
-  "timestamp": "2026-01-08T22:19:33.250Z",
+  "timestamp": "2026-03-09T18:36:40.673Z",
+  "project": "gatherli-dev",
+  "credentials": {
+    "password": "test1010"
+  },
   "users": [
     {
-      "index": 0,
-      "uid": "6Nwuo5mWiqgeJNlXw3woRBXmOzj2",
-      "email": "test1@mysta.com",
-      "displayName": "Test1",
-      "firstName": "Test",
-      "lastName": "One",
-      "password": "test1010"
-    },
-    {
       "index": 1,
-      "uid": "X1im7sFSIzMjbOOYZAeWBmaerO92",
-      "email": "test2@mysta.com",
-      "displayName": "Test2",
-      "firstName": "Test",
-      "lastName": "Two",
-      "password": "test1010"
+      "uid": "14Y1FNZp4sXEamC5uafx0XWPeWD3",
+      "email": "test1@mysta.com",
+      "displayName": "Test1"
     },
     {
       "index": 2,
-      "uid": "M758fyKVetVAxLtqOEATZYTOUh62",
-      "email": "test3@mysta.com",
-      "displayName": "Test3",
-      "firstName": "Test",
-      "lastName": "Three",
-      "password": "test1010"
+      "uid": "QAqcfrtRmqQDFtMXUmX1UFnfoVw1",
+      "email": "test2@mysta.com",
+      "displayName": "Test2"
     },
     {
       "index": 3,
-      "uid": "enM3AQjUKVUtLQW64QqaDpGEkPP2",
-      "email": "test4@mysta.com",
-      "displayName": "Test4",
-      "firstName": "Test",
-      "lastName": "Four",
-      "password": "test1010"
+      "uid": "QzV7I0n3nrZQIGGwApkWqtDYFMS2",
+      "email": "test3@mysta.com",
+      "displayName": "Test3"
     },
     {
       "index": 4,
-      "uid": "OABpDQmpvZX3TgU0N2iCu4w34Bj1",
-      "email": "test5@mysta.com",
-      "displayName": "Test5",
-      "firstName": "Test",
-      "lastName": "Five",
-      "password": "test1010"
+      "uid": "4qsNZmGas3gH2H9VrvFeVkyRhVQ2",
+      "email": "test4@mysta.com",
+      "displayName": "Test4"
     },
     {
       "index": 5,
-      "uid": "p3oGNBP0VqcWaksOxJNSyKgkjiE2",
-      "email": "test6@mysta.com",
-      "displayName": "Test6",
-      "firstName": "Test",
-      "lastName": "Six",
-      "password": "test1010"
+      "uid": "ryfj2tDFv7admLYtmXjsadNbPHJ2",
+      "email": "test5@mysta.com",
+      "displayName": "Test5"
     },
     {
       "index": 6,
-      "uid": "1sNCxMhguBZli8894YbkY1HC2q02",
-      "email": "test7@mysta.com",
-      "displayName": "Test7",
-      "firstName": "Test",
-      "lastName": "Seven",
-      "password": "test1010"
+      "uid": "jek0yAZmJ1RvEK9Gje5AeJg00pQ2",
+      "email": "test6@mysta.com",
+      "displayName": "Test6"
     },
     {
       "index": 7,
-      "uid": "mh6Z51oIHwUatlRQJWFCQbOtBQw2",
-      "email": "test8@mysta.com",
-      "displayName": "Test8",
-      "firstName": "Test",
-      "lastName": "Eight",
-      "password": "test1010"
+      "uid": "HLzeaUcFLxgt5u93Gvo40Xl17K33",
+      "email": "test7@mysta.com",
+      "displayName": "Test7"
     },
     {
       "index": 8,
-      "uid": "wL9o83Pg3uf1SVPJJ7sHt6DgIVD2",
-      "email": "test9@mysta.com",
-      "displayName": "Test9",
-      "firstName": "Test",
-      "lastName": "Nine",
-      "password": "test1010"
+      "uid": "kuSfElRdqogGJYCwJppGAr9m0b72",
+      "email": "test8@mysta.com",
+      "displayName": "Test8"
     },
     {
       "index": 9,
-      "uid": "VrAFUCcL1XbexzSuid8v6RVTyQD2",
+      "uid": "2Eg1ik7S6kX9mck4JsfzgXMV4Qu1",
+      "email": "test9@mysta.com",
+      "displayName": "Test9"
+    },
+    {
+      "index": 10,
+      "uid": "POpdoZA6sacVw4nluIjFtL51I4k2",
       "email": "test10@mysta.com",
-      "displayName": "Test10",
-      "firstName": "Test",
-      "lastName": "Ten",
-      "password": "test1010"
+      "displayName": "Test10"
     }
   ],
-  "groupId": "E9ZkIB3iEgalaNHHxprq",
-  "gameIds": [],
-  "notes": {
-    "password": "test1010",
-    "description": "ELO Chart Test Environment"
+  "groupId": "JgxtCgZ4dof523Bhdxeb",
+  "games": {
+    "past": [
+      "Dh6PbWvt8le28ZmKWZEd",
+      "YwFQsE5dU4phe7eCb9Mh",
+      "qxkl7BpOpouTY2pJjLiY",
+      "MzGF5DHVEVZklMc6R4kE",
+      "8NwKQx47naK1YkBXyCPx",
+      "SqrSK1aFprUAdTOHKYFC",
+      "psUFxgcXJ1K8Fm8bJKXM",
+      "UcHeOPbFJOQofugDAhrj",
+      "4UW07W4wCJWWJWE0Cxdv",
+      "gvfZBIVimcPo9iCgLBvE",
+      "CK3STpnBsWmxGyEwqmTK",
+      "F09FwCB5lChnxsmJsUyO"
+    ],
+    "future": [
+      "fDivmht4RYtP4f6GXXrw",
+      "DH8OWm7MyMQ9x28BRBV2",
+      "34jRUom2tDvIMkGhMeoK"
+    ]
+  },
+  "trainingSessions": {
+    "past": [
+      "onpc9BK8bmSxNErJqVj0",
+      "jzkHvgRLlo7lNyeoCMng",
+      "PhehBlv2GFr8bgH5hfcK",
+      "4XxTFV3iS0eNiGMKPQ6u",
+      "czvwlVgHhsaRPjpMN4gZ"
+    ],
+    "future": [
+      "1kfCXrOx8tBLqyWKfOUm",
+      "KEqKXWUel5pazVPbAUgH",
+      "z0rtzpELPmpor6R35oAj"
+    ]
   }
 }

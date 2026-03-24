@@ -107,6 +107,13 @@ jobs:
         working-directory: functions
         run: npm test
 
+      # Step 6: Audit production dependencies for high/critical CVEs
+      # --omit=dev excludes dev-only tooling (ESLint, Jest, etc.) that never ships to production
+      # --audit-level=high fails only on high or critical severity vulnerabilities
+      - name: 🔒 Audit npm Production Dependencies
+        working-directory: functions
+        run: npm audit --audit-level=high --omit=dev
+
   # Job 3: Python Cloud Functions Tests
   python_functions_tests:
     name: 🐍 Python Cloud Functions Tests
@@ -211,12 +218,15 @@ jobs:
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 5: Run Dart dependency audit
-      - name: 🔒 Dart Dependency Audit
-        run: |
-          echo "Checking for known vulnerabilities in Dart/Flutter dependencies..."
-          flutter pub deps --json > deps.json
-          echo "✅ Dependency audit completed"
+      # Step 5: Audit Dart/Flutter dependencies via OSV Scanner
+      # Scans pubspec.lock against the OSV vulnerability database (supports Dart natively)
+      # dart pub audit does not exist in Dart 3.x — OSV Scanner is the official alternative
+      - name: 🔒 Audit Dart Dependencies (OSV Scanner)
+        uses: google/osv-scanner-action/osv-scanner-action@e69cc6c86b31f1e7e23935bbe7031b50e51082de  # v2.0.2
+        with:
+          scan-args: |-
+            --lockfile=pubspec.lock
+            --format=table
 
   # Job 5: Final Status Check
   ci_success:
