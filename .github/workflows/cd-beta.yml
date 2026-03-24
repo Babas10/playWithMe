@@ -67,10 +67,12 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
+          # trap guarantees cleanup on every exit path (success, failure, signal)
+          trap 'rm -f /tmp/sa.json' EXIT
           echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /tmp/sa.json
           export GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json
           firebase deploy --only functions,firestore,storage --project ${{ secrets.FIREBASE_PROD_PROJECT_ID }} --non-interactive --force
-          rm /tmp/sa.json
+          rm -f /tmp/sa.json  # explicit redundant cleanup before EXIT
 
   # ─── Job 3: Deploy Android ───────────────────────────────────────────────────
   deploy_android:
@@ -185,6 +187,10 @@ jobs:
           track: internal
           status: completed
           releaseName: ${{ env.VERSION_NAME }}
+
+      - name: 🧹 Clean up Google Play service account key
+        if: always()
+        run: rm -f service-account.json
 
   # ─── Job 3: Deploy iOS ───────────────────────────────────────────────────────
   deploy_ios:
