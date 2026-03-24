@@ -108,6 +108,9 @@ export {
 // User profile updates
 export {updateUserNames} from "./updateUserNames";
 
+// Post-deploy smoke test (Story 22.7)
+export {healthCheck} from "./healthCheck";
+
 // Story 17.8.4: Scheduled account status enforcement & cleanup
 export {
   updateAccountStatuses,
