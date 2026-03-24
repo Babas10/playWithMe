@@ -1234,6 +1234,35 @@ Before marking a Story complete, confirm:
 * [ ] Branch is up to date with `main`
 * [ ] No `.env` files, Firebase configs, or API keys in git history
 
+### **Before Creating the PR**
+
+Run these checks locally before opening the pull request — catching failures here is faster than waiting for CI:
+
+```bash
+# 1. Ensure branch is up to date
+git fetch origin && git rebase origin/main
+
+# 2. Static analysis — must be clean (0 warnings, 0 errors)
+flutter analyze
+
+# 3. Full unit + widget test suite
+flutter test test/unit/ test/widget/
+
+# 4. If Cloud Functions were changed — TypeScript compilation + tests + audit
+cd functions && npm run build && npm test && npm audit --audit-level=high && cd ..
+
+# 5. Dart dependency audit
+dart pub audit
+```
+
+**CI pipeline must be green before requesting review.**
+If the pipeline is red on your PR, fix it before asking for a review — do not merge a PR with a failing pipeline.
+
+Cloud Functions-specific: if you modified any function, also verify locally with the emulator:
+```bash
+firebase emulators:start --only functions,firestore,auth --project gatherli-dev
+```
+
 ---
 
 ## 🚀 6. Example: Story 0.1 — Initialize Flutter Project

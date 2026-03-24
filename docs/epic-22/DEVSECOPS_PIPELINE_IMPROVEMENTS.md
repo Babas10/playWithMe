@@ -46,6 +46,7 @@ The stories in this epic address each of these gaps in priority order.
 | 22.8 | Enforce that production tags are pushed from `main` | Reliability |
 | 22.9 | Extract a reusable test workflow to eliminate duplication | Maintainability |
 | 22.10 | Migrate Firebase deployment to Workload Identity Federation | Security |
+| 22.11 | Add pipeline caching for CocoaPods, pub packages, and Firebase CLI | Performance |
 
 ---
 
@@ -431,9 +432,62 @@ No JSON key is stored anywhere. The token is valid for the duration of the job o
 
 ---
 
+---
+
+### Story 22.11 — Add pipeline caching for CocoaPods, pub packages, and Firebase CLI
+
+**Category:** Performance — Pipeline Speed
+
+**Current state:**
+Several slow steps re-download or re-install the same dependencies on every single pipeline run:
+
+| Step | Job | Estimated time wasted |
+|------|-----|-----------------------|
+| CocoaPods install (`pod install`) | `deploy_ios` (macOS runner) | ~4–6 min per run |
+| Flutter pub packages (`flutter pub get`) | All jobs with Flutter | ~1–2 min per run |
+| Firebase CLI (`npm install -g firebase-tools`) | `deploy_functions` | ~30–60 sec per run |
+
+Currently cached: Flutter SDK (`subosito/flutter-action cache: true`), Gradle (Android), Python pip. Everything else is downloaded from scratch on every run.
+
+**The problem:**
+The iOS build runs on a macOS runner, which GitHub bills at 10× the Linux runner rate. Wasting 4–6 minutes on CocoaPods re-installation on every run is both slow and expensive. Across dozens of beta releases, this compounds into hours of unnecessary runner time.
+
+**The fix:**
+
+**CocoaPods** — cache keyed on `ios/Podfile.lock` (only invalidated when a Flutter plugin changes its native iOS dependencies):
+```yaml
+- uses: actions/cache@<SHA>
+  with:
+    path: |
+      ios/Pods
+      ~/.cocoapods
+    key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+    restore-keys: ${{ runner.os }}-pods-
+```
+
+**Flutter pub packages** — cache keyed on `pubspec.lock`:
+```yaml
+- uses: actions/cache@<SHA>
+  with:
+    path: ~/.pub-cache
+    key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+    restore-keys: ${{ runner.os }}-pub-
+```
+Applies to all jobs that call `flutter pub get` (test, deploy_android, deploy_ios).
+
+**Firebase CLI** — move it into `functions/` devDependencies so it is covered by the existing `npm ci` + `node_modules` cache. No separate global install needed.
+
+**Benefit:**
+- CocoaPods cache saves ~4–6 minutes and significant macOS runner cost on every iOS build.
+- Pub cache saves ~1–2 minutes per Flutter job.
+- Firebase CLI from devDependencies eliminates the global install step entirely.
+- Total estimated savings: 10–15 minutes per full pipeline run.
+
+---
+
 ## Acceptance Criteria (Epic Level)
 
-All 10 stories are implemented, tested, and the pipeline passes end-to-end on a
+All 11 stories are implemented, tested, and the pipeline passes end-to-end on a
 `v*-beta` tag push without manual intervention.
 
 ## Out of Scope
