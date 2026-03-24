@@ -41,16 +41,9 @@ jobs:
       - name: 🔍 Verify Dependencies
         run: flutter pub deps
 
-      # Step 7: Run static code analysis
+      # Step 7: Run static code analysis — fails on any warning or error
       - name: 📊 Run Static Analysis
-        run: |
-          echo "Running Flutter analyze..."
-          flutter analyze > analysis_results.txt 2>&1 || true
-          echo "Analysis completed. Results:"
-          cat analysis_results.txt
-          # For now, we'll warn but not fail on analysis issues to establish CI/CD baseline
-          # TODO: In future iterations, enable --fatal-warnings when code quality improves
-          echo "✅ Static analysis completed (warnings-only mode for CI/CD baseline)"
+        run: flutter analyze
 
       # Step 8: Check code formatting
       - name: 🎨 Check Code Formatting
