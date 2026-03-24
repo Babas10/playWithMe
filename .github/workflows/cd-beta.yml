@@ -20,6 +20,17 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: 🛡️ Verify tag is on main branch
+        # Prevents accidental beta releases from feature branches reaching
+        # TestFlight and the Play Store internal track.
+        run: |
+          git fetch origin main --depth=50
+          git merge-base --is-ancestor HEAD origin/main \
+            || (echo "❌ ERROR: This tag does not point to a commit on main. Beta deploy aborted." && exit 1)
+          echo "✅ Tag is on main — proceeding with beta deploy"
 
       - name: 🔧 Setup Flutter
         uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff  # v2.18.0
