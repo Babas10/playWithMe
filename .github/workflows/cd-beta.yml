@@ -72,6 +72,19 @@ jobs:
           firebase deploy --only functions,firestore,storage --project ${{ secrets.FIREBASE_PROD_PROJECT_ID }} --non-interactive --force
           rm /tmp/sa.json
 
+      - name: 🩺 Smoke test deployed functions
+        # Verifies functions are actually running after deploy, not just accepted by the API.
+        # A zero exit from firebase deploy only means the bundle was accepted — not that the
+        # function started. This catches cold-start errors, missing env vars, and bad triggers.
+        run: |
+          sleep 15
+          curl -sf -X POST \
+            "https://us-central1-${{ secrets.FIREBASE_PROD_PROJECT_ID }}.cloudfunctions.net/healthCheck" \
+            -H "Content-Type: application/json" \
+            -d '{"data": {}}' | grep -q '"ok"' \
+            || (echo "❌ Smoke test failed — functions may not be running" && exit 1)
+          echo "✅ Smoke test passed — functions are serving traffic"
+
   # ─── Job 3: Deploy Android ───────────────────────────────────────────────────
   deploy_android:
     name: 🤖 Build & Upload Android (Play Internal)
