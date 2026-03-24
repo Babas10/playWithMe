@@ -32,7 +32,7 @@ Added OSV Scanner for Dart/Flutter dependency auditing:
 
 ```yaml
 - name: 🔒 Audit Dart Dependencies (OSV Scanner)
-  uses: google/osv-scanner-action@e69cc6c86b31f1e7e23935bbe7031b50e51082de  # v2.0.2
+  uses: google/osv-scanner-action/osv-scanner-action@e69cc6c86b31f1e7e23935bbe7031b50e51082de  # v2.0.2
   with:
     scan-args: |-
       --lockfile=pubspec.lock
