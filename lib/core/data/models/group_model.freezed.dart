@@ -25,9 +25,10 @@ mixin _$GroupModel {
   String get name => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   String? get photoUrl => throw _privateConstructorUsedError;
-  String get createdBy => throw _privateConstructorUsedError;
+  String get createdBy =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime get createdAt => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(
     fromJson: _timestampFromJsonNullable,
     toJson: _timestampToJsonNullable,
@@ -44,7 +45,8 @@ mixin _$GroupModel {
   bool get allowMembersToInviteOthers => throw _privateConstructorUsedError;
   bool get notifyMembersOfNewGames =>
       throw _privateConstructorUsedError; // Group stats
-  int get totalGamesPlayed => throw _privateConstructorUsedError;
+  int get totalGamesPlayed =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(
     fromJson: _timestampFromJsonNullable,
     toJson: _timestampToJsonNullable,
@@ -427,9 +429,11 @@ class _$GroupModelImpl extends _GroupModel {
   final String? photoUrl;
   @override
   final String createdBy;
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
   final DateTime createdAt;
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(
     fromJson: _timestampFromJsonNullable,
@@ -488,6 +492,7 @@ class _$GroupModelImpl extends _GroupModel {
   @override
   @JsonKey()
   final int totalGamesPlayed;
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(
     fromJson: _timestampFromJsonNullable,
@@ -636,10 +641,10 @@ abstract class _GroupModel extends GroupModel {
   @override
   String? get photoUrl;
   @override
-  String get createdBy;
+  String get createdBy; // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
-  DateTime get createdAt;
+  DateTime get createdAt; // ignore: invalid_annotation_target
   @override
   @JsonKey(
     fromJson: _timestampFromJsonNullable,
@@ -667,7 +672,7 @@ abstract class _GroupModel extends GroupModel {
   @override
   bool get notifyMembersOfNewGames; // Group stats
   @override
-  int get totalGamesPlayed;
+  int get totalGamesPlayed; // ignore: invalid_annotation_target
   @override
   @JsonKey(
     fromJson: _timestampFromJsonNullable,
