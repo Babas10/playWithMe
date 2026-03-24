@@ -1,0 +1,23 @@
+title = "Gatherli Gitleaks Configuration"
+
+# Extend the default gitleaks ruleset (150+ secret patterns)
+[extend]
+useDefault = true
+
+# ---------------------------------------------------------------------------
+# Allowlists
+# These paths contain intentionally fake credentials used in tests.
+# They are never real secrets and are safe to commit.
+# ---------------------------------------------------------------------------
+
+[[allowlists]]
+description = "Firebase config validator test — contains fake AIzaSy* keys for testing the validator logic"
+paths = [
+  '''test/ci_only/firebase_config_validator_test\.dart''',
+]
+
+[[allowlists]]
+description = "Mock Firebase config generator — produces placeholder key strings, never real credentials"
+paths = [
+  '''tools/generate_mock_firebase_configs\.dart''',
+]

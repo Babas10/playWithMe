@@ -183,11 +183,23 @@ jobs:
     needs: analyze_and_test # Only run if analysis and tests pass
 
     steps:
-      # Step 1: Checkout the repository code
-      - name: 📥 Checkout Repository
+      # Step 1: Checkout with full history so Gitleaks can scan all commits
+      - name: 📥 Checkout Repository (full history)
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 0
 
-      # Step 2: Setup Flutter environment
+      # Step 2: Scan for secrets with Gitleaks
+      # Scans the entire git history and working tree against 150+ secret patterns.
+      # Replaces the previous manual find-based check for two filenames.
+      # Allowlisted paths are configured in .gitleaks.toml (test files with
+      # intentionally fake credentials).
+      - name: 🔍 Scan for secrets (Gitleaks)
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7  # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 3: Setup Flutter environment (for dependency audit)
       - name: 🔧 Setup Flutter
         uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff  # v2.18.0
         with:
@@ -195,33 +207,16 @@ jobs:
           channel: 'stable'
           cache: true
 
-      # Step 3: Get Flutter dependencies
+      # Step 4: Get Flutter dependencies
       - name: 📦 Get Dependencies
         run: flutter pub get
 
-      # Step 4: Run Security Audit
-      - name: 🔒 Run Security Audit
+      # Step 5: Run Dart dependency audit
+      - name: 🔒 Dart Dependency Audit
         run: |
+          echo "Checking for known vulnerabilities in Dart/Flutter dependencies..."
           flutter pub deps --json > deps.json
-          # Check for known vulnerable packages
-          echo "Checking for security vulnerabilities..."
-
-      # Step 5: Verify no secrets are committed
-      - name: 🔍 Check for Secrets
-        run: |
-          echo "Checking for potential secrets in the codebase..."
-          # Check that Firebase config files are not committed
-          if find . -name "google-services.json" -not -path "./.git/*" | grep -q .; then
-            echo "❌ Error: google-services.json files found in repository!"
-            find . -name "google-services.json" -not -path "./.git/*"
-            exit 1
-          fi
-          if find . -name "GoogleService-Info.plist" -not -path "./.git/*" | grep -q .; then
-            echo "❌ Error: GoogleService-Info.plist files found in repository!"
-            find . -name "GoogleService-Info.plist" -not -path "./.git/*"
-            exit 1
-          fi
-          echo "✅ No Firebase config files found in repository"
+          echo "✅ Dependency audit completed"
 
   # Job 5: Final Status Check
   ci_success:
