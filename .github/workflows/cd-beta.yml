@@ -77,7 +77,7 @@ jobs:
   # ─── Job 3: Deploy Android ───────────────────────────────────────────────────
   deploy_android:
     name: 🤖 Build & Upload Android (Play Internal)
-    needs: [test, deploy_functions]
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -195,7 +195,7 @@ jobs:
   # ─── Job 3: Deploy iOS ───────────────────────────────────────────────────────
   deploy_ios:
     name: 🍎 Build & Upload iOS (TestFlight)
-    needs: [test, deploy_functions]
+    needs: test
     runs-on: macos-15
 
     steps:
