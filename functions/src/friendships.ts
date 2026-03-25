@@ -1,6 +1,7 @@
 // Cloud Functions for managing friendships in the social graph
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { writeAnalyticsEvent } from "./helpers/analytics";
 
 // ============================================================================
 // Type Definitions
@@ -1041,6 +1042,8 @@ export const onFriendRequestAccepted = functions.firestore
         });
 
         await batch.commit();
+
+        await writeAnalyticsEvent("friend_connected", {});
 
         functions.logger.info("Friend caches updated successfully", {
           friendshipId: context.params.friendshipId,
