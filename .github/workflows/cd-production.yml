@@ -11,9 +11,9 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
-  # ─── Job 1: Tests ────────────────────────────────────────────────────────────
-  test:
-    name: 🧪 Run Tests
+  # ─── Job 1: Branch Guard ─────────────────────────────────────────────────────
+  guard:
+    name: 🛡️ Verify tag is on main
     runs-on: ubuntu-latest
 
     steps:
@@ -32,24 +32,14 @@ jobs:
             || (echo "❌ ERROR: This tag does not point to a commit on main. Production deploy aborted." && exit 1)
           echo "✅ Tag is on main — proceeding with production deploy"
 
-      - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff  # v2.18.0
-        with:
-          flutter-version: '3.32.6'
-          channel: 'stable'
-          cache: true
-
-      - name: 📦 Get Dependencies
-        run: flutter pub get
-
-      - name: 🔧 Generate Mock Firebase Configs (for tests)
-        run: dart run tools/generate_mock_firebase_configs.dart
-
-      - name: 📊 Run Static Analysis
-        run: flutter analyze
-
-      - name: 🧪 Run Unit & Widget Tests
-        run: flutter test test/unit/ test/widget/
+  # ─── Job 2: Tests ────────────────────────────────────────────────────────────
+  test:
+    name: 🧪 Run Tests
+    needs: guard
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      flutter-version: '3.32.6'
+    secrets: inherit
 
   # ─── Job 2: Deploy Android ───────────────────────────────────────────────────
   deploy_android:
