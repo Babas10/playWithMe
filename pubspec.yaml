@@ -54,7 +54,7 @@ dependencies:
   cloud_firestore: ^5.4.3
   firebase_auth: ^5.3.1
   firebase_storage: ^12.3.4
-  firebase_analytics: ^10.3.0
+  firebase_analytics: ^11.6.0
   firebase_crashlytics: ^4.1.0
 
   # Image Handling
