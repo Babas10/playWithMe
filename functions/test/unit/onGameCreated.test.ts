@@ -53,6 +53,7 @@ describe("onGameCreated Cloud Function", () => {
   let mockCreatorDoc: any;
   let mockMemberDoc1: any;
   let mockMemberDoc2: any;
+  let mockAnalyticsAdd: jest.Mock;
 
   // Re-import to get fresh mocks
   let onGameCreatedHandler: any;
@@ -112,6 +113,8 @@ describe("onGameCreated Cloud Function", () => {
       exists: true,
     };
 
+    mockAnalyticsAdd = jest.fn().mockResolvedValue({});
+
     // Setup mock Firestore
     mockDb = {
       collection: jest.fn((collectionName: string) => {
@@ -133,6 +136,8 @@ describe("onGameCreated Cloud Function", () => {
               update: jest.fn().mockResolvedValue({}),
             })),
           };
+        } else if (collectionName === "analytics_events") {
+          return { add: mockAnalyticsAdd };
         }
         return {doc: jest.fn()};
       }),
@@ -179,6 +184,14 @@ describe("onGameCreated Cloud Function", () => {
       expect(callArgs.notification.body).toContain("Sunset Beach");
       expect(callArgs.data.type).toBe("game_created");
       expect(callArgs.data.gameId).toBe("game123");
+
+      // Verify analytics event was written
+      expect(mockAnalyticsAdd).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: "game_created",
+          properties: expect.objectContaining({ groupId: "group123" }),
+        })
+      );
     });
 
     it("should not notify creator", async () => {
