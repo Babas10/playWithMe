@@ -43,3 +43,7 @@ class ActivityListUpdated extends GamesListEvent {
 class RefreshGamesList extends GamesListEvent {
   const RefreshGamesList();
 }
+
+class LoadOlderActivities extends GamesListEvent {
+  const LoadOlderActivities();
+}

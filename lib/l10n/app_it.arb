@@ -96,7 +96,7 @@
   "resetPassword": "Reimposta Password",
   "backToLogin": "Torna al Login",
   "emailSent": "Email Inviata!",
-  "createAccount": "Crea Account",
+  "createAccount": "Crea un account",
   "accountCreatedSuccess": "Account creato con successo! Controlla la tua email per la verifica.",
   "alreadyHaveAccount": "Hai già un account? ",
   "signIn": "Accedi",
@@ -372,7 +372,7 @@
   "performanceStats": "Statistiche di Prestazione",
   "eloRatingLabel": "Classifica ELO",
   "peak": "Picco: {value}",
-  "winRate": "Percentuale Vittorie",
+  "winRate": "Percentuale vittorie",
   "winsLosses": "{wins}V - {losses}S",
   "streakLabel": "Serie",
   "winning": "Vittorie",
@@ -393,7 +393,6 @@
   "durationFormat": "{hours}h {minutes}m",
   "durationHours": "{hours}h",
   "durationMinutes": "{minutes}m",
-
   "bestPartner": "Miglior Partner",
   "noPartnerDataYet": "Nessun dato partner ancora",
   "playGamesWithTeammate": "Gioca 5+ partite con un compagno",
@@ -420,7 +419,6 @@
   "currentElo": "ELO attuale",
   "peakElo": "ELO massimo",
   "gamesPlayed": "Partite giocate",
-  "winRate": "Percentuale vittorie",
   "bestWin": "Migliore vittoria",
   "winGameToUnlock": "Vinci una partita per sbloccare",
   "beatOpponentsToTrack": "Batti gli avversari per tracciare le tue migliori vittorie",
@@ -447,18 +445,15 @@
   "playMoreGamesToSeeRoles": "Gioca più partite per vedere come ti comporti in diversi ruoli",
   "noStatsYet": "Nessuna stat ancora",
   "startPlayingToSeeStats": "Inizia a giocare per vedere le tue statistiche!",
-
   "playGamesToUnlockRankings": "Gioca per sbloccare le classifiche",
   "globalRank": "Classifica Globale",
   "percentile": "Percentile",
   "friendsRank": "Classifica Amici",
   "addFriendsAction": "Aggiungi amici",
-
   "period30d": "30g",
   "period90d": "90g",
   "period1y": "1a",
   "periodAllTime": "Sempre",
-
   "monthlyProgressChart": "Grafico progresso mensile",
   "playAtLeastNGames": "Gioca almeno {count} partite",
   "nOfNGames": "{current}/{total} partite",
@@ -473,17 +468,14 @@
   "periodLabel90Days": "90 giorni",
   "periodLabelYear": "anno",
   "periodLabelAllTime": "tutto il tempo",
-
   "bestEloThisMonth": "Miglior ELO questo mese",
   "bestEloPast90Days": "Miglior ELO ultimi 90 giorni",
   "bestEloThisYear": "Miglior ELO quest'anno",
   "bestEloAllTime": "Miglior ELO di sempre",
-
   "lastNGames": "Ultime {count} partite",
   "noGamesPlayedYet": "Nessuna partita giocata",
   "winsStreakCount": "{count} vittorie",
   "lossesStreakCount": "{count} sconfitte",
-
   "partnerDetailsTitle": "Dettagli partner",
   "overallRecord": "Bilancio generale",
   "games": "Partite",
@@ -520,11 +512,9 @@
   "pageNotFoundMessage": "La pagina richiesta non è stata trovata.",
   "inviteOnboardingTitle": "Sei stato invitato!",
   "inviteOnboardingSubtitle": "Sei stato invitato a unirti a:",
-  "createAccount": "Crea un account",
   "iHaveAnAccount": "Ho un account",
   "joinGroup": "Unisciti al gruppo",
   "joinGroupConfirmation": "Unirsi al gruppo?",
-  "invitedBy": "Invitato da {name}",
   "membersCount": "{count} membri",
   "inviteExpired": "Questo link di invito è scaduto",
   "inviteLinkRevoked": "Questo link di invito non è più valido",
@@ -534,7 +524,6 @@
   "continueToApp": "Continua all'app",
   "validatingInvite": "Convalida dell'invito...",
   "joiningGroup": "Entrando nel gruppo...",
-
   "createAccountToJoin": "Crea il tuo account per unirti:",
   "fullNameHint": "Nome completo",
   "fullNameRequired": "Il nome completo è obbligatorio",
@@ -562,19 +551,16 @@
   "invalidEmailError": "Inserisci un indirizzo email valido.",
   "networkError": "Impossibile connettersi. Controlla la tua connessione e riprova.",
   "creatingAccount": "Creazione account...",
-
   "verifyEmailWarning": "Verifica la tua email per mantenere il tuo account. {daysRemaining} giorni rimanenti.",
   "verifyNow": "Verifica ora",
   "dismiss": "Chiudi",
   "emailVerifiedSuccess": "Email verificata con successo!",
-
   "accountRestricted": "Il tuo account è limitato. Verifica la tua email per riottenere l'accesso completo. {daysUntilDeletion} giorni alla cancellazione dell'account.",
   "accountScheduledForDeletion": "Il tuo account è in programma per la cancellazione. Verifica la tua email ora per mantenere il tuo account.",
   "accountStatusActive": "Attivo",
   "accountStatusPendingVerification": "Verifica in sospeso",
   "accountStatusRestricted": "Limitato",
   "accountStatusScheduledForDeletion": "Cancellazione programmata",
-
   "accountDeletionWarning": "L'account verrà eliminato tra {daysRemaining} giorni.",
   "featureRestricted": "Questa funzione richiede la verifica dell'email.",
   "verifyToUnlock": "Verifica la tua email per usare questa funzione.",
@@ -583,5 +569,9 @@
   "orLater": "o più tardi",
   "@orLater": {
     "description": "Suffix shown in time picker when today is selected, indicating the minimum selectable time"
+  },
+  "loadOlderActivities": "Carica attività più vecchie",
+  "@loadOlderActivities": {
+    "description": "Button label to load activities older than 90 days in the group details activity feed"
   }
 }

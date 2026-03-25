@@ -30,6 +30,20 @@ abstract class TrainingSessionRepository {
     int limit = 20,
   });
 
+  /// Get recent training sessions for a group (upcoming + past within [pastDays] days).
+  /// Use this for the group details activity feed initial load.
+  Stream<List<TrainingSessionModel>> getRecentTrainingSessionsForGroup(
+    String groupId, {
+    int pastDays = 90,
+  });
+
+  /// One-time fetch of training sessions older than [pastDays] days for a group.
+  /// Used for the "Load older activities" feature.
+  Future<List<TrainingSessionModel>> getOlderTrainingSessionsForGroup(
+    String groupId, {
+    int pastDays = 90,
+  });
+
   /// Get training sessions for a user (across all groups they're members of)
   Stream<List<TrainingSessionModel>> getTrainingSessionsForUser(String userId);
 

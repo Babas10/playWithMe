@@ -1904,4 +1904,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get orLater => 'o más tarde';
+
+  @override
+  String get loadOlderActivities => 'Cargar actividades más antiguas';
 }

@@ -599,6 +599,43 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Stream<List<GameModel>> getRecentGamesForGroup(
+    String groupId, {
+    int pastDays = 90,
+  }) async* {
+    final cutoff = DateTime.now().subtract(Duration(days: pastDays));
+    yield _games.values
+        .where((game) =>
+            game.groupId == groupId &&
+            game.scheduledAt.isAfter(cutoff))
+        .toList();
+
+    await for (final games in _gamesController.stream) {
+      final updatedCutoff = DateTime.now().subtract(Duration(days: pastDays));
+      yield games
+          .where((game) =>
+              game.groupId == groupId &&
+              game.scheduledAt.isAfter(updatedCutoff))
+          .toList();
+    }
+  }
+
+  @override
+  Future<List<GameModel>> getOlderGamesForGroup(
+    String groupId, {
+    int pastDays = 90,
+  }) async {
+    final cutoff = DateTime.now().subtract(Duration(days: pastDays));
+    final games = _games.values
+        .where((game) =>
+            game.groupId == groupId &&
+            !game.scheduledAt.isAfter(cutoff))
+        .toList();
+    games.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
+    return games;
+  }
+
+  @override
   Stream<GameHistoryPage> getCompletedGames({
     String? groupId,
     int limit = 20,
