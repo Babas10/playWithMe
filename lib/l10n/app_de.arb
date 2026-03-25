@@ -96,7 +96,7 @@
   "resetPassword": "Passwort Zurücksetzen",
   "backToLogin": "Zurück zur Anmeldung",
   "emailSent": "E-Mail Gesendet!",
-  "createAccount": "Konto Erstellen",
+  "createAccount": "Konto erstellen",
   "accountCreatedSuccess": "Konto erfolgreich erstellt! Bitte überprüfen Sie Ihre E-Mail.",
   "alreadyHaveAccount": "Bereits ein Konto? ",
   "signIn": "Anmelden",
@@ -372,7 +372,7 @@
   "performanceStats": "Leistungsstatistiken",
   "eloRatingLabel": "ELO-Wertung",
   "peak": "Höchstwert: {value}",
-  "winRate": "Gewinnrate",
+  "winRate": "Siegquote",
   "winsLosses": "{wins}S - {losses}N",
   "streakLabel": "Serie",
   "winning": "Gewinne",
@@ -393,7 +393,6 @@
   "durationFormat": "{hours}h {minutes}m",
   "durationHours": "{hours}h",
   "durationMinutes": "{minutes}m",
-
   "bestPartner": "Bester Partner",
   "noPartnerDataYet": "Noch keine Partnerdaten",
   "playGamesWithTeammate": "Spielen Sie 5+ Spiele mit einem Teamkollegen",
@@ -420,7 +419,6 @@
   "currentElo": "Aktuelles ELO",
   "peakElo": "Höchstes ELO",
   "gamesPlayed": "Gespielte Spiele",
-  "winRate": "Siegquote",
   "bestWin": "Bester Sieg",
   "winGameToUnlock": "Gewinnen Sie ein Spiel zum Freischalten",
   "beatOpponentsToTrack": "Besiegen Sie Gegner, um Ihre besten Siege zu verfolgen",
@@ -447,18 +445,15 @@
   "playMoreGamesToSeeRoles": "Spielen Sie mehr Spiele, um zu sehen, wie Sie in verschiedenen Rollen abschneiden",
   "noStatsYet": "Noch keine Stats",
   "startPlayingToSeeStats": "Beginnen Sie zu spielen, um Ihre Statistiken zu sehen!",
-
   "playGamesToUnlockRankings": "Spielen Sie, um Ranglisten freizuschalten",
   "globalRank": "Globaler Rang",
   "percentile": "Perzentil",
   "friendsRank": "Freunde Rang",
   "addFriendsAction": "Freunde hinzufügen",
-
   "period30d": "30T",
   "period90d": "90T",
   "period1y": "1J",
   "periodAllTime": "Gesamt",
-
   "monthlyProgressChart": "Monatlicher Fortschritt",
   "playAtLeastNGames": "Spielen Sie mindestens {count} Spiele",
   "nOfNGames": "{current}/{total} Spiele",
@@ -473,17 +468,14 @@
   "periodLabel90Days": "90 Tagen",
   "periodLabelYear": "Jahr",
   "periodLabelAllTime": "Gesamtzeit",
-
   "bestEloThisMonth": "Bestes ELO diesen Monat",
   "bestEloPast90Days": "Bestes ELO letzte 90 Tage",
   "bestEloThisYear": "Bestes ELO dieses Jahr",
   "bestEloAllTime": "Bestes ELO aller Zeiten",
-
   "lastNGames": "Letzte {count} Spiele",
   "noGamesPlayedYet": "Noch keine Spiele gespielt",
   "winsStreakCount": "{count} Siege",
   "lossesStreakCount": "{count} Niederlagen",
-
   "partnerDetailsTitle": "Partner Details",
   "overallRecord": "Gesamtbilanz",
   "games": "Spiele",
@@ -520,11 +512,9 @@
   "pageNotFoundMessage": "Die angeforderte Seite konnte nicht gefunden werden.",
   "inviteOnboardingTitle": "Du wurdest eingeladen!",
   "inviteOnboardingSubtitle": "Du wurdest eingeladen beizutreten:",
-  "createAccount": "Konto erstellen",
   "iHaveAnAccount": "Ich habe ein Konto",
   "joinGroup": "Gruppe beitreten",
   "joinGroupConfirmation": "Gruppe beitreten?",
-  "invitedBy": "Eingeladen von {name}",
   "membersCount": "{count} Mitglieder",
   "inviteExpired": "Dieser Einladungslink ist abgelaufen",
   "inviteLinkRevoked": "Dieser Einladungslink ist nicht mehr gültig",
@@ -534,7 +524,6 @@
   "continueToApp": "Weiter zur App",
   "validatingInvite": "Einladung wird überprüft...",
   "joiningGroup": "Gruppe wird beigetreten...",
-
   "createAccountToJoin": "Erstellen Sie Ihr Konto zum Beitreten:",
   "fullNameHint": "Vollständiger Name",
   "fullNameRequired": "Vollständiger Name ist erforderlich",
@@ -562,19 +551,16 @@
   "invalidEmailError": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
   "networkError": "Verbindung nicht möglich. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
   "creatingAccount": "Konto wird erstellt...",
-
   "verifyEmailWarning": "Bestätigen Sie Ihre E-Mail, um Ihr Konto zu behalten. Noch {daysRemaining} Tage.",
   "verifyNow": "Jetzt bestätigen",
   "dismiss": "Schließen",
   "emailVerifiedSuccess": "E-Mail erfolgreich bestätigt!",
-
   "accountRestricted": "Ihr Konto ist eingeschränkt. Bestätigen Sie Ihre E-Mail, um den vollen Zugang wiederherzustellen. {daysUntilDeletion} Tage bis zur Kontolöschung.",
   "accountScheduledForDeletion": "Ihr Konto ist zur Löschung vorgesehen. Bestätigen Sie jetzt Ihre E-Mail, um Ihr Konto zu behalten.",
   "accountStatusActive": "Aktiv",
   "accountStatusPendingVerification": "Bestätigung ausstehend",
   "accountStatusRestricted": "Eingeschränkt",
   "accountStatusScheduledForDeletion": "Löschung geplant",
-
   "accountDeletionWarning": "Das Konto wird in {daysRemaining} Tagen gelöscht.",
   "featureRestricted": "Diese Funktion erfordert eine E-Mail-Bestätigung.",
   "verifyToUnlock": "Bestätigen Sie Ihre E-Mail, um diese Funktion zu nutzen.",
@@ -583,5 +569,9 @@
   "orLater": "oder später",
   "@orLater": {
     "description": "Suffix shown in time picker when today is selected, indicating the minimum selectable time"
+  },
+  "loadOlderActivities": "Ältere Aktivitäten laden",
+  "@loadOlderActivities": {
+    "description": "Button label to load activities older than 90 days in the group details activity feed"
   }
 }

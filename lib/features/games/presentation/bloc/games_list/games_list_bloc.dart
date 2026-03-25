@@ -2,19 +2,22 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/data/models/training_session_model.dart';
 import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
+import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/data/models/group_activity_item.dart';
-// ignore: depend_on_referenced_packages
-import 'package:rxdart/rxdart.dart';
 import 'games_list_event.dart';
 import 'games_list_state.dart';
 
 class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
   final GameRepository _gameRepository;
   final TrainingSessionRepository _trainingSessionRepository;
-  StreamSubscription<dynamic>? _activitiesSubscription;
+  StreamSubscription<List<GameModel>>? _gamesSubscription;
+  StreamSubscription<List<TrainingSessionModel>>? _trainingsSubscription;
+  List<GameModel> _currentGames = [];
+  List<TrainingSessionModel> _currentTrainings = [];
   String? _currentGroupId;
   String? _currentUserId;
 
@@ -27,6 +30,7 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
     on<LoadGamesForGroup>(_onLoadGamesForGroup);
     on<ActivityListUpdated>(_onActivityListUpdated);
     on<RefreshGamesList>(_onRefreshGamesList);
+    on<LoadOlderActivities>(_onLoadOlderActivities);
   }
 
   Future<void> _onLoadGamesForGroup(
@@ -38,31 +42,35 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
 
       _currentGroupId = event.groupId;
       _currentUserId = event.userId;
+      _currentGames = [];
+      _currentTrainings = [];
 
-      await _activitiesSubscription?.cancel();
+      await _gamesSubscription?.cancel();
+      await _trainingsSubscription?.cancel();
 
-      // Combine games and training sessions streams
-      final gamesStream = _gameRepository.getGamesForGroup(event.groupId);
-      final trainingsStream = _trainingSessionRepository
-          .getTrainingSessionsForGroup(event.groupId);
-
-      _activitiesSubscription =
-          Rx.combineLatest2(gamesStream, trainingsStream, (games, trainings) {
-        // Convert to GroupActivityItem
-        final gameActivities =
-            games.map((game) => GroupActivityItem.game(game)).toList();
-        final trainingActivities = trainings
-            .map((session) => GroupActivityItem.training(session))
-            .toList();
-
-        return [...gameActivities, ...trainingActivities];
-      }).listen(
-        (activities) {
-          add(ActivityListUpdated(activities: activities));
+      // Subscribe to games — emits independently as soon as data arrives
+      _gamesSubscription = _gameRepository
+          .getRecentGamesForGroup(event.groupId)
+          .listen(
+        (games) {
+          _currentGames = games;
+          _emitMerged();
         },
         onError: (error) {
-          debugPrint('❌ GamesListBloc: Stream error: $error');
-          add(const ActivityListUpdated(activities: []));
+          debugPrint('❌ GamesListBloc: Games stream error: $error');
+        },
+      );
+
+      // Subscribe to trainings — emits independently as soon as data arrives
+      _trainingsSubscription = _trainingSessionRepository
+          .getRecentTrainingSessionsForGroup(event.groupId)
+          .listen(
+        (trainings) {
+          _currentTrainings = trainings;
+          _emitMerged();
+        },
+        onError: (error) {
+          debugPrint('❌ GamesListBloc: Trainings stream error: $error');
         },
       );
     } on GameException catch (e) {
@@ -75,13 +83,22 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
     }
   }
 
+  void _emitMerged() {
+    final gameActivities =
+        _currentGames.map((game) => GroupActivityItem.game(game)).toList();
+    final trainingActivities = _currentTrainings
+        .map((session) => GroupActivityItem.training(session))
+        .toList();
+    add(ActivityListUpdated(
+        activities: [...gameActivities, ...trainingActivities]));
+  }
+
   Future<void> _onActivityListUpdated(
     ActivityListUpdated event,
     Emitter<GamesListState> emit,
   ) async {
     final now = DateTime.now();
 
-    // Separate into upcoming and past activities
     final upcomingActivities = event.activities
         .where((activity) => activity.startTime.isAfter(now))
         .toList()
@@ -92,15 +109,24 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
         .toList()
       ..sort((a, b) => b.startTime.compareTo(a.startTime));
 
-    // Emit empty state only if both lists are empty after filtering
     if (upcomingActivities.isEmpty && pastActivities.isEmpty) {
       emit(GamesListEmpty(userId: _currentUserId ?? ''));
       return;
     }
 
+    // Preserve older activities if already loaded
+    final previousOlder = state is GamesListLoaded
+        ? (state as GamesListLoaded).olderPastActivities
+        : <GroupActivityItem>[];
+    final previousOlderLoaded = state is GamesListLoaded
+        ? (state as GamesListLoaded).olderActivitiesLoaded
+        : false;
+
     emit(GamesListLoaded(
       upcomingActivities: upcomingActivities,
       pastActivities: pastActivities,
+      olderPastActivities: previousOlder,
+      olderActivitiesLoaded: previousOlderLoaded,
       userId: _currentUserId ?? '',
     ));
   }
@@ -117,9 +143,57 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
     }
   }
 
+  Future<void> _onLoadOlderActivities(
+    LoadOlderActivities event,
+    Emitter<GamesListState> emit,
+  ) async {
+    if (state is! GamesListLoaded || _currentGroupId == null) return;
+    final current = state as GamesListLoaded;
+    if (current.isLoadingOlderActivities || current.olderActivitiesLoaded) {
+      return;
+    }
+
+    emit(current.copyWith(isLoadingOlderActivities: true));
+
+    try {
+      final results = await Future.wait([
+        _gameRepository.getOlderGamesForGroup(_currentGroupId!),
+        _trainingSessionRepository
+            .getOlderTrainingSessionsForGroup(_currentGroupId!),
+      ]);
+
+      final olderGames = (results[0] as List<GameModel>)
+          .map((g) => GroupActivityItem.game(g))
+          .toList();
+      final olderTrainings =
+          (results[1] as List<TrainingSessionModel>)
+              .map((s) => GroupActivityItem.training(s))
+              .toList();
+
+      final olderActivities = [...olderGames, ...olderTrainings]
+        ..sort((a, b) => b.startTime.compareTo(a.startTime));
+
+      if (state is GamesListLoaded) {
+        emit((state as GamesListLoaded).copyWith(
+          olderPastActivities: olderActivities,
+          isLoadingOlderActivities: false,
+          olderActivitiesLoaded: true,
+        ));
+      }
+    } catch (e) {
+      if (state is GamesListLoaded) {
+        emit((state as GamesListLoaded).copyWith(
+          isLoadingOlderActivities: false,
+        ));
+      }
+      debugPrint('❌ GamesListBloc: Failed to load older activities: $e');
+    }
+  }
+
   @override
   Future<void> close() {
-    _activitiesSubscription?.cancel();
+    _gamesSubscription?.cancel();
+    _trainingsSubscription?.cancel();
     return super.close();
   }
 }

@@ -3505,6 +3505,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'or later'**
   String get orLater;
+
+  /// Button label to load activities older than 90 days in the group details activity feed
+  ///
+  /// In en, this message translates to:
+  /// **'Load older activities'**
+  String get loadOlderActivities;
 }
 
 class _AppLocalizationsDelegate

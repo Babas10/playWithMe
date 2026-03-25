@@ -115,6 +115,43 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
   }
 
   @override
+  Stream<List<TrainingSessionModel>> getRecentTrainingSessionsForGroup(
+    String groupId, {
+    int pastDays = 90,
+  }) async* {
+    final cutoff = DateTime.now().subtract(Duration(days: pastDays));
+    yield _sessions.values
+        .where((session) =>
+            session.groupId == groupId &&
+            session.startTime.isAfter(cutoff))
+        .toList();
+
+    await for (final sessions in _sessionsController.stream) {
+      final updatedCutoff = DateTime.now().subtract(Duration(days: pastDays));
+      yield sessions
+          .where((session) =>
+              session.groupId == groupId &&
+              session.startTime.isAfter(updatedCutoff))
+          .toList();
+    }
+  }
+
+  @override
+  Future<List<TrainingSessionModel>> getOlderTrainingSessionsForGroup(
+    String groupId, {
+    int pastDays = 90,
+  }) async {
+    final cutoff = DateTime.now().subtract(Duration(days: pastDays));
+    final sessions = _sessions.values
+        .where((session) =>
+            session.groupId == groupId &&
+            !session.startTime.isAfter(cutoff))
+        .toList()
+      ..sort((a, b) => b.startTime.compareTo(a.startTime));
+    return sessions;
+  }
+
+  @override
   Stream<List<TrainingSessionModel>> getTrainingSessionsForUser(String userId) {
     return _sessionsController.stream.map((sessions) => sessions
         .where((session) => session.isParticipant(userId))
