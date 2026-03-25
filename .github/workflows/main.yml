@@ -7,67 +7,14 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  # Job 1: Static Analysis and Testing
+  # Job 1: Static Analysis and Testing (reusable workflow)
   analyze_and_test:
     name: 📊 Analyze & Test
-    runs-on: ubuntu-latest
-
-    steps:
-      # Step 1: Checkout the repository code
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-
-      # Step 2: Setup Flutter environment
-      - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff  # v2.18.0
-        with:
-          flutter-version: '3.32.6'
-          channel: 'stable'
-          cache: true
-
-      # Step 3: Verify Flutter installation
-      - name: 🔍 Verify Flutter Installation
-        run: flutter --version
-
-      # Step 4: Get Flutter dependencies
-      - name: 📦 Get Dependencies
-        run: flutter pub get
-
-      # Step 5: Generate Mock Firebase Configs (for CI)
-      - name: 🔧 Generate Mock Firebase Configs
-        run: dart run tools/generate_mock_firebase_configs.dart
-
-      # Step 6: Verify that dependencies resolved properly
-      - name: 🔍 Verify Dependencies
-        run: flutter pub deps
-
-      # Step 7: Run static code analysis — fails on any warning or error
-      - name: 📊 Run Static Analysis
-        run: flutter analyze
-
-      # Step 8: Check code formatting
-      - name: 🎨 Check Code Formatting
-        run: |
-          echo "Checking code formatting..."
-          dart format --set-exit-if-changed . || {
-            echo "⚠️ Code formatting issues found"
-            echo "Run 'dart format .' to fix formatting"
-            echo "For now, this is informational only"
-          }
-
-      # Step 9: Run unit and widget tests (exclude integration tests)
-      - name: 🧪 Run Tests
-        run: flutter test --coverage --reporter=github --exclude-tags=integration test/unit/ test/widget/
-
-      # Step 10: Upload coverage reports
-      - name: 📈 Upload Coverage to Codecov
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457  # v3.1.6
-        if: success()
-        with:
-          file: coverage/lcov.info
-          flags: flutter
-          name: PlayWithMe Coverage
-          fail_ci_if_error: false
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      flutter-version: '3.32.6'
+      upload-coverage: true
+    secrets: inherit
 
   # Job 2: Cloud Functions Tests (TypeScript)
   cloud_functions_tests:
