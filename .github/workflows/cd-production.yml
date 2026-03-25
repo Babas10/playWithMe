@@ -75,6 +75,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: 💾 Cache pub packages
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: 📦 Get Dependencies
         run: flutter pub get
 
@@ -175,6 +183,28 @@ jobs:
           flutter-version: '3.32.6'
           channel: 'stable'
           cache: true
+
+      - name: 💾 Cache pub packages
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: 💾 Cache CocoaPods
+        # CocoaPods install is the single most expensive step on the macOS runner
+        # (~4–6 min, billed at 10× Linux rate). Cache the resolved Pods/ dir and
+        # the global spec repo keyed on Podfile.lock so the cache is only
+        # invalidated when a Flutter plugin adds/removes a native iOS dependency.
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+        with:
+          path: |
+            ios/Pods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       - name: 📦 Get Dependencies
         run: flutter pub get

@@ -58,8 +58,25 @@ jobs:
           cache: 'npm'
           cache-dependency-path: functions/package-lock.json
 
+      - name: 💾 Cache Firebase CLI
+        # Caches the global firebase-tools install across runs.
+        # Key is tied to functions/package-lock.json as a stable proxy — any
+        # functions dependency change invalidates the cache (conservative but safe).
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+        with:
+          path: ~/.npm-global
+          key: ${{ runner.os }}-firebase-cli-${{ hashFiles('functions/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-firebase-cli-
+
       - name: 📦 Install Firebase CLI
-        run: npm install -g firebase-tools
+        run: |
+          npm config set prefix ~/.npm-global
+          echo "$HOME/.npm-global/bin" >> $GITHUB_PATH
+          # Skip download entirely if the binary is already present in the restored cache
+          if ! "$HOME/.npm-global/bin/firebase" --version 2>/dev/null; then
+            npm install -g firebase-tools
+          fi
 
       - name: 📦 Install Functions Dependencies
         run: npm --prefix functions ci
@@ -121,6 +138,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/buildSrc/**/*.kt') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: 💾 Cache pub packages
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: 📦 Get Dependencies
         run: flutter pub get
@@ -222,6 +247,28 @@ jobs:
           flutter-version: '3.32.6'
           channel: 'stable'
           cache: true
+
+      - name: 💾 Cache pub packages
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: 💾 Cache CocoaPods
+        # CocoaPods install is the single most expensive step on the macOS runner
+        # (~4–6 min, billed at 10× Linux rate). Cache the resolved Pods/ dir and
+        # the global spec repo keyed on Podfile.lock so the cache is only
+        # invalidated when a Flutter plugin adds/removes a native iOS dependency.
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
+        with:
+          path: |
+            ios/Pods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       - name: 📦 Get Dependencies
         run: flutter pub get
