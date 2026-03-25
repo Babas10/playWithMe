@@ -18,6 +18,20 @@ abstract class GameRepository {
   /// Get games for a group
   Stream<List<GameModel>> getGamesForGroup(String groupId);
 
+  /// Get recent games for a group (upcoming + past within [pastDays] days).
+  /// Use this for the group details activity feed initial load.
+  Stream<List<GameModel>> getRecentGamesForGroup(
+    String groupId, {
+    int pastDays = 90,
+  });
+
+  /// One-time fetch of games older than [pastDays] days for a group.
+  /// Used for the "Load older activities" feature.
+  Future<List<GameModel>> getOlderGamesForGroup(
+    String groupId, {
+    int pastDays = 90,
+  });
+
   /// Get count of upcoming games for a group
   Stream<int> getUpcomingGamesCount(String groupId);
 

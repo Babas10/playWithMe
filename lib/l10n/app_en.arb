@@ -2764,5 +2764,10 @@
   "orLater": "or later",
   "@orLater": {
     "description": "Suffix shown in time picker when today is selected, indicating the minimum selectable time"
+  },
+
+  "loadOlderActivities": "Load older activities",
+  "@loadOlderActivities": {
+    "description": "Button label to load activities older than 90 days in the group details activity feed"
   }
 }

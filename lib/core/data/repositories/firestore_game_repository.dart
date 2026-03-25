@@ -137,6 +137,70 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Stream<List<GameModel>> getRecentGamesForGroup(
+    String groupId, {
+    int pastDays = 90,
+  }) {
+    try {
+      final cutoff = Timestamp.fromDate(
+          DateTime.now().subtract(Duration(days: pastDays)));
+      return _firestore
+          .collection(_collection)
+          .where('groupId', isEqualTo: groupId)
+          .where('scheduledAt', isGreaterThan: cutoff)
+          .orderBy('scheduledAt', descending: false)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => GameModel.fromFirestore(doc))
+              .toList())
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw GameException(
+              'Failed to get recent games for group: ${error.message}',
+              code: error.code);
+        }
+        throw GameException('Failed to get recent games for group: $error',
+            code: 'stream-error');
+      });
+    } catch (e) {
+      throw GameException('Failed to get recent games for group: $e',
+          code: 'stream-error');
+    }
+  }
+
+  @override
+  Future<List<GameModel>> getOlderGamesForGroup(
+    String groupId, {
+    int pastDays = 90,
+  }) async {
+    try {
+      final cutoff = Timestamp.fromDate(
+          DateTime.now().subtract(Duration(days: pastDays)));
+      final query = await _firestore
+          .collection(_collection)
+          .where('groupId', isEqualTo: groupId)
+          .where('scheduledAt', isLessThanOrEqualTo: cutoff)
+          .orderBy('scheduledAt', descending: false)
+          .get();
+
+      final games = query.docs
+          .where((doc) => doc.exists)
+          .map((doc) => GameModel.fromFirestore(doc))
+          .toList();
+      // Sort descending (most recent first) in Dart to avoid a new index
+      games.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
+      return games;
+    } on FirebaseException catch (e) {
+      throw GameException('Failed to get older games for group: ${e.message}',
+          code: e.code);
+    } catch (e) {
+      throw GameException('Failed to get older games for group: $e',
+          code: 'unknown');
+    }
+  }
+
+  @override
   Stream<int> getUpcomingGamesCount(String groupId) {
     try {
       final now = Timestamp.now();

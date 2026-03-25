@@ -1879,4 +1879,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orLater => 'or later';
+
+  @override
+  String get loadOlderActivities => 'Load older activities';
 }

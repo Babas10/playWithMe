@@ -168,6 +168,74 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
   }
 
   @override
+  Stream<List<TrainingSessionModel>> getRecentTrainingSessionsForGroup(
+    String groupId, {
+    int pastDays = 90,
+  }) {
+    try {
+      final cutoff = Timestamp.fromDate(
+          DateTime.now().subtract(Duration(days: pastDays)));
+      return _firestore
+          .collection(_collection)
+          .where('groupId', isEqualTo: groupId)
+          .where('startTime', isGreaterThan: cutoff)
+          .orderBy('startTime', descending: false)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => TrainingSessionModel.fromFirestore(doc))
+              .toList())
+          .handleError((error) {
+        if (error is FirebaseException) {
+          throw TrainingSessionException(
+              'Failed to get recent training sessions for group: ${error.message}',
+              code: error.code);
+        }
+        throw TrainingSessionException(
+            'Failed to get recent training sessions for group: $error',
+            code: 'stream-error');
+      });
+    } catch (e) {
+      throw TrainingSessionException(
+          'Failed to get recent training sessions for group: $e',
+          code: 'stream-error');
+    }
+  }
+
+  @override
+  Future<List<TrainingSessionModel>> getOlderTrainingSessionsForGroup(
+    String groupId, {
+    int pastDays = 90,
+  }) async {
+    try {
+      final cutoff = Timestamp.fromDate(
+          DateTime.now().subtract(Duration(days: pastDays)));
+      final query = await _firestore
+          .collection(_collection)
+          .where('groupId', isEqualTo: groupId)
+          .where('startTime', isLessThanOrEqualTo: cutoff)
+          .orderBy('startTime', descending: false)
+          .get();
+
+      final sessions = query.docs
+          .where((doc) => doc.exists)
+          .map((doc) => TrainingSessionModel.fromFirestore(doc))
+          .toList();
+      // Sort descending (most recent first) in Dart to avoid a new index
+      sessions.sort((a, b) => b.startTime.compareTo(a.startTime));
+      return sessions;
+    } on FirebaseException catch (e) {
+      throw TrainingSessionException(
+          'Failed to get older training sessions for group: ${e.message}',
+          code: e.code);
+    } catch (e) {
+      throw TrainingSessionException(
+          'Failed to get older training sessions for group: $e',
+          code: 'unknown');
+    }
+  }
+
+  @override
   Stream<List<TrainingSessionModel>> getTrainingSessionsForUser(
       String userId) {
     try {

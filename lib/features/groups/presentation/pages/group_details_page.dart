@@ -60,14 +60,7 @@ class GroupDetailsPage extends StatelessWidget {
         BlocProvider(create: (context) => sl<GroupMemberBloc>()),
         BlocProvider(create: (context) => sl<GroupInviteLinkBloc>()),
         BlocProvider(
-          create: (context) {
-            final authState = context.read<AuthenticationBloc>().state;
-            final userId = authState is AuthenticationAuthenticated
-                ? authState.user.uid
-                : '';
-            return sl<GamesListBloc>()
-              ..add(LoadGamesForGroup(groupId: groupId, userId: userId));
-          },
+          create: (context) => sl<GamesListBloc>(),
         ),
       ],
       child: _GroupDetailsPageContent(
@@ -113,6 +106,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
   /// Tracks which member UIDs were used for the last full data load.
   Set<String> _lastLoadedMemberIds = {};
 
+  /// Whether the Activities tab stream has been started.
+  bool _activitiesInitialized = false;
+
   StreamSubscription<GroupModel?>? _groupSubscription;
 
   @override
@@ -123,12 +119,33 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
     _userRepository = widget.userRepositoryOverride ?? sl<UserRepository>();
     _friendRepository = sl<FriendRepository>();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_onTabChanged);
     _subscribeToGroup();
+  }
+
+  void _onTabChanged() {
+    // Lazy-initialize the activities stream only when the Activities tab is
+    // first selected (tab index 1).
+    if (!_tabController.indexIsChanging &&
+        _tabController.index == 1 &&
+        !_activitiesInitialized) {
+      _activitiesInitialized = true;
+      final authState = context.read<AuthenticationBloc>().state;
+      if (authState is AuthenticationAuthenticated && _group != null) {
+        context.read<GamesListBloc>().add(
+              LoadGamesForGroup(
+                groupId: widget.groupId,
+                userId: authState.user.uid,
+              ),
+            );
+      }
+    }
   }
 
   @override
   void dispose() {
     _groupSubscription?.cancel();
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
   }
@@ -190,9 +207,29 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
       _isLoadingFriendships = true;
     });
 
+    // Phase 1: Load member names immediately so the list is visible.
+    try {
+      final members =
+          await _userRepository.getUsersByIds(group.memberIds);
+      if (!mounted) return;
+      setState(() {
+        _members = members;
+        _lastLoadedMemberIds = Set<String>.from(group.memberIds);
+        _isLoading = false;
+        // _isLoadingFriendships remains true — spinner shown per row
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _isLoadingFriendships = false;
+      });
+      return;
+    }
+
+    // Phase 2: Load friendship/request status in background.
     try {
       final results = await Future.wait<dynamic>([
-        _userRepository.getUsersByIds(group.memberIds),
         _friendRepository.batchCheckFriendship(otherMemberIds),
         otherMemberIds.isNotEmpty
             ? _friendRepository.batchCheckFriendRequestStatus(otherMemberIds)
@@ -200,19 +237,14 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
       ]);
 
       if (!mounted) return;
-
       setState(() {
-        _members = results[0] as List<UserModel>;
-        _friendshipStatus = results[1] as Map<String, bool>;
-        _requestStatus = results[2] as Map<String, FriendRequestStatus>;
-        _lastLoadedMemberIds = Set<String>.from(group.memberIds);
-        _isLoading = false;
+        _friendshipStatus = results[0] as Map<String, bool>;
+        _requestStatus = results[1] as Map<String, FriendRequestStatus>;
         _isLoadingFriendships = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _isLoading = false;
         _isLoadingFriendships = false;
       });
     }
@@ -762,6 +794,32 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                         _buildActivityItem(
                             context, activity, state.userId, true)),
                   ],
+                  // Older activities (loaded on demand)
+                  if (state.olderPastActivities.isNotEmpty)
+                    ...state.olderPastActivities.map((activity) =>
+                        _buildActivityItem(
+                            context, activity, state.userId, true)),
+                  // "Load older activities" button
+                  if (!state.olderActivitiesLoaded)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      child: state.isLoadingOlderActivities
+                          ? const Center(child: CircularProgressIndicator())
+                          : OutlinedButton(
+                              onPressed: () => context
+                                  .read<GamesListBloc>()
+                                  .add(const LoadOlderActivities()),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.secondary,
+                                side:
+                                    BorderSide(color: AppColors.secondary),
+                                minimumSize:
+                                    const Size(double.infinity, 44),
+                              ),
+                              child: Text(l10n.loadOlderActivities),
+                            ),
+                    ),
                   const SizedBox(height: 16),
                 ],
               ],

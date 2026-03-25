@@ -412,24 +412,24 @@ void main() {
       build: () {
         final mockGameRepository = MockGameRepository();
         final mockTrainingRepository = MockTrainingSessionRepository();
-        
+
         final futureGame = createTestGame(
           id: 'game-1',
           title: 'Future Game',
           groupId: testGroupId,
           scheduledAt: DateTime.now().add(const Duration(days: 2)),
         );
-        
+
         final futureTraining = createTestTrainingSession(
           id: 'training-1',
           title: 'Future Training',
           groupId: testGroupId,
           startTime: DateTime.now().add(const Duration(days: 1)),
         );
-        
+
         mockGameRepository.addGame(futureGame);
         mockTrainingRepository.addSession(futureTraining);
-        
+
         return GamesListBloc(
           gameRepository: mockGameRepository,
           trainingSessionRepository: mockTrainingRepository,
@@ -438,13 +438,14 @@ void main() {
       act: (bloc) => bloc.add(
         const LoadGamesForGroup(groupId: testGroupId, userId: testUserId),
       ),
-      expect: () => [
-        const GamesListLoading(),
-        isA<GamesListLoaded>()
-            .having((s) => s.upcomingActivities.length, 'upcoming activities count', 2)
-            .having((s) => s.pastActivities.length, 'past activities count', 0)
-            .having((s) => s.userId, 'userId', testUserId),
-      ],
+      // With independent stream subscriptions, each stream emits independently.
+      // Use verify to check only the final settled state rather than intermediate states.
+      verify: (bloc) {
+        final state = bloc.state as GamesListLoaded;
+        expect(state.upcomingActivities.length, 2);
+        expect(state.pastActivities.length, 0);
+        expect(state.userId, testUserId);
+      },
     );
 
     blocTest<GamesListBloc, GamesListState>(
