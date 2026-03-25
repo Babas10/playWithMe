@@ -54,6 +54,7 @@ describe("onWaitlistPromoted Cloud Function", () => {
   let mockExistingPlayer2Doc: any;
 
   let onWaitlistPromotedHandler: any;
+  let mockAnalyticsAdd: jest.Mock;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -105,6 +106,8 @@ describe("onWaitlistPromoted Cloud Function", () => {
       exists: true,
     };
 
+    mockAnalyticsAdd = jest.fn().mockResolvedValue({});
+
     // Setup mock Firestore
     mockDb = {
       collection: jest.fn((collectionName: string) => {
@@ -120,6 +123,8 @@ describe("onWaitlistPromoted Cloud Function", () => {
               update: jest.fn().mockResolvedValue({}),
             })),
           };
+        } else if (collectionName === "analytics_events") {
+          return { add: mockAnalyticsAdd };
         }
         return {doc: jest.fn()};
       }),
@@ -164,6 +169,14 @@ describe("onWaitlistPromoted Cloud Function", () => {
 
       // Should send 2 notifications (1 to promoted user, 1 to existing players)
       expect(mockMessaging.sendEachForMulticast).toHaveBeenCalledTimes(2);
+
+      // Verify analytics event was written
+      expect(mockAnalyticsAdd).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: "waitlist_promoted",
+          properties: expect.objectContaining({ groupId: "group123", gameId: "game123" }),
+        })
+      );
     });
 
     it("should not trigger when user joins directly (not from waitlist)", async () => {

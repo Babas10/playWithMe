@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { writeAnalyticsEvent } from "./helpers/analytics";
 
 /**
  * Helper function to check if current time is within quiet hours
@@ -172,6 +173,7 @@ export const onInvitationCreated = functions.firestore
         }
       }
 
+      await writeAnalyticsEvent("invitation_sent", { groupId: invitation.groupId });
       return null;
     } catch (error) {
       functions.logger.error("Error sending invitation notification", {
@@ -292,6 +294,7 @@ export const onInvitationAccepted = functions.firestore
         invitationId,
         userId,
       });
+      await writeAnalyticsEvent("invitation_accepted", { groupId: after.groupId });
       return null;
     } catch (error) {
       functions.logger.error("Error sending invitation accepted notification", {
@@ -535,6 +538,7 @@ export const onGameCreated = functions.firestore
         }
       }
 
+      await writeAnalyticsEvent("game_created", { groupId, sport: game.sport ?? "unknown" });
       return null;
     } catch (error) {
       functions.logger.error("Error sending game created notification", {
@@ -647,6 +651,7 @@ export const onMemberJoined = functions.firestore
             adminTokenCount: adminTokens.length,
           });
         }
+        await writeAnalyticsEvent("member_joined", { groupId, via: "unknown" });
       }
 
       return null;
@@ -2245,6 +2250,7 @@ export const onWaitlistPromoted = functions.firestore
         }
       }
 
+      await writeAnalyticsEvent("waitlist_promoted", { groupId, gameId });
       return null;
     } catch (error) {
       functions.logger.error("Error sending waitlist promotion notification", {
@@ -2639,6 +2645,7 @@ export const onGameCancelled = functions.firestore
           }
       }
 
+      await writeAnalyticsEvent("game_cancelled", { groupId });
       return null;
     } catch (error) {
       functions.logger.error("Error sending game cancelled notification", {
