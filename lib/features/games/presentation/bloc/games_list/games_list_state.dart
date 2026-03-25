@@ -20,16 +20,49 @@ class GamesListLoading extends GamesListState {
 class GamesListLoaded extends GamesListState {
   final List<GroupActivityItem> upcomingActivities;
   final List<GroupActivityItem> pastActivities;
+  final List<GroupActivityItem> olderPastActivities;
+  final bool isLoadingOlderActivities;
+  final bool olderActivitiesLoaded;
   final String userId;
 
   const GamesListLoaded({
     required this.upcomingActivities,
     required this.pastActivities,
+    this.olderPastActivities = const [],
+    this.isLoadingOlderActivities = false,
+    this.olderActivitiesLoaded = false,
     required this.userId,
   });
 
+  GamesListLoaded copyWith({
+    List<GroupActivityItem>? upcomingActivities,
+    List<GroupActivityItem>? pastActivities,
+    List<GroupActivityItem>? olderPastActivities,
+    bool? isLoadingOlderActivities,
+    bool? olderActivitiesLoaded,
+    String? userId,
+  }) {
+    return GamesListLoaded(
+      upcomingActivities: upcomingActivities ?? this.upcomingActivities,
+      pastActivities: pastActivities ?? this.pastActivities,
+      olderPastActivities: olderPastActivities ?? this.olderPastActivities,
+      isLoadingOlderActivities:
+          isLoadingOlderActivities ?? this.isLoadingOlderActivities,
+      olderActivitiesLoaded:
+          olderActivitiesLoaded ?? this.olderActivitiesLoaded,
+      userId: userId ?? this.userId,
+    );
+  }
+
   @override
-  List<Object?> get props => [upcomingActivities, pastActivities, userId];
+  List<Object?> get props => [
+        upcomingActivities,
+        pastActivities,
+        olderPastActivities,
+        isLoadingOlderActivities,
+        olderActivitiesLoaded,
+        userId,
+      ];
 
   // Helper getters for backward compatibility and filtering
   List<GameModel> get upcomingGames => upcomingActivities
