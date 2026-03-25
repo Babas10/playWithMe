@@ -1,3 +1,7 @@
+import 'dart:ui';
+
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:play_with_me/app/play_with_me_app.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
@@ -10,6 +14,20 @@ Future<void> mainCommon() async {
   try {
     // Initialize Firebase before anything else
     await FirebaseService.initialize();
+
+    // Route Flutter framework errors (widget build failures, layout errors, etc.)
+    // to Crashlytics. Disabled in debug mode so the development console stays clean.
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    FlutterError.onError =
+        FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    // Route uncaught async/platform errors (Dart isolate errors, plugin errors)
+    // to Crashlytics.
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
 
     // Initialize dependency injection
     await initializeDependencies();
