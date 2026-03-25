@@ -34,6 +34,7 @@ mixin _$RecurrenceRuleModel {
 
   /// The date until which to generate occurrences
   /// Either count or endDate should be specified, not both
+  // ignore: invalid_annotation_target
   @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)
   DateTime? get endDate => throw _privateConstructorUsedError;
 
@@ -217,6 +218,7 @@ class _$RecurrenceRuleModelImpl extends _RecurrenceRuleModel {
 
   /// The date until which to generate occurrences
   /// Either count or endDate should be specified, not both
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)
   final DateTime? endDate;
@@ -318,6 +320,7 @@ abstract class _RecurrenceRuleModel extends RecurrenceRuleModel {
 
   /// The date until which to generate occurrences
   /// Either count or endDate should be specified, not both
+  // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)
   DateTime? get endDate;
