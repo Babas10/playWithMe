@@ -1,0 +1,62 @@
+name: Reusable — Flutter Analyze & Test
+
+# Called by main.yml (CI/PR), cd-beta.yml, and cd-production.yml.
+# Centralizes the Flutter analyze + unit/widget test steps so they
+# stay in sync across all three workflows.
+on:
+  workflow_call:
+    inputs:
+      flutter-version:
+        description: 'Flutter SDK version to use'
+        type: string
+        default: '3.32.6'
+      upload-coverage:
+        description: 'Upload coverage report to Codecov after tests'
+        type: boolean
+        default: false
+
+jobs:
+  test:
+    name: 🧪 Analyze & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff  # v2.18.0
+        with:
+          flutter-version: ${{ inputs.flutter-version }}
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+
+      - name: 🔧 Generate Mock Firebase Configs
+        run: dart run tools/generate_mock_firebase_configs.dart
+
+      - name: 📊 Run Static Analysis
+        run: flutter analyze
+
+      - name: 🎨 Check Code Formatting
+        # Informational only — never fails the build.
+        run: |
+          dart format --set-exit-if-changed . || {
+            echo "⚠️ Code formatting issues found"
+            echo "Run 'dart format .' to fix formatting"
+            echo "For now, this is informational only"
+          }
+
+      - name: 🧪 Run Unit & Widget Tests
+        run: flutter test --coverage --reporter=github --exclude-tags=integration test/unit/ test/widget/
+
+      - name: 📈 Upload Coverage to Codecov
+        if: inputs.upload-coverage
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457  # v3.1.6
+        with:
+          file: coverage/lcov.info
+          flags: flutter
+          name: PlayWithMe Coverage
+          fail_ci_if_error: false
