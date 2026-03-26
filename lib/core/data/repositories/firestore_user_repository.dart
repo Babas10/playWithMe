@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:play_with_me/core/utils/performance_tracer.dart';
 
 import '../../domain/exceptions/repository_exceptions.dart';
 import '../../domain/repositories/user_repository.dart';
@@ -102,9 +103,9 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<List<UserModel>> getUsersByIds(List<String> uids) async {
-    if (uids.isEmpty) return [];
-
+  Future<List<UserModel>> getUsersByIds(List<String> uids) {
+    if (uids.isEmpty) return Future.value([]);
+    return PerformanceTracer.trace('repo_get_users_by_ids', () async {
     try {
       final now = DateTime.now();
 
@@ -150,6 +151,7 @@ class FirestoreUserRepository implements UserRepository {
     } catch (e) {
       throw UserException('Failed to get users: $e');
     }
+    });
   }
 
   /// Evicts a specific UID from the user profile cache (e.g., after a profile update).
@@ -592,7 +594,8 @@ class FirestoreUserRepository implements UserRepository {
   Future<HeadToHeadStats?> getHeadToHeadStats(
     String userId,
     String opponentId,
-  ) async {
+  ) {
+    return PerformanceTracer.trace('repo_get_head_to_head_stats', () async {
     try {
       // Call Cloud Function to get head-to-head stats
       // Security: Function validates that the caller is requesting their own stats
@@ -630,6 +633,7 @@ class FirestoreUserRepository implements UserRepository {
     } catch (e) {
       throw UserException('Failed to get head-to-head stats: $e');
     }
+    });
   }
 
   @override
@@ -647,7 +651,8 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<UserRanking> getUserRanking(String userId) async {
+  Future<UserRanking> getUserRanking(String userId) {
+    return PerformanceTracer.trace('repo_calculate_user_ranking', () async {
     try {
       final callable = _functions.httpsCallable('calculateUserRanking');
       final result = await callable.call<Map<String, dynamic>>();
@@ -667,5 +672,6 @@ class FirestoreUserRepository implements UserRepository {
     } catch (e) {
       throw UserException('Failed to get ranking: $e');
     }
+    });
   }
 }
