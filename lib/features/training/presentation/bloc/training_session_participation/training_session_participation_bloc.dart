@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/utils/performance_tracer.dart';
 
 import '../../../../../core/data/models/training_session_participant_model.dart';
 import '../../../../../core/domain/exceptions/repository_exceptions.dart';
@@ -36,6 +37,7 @@ class TrainingSessionParticipationBloc extends Bloc<
     emit(const ParticipationLoading());
 
     try {
+      await PerformanceTracer.trace('page_training_session_details_setup', () async {
       // Cancel any existing subscription
       await _participantsSubscription?.cancel();
 
@@ -61,6 +63,7 @@ class TrainingSessionParticipationBloc extends Bloc<
           }
         },
       );
+      });
     } catch (e) {
       emit(ParticipationError(
         message: _getErrorMessage(e),

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/entities/friendship_entity.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
 import 'package:play_with_me/core/utils/error_messages.dart';
+import 'package:play_with_me/core/utils/performance_tracer.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'friend_event.dart';
@@ -45,11 +46,11 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     // error handling. This prevents Android's ExecutionException from
     // causing all data to be lost when one Cloud Function call fails
     // (see GitHub issue #454).
-    final results = await Future.wait([
+    final results = await PerformanceTracer.trace('page_my_community_load', () => Future.wait([
       _safeCall(() => _friendRepository.getFriends(currentUser.uid), <UserEntity>[]),
       _safeCall(() => _friendRepository.getPendingRequests(type: FriendRequestType.received), <FriendshipEntity>[]),
       _safeCall(() => _friendRepository.getPendingRequests(type: FriendRequestType.sent), <FriendshipEntity>[]),
-    ]);
+    ]));
 
     emit(FriendState.loaded(
       friends: results[0] as List<UserEntity>,
