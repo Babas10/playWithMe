@@ -1,7 +1,9 @@
 // Tests GroupBloc functionality and validates all group management operations work correctly.
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_event.dart';
 import 'package:play_with_me/core/presentation/bloc/group/group_state.dart';
@@ -10,18 +12,27 @@ import 'package:play_with_me/core/data/models/group_model.dart';
 import '../../../data/repositories/mock_group_repository.dart';
 import '../../../data/repositories/mock_invitation_repository.dart';
 
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
+
 void main() {
   group('GroupBloc', () {
     late GroupBloc groupBloc;
     late MockGroupRepository mockGroupRepository;
     late MockInvitationRepository mockInvitationRepository;
+    late MockFirebaseAnalytics mockAnalytics;
 
     setUp(() {
       mockGroupRepository = MockGroupRepository();
       mockInvitationRepository = MockInvitationRepository();
+      mockAnalytics = MockFirebaseAnalytics();
+      when(() => mockAnalytics.logEvent(
+            name: any(named: 'name'),
+            parameters: any(named: 'parameters'),
+          )).thenAnswer((_) async {});
       groupBloc = GroupBloc(
         groupRepository: mockGroupRepository,
         invitationRepository: mockInvitationRepository,
+        analytics: mockAnalytics,
       );
     });
 
@@ -31,6 +42,18 @@ void main() {
 
     test('initial state is GroupInitial', () {
       expect(groupBloc.state, equals(const GroupInitial()));
+    });
+
+    group('GroupCreationStarted', () {
+      blocTest<GroupBloc, GroupState>(
+        'logs create_group_started and emits no state change',
+        build: () => groupBloc,
+        act: (bloc) => bloc.add(const GroupCreationStarted()),
+        expect: () => [],
+        verify: (_) {
+          verify(() => mockAnalytics.logEvent(name: 'create_group_started')).called(1);
+        },
+      );
     });
 
     group('LoadGroupById', () {

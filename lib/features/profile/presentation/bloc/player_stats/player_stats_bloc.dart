@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart'; // Story 302.7
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/utils/performance_tracer.dart';
 
 import 'player_stats_event.dart';
 import 'player_stats_state.dart';
@@ -29,7 +30,7 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
 
     try {
       // Fetch user immediately to ensure we don't hang forever
-      final initialUser = await _userRepository
+      final initialUser = await PerformanceTracer.trace('page_stats_load', () => _userRepository
           .getUserStream(event.userId)
           .timeout(
             const Duration(seconds: 5),
@@ -39,7 +40,7 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
               sink.add(null);
             },
           )
-          .first;
+          .first);
 
       if (initialUser != null) {
         // Trigger the update with the initial user

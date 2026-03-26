@@ -1,6 +1,7 @@
 // BLoC for managing deep link state and pending invites.
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_event.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_state.dart';
@@ -10,13 +11,16 @@ import 'package:play_with_me/core/services/pending_invite_storage.dart';
 class DeepLinkBloc extends Bloc<DeepLinkEvent, DeepLinkState> {
   final DeepLinkService _deepLinkService;
   final PendingInviteStorage _pendingInviteStorage;
+  final FirebaseAnalytics _analytics;
   StreamSubscription<String?>? _tokenSubscription;
 
   DeepLinkBloc({
     required DeepLinkService deepLinkService,
     required PendingInviteStorage pendingInviteStorage,
+    required FirebaseAnalytics analytics,
   })  : _deepLinkService = deepLinkService,
         _pendingInviteStorage = pendingInviteStorage,
+        _analytics = analytics,
         super(const DeepLinkInitial()) {
     on<InitializeDeepLinks>(_onInitialize);
     on<InviteTokenReceived>(_onInviteTokenReceived);
@@ -33,6 +37,8 @@ class DeepLinkBloc extends Bloc<DeepLinkEvent, DeepLinkState> {
       // Clear storage immediately — token now lives in BLoC state only.
       // This prevents stale tokens from re-triggering on every restart.
       await _pendingInviteStorage.clear();
+      // Deferred deep link: user tapped the invite link before app was installed.
+      await _analytics.logEvent(name: 'invite_link_tapped');
       emit(DeepLinkPendingInvite(token: storedToken));
       // Still start the foreground listener
       _startLinkListener();
@@ -71,6 +77,7 @@ class DeepLinkBloc extends Bloc<DeepLinkEvent, DeepLinkState> {
     // the registration/login flow. The listeners in play_with_me_app.dart
     // will clear this after consuming the token.
     await _pendingInviteStorage.store(event.token);
+    await _analytics.logEvent(name: 'invite_link_tapped');
     emit(DeepLinkPendingInvite(token: event.token));
   }
 

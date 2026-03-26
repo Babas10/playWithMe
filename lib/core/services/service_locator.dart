@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -105,6 +106,10 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<FirebaseFunctions>()) {
     sl.registerLazySingleton<FirebaseFunctions>(() => FirebaseFunctions.instance);
+  }
+
+  if (!sl.isRegistered<FirebaseAnalytics>()) {
+    sl.registerLazySingleton<FirebaseAnalytics>(() => FirebaseAnalytics.instance);
   }
 
   if (!sl.isRegistered<FlutterLocalNotificationsPlugin>()) {
@@ -289,6 +294,7 @@ Future<void> initializeDependencies() async {
     sl.registerFactory<RegistrationBloc>(
       () => RegistrationBloc(
         authRepository: sl(),
+        analytics: sl(),
       ),
     );
   }
@@ -311,6 +317,7 @@ Future<void> initializeDependencies() async {
       () => GroupBloc(
         groupRepository: sl(),
         invitationRepository: sl(),
+        analytics: sl(),
       ),
     );
   }
@@ -352,7 +359,7 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<GameCreationBloc>()) {
     sl.registerFactory<GameCreationBloc>(
-      () => GameCreationBloc(gameRepository: sl()),
+      () => GameCreationBloc(gameRepository: sl(), analytics: sl()),
     );
   }
 
@@ -361,6 +368,7 @@ Future<void> initializeDependencies() async {
       () => GameDetailsBloc(
         gameRepository: sl(),
         userRepository: sl(),
+        analytics: sl(),
       ),
     );
   }
@@ -442,6 +450,7 @@ Future<void> initializeDependencies() async {
       () => DeepLinkBloc(
         deepLinkService: sl(),
         pendingInviteStorage: sl(),
+        analytics: sl(),
       ),
     );
   }

@@ -82,6 +82,7 @@ dependencies:
 
   # Deep Linking
   app_links: ^6.4.0
+  firebase_performance: ^0.10.1+10
 
 dev_dependencies:
   flutter_test:

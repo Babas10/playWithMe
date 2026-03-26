@@ -1,24 +1,30 @@
 import 'dart:async';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/repositories/group_repository.dart';
 import '../../../domain/repositories/invitation_repository.dart';
 import '../../../data/models/group_model.dart';
 import '../../../utils/error_messages.dart';
+import '../../../utils/performance_tracer.dart';
 import 'group_event.dart';
 import 'group_state.dart';
 
 class GroupBloc extends Bloc<GroupEvent, GroupState> {
   final GroupRepository _groupRepository;
   final InvitationRepository? _invitationRepository;
+  final FirebaseAnalytics _analytics;
   StreamSubscription<dynamic>? _groupsSubscription;
 
   GroupBloc({
     required GroupRepository groupRepository,
     InvitationRepository? invitationRepository,
+    required FirebaseAnalytics analytics,
   })  : _groupRepository = groupRepository,
         _invitationRepository = invitationRepository,
+        _analytics = analytics,
         super(const GroupInitial()) {
+    on<GroupCreationStarted>(_onGroupCreationStarted);
     on<LoadGroupById>(_onLoadGroupById);
     on<LoadGroupsForUser>(_onLoadGroupsForUser);
     on<CreateGroup>(_onCreateGroup);
@@ -33,6 +39,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     on<DeleteGroup>(_onDeleteGroup);
   }
 
+  Future<void> _onGroupCreationStarted(
+    GroupCreationStarted event,
+    Emitter<GroupState> emit,
+  ) async {
+    await _analytics.logEvent(name: 'create_group_started');
+  }
+
   Future<void> _onLoadGroupById(
     LoadGroupById event,
     Emitter<GroupState> emit,
@@ -40,7 +53,10 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     try {
       emit(const GroupLoading());
 
-      final group = await _groupRepository.getGroupById(event.groupId);
+      final group = await PerformanceTracer.trace(
+        'page_group_details_load',
+        () => _groupRepository.getGroupById(event.groupId),
+      );
       if (group != null) {
         emit(GroupLoaded(group: group));
       } else {
