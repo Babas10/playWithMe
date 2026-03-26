@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { writePerformanceEvent } from "./helpers/analytics";
 
 /**
  * Request interface for getUpcomingTrainingSessionsForUser Cloud Function
@@ -226,6 +227,21 @@ export async function getUpcomingTrainingSessionsForUserHandler(
  * final nextSession = sessions.isNotEmpty ? sessions.first : null;
  * ```
  */
-export const getUpcomingTrainingSessionsForUser = functions.https.onCall(
-  getUpcomingTrainingSessionsForUserHandler
-);
+export const getUpcomingTrainingSessionsForUser = functions.https.onCall(async (data, context) => {
+  const start = Date.now();
+  let status: "success" | "error" = "success";
+  try {
+    return await getUpcomingTrainingSessionsForUserHandler(data, context);
+  } catch (error) {
+    status = "error";
+    throw error;
+  } finally {
+    await writePerformanceEvent({
+      functionName: "getUpcomingTrainingSessionsForUser",
+      durationMs: Date.now() - start,
+      uid: context.auth?.uid,
+      status,
+    });
+  }
+});
+
