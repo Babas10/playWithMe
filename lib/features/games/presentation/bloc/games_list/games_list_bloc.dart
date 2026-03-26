@@ -6,6 +6,7 @@ import 'package:play_with_me/core/data/models/training_session_model.dart';
 import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 import 'package:play_with_me/core/domain/repositories/training_session_repository.dart';
+import 'package:play_with_me/core/utils/performance_tracer.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/data/models/group_activity_item.dart';
 import 'games_list_event.dart';
@@ -45,34 +46,36 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
       _currentGames = [];
       _currentTrainings = [];
 
-      await _gamesSubscription?.cancel();
-      await _trainingsSubscription?.cancel();
+      await PerformanceTracer.trace('page_games_list_setup', () async {
+        await _gamesSubscription?.cancel();
+        await _trainingsSubscription?.cancel();
 
-      // Subscribe to games — emits independently as soon as data arrives
-      _gamesSubscription = _gameRepository
-          .getRecentGamesForGroup(event.groupId)
-          .listen(
-        (games) {
-          _currentGames = games;
-          _emitMerged();
-        },
-        onError: (error) {
-          debugPrint('❌ GamesListBloc: Games stream error: $error');
-        },
-      );
+        // Subscribe to games — emits independently as soon as data arrives
+        _gamesSubscription = _gameRepository
+            .getRecentGamesForGroup(event.groupId)
+            .listen(
+          (games) {
+            _currentGames = games;
+            _emitMerged();
+          },
+          onError: (error) {
+            debugPrint('❌ GamesListBloc: Games stream error: $error');
+          },
+        );
 
-      // Subscribe to trainings — emits independently as soon as data arrives
-      _trainingsSubscription = _trainingSessionRepository
-          .getRecentTrainingSessionsForGroup(event.groupId)
-          .listen(
-        (trainings) {
-          _currentTrainings = trainings;
-          _emitMerged();
-        },
-        onError: (error) {
-          debugPrint('❌ GamesListBloc: Trainings stream error: $error');
-        },
-      );
+        // Subscribe to trainings — emits independently as soon as data arrives
+        _trainingsSubscription = _trainingSessionRepository
+            .getRecentTrainingSessionsForGroup(event.groupId)
+            .listen(
+          (trainings) {
+            _currentTrainings = trainings;
+            _emitMerged();
+          },
+          onError: (error) {
+            debugPrint('❌ GamesListBloc: Trainings stream error: $error');
+          },
+        );
+      });
     } on GameException catch (e) {
       emit(GamesListError(message: e.message));
     } on TrainingSessionException catch (e) {

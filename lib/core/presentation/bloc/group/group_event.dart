@@ -5,6 +5,11 @@ abstract class GroupEvent extends BaseBlocEvent {
   const GroupEvent();
 }
 
+/// Dispatched when the group creation screen is opened (intent signal).
+class GroupCreationStarted extends GroupEvent {
+  const GroupCreationStarted();
+}
+
 class LoadGroupById extends GroupEvent {
   final String groupId;
 

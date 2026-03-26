@@ -1,6 +1,7 @@
 // Validates GameCreationBloc correctly manages form state, validation, and game creation logic.
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -12,10 +13,13 @@ import 'package:play_with_me/features/games/presentation/bloc/game_creation/game
 
 class MockGameRepository extends Mock implements GameRepository {}
 
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
+
 class FakeGameModel extends Fake implements GameModel {}
 
 void main() {
   late GameRepository mockGameRepository;
+  late MockFirebaseAnalytics mockAnalytics;
   late GameCreationBloc gameCreationBloc;
 
   setUpAll(() {
@@ -24,7 +28,15 @@ void main() {
 
   setUp(() {
     mockGameRepository = MockGameRepository();
-    gameCreationBloc = GameCreationBloc(gameRepository: mockGameRepository);
+    mockAnalytics = MockFirebaseAnalytics();
+    when(() => mockAnalytics.logEvent(
+          name: any(named: 'name'),
+          parameters: any(named: 'parameters'),
+        )).thenAnswer((_) async {});
+    gameCreationBloc = GameCreationBloc(
+      gameRepository: mockGameRepository,
+      analytics: mockAnalytics,
+    );
   });
 
   tearDown(() {
@@ -55,6 +67,24 @@ void main() {
             isValid: false,
           ),
         ],
+        verify: (_) {
+          verify(() => mockAnalytics.logEvent(name: 'create_game_started')).called(1);
+        },
+      );
+
+      blocTest<GameCreationBloc, GameCreationState>(
+        'does not log create_game_started when state is not initial (re-selection)',
+        build: () => gameCreationBloc,
+        seed: () => const GameCreationFormState(
+          groupError: 'Please select a group',
+        ),
+        act: (bloc) => bloc.add(const SelectGroup(
+          groupId: 'group1',
+          groupName: 'Test Group',
+        )),
+        verify: (_) {
+          verifyNever(() => mockAnalytics.logEvent(name: 'create_game_started'));
+        },
       );
 
       blocTest<GameCreationBloc, GameCreationState>(

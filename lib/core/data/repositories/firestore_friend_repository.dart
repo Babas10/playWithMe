@@ -5,6 +5,7 @@ import 'package:play_with_me/core/domain/entities/friendship_entity.dart';
 import 'package:play_with_me/core/domain/entities/friendship_status_result.dart';
 import 'package:play_with_me/core/domain/entities/user_search_result.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
+import 'package:play_with_me/core/utils/performance_tracer.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 
 /// Firestore implementation of FriendRepository
@@ -159,7 +160,8 @@ class FirestoreFriendRepository implements FriendRepository {
   }
 
   @override
-  Future<List<UserEntity>> getFriends(String userId) async {
+  Future<List<UserEntity>> getFriends(String userId) {
+    return PerformanceTracer.trace('repo_get_friends', () async {
     try {
       // Story 11.13: Use Cloud Function to fetch friends
       // Following Epic 11's Cloud Function-first architecture
@@ -209,6 +211,7 @@ class FirestoreFriendRepository implements FriendRepository {
     } catch (e) {
       throw FriendshipException('Failed to get friends: $e');
     }
+    });
   }
 
   @override
@@ -362,7 +365,8 @@ class FirestoreFriendRepository implements FriendRepository {
   }
 
   @override
-  Future<UserSearchResult> searchUserByEmail(String email) async {
+  Future<UserSearchResult> searchUserByEmail(String email) {
+    return PerformanceTracer.trace('repo_search_user_by_email', () async {
     try {
       final callable = _functions.httpsCallable('searchUserByEmail');
       final result = await callable.call({'email': email});
@@ -404,6 +408,7 @@ class FirestoreFriendRepository implements FriendRepository {
     } catch (e) {
       throw FriendshipException('Failed to search user by email: $e');
     }
+    });
   }
 
   @override

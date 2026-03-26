@@ -1,5 +1,6 @@
 // Validates GameCreationBloc manages game creation form state and submission logic.
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/data/models/game_model.dart';
@@ -10,10 +11,13 @@ import 'game_creation_state.dart';
 
 class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
   final GameRepository _gameRepository;
+  final FirebaseAnalytics _analytics;
 
   GameCreationBloc({
     required GameRepository gameRepository,
+    required FirebaseAnalytics analytics,
   })  : _gameRepository = gameRepository,
+        _analytics = analytics,
         super(const GameCreationInitial()) {
     on<SelectGroup>(_onSelectGroup);
     on<SetDateTime>(_onSetDateTime);
@@ -37,7 +41,12 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
     return const GameCreationFormState();
   }
 
-  void _onSelectGroup(SelectGroup event, Emitter<GameCreationState> emit) {
+  Future<void> _onSelectGroup(
+      SelectGroup event, Emitter<GameCreationState> emit) async {
+    // Log intent when the creation screen opens (SelectGroup is dispatched on initState).
+    if (state is GameCreationInitial) {
+      await _analytics.logEvent(name: 'create_game_started');
+    }
     final formState = _currentFormState.copyWith(
       groupId: event.groupId,
       groupName: event.groupName,

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
+import 'package:play_with_me/core/utils/performance_tracer.dart';
 import 'head_to_head_event.dart';
 import 'head_to_head_state.dart';
 
@@ -22,9 +23,9 @@ class HeadToHeadBloc extends Bloc<HeadToHeadEvent, HeadToHeadState> {
 
     try {
       // Fetch head-to-head stats (opponent info is cached in the stats document)
-      final stats = await userRepository.getHeadToHeadStats(
-        event.userId,
-        event.opponentId,
+      final stats = await PerformanceTracer.trace(
+        'page_head_to_head_load',
+        () => userRepository.getHeadToHeadStats(event.userId, event.opponentId),
       );
 
       if (stats == null) {

@@ -1,5 +1,6 @@
 // Widget tests for GroupListPage using mocked repository
 // These tests verify UI behavior without real Firestore streams
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -19,10 +20,12 @@ import '../../../../../unit/core/data/repositories/mock_group_repository.dart';
 
 // Mock classes
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
 
 void main() {
   late MockGroupRepository mockGroupRepository;
   late MockAuthenticationBloc mockAuthBloc;
+  late MockFirebaseAnalytics mockAnalytics;
   late GroupBloc groupBloc;
 
   const testUserId = 'test-user-123';
@@ -30,6 +33,11 @@ void main() {
   setUp(() {
     mockGroupRepository = MockGroupRepository();
     mockAuthBloc = MockAuthenticationBloc();
+    mockAnalytics = MockFirebaseAnalytics();
+    when(() => mockAnalytics.logEvent(
+          name: any(named: 'name'),
+          parameters: any(named: 'parameters'),
+        )).thenAnswer((_) async {});
 
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
@@ -47,7 +55,10 @@ void main() {
 
     // Ensure groups are cleared before each test
     mockGroupRepository.clearGroups();
-    groupBloc = GroupBloc(groupRepository: mockGroupRepository);
+    groupBloc = GroupBloc(
+      groupRepository: mockGroupRepository,
+      analytics: mockAnalytics,
+    );
   });
 
   tearDown(() {
