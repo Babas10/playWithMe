@@ -1,3 +1,8 @@
+# Load test tool
+tools/load_test/node_modules/
+tools/load_test/lib/
+tools/load_test/*service-account*.json
+
 # Miscellaneous
 *.class
 *.log
