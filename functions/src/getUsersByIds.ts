@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { writePerformanceEvent } from "./helpers/analytics";
 
 /**
  * Request interface for getUsersByIds Cloud Function
@@ -151,4 +152,21 @@ export async function getUsersByIdsHandler(
  * - Uses Admin SDK to bypass security rules
  * - Limited to 100 users per request to prevent abuse
  */
-export const getUsersByIds = functions.https.onCall(getUsersByIdsHandler);
+export const getUsersByIds = functions.https.onCall(async (data, context) => {
+  const start = Date.now();
+  let status: "success" | "error" = "success";
+  try {
+    return await getUsersByIdsHandler(data, context);
+  } catch (error) {
+    status = "error";
+    throw error;
+  } finally {
+    await writePerformanceEvent({
+      functionName: "getUsersByIds",
+      durationMs: Date.now() - start,
+      uid: context.auth?.uid,
+      status,
+    });
+  }
+});
+

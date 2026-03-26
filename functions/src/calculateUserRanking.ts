@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { writePerformanceEvent } from "./helpers/analytics";
 
 /**
  * Response interface for calculateUserRanking Cloud Function (Story 302.2)
@@ -214,6 +215,21 @@ export async function calculateUserRankingHandler(
  * - User profile ranking display
  * - Leaderboard comparisons
  */
-export const calculateUserRanking = functions.https.onCall(
-  calculateUserRankingHandler
-);
+export const calculateUserRanking = functions.https.onCall(async (data, context) => {
+  const start = Date.now();
+  let status: "success" | "error" = "success";
+  try {
+    return await calculateUserRankingHandler(data, context);
+  } catch (error) {
+    status = "error";
+    throw error;
+  } finally {
+    await writePerformanceEvent({
+      functionName: "calculateUserRanking",
+      durationMs: Date.now() - start,
+      uid: context.auth?.uid,
+      status,
+    });
+  }
+});
+
