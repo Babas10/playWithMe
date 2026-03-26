@@ -2,6 +2,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {checkFriendship} from "./friendships";
+import { writePerformanceEvent } from "./helpers/analytics";
 
 interface SearchUserByEmailRequest {
   email: string;
@@ -201,4 +202,21 @@ export async function searchUserByEmailHandler(
  * This function provides a secure way to look up users without exposing
  * the entire /users collection to client-side queries.
  */
-export const searchUserByEmail = functions.https.onCall(searchUserByEmailHandler);
+export const searchUserByEmail = functions.https.onCall(async (data, context) => {
+  const start = Date.now();
+  let status: "success" | "error" = "success";
+  try {
+    return await searchUserByEmailHandler(data, context);
+  } catch (error) {
+    status = "error";
+    throw error;
+  } finally {
+    await writePerformanceEvent({
+      functionName: "searchUserByEmail",
+      durationMs: Date.now() - start,
+      uid: context.auth?.uid,
+      status,
+    });
+  }
+});
+

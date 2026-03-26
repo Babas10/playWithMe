@@ -2,6 +2,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { writeAnalyticsEvent } from "./helpers/analytics";
+import { writePerformanceEvent } from "./helpers/analytics";
 
 // ============================================================================
 // Type Definitions
@@ -783,7 +784,23 @@ export async function getFriendsHandler(
 /**
  * Cloud Function to get a user's friends list
  */
-export const getFriends = functions.https.onCall(getFriendsHandler);
+export const getFriends = functions.https.onCall(async (data, context) => {
+  const start = Date.now();
+  let status: "success" | "error" = "success";
+  try {
+    return await getFriendsHandler(data, context);
+  } catch (error) {
+    status = "error";
+    throw error;
+  } finally {
+    await writePerformanceEvent({
+      functionName: "getFriends",
+      durationMs: Date.now() - start,
+      uid: context.auth?.uid,
+      status,
+    });
+  }
+});;
 
 // ============================================================================
 // Function 6: Check Friendship Status
@@ -1608,9 +1625,23 @@ export async function batchCheckFriendshipHandler(
  *
  * Performance: O(1) Firestore reads regardless of user count (up to 100)
  */
-export const batchCheckFriendship = functions.https.onCall(
-  batchCheckFriendshipHandler
-);
+export const batchCheckFriendship = functions.https.onCall(async (data, context) => {
+  const start = Date.now();
+  let status: "success" | "error" = "success";
+  try {
+    return await batchCheckFriendshipHandler(data, context);
+  } catch (error) {
+    status = "error";
+    throw error;
+  } finally {
+    await writePerformanceEvent({
+      functionName: "batchCheckFriendship",
+      durationMs: Date.now() - start,
+      uid: context.auth?.uid,
+      status,
+    });
+  }
+});;
 
 // ============================================================================
 // Story 11.19: Batch Friend Request Status Checking

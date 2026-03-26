@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { writePerformanceEvent } from "./helpers/analytics";
 
 /**
  * Get head-to-head statistics between the authenticated user and an opponent.
@@ -11,26 +12,28 @@ import * as admin from "firebase-admin";
  */
 export const getHeadToHeadStats = functions.https.onCall(
   async (data, context) => {
-    // Validate authentication
-    if (!context.auth) {
-      throw new functions.https.HttpsError(
-        "unauthenticated",
-        "You must be logged in to view head-to-head statistics."
-      );
-    }
-
-    // Validate input
-    if (!data || typeof data.opponentId !== "string") {
-      throw new functions.https.HttpsError(
-        "invalid-argument",
-        'Expected parameter "opponentId" of type string.'
-      );
-    }
-
-    const userId = context.auth.uid;
-    const opponentId = data.opponentId;
-
+    const start = Date.now();
+    let status: "success" | "error" = "success";
     try {
+      // Validate authentication
+      if (!context.auth) {
+        throw new functions.https.HttpsError(
+          "unauthenticated",
+          "You must be logged in to view head-to-head statistics."
+        );
+      }
+
+      // Validate input
+      if (!data || typeof data.opponentId !== "string") {
+        throw new functions.https.HttpsError(
+          "invalid-argument",
+          'Expected parameter "opponentId" of type string.'
+        );
+      }
+
+      const userId = context.auth.uid;
+      const opponentId = data.opponentId;
+
       const db = admin.firestore();
 
       // Fetch head-to-head stats document
@@ -68,14 +71,25 @@ export const getHeadToHeadStats = functions.https.onCall(
 
       return serializedData;
     } catch (error) {
+      status = "error";
+      if (error instanceof functions.https.HttpsError) {
+        throw error;
+      }
       functions.logger.error(
-        `Error retrieving head-to-head stats for ${userId} vs ${opponentId}:`,
+        "Error retrieving head-to-head stats:",
         error
       );
       throw new functions.https.HttpsError(
         "internal",
         "Failed to retrieve head-to-head statistics. Please try again later."
       );
+    } finally {
+      await writePerformanceEvent({
+        functionName: "getHeadToHeadStats",
+        durationMs: Date.now() - start,
+        uid: context.auth?.uid,
+        status,
+      });
     }
   }
 );

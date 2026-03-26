@@ -2,6 +2,7 @@
 // ARCHITECTURE: Training sessions are in Games layer
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { writePerformanceEvent } from "./helpers/analytics";
 
 // ============================================================================
 // Type Definitions
@@ -200,6 +201,9 @@ export const generateRecurringTrainingSessions = functions
       data: GenerateRecurringSessionsRequest,
       context: functions.https.CallableContext
     ): Promise<GenerateRecurringSessionsResponse> => {
+      const start = Date.now();
+      let status: "success" | "error" = "success";
+      try {
       // ========================================
       // 1. Authentication Check
       // ========================================
@@ -328,6 +332,17 @@ export const generateRecurringTrainingSessions = functions
           "internal",
           "Failed to generate recurring training sessions. Please try again."
         );
+      }
+      } catch (error) {
+        status = "error";
+        throw error;
+      } finally {
+        await writePerformanceEvent({
+          functionName: "generateRecurringTrainingSessions",
+          durationMs: Date.now() - start,
+          uid: context.auth?.uid,
+          status,
+        });
       }
     }
   );
