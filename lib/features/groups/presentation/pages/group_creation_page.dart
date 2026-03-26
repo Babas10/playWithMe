@@ -30,6 +30,12 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
   Set<String> _selectedFriendIds = {};
 
   @override
+  void initState() {
+    super.initState();
+    context.read<GroupBloc>().add(const GroupCreationStarted());
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();

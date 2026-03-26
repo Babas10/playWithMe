@@ -1,7 +1,9 @@
 // Validates GameDetailsBloc emits correct states during game details operations.
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_event.dart';
@@ -10,17 +12,26 @@ import 'package:play_with_me/features/games/presentation/bloc/game_details/game_
 import '../../../../../../unit/core/data/repositories/mock_game_repository.dart';
 import '../../../../../../unit/core/data/repositories/mock_user_repository.dart';
 
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
+
 void main() {
   late MockGameRepository mockGameRepository;
   late MockUserRepository mockUserRepository;
+  late MockFirebaseAnalytics mockAnalytics;
   late GameDetailsBloc gameDetailsBloc;
 
   setUp(() {
     mockGameRepository = MockGameRepository();
     mockUserRepository = MockUserRepository();
+    mockAnalytics = MockFirebaseAnalytics();
+    when(() => mockAnalytics.logEvent(
+          name: any(named: 'name'),
+          parameters: any(named: 'parameters'),
+        )).thenAnswer((_) async {});
     gameDetailsBloc = GameDetailsBloc(
       gameRepository: mockGameRepository,
       userRepository: mockUserRepository,
+      analytics: mockAnalytics,
     );
   });
 
@@ -46,6 +57,7 @@ void main() {
           return GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
         },
         act: (bloc) => bloc.add(const LoadGameDetails(gameId: 'test-game-123')),
@@ -55,6 +67,12 @@ void main() {
               .having((state) => state.game, 'game', TestGameData.testGame)
               .having((state) => state.players, 'players', isNotEmpty),
         ],
+        verify: (_) {
+          verify(() => mockAnalytics.logEvent(
+                name: 'rsvp_screen_opened',
+                parameters: any(named: 'parameters'),
+              )).called(1);
+        },
       );
 
       blocTest<GameDetailsBloc, GameDetailsState>(
@@ -78,6 +96,7 @@ void main() {
           return GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
         },
         act: (bloc) => bloc.add(const LoadGameDetails(gameId: 'test-game-123')),
@@ -94,6 +113,7 @@ void main() {
         build: () => GameDetailsBloc(
           gameRepository: mockGameRepository,
           userRepository: mockUserRepository,
+        analytics: mockAnalytics,
         ),
         act: (bloc) => bloc.add(const LoadGameDetails(gameId: 'non-existent-game')),
         expect: () => [
@@ -116,6 +136,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
@@ -147,6 +168,7 @@ void main() {
         build: () => GameDetailsBloc(
           gameRepository: mockGameRepository,
           userRepository: mockUserRepository,
+        analytics: mockAnalytics,
         ),
         seed: () => GameDetailsLoaded(game: TestGameData.testGame),
         act: (bloc) => bloc.add(
@@ -171,6 +193,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'full-game-101'));
@@ -206,6 +229,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
@@ -239,6 +263,7 @@ void main() {
         build: () => GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           ),
         seed: () => GameDetailsLoaded(game: TestGameData.testGame),
         act: (bloc) => bloc.add(
@@ -269,6 +294,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'full-game-101'));
@@ -312,6 +338,7 @@ void main() {
         final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
 
         bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
@@ -333,6 +360,7 @@ void main() {
         final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
         bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
 
@@ -359,6 +387,7 @@ void main() {
         build: () => GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           ),
         act: (bloc) => bloc.add(GameDetailsUpdated(game: TestGameData.testGame)),
         expect: () => [
@@ -371,6 +400,7 @@ void main() {
         build: () => GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           ),
         act: (bloc) => bloc.add(const GameDetailsUpdated(game: null)),
         expect: () => [
@@ -387,6 +417,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           // Establish stream subscription before test
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
@@ -425,6 +456,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
@@ -461,6 +493,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
@@ -493,6 +526,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
@@ -520,6 +554,7 @@ void main() {
         build: () => GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           ),
         seed: () => GameDetailsLoaded(game: TestGameData.testGame),
         act: (bloc) => bloc.add(
@@ -551,6 +586,7 @@ void main() {
           final bloc = GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
           bloc.add(const LoadGameDetails(gameId: 'test-game-123'));
           return bloc;
@@ -584,6 +620,7 @@ void main() {
           return GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
         },
         seed: () => GameDetailsLoaded(game: TestGameData.testGame), // Scheduled status
@@ -611,6 +648,7 @@ void main() {
           return GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
         },
         seed: () => GameDetailsLoaded(
@@ -644,6 +682,7 @@ void main() {
           return GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
         },
         seed: () => GameDetailsLoaded(
@@ -673,6 +712,7 @@ void main() {
           return GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           );
         },
         seed: () => GameDetailsLoaded(game: TestGameData.testGame),
@@ -700,6 +740,7 @@ void main() {
         build: () => GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           ),
         act: (bloc) => bloc.add(
           const JoinGameDetails(gameId: 'test-game-123', userId: 'user-123'),
@@ -714,6 +755,7 @@ void main() {
         build: () => GameDetailsBloc(
             gameRepository: mockGameRepository,
             userRepository: mockUserRepository,
+        analytics: mockAnalytics,
           ),
         act: (bloc) => bloc.add(
           const LeaveGameDetails(gameId: 'test-game-123', userId: 'user-123'),

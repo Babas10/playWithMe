@@ -1,5 +1,6 @@
 // Validates DeepLinkBloc emits correct states during initialization, token reception, and clearing.
 import 'package:bloc_test/bloc_test.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
@@ -12,19 +13,28 @@ class MockDeepLinkService extends Mock implements DeepLinkService {}
 
 class MockPendingInviteStorage extends Mock implements PendingInviteStorage {}
 
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
+
 void main() {
   late MockDeepLinkService mockDeepLinkService;
   late MockPendingInviteStorage mockStorage;
+  late MockFirebaseAnalytics mockAnalytics;
 
   setUp(() {
     mockDeepLinkService = MockDeepLinkService();
     mockStorage = MockPendingInviteStorage();
+    mockAnalytics = MockFirebaseAnalytics();
+    when(() => mockAnalytics.logEvent(
+          name: any(named: 'name'),
+          parameters: any(named: 'parameters'),
+        )).thenAnswer((_) async {});
   });
 
   DeepLinkBloc buildBloc() {
     return DeepLinkBloc(
       deepLinkService: mockDeepLinkService,
       pendingInviteStorage: mockStorage,
+      analytics: mockAnalytics,
     );
   }
 
@@ -55,6 +65,7 @@ void main() {
         verify: (_) {
           verify(() => mockStorage.retrieve()).called(1);
           verifyNever(() => mockDeepLinkService.getInitialInviteToken());
+          verify(() => mockAnalytics.logEvent(name: 'invite_link_tapped')).called(1);
         },
       );
 
@@ -129,6 +140,7 @@ void main() {
         ],
         verify: (_) {
           verify(() => mockStorage.store('new-token')).called(1);
+          verify(() => mockAnalytics.logEvent(name: 'invite_link_tapped')).called(1);
         },
       );
     });

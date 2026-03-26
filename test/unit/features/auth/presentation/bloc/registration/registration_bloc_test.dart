@@ -1,19 +1,32 @@
 // Verifies that RegistrationBloc correctly handles registration events and emits appropriate states.
 import 'package:bloc_test/bloc_test.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/registration/registration_state.dart';
 import '../../../data/mock_auth_repository.dart';
 
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
+
 void main() {
   group('RegistrationBloc', () {
     late MockAuthRepository mockAuthRepository;
+    late MockFirebaseAnalytics mockAnalytics;
     late RegistrationBloc registrationBloc;
 
     setUp(() {
       mockAuthRepository = MockAuthRepository();
-      registrationBloc = RegistrationBloc(authRepository: mockAuthRepository);
+      mockAnalytics = MockFirebaseAnalytics();
+      when(() => mockAnalytics.logEvent(
+            name: any(named: 'name'),
+            parameters: any(named: 'parameters'),
+          )).thenAnswer((_) async {});
+      registrationBloc = RegistrationBloc(
+        authRepository: mockAuthRepository,
+        analytics: mockAnalytics,
+      );
     });
 
     tearDown(() {
@@ -303,6 +316,35 @@ void main() {
             const RegistrationLoading(),
             const RegistrationSuccess(),
           ],
+          verify: (_) {
+            verify(() => mockAnalytics.logEvent(name: 'onboarding_completed')).called(1);
+          },
+        );
+
+        blocTest<RegistrationBloc, RegistrationState>(
+          'does not log onboarding_completed when registration fails',
+          setUp: () {
+            mockAuthRepository.setCreateUserWithEmailAndPasswordBehavior(
+              ({required String email, required String password}) async =>
+                  throw Exception('Email already in use'),
+            );
+          },
+          build: () => registrationBloc,
+          act: (bloc) => bloc.add(const RegistrationSubmitted(
+            firstName: validFirstName,
+            lastName: validLastName,
+            displayName: validDisplayName,
+            email: validEmail,
+            password: validPassword,
+            confirmPassword: validPassword,
+          )),
+          expect: () => [
+            const RegistrationLoading(),
+            const RegistrationFailure('Email already in use'),
+          ],
+          verify: (_) {
+            verifyNever(() => mockAnalytics.logEvent(name: 'onboarding_completed'));
+          },
         );
 
         blocTest<RegistrationBloc, RegistrationState>(

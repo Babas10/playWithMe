@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
@@ -6,10 +7,13 @@ import 'package:play_with_me/features/auth/presentation/bloc/registration/regist
 
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   final AuthRepository _authRepository;
+  final FirebaseAnalytics _analytics;
 
   RegistrationBloc({
     required AuthRepository authRepository,
+    required FirebaseAnalytics analytics,
   })  : _authRepository = authRepository,
+        _analytics = analytics,
         super(const RegistrationInitial()) {
     on<RegistrationSubmitted>(_onRegistrationSubmitted);
     on<RegistrationFormReset>(_onRegistrationFormReset);
@@ -71,6 +75,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
         debugPrint('⚠️ RegistrationBloc: Failed to send email verification: $e');
       }
 
+      await _analytics.logEvent(name: 'onboarding_completed');
       emit(const RegistrationSuccess());
     } catch (error) {
       String errorMessage = error.toString();

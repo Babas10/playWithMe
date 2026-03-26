@@ -39,6 +39,7 @@ class GameDetailsPage extends StatelessWidget {
       create: (context) => GameDetailsBloc(
         gameRepository: gameRepository ?? sl<GameRepository>(),
         userRepository: userRepository ?? sl<UserRepository>(),
+        analytics: sl(),
       )..add(LoadGameDetails(gameId: gameId)),
       child: const _GameDetailsView(),
     );

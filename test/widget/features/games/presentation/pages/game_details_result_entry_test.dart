@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -28,11 +29,14 @@ class MockAuthenticationBloc extends MockBloc<AuthenticationEvent, Authenticatio
 class MockInvitationBloc extends MockBloc<InvitationEvent, InvitationState>
     implements InvitationBloc {}
 
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
+
 void main() {
   late MockGameRepository mockGameRepository;
   late MockUserRepository mockUserRepository;
   late MockAuthenticationBloc mockAuthBloc;
   late MockInvitationBloc mockInvitationBloc;
+  late MockFirebaseAnalytics mockAnalytics;
   final sl = GetIt.instance;
 
   const creatorId = 'user-creator';
@@ -52,6 +56,11 @@ void main() {
     mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
+    mockAnalytics = MockFirebaseAnalytics();
+    when(() => mockAnalytics.logEvent(
+          name: any(named: 'name'),
+          parameters: any(named: 'parameters'),
+        )).thenAnswer((_) async {});
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
 
     if (sl.isRegistered<GameRepository>()) {
@@ -63,6 +72,11 @@ void main() {
       sl.unregister<UserRepository>();
     }
     sl.registerSingleton<UserRepository>(mockUserRepository);
+
+    if (sl.isRegistered<FirebaseAnalytics>()) {
+      sl.unregister<FirebaseAnalytics>();
+    }
+    sl.registerSingleton<FirebaseAnalytics>(mockAnalytics);
   });
 
   tearDown(() {
