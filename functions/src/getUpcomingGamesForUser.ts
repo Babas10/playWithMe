@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { writePerformanceEvent } from "./helpers/analytics";
 
 /**
  * Request interface for getUpcomingGamesForUser Cloud Function
@@ -238,6 +239,21 @@ export async function getUpcomingGamesForUserHandler(
  * final nextGame = games.isNotEmpty ? games.first : null;
  * ```
  */
-export const getUpcomingGamesForUser = functions.https.onCall(
-  getUpcomingGamesForUserHandler
-);
+export const getUpcomingGamesForUser = functions.https.onCall(async (data, context) => {
+  const start = Date.now();
+  let status: "success" | "error" = "success";
+  try {
+    return await getUpcomingGamesForUserHandler(data, context);
+  } catch (error) {
+    status = "error";
+    throw error;
+  } finally {
+    await writePerformanceEvent({
+      functionName: "getUpcomingGamesForUser",
+      durationMs: Date.now() - start,
+      uid: context.auth?.uid,
+      status,
+    });
+  }
+});
+
