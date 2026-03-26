@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
@@ -43,6 +44,9 @@ class MockDeepLinkService extends Mock implements DeepLinkService {}
 
 // Mock for PendingInviteStorage
 class MockPendingInviteStorage extends Mock implements PendingInviteStorage {}
+
+// Mock for FirebaseAnalytics
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
 
 // Mock for GroupInviteLinkRepository
 class MockGroupInviteLinkRepository extends Mock
@@ -99,6 +103,14 @@ Future<void> initializeTestDependencies({
     () => _globalMockUserRepo!,
   );
 
+  // Register mock FirebaseAnalytics
+  final mockAnalytics = MockFirebaseAnalytics();
+  when(() => mockAnalytics.logEvent(
+        name: any(named: 'name'),
+        parameters: any(named: 'parameters'),
+      )).thenAnswer((_) async {});
+  sl.registerLazySingleton<FirebaseAnalytics>(() => mockAnalytics);
+
   // Register BLoCs with mock repository
   sl.registerFactory<AuthenticationBloc>(
     () => AuthenticationBloc(authRepository: sl<AuthRepository>()),
@@ -111,6 +123,7 @@ Future<void> initializeTestDependencies({
   sl.registerFactory<RegistrationBloc>(
     () => RegistrationBloc(
       authRepository: sl<AuthRepository>(),
+      analytics: sl<FirebaseAnalytics>(),
     ),
   );
 
@@ -147,6 +160,7 @@ Future<void> initializeTestDependencies({
     () => GroupBloc(
       groupRepository: sl<GroupRepository>(),
       invitationRepository: sl<InvitationRepository>(),
+      analytics: sl<FirebaseAnalytics>(),
     ),
   );
 
@@ -202,6 +216,7 @@ Future<void> initializeTestDependencies({
     () => DeepLinkBloc(
       deepLinkService: sl<DeepLinkService>(),
       pendingInviteStorage: sl<PendingInviteStorage>(),
+      analytics: sl<FirebaseAnalytics>(),
     ),
   );
 

@@ -1,5 +1,6 @@
 // Widget tests for GameDetailsPage verifying UI behavior with mocked dependencies.
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,6 +9,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
+import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
@@ -21,22 +23,32 @@ import '../../../../../unit/core/data/repositories/mock_user_repository.dart';
 // Mock classes
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 class MockInvitationBloc extends Mock implements InvitationBloc {}
+class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
 
 void main() {
   late MockGameRepository mockGameRepository;
   late MockUserRepository mockUserRepository;
   late MockAuthenticationBloc mockAuthBloc;
   late MockInvitationBloc mockInvitationBloc;
+  late MockFirebaseAnalytics mockAnalytics;
   late GameDetailsBloc gameDetailsBloc;
 
   const testUserId = 'test-uid-123';
   const testGameId = 'test-game-123';
 
-  setUp(() {
+  setUp(() async {
     mockGameRepository = MockGameRepository();
     mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
+    mockAnalytics = MockFirebaseAnalytics();
+    when(() => mockAnalytics.logEvent(
+          name: any(named: 'name'),
+          parameters: any(named: 'parameters'),
+        )).thenAnswer((_) async {});
+
+    await sl.reset();
+    sl.registerLazySingleton<FirebaseAnalytics>(() => mockAnalytics);
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
     when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
 
@@ -72,13 +84,15 @@ void main() {
     gameDetailsBloc = GameDetailsBloc(
       gameRepository: mockGameRepository,
       userRepository: mockUserRepository,
+      analytics: mockAnalytics,
     );
   });
 
-  tearDown(() {
+  tearDown(() async {
     gameDetailsBloc.close();
     mockGameRepository.dispose();
     mockUserRepository.dispose();
+    await sl.reset();
   });
 
   Widget createApp({required String gameId}) {

@@ -1,5 +1,6 @@
 // Manages game details screen state with real-time updates and RSVP actions.
 import 'dart:async';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
@@ -13,13 +14,16 @@ import 'game_details_state.dart';
 class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
   final GameRepository _gameRepository;
   final UserRepository _userRepository;
+  final FirebaseAnalytics _analytics;
   StreamSubscription<dynamic>? _gameSubscription;
 
   GameDetailsBloc({
     required GameRepository gameRepository,
     required UserRepository userRepository,
+    required FirebaseAnalytics analytics,
   })  : _gameRepository = gameRepository,
         _userRepository = userRepository,
+        _analytics = analytics,
         super(const GameDetailsInitial()) {
     on<LoadGameDetails>(_onLoadGameDetails);
     on<GameDetailsUpdated>(_onGameDetailsUpdated);
@@ -62,8 +66,17 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     GameDetailsUpdated event,
     Emitter<GameDetailsState> emit,
   ) async {
+    // Log when the RSVP screen first renders (state transitions from loading).
+    final isFirstLoad = state is GameDetailsLoading || state is GameDetailsInitial;
+
     if (event.game != null) {
       final game = event.game!;
+      if (isFirstLoad) {
+        await _analytics.logEvent(
+          name: 'rsvp_screen_opened',
+          parameters: {'game_status': game.status.toString().split('.').last},
+        );
+      }
       // Fetch player data for all players and waitlisted users
       final allPlayerIds = <String>{
         ...game.playerIds,
