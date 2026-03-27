@@ -215,7 +215,7 @@ export async function calculateUserRankingHandler(
  * - User profile ranking display
  * - Leaderboard comparisons
  */
-export const calculateUserRanking = functions.https.onCall(async (data, context) => {
+export const calculateUserRanking = functions.region('europe-west6').https.onCall(async (data, context) => {
   const start = Date.now();
   let status: "success" | "error" = "success";
   try {

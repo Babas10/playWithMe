@@ -14,6 +14,7 @@ import { updateHeadToHeadStats } from "./statsTracking";
  * Trigger: onUpdate when eloCalculated changes from false to true
  */
 export const onEloCalculationComplete = functions
+  .region('europe-west6')
   .runWith({
     timeoutSeconds: 180, // 3 minutes - multiple h2h transactions can be slow
     memory: "512MB",

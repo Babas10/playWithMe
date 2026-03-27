@@ -58,7 +58,7 @@ async function getTrainingSessionData(
 // Main Cloud Function
 // ============================================================================
 
-export const getTrainingFeedback = functions.https.onCall(
+export const getTrainingFeedback = functions.region('europe-west6').https.onCall(
   async (
     data: GetTrainingFeedbackRequest,
     context: functions.https.CallableContext

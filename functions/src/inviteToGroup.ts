@@ -356,4 +356,4 @@ export async function inviteToGroupHandler(
  * Cloud Function to invite a user to a group
  * Story 11.16: Enforces that only confirmed friends can be invited to groups
  */
-export const inviteToGroup = functions.https.onCall(inviteToGroupHandler);
+export const inviteToGroup = functions.region('europe-west6').https.onCall(inviteToGroupHandler);

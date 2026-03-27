@@ -21,7 +21,7 @@ interface CancelTrainingSessionResponse {
 // Main Cloud Function
 // ============================================================================
 
-export const cancelTrainingSession = functions.https.onCall(
+export const cancelTrainingSession = functions.region('europe-west6').https.onCall(
   async (
     data: CancelTrainingSessionRequest,
     context: functions.https.CallableContext

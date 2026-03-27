@@ -280,7 +280,7 @@ class FirestoreGroupRepository implements GroupRepository {
   @override
   Future<void> leaveGroup(String groupId) async {
     try {
-      final callable = FirebaseFunctions.instance.httpsCallable('leaveGroup');
+      final callable = FirebaseFunctions.instanceFor(region: 'europe-west6').httpsCallable('leaveGroup');
       final result = await callable.call<Map<String, dynamic>>({
         'groupId': groupId,
       });

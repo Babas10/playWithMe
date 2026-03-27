@@ -10,7 +10,7 @@ import { writePerformanceEvent } from "./helpers/analytics";
  * @param opponentId - The ID of the opponent to get stats against
  * @returns Head-to-head statistics document or null if not found
  */
-export const getHeadToHeadStats = functions.https.onCall(
+export const getHeadToHeadStats = functions.region('europe-west6').https.onCall(
   async (data, context) => {
     const start = Date.now();
     let status: "success" | "error" = "success";

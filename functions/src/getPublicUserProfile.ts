@@ -135,6 +135,6 @@ export async function getPublicUserProfileHandler(
  * - User profile viewing
  * - Friend profile display
  */
-export const getPublicUserProfile = functions.https.onCall(
+export const getPublicUserProfile = functions.region('europe-west6').https.onCall(
   getPublicUserProfileHandler
 );

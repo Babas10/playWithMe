@@ -202,7 +202,7 @@ export async function searchUserByEmailHandler(
  * This function provides a secure way to look up users without exposing
  * the entire /users collection to client-side queries.
  */
-export const searchUserByEmail = functions.https.onCall(async (data, context) => {
+export const searchUserByEmail = functions.region('europe-west6').https.onCall(async (data, context) => {
   const start = Date.now();
   let status: "success" | "error" = "success";
   try {

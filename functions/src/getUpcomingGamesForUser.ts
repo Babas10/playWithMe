@@ -239,7 +239,7 @@ export async function getUpcomingGamesForUserHandler(
  * final nextGame = games.isNotEmpty ? games.first : null;
  * ```
  */
-export const getUpcomingGamesForUser = functions.https.onCall(async (data, context) => {
+export const getUpcomingGamesForUser = functions.region('europe-west6').https.onCall(async (data, context) => {
   const start = Date.now();
   let status: "success" | "error" = "success";
   try {

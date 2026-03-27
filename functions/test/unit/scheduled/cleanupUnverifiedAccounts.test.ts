@@ -31,8 +31,9 @@ jest.mock("firebase-admin", () => {
 });
 
 // Mock firebase-functions
-jest.mock("firebase-functions", () => ({
-  pubsub: {
+jest.mock("firebase-functions", () => {
+  const _fn = {
+    pubsub: {
     schedule: jest.fn(() => ({
       onRun: jest.fn((handler: Function) => handler),
     })),
@@ -43,7 +44,10 @@ jest.mock("firebase-functions", () => ({
     error: jest.fn(),
     debug: jest.fn(),
   },
-}));
+  };
+  (_fn as any).region = jest.fn(() => _fn);
+  return _fn;
+})
 
 // Import handler after mocks are set up
 import {cleanupUnverifiedAccounts} from

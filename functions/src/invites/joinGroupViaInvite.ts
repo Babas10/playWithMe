@@ -202,6 +202,6 @@ export async function joinGroupViaInviteHandler(
   }
 }
 
-export const joinGroupViaInvite = functions.https.onCall(
+export const joinGroupViaInvite = functions.region('europe-west6').https.onCall(
   joinGroupViaInviteHandler
 );

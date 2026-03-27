@@ -131,6 +131,6 @@ export async function hasSubmittedTrainingFeedbackHandler(
     }
 }
 
-export const hasSubmittedTrainingFeedback = functions.https.onCall(
+export const hasSubmittedTrainingFeedback = functions.region('europe-west6').https.onCall(
   hasSubmittedTrainingFeedbackHandler
 );

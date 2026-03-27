@@ -22,8 +22,9 @@ jest.mock("firebase-admin", () => ({
   })),
 }));
 
-jest.mock("firebase-functions", () => ({
-  https: {
+jest.mock("firebase-functions", () => {
+  const _fn = {
+    https: {
     HttpsError: class HttpsError extends Error {
       constructor(public code: string, message: string) {
         super(message);
@@ -33,7 +34,10 @@ jest.mock("firebase-functions", () => ({
     onCall: jest.fn((handler) => handler),
   },
   logger: mockLogger,
-}));
+  };
+  (_fn as any).region = jest.fn(() => _fn);
+  return _fn;
+})
 
 import {getPublicUserProfileHandler} from "../../src/getPublicUserProfile";
 

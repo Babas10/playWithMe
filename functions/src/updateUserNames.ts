@@ -13,7 +13,7 @@ import * as admin from "firebase-admin";
  * @param data.firstName - User's first name (required, min 2 chars)
  * @param data.lastName - User's last name (required, min 2 chars)
  */
-export const updateUserNames = functions.https.onCall(async (data, context) => {
+export const updateUserNames = functions.region('europe-west6').https.onCall(async (data, context) => {
   // 1. Validate authentication
   if (!context.auth) {
     throw new functions.https.HttpsError(

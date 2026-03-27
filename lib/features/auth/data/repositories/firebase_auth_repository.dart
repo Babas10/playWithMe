@@ -15,7 +15,7 @@ class FirebaseAuthRepository implements AuthRepository {
     FirebaseAuth? firebaseAuth,
     FirebaseFunctions? functions,
   })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
 
   @override
   UserEntity? get currentUser {

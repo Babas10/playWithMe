@@ -26,7 +26,7 @@ class FirestoreTrainingFeedbackRepository
     FirebaseFunctions? functions,
     FirebaseAuth? auth,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instance,
+        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6'),
         _auth = auth ?? FirebaseAuth.instance;
 
   /// Get feedback collection reference for a training session

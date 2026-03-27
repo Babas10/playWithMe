@@ -157,6 +157,7 @@ function validateLocation(locationName: string): string | null {
  * @returns CreateTrainingSessionResponse with sessionId
  */
 export const createTrainingSession = functions
+  .region('europe-west6')
   .runWith({
     timeoutSeconds: 30,
     memory: "256MB",

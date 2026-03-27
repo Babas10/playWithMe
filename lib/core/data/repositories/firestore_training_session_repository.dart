@@ -29,7 +29,7 @@ class FirestoreTrainingSessionRepository implements TrainingSessionRepository {
     FirebaseFunctions? functions,
     required GroupRepository groupRepository,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instance,
+        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6'),
         _groupRepository = groupRepository;
 
   @override
