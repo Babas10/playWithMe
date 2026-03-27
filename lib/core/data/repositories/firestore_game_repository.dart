@@ -1217,7 +1217,7 @@ class FirestoreGameRepository implements GameRepository {
     try {
       // Call Cloud Function to fetch completed games
       final callable =
-          FirebaseFunctions.instance.httpsCallable('getCompletedGames');
+          FirebaseFunctions.instanceFor(region: 'europe-west6').httpsCallable('getCompletedGames');
 
       final result = await callable.call({
         if (groupId != null) 'groupId': groupId,

@@ -156,4 +156,4 @@ export async function declineInvitationHandler(
  * - Uses Admin SDK to bypass security rules
  * - Validates invitation ownership
  */
-export const declineInvitation = functions.https.onCall(declineInvitationHandler);
+export const declineInvitation = functions.region('europe-west6').https.onCall(declineInvitationHandler);

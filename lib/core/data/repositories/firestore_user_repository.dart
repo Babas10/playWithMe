@@ -32,7 +32,7 @@ class FirestoreUserRepository implements UserRepository {
     FirebaseFunctions? functions,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
         _auth = auth ?? FirebaseAuth.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
 
   @override
   Stream<UserModel?> get currentUser {

@@ -15,7 +15,7 @@ import * as admin from "firebase-admin";
  * - Initializes profile with predictable structure
  * - Comprehensive logging for monitoring and debugging
  */
-export const createUserDocument = functions.auth.user().onCreate(async (user) => {
+export const createUserDocument = functions.region('europe-west6').auth.user().onCreate(async (user) => {
   const db = admin.firestore();
   const userRef = db.collection("users").doc(user.uid);
 
@@ -122,7 +122,7 @@ export const createUserDocument = functions.auth.user().onCreate(async (user) =>
  *
  * Note: This is a best-effort cleanup. Some data may be retained for audit purposes.
  */
-export const deleteUserDocument = functions.auth.user().onDelete(async (user) => {
+export const deleteUserDocument = functions.region('europe-west6').auth.user().onDelete(async (user) => {
   const db = admin.firestore();
 
   // Note: Using batch instead of transaction for cleanup operations

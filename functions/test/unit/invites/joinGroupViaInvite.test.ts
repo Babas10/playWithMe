@@ -29,8 +29,9 @@ jest.mock("firebase-admin", () => {
 });
 
 // Mock firebase-functions
-jest.mock("firebase-functions", () => ({
-  https: {
+jest.mock("firebase-functions", () => {
+  const _fn = {
+    https: {
     HttpsError: class HttpsError extends Error {
       code: string;
       constructor(code: string, message: string) {
@@ -47,7 +48,10 @@ jest.mock("firebase-functions", () => ({
     error: jest.fn(),
     debug: jest.fn(),
   },
-}));
+  };
+  (_fn as any).region = jest.fn(() => _fn);
+  return _fn;
+})
 
 describe("joinGroupViaInvite Cloud Function", () => {
   let mockDb: any;

@@ -152,7 +152,7 @@ export async function getUsersByIdsHandler(
  * - Uses Admin SDK to bypass security rules
  * - Limited to 100 users per request to prevent abuse
  */
-export const getUsersByIds = functions.https.onCall(async (data, context) => {
+export const getUsersByIds = functions.region('europe-west6').https.onCall(async (data, context) => {
   const start = Date.now();
   let status: "success" | "error" = "success";
   try {

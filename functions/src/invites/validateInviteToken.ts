@@ -211,6 +211,6 @@ export async function validateInviteTokenHandler(
   }
 }
 
-export const validateInviteToken = functions.https.onCall(
+export const validateInviteToken = functions.region('europe-west6').https.onCall(
   validateInviteTokenHandler
 );

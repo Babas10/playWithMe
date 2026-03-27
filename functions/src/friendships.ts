@@ -351,7 +351,7 @@ export async function sendFriendRequestHandler(
 /**
  * Cloud Function to send a friend request
  */
-export const sendFriendRequest = functions.https.onCall(
+export const sendFriendRequest = functions.region('europe-west6').https.onCall(
   sendFriendRequestHandler
 );
 
@@ -446,7 +446,7 @@ export async function acceptFriendRequestHandler(
 /**
  * Cloud Function to accept a friend request
  */
-export const acceptFriendRequest = functions.https.onCall(
+export const acceptFriendRequest = functions.region('europe-west6').https.onCall(
   acceptFriendRequestHandler
 );
 
@@ -541,7 +541,7 @@ export async function declineFriendRequestHandler(
 /**
  * Cloud Function to decline a friend request
  */
-export const declineFriendRequest = functions.https.onCall(
+export const declineFriendRequest = functions.region('europe-west6').https.onCall(
   declineFriendRequestHandler
 );
 
@@ -621,7 +621,7 @@ export async function removeFriendHandler(
 /**
  * Cloud Function to remove a friend
  */
-export const removeFriend = functions.https.onCall(removeFriendHandler);
+export const removeFriend = functions.region('europe-west6').https.onCall(removeFriendHandler);
 
 // ============================================================================
 // Function 5: Get Friends
@@ -784,7 +784,7 @@ export async function getFriendsHandler(
 /**
  * Cloud Function to get a user's friends list
  */
-export const getFriends = functions.https.onCall(async (data, context) => {
+export const getFriends = functions.region('europe-west6').https.onCall(async (data, context) => {
   const start = Date.now();
   let status: "success" | "error" = "success";
   try {
@@ -897,7 +897,7 @@ export async function checkFriendshipStatusHandler(
 /**
  * Cloud Function to check friendship status with another user
  */
-export const checkFriendshipStatus = functions.https.onCall(
+export const checkFriendshipStatus = functions.region('europe-west6').https.onCall(
   checkFriendshipStatusHandler
 );
 
@@ -1000,7 +1000,7 @@ export async function getFriendshipRequestsHandler(
 /**
  * Cloud Function to get all pending friendship requests for the authenticated user
  */
-export const getFriendshipRequests = functions.https.onCall(
+export const getFriendshipRequests = functions.region('europe-west6').https.onCall(
   getFriendshipRequestsHandler
 );
 
@@ -1019,7 +1019,7 @@ export const getFriendshipRequests = functions.https.onCall(
  *
  * Performance: Uses batched writes to minimize Firestore operations
  */
-export const onFriendRequestAccepted = functions.firestore
+export const onFriendRequestAccepted = functions.region('europe-west6').firestore
   .document("friendships/{friendshipId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -1090,7 +1090,7 @@ export const onFriendRequestAccepted = functions.firestore
  *
  * Performance: Uses batched writes to minimize Firestore operations
  */
-export const onFriendRemoved = functions.firestore
+export const onFriendRemoved = functions.region('europe-west6').firestore
   .document("friendships/{friendshipId}")
   .onDelete(async (snap, context) => {
     const data = snap.data();
@@ -1380,7 +1380,7 @@ export async function getFriendshipsHandler(
  * Cloud Function to get friendships by status with denormalized user info
  * Story 11.13: Unified function to replace getFriends and getFriendshipRequests
  */
-export const getFriendships = functions.https.onCall(getFriendshipsHandler);
+export const getFriendships = functions.region('europe-west6').https.onCall(getFriendshipsHandler);
 
 // ============================================================================
 // Helper Functions (Story 11.4)
@@ -1504,7 +1504,7 @@ export async function verifyFriendshipHandler(
  * Story 11.14: Enables Groups layer to validate member invitations
  * via the social graph API
  */
-export const verifyFriendship = functions.https.onCall(
+export const verifyFriendship = functions.region('europe-west6').https.onCall(
   verifyFriendshipHandler
 );
 
@@ -1625,7 +1625,7 @@ export async function batchCheckFriendshipHandler(
  *
  * Performance: O(1) Firestore reads regardless of user count (up to 100)
  */
-export const batchCheckFriendship = functions.https.onCall(async (data, context) => {
+export const batchCheckFriendship = functions.region('europe-west6').https.onCall(async (data, context) => {
   const start = Date.now();
   let status: "success" | "error" = "success";
   try {
@@ -1800,6 +1800,6 @@ export async function batchCheckFriendRequestStatusHandler(
  * Performance: O(N/10) Firestore reads (due to 'in' query limit of 10)
  * Still much better than 2N individual reads
  */
-export const batchCheckFriendRequestStatus = functions.https.onCall(
+export const batchCheckFriendRequestStatus = functions.region('europe-west6').https.onCall(
   batchCheckFriendRequestStatusHandler
 );

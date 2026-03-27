@@ -32,7 +32,7 @@ const DRY_RUN = true;
  *
  * Story 17.8.4: Scheduled Cloud Functions for Account Cleanup (#481)
  */
-export const cleanupUnverifiedAccounts = functions.pubsub
+export const cleanupUnverifiedAccounts = functions.region('europe-west6').pubsub
   .schedule("every 24 hours")
   .onRun(async () => {
     const db = admin.firestore();

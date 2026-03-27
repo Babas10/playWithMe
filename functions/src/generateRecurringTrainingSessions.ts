@@ -192,6 +192,7 @@ async function createSessionInstance(
  * @returns GenerateRecurringSessionsResponse with generated session IDs
  */
 export const generateRecurringTrainingSessions = functions
+  .region('europe-west6')
   .runWith({
     timeoutSeconds: 60,
     memory: "512MB",

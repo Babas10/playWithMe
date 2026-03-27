@@ -258,7 +258,7 @@ function formatDateTime(timestamp: admin.firestore.Timestamp): string {
 // Notifies all group members when a new training session is created
 // ============================================================================
 
-export const onTrainingSessionCreated = functions.firestore
+export const onTrainingSessionCreated = functions.region('europe-west6').firestore
   .document("trainingSessions/{sessionId}")
   .onCreate(async (snapshot, context) => {
     const sessionData = snapshot.data();
@@ -362,7 +362,7 @@ export const onTrainingSessionCreated = functions.firestore
 // Handles: minimum participants reached, session cancelled
 // ============================================================================
 
-export const onTrainingSessionUpdated = functions.firestore
+export const onTrainingSessionUpdated = functions.region('europe-west6').firestore
   .document("trainingSessions/{sessionId}")
   .onUpdate(async (change, context) => {
     const beforeData = change.before.data();
@@ -573,7 +573,7 @@ async function handleSessionCancelled(
 // Notifies all participants when someone submits feedback
 // ============================================================================
 
-export const onTrainingFeedbackCreated = functions.firestore
+export const onTrainingFeedbackCreated = functions.region('europe-west6').firestore
   .document("trainingSessions/{sessionId}/feedback/{feedbackId}")
   .onCreate(async (snapshot, context) => {
     const feedbackData = snapshot.data();
@@ -682,7 +682,7 @@ export const onTrainingFeedbackCreated = functions.firestore
 // Notifies group members when someone joins a training session
 // ============================================================================
 
-export const onParticipantJoined = functions.firestore
+export const onParticipantJoined = functions.region('europe-west6').firestore
   .document("trainingSessions/{sessionId}/participants/{userId}")
   .onCreate(async (snapshot, context) => {
     const sessionId = context.params.sessionId;
@@ -806,7 +806,7 @@ export const onParticipantJoined = functions.firestore
 // Notifies group members and organizer when someone leaves a training session
 // ============================================================================
 
-export const onParticipantLeft = functions.firestore
+export const onParticipantLeft = functions.region('europe-west6').firestore
   .document("trainingSessions/{sessionId}/participants/{userId}")
   .onUpdate(async (change, context) => {
     const sessionId = context.params.sessionId;
