@@ -63,23 +63,20 @@ export async function calculateUserRankingHandler(
       eloGamesPlayed,
     });
 
-    // 3. Calculate global rank (count users with higher ELO)
-    const higherEloCount = await db
-      .collection("users")
-      .where("eloRating", ">", userElo)
-      .where("eloGamesPlayed", ">", 0)
-      .count()
-      .get();
+    // 3 & 4. Run both count queries in parallel — they only depend on userElo
+    const [higherEloCount, totalUsersSnapshot] = await Promise.all([
+      db.collection("users")
+        .where("eloRating", ">", userElo)
+        .where("eloGamesPlayed", ">", 0)
+        .count()
+        .get(),
+      db.collection("users")
+        .where("eloGamesPlayed", ">", 0)
+        .count()
+        .get(),
+    ]);
 
     const globalRank = higherEloCount.data().count + 1;
-
-    // 4. Get total users with ELO ratings (at least 1 game played)
-    const totalUsersSnapshot = await db
-      .collection("users")
-      .where("eloGamesPlayed", ">", 0)
-      .count()
-      .get();
-
     const totalUsers = totalUsersSnapshot.data().count;
 
     // 5. Calculate percentile (0-100, where 100 = top performer)
