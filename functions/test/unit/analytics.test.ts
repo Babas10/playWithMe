@@ -25,14 +25,18 @@ jest.mock("firebase-admin", () => {
 });
 
 // Mock firebase-functions
-jest.mock("firebase-functions", () => ({
-  logger: {
+jest.mock("firebase-functions", () => {
+  const _fn = {
+    logger: {
     info: jest.fn(),
     warn: jest.fn(),
     error: jest.fn(),
     debug: jest.fn(),
   },
-}));
+  };
+  (_fn as any).region = jest.fn(() => _fn);
+  return _fn;
+})
 
 describe("writeAnalyticsEvent", () => {
   let mockAdd: jest.Mock;

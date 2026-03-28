@@ -30,8 +30,9 @@ jest.mock("firebase-admin", () => {
 });
 
 // Mock firebase-functions
-jest.mock("firebase-functions", () => ({
-  firestore: {
+jest.mock("firebase-functions", () => {
+  const _fn = {
+    firestore: {
     document: jest.fn(() => ({
       onCreate: jest.fn((handler) => handler),
       onUpdate: jest.fn((handler) => handler),
@@ -44,7 +45,10 @@ jest.mock("firebase-functions", () => ({
     error: jest.fn(),
     debug: jest.fn(),
   },
-}));
+  };
+  (_fn as any).region = jest.fn(() => _fn);
+  return _fn;
+})
 
 describe("onPlayerJoinedGame Cloud Function", () => {
   let mockDb: any;

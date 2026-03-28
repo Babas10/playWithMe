@@ -29,8 +29,9 @@ jest.mock("../../src/friendships", () => ({
 }));
 
 // Mock firebase-functions with logger
-jest.mock("firebase-functions", () => ({
-  https: {
+jest.mock("firebase-functions", () => {
+  const _fn = {
+    https: {
     HttpsError: class HttpsError extends Error {
       code: string;
       constructor(code: string, message: string) {
@@ -52,7 +53,10 @@ jest.mock("firebase-functions", () => ({
       serverTimestamp: jest.fn(() => "TIMESTAMP"),
     },
   },
-}));
+  };
+  (_fn as any).region = jest.fn(() => _fn);
+  return _fn;
+})
 
 // Import functions to access logger
 const functions = require("firebase-functions");

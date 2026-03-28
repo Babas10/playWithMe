@@ -227,7 +227,7 @@ export async function getUpcomingTrainingSessionsForUserHandler(
  * final nextSession = sessions.isNotEmpty ? sessions.first : null;
  * ```
  */
-export const getUpcomingTrainingSessionsForUser = functions.https.onCall(async (data, context) => {
+export const getUpcomingTrainingSessionsForUser = functions.region('europe-west6').https.onCall(async (data, context) => {
   const start = Date.now();
   let status: "success" | "error" = "success";
   try {

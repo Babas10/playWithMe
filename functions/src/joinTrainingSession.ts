@@ -71,7 +71,7 @@ async function isGroupMember(
 // Main Cloud Function
 // ============================================================================
 
-export const joinTrainingSession = functions.https.onCall(
+export const joinTrainingSession = functions.region('europe-west6').https.onCall(
   async (
     data: JoinTrainingSessionRequest,
     context: functions.https.CallableContext

@@ -99,6 +99,9 @@ android/app/release.jks
 node_modules/
 infrastructure/terraform/.terraform/
 
+# Load test service account keys and credentials
+tools/load_test/*.json
+
 # Python
 __pycache__/
 *.py[cod]

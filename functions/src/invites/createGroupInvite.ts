@@ -202,6 +202,6 @@ export async function createGroupInviteHandler(
   }
 }
 
-export const createGroupInvite = functions.https.onCall(
+export const createGroupInvite = functions.region('europe-west6').https.onCall(
   createGroupInviteHandler
 );

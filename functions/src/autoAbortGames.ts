@@ -17,7 +17,7 @@ import * as admin from 'firebase-admin';
  *
  * Story #285: Auto-Abort Games with Insufficient Players
  */
-export const autoAbortGames = functions.pubsub
+export const autoAbortGames = functions.region('europe-west6').pubsub
   .schedule('every 1 minutes') // Runs every minute for fast response
   .onRun(async (context) => {
     const firestore = admin.firestore();

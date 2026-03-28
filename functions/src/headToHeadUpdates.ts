@@ -14,6 +14,7 @@ import { updateNemesis } from "./statsTracking";
  * Trigger: onCreate, onUpdate of users/{userId}/headToHead/{opponentId}
  */
 export const onHeadToHeadStatsUpdated = functions
+  .region('europe-west6')
   .runWith({
     timeoutSeconds: 60, // Nemesis calculation for single user should be fast
     memory: "256MB",

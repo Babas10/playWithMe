@@ -20,7 +20,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
     FirebaseFunctions? functions,
     GroupRepository? groupRepository,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
 
   @override
   Future<String> sendInvitation({

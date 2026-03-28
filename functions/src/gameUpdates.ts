@@ -16,6 +16,7 @@ import { processGameEloUpdates } from "./elo";
  * - onHeadToHeadStatsUpdated: Nemesis (triggered by h2h doc changes)
  */
 export const onGameStatusChanged = functions
+  .region('europe-west6')
   .runWith({
     timeoutSeconds: 60, // Fast now - only ELO + teammate stats
     memory: "512MB",
