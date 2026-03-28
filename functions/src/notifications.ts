@@ -31,7 +31,7 @@ function isQuietHours(quietHours: any): boolean {
 /**
  * Send notification when user is invited to a group
  */
-export const onInvitationCreated = functions.firestore
+export const onInvitationCreated = functions.region('europe-west6').firestore
   .document("users/{userId}/invitations/{invitationId}")
   .onCreate(async (snapshot, context) => {
     const invitation = snapshot.data();
@@ -189,7 +189,7 @@ export const onInvitationCreated = functions.firestore
 /**
  * Send notification when invitation is accepted
  */
-export const onInvitationAccepted = functions.firestore
+export const onInvitationAccepted = functions.region('europe-west6').firestore
   .document("users/{userId}/invitations/{invitationId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -312,7 +312,7 @@ export const onInvitationAccepted = functions.firestore
  * Send notification when a new game is created
  * Notifies all group members except the creator
  */
-export const onGameCreated = functions.firestore
+export const onGameCreated = functions.region('europe-west6').firestore
   .document("games/{gameId}")
   .onCreate(async (snapshot, context) => {
     const game = snapshot.data();
@@ -554,7 +554,7 @@ export const onGameCreated = functions.firestore
 /**
  * Send notification when a member joins the group
  */
-export const onMemberJoined = functions.firestore
+export const onMemberJoined = functions.region('europe-west6').firestore
   .document("groups/{groupId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -668,7 +668,7 @@ export const onMemberJoined = functions.firestore
 /**
  * Send notification when a member leaves the group
  */
-export const onMemberLeft = functions.firestore
+export const onMemberLeft = functions.region('europe-west6').firestore
   .document("groups/{groupId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -781,7 +781,7 @@ export const onMemberLeft = functions.firestore
 /**
  * Send notification when user's role changes (promoted to/demoted from admin)
  */
-export const onRoleChanged = functions.firestore
+export const onRoleChanged = functions.region('europe-west6').firestore
   .document("groups/{groupId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -919,7 +919,7 @@ export const onRoleChanged = functions.firestore
 /**
  * Send notification when a friend request is sent
  */
-export const onFriendRequestSent = functions.firestore
+export const onFriendRequestSent = functions.region('europe-west6').firestore
   .document("friendships/{friendshipId}")
   .onCreate(async (snapshot, context) => {
     const friendship = snapshot.data();
@@ -1078,7 +1078,7 @@ export const onFriendRequestSent = functions.firestore
 /**
  * Send notification when a friend request is accepted
  */
-export const onFriendRequestAccepted = functions.firestore
+export const onFriendRequestAccepted = functions.region('europe-west6').firestore
   .document("friendships/{friendshipId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -1263,7 +1263,7 @@ export const onFriendRequestAccepted = functions.firestore
 /**
  * Silent cleanup when a friend request is declined
  */
-export const onFriendRequestDeclined = functions.firestore
+export const onFriendRequestDeclined = functions.region('europe-west6').firestore
   .document("friendships/{friendshipId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -1290,7 +1290,7 @@ export const onFriendRequestDeclined = functions.firestore
 /**
  * Handle friend removal (cleanup caches)
  */
-export const onFriendRemoved = functions.firestore
+export const onFriendRemoved = functions.region('europe-west6').firestore
   .document("friendships/{friendshipId}")
   .onDelete(async (snapshot, context) => {
     const friendship = snapshot.data();
@@ -1367,7 +1367,7 @@ export const onFriendRemoved = functions.firestore
  * Send notification when a player joins a game
  * Notifies all current players except the one who just joined
  */
-export const onPlayerJoinedGame = functions.firestore
+export const onPlayerJoinedGame = functions.region('europe-west6').firestore
   .document("games/{gameId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -1633,7 +1633,7 @@ export const onPlayerJoinedGame = functions.firestore
  * Send notification when a player leaves a game
  * Notifies all remaining players except the one who left
  */
-export const onPlayerLeftGame = functions.firestore
+export const onPlayerLeftGame = functions.region('europe-west6').firestore
   .document("games/{gameId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -1899,7 +1899,7 @@ export const onPlayerLeftGame = functions.firestore
  * Send notification when a waitlist user is promoted to player
  * Notifies the promoted user and all current players
  */
-export const onWaitlistPromoted = functions.firestore
+export const onWaitlistPromoted = functions.region('europe-west6').firestore
   .document("games/{gameId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -2268,7 +2268,7 @@ export const onWaitlistPromoted = functions.firestore
  * Notifies all confirmed participants except the user who submitted the result
  * Story 14.15: Notifications for Game Result Verification
  */
-export const onGameResultSubmitted = functions.firestore
+export const onGameResultSubmitted = functions.region('europe-west6').firestore
   .document("games/{gameId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();
@@ -2501,7 +2501,7 @@ export const onGameResultSubmitted = functions.firestore
 /**
  * Send notification when a game is cancelled (e.g. auto-aborted due to insufficient players)
  */
-export const onGameCancelled = functions.firestore
+export const onGameCancelled = functions.region('europe-west6').firestore
   .document("games/{gameId}")
   .onUpdate(async (change, context) => {
     const before = change.before.data();

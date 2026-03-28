@@ -2,14 +2,18 @@
 
 import {healthCheckHandler} from "../../src/healthCheck";
 
-jest.mock("firebase-functions", () => ({
-  https: {
+jest.mock("firebase-functions", () => {
+  const _fn = {
+    https: {
     onCall: jest.fn((handler) => handler),
   },
   logger: {
     info: jest.fn(),
   },
-}));
+  };
+  (_fn as any).region = jest.fn(() => _fn);
+  return _fn;
+})
 
 describe("healthCheck Cloud Function", () => {
   beforeEach(() => {

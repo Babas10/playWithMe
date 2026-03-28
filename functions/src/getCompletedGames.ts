@@ -272,6 +272,6 @@ export async function getCompletedGamesHandler(
  * });
  * ```
  */
-export const getCompletedGames = functions.https.onCall(
+export const getCompletedGames = functions.region('europe-west6').https.onCall(
   getCompletedGamesHandler
 );

@@ -144,6 +144,6 @@ export async function revokeGroupInviteHandler(
   }
 }
 
-export const revokeGroupInvite = functions.https.onCall(
+export const revokeGroupInvite = functions.region('europe-west6').https.onCall(
   revokeGroupInviteHandler
 );

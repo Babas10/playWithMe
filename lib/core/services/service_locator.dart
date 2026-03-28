@@ -105,7 +105,7 @@ Future<void> initializeDependencies() async {
   }
 
   if (!sl.isRegistered<FirebaseFunctions>()) {
-    sl.registerLazySingleton<FirebaseFunctions>(() => FirebaseFunctions.instance);
+    sl.registerLazySingleton<FirebaseFunctions>(() => FirebaseFunctions.instanceFor(region: 'europe-west6'));
   }
 
   if (!sl.isRegistered<FirebaseAnalytics>()) {

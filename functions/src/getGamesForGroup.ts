@@ -245,7 +245,7 @@ export async function getGamesForGroupHandler(
  * (see FirestoreGameRepository.getGamesForGroup). This function serves as
  * a complementary approach for specific use cases.
  */
-export const getGamesForGroup = functions.https.onCall(async (data, context) => {
+export const getGamesForGroup = functions.region('europe-west6').https.onCall(async (data, context) => {
   const start = Date.now();
   let status: "success" | "error" = "success";
   try {

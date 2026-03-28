@@ -244,4 +244,4 @@ export async function acceptInvitationHandler(
  * - Validates friendship (Story 11.4 - mandatory for all invitations)
  * - Atomic batch operation for data consistency
  */
-export const acceptInvitation = functions.https.onCall(acceptInvitationHandler);
+export const acceptInvitation = functions.region('europe-west6').https.onCall(acceptInvitationHandler);

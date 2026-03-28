@@ -195,4 +195,4 @@ export async function leaveGroupHandler(
  * - Prevents last admin from leaving
  * - Atomic batch operation for data consistency
  */
-export const leaveGroup = functions.https.onCall(leaveGroupHandler);
+export const leaveGroup = functions.region('europe-west6').https.onCall(leaveGroupHandler);

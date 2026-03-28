@@ -174,4 +174,4 @@ export async function searchUsersHandler(
  *
  * Following Epic 11's Cloud Function-first architecture.
  */
-export const searchUsers = functions.https.onCall(searchUsersHandler);
+export const searchUsers = functions.region('europe-west6').https.onCall(searchUsersHandler);

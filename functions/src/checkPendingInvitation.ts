@@ -120,4 +120,4 @@ export async function checkPendingInvitationHandler(
  * - Uses Admin SDK to query Firestore (bypasses security rules)
  * - Returns only a boolean (no sensitive data exposed)
  */
-export const checkPendingInvitation = functions.https.onCall(checkPendingInvitationHandler);
+export const checkPendingInvitation = functions.region('europe-west6').https.onCall(checkPendingInvitationHandler);
