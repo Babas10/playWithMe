@@ -212,6 +212,13 @@ jobs:
             --build-name=${{ env.VERSION_NAME }} \
             --build-number=${{ env.BUILD_NUMBER }}
 
+      - name: 💾 Save AAB as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-aab-${{ env.VERSION_NAME }}
+          path: build/app/outputs/bundle/prodRelease/app-prod-release.aab
+          retention-days: 7
+
       - name: 🔑 Decode Google Play Service Account
         run: |
           echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode \
