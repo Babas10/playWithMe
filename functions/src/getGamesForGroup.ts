@@ -108,8 +108,14 @@ export async function getGamesForGroupHandler(
   const db = admin.firestore();
 
   try {
-    // Verify group exists and user is a member
-    const groupDoc = await db.collection("groups").doc(groupId).get();
+    // Fire membership check and games query in parallel to save one round-trip
+    const [groupDoc, gamesSnapshot] = await Promise.all([
+      db.collection("groups").doc(groupId).get(),
+      db.collection("games")
+        .where("groupId", "==", groupId)
+        .orderBy("scheduledAt", "asc")
+        .get(),
+    ]);
 
     if (!groupDoc.exists) {
       functions.logger.warn("Group not found", {
@@ -146,13 +152,6 @@ export async function getGamesForGroupHandler(
         "You must be a member of this group to view its games"
       );
     }
-
-    // Query all games for this group, ordered by scheduled time
-    const gamesSnapshot = await db
-      .collection("games")
-      .where("groupId", "==", groupId)
-      .orderBy("scheduledAt", "asc")
-      .get();
 
     const games: GameData[] = [];
 

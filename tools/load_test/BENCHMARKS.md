@@ -150,6 +150,22 @@ Errors:  0 / 50 (0.0%)
 | `calculateUserRanking` | 872 → 748ms (-124) | 1159 → 885ms (-274) | **best improvement** |
 | `searchUserByEmail` | 317 → 339ms (+22) | 554 → 552ms (-2) | within noise |
 
+---
+
+## Post-parallelisation — Stories 25.5 + 25.6 (2026-03-26)
+
+> **Why numbers barely changed:** the load test replicates Firestore queries directly via
+> Admin SDK — it never calls the Cloud Function code. Parallelising reads *inside* the
+> function saves real users one Firestore RTT (~300–600ms per call) but is invisible here.
+>
+> The `getGamesForGroup` p95 spike (~3s) is a Firestore concurrency characteristic of the
+> underlying query under load — not addressable through function-code changes alone.
+
+| Function | p50 Δ | p95 Δ | Notes |
+|---|---|---|---|
+| `getGamesForGroup` | 1109 → 1021ms (-88) | 3043 → 3189ms (+146) | spike unchanged — within variance |
+| `calculateUserRanking` | 748 → 743ms (-5) | 885 → 948ms (+63) | within noise |
+
 ```
 📊 Load Test Report — getGamesForGroup
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
