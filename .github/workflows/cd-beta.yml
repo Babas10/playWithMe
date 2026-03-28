@@ -99,7 +99,7 @@ jobs:
         run: |
           sleep 15
           curl -sf -X POST \
-            "https://us-central1-${{ secrets.FIREBASE_PROD_PROJECT_ID }}.cloudfunctions.net/healthCheck" \
+            "https://europe-west6-${{ secrets.FIREBASE_PROD_PROJECT_ID }}.cloudfunctions.net/healthCheck" \
             -H "Content-Type: application/json" \
             -d '{"data": {}}' | grep -q '"ok"' \
             || (echo "❌ Smoke test failed — functions may not be running" && exit 1)
