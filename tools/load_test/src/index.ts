@@ -6,9 +6,12 @@ import * as admin from "firebase-admin";
 import * as path from "path";
 import * as fs from "fs";
 
+import { execSync } from "child_process";
+
 import { runScenario, Scenario } from "./runner";
 import { computeStats, printReport } from "./reporter";
 import { seedTestData, cleanupTestData } from "./seed";
+import { BenchmarkSink, BenchmarkRow, buildRow } from "./bigquery";
 
 import { makeScenario as makeGetGamesForGroup } from "./scenarios/getGamesForGroup";
 import { makeScenario as makeGetUpcomingGamesForUser } from "./scenarios/getUpcomingGamesForUser";
@@ -84,6 +87,10 @@ async function main(): Promise<void> {
     .option("--concurrency <n>", "Number of parallel workers", "5")
     .option("--requests <n>", "Total number of requests per scenario", "50")
     .option("--dry-run", "Print what would be called without executing")
+    .option("--bigquery", "Insert results into BigQuery after the run")
+    .option("--notes <text>", "Label for this run stored in BigQuery (e.g. 'post-migration')", "")
+    .option("--dataset <name>", "BigQuery dataset name", "load_test")
+    .option("--setup-bigquery", "Create the BigQuery dataset and table, then exit")
     .parse(process.argv);
 
   const opts = program.opts<{
@@ -94,6 +101,10 @@ async function main(): Promise<void> {
     concurrency: string;
     requests: string;
     dryRun?: boolean;
+    bigquery?: boolean;
+    notes: string;
+    dataset: string;
+    setupBigquery?: boolean;
   }>();
 
   const concurrency = parseInt(opts.concurrency, 10);
@@ -105,6 +116,14 @@ async function main(): Promise<void> {
   }
 
   const db = !dryRun ? admin.firestore() : null;
+  const keyPath = process.env.GATHERLI_DEV_SERVICE_ACCOUNT!;
+
+  // Setup BigQuery table only
+  if (opts.setupBigquery) {
+    const sink = new BenchmarkSink(path.resolve(keyPath), opts.dataset, "results");
+    await sink.setup();
+    process.exit(0);
+  }
 
   // Seed only
   if (opts.seed) {
@@ -138,6 +157,17 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  // Shared run metadata
+  const runId = new Date().toISOString();
+  const gitSha = (() => {
+    try {
+      return execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
+    } catch {
+      return "unknown";
+    }
+  })();
+  const collectedRows: BenchmarkRow[] = [];
+
   for (const name of scenarioNames) {
     const factory = registry[name];
     if (!factory) {
@@ -154,7 +184,26 @@ async function main(): Promise<void> {
     if (!dryRun) {
       const stats = computeStats(results);
       printReport(name, stats, concurrency, wallClockMs);
+
+      if (opts.bigquery) {
+        collectedRows.push(buildRow({
+          runId,
+          scenario: name,
+          stats,
+          concurrency,
+          wallClockMs,
+          gitSha,
+          notes: opts.notes,
+        }));
+      }
     }
+  }
+
+  // Insert all rows in one batch after all scenarios complete
+  if (opts.bigquery && collectedRows.length > 0) {
+    console.log(`\n📤 Uploading ${collectedRows.length} result(s) to BigQuery...`);
+    const sink = new BenchmarkSink(path.resolve(keyPath), opts.dataset, "results");
+    await sink.insertRows(collectedRows);
   }
 }
 
