@@ -15,8 +15,18 @@ Run the tool against gatherli-dev and paste the output below.
 ```bash
 cd tools/load_test
 export GATHERLI_DEV_SERVICE_ACCOUNT=/path/to/gatherli-dev-service-account.json
+
+# Run and print results to console only
 npx ts-node src/index.ts --all --concurrency 5 --requests 50
+
+# Run and also store results in BigQuery (first time: create the table)
+npx ts-node src/index.ts --setup-bigquery
+npx ts-node src/index.ts --all --concurrency 5 --requests 50 --bigquery --notes "post-migration"
 ```
+
+Results land in BigQuery table `load_test.results` in the `gatherli-dev` project.
+Use `--dataset <name>` to override the dataset name (default: `load_test`).
+The service account must have the **BigQuery Data Editor** role on the dataset.
 
 ---
 
