@@ -231,7 +231,7 @@ jobs:
           packageName: org.gatherli.app
           releaseFiles: build/app/outputs/bundle/prodRelease/app-prod-release.aab
           track: internal
-          status: completed
+          status: draft
           releaseName: ${{ env.VERSION_NAME }}
 
       - name: 🧹 Clean up Google Play service account key
