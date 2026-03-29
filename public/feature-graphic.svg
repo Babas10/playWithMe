@@ -1,25 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
-  <!-- Background -->
-  <rect width="1024" height="500" fill="#004E64"/>
+  <!-- White background -->
+  <rect width="1024" height="500" fill="#FFFFFF"/>
 
-  <!-- Subtle decorative circle top-right -->
-  <circle cx="880" cy="-60" r="280" fill="#FFFFFF" fill-opacity="0.04"/>
-  <!-- Subtle decorative circle bottom-left -->
-  <circle cx="120" cy="560" r="220" fill="#FFFFFF" fill-opacity="0.04"/>
-
-  <!-- Volleyball icon (centered left area), scaled up -->
-  <g transform="translate(148, 90) scale(13.5)" fill="#FFFFFF" fill-opacity="0.18">
-    <path d="M6,4.01C3.58,5.84,2,8.73,2,12c0,1.46,0.32,2.85,0.89,4.11L6,14.31V4.01z"/>
-    <path d="M11,11.42V2.05C9.94,2.16,8.93,2.43,8,2.84v10.32L11,11.42z"/>
-    <path d="M12,13.15l-8.11,4.68c0.61,0.84,1.34,1.59,2.18,2.2L15,14.89L12,13.15z"/>
-    <path d="M13,7.96v3.46l8.11,4.68c0.42-0.93,0.7-1.93,0.82-2.98L13,7.96z"/>
-    <path d="M8.07,21.2C9.28,21.71,10.6,22,12,22c3.34,0,6.29-1.65,8.11-4.16L17,16.04L8.07,21.2z"/>
-    <path d="M21.92,10.81c-0.55-4.63-4.26-8.3-8.92-8.76v3.6L21.92,10.81z"/>
-  </g>
-
-  <!-- App icon (white background circle) -->
-  <circle cx="220" cy="250" r="108" fill="#FFFFFF" fill-opacity="0.12"/>
-  <g transform="translate(92, 122) scale(10.8)" fill="#FFFFFF">
+  <!-- Volleyball icon, blue, centered vertically on left -->
+  <g transform="translate(92, 122) scale(10.8)" fill="#004E64">
     <path d="M6,4.01C3.58,5.84,2,8.73,2,12c0,1.46,0.32,2.85,0.89,4.11L6,14.31V4.01z"/>
     <path d="M11,11.42V2.05C9.94,2.16,8.93,2.43,8,2.84v10.32L11,11.42z"/>
     <path d="M12,13.15l-8.11,4.68c0.61,0.84,1.34,1.59,2.18,2.2L15,14.89L12,13.15z"/>
@@ -29,8 +13,8 @@
   </g>
 
   <!-- App name -->
-  <text x="380" y="230" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="96" font-weight="700" fill="#FFFFFF" letter-spacing="-2">Gatherli</text>
+  <text x="380" y="240" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="96" font-weight="700" fill="#004E64" letter-spacing="-2">Gatherli</text>
 
   <!-- Tagline -->
-  <text x="382" y="300" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="34" font-weight="400" fill="#FFFFFF" fill-opacity="0.75" letter-spacing="0.5">Organize. Play. Track your game.</text>
+  <text x="384" y="305" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="34" font-weight="400" fill="#004E64" fill-opacity="0.6" letter-spacing="0.5">Organize. Play. Track your game.</text>
 </svg>
