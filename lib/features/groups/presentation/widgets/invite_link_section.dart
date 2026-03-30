@@ -192,6 +192,7 @@ class InviteLinkSection extends StatelessWidget {
     AppLocalizations l10n,
   ) async {
     await Clipboard.setData(ClipboardData(text: url));
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.linkCopied),

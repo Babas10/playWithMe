@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Delete Account — Gatherli</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      padding: 40px 16px;
+      -webkit-font-smoothing: antialiased;
+      color: #1a202c;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+      max-width: 680px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 48px 40px;
+    }
+
+    @media (max-width: 520px) {
+      .card { padding: 32px 20px; }
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+
+    .logo img {
+      width: 36px;
+      height: 36px;
+    }
+
+    .logo-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a202c;
+      letter-spacing: -0.3px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 6px;
+      letter-spacing: -0.4px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #718096;
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a202c;
+      margin: 28px 0 10px;
+    }
+
+    p, li {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #4a5568;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-top: 6px;
+    }
+
+    li { margin-bottom: 4px; }
+
+    a {
+      color: #004E64;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .step-number {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #004E64;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .step-content strong {
+      display: block;
+      font-size: 15px;
+      color: #1a202c;
+      margin-bottom: 2px;
+    }
+
+    .step-content p {
+      font-size: 14px;
+      color: #718096;
+    }
+
+    .warning-box {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 24px 0;
+    }
+
+    .warning-box p {
+      font-size: 14px;
+      color: #c53030;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #f7fafc;
+      color: #4a5568;
+      font-weight: 600;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0f4f8;
+      color: #4a5568;
+      vertical-align: top;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-deleted {
+      background: #fff5f5;
+      color: #c53030;
+    }
+
+    .badge-retained {
+      background: #fffbeb;
+      color: #b7791f;
+    }
+
+    .contact-box {
+      background: #f0f9ff;
+      border: 1px solid #bee3f8;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 32px;
+    }
+
+    .contact-box p {
+      font-size: 14px;
+      color: #2c5282;
+    }
+
+    .contact-box a {
+      color: #2b6cb0;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 32px 0;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: #a0aec0;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="logo">
+      <img src="/logo-96.png" alt="Gatherli logo">
+      <span class="logo-name">Gatherli</span>
+    </div>
+
+    <h1>Delete Your Account</h1>
+    <p class="subtitle">
+      You can permanently delete your Gatherli account and all associated data directly from the app,
+      or by contacting us at <a href="mailto:admin@gatherli.org">admin@gatherli.org</a>.
+    </p>
+
+    <hr class="divider">
+
+    <h2>How to delete your account from the app</h2>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <strong>Open Gatherli and sign in</strong>
+        <p>Make sure you are logged into the account you want to delete.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <strong>Go to your Profile</strong>
+        <p>Tap the profile icon in the bottom navigation bar.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <strong>Open Settings</strong>
+        <p>Tap the settings icon in the top-right corner of your profile page.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <strong>Tap "Delete Account"</strong>
+        <p>Scroll to the bottom of the Settings page and tap <em>Delete Account</em>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">5</div>
+      <div class="step-content">
+        <strong>Confirm deletion</strong>
+        <p>Read the confirmation dialog and tap <em>Confirm</em> to permanently delete your account.</p>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <p><strong>⚠️ This action is permanent.</strong> Once confirmed, your account and all personal data will be deleted and cannot be recovered.</p>
+    </div>
+
+    <hr class="divider">
+
+    <h2>What data is deleted</h2>
+    <p>When you delete your account, the following data is permanently removed within 30 days:</p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Data type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Account credentials (email, password)</td>
+          <td><span class="badge badge-deleted">Deleted immediately</span></td>
+        </tr>
+        <tr>
+          <td>Profile information (name, photo)</td>
+          <td><span class="badge badge-deleted">Deleted within 30 days</span></td>
+        </tr>
+        <tr>
+          <td>Friends list and friend requests</td>
+          <td><span class="badge badge-deleted">Deleted within 30 days</span></td>
+        </tr>
+        <tr>
+          <td>Group memberships</td>
+          <td><span class="badge badge-deleted">Deleted within 30 days</span></td>
+        </tr>
+        <tr>
+          <td>ELO rating and rating history</td>
+          <td><span class="badge badge-deleted">Deleted within 30 days</span></td>
+        </tr>
+        <tr>
+          <td>Game participation records</td>
+          <td><span class="badge badge-retained">Anonymised — game results retained</span></td>
+        </tr>
+        <tr>
+          <td>Training session participation</td>
+          <td><span class="badge badge-retained">Anonymised — session records retained</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="divider">
+
+    <h2>Request deletion by email</h2>
+    <p>
+      If you are unable to access the app, you can request account deletion by emailing us at
+      <a href="mailto:admin@gatherli.org">admin@gatherli.org</a> from the email address
+      associated with your account. We will process your request within 30 days.
+    </p>
+
+    <div class="contact-box">
+      <p><strong>Contact us</strong><br>
+      Email: <a href="mailto:admin@gatherli.org">admin@gatherli.org</a><br>
+      We respond within 5 business days.</p>
+    </div>
+
+  </div>
+
+  <footer>
+    &copy; 2026 Gatherli &nbsp;·&nbsp;
+    <a href="/privacy">Privacy Policy</a>
+  </footer>
+</body>
+</html>
