@@ -3,6 +3,10 @@ tools/load_test/node_modules/
 tools/load_test/lib/
 tools/load_test/*service-account*.json
 
+# Generated environment scripts configs (contain credentials)
+functions/scripts/accessConfig.json
+functions/scripts/screenshotConfig.json
+
 # Miscellaneous
 *.class
 *.log
