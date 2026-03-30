@@ -32,11 +32,11 @@ class ExpandedStatsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // ELO Evolution Chart
-        MomentumConsistencyCard(user: user, ratingHistory: ratingHistory),
-
         // Performance Overview Card
         PerformanceOverviewCard(user: user),
+
+        // ELO Evolution Chart
+        MomentumConsistencyCard(user: user, ratingHistory: ratingHistory),
 
         // Partners Card
         PartnersCard(user: user),
