@@ -186,12 +186,13 @@ class InviteLinkSection extends StatelessWidget {
     );
   }
 
-  void _copyToClipboard(
+  Future<void> _copyToClipboard(
     BuildContext context,
     String url,
     AppLocalizations l10n,
-  ) {
-    Clipboard.setData(ClipboardData(text: url));
+  ) async {
+    await Clipboard.setData(ClipboardData(text: url));
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.linkCopied),

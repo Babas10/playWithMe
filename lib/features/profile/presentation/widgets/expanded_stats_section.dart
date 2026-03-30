@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/features/profile/presentation/widgets/momentum_consistency_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/performance_overview_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/partners_card.dart';
 import 'package:play_with_me/features/profile/presentation/widgets/rivals_card.dart';
@@ -33,6 +34,9 @@ class ExpandedStatsSection extends StatelessWidget {
       children: [
         // Performance Overview Card
         PerformanceOverviewCard(user: user),
+
+        // ELO Evolution Chart
+        MomentumConsistencyCard(user: user, ratingHistory: ratingHistory),
 
         // Partners Card
         PartnersCard(user: user),
