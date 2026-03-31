@@ -7,6 +7,13 @@ tools/load_test/*service-account*.json
 functions/scripts/accessConfig.json
 functions/scripts/screenshotConfig.json
 
+# Production environment scripts (contain credentials / destructive operations)
+functions/scripts/setupAccessEnvironment.ts
+functions/scripts/cleanupAccessEnvironment.ts
+functions/scripts/setupScreenshotEnvironment.ts
+functions/scripts/cleanupScreenshotEnvironment.ts
+functions/scripts/clearProdEnvironment.ts
+
 # Miscellaneous
 *.class
 *.log

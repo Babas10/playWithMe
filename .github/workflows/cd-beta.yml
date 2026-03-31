@@ -96,14 +96,24 @@ jobs:
         # Verifies functions are actually running after deploy, not just accepted by the API.
         # A zero exit from firebase deploy only means the bundle was accepted — not that the
         # function started. This catches cold-start errors, missing env vars, and bad triggers.
+        # Waits 45s for cold-start, then retries up to 3 times with 15s between attempts.
         run: |
-          sleep 15
-          curl -sf -X POST \
-            "https://europe-west6-${{ secrets.FIREBASE_PROD_PROJECT_ID }}.cloudfunctions.net/healthCheck" \
-            -H "Content-Type: application/json" \
-            -d '{"data": {}}' | grep -q '"ok"' \
-            || (echo "❌ Smoke test failed — functions may not be running" && exit 1)
-          echo "✅ Smoke test passed — functions are serving traffic"
+          sleep 45
+          for i in 1 2 3; do
+            if curl -sf -X POST \
+              "https://europe-west6-${{ secrets.FIREBASE_PROD_PROJECT_ID }}.cloudfunctions.net/healthCheck" \
+              -H "Content-Type: application/json" \
+              -d '{"data": {}}' | grep -q '"ok"'; then
+              echo "✅ Smoke test passed — functions are serving traffic"
+              exit 0
+            fi
+            if [ "$i" -eq 3 ]; then
+              echo "❌ Smoke test failed after 3 attempts — functions may not be running"
+              exit 1
+            fi
+            echo "⏳ Attempt $i failed, retrying in 15s..."
+            sleep 15
+          done
 
   # ─── Job 4: Deploy Android ───────────────────────────────────────────────────
   deploy_android:
