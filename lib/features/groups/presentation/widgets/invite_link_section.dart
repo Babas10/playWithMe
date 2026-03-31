@@ -186,13 +186,15 @@ class InviteLinkSection extends StatelessWidget {
     );
   }
 
-  Future<void> _copyToClipboard(
+  void _copyToClipboard(
     BuildContext context,
     String url,
     AppLocalizations l10n,
-  ) async {
-    await Clipboard.setData(ClipboardData(text: url));
-    if (!context.mounted) return;
+  ) {
+    // Fire synchronously within the user gesture handler — on iOS 16+,
+    // async clipboard writes are not reliably registered as user-initiated
+    // by the system pasteboard, causing paste to silently fail in other apps.
+    Clipboard.setData(ClipboardData(text: url.trim())).ignore();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.linkCopied),
