@@ -2825,7 +2825,7 @@ abstract class AppLocalizations {
   /// No description provided for @periodAllTime.
   ///
   /// In en, this message translates to:
-  /// **'All Time'**
+  /// **'∞'**
   String get periodAllTime;
 
   /// No description provided for @monthlyProgressChart.

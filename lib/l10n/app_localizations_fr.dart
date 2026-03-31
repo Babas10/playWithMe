@@ -1520,7 +1520,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get period1y => '1an';
 
   @override
-  String get periodAllTime => 'Tout temps';
+  String get periodAllTime => '∞';
 
   @override
   String get monthlyProgressChart => 'Graphique de progression mensuel';

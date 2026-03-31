@@ -76,8 +76,8 @@ void main() {
         expect(TimePeriod.oneYear.displayName, equals('1y'));
       });
 
-      test('allTime returns "All Time"', () {
-        expect(TimePeriod.allTime.displayName, equals('All Time'));
+      test("allTime returns '∞'", () {
+        expect(TimePeriod.allTime.displayName, equals('∞'));
       });
 
       test('all periods have non-empty display names', () {

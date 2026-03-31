@@ -9,7 +9,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 /// - 30d
 /// - 90d
 /// - 1y
-/// - All Time
+/// - ∞
 class TimePeriodSelector extends StatelessWidget {
   final TimePeriod selectedPeriod;
   final ValueChanged<TimePeriod> onPeriodChanged;

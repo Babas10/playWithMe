@@ -321,7 +321,7 @@ void main() {
         expect(find.text('30d'), findsOneWidget);
         expect(find.text('90d'), findsOneWidget);
         expect(find.text('1y'), findsOneWidget);
-        expect(find.text('All Time'), findsOneWidget);
+        expect(find.text('∞'), findsOneWidget);
       });
     });
   });

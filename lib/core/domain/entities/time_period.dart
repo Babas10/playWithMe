@@ -34,7 +34,7 @@ extension TimePeriodExtension on TimePeriod {
       case TimePeriod.oneYear:
         return '1y';
       case TimePeriod.allTime:
-        return 'All Time';
+        return '∞';
     }
   }
 }

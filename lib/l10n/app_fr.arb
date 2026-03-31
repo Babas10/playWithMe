@@ -453,7 +453,7 @@
   "period30d": "30j",
   "period90d": "90j",
   "period1y": "1an",
-  "periodAllTime": "Tout temps",
+  "periodAllTime": "∞",
   "monthlyProgressChart": "Graphique de progression mensuel",
   "playAtLeastNGames": "Jouez au moins {count} matchs",
   "nOfNGames": "{current}/{total} matchs",

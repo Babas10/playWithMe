@@ -2259,7 +2259,7 @@
   "period30d": "30d",
   "period90d": "90d",
   "period1y": "1y",
-  "periodAllTime": "All Time",
+  "periodAllTime": "∞",
 
   "monthlyProgressChart": "Monthly Progress Chart",
   "playAtLeastNGames": "Play at least {count} games",

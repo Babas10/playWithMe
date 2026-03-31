@@ -1509,7 +1509,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get period1y => '1a';
 
   @override
-  String get periodAllTime => 'Sempre';
+  String get periodAllTime => '∞';
 
   @override
   String get monthlyProgressChart => 'Grafico progresso mensile';

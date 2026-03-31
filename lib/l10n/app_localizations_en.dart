@@ -1497,7 +1497,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get period1y => '1y';
 
   @override
-  String get periodAllTime => 'All Time';
+  String get periodAllTime => '∞';
 
   @override
   String get monthlyProgressChart => 'Monthly Progress Chart';
