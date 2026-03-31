@@ -3,6 +3,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -926,8 +928,10 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
     );
   }
 
-  void _shareInviteLink(BuildContext context, String link) {
+  Future<void> _shareInviteLink(BuildContext context, String link) async {
     final l10n = AppLocalizations.of(context)!;
+    await Clipboard.setData(ClipboardData(text: link));
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.linkCopied),
@@ -935,9 +939,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
         behavior: SnackBarBehavior.floating,
         action: SnackBarAction(
           label: l10n.shareLink,
-          onPressed: () {
-            // Share handled by invite link section logic
-          },
+          onPressed: () => Share.share(l10n.inviteLinkShareMessage(link)),
         ),
       ),
     );
