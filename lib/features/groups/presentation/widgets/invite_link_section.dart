@@ -125,7 +125,7 @@ class InviteLinkSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppColors.divider),
           ),
-          child: Text(
+          child: SelectableText(
             state.deepLinkUrl,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.secondary,
@@ -186,15 +186,15 @@ class InviteLinkSection extends StatelessWidget {
     );
   }
 
-  void _copyToClipboard(
+  Future<void> _copyToClipboard(
     BuildContext context,
     String url,
     AppLocalizations l10n,
-  ) {
-    // Fire synchronously within the user gesture handler — on iOS 16+,
-    // async clipboard writes are not reliably registered as user-initiated
-    // by the system pasteboard, causing paste to silently fail in other apps.
-    Clipboard.setData(ClipboardData(text: url.trim())).ignore();
+  ) async {
+    final trimmedUrl = url.trim();
+    if (trimmedUrl.isEmpty) return;
+    await Clipboard.setData(ClipboardData(text: trimmedUrl));
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.linkCopied),
