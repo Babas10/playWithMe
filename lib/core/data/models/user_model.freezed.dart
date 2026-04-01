@@ -70,6 +70,8 @@ mixin _$UserModel {
   @TimestampConverter()
   DateTime? get lastGameDate => throw _privateConstructorUsedError;
   Map<String, dynamic> get teammateStats =>
+      throw _privateConstructorUsedError; // Gender profile (Story 26.1)
+  UserGender? get gender =>
       throw _privateConstructorUsedError; // ELO Rating fields (Story 14.5.3)
   double get eloRating => throw _privateConstructorUsedError;
   @TimestampConverter()
@@ -141,6 +143,7 @@ abstract class $UserModelCopyWith<$Res> {
     List<String> recentGameIds,
     @TimestampConverter() DateTime? lastGameDate,
     Map<String, dynamic> teammateStats,
+    UserGender? gender,
     double eloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
     double eloPeak,
@@ -211,6 +214,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? recentGameIds = null,
     Object? lastGameDate = freezed,
     Object? teammateStats = null,
+    Object? gender = freezed,
     Object? eloRating = null,
     Object? eloLastUpdated = freezed,
     Object? eloPeak = null,
@@ -375,6 +379,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.teammateStats
                 : teammateStats // ignore: cast_nullable_to_non_nullable
                       as Map<String, dynamic>,
+            gender: freezed == gender
+                ? _value.gender
+                : gender // ignore: cast_nullable_to_non_nullable
+                      as UserGender?,
             eloRating: null == eloRating
                 ? _value.eloRating
                 : eloRating // ignore: cast_nullable_to_non_nullable
@@ -521,6 +529,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
     List<String> recentGameIds,
     @TimestampConverter() DateTime? lastGameDate,
     Map<String, dynamic> teammateStats,
+    UserGender? gender,
     double eloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
     double eloPeak,
@@ -594,6 +603,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? recentGameIds = null,
     Object? lastGameDate = freezed,
     Object? teammateStats = null,
+    Object? gender = freezed,
     Object? eloRating = null,
     Object? eloLastUpdated = freezed,
     Object? eloPeak = null,
@@ -758,6 +768,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value._teammateStats
             : teammateStats // ignore: cast_nullable_to_non_nullable
                   as Map<String, dynamic>,
+        gender: freezed == gender
+            ? _value.gender
+            : gender // ignore: cast_nullable_to_non_nullable
+                  as UserGender?,
         eloRating: null == eloRating
             ? _value.eloRating
             : eloRating // ignore: cast_nullable_to_non_nullable
@@ -841,6 +855,7 @@ class _$UserModelImpl extends _UserModel {
     final List<String> recentGameIds = const [],
     @TimestampConverter() this.lastGameDate,
     final Map<String, dynamic> teammateStats = const {},
+    this.gender,
     this.eloRating = 1200.0,
     @TimestampConverter() this.eloLastUpdated,
     this.eloPeak = 1200.0,
@@ -999,6 +1014,9 @@ class _$UserModelImpl extends _UserModel {
     return EqualUnmodifiableMapView(_teammateStats);
   }
 
+  // Gender profile (Story 26.1)
+  @override
+  final UserGender? gender;
   // ELO Rating fields (Story 14.5.3)
   @override
   @JsonKey()
@@ -1030,7 +1048,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, emailVerifiedAt: $emailVerifiedAt, accountStatus: $accountStatus, gracePeriodExpiresAt: $gracePeriodExpiresAt, deletionScheduledAt: $deletionScheduledAt, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats, roleBasedStats: $roleBasedStats)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, emailVerifiedAt: $emailVerifiedAt, accountStatus: $accountStatus, gracePeriodExpiresAt: $gracePeriodExpiresAt, deletionScheduledAt: $deletionScheduledAt, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, gender: $gender, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats, roleBasedStats: $roleBasedStats)';
   }
 
   @override
@@ -1115,6 +1133,7 @@ class _$UserModelImpl extends _UserModel {
               other._teammateStats,
               _teammateStats,
             ) &&
+            (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.eloRating, eloRating) ||
                 other.eloRating == eloRating) &&
             (identical(other.eloLastUpdated, eloLastUpdated) ||
@@ -1174,6 +1193,7 @@ class _$UserModelImpl extends _UserModel {
     const DeepCollectionEquality().hash(_recentGameIds),
     lastGameDate,
     const DeepCollectionEquality().hash(_teammateStats),
+    gender,
     eloRating,
     eloLastUpdated,
     eloPeak,
@@ -1239,6 +1259,7 @@ abstract class _UserModel extends UserModel {
     final List<String> recentGameIds,
     @TimestampConverter() final DateTime? lastGameDate,
     final Map<String, dynamic> teammateStats,
+    final UserGender? gender,
     final double eloRating,
     @TimestampConverter() final DateTime? eloLastUpdated,
     final double eloPeak,
@@ -1337,7 +1358,9 @@ abstract class _UserModel extends UserModel {
   @TimestampConverter()
   DateTime? get lastGameDate;
   @override
-  Map<String, dynamic> get teammateStats; // ELO Rating fields (Story 14.5.3)
+  Map<String, dynamic> get teammateStats; // Gender profile (Story 26.1)
+  @override
+  UserGender? get gender; // ELO Rating fields (Story 14.5.3)
   @override
   double get eloRating;
   @override

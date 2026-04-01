@@ -54,6 +54,8 @@ class UserModel with _$UserModel {
     @Default([]) List<String> recentGameIds,
     @TimestampConverter() DateTime? lastGameDate,
     @Default({}) Map<String, dynamic> teammateStats,
+    // Gender profile (Story 26.1)
+    UserGender? gender,
     // ELO Rating fields (Story 14.5.3)
     @Default(1200.0) double eloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
@@ -131,6 +133,12 @@ class UserModel with _$UserModel {
 
   /// Business logic methods
 
+  /// Effective gender — null and [UserGender.none] both mean no gender set.
+  UserGender get effectiveGender => gender ?? UserGender.none;
+
+  /// True when the user only participates in mixed games and has only a mix ELO.
+  bool get isMixOnly => effectiveGender == UserGender.none;
+
   /// Check if the user has a complete profile
   bool get hasCompleteProfile =>
       displayName != null &&
@@ -196,6 +204,7 @@ class UserModel with _$UserModel {
     String? location,
     String? bio,
     DateTime? dateOfBirth,
+    UserGender? gender,
   }) {
     return copyWith(
       displayName: displayName ?? this.displayName,
@@ -206,6 +215,7 @@ class UserModel with _$UserModel {
       location: location ?? this.location,
       bio: bio ?? this.bio,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      gender: gender ?? this.gender,
       updatedAt: DateTime.now(),
     );
   }
@@ -300,6 +310,17 @@ class UserModel with _$UserModel {
         DateTime.now().difference(friendsLastUpdated!).inHours;
     return hoursSinceUpdate > 24;
   }
+}
+
+/// Gender identity used to classify games and route ELO updates (Story 26.1).
+/// Null in Firestore → treated as [none] at runtime.
+enum UserGender {
+  @JsonValue('male')
+  male,
+  @JsonValue('female')
+  female,
+  @JsonValue('none')
+  none,
 }
 
 enum UserPrivacyLevel {
