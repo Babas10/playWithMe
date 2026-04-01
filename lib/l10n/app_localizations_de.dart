@@ -1917,4 +1917,27 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get loadOlderActivities => 'Ältere Aktivitäten laden';
+
+  @override
+  String get genderSelectionTitle => 'Erzähl uns von dir';
+
+  @override
+  String get genderSelectionSubtitle =>
+      'Wir nutzen dies, um dir die richtigen Spiele vorzuschlagen.';
+
+  @override
+  String get genderMale => 'Männlich';
+
+  @override
+  String get genderFemale => 'Weiblich';
+
+  @override
+  String get genderPreferNotToSay => 'Keine Angabe';
+
+  @override
+  String get genderSelectionContinue => 'Weiter';
+
+  @override
+  String get genderSelectionError =>
+      'Speichern fehlgeschlagen. Bitte erneut versuchen.';
 }

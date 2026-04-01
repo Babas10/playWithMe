@@ -573,5 +573,34 @@
   "loadOlderActivities": "Carica attività più vecchie",
   "@loadOlderActivities": {
     "description": "Button label to load activities older than 90 days in the group details activity feed"
+  },
+
+  "genderSelectionTitle": "Parlaci di te",
+  "@genderSelectionTitle": {
+    "description": "Title of the gender selection onboarding screen"
+  },
+  "genderSelectionSubtitle": "Lo usiamo per abbinarti alle partite giuste.",
+  "@genderSelectionSubtitle": {
+    "description": "Subtitle of the gender selection onboarding screen"
+  },
+  "genderMale": "Uomo",
+  "@genderMale": {
+    "description": "Gender option: Male"
+  },
+  "genderFemale": "Donna",
+  "@genderFemale": {
+    "description": "Gender option: Female"
+  },
+  "genderPreferNotToSay": "Preferisco non specificare",
+  "@genderPreferNotToSay": {
+    "description": "Gender option: Prefer not to say"
+  },
+  "genderSelectionContinue": "Continua",
+  "@genderSelectionContinue": {
+    "description": "Continue button label on gender selection screen"
+  },
+  "genderSelectionError": "Impossibile salvare la scelta. Riprova.",
+  "@genderSelectionError": {
+    "description": "Error message shown when saving gender fails"
   }
 }

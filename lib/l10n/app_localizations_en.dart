@@ -1882,4 +1882,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loadOlderActivities => 'Load older activities';
+
+  @override
+  String get genderSelectionTitle => 'Tell us about yourself';
+
+  @override
+  String get genderSelectionSubtitle =>
+      'We use this to match you in the right games.';
+
+  @override
+  String get genderMale => 'Male';
+
+  @override
+  String get genderFemale => 'Female';
+
+  @override
+  String get genderPreferNotToSay => 'Prefer not to say';
+
+  @override
+  String get genderSelectionContinue => 'Continue';
+
+  @override
+  String get genderSelectionError =>
+      'Failed to save your choice. Please try again.';
 }

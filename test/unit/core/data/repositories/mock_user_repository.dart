@@ -101,6 +101,7 @@ class MockUserRepository implements UserRepository {
     String? location,
     String? bio,
     DateTime? dateOfBirth,
+    UserGender? gender,
   }) async {
     final user = _users[uid];
     if (user == null) throw Exception('User not found');
@@ -114,6 +115,7 @@ class MockUserRepository implements UserRepository {
       location: location,
       bio: bio,
       dateOfBirth: dateOfBirth,
+      gender: gender,
     );
 
     _users[uid] = updatedUser;
