@@ -1688,7 +1688,79 @@ npm run test:functions
 
 ---
 
-### **11.11 Cloud Function Pre-Commit Checklist**
+### **11.11 Cloud Function Versioning & Production Safety**
+
+When a Cloud Function needs to change, the approach depends on whether the change is **breaking** or **non-breaking**.
+
+#### **Non-Breaking Changes (safe to deploy directly)**
+
+Add optional parameters, add fields to the response, or broaden accepted inputs. Old app versions ignore the new fields and keep working.
+
+```typescript
+// v1 returns { groupId, inviteLink }
+// v2 returns { groupId, inviteLink, eloRating }  ← old clients ignore eloRating
+```
+
+Deploy directly. No coordination with the Flutter app required.
+
+#### **Breaking Changes (requires versioned rollout)**
+
+Rename a field, change a type, remove a parameter, or restructure the response. **Never modify a live function in-place** if the current production app depends on it.
+
+**Steps:**
+
+1. **Deploy a new versioned function** alongside the existing one:
+
+   ```typescript
+   // Keep old function — still called by app in production
+   export const generateInviteLink = ...      // v1
+
+   // New function — called by the new app build
+   export const generateInviteLinkV2 = ...    // v2
+   ```
+
+2. **Update the Flutter client** to call the new function name:
+
+   ```dart
+   FirebaseFunctions.instance.httpsCallable('generateInviteLinkV2')
+   ```
+
+3. **Ship the app update** (TestFlight / Google Play).
+
+4. **Monitor the old function's invocations** in the Firebase console until they drop to near zero (most users have updated).
+
+5. **Delete the old function** once it's no longer called.
+
+#### **Optional: Client Version Enforcement**
+
+To force old app versions to update rather than call a deprecated function:
+
+```typescript
+const clientVersion = data.appVersion ?? '0.0.0';
+if (semver.lt(clientVersion, '0.6.0')) {
+  throw new functions.https.HttpsError(
+    'failed-precondition',
+    'Please update the app to continue.',
+  );
+}
+```
+
+#### **Rules Summary**
+
+| Change Type | Approach |
+|-------------|----------|
+| Add optional field to response | Deploy in-place ✅ |
+| Add optional input parameter | Deploy in-place ✅ |
+| Rename a field | New versioned function ⚠️ |
+| Remove a parameter | New versioned function ⚠️ |
+| Change a field type | New versioned function ⚠️ |
+| Restructure response shape | New versioned function ⚠️ |
+
+> **Rule:** Never delete a function that a live production app version still calls. It will throw `not-found` errors for all users on the old build.
+
+---
+
+### **11.12 Cloud Function Pre-Commit Checklist**
 
 Before committing any new or modified Cloud Function, ensure:
 

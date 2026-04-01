@@ -2769,5 +2769,34 @@
   "loadOlderActivities": "Load older activities",
   "@loadOlderActivities": {
     "description": "Button label to load activities older than 90 days in the group details activity feed"
+  },
+
+  "genderSelectionTitle": "Tell us about yourself",
+  "@genderSelectionTitle": {
+    "description": "Title of the gender selection onboarding screen"
+  },
+  "genderSelectionSubtitle": "We use this to match you in the right games.",
+  "@genderSelectionSubtitle": {
+    "description": "Subtitle of the gender selection onboarding screen"
+  },
+  "genderMale": "Male",
+  "@genderMale": {
+    "description": "Gender option: Male"
+  },
+  "genderFemale": "Female",
+  "@genderFemale": {
+    "description": "Gender option: Female"
+  },
+  "genderPreferNotToSay": "Prefer not to say",
+  "@genderPreferNotToSay": {
+    "description": "Gender option: Prefer not to say (maps to UserGender.none)"
+  },
+  "genderSelectionContinue": "Continue",
+  "@genderSelectionContinue": {
+    "description": "Continue button label on gender selection screen"
+  },
+  "genderSelectionError": "Failed to save your choice. Please try again.",
+  "@genderSelectionError": {
+    "description": "Error message shown when saving gender fails"
   }
 }

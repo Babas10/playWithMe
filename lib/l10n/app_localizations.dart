@@ -3511,6 +3511,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load older activities'**
   String get loadOlderActivities;
+
+  /// Title of the gender selection onboarding screen
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us about yourself'**
+  String get genderSelectionTitle;
+
+  /// Subtitle of the gender selection onboarding screen
+  ///
+  /// In en, this message translates to:
+  /// **'We use this to match you in the right games.'**
+  String get genderSelectionSubtitle;
+
+  /// Gender option: Male
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get genderMale;
+
+  /// Gender option: Female
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get genderFemale;
+
+  /// Gender option: Prefer not to say (maps to UserGender.none)
+  ///
+  /// In en, this message translates to:
+  /// **'Prefer not to say'**
+  String get genderPreferNotToSay;
+
+  /// Continue button label on gender selection screen
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get genderSelectionContinue;
+
+  /// Error message shown when saving gender fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save your choice. Please try again.'**
+  String get genderSelectionError;
 }
 
 class _AppLocalizationsDelegate

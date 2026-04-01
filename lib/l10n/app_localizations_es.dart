@@ -1907,4 +1907,27 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get loadOlderActivities => 'Cargar actividades más antiguas';
+
+  @override
+  String get genderSelectionTitle => 'Cuéntanos sobre ti';
+
+  @override
+  String get genderSelectionSubtitle =>
+      'Lo usamos para emparejarte en los juegos correctos.';
+
+  @override
+  String get genderMale => 'Hombre';
+
+  @override
+  String get genderFemale => 'Mujer';
+
+  @override
+  String get genderPreferNotToSay => 'Prefiero no decirlo';
+
+  @override
+  String get genderSelectionContinue => 'Continuar';
+
+  @override
+  String get genderSelectionError =>
+      'No se pudo guardar tu elección. Inténtalo de nuevo.';
 }

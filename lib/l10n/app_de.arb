@@ -573,5 +573,34 @@
   "loadOlderActivities": "Ältere Aktivitäten laden",
   "@loadOlderActivities": {
     "description": "Button label to load activities older than 90 days in the group details activity feed"
+  },
+
+  "genderSelectionTitle": "Erzähl uns von dir",
+  "@genderSelectionTitle": {
+    "description": "Title of the gender selection onboarding screen"
+  },
+  "genderSelectionSubtitle": "Wir nutzen dies, um dir die richtigen Spiele vorzuschlagen.",
+  "@genderSelectionSubtitle": {
+    "description": "Subtitle of the gender selection onboarding screen"
+  },
+  "genderMale": "Männlich",
+  "@genderMale": {
+    "description": "Gender option: Male"
+  },
+  "genderFemale": "Weiblich",
+  "@genderFemale": {
+    "description": "Gender option: Female"
+  },
+  "genderPreferNotToSay": "Keine Angabe",
+  "@genderPreferNotToSay": {
+    "description": "Gender option: Prefer not to say"
+  },
+  "genderSelectionContinue": "Weiter",
+  "@genderSelectionContinue": {
+    "description": "Continue button label on gender selection screen"
+  },
+  "genderSelectionError": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+  "@genderSelectionError": {
+    "description": "Error message shown when saving gender fails"
   }
 }

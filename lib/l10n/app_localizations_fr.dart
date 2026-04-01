@@ -1920,4 +1920,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loadOlderActivities => 'Charger les activités plus anciennes';
+
+  @override
+  String get genderSelectionTitle => 'Parlez-nous de vous';
+
+  @override
+  String get genderSelectionSubtitle =>
+      'Nous utilisons cela pour vous proposer les bons matchs.';
+
+  @override
+  String get genderMale => 'Homme';
+
+  @override
+  String get genderFemale => 'Femme';
+
+  @override
+  String get genderPreferNotToSay => 'Préfère ne pas préciser';
+
+  @override
+  String get genderSelectionContinue => 'Continuer';
+
+  @override
+  String get genderSelectionError =>
+      'Impossible de sauvegarder votre choix. Veuillez réessayer.';
 }
