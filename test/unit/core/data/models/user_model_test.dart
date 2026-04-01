@@ -1200,6 +1200,225 @@ void main() {
         expect(restored.deletionScheduledAt, deletionDate);
       });
     });
+
+    // Story 26.1 — Gender field
+    group('UserGender', () {
+      test('defaults to null when field is absent from JSON', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+        );
+
+        expect(user.gender, isNull);
+      });
+
+      test('effectiveGender returns none when gender is null', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+        );
+
+        expect(user.effectiveGender, UserGender.none);
+      });
+
+      test('effectiveGender returns none when gender is explicitly none', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          gender: UserGender.none,
+        );
+
+        expect(user.effectiveGender, UserGender.none);
+      });
+
+      test('isMixOnly is true when gender is null', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+        );
+
+        expect(user.isMixOnly, isTrue);
+      });
+
+      test('isMixOnly is true when gender is none', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          gender: UserGender.none,
+        );
+
+        expect(user.isMixOnly, isTrue);
+      });
+
+      test('isMixOnly is false for male', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          gender: UserGender.male,
+        );
+
+        expect(user.isMixOnly, isFalse);
+      });
+
+      test('isMixOnly is false for female', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          gender: UserGender.female,
+        );
+
+        expect(user.isMixOnly, isFalse);
+      });
+
+      test('serializes male to "male"', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          gender: UserGender.male,
+        );
+
+        expect(user.toJson()['gender'], 'male');
+      });
+
+      test('serializes female to "female"', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          gender: UserGender.female,
+        );
+
+        expect(user.toJson()['gender'], 'female');
+      });
+
+      test('serializes none to "none"', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          gender: UserGender.none,
+        );
+
+        expect(user.toJson()['gender'], 'none');
+      });
+
+      test('serializes null gender to null', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+        );
+
+        expect(user.toJson()['gender'], isNull);
+      });
+
+      test('deserializes "male" correctly', () {
+        final user = UserModel.fromJson({
+          'uid': 'uid',
+          'email': 'a@b.com',
+          'isEmailVerified': false,
+          'isAnonymous': false,
+          'gender': 'male',
+        });
+
+        expect(user.gender, UserGender.male);
+      });
+
+      test('deserializes "female" correctly', () {
+        final user = UserModel.fromJson({
+          'uid': 'uid',
+          'email': 'a@b.com',
+          'isEmailVerified': false,
+          'isAnonymous': false,
+          'gender': 'female',
+        });
+
+        expect(user.gender, UserGender.female);
+      });
+
+      test('deserializes "none" correctly', () {
+        final user = UserModel.fromJson({
+          'uid': 'uid',
+          'email': 'a@b.com',
+          'isEmailVerified': false,
+          'isAnonymous': false,
+          'gender': 'none',
+        });
+
+        expect(user.gender, UserGender.none);
+      });
+
+      test('deserializes missing gender field as null', () {
+        final user = UserModel.fromJson({
+          'uid': 'uid',
+          'email': 'a@b.com',
+          'isEmailVerified': false,
+          'isAnonymous': false,
+        });
+
+        expect(user.gender, isNull);
+      });
+
+      test('round-trip serialization preserves all three values', () {
+        for (final gender in UserGender.values) {
+          final user = UserModel(
+            uid: 'uid',
+            email: 'a@b.com',
+            isEmailVerified: false,
+            isAnonymous: false,
+            gender: gender,
+          );
+          final restored = UserModel.fromJson(user.toJson());
+          expect(restored.gender, gender);
+        }
+      });
+
+      test('updateProfile sets gender', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+        );
+
+        final updated = user.updateProfile(gender: UserGender.female);
+
+        expect(updated.gender, UserGender.female);
+      });
+
+      test('updateProfile preserves existing gender when not passed', () {
+        const user = UserModel(
+          uid: 'uid',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          gender: UserGender.male,
+        );
+
+        final updated = user.updateProfile(displayName: 'New Name');
+
+        expect(updated.gender, UserGender.male);
+      });
+    });
   });
 }
 

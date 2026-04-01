@@ -69,6 +69,7 @@ _$UserModelImpl _$$UserModelImplFromJson(
       const [],
   lastGameDate: const TimestampConverter().fromJson(json['lastGameDate']),
   teammateStats: json['teammateStats'] as Map<String, dynamic>? ?? const {},
+  gender: $enumDecodeNullable(_$UserGenderEnumMap, json['gender']),
   eloRating: (json['eloRating'] as num?)?.toDouble() ?? 1200.0,
   eloLastUpdated: const TimestampConverter().fromJson(json['eloLastUpdated']),
   eloPeak: (json['eloPeak'] as num?)?.toDouble() ?? 1200.0,
@@ -137,6 +138,7 @@ Map<String, dynamic> _$$UserModelImplToJson(
   'recentGameIds': instance.recentGameIds,
   'lastGameDate': const TimestampConverter().toJson(instance.lastGameDate),
   'teammateStats': instance.teammateStats,
+  'gender': _$UserGenderEnumMap[instance.gender],
   'eloRating': instance.eloRating,
   'eloLastUpdated': const TimestampConverter().toJson(instance.eloLastUpdated),
   'eloPeak': instance.eloPeak,
@@ -159,6 +161,12 @@ const _$UserPrivacyLevelEnumMap = {
   UserPrivacyLevel.public: 'public',
   UserPrivacyLevel.friends: 'friends',
   UserPrivacyLevel.private: 'private',
+};
+
+const _$UserGenderEnumMap = {
+  UserGender.male: 'male',
+  UserGender.female: 'female',
+  UserGender.none: 'none',
 };
 
 _$NemesisRecordImpl _$$NemesisRecordImplFromJson(Map<String, dynamic> json) =>

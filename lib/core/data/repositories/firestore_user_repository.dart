@@ -186,6 +186,7 @@ class FirestoreUserRepository implements UserRepository {
     String? location,
     String? bio,
     DateTime? dateOfBirth,
+    UserGender? gender,
   }) async {
     try {
       final currentUser = await getUserById(uid);
@@ -202,6 +203,7 @@ class FirestoreUserRepository implements UserRepository {
         location: location,
         bio: bio,
         dateOfBirth: dateOfBirth,
+        gender: gender,
       );
 
       await createOrUpdateUser(updatedUser);

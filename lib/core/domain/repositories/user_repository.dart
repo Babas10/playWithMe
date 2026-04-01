@@ -37,6 +37,7 @@ abstract class UserRepository {
     String? location,
     String? bio,
     DateTime? dateOfBirth,
+    UserGender? gender,
   });
 
   /// Update user preferences
