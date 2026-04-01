@@ -19,6 +19,7 @@ _$RatingHistoryEntryImpl _$$RatingHistoryEntryImplFromJson(
   timestamp: const RequiredTimestampConverter().fromJson(
     json['timestamp'] as Object,
   ),
+  gameType: $enumDecodeNullable(_$EloGameTypeEnumMap, json['gameType']),
 );
 
 Map<String, dynamic> _$$RatingHistoryEntryImplToJson(
@@ -32,4 +33,10 @@ Map<String, dynamic> _$$RatingHistoryEntryImplToJson(
   'opponentTeam': instance.opponentTeam,
   'won': instance.won,
   'timestamp': const RequiredTimestampConverter().toJson(instance.timestamp),
+  'gameType': _$EloGameTypeEnumMap[instance.gameType],
+};
+
+const _$EloGameTypeEnumMap = {
+  EloGameType.gender: 'gender',
+  EloGameType.mix: 'mix',
 };

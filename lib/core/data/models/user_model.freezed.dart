@@ -72,8 +72,11 @@ mixin _$UserModel {
   Map<String, dynamic> get teammateStats =>
       throw _privateConstructorUsedError; // Gender profile (Story 26.1)
   UserGender? get gender =>
-      throw _privateConstructorUsedError; // ELO Rating fields (Story 14.5.3)
-  double get eloRating => throw _privateConstructorUsedError;
+      throw _privateConstructorUsedError; // ELO Rating fields (Story 14.5.3 / Story 26.3)
+  double get eloRating =>
+      throw _privateConstructorUsedError; // gender-specific ELO
+  double get mixEloRating =>
+      throw _privateConstructorUsedError; // mixed-game ELO (Story 26.3)
   @TimestampConverter()
   DateTime? get eloLastUpdated => throw _privateConstructorUsedError;
   double get eloPeak => throw _privateConstructorUsedError;
@@ -145,6 +148,7 @@ abstract class $UserModelCopyWith<$Res> {
     Map<String, dynamic> teammateStats,
     UserGender? gender,
     double eloRating,
+    double mixEloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
     double eloPeak,
     @TimestampConverter() DateTime? eloPeakDate,
@@ -216,6 +220,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? teammateStats = null,
     Object? gender = freezed,
     Object? eloRating = null,
+    Object? mixEloRating = null,
     Object? eloLastUpdated = freezed,
     Object? eloPeak = null,
     Object? eloPeakDate = freezed,
@@ -387,6 +392,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.eloRating
                 : eloRating // ignore: cast_nullable_to_non_nullable
                       as double,
+            mixEloRating: null == mixEloRating
+                ? _value.mixEloRating
+                : mixEloRating // ignore: cast_nullable_to_non_nullable
+                      as double,
             eloLastUpdated: freezed == eloLastUpdated
                 ? _value.eloLastUpdated
                 : eloLastUpdated // ignore: cast_nullable_to_non_nullable
@@ -531,6 +540,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
     Map<String, dynamic> teammateStats,
     UserGender? gender,
     double eloRating,
+    double mixEloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
     double eloPeak,
     @TimestampConverter() DateTime? eloPeakDate,
@@ -605,6 +615,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? teammateStats = null,
     Object? gender = freezed,
     Object? eloRating = null,
+    Object? mixEloRating = null,
     Object? eloLastUpdated = freezed,
     Object? eloPeak = null,
     Object? eloPeakDate = freezed,
@@ -776,6 +787,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.eloRating
             : eloRating // ignore: cast_nullable_to_non_nullable
                   as double,
+        mixEloRating: null == mixEloRating
+            ? _value.mixEloRating
+            : mixEloRating // ignore: cast_nullable_to_non_nullable
+                  as double,
         eloLastUpdated: freezed == eloLastUpdated
             ? _value.eloLastUpdated
             : eloLastUpdated // ignore: cast_nullable_to_non_nullable
@@ -857,6 +872,7 @@ class _$UserModelImpl extends _UserModel {
     final Map<String, dynamic> teammateStats = const {},
     this.gender,
     this.eloRating = 1200.0,
+    this.mixEloRating = 1000.0,
     @TimestampConverter() this.eloLastUpdated,
     this.eloPeak = 1200.0,
     @TimestampConverter() this.eloPeakDate,
@@ -1017,10 +1033,15 @@ class _$UserModelImpl extends _UserModel {
   // Gender profile (Story 26.1)
   @override
   final UserGender? gender;
-  // ELO Rating fields (Story 14.5.3)
+  // ELO Rating fields (Story 14.5.3 / Story 26.3)
   @override
   @JsonKey()
   final double eloRating;
+  // gender-specific ELO
+  @override
+  @JsonKey()
+  final double mixEloRating;
+  // mixed-game ELO (Story 26.3)
   @override
   @TimestampConverter()
   final DateTime? eloLastUpdated;
@@ -1048,7 +1069,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, emailVerifiedAt: $emailVerifiedAt, accountStatus: $accountStatus, gracePeriodExpiresAt: $gracePeriodExpiresAt, deletionScheduledAt: $deletionScheduledAt, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, gender: $gender, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats, roleBasedStats: $roleBasedStats)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, emailVerifiedAt: $emailVerifiedAt, accountStatus: $accountStatus, gracePeriodExpiresAt: $gracePeriodExpiresAt, deletionScheduledAt: $deletionScheduledAt, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, gender: $gender, eloRating: $eloRating, mixEloRating: $mixEloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats, roleBasedStats: $roleBasedStats)';
   }
 
   @override
@@ -1136,6 +1157,8 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.eloRating, eloRating) ||
                 other.eloRating == eloRating) &&
+            (identical(other.mixEloRating, mixEloRating) ||
+                other.mixEloRating == mixEloRating) &&
             (identical(other.eloLastUpdated, eloLastUpdated) ||
                 other.eloLastUpdated == eloLastUpdated) &&
             (identical(other.eloPeak, eloPeak) || other.eloPeak == eloPeak) &&
@@ -1195,6 +1218,7 @@ class _$UserModelImpl extends _UserModel {
     const DeepCollectionEquality().hash(_teammateStats),
     gender,
     eloRating,
+    mixEloRating,
     eloLastUpdated,
     eloPeak,
     eloPeakDate,
@@ -1261,6 +1285,7 @@ abstract class _UserModel extends UserModel {
     final Map<String, dynamic> teammateStats,
     final UserGender? gender,
     final double eloRating,
+    final double mixEloRating,
     @TimestampConverter() final DateTime? eloLastUpdated,
     final double eloPeak,
     @TimestampConverter() final DateTime? eloPeakDate,
@@ -1360,9 +1385,11 @@ abstract class _UserModel extends UserModel {
   @override
   Map<String, dynamic> get teammateStats; // Gender profile (Story 26.1)
   @override
-  UserGender? get gender; // ELO Rating fields (Story 14.5.3)
+  UserGender? get gender; // ELO Rating fields (Story 14.5.3 / Story 26.3)
   @override
-  double get eloRating;
+  double get eloRating; // gender-specific ELO
+  @override
+  double get mixEloRating; // mixed-game ELO (Story 26.3)
   @override
   @TimestampConverter()
   DateTime? get eloLastUpdated;

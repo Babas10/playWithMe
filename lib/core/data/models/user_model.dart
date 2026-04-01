@@ -56,8 +56,9 @@ class UserModel with _$UserModel {
     @Default({}) Map<String, dynamic> teammateStats,
     // Gender profile (Story 26.1)
     UserGender? gender,
-    // ELO Rating fields (Story 14.5.3)
-    @Default(1200.0) double eloRating,
+    // ELO Rating fields (Story 14.5.3 / Story 26.3)
+    @Default(1200.0) double eloRating, // gender-specific ELO
+    @Default(1000.0) double mixEloRating, // mixed-game ELO (Story 26.3)
     @TimestampConverter() DateTime? eloLastUpdated,
     @Default(1200.0) double eloPeak,
     @TimestampConverter() DateTime? eloPeakDate,

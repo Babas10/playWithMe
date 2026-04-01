@@ -1419,6 +1419,96 @@ void main() {
         expect(updated.gender, UserGender.male);
       });
     });
+
+    // Story 26.3: Dual ELO data model
+    group('Dual ELO (Story 26.3)', () {
+      test('mixEloRating defaults to 1000 when field is absent', () {
+        final user = UserModel(
+          uid: 'u1',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+        );
+        expect(user.mixEloRating, 1000.0);
+      });
+
+      test('eloRating still defaults to 1200 when field is absent', () {
+        final user = UserModel(
+          uid: 'u1',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+        );
+        expect(user.eloRating, 1200.0);
+      });
+
+      test('serializes both ELO fields to JSON', () {
+        final user = UserModel(
+          uid: 'u1',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+          eloRating: 1350.0,
+          mixEloRating: 1150.0,
+        );
+        final json = user.toJson();
+        expect(json['eloRating'], 1350.0);
+        expect(json['mixEloRating'], 1150.0);
+      });
+
+      test('deserializes mixEloRating from JSON', () {
+        final json = {
+          'uid': 'u1',
+          'email': 'a@b.com',
+          'isEmailVerified': false,
+          'isAnonymous': false,
+          'createdAt': DateTime(2024).millisecondsSinceEpoch,
+          'updatedAt': DateTime(2024).millisecondsSinceEpoch,
+          'eloRating': 1400.0,
+          'mixEloRating': 1050.5,
+        };
+        final user = UserModel.fromJson(json);
+        expect(user.eloRating, 1400.0);
+        expect(user.mixEloRating, 1050.5);
+      });
+
+      test('deserializes missing mixEloRating as 1000 (backward compat)', () {
+        final json = {
+          'uid': 'u1',
+          'email': 'a@b.com',
+          'isEmailVerified': false,
+          'isAnonymous': false,
+          'createdAt': DateTime(2024).millisecondsSinceEpoch,
+          'updatedAt': DateTime(2024).millisecondsSinceEpoch,
+          'eloRating': 1250.0,
+          // mixEloRating intentionally absent
+        };
+        final user = UserModel.fromJson(json);
+        expect(user.mixEloRating, 1000.0);
+      });
+
+      test('round-trip serialization preserves both ELO fields', () {
+        final original = UserModel(
+          uid: 'u1',
+          email: 'a@b.com',
+          isEmailVerified: false,
+          isAnonymous: false,
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+          eloRating: 1550.5,
+          mixEloRating: 975.0,
+        );
+        final restored = UserModel.fromJson(original.toJson());
+        expect(restored.eloRating, original.eloRating);
+        expect(restored.mixEloRating, original.mixEloRating);
+      });
+    });
   });
 }
 

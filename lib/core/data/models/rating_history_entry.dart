@@ -6,6 +6,14 @@ import 'user_model.dart'; // For RequiredTimestampConverter
 part 'rating_history_entry.freezed.dart';
 part 'rating_history_entry.g.dart';
 
+/// Whether this history entry is for a gender-specific or mixed game (Story 26.3).
+enum EloGameType {
+  @JsonValue('gender')
+  gender,
+  @JsonValue('mix')
+  mix,
+}
+
 /// Represents an entry in a user's ELO rating history (Story 14.5.3).
 /// Each entry records a rating change after a game.
 @freezed
@@ -34,6 +42,10 @@ class RatingHistoryEntry with _$RatingHistoryEntry {
 
     /// When this rating update was recorded
     @RequiredTimestampConverter() required DateTime timestamp,
+
+    /// Whether this change was for a gender or mixed game (Story 26.3).
+    /// Null for legacy entries created before this field was added.
+    EloGameType? gameType,
   }) = _RatingHistoryEntry;
 
   const RatingHistoryEntry._();
