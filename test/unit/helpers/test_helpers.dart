@@ -24,6 +24,7 @@ import 'package:play_with_me/core/services/deep_link_service.dart';
 import 'package:play_with_me/core/services/pending_invite_storage.dart';
 import 'package:play_with_me/core/domain/repositories/group_invite_link_repository.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
+import 'package:play_with_me/features/onboarding/presentation/bloc/gender_selection/gender_selection_bloc.dart';
 import '../features/auth/data/mock_auth_repository.dart';
 import '../core/data/repositories/mock_group_repository.dart';
 
@@ -96,6 +97,8 @@ Future<void> initializeTestDependencies({
   when(() => _globalMockUserRepo!.createOrUpdateUser(any())).thenAnswer((_) async {});
   // Stub getUserStream to return an empty stream (for PlayerStatsBloc)
   when(() => _globalMockUserRepo!.getUserStream(any())).thenAnswer((_) => Stream.value(null));
+  // Stub getUserById to return null — gender check falls through to NotRequired (Story 26.2)
+  when(() => _globalMockUserRepo!.getUserById(any())).thenAnswer((_) async => null);
   // Stub getRatingHistory to return an empty stream (for PlayerStatsBloc)
   when(() => _globalMockUserRepo!.getRatingHistory(any(), limit: any(named: 'limit')))
       .thenAnswer((_) => Stream.value([]));
@@ -234,6 +237,11 @@ Future<void> initializeTestDependencies({
   // Register AccountStatusBloc factory that uses the mock auth repository
   sl.registerFactory<AccountStatusBloc>(
     () => AccountStatusBloc(authRepository: sl<AuthRepository>()),
+  );
+
+  // Register GenderSelectionBloc factory (Story 26.2)
+  sl.registerFactory<GenderSelectionBloc>(
+    () => GenderSelectionBloc(userRepository: sl<UserRepository>()),
   );
 }
 
