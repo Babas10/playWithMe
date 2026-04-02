@@ -262,6 +262,7 @@
   "joined": "INSCRITO",
   "training": "Entrenamiento",
   "gameLabel": "PARTIDO",
+  "mixGameBadge": "MIX",
   "minParticipants": "Mín: {count}",
   "selectGameDate": "Seleccionar Fecha del Partido",
   "selectGameTime": "Seleccionar Hora del Partido",
@@ -575,7 +576,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Cuéntanos sobre ti",
+  "genderSelectionTitle": "Género",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -591,7 +592,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Prefiero no decirlo",
+  "genderPreferNotToSay": "Ninguno",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say"
   },
@@ -615,12 +616,20 @@
   "@gameCreationGameTypeMixed": {
     "description": "Option label for mixed-gender game in game creation (Story 26.8)"
   },
-  "gameCreationGameTypeDescription": "Los juegos normales cuentan para tu ELO de género. Los juegos mixtos cuentan para tu ELO mixto.",
+  "gameCreationGameTypeDescription": "Los juegos normales cuentan para tu ELO. Los juegos mixtos son amistosos y no afectan tu clasificación.",
   "@gameCreationGameTypeDescription": {
     "description": "Explanatory text under the game type selector (Story 26.8)"
   },
   "gameCreationAlwaysMixed": "Tus juegos son siempre mixtos",
   "@gameCreationAlwaysMixed": {
     "description": "Info label shown to no-gender users instead of the selector (Story 26.8)"
+  },
+  "registrationGenderRequired": "Por favor selecciona un género para continuar",
+  "@registrationGenderRequired": {
+    "description": "Validation error on registration when no gender is selected"
+  },
+  "registrationGenderTooltip": "Tu género determina si tus partidos se clasifican como mixtos o no mixtos.",
+  "@registrationGenderTooltip": {
+    "description": "Tooltip explaining why gender is asked during registration"
   }
 }

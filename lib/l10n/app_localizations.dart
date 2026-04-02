@@ -1676,6 +1676,12 @@ abstract class AppLocalizations {
   /// **'GAME'**
   String get gameLabel;
 
+  /// Badge label shown on mixed-gender games
+  ///
+  /// In en, this message translates to:
+  /// **'MIX'**
+  String get mixGameBadge;
+
   /// Minimum participants label
   ///
   /// In en, this message translates to:
@@ -3515,7 +3521,7 @@ abstract class AppLocalizations {
   /// Title of the gender selection onboarding screen
   ///
   /// In en, this message translates to:
-  /// **'Tell us about yourself'**
+  /// **'Gender'**
   String get genderSelectionTitle;
 
   /// Subtitle of the gender selection onboarding screen
@@ -3539,7 +3545,7 @@ abstract class AppLocalizations {
   /// Gender option: Prefer not to say (maps to UserGender.none)
   ///
   /// In en, this message translates to:
-  /// **'Prefer not to say'**
+  /// **'None of them'**
   String get genderPreferNotToSay;
 
   /// Continue button label on gender selection screen
@@ -3575,7 +3581,7 @@ abstract class AppLocalizations {
   /// Explanatory text under the game type selector (Story 26.8)
   ///
   /// In en, this message translates to:
-  /// **'Normal games count for your gender ELO. Mixed games count for your mix ELO.'**
+  /// **'Normal games count for your gender ELO. Mixed games are friendly and do not affect your rating.'**
   String get gameCreationGameTypeDescription;
 
   /// Info label shown to no-gender users instead of the selector (Story 26.8)
@@ -3583,6 +3589,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your games are always mixed'**
   String get gameCreationAlwaysMixed;
+
+  /// Validation error on registration when no gender is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a gender to continue'**
+  String get registrationGenderRequired;
+
+  /// Tooltip explaining why gender is asked during registration
+  ///
+  /// In en, this message translates to:
+  /// **'Your gender determines whether games you play are classified as mixed or non-mixed.'**
+  String get registrationGenderTooltip;
 }
 
 class _AppLocalizationsDelegate

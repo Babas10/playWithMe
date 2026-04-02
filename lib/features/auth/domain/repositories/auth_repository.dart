@@ -40,9 +40,10 @@ abstract class AuthRepository {
     String? photoUrl,
   });
 
-  /// Update user's first and last name in Firestore via Cloud Function
+  /// Update user's first and last name (and optionally gender) in Firestore via Cloud Function
   Future<void> updateUserNames({
     required String firstName,
     required String lastName,
+    String? gender,
   });
 }

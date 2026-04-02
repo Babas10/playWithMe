@@ -48,6 +48,10 @@ _$GameModelImpl _$$GameModelImplFromJson(
   courtInfo: json['courtInfo'] as String?,
   gameType: $enumDecodeNullable(_$GameTypeEnumMap, json['gameType']),
   skillLevel: $enumDecodeNullable(_$GameSkillLevelEnumMap, json['skillLevel']),
+  gameGenderType: $enumDecodeNullable(
+    _$GameGenderTypeEnumMap,
+    json['gameGenderType'],
+  ),
   scores:
       (json['scores'] as List<dynamic>?)
           ?.map((e) => GameScore.fromJson(e as Map<String, dynamic>))
@@ -104,6 +108,7 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'courtInfo': instance.courtInfo,
       'gameType': _$GameTypeEnumMap[instance.gameType],
       'skillLevel': _$GameSkillLevelEnumMap[instance.skillLevel],
+      'gameGenderType': _$GameGenderTypeEnumMap[instance.gameGenderType],
       'scores': instance.scores,
       'winnerId': instance.winnerId,
       'teams': instance.teams,

@@ -262,6 +262,7 @@
   "joined": "BEIGETRETEN",
   "training": "Training",
   "gameLabel": "SPIEL",
+  "mixGameBadge": "MIX",
   "minParticipants": "Min: {count}",
   "selectGameDate": "Spieldatum Auswählen",
   "selectGameTime": "Spielzeit Auswählen",
@@ -575,7 +576,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Erzähl uns von dir",
+  "genderSelectionTitle": "Geschlecht",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -591,7 +592,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Keine Angabe",
+  "genderPreferNotToSay": "Keines davon",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say"
   },
@@ -615,12 +616,20 @@
   "@gameCreationGameTypeMixed": {
     "description": "Option label for mixed-gender game in game creation (Story 26.8)"
   },
-  "gameCreationGameTypeDescription": "Normale Spiele zählen für Ihre Geschlechts-ELO. Gemischte Spiele zählen für Ihre Mix-ELO.",
+  "gameCreationGameTypeDescription": "Normale Spiele zählen für dein ELO. Gemischte Spiele sind freundschaftlich und beeinflussen dein Rating nicht.",
   "@gameCreationGameTypeDescription": {
     "description": "Explanatory text under the game type selector (Story 26.8)"
   },
   "gameCreationAlwaysMixed": "Ihre Spiele sind immer gemischt",
   "@gameCreationAlwaysMixed": {
     "description": "Info label shown to no-gender users instead of the selector (Story 26.8)"
+  },
+  "registrationGenderRequired": "Bitte wählen Sie ein Geschlecht aus, um fortzufahren",
+  "@registrationGenderRequired": {
+    "description": "Validation error on registration when no gender is selected"
+  },
+  "registrationGenderTooltip": "Ihr Geschlecht bestimmt, ob Ihre Spiele als gemischt oder nicht gemischt eingestuft werden.",
+  "@registrationGenderTooltip": {
+    "description": "Tooltip explaining why gender is asked during registration"
   }
 }

@@ -56,9 +56,8 @@ class UserModel with _$UserModel {
     @Default({}) Map<String, dynamic> teammateStats,
     // Gender profile (Story 26.1)
     UserGender? gender,
-    // ELO Rating fields (Story 14.5.3 / Story 26.3)
-    @Default(1200.0) double eloRating, // gender-specific ELO
-    @Default(1000.0) double mixEloRating, // mixed-game ELO (Story 26.3)
+    // ELO Rating fields (Story 14.5.3)
+    @Default(1200.0) double eloRating,
     @TimestampConverter() DateTime? eloLastUpdated,
     @Default(1200.0) double eloPeak,
     @TimestampConverter() DateTime? eloPeakDate,
@@ -137,7 +136,7 @@ class UserModel with _$UserModel {
   /// Effective gender — null and [UserGender.none] both mean no gender set.
   UserGender get effectiveGender => gender ?? UserGender.none;
 
-  /// True when the user only participates in mixed games and has only a mix ELO.
+  /// True when the user has no gender — games they join are always classified as mixed.
   bool get isMixOnly => effectiveGender == UserGender.none;
 
   /// Check if the user has a complete profile

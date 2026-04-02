@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/presentation/widgets/joined_badge.dart';
+import 'package:play_with_me/core/presentation/widgets/mix_game_badge.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -63,6 +64,10 @@ class GameListItem extends StatelessWidget {
                           ),
                     ),
                   ),
+                  if (game.gameGenderType == GameGenderType.mix) ...[
+                    const MixGameBadge(),
+                    const SizedBox(width: 6),
+                  ],
                   if (isCompletedWithResult)
                     GameResultBadge(
                       result: game.result!,

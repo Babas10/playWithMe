@@ -132,9 +132,7 @@ void main() {
 
       // Allow authentication bloc to process the state change
       await tester.pump(const Duration(milliseconds: 10)); // Allow stream emission
-      await tester.pump(); // AuthenticationAuthenticated emitted, CheckGenderSelection fired
-      await tester.pump(); // GenderSelectionBloc: Checking state, getUserById future created
-      await tester.pump(); // getUserById resolves → NotRequired → HomePage rendered
+      await tester.pump(); // AuthenticationAuthenticated emitted → HomePage rendered
 
       // Should transition to HomePage (Authenticated state)
       // Bottom nav now has: Home, Stats, Groups, Community (Profile is in AppBar)

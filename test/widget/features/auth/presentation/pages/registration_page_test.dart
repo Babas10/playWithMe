@@ -243,6 +243,11 @@ void main() {
             find.widgetWithText(TextFormField, 'Confirm Password'), 'Password1');
         await tester.pump();
 
+        // Select gender
+        await tester.ensureVisible(find.text('Male'));
+        await tester.tap(find.text('Male'));
+        await tester.pump();
+
         // Tap create account button
         final createButton =
             find.widgetWithText(ElevatedButton, 'Create Account');
@@ -260,6 +265,7 @@ void main() {
               email: 'test@example.com',
               password: 'Password1',
               confirmPassword: 'Password1',
+              gender: 'male',
             ),
           ),
         ).called(1);

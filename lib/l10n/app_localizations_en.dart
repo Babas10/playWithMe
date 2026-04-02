@@ -840,6 +840,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameLabel => 'GAME';
 
   @override
+  String get mixGameBadge => 'MIX';
+
+  @override
   String minParticipants(int count) {
     return 'Min: $count';
   }
@@ -1884,7 +1887,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadOlderActivities => 'Load older activities';
 
   @override
-  String get genderSelectionTitle => 'Tell us about yourself';
+  String get genderSelectionTitle => 'Gender';
 
   @override
   String get genderSelectionSubtitle =>
@@ -1897,7 +1900,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genderFemale => 'Female';
 
   @override
-  String get genderPreferNotToSay => 'Prefer not to say';
+  String get genderPreferNotToSay => 'None of them';
 
   @override
   String get genderSelectionContinue => 'Continue';
@@ -1917,8 +1920,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameCreationGameTypeDescription =>
-      'Normal games count for your gender ELO. Mixed games count for your mix ELO.';
+      'Normal games count for your gender ELO. Mixed games are friendly and do not affect your rating.';
 
   @override
   String get gameCreationAlwaysMixed => 'Your games are always mixed';
+
+  @override
+  String get registrationGenderRequired => 'Please select a gender to continue';
+
+  @override
+  String get registrationGenderTooltip =>
+      'Your gender determines whether games you play are classified as mixed or non-mixed.';
 }

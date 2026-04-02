@@ -848,6 +848,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gameLabel => 'PARTITA';
 
   @override
+  String get mixGameBadge => 'MIX';
+
+  @override
   String minParticipants(int count) {
     return 'Min: $count';
   }
@@ -1905,7 +1908,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get loadOlderActivities => 'Carica attività più vecchie';
 
   @override
-  String get genderSelectionTitle => 'Parlaci di te';
+  String get genderSelectionTitle => 'Genere';
 
   @override
   String get genderSelectionSubtitle =>
@@ -1918,7 +1921,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get genderFemale => 'Donna';
 
   @override
-  String get genderPreferNotToSay => 'Preferisco non specificare';
+  String get genderPreferNotToSay => 'Nessuno dei due';
 
   @override
   String get genderSelectionContinue => 'Continua';
@@ -1937,8 +1940,15 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get gameCreationGameTypeDescription =>
-      'Le partite normali contano per il tuo ELO di genere. Le partite miste contano per il tuo ELO misto.';
+      'Le partite normali contano per il tuo ELO. Le partite miste sono amichevoli e non influenzano il tuo punteggio.';
 
   @override
   String get gameCreationAlwaysMixed => 'Le tue partite sono sempre miste';
+
+  @override
+  String get registrationGenderRequired => 'Seleziona un genere per continuare';
+
+  @override
+  String get registrationGenderTooltip =>
+      'Il tuo genere determina se le partite sono classificate come miste o non miste.';
 }

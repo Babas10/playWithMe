@@ -46,10 +46,6 @@ mixin _$RatingHistoryEntry {
   @RequiredTimestampConverter()
   DateTime get timestamp => throw _privateConstructorUsedError;
 
-  /// Whether this change was for a gender or mixed game (Story 26.3).
-  /// Null for legacy entries created before this field was added.
-  EloGameType? get gameType => throw _privateConstructorUsedError;
-
   /// Serializes this RatingHistoryEntry to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
@@ -76,7 +72,6 @@ abstract class $RatingHistoryEntryCopyWith<$Res> {
     String opponentTeam,
     bool won,
     @RequiredTimestampConverter() DateTime timestamp,
-    EloGameType? gameType,
   });
 }
 
@@ -103,7 +98,6 @@ class _$RatingHistoryEntryCopyWithImpl<$Res, $Val extends RatingHistoryEntry>
     Object? opponentTeam = null,
     Object? won = null,
     Object? timestamp = null,
-    Object? gameType = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -139,10 +133,6 @@ class _$RatingHistoryEntryCopyWithImpl<$Res, $Val extends RatingHistoryEntry>
                 ? _value.timestamp
                 : timestamp // ignore: cast_nullable_to_non_nullable
                       as DateTime,
-            gameType: freezed == gameType
-                ? _value.gameType
-                : gameType // ignore: cast_nullable_to_non_nullable
-                      as EloGameType?,
           )
           as $Val,
     );
@@ -167,7 +157,6 @@ abstract class _$$RatingHistoryEntryImplCopyWith<$Res>
     String opponentTeam,
     bool won,
     @RequiredTimestampConverter() DateTime timestamp,
-    EloGameType? gameType,
   });
 }
 
@@ -193,7 +182,6 @@ class __$$RatingHistoryEntryImplCopyWithImpl<$Res>
     Object? opponentTeam = null,
     Object? won = null,
     Object? timestamp = null,
-    Object? gameType = freezed,
   }) {
     return _then(
       _$RatingHistoryEntryImpl(
@@ -229,10 +217,6 @@ class __$$RatingHistoryEntryImplCopyWithImpl<$Res>
             ? _value.timestamp
             : timestamp // ignore: cast_nullable_to_non_nullable
                   as DateTime,
-        gameType: freezed == gameType
-            ? _value.gameType
-            : gameType // ignore: cast_nullable_to_non_nullable
-                  as EloGameType?,
       ),
     );
   }
@@ -250,7 +234,6 @@ class _$RatingHistoryEntryImpl extends _RatingHistoryEntry {
     required this.opponentTeam,
     required this.won,
     @RequiredTimestampConverter() required this.timestamp,
-    this.gameType,
   }) : super._();
 
   factory _$RatingHistoryEntryImpl.fromJson(Map<String, dynamic> json) =>
@@ -289,14 +272,9 @@ class _$RatingHistoryEntryImpl extends _RatingHistoryEntry {
   @RequiredTimestampConverter()
   final DateTime timestamp;
 
-  /// Whether this change was for a gender or mixed game (Story 26.3).
-  /// Null for legacy entries created before this field was added.
-  @override
-  final EloGameType? gameType;
-
   @override
   String toString() {
-    return 'RatingHistoryEntry(entryId: $entryId, gameId: $gameId, oldRating: $oldRating, newRating: $newRating, ratingChange: $ratingChange, opponentTeam: $opponentTeam, won: $won, timestamp: $timestamp, gameType: $gameType)';
+    return 'RatingHistoryEntry(entryId: $entryId, gameId: $gameId, oldRating: $oldRating, newRating: $newRating, ratingChange: $ratingChange, opponentTeam: $opponentTeam, won: $won, timestamp: $timestamp)';
   }
 
   @override
@@ -316,9 +294,7 @@ class _$RatingHistoryEntryImpl extends _RatingHistoryEntry {
                 other.opponentTeam == opponentTeam) &&
             (identical(other.won, won) || other.won == won) &&
             (identical(other.timestamp, timestamp) ||
-                other.timestamp == timestamp) &&
-            (identical(other.gameType, gameType) ||
-                other.gameType == gameType));
+                other.timestamp == timestamp));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -333,7 +309,6 @@ class _$RatingHistoryEntryImpl extends _RatingHistoryEntry {
     opponentTeam,
     won,
     timestamp,
-    gameType,
   );
 
   /// Create a copy of RatingHistoryEntry
@@ -363,7 +338,6 @@ abstract class _RatingHistoryEntry extends RatingHistoryEntry {
     required final String opponentTeam,
     required final bool won,
     @RequiredTimestampConverter() required final DateTime timestamp,
-    final EloGameType? gameType,
   }) = _$RatingHistoryEntryImpl;
   const _RatingHistoryEntry._() : super._();
 
@@ -402,11 +376,6 @@ abstract class _RatingHistoryEntry extends RatingHistoryEntry {
   @override
   @RequiredTimestampConverter()
   DateTime get timestamp;
-
-  /// Whether this change was for a gender or mixed game (Story 26.3).
-  /// Null for legacy entries created before this field was added.
-  @override
-  EloGameType? get gameType;
 
   /// Create a copy of RatingHistoryEntry
   /// with the given fields replaced by the non-null parameter values.

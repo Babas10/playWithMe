@@ -262,6 +262,7 @@
   "joined": "ISCRITTO",
   "training": "Allenamento",
   "gameLabel": "PARTITA",
+  "mixGameBadge": "MIX",
   "minParticipants": "Min: {count}",
   "selectGameDate": "Seleziona Data Partita",
   "selectGameTime": "Seleziona Ora Partita",
@@ -575,7 +576,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Parlaci di te",
+  "genderSelectionTitle": "Genere",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -591,7 +592,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Preferisco non specificare",
+  "genderPreferNotToSay": "Nessuno dei due",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say"
   },
@@ -615,12 +616,20 @@
   "@gameCreationGameTypeMixed": {
     "description": "Option label for mixed-gender game in game creation (Story 26.8)"
   },
-  "gameCreationGameTypeDescription": "Le partite normali contano per il tuo ELO di genere. Le partite miste contano per il tuo ELO misto.",
+  "gameCreationGameTypeDescription": "Le partite normali contano per il tuo ELO. Le partite miste sono amichevoli e non influenzano il tuo punteggio.",
   "@gameCreationGameTypeDescription": {
     "description": "Explanatory text under the game type selector (Story 26.8)"
   },
   "gameCreationAlwaysMixed": "Le tue partite sono sempre miste",
   "@gameCreationAlwaysMixed": {
     "description": "Info label shown to no-gender users instead of the selector (Story 26.8)"
+  },
+  "registrationGenderRequired": "Seleziona un genere per continuare",
+  "@registrationGenderRequired": {
+    "description": "Validation error on registration when no gender is selected"
+  },
+  "registrationGenderTooltip": "Il tuo genere determina se le partite sono classificate come miste o non miste.",
+  "@registrationGenderTooltip": {
+    "description": "Tooltip explaining why gender is asked during registration"
   }
 }

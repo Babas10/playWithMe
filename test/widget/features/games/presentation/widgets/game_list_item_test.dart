@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/presentation/widgets/mix_game_badge.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_list_item.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_result_badge.dart';
@@ -14,6 +15,7 @@ GameModel _createGame({
   String? userId,
   bool allowWaitlist = true,
   GameResult? result,
+  GameGenderType? gameGenderType,
 }) {
   return GameModel(
     id: 'game-1',
@@ -36,6 +38,7 @@ GameModel _createGame({
     // But GameModel.isFull checks playerIds.length >= maxPlayers.
     // So we should construct it with enough players if isFull is needed.
     result: result,
+    gameGenderType: gameGenderType,
   );
 }
 
@@ -275,6 +278,47 @@ void main() {
 
       await tester.tap(find.byType(GameListItem));
       expect(tapped, isTrue);
+    });
+  });
+
+  // Story 26.5: MixGameBadge visibility
+  group('MixGameBadge in GameListItem', () {
+    Widget buildItem(GameModel game) => MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
+          ),
+        );
+
+    testWidgets('shows MixGameBadge when gameGenderType is mix', (tester) async {
+      final game = _createGame(gameGenderType: GameGenderType.mix);
+      await tester.pumpWidget(buildItem(game));
+      expect(find.byType(MixGameBadge), findsOneWidget);
+      expect(find.text('MIX'), findsOneWidget);
+    });
+
+    testWidgets('hides MixGameBadge when gameGenderType is male', (tester) async {
+      final game = _createGame(gameGenderType: GameGenderType.male);
+      await tester.pumpWidget(buildItem(game));
+      expect(find.byType(MixGameBadge), findsNothing);
+    });
+
+    testWidgets('hides MixGameBadge when gameGenderType is female', (tester) async {
+      final game = _createGame(gameGenderType: GameGenderType.female);
+      await tester.pumpWidget(buildItem(game));
+      expect(find.byType(MixGameBadge), findsNothing);
+    });
+
+    testWidgets('hides MixGameBadge when gameGenderType is null', (tester) async {
+      final game = _createGame();
+      await tester.pumpWidget(buildItem(game));
+      expect(find.byType(MixGameBadge), findsNothing);
     });
   });
 }
