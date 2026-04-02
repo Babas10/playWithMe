@@ -75,10 +75,6 @@ _$GameModelImpl _$$GameModelImplFromJson(
   completedAt: const TimestampConverter().fromJson(json['completedAt']),
   weatherDependent: json['weatherDependent'] as bool? ?? true,
   weatherNotes: json['weatherNotes'] as String?,
-  gameGenderType: $enumDecodeNullable(
-    _$GameGenderTypeEnumMap,
-    json['gameGenderType'],
-  ),
 );
 
 Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
@@ -120,7 +116,6 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'completedAt': const TimestampConverter().toJson(instance.completedAt),
       'weatherDependent': instance.weatherDependent,
       'weatherNotes': instance.weatherNotes,
-      'gameGenderType': _$GameGenderTypeEnumMap[instance.gameGenderType],
     };
 
 const _$GameStatusEnumMap = {
