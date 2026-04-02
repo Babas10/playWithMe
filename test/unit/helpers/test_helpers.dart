@@ -24,7 +24,6 @@ import 'package:play_with_me/core/services/deep_link_service.dart';
 import 'package:play_with_me/core/services/pending_invite_storage.dart';
 import 'package:play_with_me/core/domain/repositories/group_invite_link_repository.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
-import 'package:play_with_me/features/onboarding/presentation/bloc/gender_selection/gender_selection_bloc.dart';
 import '../features/auth/data/mock_auth_repository.dart';
 import '../core/data/repositories/mock_group_repository.dart';
 
@@ -239,10 +238,6 @@ Future<void> initializeTestDependencies({
     () => AccountStatusBloc(authRepository: sl<AuthRepository>()),
   );
 
-  // Register GenderSelectionBloc factory (Story 26.2)
-  sl.registerFactory<GenderSelectionBloc>(
-    () => GenderSelectionBloc(userRepository: sl<UserRepository>()),
-  );
 }
 
 /// Get the mock repository for test control

@@ -1887,7 +1887,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadOlderActivities => 'Load older activities';
 
   @override
-  String get genderSelectionTitle => 'Tell us about yourself';
+  String get genderSelectionTitle => 'Gender';
 
   @override
   String get genderSelectionSubtitle =>
@@ -1900,7 +1900,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genderFemale => 'Female';
 
   @override
-  String get genderPreferNotToSay => 'Prefer not to say';
+  String get genderPreferNotToSay => 'None of them';
 
   @override
   String get genderSelectionContinue => 'Continue';
@@ -1908,4 +1908,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get genderSelectionError =>
       'Failed to save your choice. Please try again.';
+
+  @override
+  String get registrationGenderRequired => 'Please select a gender to continue';
+
+  @override
+  String get registrationGenderTooltip =>
+      'Your gender determines whether games you play are classified as mixed or non-mixed.';
 }

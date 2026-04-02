@@ -2775,7 +2775,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Tell us about yourself",
+  "genderSelectionTitle": "Gender",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -2791,7 +2791,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Prefer not to say",
+  "genderPreferNotToSay": "None of them",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say (maps to UserGender.none)"
   },
@@ -2802,5 +2802,13 @@
   "genderSelectionError": "Failed to save your choice. Please try again.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "registrationGenderRequired": "Please select a gender to continue",
+  "@registrationGenderRequired": {
+    "description": "Validation error on registration when no gender is selected"
+  },
+  "registrationGenderTooltip": "Your gender determines whether games you play are classified as mixed or non-mixed.",
+  "@registrationGenderTooltip": {
+    "description": "Tooltip explaining why gender is asked during registration"
   }
 }

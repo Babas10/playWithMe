@@ -576,7 +576,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Cuéntanos sobre ti",
+  "genderSelectionTitle": "Género",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -592,7 +592,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Prefiero no decirlo",
+  "genderPreferNotToSay": "Ninguno",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say"
   },
@@ -603,5 +603,13 @@
   "genderSelectionError": "No se pudo guardar tu elección. Inténtalo de nuevo.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "registrationGenderRequired": "Por favor selecciona un género para continuar",
+  "@registrationGenderRequired": {
+    "description": "Validation error on registration when no gender is selected"
+  },
+  "registrationGenderTooltip": "Tu género determina si tus partidos se clasifican como mixtos o no mixtos.",
+  "@registrationGenderTooltip": {
+    "description": "Tooltip explaining why gender is asked during registration"
   }
 }
