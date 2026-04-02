@@ -26,6 +26,49 @@ npx ts-node scripts/showTestConfig.ts
 
 ### Core Setup Scripts
 
+#### `setupGenderTestEnvironment.ts` ⭐ (Story 26.10)
+**Purpose:** Gender-aware test environment setup — demonstrates mixed vs non-mixed game classification and ELO impact (DESTRUCTIVE - clears all data)
+
+**What it does:**
+1. Clears entire Firestore database (all collections)
+2. Deletes all Firebase Auth users
+3. Creates 15 test users with explicit gender assignments:
+   - **test1–test5** (male) — play in male-only and mixed games
+   - **test6–test10** (female) — play in female-only and mixed games
+   - **test11–test15** (none/prefer not to say) — always classified as mixed
+4. Creates friendships between all 15 users (complete graph — 105 friendships)
+5. Creates group "Venice Beach Mixed Crew" with all 15 members
+6. Seeds 15 completed games:
+   - 5 **male-only** games (Men's Cup #1–5) — ELO is calculated
+   - 5 **female-only** games (Women's Cup #1–5) — ELO is calculated
+   - 5 **mixed** games (Mixed Friendly #1–5) — ELO is **NOT** calculated (friendly)
+7. Waits 10 s for cloud functions, then backdates rating history timestamps
+8. Creates 3 future scheduled games (1 male, 1 female, 1 mixed)
+9. Exports config to `genderTestConfig.json`
+
+**Usage:**
+```bash
+cd functions
+npx ts-node scripts/setupGenderTestEnvironment.ts
+```
+
+**Test Users Created:**
+
+| Email | Display Name | Gender |
+|-------|-------------|--------|
+| test1@mysta.com – test5@mysta.com | Test1–Test5 | Male |
+| test6@mysta.com – test10@mysta.com | Test6–Test10 | Female |
+| test11@mysta.com – test15@mysta.com | Test11–Test15 | None |
+
+**Password (all users):** `test1010`
+
+**Key behaviour to observe:**
+- After running, test1–5 and test6–10 will have changed ELO ratings (from competitive games)
+- test11–15 will retain their default ELO (1200) — mixed games don't affect ratings
+- Mixed Friendly #1–5 will have `eloCalculated: true` but `eloUpdates: {}` (intentionally empty)
+
+---
+
 #### `setupTestEnvironment.ts` ⭐
 **Purpose:** Complete test environment setup (DESTRUCTIVE - clears all data)
 
@@ -235,9 +278,10 @@ if (projectId !== "gatherli-dev") {
 ## 💡 Tips
 
 1. **Always run `setupTestEnvironment.ts` first** to generate testConfig.json
-2. **Use `showTestConfig.ts`** to get current user IDs for manual testing
-3. **Import testConfigLoader** in new scripts instead of hardcoding UIDs
-4. **Check testConfig.json timestamp** to see when test data was last regenerated
+2. **Run `setupGenderTestEnvironment.ts`** to test gender/mixed-game ELO behaviour (generates genderTestConfig.json)
+3. **Use `showTestConfig.ts`** to get current user IDs for manual testing
+4. **Import testConfigLoader** in new scripts instead of hardcoding UIDs
+5. **Check testConfig.json timestamp** to see when test data was last regenerated
 
 ---
 

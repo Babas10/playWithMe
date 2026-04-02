@@ -49,6 +49,17 @@ export const onGameStatusChanged = functions
       return null;
     }
 
+    // Skip ELO for mixed games — mixed games are friendly and do not affect ratings (Story 26.10)
+    if (after.gameGenderType === "mix") {
+      functions.logger.info(`Game ${gameId} is a mixed game, skipping ELO calculation.`);
+      await change.after.ref.update({
+        eloCalculated: true,
+        eloUpdates: {},
+        eloCalculatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      return null;
+    }
+
     functions.logger.info(`Game ${gameId} completed. initiating ELO updates.`);
 
     try {
