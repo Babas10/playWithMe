@@ -575,7 +575,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Cuéntanos sobre ti",
+  "genderSelectionTitle": "Género",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -607,7 +607,7 @@
   "@registrationGenderRequired": {
     "description": "Validation error on registration when no gender is selected"
   },
-  "registrationGenderTooltip": "Tu género determina si tus partidos se clasifican como mixtos o no mixtos. Un partido es mixto cuando jugadores masculinos y femeninos están en el mismo equipo. Los partidos mixtos son amistosos y no afectan el ELO.",
+  "registrationGenderTooltip": "Tu género determina si tus partidos se clasifican como mixtos o no mixtos.",
   "@registrationGenderTooltip": {
     "description": "Tooltip explaining why gender is asked during registration"
   }

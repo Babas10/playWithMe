@@ -195,27 +195,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                Column(
+                Row(
                   children: [
-                    _GenderCard(
+                    _GenderOption(
                       label: l10n.genderMale,
                       value: _kGenderMale,
                       selected: _selectedGender == _kGenderMale,
                       onTap: () => setState(() => _selectedGender = _kGenderMale),
                     ),
-                    const SizedBox(height: 8),
-                    _GenderCard(
+                    const SizedBox(width: 8),
+                    _GenderOption(
                       label: l10n.genderFemale,
                       value: _kGenderFemale,
                       selected: _selectedGender == _kGenderFemale,
                       onTap: () => setState(() => _selectedGender = _kGenderFemale),
                     ),
-                    const SizedBox(height: 8),
-                    _GenderCard(
-                      label: l10n.genderPreferNotToSay,
-                      value: _kGenderNone,
-                      selected: _selectedGender == _kGenderNone,
-                      onTap: () => setState(() => _selectedGender = _kGenderNone),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _GenderOption(
+                        label: l10n.genderPreferNotToSay,
+                        value: _kGenderNone,
+                        selected: _selectedGender == _kGenderNone,
+                        onTap: () => setState(() => _selectedGender = _kGenderNone),
+                      ),
                     ),
                   ],
                 ),
@@ -364,14 +366,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 }
 
-/// Checkbox-card option for the gender selector on the registration page.
-class _GenderCard extends StatelessWidget {
+/// Pill-style option for the gender selector on the registration page.
+class _GenderOption extends StatelessWidget {
   final String label;
   final String value;
   final bool selected;
   final VoidCallback onTap;
 
-  const _GenderCard({
+  const _GenderOption({
     required this.label,
     required this.value,
     required this.selected,
@@ -384,36 +386,24 @@ class _GenderCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.primary.withValues(alpha: 0.08)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          color: selected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: selected
                 ? AppColors.primary
                 : AppColors.textMuted.withValues(alpha: 0.4),
-            width: selected ? 2 : 1,
           ),
         ),
-        child: Row(
-          children: [
-            Icon(
-              selected ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: selected ? AppColors.primary : AppColors.textMuted,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                color: selected ? AppColors.primary : AppColors.textMuted,
-              ),
-            ),
-          ],
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: selected ? Colors.white : AppColors.textMuted,
+          ),
         ),
       ),
     );

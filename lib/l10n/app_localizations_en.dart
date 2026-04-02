@@ -1884,7 +1884,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadOlderActivities => 'Load older activities';
 
   @override
-  String get genderSelectionTitle => 'Tell us about yourself';
+  String get genderSelectionTitle => 'Gender';
 
   @override
   String get genderSelectionSubtitle =>
@@ -1911,5 +1911,5 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get registrationGenderTooltip =>
-      'Your gender determines whether games you play are classified as mixed or non-mixed. A game is mixed when male and female players share the same team. Mixed games are friendly and do not affect ELO ratings.';
+      'Your gender determines whether games you play are classified as mixed or non-mixed.';
 }

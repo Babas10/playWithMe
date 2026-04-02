@@ -3515,7 +3515,7 @@ abstract class AppLocalizations {
   /// Title of the gender selection onboarding screen
   ///
   /// In en, this message translates to:
-  /// **'Tell us about yourself'**
+  /// **'Gender'**
   String get genderSelectionTitle;
 
   /// Subtitle of the gender selection onboarding screen
@@ -3563,7 +3563,7 @@ abstract class AppLocalizations {
   /// Tooltip explaining why gender is asked during registration
   ///
   /// In en, this message translates to:
-  /// **'Your gender determines whether games you play are classified as mixed or non-mixed. A game is mixed when male and female players share the same team. Mixed games are friendly and do not affect ELO ratings.'**
+  /// **'Your gender determines whether games you play are classified as mixed or non-mixed.'**
   String get registrationGenderTooltip;
 }
 

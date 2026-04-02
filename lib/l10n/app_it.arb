@@ -575,7 +575,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Parlaci di te",
+  "genderSelectionTitle": "Genere",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -607,7 +607,7 @@
   "@registrationGenderRequired": {
     "description": "Validation error on registration when no gender is selected"
   },
-  "registrationGenderTooltip": "Il tuo genere determina se le partite sono classificate come miste o non miste. Una partita è mista quando giocatori maschili e femminili sono nella stessa squadra. Le partite miste sono amichevoli e non influenzano il punteggio ELO.",
+  "registrationGenderTooltip": "Il tuo genere determina se le partite sono classificate come miste o non miste.",
   "@registrationGenderTooltip": {
     "description": "Tooltip explaining why gender is asked during registration"
   }

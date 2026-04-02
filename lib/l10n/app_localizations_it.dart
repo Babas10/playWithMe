@@ -1905,7 +1905,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get loadOlderActivities => 'Carica attività più vecchie';
 
   @override
-  String get genderSelectionTitle => 'Parlaci di te';
+  String get genderSelectionTitle => 'Genere';
 
   @override
   String get genderSelectionSubtitle =>
@@ -1931,5 +1931,5 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get registrationGenderTooltip =>
-      'Il tuo genere determina se le partite sono classificate come miste o non miste. Una partita è mista quando giocatori maschili e femminili sono nella stessa squadra. Le partite miste sono amichevoli e non influenzano il punteggio ELO.';
+      'Il tuo genere determina se le partite sono classificate come miste o non miste.';
 }

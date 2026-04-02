@@ -1919,7 +1919,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loadOlderActivities => 'Ältere Aktivitäten laden';
 
   @override
-  String get genderSelectionTitle => 'Erzähl uns von dir';
+  String get genderSelectionTitle => 'Geschlecht';
 
   @override
   String get genderSelectionSubtitle =>
@@ -1947,5 +1947,5 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get registrationGenderTooltip =>
-      'Ihr Geschlecht bestimmt, ob Ihre Spiele als gemischt oder nicht gemischt eingestuft werden. Ein Spiel ist gemischt, wenn männliche und weibliche Spieler im selben Team sind. Gemischte Spiele sind freundschaftlich und beeinflussen das ELO-Rating nicht.';
+      'Ihr Geschlecht bestimmt, ob Ihre Spiele als gemischt oder nicht gemischt eingestuft werden.';
 }

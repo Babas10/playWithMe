@@ -575,7 +575,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Erzähl uns von dir",
+  "genderSelectionTitle": "Geschlecht",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -607,7 +607,7 @@
   "@registrationGenderRequired": {
     "description": "Validation error on registration when no gender is selected"
   },
-  "registrationGenderTooltip": "Ihr Geschlecht bestimmt, ob Ihre Spiele als gemischt oder nicht gemischt eingestuft werden. Ein Spiel ist gemischt, wenn männliche und weibliche Spieler im selben Team sind. Gemischte Spiele sind freundschaftlich und beeinflussen das ELO-Rating nicht.",
+  "registrationGenderTooltip": "Ihr Geschlecht bestimmt, ob Ihre Spiele als gemischt oder nicht gemischt eingestuft werden.",
   "@registrationGenderTooltip": {
     "description": "Tooltip explaining why gender is asked during registration"
   }

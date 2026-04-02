@@ -1922,7 +1922,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get loadOlderActivities => 'Charger les activités plus anciennes';
 
   @override
-  String get genderSelectionTitle => 'Parlez-nous de vous';
+  String get genderSelectionTitle => 'Genre';
 
   @override
   String get genderSelectionSubtitle =>
@@ -1950,5 +1950,5 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get registrationGenderTooltip =>
-      'Votre genre détermine si vos parties sont classées comme mixtes ou non mixtes. Une partie est mixte lorsque des joueurs masculins et féminins sont dans la même équipe. Les parties mixtes sont amicales et n\'affectent pas le classement ELO.';
+      'Votre genre détermine si vos parties sont classées comme mixtes ou non mixtes.';
 }

@@ -575,7 +575,7 @@
     "description": "Button label to load activities older than 90 days in the group details activity feed"
   },
 
-  "genderSelectionTitle": "Parlez-nous de vous",
+  "genderSelectionTitle": "Genre",
   "@genderSelectionTitle": {
     "description": "Title of the gender selection onboarding screen"
   },
@@ -607,7 +607,7 @@
   "@registrationGenderRequired": {
     "description": "Validation error on registration when no gender is selected"
   },
-  "registrationGenderTooltip": "Votre genre détermine si vos parties sont classées comme mixtes ou non mixtes. Une partie est mixte lorsque des joueurs masculins et féminins sont dans la même équipe. Les parties mixtes sont amicales et n'affectent pas le classement ELO.",
+  "registrationGenderTooltip": "Votre genre détermine si vos parties sont classées comme mixtes ou non mixtes.",
   "@registrationGenderTooltip": {
     "description": "Tooltip explaining why gender is asked during registration"
   }
