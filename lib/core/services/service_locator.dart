@@ -66,7 +66,6 @@ import 'package:play_with_me/core/presentation/bloc/account_status/account_statu
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_registration/invite_registration_bloc.dart';
-import 'package:play_with_me/features/onboarding/presentation/bloc/gender_selection/gender_selection_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -456,9 +455,4 @@ Future<void> initializeDependencies() async {
     );
   }
 
-  if (!sl.isRegistered<GenderSelectionBloc>()) {
-    sl.registerFactory<GenderSelectionBloc>(
-      () => GenderSelectionBloc(userRepository: sl()),
-    );
-  }
 }

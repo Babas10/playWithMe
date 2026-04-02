@@ -591,7 +591,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Keine Angabe",
+  "genderPreferNotToSay": "Keines davon",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say"
   },
@@ -602,5 +602,13 @@
   "genderSelectionError": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "registrationGenderRequired": "Bitte wählen Sie ein Geschlecht aus, um fortzufahren",
+  "@registrationGenderRequired": {
+    "description": "Validation error on registration when no gender is selected"
+  },
+  "registrationGenderTooltip": "Ihr Geschlecht bestimmt, ob Ihre Spiele als gemischt oder nicht gemischt eingestuft werden. Ein Spiel ist gemischt, wenn männliche und weibliche Spieler im selben Team sind. Gemischte Spiele sind freundschaftlich und beeinflussen das ELO-Rating nicht.",
+  "@registrationGenderTooltip": {
+    "description": "Tooltip explaining why gender is asked during registration"
   }
 }

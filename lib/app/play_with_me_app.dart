@@ -57,10 +57,6 @@ import 'package:play_with_me/features/training/presentation/pages/training_sessi
 import 'package:play_with_me/core/presentation/widgets/global_bottom_nav_bar.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
-import 'package:play_with_me/features/onboarding/presentation/bloc/gender_selection/gender_selection_bloc.dart';
-import 'package:play_with_me/features/onboarding/presentation/bloc/gender_selection/gender_selection_event.dart';
-import 'package:play_with_me/features/onboarding/presentation/bloc/gender_selection/gender_selection_state.dart';
-import 'package:play_with_me/features/onboarding/presentation/pages/gender_selection_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class PlayWithMeApp extends StatelessWidget {
@@ -99,9 +95,6 @@ class PlayWithMeApp extends StatelessWidget {
             repository: sl<LocalePreferencesRepository>(),
           )..add(const LocalePreferencesEvent.loadPreferences()),
         ),
-        BlocProvider<GenderSelectionBloc>(
-          create: (context) => sl<GenderSelectionBloc>(),
-        ),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -110,9 +103,6 @@ class PlayWithMeApp extends StatelessWidget {
               if (state is AuthenticationAuthenticated) {
                 context.read<InvitationBloc>().add(
                   LoadPendingInvitations(userId: state.user.uid),
-                );
-                context.read<GenderSelectionBloc>().add(
-                  CheckGenderSelection(uid: state.user.uid),
                 );
                 // Check for pending invite token (from "I Have an Account" flow).
                 // If found, navigate to join confirmation and clear the stack.
@@ -276,19 +266,7 @@ class PlayWithMeApp extends StatelessWidget {
             home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
               builder: (context, authState) {
                 if (authState is AuthenticationAuthenticated) {
-                  return BlocBuilder<GenderSelectionBloc, GenderSelectionState>(
-                    builder: (context, genderState) {
-                      if (genderState is GenderSelectionRequired) {
-                        return const GenderSelectionPage();
-                      }
-                      if (genderState is GenderSelectionNotRequired ||
-                          genderState is GenderSelectionSaved) {
-                        return const HomePage();
-                      }
-                      // GenderSelectionInitial / GenderSelectionChecking
-                      return const _SplashScreen();
-                    },
-                  );
+                  return const HomePage();
                 } else if (authState is AuthenticationUnauthenticated) {
                   return const LoginPage();
                 } else {

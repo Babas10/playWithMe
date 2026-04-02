@@ -203,12 +203,14 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> updateUserNames({
     required String firstName,
     required String lastName,
+    String? gender,
   }) async {
     try {
       final callable = _functions.httpsCallable('updateUserNames');
       await callable.call<dynamic>({
         'firstName': firstName,
         'lastName': lastName,
+        if (gender != null) 'gender': gender,
       });
       debugPrint('✅ User names updated in Firestore');
     } on FirebaseFunctionsException catch (e) {

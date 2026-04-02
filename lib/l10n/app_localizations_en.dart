@@ -1897,7 +1897,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genderFemale => 'Female';
 
   @override
-  String get genderPreferNotToSay => 'Prefer not to say';
+  String get genderPreferNotToSay => 'None of them';
 
   @override
   String get genderSelectionContinue => 'Continue';
@@ -1905,4 +1905,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get genderSelectionError =>
       'Failed to save your choice. Please try again.';
+
+  @override
+  String get registrationGenderRequired => 'Please select a gender to continue';
+
+  @override
+  String get registrationGenderTooltip =>
+      'Your gender determines whether games you play are classified as mixed or non-mixed. A game is mixed when male and female players share the same team. Mixed games are friendly and do not affect ELO ratings.';
 }

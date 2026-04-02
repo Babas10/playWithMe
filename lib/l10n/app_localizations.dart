@@ -3539,7 +3539,7 @@ abstract class AppLocalizations {
   /// Gender option: Prefer not to say (maps to UserGender.none)
   ///
   /// In en, this message translates to:
-  /// **'Prefer not to say'**
+  /// **'None of them'**
   String get genderPreferNotToSay;
 
   /// Continue button label on gender selection screen
@@ -3553,6 +3553,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to save your choice. Please try again.'**
   String get genderSelectionError;
+
+  /// Validation error on registration when no gender is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a gender to continue'**
+  String get registrationGenderRequired;
+
+  /// Tooltip explaining why gender is asked during registration
+  ///
+  /// In en, this message translates to:
+  /// **'Your gender determines whether games you play are classified as mixed or non-mixed. A game is mixed when male and female players share the same team. Mixed games are friendly and do not affect ELO ratings.'**
+  String get registrationGenderTooltip;
 }
 
 class _AppLocalizationsDelegate

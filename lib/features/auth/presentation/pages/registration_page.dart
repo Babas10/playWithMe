@@ -9,6 +9,11 @@ import 'package:play_with_me/features/auth/presentation/bloc/registration/regist
 import 'package:play_with_me/features/auth/presentation/widgets/auth_form_field.dart';
 import 'package:play_with_me/features/auth/presentation/widgets/auth_button.dart';
 
+/// Gender value constants — mirror UserGender JSON values without importing the data layer.
+const _kGenderMale = 'male';
+const _kGenderFemale = 'female';
+const _kGenderNone = 'none';
+
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
@@ -30,6 +35,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  String? _selectedGender;
 
   @override
   void dispose() {
@@ -165,7 +171,66 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
+                // ── Gender selector ──────────────────────────────────────
+                Row(
+                  children: [
+                    Text(
+                      l10n.genderSelectionTitle,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(width: 4),
+                    Tooltip(
+                      message: l10n.registrationGenderTooltip,
+                      triggerMode: TooltipTriggerMode.tap,
+                      showDuration: const Duration(seconds: 6),
+                      child: const Icon(
+                        Icons.help_outline,
+                        size: 16,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Column(
+                  children: [
+                    _GenderCard(
+                      label: l10n.genderMale,
+                      value: _kGenderMale,
+                      selected: _selectedGender == _kGenderMale,
+                      onTap: () => setState(() => _selectedGender = _kGenderMale),
+                    ),
+                    const SizedBox(height: 8),
+                    _GenderCard(
+                      label: l10n.genderFemale,
+                      value: _kGenderFemale,
+                      selected: _selectedGender == _kGenderFemale,
+                      onTap: () => setState(() => _selectedGender = _kGenderFemale),
+                    ),
+                    const SizedBox(height: 8),
+                    _GenderCard(
+                      label: l10n.genderPreferNotToSay,
+                      value: _kGenderNone,
+                      selected: _selectedGender == _kGenderNone,
+                      onTap: () => setState(() => _selectedGender = _kGenderNone),
+                    ),
+                  ],
+                ),
+                if (_selectedGender == null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6, left: 4),
+                    child: Text(
+                      l10n.registrationGenderRequired,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                // ── Password ─────────────────────────────────────────────
                 AuthFormField(
                   controller: _passwordController,
                   hintText: l10n.passwordHint,
@@ -236,7 +301,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   },
                   onFieldSubmitted: (_) => _submitRegistration(),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 BlocBuilder<RegistrationBloc, RegistrationState>(
                   builder: (context, state) {
                     return AuthButton(
@@ -279,7 +344,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   void _submitRegistration() {
-    if (_formKey.currentState!.validate()) {
+    // Force-show the gender error if not yet selected.
+    if (_selectedGender == null) {
+      setState(() {});
+    }
+    if (_formKey.currentState!.validate() && _selectedGender != null) {
       context.read<RegistrationBloc>().add(
             RegistrationSubmitted(
               firstName: _firstNameController.text.trim(),
@@ -288,8 +357,65 @@ class _RegistrationPageState extends State<RegistrationPage> {
               email: _emailController.text.trim(),
               password: _passwordController.text,
               confirmPassword: _confirmPasswordController.text,
+              gender: _selectedGender!,
             ),
           );
     }
+  }
+}
+
+/// Checkbox-card option for the gender selector on the registration page.
+class _GenderCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _GenderCard({
+    required this.label,
+    required this.value,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? AppColors.primary
+                : AppColors.textMuted.withValues(alpha: 0.4),
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              selected ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: selected ? AppColors.primary : AppColors.textMuted,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                color: selected ? AppColors.primary : AppColors.textMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

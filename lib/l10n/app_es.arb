@@ -591,7 +591,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Prefiero no decirlo",
+  "genderPreferNotToSay": "Ninguno",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say"
   },
@@ -602,5 +602,13 @@
   "genderSelectionError": "No se pudo guardar tu elección. Inténtalo de nuevo.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "registrationGenderRequired": "Por favor selecciona un género para continuar",
+  "@registrationGenderRequired": {
+    "description": "Validation error on registration when no gender is selected"
+  },
+  "registrationGenderTooltip": "Tu género determina si tus partidos se clasifican como mixtos o no mixtos. Un partido es mixto cuando jugadores masculinos y femeninos están en el mismo equipo. Los partidos mixtos son amistosos y no afectan el ELO.",
+  "@registrationGenderTooltip": {
+    "description": "Tooltip explaining why gender is asked during registration"
   }
 }

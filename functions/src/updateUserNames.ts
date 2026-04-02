@@ -1,17 +1,20 @@
-// Cloud Function to persist firstName and lastName to Firestore user document.
+// Cloud Function to persist firstName, lastName, and gender to Firestore user document.
 // This is needed because createUserDocument (Auth onCreate trigger) only has access
-// to Firebase Auth fields (email, displayName) — not custom fields like firstName/lastName.
+// to Firebase Auth fields (email, displayName) — not custom fields like firstName/lastName/gender.
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+
+const VALID_GENDERS = ["male", "female", "none"];
 
 /**
  * Callable Cloud Function: updateUserNames
  *
- * Called after account creation to persist firstName and lastName
+ * Called after account creation to persist firstName, lastName, and gender
  * to the authenticated user's Firestore document.
  *
  * @param data.firstName - User's first name (required, min 2 chars)
  * @param data.lastName - User's last name (required, min 2 chars)
+ * @param data.gender - User's gender ('male' | 'female' | 'none') — optional
  */
 export const updateUserNames = functions.region('europe-west6').https.onCall(async (data, context) => {
   // 1. Validate authentication
@@ -23,7 +26,7 @@ export const updateUserNames = functions.region('europe-west6').https.onCall(asy
   }
 
   const uid = context.auth.uid;
-  const {firstName, lastName} = data;
+  const {firstName, lastName, gender} = data;
 
   // 2. Validate parameters
   if (!firstName || typeof firstName !== "string") {
@@ -57,22 +60,36 @@ export const updateUserNames = functions.region('europe-west6').https.onCall(asy
     );
   }
 
-  functions.logger.info("[updateUserNames] Updating names", {
+  if (gender !== undefined && !VALID_GENDERS.includes(gender)) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      `Invalid gender value. Expected one of: ${VALID_GENDERS.join(", ")}.`
+    );
+  }
+
+  functions.logger.info("[updateUserNames] Updating profile", {
     uid,
     firstName: trimmedFirstName,
     lastName: trimmedLastName,
+    gender: gender ?? "not provided",
   });
 
   try {
     const db = admin.firestore();
     const userRef = db.collection("users").doc(uid);
 
-    await userRef.update({
+    const update: Record<string, unknown> = {
       firstName: trimmedFirstName,
       lastName: trimmedLastName,
       displayName: `${trimmedFirstName} ${trimmedLastName}`,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    };
+
+    if (gender !== undefined) {
+      update.gender = gender;
+    }
+
+    await userRef.update(update);
 
     functions.logger.info("[updateUserNames] Successfully updated", {uid});
 

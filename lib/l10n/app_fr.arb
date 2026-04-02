@@ -591,7 +591,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Préfère ne pas préciser",
+  "genderPreferNotToSay": "Aucun des deux",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say"
   },
@@ -602,5 +602,13 @@
   "genderSelectionError": "Impossible de sauvegarder votre choix. Veuillez réessayer.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "registrationGenderRequired": "Veuillez sélectionner un genre pour continuer",
+  "@registrationGenderRequired": {
+    "description": "Validation error on registration when no gender is selected"
+  },
+  "registrationGenderTooltip": "Votre genre détermine si vos parties sont classées comme mixtes ou non mixtes. Une partie est mixte lorsque des joueurs masculins et féminins sont dans la même équipe. Les parties mixtes sont amicales et n'affectent pas le classement ELO.",
+  "@registrationGenderTooltip": {
+    "description": "Tooltip explaining why gender is asked during registration"
   }
 }

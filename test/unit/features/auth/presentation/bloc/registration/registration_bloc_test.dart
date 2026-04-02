@@ -44,6 +44,7 @@ void main() {
       const validDisplayName = 'JohnD';
       const validEmail = 'test@example.com';
       const validPassword = 'Password1';
+      const validGender = 'male';
 
       group('First Name Validation', () {
         blocTest<RegistrationBloc, RegistrationState>(
@@ -56,6 +57,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -73,6 +75,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -92,6 +95,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -109,6 +113,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -128,6 +133,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -145,6 +151,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -162,6 +169,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -181,6 +189,7 @@ void main() {
             email: '',
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -198,6 +207,7 @@ void main() {
             email: 'invalid-email',
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -217,6 +227,7 @@ void main() {
             email: validEmail,
             password: '',
             confirmPassword: '',
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -234,6 +245,7 @@ void main() {
             email: validEmail,
             password: 'Pass1',
             confirmPassword: 'Pass1',
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -251,6 +263,7 @@ void main() {
             email: validEmail,
             password: 'password1',
             confirmPassword: 'password1',
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -268,6 +281,7 @@ void main() {
             email: validEmail,
             password: 'Password',
             confirmPassword: 'Password',
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -287,6 +301,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: 'DifferentPassword1',
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -311,6 +326,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -337,6 +353,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -362,6 +379,7 @@ void main() {
             email: 'test+tag@example.com',
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -387,6 +405,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -410,6 +429,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -438,6 +458,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -452,7 +473,7 @@ void main() {
               ({required String email, required String password}) async => TestUserData.testUser,
             );
             mockAuthRepository.setUpdateUserNamesBehavior(
-              ({required String firstName, required String lastName}) async =>
+              ({required String firstName, required String lastName, String? gender}) async =>
                 throw Exception('Failed to persist names'),
             );
           },
@@ -464,6 +485,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -489,6 +511,7 @@ void main() {
             email: validEmail,
             password: validPassword,
             confirmPassword: validPassword,
+            gender: validGender,
           )),
           expect: () => [
             const RegistrationLoading(),
@@ -538,8 +561,9 @@ void main() {
           email: 'test@example.com',
           password: 'Password1',
           confirmPassword: 'Password1',
+          gender: 'male',
         );
-        expect(event.props, ['John', 'Doe', 'JohnD', 'test@example.com', 'Password1', 'Password1']);
+        expect(event.props, ['John', 'Doe', 'JohnD', 'test@example.com', 'Password1', 'Password1', 'male']);
       });
 
       test('RegistrationFormReset props is empty', () {
@@ -608,6 +632,7 @@ void main() {
             email: 'test@example.com',
             password: 'Password1',
             confirmPassword: 'Password1',
+            gender: 'male',
           ),
           const RegistrationSubmitted(
             firstName: 'John',
@@ -616,6 +641,7 @@ void main() {
             email: 'test@example.com',
             password: 'Password1',
             confirmPassword: 'Password1',
+            gender: 'male',
           ),
         );
       });
@@ -629,6 +655,7 @@ void main() {
             email: 'test1@example.com',
             password: 'Password1',
             confirmPassword: 'Password1',
+            gender: 'male',
           ),
           isNot(const RegistrationSubmitted(
             firstName: 'John',
@@ -637,6 +664,7 @@ void main() {
             email: 'test2@example.com',
             password: 'Password1',
             confirmPassword: 'Password1',
+            gender: 'male',
           )),
         );
       });

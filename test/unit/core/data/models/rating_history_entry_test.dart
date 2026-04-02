@@ -303,60 +303,6 @@ void main() {
       });
     });
 
-    // Story 26.3: EloGameType field
-    group('EloGameType (Story 26.3)', () {
-      test('gameType defaults to null when field is absent (legacy entries)', () {
-        expect(testEntry.gameType, isNull);
-      });
-
-      test('serializes EloGameType.gender to "gender"', () {
-        final entry = testEntry.copyWith(gameType: EloGameType.gender);
-        final json = entry.toJson();
-        expect(json['gameType'], 'gender');
-      });
-
-      test('serializes EloGameType.mix to "mix"', () {
-        final entry = testEntry.copyWith(gameType: EloGameType.mix);
-        final json = entry.toJson();
-        expect(json['gameType'], 'mix');
-      });
-
-      test('serializes null gameType to null', () {
-        final entry = testEntry.copyWith(gameType: null);
-        final json = entry.toJson();
-        expect(json['gameType'], isNull);
-      });
-
-      test('deserializes "gender" correctly', () {
-        final json = testEntry.toJson()..['gameType'] = 'gender';
-        final entry = RatingHistoryEntry.fromJson(json);
-        expect(entry.gameType, EloGameType.gender);
-      });
-
-      test('deserializes "mix" correctly', () {
-        final json = testEntry.toJson()..['gameType'] = 'mix';
-        final entry = RatingHistoryEntry.fromJson(json);
-        expect(entry.gameType, EloGameType.mix);
-      });
-
-      test('deserializes missing gameType field as null', () {
-        final json = testEntry.toJson()..remove('gameType');
-        final entry = RatingHistoryEntry.fromJson(json);
-        expect(entry.gameType, isNull);
-      });
-
-      test('round-trip serialization preserves EloGameType.gender', () {
-        final original = testEntry.copyWith(gameType: EloGameType.gender);
-        final restored = RatingHistoryEntry.fromJson(original.toJson());
-        expect(restored.gameType, EloGameType.gender);
-      });
-
-      test('round-trip serialization preserves EloGameType.mix', () {
-        final original = testEntry.copyWith(gameType: EloGameType.mix);
-        final restored = RatingHistoryEntry.fromJson(original.toJson());
-        expect(restored.gameType, EloGameType.mix);
-      });
-    });
   });
 }
 

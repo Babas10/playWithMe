@@ -16,6 +16,7 @@ class RegistrationSubmitted extends RegistrationEvent {
     required this.email,
     required this.password,
     required this.confirmPassword,
+    required this.gender,
   });
 
   final String firstName;
@@ -24,9 +25,11 @@ class RegistrationSubmitted extends RegistrationEvent {
   final String email;
   final String password;
   final String confirmPassword;
+  /// Gender value as stored in Firestore: 'male', 'female', or 'none'.
+  final String gender;
 
   @override
-  List<Object?> get props => [firstName, lastName, displayName, email, password, confirmPassword];
+  List<Object?> get props => [firstName, lastName, displayName, email, password, confirmPassword, gender];
 }
 
 /// Event to reset the registration form state

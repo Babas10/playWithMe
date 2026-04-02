@@ -1935,7 +1935,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get genderFemale => 'Femme';
 
   @override
-  String get genderPreferNotToSay => 'Préfère ne pas préciser';
+  String get genderPreferNotToSay => 'Aucun des deux';
 
   @override
   String get genderSelectionContinue => 'Continuer';
@@ -1943,4 +1943,12 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get genderSelectionError =>
       'Impossible de sauvegarder votre choix. Veuillez réessayer.';
+
+  @override
+  String get registrationGenderRequired =>
+      'Veuillez sélectionner un genre pour continuer';
+
+  @override
+  String get registrationGenderTooltip =>
+      'Votre genre détermine si vos parties sont classées comme mixtes ou non mixtes. Une partie est mixte lorsque des joueurs masculins et féminins sont dans la même équipe. Les parties mixtes sont amicales et n\'affectent pas le classement ELO.';
 }

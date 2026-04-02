@@ -51,15 +51,16 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
         debugPrint('⚠️ RegistrationBloc: Failed to update display name: $e');
       }
 
-      // Persist firstName and lastName to Firestore via Cloud Function
+      // Persist firstName, lastName and gender to Firestore via Cloud Function
       try {
         await _authRepository.updateUserNames(
           firstName: event.firstName.trim(),
           lastName: event.lastName.trim(),
+          gender: event.gender,
         );
-        debugPrint('✅ RegistrationBloc: First/last name persisted to Firestore');
+        debugPrint('✅ RegistrationBloc: First/last name and gender persisted to Firestore');
       } catch (e) {
-        debugPrint('⚠️ RegistrationBloc: Failed to persist names: $e');
+        debugPrint('⚠️ RegistrationBloc: Failed to persist names/gender: $e');
       }
 
       // NOTE: Firestore user document is automatically created by the Cloud Function
@@ -154,6 +155,10 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
     if (event.password != event.confirmPassword) {
       return 'Passwords do not match';
+    }
+
+    if (!['male', 'female', 'none'].contains(event.gender)) {
+      return 'Please select a gender';
     }
 
     return null;

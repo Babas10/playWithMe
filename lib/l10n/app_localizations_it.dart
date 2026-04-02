@@ -1918,11 +1918,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get genderFemale => 'Donna';
 
   @override
-  String get genderPreferNotToSay => 'Preferisco non specificare';
+  String get genderPreferNotToSay => 'Nessuno dei due';
 
   @override
   String get genderSelectionContinue => 'Continua';
 
   @override
   String get genderSelectionError => 'Impossibile salvare la scelta. Riprova.';
+
+  @override
+  String get registrationGenderRequired => 'Seleziona un genere per continuare';
+
+  @override
+  String get registrationGenderTooltip =>
+      'Il tuo genere determina se le partite sono classificate come miste o non miste. Una partita è mista quando giocatori maschili e femminili sono nella stessa squadra. Le partite miste sono amichevoli e non influenzano il punteggio ELO.';
 }
