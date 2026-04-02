@@ -262,6 +262,7 @@
   "joined": "INSCRITO",
   "training": "Entrenamiento",
   "gameLabel": "PARTIDO",
+  "mixGameBadge": "MIX",
   "minParticipants": "Mín: {count}",
   "selectGameDate": "Seleccionar Fecha del Partido",
   "selectGameTime": "Seleccionar Hora del Partido",

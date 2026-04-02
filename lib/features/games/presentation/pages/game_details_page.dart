@@ -8,6 +8,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
+import 'package:play_with_me/core/presentation/widgets/mix_game_badge.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/data/models/game_model.dart';
@@ -217,12 +218,23 @@ class _GameInfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              game.title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                    game.title,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
+                        ),
                   ),
+                ),
+                if (game.gameGenderType == GameGenderType.mix) ...[
+                  const SizedBox(width: 8),
+                  const MixGameBadge(),
+                ],
+              ],
             ),
             if (game.description != null) ...[
               const SizedBox(height: 8),

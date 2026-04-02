@@ -1676,6 +1676,12 @@ abstract class AppLocalizations {
   /// **'GAME'**
   String get gameLabel;
 
+  /// Badge label shown on mixed-gender games
+  ///
+  /// In en, this message translates to:
+  /// **'MIX'**
+  String get mixGameBadge;
+
   /// Minimum participants label
   ///
   /// In en, this message translates to:
