@@ -105,6 +105,16 @@ class SetSkillLevel extends GameCreationEvent {
   List<Object?> get props => [skillLevel];
 }
 
+/// Event to set the gender type of the game (Story 26.8)
+class SetGameGenderType extends GameCreationEvent {
+  final GameGenderType? gameGenderType;
+
+  const SetGameGenderType({this.gameGenderType});
+
+  @override
+  List<Object?> get props => [gameGenderType];
+}
+
 /// Event to validate the form
 class ValidateForm extends GameCreationEvent {
   const ValidateForm();

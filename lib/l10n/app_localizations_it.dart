@@ -1930,6 +1930,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get genderSelectionError => 'Impossibile salvare la scelta. Riprova.';
 
   @override
+  String get gameCreationGameTypeSectionLabel => 'Tipo di partita';
+
+  @override
+  String get gameCreationGameTypeNormal => 'Normale';
+
+  @override
+  String get gameCreationGameTypeMixed => 'Misto';
+
+  @override
+  String get gameCreationGameTypeDescription =>
+      'Le partite normali contano per il tuo ELO. Le partite miste sono amichevoli e non influenzano il tuo punteggio.';
+
+  @override
+  String get gameCreationAlwaysMixed => 'Le tue partite sono sempre miste';
+
+  @override
   String get registrationGenderRequired => 'Seleziona un genere per continuare';
 
   @override

@@ -35,8 +35,6 @@ class GameModel with _$GameModel {
     String? courtInfo,
     GameType? gameType,
     GameSkillLevel? skillLevel,
-    // Gender classification — set by Cloud Function (Story 26.4)
-    GameGenderType? gameGenderType,
     // Scoring
     @Default([]) List<GameScore> scores,
     String? winnerId,
@@ -58,6 +56,9 @@ class GameModel with _$GameModel {
     // Weather considerations
     @Default(true) bool weatherDependent,
     String? weatherNotes,
+    // Gender classification — set by creator intent at creation, re-validated by
+    // Cloud Function when players join (Story 26.4 / Story 26.8).
+    GameGenderType? gameGenderType,
   }) = _GameModel;
 
   const GameModel._();
@@ -700,8 +701,9 @@ enum GameSkillLevel {
   mixed,
 }
 
-/// Gender classification of a game based on its players (Story 26.4).
-/// Set automatically by the Cloud Function after player list changes.
+/// Gender classification for a game (Story 26.4 / Story 26.8).
+/// Set at creation by the creator's intent; re-validated by Cloud Function
+/// when players join.
 enum GameGenderType {
   @JsonValue('male')
   male,

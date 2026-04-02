@@ -3560,6 +3560,36 @@ abstract class AppLocalizations {
   /// **'Failed to save your choice. Please try again.'**
   String get genderSelectionError;
 
+  /// Section label for the game type selector in game creation (Story 26.8)
+  ///
+  /// In en, this message translates to:
+  /// **'Game Type'**
+  String get gameCreationGameTypeSectionLabel;
+
+  /// Option label for gender-specific game in game creation (Story 26.8)
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get gameCreationGameTypeNormal;
+
+  /// Option label for mixed-gender game in game creation (Story 26.8)
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed'**
+  String get gameCreationGameTypeMixed;
+
+  /// Explanatory text under the game type selector (Story 26.8)
+  ///
+  /// In en, this message translates to:
+  /// **'Normal games count for your gender ELO. Mixed games are friendly and do not affect your rating.'**
+  String get gameCreationGameTypeDescription;
+
+  /// Info label shown to no-gender users instead of the selector (Story 26.8)
+  ///
+  /// In en, this message translates to:
+  /// **'Your games are always mixed'**
+  String get gameCreationAlwaysMixed;
+
   /// Validation error on registration when no gender is selected
   ///
   /// In en, this message translates to:

@@ -54,8 +54,6 @@ mixin _$GameModel {
   String? get courtInfo => throw _privateConstructorUsedError;
   GameType? get gameType => throw _privateConstructorUsedError;
   GameSkillLevel? get skillLevel =>
-      throw _privateConstructorUsedError; // Gender classification — set by Cloud Function (Story 26.4)
-  GameGenderType? get gameGenderType =>
       throw _privateConstructorUsedError; // Scoring
   List<GameScore> get scores => throw _privateConstructorUsedError;
   String? get winnerId =>
@@ -76,7 +74,10 @@ mixin _$GameModel {
   @TimestampConverter()
   DateTime? get completedAt => throw _privateConstructorUsedError; // Weather considerations
   bool get weatherDependent => throw _privateConstructorUsedError;
-  String? get weatherNotes => throw _privateConstructorUsedError;
+  String? get weatherNotes =>
+      throw _privateConstructorUsedError; // Gender classification — set by creator intent at creation, re-validated by
+  // Cloud Function when players join (Story 26.4 / Story 26.8).
+  GameGenderType? get gameGenderType => throw _privateConstructorUsedError;
 
   /// Serializes this GameModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -119,7 +120,6 @@ abstract class $GameModelCopyWith<$Res> {
     String? courtInfo,
     GameType? gameType,
     GameSkillLevel? skillLevel,
-    GameGenderType? gameGenderType,
     List<GameScore> scores,
     String? winnerId,
     GameTeams? teams,
@@ -131,6 +131,7 @@ abstract class $GameModelCopyWith<$Res> {
     @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
     String? weatherNotes,
+    GameGenderType? gameGenderType,
   });
 
   $GameLocationCopyWith<$Res> get location;
@@ -178,7 +179,6 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? courtInfo = freezed,
     Object? gameType = freezed,
     Object? skillLevel = freezed,
-    Object? gameGenderType = freezed,
     Object? scores = null,
     Object? winnerId = freezed,
     Object? teams = freezed,
@@ -190,6 +190,7 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? completedAt = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
+    Object? gameGenderType = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -293,10 +294,6 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.skillLevel
                 : skillLevel // ignore: cast_nullable_to_non_nullable
                       as GameSkillLevel?,
-            gameGenderType: freezed == gameGenderType
-                ? _value.gameGenderType
-                : gameGenderType // ignore: cast_nullable_to_non_nullable
-                      as GameGenderType?,
             scores: null == scores
                 ? _value.scores
                 : scores // ignore: cast_nullable_to_non_nullable
@@ -341,6 +338,10 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.weatherNotes
                 : weatherNotes // ignore: cast_nullable_to_non_nullable
                       as String?,
+            gameGenderType: freezed == gameGenderType
+                ? _value.gameGenderType
+                : gameGenderType // ignore: cast_nullable_to_non_nullable
+                      as GameGenderType?,
           )
           as $Val,
     );
@@ -420,7 +421,6 @@ abstract class _$$GameModelImplCopyWith<$Res>
     String? courtInfo,
     GameType? gameType,
     GameSkillLevel? skillLevel,
-    GameGenderType? gameGenderType,
     List<GameScore> scores,
     String? winnerId,
     GameTeams? teams,
@@ -432,6 +432,7 @@ abstract class _$$GameModelImplCopyWith<$Res>
     @TimestampConverter() DateTime? completedAt,
     bool weatherDependent,
     String? weatherNotes,
+    GameGenderType? gameGenderType,
   });
 
   @override
@@ -481,7 +482,6 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? courtInfo = freezed,
     Object? gameType = freezed,
     Object? skillLevel = freezed,
-    Object? gameGenderType = freezed,
     Object? scores = null,
     Object? winnerId = freezed,
     Object? teams = freezed,
@@ -493,6 +493,7 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? completedAt = freezed,
     Object? weatherDependent = null,
     Object? weatherNotes = freezed,
+    Object? gameGenderType = freezed,
   }) {
     return _then(
       _$GameModelImpl(
@@ -596,10 +597,6 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.skillLevel
             : skillLevel // ignore: cast_nullable_to_non_nullable
                   as GameSkillLevel?,
-        gameGenderType: freezed == gameGenderType
-            ? _value.gameGenderType
-            : gameGenderType // ignore: cast_nullable_to_non_nullable
-                  as GameGenderType?,
         scores: null == scores
             ? _value._scores
             : scores // ignore: cast_nullable_to_non_nullable
@@ -644,6 +641,10 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.weatherNotes
             : weatherNotes // ignore: cast_nullable_to_non_nullable
                   as String?,
+        gameGenderType: freezed == gameGenderType
+            ? _value.gameGenderType
+            : gameGenderType // ignore: cast_nullable_to_non_nullable
+                  as GameGenderType?,
       ),
     );
   }
@@ -678,7 +679,6 @@ class _$GameModelImpl extends _GameModel {
     this.courtInfo,
     this.gameType,
     this.skillLevel,
-    this.gameGenderType,
     final List<GameScore> scores = const [],
     this.winnerId,
     this.teams,
@@ -690,6 +690,7 @@ class _$GameModelImpl extends _GameModel {
     @TimestampConverter() this.completedAt,
     this.weatherDependent = true,
     this.weatherNotes,
+    this.gameGenderType,
   }) : _playerIds = playerIds,
        _waitlistIds = waitlistIds,
        _equipment = equipment,
@@ -786,9 +787,6 @@ class _$GameModelImpl extends _GameModel {
   final GameType? gameType;
   @override
   final GameSkillLevel? skillLevel;
-  // Gender classification — set by Cloud Function (Story 26.4)
-  @override
-  final GameGenderType? gameGenderType;
   // Scoring
   final List<GameScore> _scores;
   // Scoring
@@ -850,10 +848,14 @@ class _$GameModelImpl extends _GameModel {
   final bool weatherDependent;
   @override
   final String? weatherNotes;
+  // Gender classification — set by creator intent at creation, re-validated by
+  // Cloud Function when players join (Story 26.4 / Story 26.8).
+  @override
+  final GameGenderType? gameGenderType;
 
   @override
   String toString() {
-    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, gameGenderType: $gameGenderType, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, eloUpdates: $eloUpdates, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
+    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, eloUpdates: $eloUpdates, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes, gameGenderType: $gameGenderType)';
   }
 
   @override
@@ -911,8 +913,6 @@ class _$GameModelImpl extends _GameModel {
                 other.gameType == gameType) &&
             (identical(other.skillLevel, skillLevel) ||
                 other.skillLevel == skillLevel) &&
-            (identical(other.gameGenderType, gameGenderType) ||
-                other.gameGenderType == gameGenderType) &&
             const DeepCollectionEquality().equals(other._scores, _scores) &&
             (identical(other.winnerId, winnerId) ||
                 other.winnerId == winnerId) &&
@@ -935,7 +935,9 @@ class _$GameModelImpl extends _GameModel {
             (identical(other.weatherDependent, weatherDependent) ||
                 other.weatherDependent == weatherDependent) &&
             (identical(other.weatherNotes, weatherNotes) ||
-                other.weatherNotes == weatherNotes));
+                other.weatherNotes == weatherNotes) &&
+            (identical(other.gameGenderType, gameGenderType) ||
+                other.gameGenderType == gameGenderType));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -967,7 +969,6 @@ class _$GameModelImpl extends _GameModel {
     courtInfo,
     gameType,
     skillLevel,
-    gameGenderType,
     const DeepCollectionEquality().hash(_scores),
     winnerId,
     teams,
@@ -979,6 +980,7 @@ class _$GameModelImpl extends _GameModel {
     completedAt,
     weatherDependent,
     weatherNotes,
+    gameGenderType,
   ]);
 
   /// Create a copy of GameModel
@@ -1022,7 +1024,6 @@ abstract class _GameModel extends GameModel {
     final String? courtInfo,
     final GameType? gameType,
     final GameSkillLevel? skillLevel,
-    final GameGenderType? gameGenderType,
     final List<GameScore> scores,
     final String? winnerId,
     final GameTeams? teams,
@@ -1034,6 +1035,7 @@ abstract class _GameModel extends GameModel {
     @TimestampConverter() final DateTime? completedAt,
     final bool weatherDependent,
     final String? weatherNotes,
+    final GameGenderType? gameGenderType,
   }) = _$GameModelImpl;
   const _GameModel._() : super._();
 
@@ -1094,9 +1096,7 @@ abstract class _GameModel extends GameModel {
   @override
   GameType? get gameType;
   @override
-  GameSkillLevel? get skillLevel; // Gender classification — set by Cloud Function (Story 26.4)
-  @override
-  GameGenderType? get gameGenderType; // Scoring
+  GameSkillLevel? get skillLevel; // Scoring
   @override
   List<GameScore> get scores;
   @override
@@ -1121,7 +1121,10 @@ abstract class _GameModel extends GameModel {
   @override
   bool get weatherDependent;
   @override
-  String? get weatherNotes;
+  String? get weatherNotes; // Gender classification — set by creator intent at creation, re-validated by
+  // Cloud Function when players join (Story 26.4 / Story 26.8).
+  @override
+  GameGenderType? get gameGenderType;
 
   /// Create a copy of GameModel
   /// with the given fields replaced by the non-null parameter values.

@@ -1945,6 +1945,22 @@ class AppLocalizationsDe extends AppLocalizations {
       'Speichern fehlgeschlagen. Bitte erneut versuchen.';
 
   @override
+  String get gameCreationGameTypeSectionLabel => 'Spieltyp';
+
+  @override
+  String get gameCreationGameTypeNormal => 'Normal';
+
+  @override
+  String get gameCreationGameTypeMixed => 'Gemischt';
+
+  @override
+  String get gameCreationGameTypeDescription =>
+      'Normale Spiele zählen für dein ELO. Gemischte Spiele sind freundschaftlich und beeinflussen dein Rating nicht.';
+
+  @override
+  String get gameCreationAlwaysMixed => 'Ihre Spiele sind immer gemischt';
+
+  @override
   String get registrationGenderRequired =>
       'Bitte wählen Sie ein Geschlecht aus, um fortzufahren';
 
