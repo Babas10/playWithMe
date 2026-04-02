@@ -262,6 +262,7 @@
   "joined": "BEIGETRETEN",
   "training": "Training",
   "gameLabel": "SPIEL",
+  "mixGameBadge": "MIX",
   "minParticipants": "Min: {count}",
   "selectGameDate": "Spieldatum Auswählen",
   "selectGameTime": "Spielzeit Auswählen",

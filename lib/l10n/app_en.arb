@@ -1336,6 +1336,10 @@
   "@gameLabel": {
     "description": "Game badge label"
   },
+  "mixGameBadge": "MIX",
+  "@mixGameBadge": {
+    "description": "Badge label shown on mixed-gender games"
+  },
 
   "minParticipants": "Min: {count}",
   "@minParticipants": {

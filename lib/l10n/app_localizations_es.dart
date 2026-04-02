@@ -849,6 +849,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gameLabel => 'PARTIDO';
 
   @override
+  String get mixGameBadge => 'MIX';
+
+  @override
   String minParticipants(int count) {
     return 'Mín: $count';
   }
