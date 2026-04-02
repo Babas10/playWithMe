@@ -197,18 +197,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    _GenderOption(
-                      label: l10n.genderMale,
-                      value: _kGenderMale,
-                      selected: _selectedGender == _kGenderMale,
-                      onTap: () => setState(() => _selectedGender = _kGenderMale),
+                    Expanded(
+                      child: _GenderOption(
+                        label: l10n.genderMale,
+                        value: _kGenderMale,
+                        selected: _selectedGender == _kGenderMale,
+                        onTap: () => setState(() => _selectedGender = _kGenderMale),
+                      ),
                     ),
                     const SizedBox(width: 8),
-                    _GenderOption(
-                      label: l10n.genderFemale,
-                      value: _kGenderFemale,
-                      selected: _selectedGender == _kGenderFemale,
-                      onTap: () => setState(() => _selectedGender = _kGenderFemale),
+                    Expanded(
+                      child: _GenderOption(
+                        label: l10n.genderFemale,
+                        value: _kGenderFemale,
+                        selected: _selectedGender == _kGenderFemale,
+                        onTap: () => setState(() => _selectedGender = _kGenderFemale),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -366,7 +370,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 }
 
-/// Pill-style option for the gender selector on the registration page.
+/// Circle-with-label option for the gender selector on the registration page.
 class _GenderOption extends StatelessWidget {
   final String label;
   final String value;
@@ -384,27 +388,37 @@ class _GenderOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: selected
-                ? AppColors.primary
-                : AppColors.textMuted.withValues(alpha: 0.4),
+      child: Column(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: selected ? AppColors.primary : Colors.transparent,
+              border: Border.all(
+                color: selected
+                    ? AppColors.primary
+                    : AppColors.textMuted.withValues(alpha: 0.4),
+                width: selected ? 2 : 1,
+              ),
+            ),
+            child: selected
+                ? const Icon(Icons.check, color: Colors.white, size: 22)
+                : null,
           ),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.textMuted,
+          const SizedBox(height: 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+              color: selected ? AppColors.primary : AppColors.textMuted,
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
