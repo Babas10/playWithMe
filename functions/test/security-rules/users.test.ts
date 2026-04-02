@@ -37,7 +37,7 @@ describe("User Security Rules", () => {
 
   describe("Read Access", () => {
     beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
@@ -141,7 +141,7 @@ describe("User Security Rules", () => {
 
   describe("Update Access - Allowed Fields", () => {
     beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
@@ -203,7 +203,7 @@ describe("User Security Rules", () => {
 
   describe("Update Access - Protected Fields (Epic 11)", () => {
     beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
@@ -258,7 +258,7 @@ describe("User Security Rules", () => {
 
   describe("Update Access - Core Protected Fields", () => {
     beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
@@ -320,7 +320,7 @@ describe("User Security Rules", () => {
 
   describe("FCM Token Management", () => {
     beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
@@ -354,7 +354,7 @@ describe("User Security Rules", () => {
 
   describe("Preferences Subcollection", () => {
     beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
