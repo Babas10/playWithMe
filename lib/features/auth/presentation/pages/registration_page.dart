@@ -392,8 +392,8 @@ class _GenderOption extends StatelessWidget {
         children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            width: 48,
-            height: 48,
+            width: 24,
+            height: 24,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: selected ? AppColors.primary : Colors.transparent,
@@ -405,7 +405,7 @@ class _GenderOption extends StatelessWidget {
               ),
             ),
             child: selected
-                ? const Icon(Icons.check, color: Colors.white, size: 22)
+                ? const Icon(Icons.check, color: Colors.white, size: 14)
                 : null,
           ),
           const SizedBox(height: 6),
