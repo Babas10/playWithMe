@@ -1553,4 +1553,139 @@ void main() {
       expect(result, isA<Timestamp>());
     });
   });
+
+  // Story 26.4: GameGenderType serialization
+  group('GameGenderType (Story 26.4)', () {
+    test('GameGenderType.male serializes to "male"', () {
+      final game = GameModel(
+        id: 'g1',
+        title: 'T',
+        groupId: 'grp',
+        createdBy: 'u1',
+        createdAt: DateTime(2024),
+        scheduledAt: DateTime(2025),
+        location: const GameLocation(name: 'Court'),
+        gameGenderType: GameGenderType.male,
+      );
+      final json = game.toJson();
+      expect(json['gameGenderType'], 'male');
+    });
+
+    test('GameGenderType.female serializes to "female"', () {
+      final game = GameModel(
+        id: 'g2',
+        title: 'T',
+        groupId: 'grp',
+        createdBy: 'u1',
+        createdAt: DateTime(2024),
+        scheduledAt: DateTime(2025),
+        location: const GameLocation(name: 'Court'),
+        gameGenderType: GameGenderType.female,
+      );
+      final json = game.toJson();
+      expect(json['gameGenderType'], 'female');
+    });
+
+    test('GameGenderType.mix serializes to "mix"', () {
+      final game = GameModel(
+        id: 'g3',
+        title: 'T',
+        groupId: 'grp',
+        createdBy: 'u1',
+        createdAt: DateTime(2024),
+        scheduledAt: DateTime(2025),
+        location: const GameLocation(name: 'Court'),
+        gameGenderType: GameGenderType.mix,
+      );
+      final json = game.toJson();
+      expect(json['gameGenderType'], 'mix');
+    });
+
+    test('gameGenderType defaults to null', () {
+      final game = GameModel(
+        id: 'g4',
+        title: 'T',
+        groupId: 'grp',
+        createdBy: 'u1',
+        createdAt: DateTime(2024),
+        scheduledAt: DateTime(2025),
+        location: const GameLocation(name: 'Court'),
+      );
+      expect(game.gameGenderType, isNull);
+    });
+
+    test('deserializes "male" correctly', () {
+      final json = <String, dynamic>{
+        'id': 'g5',
+        'title': 'T',
+        'groupId': 'grp',
+        'createdBy': 'u1',
+        'createdAt': '2024-01-01T00:00:00.000',
+        'scheduledAt': '2025-01-01T00:00:00.000',
+        'location': {'name': 'Court'},
+        'gameGenderType': 'male',
+      };
+      final game = GameModel.fromJson(json);
+      expect(game.gameGenderType, GameGenderType.male);
+    });
+
+    test('deserializes "female" correctly', () {
+      final json = <String, dynamic>{
+        'id': 'g6',
+        'title': 'T',
+        'groupId': 'grp',
+        'createdBy': 'u1',
+        'createdAt': '2024-01-01T00:00:00.000',
+        'scheduledAt': '2025-01-01T00:00:00.000',
+        'location': {'name': 'Court'},
+        'gameGenderType': 'female',
+      };
+      final game = GameModel.fromJson(json);
+      expect(game.gameGenderType, GameGenderType.female);
+    });
+
+    test('deserializes "mix" correctly', () {
+      final json = <String, dynamic>{
+        'id': 'g7',
+        'title': 'T',
+        'groupId': 'grp',
+        'createdBy': 'u1',
+        'createdAt': '2024-01-01T00:00:00.000',
+        'scheduledAt': '2025-01-01T00:00:00.000',
+        'location': {'name': 'Court'},
+        'gameGenderType': 'mix',
+      };
+      final game = GameModel.fromJson(json);
+      expect(game.gameGenderType, GameGenderType.mix);
+    });
+
+    test('deserializes missing gameGenderType as null (legacy games)', () {
+      final json = <String, dynamic>{
+        'id': 'g8',
+        'title': 'T',
+        'groupId': 'grp',
+        'createdBy': 'u1',
+        'createdAt': '2024-01-01T00:00:00.000',
+        'scheduledAt': '2025-01-01T00:00:00.000',
+        'location': {'name': 'Court'},
+      };
+      final game = GameModel.fromJson(json);
+      expect(game.gameGenderType, isNull);
+    });
+
+    test('copyWith preserves GameGenderType.mix', () {
+      final game = GameModel(
+        id: 'g9',
+        title: 'T',
+        groupId: 'grp',
+        createdBy: 'u1',
+        createdAt: DateTime(2024),
+        scheduledAt: DateTime(2025),
+        location: const GameLocation(name: 'Court'),
+        gameGenderType: GameGenderType.mix,
+      );
+      final updated = game.copyWith(title: 'Updated');
+      expect(updated.gameGenderType, GameGenderType.mix);
+    });
+  });
 }

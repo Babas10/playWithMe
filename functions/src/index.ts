@@ -85,6 +85,12 @@ export {
   onGameStatusChanged, // Story 14.16 (ELO + teammate stats)
 } from "./gameUpdates";
 
+// Export game gender classification triggers (Story 26.4)
+export {
+  onGameCreatedClassifyGender,
+  onGamePlayersChangedClassifyGender,
+} from "./gameGenderClassification";
+
 // Export head-to-head update triggers
 export {
   onEloCalculationComplete, // Story 301.8 (H2H stats - triggers after ELO)
