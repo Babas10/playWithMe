@@ -5,6 +5,7 @@ import { processStatsTracking } from "./statsTracking";
 // Constants
 const K_FACTOR = 32;
 const DEFAULT_ELO = 1200;
+const DEFAULT_MIX_ELO = 1000;
 
 /**
  * Calculate team rating using Weak-Link formula.
@@ -90,6 +91,20 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
   const teamBPlayerIds = gameData.teams.teamBPlayerIds;
   const individualGames = gameData.result.games; // Array of individual games
 
+  // Story 26.7: Route ELO writes to the correct bucket based on gameGenderType.
+  // 'male' or 'female' → eloRating (gender ELO)
+  // 'mix' or unknown   → mixEloRating (mix ELO)
+  // Null/undefined is treated as gender (legacy games created before Story 26.4).
+  const gameGenderType = gameData.gameGenderType ?? null;
+  const isMixGame = gameGenderType === "mix";
+  const eloField = isMixGame ? "mixEloRating" : "eloRating";
+  const defaultEloForGame = isMixGame ? DEFAULT_MIX_ELO : DEFAULT_ELO;
+  const historyGameType = isMixGame ? "mix" : "gender";
+
+  functions.logger.info(
+    `Game ${gameId} gameGenderType=${gameGenderType}, routing ELO writes to "${eloField}"`
+  );
+
   try {
     await db.runTransaction(async (transaction) => {
       // 1. Fetch all players
@@ -109,10 +124,11 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
       });
 
       // Track current ratings as we process each game (starts with stored ratings)
+      // Use the correct ELO bucket depending on game type (Story 26.7)
       const currentRatings = new Map<string, number>();
       playerIds.forEach(id => {
         const data = playerMap.get(id);
-        currentRatings.set(id, data?.eloRating || DEFAULT_ELO);
+        currentRatings.set(id, data?.[eloField] || defaultEloForGame);
       });
 
       // Track cumulative changes for each player
@@ -186,9 +202,10 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
         const data = playerMap.get(playerId);
         if (!data) return;
 
-        const originalRating = data.eloRating || DEFAULT_ELO;
+        // Story 26.7: Read and write the correct ELO bucket
+        const originalRating = data[eloField] || defaultEloForGame;
         const cumulativeChange = cumulativeChanges.get(playerId) || 0;
-        const finalRating = currentRatings.get(playerId) || DEFAULT_ELO;
+        const finalRating = currentRatings.get(playerId) || defaultEloForGame;
         const won = isTeamA ? overallTeamAWon : overallTeamBWon;
         const opponentIds = isTeamA ? teamBPlayerIds : teamAPlayerIds;
 
@@ -206,10 +223,10 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
         // Calculate best win tracking (Story 301.6)
         let bestWinUpdate: any = undefined;
         if (won && cumulativeChange > 0) {
-          // Get opponent team ratings at the time of the game
+          // Get opponent team ratings using the same ELO bucket (Story 26.7)
           const opponentRatings = opponentIds.map((oid: string) => {
             const oppData = playerMap.get(oid);
-            return oppData?.eloRating || DEFAULT_ELO;
+            return oppData?.[eloField] || defaultEloForGame;
           });
 
           // Calculate opponent team ELO (using same formula as team rating)
@@ -235,9 +252,10 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
         }
 
         // Update User Doc
+        // Story 26.7: write to the correct ELO bucket (eloRating or mixEloRating)
         const userRef = db.collection("users").doc(playerId);
         const updateData: any = {
-          eloRating: finalRating,
+          [eloField]: finalRating,          // gender or mix ELO bucket
           eloLastUpdated: now,
           eloPeak: newPeak,
           eloPeakDate: newPeakDate,
@@ -267,6 +285,7 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
         };
 
         // Add to History (one entry per play session with cumulative change)
+        // Story 26.7: tag the entry with gameType so the chart can filter by bucket
         const opponentNames = opponentIds.map((oid: string) => displayNames.get(oid) || "Unknown").join(" & ");
         const historyRef = userRef.collection("ratingHistory").doc();
         transaction.set(historyRef, {
@@ -277,6 +296,7 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
             opponentTeam: opponentNames,
             won: won,
             timestamp: now,
+            gameType: historyGameType,  // 'gender' | 'mix'
         });
       };
 

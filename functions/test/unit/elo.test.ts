@@ -650,6 +650,213 @@ describe("processGameEloUpdates", () => {
     await expect(processGameEloUpdates(gameId, gameData)).resolves.not.toThrow();
   });
 
+  // ========================================================================
+  // Story 26.7: ELO routing by game type
+  // ========================================================================
+
+  /**
+   * Helper: builds a complete mock db suitable for Story 26.7 routing tests.
+   * playerMap maps player id → { eloRating, mixEloRating, displayName }
+   */
+  function buildMockDb(
+    localDb: any,
+    localTransaction: any,
+    gameId: string,
+    gameData: any,
+    playerMap: Record<string, any>
+  ): void {
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = {
+      exists: true,
+      id: gameId,
+      ref: gameRef,
+      data: () => gameData,
+    };
+
+    const subCollectionMock = { doc: jest.fn(() => ({ id: "historyId" })) };
+    const docRefMock = { collection: jest.fn(() => subCollectionMock) };
+
+    const collectionMock = {
+      doc: jest.fn((id: string) => {
+        if (id === gameId) {
+          return { ...docRefMock, get: jest.fn().mockResolvedValue(gameDocMock) };
+        }
+        return {
+          ...docRefMock,
+          id,
+          exists: true,
+          data: () => playerMap[id] || {},
+        };
+      }),
+    };
+    localDb.collection.mockReturnValue(collectionMock);
+
+    localTransaction.get.mockImplementation((ref: any) =>
+      Promise.resolve({
+        exists: true,
+        id: ref.id,
+        data: () => playerMap[ref.id] || {},
+      })
+    );
+  }
+
+  test("gender game — updates eloRating, leaves mixEloRating unchanged", async () => {
+    const gameId = "g-gender";
+    const gameData = {
+      gameGenderType: "male",
+      teams: { teamAPlayerIds: ["p1"], teamBPlayerIds: ["p2"] },
+      result: { games: [{ winner: "teamA" }] },
+    };
+    const playerMap: Record<string, any> = {
+      p1: { eloRating: 1200, mixEloRating: 1000, displayName: "P1" },
+      p2: { eloRating: 1200, mixEloRating: 1000, displayName: "P2" },
+    };
+    buildMockDb(db, transaction, gameId, gameData, playerMap);
+
+    await processGameEloUpdates(gameId, gameData);
+
+    const p1Call = transaction.update.mock.calls.find((c: any) => c[0]?.id === "p1");
+    expect(p1Call).toBeDefined();
+    // eloRating should be present and changed
+    expect(p1Call[1]).toHaveProperty("eloRating");
+    // mixEloRating must NOT be written
+    expect(p1Call[1]).not.toHaveProperty("mixEloRating");
+  });
+
+  test("female gender game — updates eloRating, leaves mixEloRating unchanged", async () => {
+    const gameId = "g-female";
+    const gameData = {
+      gameGenderType: "female",
+      teams: { teamAPlayerIds: ["p1"], teamBPlayerIds: ["p2"] },
+      result: { games: [{ winner: "teamA" }] },
+    };
+    const playerMap: Record<string, any> = {
+      p1: { eloRating: 1300, mixEloRating: 1050, displayName: "P1" },
+      p2: { eloRating: 1300, mixEloRating: 1050, displayName: "P2" },
+    };
+    buildMockDb(db, transaction, gameId, gameData, playerMap);
+
+    await processGameEloUpdates(gameId, gameData);
+
+    const p1Call = transaction.update.mock.calls.find((c: any) => c[0]?.id === "p1");
+    expect(p1Call).toBeDefined();
+    expect(p1Call[1]).toHaveProperty("eloRating");
+    expect(p1Call[1]).not.toHaveProperty("mixEloRating");
+  });
+
+  test("mix game — updates mixEloRating, leaves eloRating unchanged", async () => {
+    const gameId = "g-mix";
+    const gameData = {
+      gameGenderType: "mix",
+      teams: { teamAPlayerIds: ["p1"], teamBPlayerIds: ["p2"] },
+      result: { games: [{ winner: "teamA" }] },
+    };
+    const playerMap: Record<string, any> = {
+      p1: { eloRating: 1200, mixEloRating: 1000, displayName: "P1" },
+      p2: { eloRating: 1200, mixEloRating: 1000, displayName: "P2" },
+    };
+    buildMockDb(db, transaction, gameId, gameData, playerMap);
+
+    await processGameEloUpdates(gameId, gameData);
+
+    const p1Call = transaction.update.mock.calls.find((c: any) => c[0]?.id === "p1");
+    expect(p1Call).toBeDefined();
+    // mixEloRating should be present and changed
+    expect(p1Call[1]).toHaveProperty("mixEloRating");
+    // eloRating must NOT be written
+    expect(p1Call[1]).not.toHaveProperty("eloRating");
+  });
+
+  test("null gameGenderType — treated as gender game (legacy fallback)", async () => {
+    const gameId = "g-null";
+    const gameData = {
+      // gameGenderType absent (legacy game)
+      teams: { teamAPlayerIds: ["p1"], teamBPlayerIds: ["p2"] },
+      result: { games: [{ winner: "teamA" }] },
+    };
+    const playerMap: Record<string, any> = {
+      p1: { eloRating: 1200, mixEloRating: 1000, displayName: "P1" },
+      p2: { eloRating: 1200, mixEloRating: 1000, displayName: "P2" },
+    };
+    buildMockDb(db, transaction, gameId, gameData, playerMap);
+
+    await processGameEloUpdates(gameId, gameData);
+
+    const p1Call = transaction.update.mock.calls.find((c: any) => c[0]?.id === "p1");
+    expect(p1Call).toBeDefined();
+    expect(p1Call[1]).toHaveProperty("eloRating");
+    expect(p1Call[1]).not.toHaveProperty("mixEloRating");
+  });
+
+  test("gender game — history entry has gameType='gender'", async () => {
+    const gameId = "g-hist-gender";
+    const gameData = {
+      gameGenderType: "male",
+      teams: { teamAPlayerIds: ["p1"], teamBPlayerIds: ["p2"] },
+      result: { games: [{ winner: "teamA" }] },
+    };
+    const playerMap: Record<string, any> = {
+      p1: { eloRating: 1200, mixEloRating: 1000, displayName: "P1" },
+      p2: { eloRating: 1200, mixEloRating: 1000, displayName: "P2" },
+    };
+    buildMockDb(db, transaction, gameId, gameData, playerMap);
+
+    await processGameEloUpdates(gameId, gameData);
+
+    // transaction.set is called for each history entry
+    expect(transaction.set).toHaveBeenCalled();
+    const historyCall = transaction.set.mock.calls[0];
+    expect(historyCall[1]).toHaveProperty("gameType", "gender");
+  });
+
+  test("mix game — history entry has gameType='mix'", async () => {
+    const gameId = "g-hist-mix";
+    const gameData = {
+      gameGenderType: "mix",
+      teams: { teamAPlayerIds: ["p1"], teamBPlayerIds: ["p2"] },
+      result: { games: [{ winner: "teamA" }] },
+    };
+    const playerMap: Record<string, any> = {
+      p1: { eloRating: 1200, mixEloRating: 1000, displayName: "P1" },
+      p2: { eloRating: 1200, mixEloRating: 1000, displayName: "P2" },
+    };
+    buildMockDb(db, transaction, gameId, gameData, playerMap);
+
+    await processGameEloUpdates(gameId, gameData);
+
+    expect(transaction.set).toHaveBeenCalled();
+    const historyCall = transaction.set.mock.calls[0];
+    expect(historyCall[1]).toHaveProperty("gameType", "mix");
+  });
+
+  test("mix game — uses mixEloRating as starting rating (default 1000)", async () => {
+    const gameId = "g-default-mix";
+    const gameData = {
+      gameGenderType: "mix",
+      teams: { teamAPlayerIds: ["p1"], teamBPlayerIds: ["p2"] },
+      result: { games: [{ winner: "teamA" }] },
+    };
+    // p1 has no mixEloRating → should default to 1000
+    const playerMap: Record<string, any> = {
+      p1: { eloRating: 1200, displayName: "P1" }, // no mixEloRating
+      p2: { eloRating: 1200, mixEloRating: 1000, displayName: "P2" },
+    };
+    buildMockDb(db, transaction, gameId, gameData, playerMap);
+
+    await processGameEloUpdates(gameId, gameData);
+
+    // p1's history entry should show oldRating as 1000 (DEFAULT_MIX_ELO)
+    const p1HistCall = transaction.set.mock.calls.find((c: any) => {
+      // The set call's second arg has oldRating
+      return c[1]?.oldRating !== undefined;
+    });
+    expect(p1HistCall).toBeDefined();
+    // At least one history entry should have oldRating=1000 (the p1 entry)
+    const histEntries = transaction.set.mock.calls.map((c: any) => c[1]);
+    const p1Entry = histEntries.find((e: any) => e?.oldRating === 1000);
+    expect(p1Entry).toBeDefined();
+  });
+
   test("rejects when game document doesn't exist (Story 15.5)", async () => {
     const gameId = "nonexistent";
     const gameData = {
