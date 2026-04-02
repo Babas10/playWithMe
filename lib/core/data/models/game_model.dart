@@ -35,6 +35,8 @@ class GameModel with _$GameModel {
     String? courtInfo,
     GameType? gameType,
     GameSkillLevel? skillLevel,
+    // Gender classification — set by Cloud Function (Story 26.4)
+    GameGenderType? gameGenderType,
     // Scoring
     @Default([]) List<GameScore> scores,
     String? winnerId,
@@ -696,6 +698,17 @@ enum GameSkillLevel {
   advanced,
   @JsonValue('mixed')
   mixed,
+}
+
+/// Gender classification of a game based on its players (Story 26.4).
+/// Set automatically by the Cloud Function after player list changes.
+enum GameGenderType {
+  @JsonValue('male')
+  male,
+  @JsonValue('female')
+  female,
+  @JsonValue('mix')
+  mix,
 }
 
 /// Custom converter for Firestore Timestamp to DateTime

@@ -40,7 +40,7 @@ describe("Friendship Security Rules", () => {
   describe("Read Access", () => {
     beforeEach(async () => {
       // Set up test data with admin context
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         // Create test users
@@ -133,7 +133,7 @@ describe("Friendship Security Rules", () => {
   describe("Create Access", () => {
     beforeEach(async () => {
       // Set up test users
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
@@ -224,7 +224,7 @@ describe("Friendship Security Rules", () => {
   describe("Update Access", () => {
     beforeEach(async () => {
       // Set up test data
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
@@ -364,7 +364,7 @@ describe("Friendship Security Rules", () => {
   describe("Delete Access", () => {
     beforeEach(async () => {
       // Set up test data
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({
@@ -422,7 +422,7 @@ describe("Friendship Security Rules", () => {
 
   describe("Edge Cases", () => {
     beforeEach(async () => {
-      await testEnv.withSecurityRulesDisabled(async (context) => {
+      await testEnv.withSecurityRulesDisabled(async (context: testing.RulesTestContext) => {
         const db = context.firestore();
 
         await db.collection("users").doc("user1").set({

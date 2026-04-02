@@ -54,6 +54,8 @@ mixin _$GameModel {
   String? get courtInfo => throw _privateConstructorUsedError;
   GameType? get gameType => throw _privateConstructorUsedError;
   GameSkillLevel? get skillLevel =>
+      throw _privateConstructorUsedError; // Gender classification — set by Cloud Function (Story 26.4)
+  GameGenderType? get gameGenderType =>
       throw _privateConstructorUsedError; // Scoring
   List<GameScore> get scores => throw _privateConstructorUsedError;
   String? get winnerId =>
@@ -117,6 +119,7 @@ abstract class $GameModelCopyWith<$Res> {
     String? courtInfo,
     GameType? gameType,
     GameSkillLevel? skillLevel,
+    GameGenderType? gameGenderType,
     List<GameScore> scores,
     String? winnerId,
     GameTeams? teams,
@@ -175,6 +178,7 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? courtInfo = freezed,
     Object? gameType = freezed,
     Object? skillLevel = freezed,
+    Object? gameGenderType = freezed,
     Object? scores = null,
     Object? winnerId = freezed,
     Object? teams = freezed,
@@ -289,6 +293,10 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
                 ? _value.skillLevel
                 : skillLevel // ignore: cast_nullable_to_non_nullable
                       as GameSkillLevel?,
+            gameGenderType: freezed == gameGenderType
+                ? _value.gameGenderType
+                : gameGenderType // ignore: cast_nullable_to_non_nullable
+                      as GameGenderType?,
             scores: null == scores
                 ? _value.scores
                 : scores // ignore: cast_nullable_to_non_nullable
@@ -412,6 +420,7 @@ abstract class _$$GameModelImplCopyWith<$Res>
     String? courtInfo,
     GameType? gameType,
     GameSkillLevel? skillLevel,
+    GameGenderType? gameGenderType,
     List<GameScore> scores,
     String? winnerId,
     GameTeams? teams,
@@ -472,6 +481,7 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? courtInfo = freezed,
     Object? gameType = freezed,
     Object? skillLevel = freezed,
+    Object? gameGenderType = freezed,
     Object? scores = null,
     Object? winnerId = freezed,
     Object? teams = freezed,
@@ -586,6 +596,10 @@ class __$$GameModelImplCopyWithImpl<$Res>
             ? _value.skillLevel
             : skillLevel // ignore: cast_nullable_to_non_nullable
                   as GameSkillLevel?,
+        gameGenderType: freezed == gameGenderType
+            ? _value.gameGenderType
+            : gameGenderType // ignore: cast_nullable_to_non_nullable
+                  as GameGenderType?,
         scores: null == scores
             ? _value._scores
             : scores // ignore: cast_nullable_to_non_nullable
@@ -664,6 +678,7 @@ class _$GameModelImpl extends _GameModel {
     this.courtInfo,
     this.gameType,
     this.skillLevel,
+    this.gameGenderType,
     final List<GameScore> scores = const [],
     this.winnerId,
     this.teams,
@@ -771,6 +786,9 @@ class _$GameModelImpl extends _GameModel {
   final GameType? gameType;
   @override
   final GameSkillLevel? skillLevel;
+  // Gender classification — set by Cloud Function (Story 26.4)
+  @override
+  final GameGenderType? gameGenderType;
   // Scoring
   final List<GameScore> _scores;
   // Scoring
@@ -835,7 +853,7 @@ class _$GameModelImpl extends _GameModel {
 
   @override
   String toString() {
-    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, eloUpdates: $eloUpdates, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
+    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, gameGenderType: $gameGenderType, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, eloUpdates: $eloUpdates, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes)';
   }
 
   @override
@@ -893,6 +911,8 @@ class _$GameModelImpl extends _GameModel {
                 other.gameType == gameType) &&
             (identical(other.skillLevel, skillLevel) ||
                 other.skillLevel == skillLevel) &&
+            (identical(other.gameGenderType, gameGenderType) ||
+                other.gameGenderType == gameGenderType) &&
             const DeepCollectionEquality().equals(other._scores, _scores) &&
             (identical(other.winnerId, winnerId) ||
                 other.winnerId == winnerId) &&
@@ -947,6 +967,7 @@ class _$GameModelImpl extends _GameModel {
     courtInfo,
     gameType,
     skillLevel,
+    gameGenderType,
     const DeepCollectionEquality().hash(_scores),
     winnerId,
     teams,
@@ -1001,6 +1022,7 @@ abstract class _GameModel extends GameModel {
     final String? courtInfo,
     final GameType? gameType,
     final GameSkillLevel? skillLevel,
+    final GameGenderType? gameGenderType,
     final List<GameScore> scores,
     final String? winnerId,
     final GameTeams? teams,
@@ -1072,7 +1094,9 @@ abstract class _GameModel extends GameModel {
   @override
   GameType? get gameType;
   @override
-  GameSkillLevel? get skillLevel; // Scoring
+  GameSkillLevel? get skillLevel; // Gender classification — set by Cloud Function (Story 26.4)
+  @override
+  GameGenderType? get gameGenderType; // Scoring
   @override
   List<GameScore> get scores;
   @override
