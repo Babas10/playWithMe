@@ -3553,6 +3553,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to save your choice. Please try again.'**
   String get genderSelectionError;
+
+  /// Tab label for gender-specific ELO rating in the ELO progress card (Story 26.6)
+  ///
+  /// In en, this message translates to:
+  /// **'Gender ELO'**
+  String get eloTabGender;
+
+  /// Tab label for mixed-game ELO rating in the ELO progress card (Story 26.6)
+  ///
+  /// In en, this message translates to:
+  /// **'Mix ELO'**
+  String get eloTabMix;
 }
 
 class _AppLocalizationsDelegate

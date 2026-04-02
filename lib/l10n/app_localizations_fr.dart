@@ -1943,4 +1943,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get genderSelectionError =>
       'Impossible de sauvegarder votre choix. Veuillez réessayer.';
+
+  @override
+  String get eloTabGender => 'ELO Genre';
+
+  @override
+  String get eloTabMix => 'ELO Mix';
 }

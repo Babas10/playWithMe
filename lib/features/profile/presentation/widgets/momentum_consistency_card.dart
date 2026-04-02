@@ -24,7 +24,8 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 /// - Current win streak with longest streak (optional secondary line)
 /// - Time period selector for filtering (Story 302.3)
 /// - Monthly improvement chart for long-term progress tracking (Story 302.4)
-class MomentumConsistencyCard extends StatelessWidget {
+/// - ELO tab switcher for gender vs mix ELO (Story 26.6, hidden for mix-only users)
+class MomentumConsistencyCard extends StatefulWidget {
   final UserModel user;
   final List<RatingHistoryEntry> ratingHistory;
 
@@ -35,18 +36,52 @@ class MomentumConsistencyCard extends StatelessWidget {
   });
 
   @override
+  State<MomentumConsistencyCard> createState() =>
+      _MomentumConsistencyCardState();
+}
+
+class _MomentumConsistencyCardState extends State<MomentumConsistencyCard> {
+  // Active tab: gender ELO or mix ELO. Defaults to gender for gendered users,
+  // mix for mix-only users (isMixOnly).
+  late EloGameType _activeTab;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeTab =
+        widget.user.isMixOnly ? EloGameType.mix : EloGameType.gender;
+  }
+
+  double get _currentElo => _activeTab == EloGameType.mix
+      ? widget.user.mixEloRating
+      : widget.user.eloRating;
+
+  /// Filters the history list to only entries matching the active tab.
+  /// Legacy entries (gameType == null) are treated as gender entries.
+  List<RatingHistoryEntry> _filterHistory(
+      List<RatingHistoryEntry> history) {
+    return history.where((e) {
+      if (_activeTab == EloGameType.mix) {
+        return e.gameType == EloGameType.mix;
+      }
+      // gender tab: include entries with null gameType (legacy) or gender
+      return e.gameType == null || e.gameType == EloGameType.gender;
+    }).toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => EloHistoryBloc(
             userRepository: sl<UserRepository>(),
-          )..add(EloHistoryEvent.loadHistory(userId: user.uid)),
+          )..add(EloHistoryEvent.loadHistory(userId: widget.user.uid)),
         ),
         BlocProvider(
           create: (context) => PlayerStatsBloc(
             userRepository: sl<UserRepository>(),
-          )..add(LoadPlayerStats(user.uid)), // Story 302.5: Load stats (ranking auto-loads via listener)
+          )..add(LoadPlayerStats(widget.user.uid)), // Story 302.5: Load stats (ranking auto-loads via listener)
         ),
       ],
       child: Padding(
@@ -90,7 +125,7 @@ class MomentumConsistencyCard extends StatelessWidget {
               listener: (context, statsState) {
                 if (statsState is PlayerStatsLoaded &&
                     statsState.ranking == null) {
-                  context.read<PlayerStatsBloc>().add(LoadRanking(user.uid));
+                  context.read<PlayerStatsBloc>().add(LoadRanking(widget.user.uid));
                 }
               },
               child: BlocBuilder<PlayerStatsBloc, PlayerStatsState>(
@@ -100,7 +135,7 @@ class MomentumConsistencyCard extends StatelessWidget {
                       children: [
                         RankingStatsCards(
                           ranking: statsState.ranking,
-                          currentStreak: user.currentStreak,
+                          currentStreak: widget.user.currentStreak,
                           onAddFriendsTap: () {
                             Navigator.pushNamed(context, '/friends');
                           },
@@ -118,12 +153,24 @@ class MomentumConsistencyCard extends StatelessWidget {
               builder: (context, state) {
                 if (state is! EloHistoryLoaded) return const SizedBox.shrink();
 
+                final filteredHistory = _filterHistory(state.filteredHistory);
+
                 return Card(
                   margin: EdgeInsets.zero,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
+                        // ELO tab switcher — hidden for mix-only users (Story 26.6)
+                        if (!widget.user.isMixOnly) ...[
+                          _EloTabSwitcher(
+                            activeTab: _activeTab,
+                            onTabChanged: (tab) {
+                              setState(() => _activeTab = tab);
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                         TimePeriodSelector(
                           selectedPeriod: state.selectedPeriod,
                           onPeriodChanged: (period) {
@@ -134,8 +181,8 @@ class MomentumConsistencyCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         MonthlyImprovementChart(
-                          ratingHistory: state.filteredHistory,
-                          currentElo: user.eloRating,
+                          ratingHistory: filteredHistory,
+                          currentElo: _currentElo,
                           timePeriod: state.selectedPeriod,
                         ),
                         const SizedBox(height: 16),
@@ -158,14 +205,14 @@ class MomentumConsistencyCard extends StatelessWidget {
 
   Widget _buildStreakSection(BuildContext context) {
     final theme = Theme.of(context);
-    final hasStreak = user.currentStreak != 0;
+    final hasStreak = widget.user.currentStreak != 0;
 
     if (!hasStreak) {
       return _buildNoStreakState(context);
     }
 
-    final isWinning = user.currentStreak > 0;
-    final streakValue = user.currentStreak.abs();
+    final isWinning = widget.user.currentStreak > 0;
+    final streakValue = widget.user.currentStreak.abs();
     final streakColor = isWinning ? Colors.green : Colors.red;
     final streakIcon = isWinning ? Icons.trending_up : Icons.trending_down;
     final streakLabel = isWinning
@@ -286,6 +333,77 @@ class MomentumConsistencyCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Pill-style tab switcher for toggling between Gender ELO and Mix ELO.
+class _EloTabSwitcher extends StatelessWidget {
+  final EloGameType activeTab;
+  final ValueChanged<EloGameType> onTabChanged;
+
+  const _EloTabSwitcher({
+    required this.activeTab,
+    required this.onTabChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        _Tab(
+          label: l10n.eloTabGender,
+          isActive: activeTab == EloGameType.gender,
+          onTap: () => onTabChanged(EloGameType.gender),
+        ),
+        const SizedBox(width: 8),
+        _Tab(
+          label: l10n.eloTabMix,
+          isActive: activeTab == EloGameType.mix,
+          onTap: () => onTabChanged(EloGameType.mix),
+        ),
+      ],
+    );
+  }
+}
+
+class _Tab extends StatelessWidget {
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _Tab({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isActive
+                ? AppColors.primary
+                : AppColors.textMuted.withValues(alpha: 0.4),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isActive ? Colors.white : AppColors.textMuted,
+          ),
+        ),
+      ),
     );
   }
 }

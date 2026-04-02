@@ -1905,4 +1905,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get genderSelectionError =>
       'Failed to save your choice. Please try again.';
+
+  @override
+  String get eloTabGender => 'Gender ELO';
+
+  @override
+  String get eloTabMix => 'Mix ELO';
 }

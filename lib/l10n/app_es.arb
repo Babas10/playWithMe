@@ -602,5 +602,13 @@
   "genderSelectionError": "No se pudo guardar tu elección. Inténtalo de nuevo.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "eloTabGender": "ELO Género",
+  "@eloTabGender": {
+    "description": "Tab label for gender-specific ELO rating in the ELO progress card (Story 26.6)"
+  },
+  "eloTabMix": "ELO Mix",
+  "@eloTabMix": {
+    "description": "Tab label for mixed-game ELO rating in the ELO progress card (Story 26.6)"
   }
 }
