@@ -2798,5 +2798,25 @@
   "genderSelectionError": "Failed to save your choice. Please try again.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "gameCreationGameTypeSectionLabel": "Game Type",
+  "@gameCreationGameTypeSectionLabel": {
+    "description": "Section label for the game type selector in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeNormal": "Normal",
+  "@gameCreationGameTypeNormal": {
+    "description": "Option label for gender-specific game in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeMixed": "Mixed",
+  "@gameCreationGameTypeMixed": {
+    "description": "Option label for mixed-gender game in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeDescription": "Normal games count for your gender ELO. Mixed games count for your mix ELO.",
+  "@gameCreationGameTypeDescription": {
+    "description": "Explanatory text under the game type selector (Story 26.8)"
+  },
+  "gameCreationAlwaysMixed": "Your games are always mixed",
+  "@gameCreationAlwaysMixed": {
+    "description": "Info label shown to no-gender users instead of the selector (Story 26.8)"
   }
 }

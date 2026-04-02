@@ -1930,4 +1930,20 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get genderSelectionError =>
       'No se pudo guardar tu elección. Inténtalo de nuevo.';
+
+  @override
+  String get gameCreationGameTypeSectionLabel => 'Tipo de juego';
+
+  @override
+  String get gameCreationGameTypeNormal => 'Normal';
+
+  @override
+  String get gameCreationGameTypeMixed => 'Mixto';
+
+  @override
+  String get gameCreationGameTypeDescription =>
+      'Los juegos normales cuentan para tu ELO de género. Los juegos mixtos cuentan para tu ELO mixto.';
+
+  @override
+  String get gameCreationAlwaysMixed => 'Tus juegos son siempre mixtos';
 }

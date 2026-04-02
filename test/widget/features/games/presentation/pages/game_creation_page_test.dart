@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
+import 'package:play_with_me/core/data/models/user_model.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.dart';
@@ -28,6 +30,8 @@ class MockInvitationBloc
     extends MockBloc<InvitationEvent, InvitationState>
     implements InvitationBloc {}
 
+class MockUserRepository extends Mock implements UserRepository {}
+
 class FakeGameCreationEvent extends Fake implements GameCreationEvent {}
 
 class FakeGameCreationState extends Fake implements GameCreationState {}
@@ -36,10 +40,31 @@ void main() {
   late MockGameCreationBloc mockGameCreationBloc;
   late MockAuthenticationBloc mockAuthBloc;
   late MockInvitationBloc mockInvitationBloc;
+  late MockUserRepository mockUserRepository;
 
   const testUserId = 'test-user-123';
   const testGroupId = 'test-group-123';
   const testGroupName = 'Beach Volleyball Crew';
+
+  /// A gendered (male) user — should see Normal/Mixed selector.
+  final genderedUser = UserModel(
+    uid: testUserId,
+    email: 'test@example.com',
+    isEmailVerified: true,
+    isAnonymous: false,
+    gender: UserGender.male,
+    createdAt: DateTime(2024, 1, 1),
+  );
+
+  /// A no-gender user — should only see "always mixed" info label.
+  final noGenderUser = UserModel(
+    uid: testUserId,
+    email: 'test@example.com',
+    isEmailVerified: true,
+    isAnonymous: false,
+    gender: UserGender.none,
+    createdAt: DateTime(2024, 1, 1),
+  );
 
   setUpAll(() {
     registerFallbackValue(FakeGameCreationEvent());
@@ -50,6 +75,7 @@ void main() {
     mockGameCreationBloc = MockGameCreationBloc();
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
+    mockUserRepository = MockUserRepository();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
 
     when(() => mockGameCreationBloc.state)
@@ -68,13 +94,18 @@ void main() {
       ),
     );
     when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
+
+    // Default: gendered user (male) — tests that need a different user
+    // can override this stub before calling createTestWidget.
+    when(() => mockUserRepository.currentUser)
+        .thenAnswer((_) => Stream.value(genderedUser));
   });
 
   tearDown(() {
     mockGameCreationBloc.close();
   });
 
-  Widget createTestWidget() {
+  Widget createTestWidget({UserRepository? userRepository}) {
     return MaterialApp(
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -89,9 +120,10 @@ void main() {
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
           BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
         ],
-        child: const GameCreationPage(
+        child: GameCreationPage(
           groupId: testGroupId,
           groupName: testGroupName,
+          userRepository: userRepository ?? mockUserRepository,
         ),
       ),
     );
@@ -605,6 +637,135 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.text('Please log in to create a game'), findsOneWidget);
+      });
+    });
+
+    // Story 26.8 — Game type selector visibility based on user gender
+    group('Game Type Selector (Story 26.8)', () {
+      testWidgets(
+          'shows Normal/Mixed selector for a gendered (male) user',
+          (tester) async {
+        when(() => mockUserRepository.currentUser)
+            .thenAnswer((_) => Stream.value(genderedUser));
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump(); // allow Future from currentUser.first to resolve
+
+        // Section label must be visible
+        expect(find.text('Game Type'), findsOneWidget);
+        // Both toggle options must be visible
+        expect(find.text('Normal'), findsOneWidget);
+        expect(find.text('Mixed'), findsOneWidget);
+        // Info label for mix-only users must NOT appear
+        expect(find.text('Your games are always mixed'), findsNothing);
+      });
+
+      testWidgets(
+          'shows Normal/Mixed selector for a gendered (female) user',
+          (tester) async {
+        final femaleUser = UserModel(
+          uid: testUserId,
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+          gender: UserGender.female,
+          createdAt: DateTime(2024, 1, 1),
+        );
+        when(() => mockUserRepository.currentUser)
+            .thenAnswer((_) => Stream.value(femaleUser));
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        expect(find.text('Normal'), findsOneWidget);
+        expect(find.text('Mixed'), findsOneWidget);
+        expect(find.text('Your games are always mixed'), findsNothing);
+      });
+
+      testWidgets(
+          'hides selector and shows info label for a no-gender user',
+          (tester) async {
+        when(() => mockUserRepository.currentUser)
+            .thenAnswer((_) => Stream.value(noGenderUser));
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // No toggle options
+        expect(find.text('Normal'), findsNothing);
+        expect(find.text('Mixed'), findsNothing);
+        // Info label must be shown
+        expect(find.text('Your games are always mixed'), findsOneWidget);
+      });
+
+      testWidgets(
+          'tapping Mixed option dispatches SetGameGenderType(mix)',
+          (tester) async {
+        when(() => mockUserRepository.currentUser)
+            .thenAnswer((_) => Stream.value(genderedUser));
+        // Seed a form state so the BLoC emits a state that renders the selector
+        when(() => mockGameCreationBloc.state).thenReturn(
+          const GameCreationFormState(isValid: false),
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Scroll to selector if needed, then tap Mixed
+        await tester.ensureVisible(find.text('Mixed'));
+        await tester.tap(find.text('Mixed'));
+        await tester.pump();
+
+        verify(
+          () => mockGameCreationBloc.add(
+            const SetGameGenderType(gameGenderType: GameGenderType.mix),
+          ),
+        ).called(1);
+      });
+
+      testWidgets(
+          'tapping Normal option dispatches SetGameGenderType(null)',
+          (tester) async {
+        when(() => mockUserRepository.currentUser)
+            .thenAnswer((_) => Stream.value(genderedUser));
+        when(() => mockGameCreationBloc.state).thenReturn(
+          const GameCreationFormState(
+            gameGenderType: GameGenderType.mix,
+            isValid: false,
+          ),
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        // Clear recorded calls from initState (which also dispatches null for gendered users).
+        clearInteractions(mockGameCreationBloc);
+
+        await tester.ensureVisible(find.text('Normal'));
+        await tester.tap(find.text('Normal'));
+        await tester.pump();
+
+        verify(
+          () => mockGameCreationBloc.add(
+            const SetGameGenderType(gameGenderType: null),
+          ),
+        ).called(1);
+      });
+
+      testWidgets(
+          'no-gender user silently dispatches SetGameGenderType(mix) on load',
+          (tester) async {
+        when(() => mockUserRepository.currentUser)
+            .thenAnswer((_) => Stream.value(noGenderUser));
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
+
+        verify(
+          () => mockGameCreationBloc.add(
+            const SetGameGenderType(gameGenderType: GameGenderType.mix),
+          ),
+        ).called(1);
       });
     });
   });

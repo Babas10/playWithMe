@@ -56,6 +56,9 @@ class GameModel with _$GameModel {
     // Weather considerations
     @Default(true) bool weatherDependent,
     String? weatherNotes,
+    // Gender classification — set by creator intent at creation, re-validated by
+    // Cloud Function when players join (Story 26.4 / Story 26.8).
+    GameGenderType? gameGenderType,
   }) = _GameModel;
 
   const GameModel._();
@@ -696,6 +699,18 @@ enum GameSkillLevel {
   advanced,
   @JsonValue('mixed')
   mixed,
+}
+
+/// Gender classification for a game (Story 26.4 / Story 26.8).
+/// Set at creation by the creator's intent; re-validated by Cloud Function
+/// when players join.
+enum GameGenderType {
+  @JsonValue('male')
+  male,
+  @JsonValue('female')
+  female,
+  @JsonValue('mix')
+  mix,
 }
 
 /// Custom converter for Firestore Timestamp to DateTime

@@ -602,5 +602,25 @@
   "genderSelectionError": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "gameCreationGameTypeSectionLabel": "Spieltyp",
+  "@gameCreationGameTypeSectionLabel": {
+    "description": "Section label for the game type selector in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeNormal": "Normal",
+  "@gameCreationGameTypeNormal": {
+    "description": "Option label for gender-specific game in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeMixed": "Gemischt",
+  "@gameCreationGameTypeMixed": {
+    "description": "Option label for mixed-gender game in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeDescription": "Normale Spiele zählen für Ihre Geschlechts-ELO. Gemischte Spiele zählen für Ihre Mix-ELO.",
+  "@gameCreationGameTypeDescription": {
+    "description": "Explanatory text under the game type selector (Story 26.8)"
+  },
+  "gameCreationAlwaysMixed": "Ihre Spiele sind immer gemischt",
+  "@gameCreationAlwaysMixed": {
+    "description": "Info label shown to no-gender users instead of the selector (Story 26.8)"
   }
 }

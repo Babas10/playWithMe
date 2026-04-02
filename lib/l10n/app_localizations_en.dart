@@ -1905,4 +1905,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get genderSelectionError =>
       'Failed to save your choice. Please try again.';
+
+  @override
+  String get gameCreationGameTypeSectionLabel => 'Game Type';
+
+  @override
+  String get gameCreationGameTypeNormal => 'Normal';
+
+  @override
+  String get gameCreationGameTypeMixed => 'Mixed';
+
+  @override
+  String get gameCreationGameTypeDescription =>
+      'Normal games count for your gender ELO. Mixed games count for your mix ELO.';
+
+  @override
+  String get gameCreationAlwaysMixed => 'Your games are always mixed';
 }

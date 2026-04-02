@@ -602,5 +602,25 @@
   "genderSelectionError": "Impossible de sauvegarder votre choix. Veuillez réessayer.",
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
+  },
+  "gameCreationGameTypeSectionLabel": "Type de partie",
+  "@gameCreationGameTypeSectionLabel": {
+    "description": "Section label for the game type selector in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeNormal": "Normal",
+  "@gameCreationGameTypeNormal": {
+    "description": "Option label for gender-specific game in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeMixed": "Mixte",
+  "@gameCreationGameTypeMixed": {
+    "description": "Option label for mixed-gender game in game creation (Story 26.8)"
+  },
+  "gameCreationGameTypeDescription": "Les parties normales comptent pour votre ELO de genre. Les parties mixtes comptent pour votre ELO mixte.",
+  "@gameCreationGameTypeDescription": {
+    "description": "Explanatory text under the game type selector (Story 26.8)"
+  },
+  "gameCreationAlwaysMixed": "Vos parties sont toujours mixtes",
+  "@gameCreationAlwaysMixed": {
+    "description": "Info label shown to no-gender users instead of the selector (Story 26.8)"
   }
 }
