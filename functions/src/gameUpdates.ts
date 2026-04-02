@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
 import { processGameEloUpdates } from "./elo";
 
 /**
@@ -46,6 +47,17 @@ export const onGameStatusChanged = functions
         `CRITICAL: ELO trigger fired for non-game collection: ${change.before.ref.parent.id}`,
         {gameId, collection: change.before.ref.parent.id}
       );
+      return null;
+    }
+
+    // Skip ELO for mixed games — mixed games are friendly and do not affect ratings (Story 26.10)
+    if (after.gameGenderType === "mix") {
+      functions.logger.info(`Game ${gameId} is a mixed game, skipping ELO calculation.`);
+      await change.after.ref.update({
+        eloCalculated: true,
+        eloUpdates: {},
+        eloCalculatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
       return null;
     }
 
