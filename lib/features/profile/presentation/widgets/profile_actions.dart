@@ -9,14 +9,12 @@ class ProfileActions extends StatelessWidget {
     required this.onSignOut,
     required this.onDeleteAccount,
     this.onNotificationSettings,
-    this.onGameHistory,
   });
 
   final VoidCallback onEditProfile;
   final VoidCallback onSignOut;
   final VoidCallback onDeleteAccount;
   final VoidCallback? onNotificationSettings;
-  final VoidCallback? onGameHistory;
 
   @override
   Widget build(BuildContext context) {
@@ -42,15 +40,6 @@ class ProfileActions extends StatelessWidget {
               label: Text(l10n.notificationSettings),
             ),
 
-          // Game History button
-          if (onGameHistory != null) ...[
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: onGameHistory,
-              icon: const Icon(Icons.history),
-              label: Text(l10n.gameHistory),
-            ),
-          ],
           const SizedBox(height: 24),
 
           // Sign Out button

@@ -43,38 +43,35 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
       debugPrint('✅ RegistrationBloc: User created: ${user.email}');
 
-      // Update display name
-      try {
-        await _authRepository.updateUserProfile(displayName: event.displayName.trim());
-        debugPrint('✅ RegistrationBloc: Display name updated');
-      } catch (e) {
-        debugPrint('⚠️ RegistrationBloc: Failed to update display name: $e');
-      }
-
-      // Persist firstName, lastName and gender to Firestore via Cloud Function
-      try {
-        await _authRepository.updateUserNames(
-          firstName: event.firstName.trim(),
-          lastName: event.lastName.trim(),
-          gender: event.gender,
-        );
-        debugPrint('✅ RegistrationBloc: First/last name and gender persisted to Firestore');
-      } catch (e) {
-        debugPrint('⚠️ RegistrationBloc: Failed to persist names/gender: $e');
-      }
-
-      // NOTE: Firestore user document is automatically created by the Cloud Function
-      // createUserDocument (functions/src/createUserDocument.ts) when the Auth user is created.
-      // No manual client-side creation needed to avoid permission conflicts.
-      debugPrint('ℹ️ RegistrationBloc: Firestore document will be created by Cloud Function');
-
-      // Send email verification
-      try {
-        await _authRepository.sendEmailVerification();
-        debugPrint('✅ RegistrationBloc: Email verification sent');
-      } catch (e) {
-        debugPrint('⚠️ RegistrationBloc: Failed to send email verification: $e');
-      }
+      // Run all post-creation steps in parallel to minimise registration latency.
+      // - updateUserProfile  : sets Firebase Auth displayName
+      // - updateUserNames    : writes firstName/lastName/gender to Firestore (set+merge,
+      //                        so it is safe even if createUserDocument hasn't fired yet)
+      // - sendEmailVerification: fires and forgets — non-blocking for UX
+      await Future.wait([
+        _authRepository
+            .updateUserProfile(displayName: event.displayName.trim())
+            .then((_) => debugPrint('✅ RegistrationBloc: Display name updated'))
+            .catchError((e) {
+          debugPrint('⚠️ RegistrationBloc: Failed to update display name: $e');
+        }),
+        _authRepository
+            .updateUserNames(
+              firstName: event.firstName.trim(),
+              lastName: event.lastName.trim(),
+              gender: event.gender,
+            )
+            .then((_) => debugPrint('✅ RegistrationBloc: Names/gender persisted'))
+            .catchError((e) {
+          debugPrint('⚠️ RegistrationBloc: Failed to persist names/gender: $e');
+        }),
+        _authRepository
+            .sendEmailVerification()
+            .then((_) => debugPrint('✅ RegistrationBloc: Email verification sent'))
+            .catchError((e) {
+          debugPrint('⚠️ RegistrationBloc: Failed to send email verification: $e');
+        }),
+      ]);
 
       await _analytics.logEvent(name: 'onboarding_completed');
       emit(const RegistrationSuccess());
