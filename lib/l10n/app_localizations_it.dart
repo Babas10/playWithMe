@@ -1930,6 +1930,25 @@ class AppLocalizationsIt extends AppLocalizations {
   String get genderSelectionError => 'Impossibile salvare la scelta. Riprova.';
 
   @override
+  String get deleteAccount => 'Elimina account';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Eliminare il tuo account?';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'Il tuo account e tutti i tuoi dati verranno eliminati definitivamente. Questa azione è irreversibile.';
+
+  @override
+  String get deleteAccountConfirm => 'Elimina definitivamente';
+
+  @override
+  String get deleteAccountSuccess => 'Il tuo account è stato eliminato.';
+
+  @override
+  String get deleteAccountError => 'Impossibile eliminare l\'account. Riprova.';
+
+  @override
   String get gameCreationGameTypeSectionLabel => 'Tipo di partita';
 
   @override

@@ -19,7 +19,9 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 
 import 'package:get_it/get_it.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import '../../../../core/data/repositories/mock_game_repository.dart';
+import '../../../../features/auth/data/mock_auth_repository.dart';
 
 // Fake AuthenticationBloc for testing
 class FakeAuthenticationBloc extends Fake implements AuthenticationBloc {
@@ -50,7 +52,11 @@ void main() {
     if (GetIt.I.isRegistered<GameRepository>()) {
       GetIt.I.unregister<GameRepository>();
     }
+    if (GetIt.I.isRegistered<AuthRepository>()) {
+      GetIt.I.unregister<AuthRepository>();
+    }
     GetIt.I.registerSingleton<GameRepository>(MockGameRepository());
+    GetIt.I.registerSingleton<AuthRepository>(MockAuthRepository());
   });
 
   tearDown(() {

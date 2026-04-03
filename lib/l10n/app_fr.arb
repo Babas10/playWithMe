@@ -604,6 +604,13 @@
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
   },
+
+  "deleteAccount": "Supprimer le compte",
+  "deleteAccountConfirmTitle": "Supprimer votre compte ?",
+  "deleteAccountConfirmMessage": "Cette action supprimera définitivement votre compte et toutes vos données. Elle est irréversible.",
+  "deleteAccountConfirm": "Supprimer définitivement",
+  "deleteAccountSuccess": "Votre compte a été supprimé.",
+  "deleteAccountError": "Impossible de supprimer votre compte. Veuillez réessayer.",
   "gameCreationGameTypeSectionLabel": "Type de partie",
   "@gameCreationGameTypeSectionLabel": {
     "description": "Section label for the game type selector in game creation (Story 26.8)"

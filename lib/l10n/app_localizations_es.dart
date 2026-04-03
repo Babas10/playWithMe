@@ -1935,6 +1935,26 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo guardar tu elección. Inténtalo de nuevo.';
 
   @override
+  String get deleteAccount => 'Eliminar cuenta';
+
+  @override
+  String get deleteAccountConfirmTitle => '¿Eliminar tu cuenta?';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'Tu cuenta y todos tus datos se eliminarán de forma permanente. Esta acción no se puede deshacer.';
+
+  @override
+  String get deleteAccountConfirm => 'Eliminar permanentemente';
+
+  @override
+  String get deleteAccountSuccess => 'Tu cuenta ha sido eliminada.';
+
+  @override
+  String get deleteAccountError =>
+      'No se pudo eliminar tu cuenta. Inténtalo de nuevo.';
+
+  @override
   String get gameCreationGameTypeSectionLabel => 'Tipo de juego';
 
   @override

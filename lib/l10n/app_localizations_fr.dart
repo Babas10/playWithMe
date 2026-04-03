@@ -1948,6 +1948,26 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de sauvegarder votre choix. Veuillez réessayer.';
 
   @override
+  String get deleteAccount => 'Supprimer le compte';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Supprimer votre compte ?';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'Cette action supprimera définitivement votre compte et toutes vos données. Elle est irréversible.';
+
+  @override
+  String get deleteAccountConfirm => 'Supprimer définitivement';
+
+  @override
+  String get deleteAccountSuccess => 'Votre compte a été supprimé.';
+
+  @override
+  String get deleteAccountError =>
+      'Impossible de supprimer votre compte. Veuillez réessayer.';
+
+  @override
   String get gameCreationGameTypeSectionLabel => 'Type de partie';
 
   @override

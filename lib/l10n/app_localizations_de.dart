@@ -1945,6 +1945,26 @@ class AppLocalizationsDe extends AppLocalizations {
       'Speichern fehlgeschlagen. Bitte erneut versuchen.';
 
   @override
+  String get deleteAccount => 'Konto löschen';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Konto löschen?';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'Ihr Konto und alle zugehörigen Daten werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get deleteAccountConfirm => 'Dauerhaft löschen';
+
+  @override
+  String get deleteAccountSuccess => 'Ihr Konto wurde gelöscht.';
+
+  @override
+  String get deleteAccountError =>
+      'Konto konnte nicht gelöscht werden. Bitte erneut versuchen.';
+
+  @override
   String get gameCreationGameTypeSectionLabel => 'Spieltyp';
 
   @override

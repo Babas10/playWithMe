@@ -3560,6 +3560,42 @@ abstract class AppLocalizations {
   /// **'Failed to save your choice. Please try again.'**
   String get genderSelectionError;
 
+  /// Label for the delete account button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccount;
+
+  /// Title of the account deletion confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get deleteAccountConfirmTitle;
+
+  /// Body text of the account deletion confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete your account and all your data. This action cannot be undone.'**
+  String get deleteAccountConfirmMessage;
+
+  /// Confirm button label in the account deletion dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get deleteAccountConfirm;
+
+  /// Snackbar message shown after successful account deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been deleted.'**
+  String get deleteAccountSuccess;
+
+  /// Snackbar message shown when account deletion fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete your account. Please try again.'**
+  String get deleteAccountError;
+
   /// Section label for the game type selector in game creation (Story 26.8)
   ///
   /// In en, this message translates to:

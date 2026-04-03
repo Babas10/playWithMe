@@ -6,6 +6,7 @@ admin.initializeApp();
 
 // Export Auth triggers
 export {createUserDocument, deleteUserDocument} from "./createUserDocument";
+export {deleteUserAccount} from "./deleteUserAccount"; // Story 27.1 — account deletion
 
 // Export all Cloud Functions
 export {searchUserByEmail} from "./searchUserByEmail";

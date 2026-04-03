@@ -7,12 +7,14 @@ class ProfileActions extends StatelessWidget {
     super.key,
     required this.onEditProfile,
     required this.onSignOut,
+    required this.onDeleteAccount,
     this.onNotificationSettings,
     this.onGameHistory,
   });
 
   final VoidCallback onEditProfile;
   final VoidCallback onSignOut;
+  final VoidCallback onDeleteAccount;
   final VoidCallback? onNotificationSettings;
   final VoidCallback? onGameHistory;
 
@@ -56,6 +58,17 @@ class ProfileActions extends StatelessWidget {
             onPressed: onSignOut,
             icon: const Icon(Icons.logout),
             label: Text(l10n.signOut),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Delete Account button
+          TextButton.icon(
+            onPressed: onDeleteAccount,
+            icon: const Icon(Icons.delete_forever_outlined),
+            label: Text(l10n.deleteAccount),
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.error,
             ),

@@ -95,6 +95,9 @@ class MockAuthRepository implements AuthRepository {
   Future<void> Function({required String firstName, required String lastName, String? gender}) _updateUserNamesBehavior =
     ({required String firstName, required String lastName, String? gender}) async {};
 
+  Future<void> Function() _deleteAccountBehavior =
+    () async {};
+
   // Configure behaviors for testing
   void setSignInWithEmailAndPasswordBehavior(Future<UserEntity> Function({required String email, required String password}) behavior) {
     _signInWithEmailAndPasswordBehavior = behavior;
@@ -130,6 +133,10 @@ class MockAuthRepository implements AuthRepository {
 
   void setUpdateUserNamesBehavior(Future<void> Function({required String firstName, required String lastName, String? gender}) behavior) {
     _updateUserNamesBehavior = behavior;
+  }
+
+  void setDeleteAccountBehavior(Future<void> Function() behavior) {
+    _deleteAccountBehavior = behavior;
   }
 
   @override
@@ -176,6 +183,11 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<void> updateUserNames({required String firstName, required String lastName, String? gender}) {
     return _updateUserNamesBehavior(firstName: firstName, lastName: lastName, gender: gender);
+  }
+
+  @override
+  Future<void> deleteAccount() {
+    return _deleteAccountBehavior();
   }
 }
 
