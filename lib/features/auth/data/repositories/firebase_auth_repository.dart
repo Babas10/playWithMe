@@ -228,6 +228,10 @@ class FirebaseAuthRepository implements AuthRepository {
       final callable = _functions.httpsCallable('deleteUserAccount');
       await callable.call<dynamic>({});
       debugPrint('✅ Account deleted via Cloud Function');
+      // The Cloud Function deletes the Auth account server-side via Admin SDK.
+      // The client SDK is not notified automatically, so sign out explicitly to
+      // trigger onAuthStateChanged → AuthenticationUnauthenticated → LoginPage.
+      await _firebaseAuth.signOut();
     } on FirebaseFunctionsException catch (e) {
       debugPrint('❌ Cloud Function error deleting account: ${e.code} - ${e.message}');
       throw Exception('Failed to delete account: ${e.message}');
