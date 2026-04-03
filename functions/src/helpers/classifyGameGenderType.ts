@@ -29,8 +29,8 @@ export async function classifyGameGenderType(
     const userData = userDoc.data();
     const gender: string | undefined = userData?.gender;
 
-    if (!gender || gender === "prefer_not_to_say") {
-      // Unknown or non-binary preference → treat as mixed
+    if (!gender || gender === "none" || gender === "prefer_not_to_say") {
+      // Unknown, none, or non-binary preference → treat as mixed
       functions.logger.debug("[classifyGameGenderType] Player has no classifiable gender", {
         playerId,
         gender: gender ?? "undefined",
