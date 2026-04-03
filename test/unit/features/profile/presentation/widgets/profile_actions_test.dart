@@ -10,6 +10,7 @@ void main() {
   Widget createTestWidget({
     required VoidCallback onEditProfile,
     required VoidCallback onSignOut,
+    VoidCallback? onDeleteAccount,
   }) {
     return MaterialApp(
       localizationsDelegates: const [
@@ -23,6 +24,7 @@ void main() {
         body: ProfileActions(
           onEditProfile: onEditProfile,
           onSignOut: onSignOut,
+          onDeleteAccount: onDeleteAccount ?? () {},
         ),
       ),
     );

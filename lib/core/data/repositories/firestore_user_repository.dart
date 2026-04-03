@@ -189,24 +189,31 @@ class FirestoreUserRepository implements UserRepository {
     UserGender? gender,
   }) async {
     try {
-      final currentUser = await getUserById(uid);
-      if (currentUser == null) {
-        throw UserException('User not found', code: 'not-found');
+      // Use targeted update to avoid touching protected fields (friendIds,
+      // friendCount, createdAt) which are blocked by Firestore security rules.
+      final updates = <String, dynamic>{
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      if (displayName != null) updates['displayName'] = displayName;
+      if (photoUrl != null) updates['photoUrl'] = photoUrl;
+      if (firstName != null) updates['firstName'] = firstName;
+      if (lastName != null) updates['lastName'] = lastName;
+      if (phoneNumber != null) updates['phoneNumber'] = phoneNumber;
+      if (location != null) updates['location'] = location;
+      if (bio != null) updates['bio'] = bio;
+      if (dateOfBirth != null) {
+        updates['dateOfBirth'] = Timestamp.fromDate(dateOfBirth);
+      }
+      if (gender != null) {
+        updates['gender'] = gender.name;
       }
 
-      final updatedUser = currentUser.updateProfile(
-        displayName: displayName,
-        photoUrl: photoUrl,
-        firstName: firstName,
-        lastName: lastName,
-        phoneNumber: phoneNumber,
-        location: location,
-        bio: bio,
-        dateOfBirth: dateOfBirth,
-        gender: gender,
+      await _firestore.collection(_collection).doc(uid).update(updates);
+    } on FirebaseException catch (e) {
+      throw UserException(
+        'Failed to update user profile: ${e.message}',
+        code: e.code,
       );
-
-      await createOrUpdateUser(updatedUser);
     } catch (e) {
       throw UserException('Failed to update user profile: $e');
     }

@@ -224,6 +224,7 @@ void main() {
       test('throws UserException when user not found', () async {
         // Use current user's ID so it reads from Firestore directly (not Cloud Function)
         // But don't create the document, so user is not found
+        // The new targeted update() call surfaces Firestore's own not-found error.
         expect(
           () => repository.updateUserProfile(
             testUserId,
@@ -232,7 +233,7 @@ void main() {
           throwsA(isA<UserException>().having(
             (e) => e.message,
             'message',
-            contains('User not found'),
+            contains('Failed to update user profile'),
           )),
         );
       });

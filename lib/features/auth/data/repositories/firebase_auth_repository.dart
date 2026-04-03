@@ -222,6 +222,21 @@ class FirebaseAuthRepository implements AuthRepository {
     }
   }
 
+  @override
+  Future<void> deleteAccount() async {
+    try {
+      final callable = _functions.httpsCallable('deleteUserAccount');
+      await callable.call<dynamic>({});
+      debugPrint('✅ Account deleted via Cloud Function');
+    } on FirebaseFunctionsException catch (e) {
+      debugPrint('❌ Cloud Function error deleting account: ${e.code} - ${e.message}');
+      throw Exception('Failed to delete account: ${e.message}');
+    } catch (e) {
+      debugPrint('❌ Error deleting account: $e');
+      throw Exception('Failed to delete account: $e');
+    }
+  }
+
   /// Map Firebase Auth exceptions to more user-friendly messages
   Exception _mapFirebaseAuthException(FirebaseAuthException e) {
     switch (e.code) {

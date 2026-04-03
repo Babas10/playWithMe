@@ -46,4 +46,8 @@ abstract class AuthRepository {
     required String lastName,
     String? gender,
   });
+
+  /// Permanently delete the current user's account and all associated data.
+  /// Calls the deleteUserAccount Cloud Function for cascade cleanup.
+  Future<void> deleteAccount();
 }

@@ -7,6 +7,9 @@ import 'package:play_with_me/features/auth/domain/repositories/auth_repository.d
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/account_deletion/account_deletion_bloc.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/account_deletion/account_deletion_event.dart';
+import 'package:play_with_me/features/profile/presentation/bloc/account_deletion/account_deletion_state.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
 import 'package:play_with_me/features/profile/presentation/pages/email_verification_page.dart';
@@ -33,23 +36,48 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
-      builder: (context, state) {
-        if (state is AuthenticationAuthenticated) {
-          return _ProfileContent(state: state);
-        }
+    return BlocProvider<AccountDeletionBloc>(
+      create: (_) => AccountDeletionBloc(authRepository: sl<AuthRepository>()),
+      child: BlocListener<AccountDeletionBloc, AccountDeletionState>(
+        listener: (context, state) {
+          if (state is AccountDeletionSuccess) {
+            // Auth state stream will fire, routing the user to login automatically.
+            // Show a brief snackbar in case there's a delay.
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.deleteAccountSuccess),
+              ),
+            );
+          } else if (state is AccountDeletionFailure) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.deleteAccountError),
+                  backgroundColor: Colors.red,
+                ),
+              );
+          }
+        },
+        child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+          builder: (context, state) {
+            if (state is AuthenticationAuthenticated) {
+              return _ProfileContent(state: state);
+            }
 
-        if (state is AuthenticationUnknown) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
+            if (state is AuthenticationUnknown) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
 
-        // Unauthenticated state - should not happen on profile page
-        return Center(
-          child: Text(AppLocalizations.of(context)!.pleaseLogIn),
-        );
-      },
+            // Unauthenticated state - should not happen on profile page
+            return Center(
+              child: Text(AppLocalizations.of(context)!.pleaseLogIn),
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -129,6 +157,9 @@ class _ProfileContent extends StatelessWidget {
             onSignOut: () {
               _showSignOutDialog(context);
             },
+            onDeleteAccount: () {
+              _showDeleteAccountDialog(context);
+            },
           ),
         ],
       ),
@@ -146,6 +177,38 @@ class _ProfileContent extends StatelessWidget {
           )..add(const EmailVerificationEvent.checkStatus()),
           child: const EmailVerificationPage(),
         ),
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final accountDeletionBloc = context.read<AccountDeletionBloc>();
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text(l10n.deleteAccountConfirmTitle),
+        content: Text(l10n.deleteAccountConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.secondary,
+            ),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              accountDeletionBloc.add(const AccountDeletionEvent.deleteRequested());
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(l10n.deleteAccountConfirm),
+          ),
+        ],
       ),
     );
   }

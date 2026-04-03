@@ -2803,6 +2803,31 @@
   "@genderSelectionError": {
     "description": "Error message shown when saving gender fails"
   },
+
+  "deleteAccount": "Delete Account",
+  "@deleteAccount": {
+    "description": "Label for the delete account button"
+  },
+  "deleteAccountConfirmTitle": "Delete your account?",
+  "@deleteAccountConfirmTitle": {
+    "description": "Title of the account deletion confirmation dialog"
+  },
+  "deleteAccountConfirmMessage": "This will permanently delete your account and all your data. This action cannot be undone.",
+  "@deleteAccountConfirmMessage": {
+    "description": "Body text of the account deletion confirmation dialog"
+  },
+  "deleteAccountConfirm": "Delete permanently",
+  "@deleteAccountConfirm": {
+    "description": "Confirm button label in the account deletion dialog"
+  },
+  "deleteAccountSuccess": "Your account has been deleted.",
+  "@deleteAccountSuccess": {
+    "description": "Snackbar message shown after successful account deletion"
+  },
+  "deleteAccountError": "Failed to delete your account. Please try again.",
+  "@deleteAccountError": {
+    "description": "Snackbar message shown when account deletion fails"
+  },
   "gameCreationGameTypeSectionLabel": "Game Type",
   "@gameCreationGameTypeSectionLabel": {
     "description": "Section label for the game type selector in game creation (Story 26.8)"

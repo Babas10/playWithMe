@@ -1910,6 +1910,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to save your choice. Please try again.';
 
   @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'This will permanently delete your account and all your data. This action cannot be undone.';
+
+  @override
+  String get deleteAccountConfirm => 'Delete permanently';
+
+  @override
+  String get deleteAccountSuccess => 'Your account has been deleted.';
+
+  @override
+  String get deleteAccountError =>
+      'Failed to delete your account. Please try again.';
+
+  @override
   String get gameCreationGameTypeSectionLabel => 'Game Type';
 
   @override
