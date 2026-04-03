@@ -83,7 +83,9 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
       losses: 0,
     };
 
-    await userRef.set(userData);
+    // Use merge: true so that if updateUserNames already wrote firstName/lastName/gender
+    // before this trigger fired, those fields are preserved rather than overwritten.
+    await userRef.set(userData, {merge: true});
 
     functions.logger.info(`Successfully created Firestore user document`, {
       uid: user.uid,

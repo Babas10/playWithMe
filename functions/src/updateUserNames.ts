@@ -89,7 +89,10 @@ export const updateUserNames = functions.region('europe-west6').https.onCall(asy
       update.gender = gender;
     }
 
-    await userRef.update(update);
+    // Use set+merge so this works even if createUserDocument hasn't run yet.
+    // There is a race between this callable and the Auth onCreate trigger;
+    // merge: true handles both orderings without clobbering unrelated fields.
+    await userRef.set(update, {merge: true});
 
     functions.logger.info("[updateUserNames] Successfully updated", {uid});
 
