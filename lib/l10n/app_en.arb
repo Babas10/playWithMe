@@ -2791,7 +2791,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "None of them",
+  "genderPreferNotToSay": "Other",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say (maps to UserGender.none)"
   },
