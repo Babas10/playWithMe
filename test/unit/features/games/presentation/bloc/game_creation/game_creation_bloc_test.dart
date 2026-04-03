@@ -283,60 +283,6 @@ void main() {
       );
     });
 
-    group('SetGameGenderType', () {
-      blocTest<GameCreationBloc, GameCreationState>(
-        'emits GameCreationFormState with mix gameGenderType',
-        build: () => gameCreationBloc,
-        act: (bloc) => bloc.add(const SetGameGenderType(
-          gameGenderType: GameGenderType.mix,
-        )),
-        expect: () => [
-          const GameCreationFormState(
-            gameGenderType: GameGenderType.mix,
-            isValid: false,
-          ),
-        ],
-      );
-
-      blocTest<GameCreationBloc, GameCreationState>(
-        'clears gameGenderType back to null (Normal) when dispatched with null',
-        build: () => gameCreationBloc,
-        seed: () => const GameCreationFormState(
-          gameGenderType: GameGenderType.mix,
-        ),
-        act: (bloc) => bloc.add(const SetGameGenderType(
-          gameGenderType: null,
-        )),
-        expect: () => [
-          const GameCreationFormState(
-            gameGenderType: null,
-            isValid: false,
-          ),
-        ],
-      );
-
-      blocTest<GameCreationBloc, GameCreationState>(
-        'preserves other form fields when gameGenderType changes',
-        build: () => gameCreationBloc,
-        seed: () => GameCreationFormState(
-          groupId: 'group1',
-          groupName: 'Test Group',
-          dateTime: DateTime(2030),
-          title: 'Beach Volleyball',
-          gameGenderType: null,
-        ),
-        act: (bloc) => bloc.add(const SetGameGenderType(
-          gameGenderType: GameGenderType.mix,
-        )),
-        expect: () => [
-          isA<GameCreationFormState>()
-              .having((s) => s.groupId, 'groupId', 'group1')
-              .having((s) => s.title, 'title', 'Beach Volleyball')
-              .having((s) => s.gameGenderType, 'gameGenderType', GameGenderType.mix),
-        ],
-      );
-    });
-
     group('SetSkillLevel', () {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationFormState with skillLevel',
@@ -603,67 +549,6 @@ void main() {
         ],
         verify: (_) {
           verifyNever(() => mockGameRepository.createGame(any()));
-        },
-      );
-
-      blocTest<GameCreationBloc, GameCreationState>(
-        'passes gameGenderType to repository when mix is selected',
-        build: () {
-          when(() => mockGameRepository.createGame(any())).thenAnswer(
-            (_) async => 'game456',
-          );
-          return gameCreationBloc;
-        },
-        seed: () => GameCreationFormState(
-          groupId: 'group1',
-          groupName: 'Test Group',
-          dateTime: futureDate,
-          locationName: 'Venice Beach',
-          title: 'Mixed Volleyball',
-          gameGenderType: GameGenderType.mix,
-          isValid: true,
-        ),
-        act: (bloc) => bloc.add(const SubmitGame(createdBy: 'user123')),
-        expect: () => [
-          const GameCreationSubmitting(),
-          isA<GameCreationSuccess>(),
-        ],
-        verify: (_) {
-          final captured = verify(
-            () => mockGameRepository.createGame(captureAny()),
-          ).captured;
-          final game = captured.first as GameModel;
-          expect(game.gameGenderType, equals(GameGenderType.mix));
-        },
-      );
-
-      blocTest<GameCreationBloc, GameCreationState>(
-        'passes null gameGenderType (Normal) to repository when not set',
-        build: () {
-          when(() => mockGameRepository.createGame(any())).thenAnswer(
-            (_) async => 'game789',
-          );
-          return gameCreationBloc;
-        },
-        seed: () => GameCreationFormState(
-          groupId: 'group1',
-          groupName: 'Test Group',
-          dateTime: futureDate,
-          locationName: 'Venice Beach',
-          title: 'Gender Volleyball',
-          isValid: true,
-        ),
-        act: (bloc) => bloc.add(const SubmitGame(createdBy: 'user123')),
-        expect: () => [
-          const GameCreationSubmitting(),
-          isA<GameCreationSuccess>(),
-        ],
-        verify: (_) {
-          final captured = verify(
-            () => mockGameRepository.createGame(captureAny()),
-          ).captured;
-          final game = captured.first as GameModel;
-          expect(game.gameGenderType, isNull);
         },
       );
 

@@ -1955,22 +1955,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo eliminar tu cuenta. Inténtalo de nuevo.';
 
   @override
-  String get gameCreationGameTypeSectionLabel => 'Tipo de juego';
-
-  @override
-  String get gameCreationGameTypeNormal => 'Normal';
-
-  @override
-  String get gameCreationGameTypeMixed => 'Mixto';
-
-  @override
-  String get gameCreationGameTypeDescription =>
-      'Los juegos normales cuentan para tu ELO. Los juegos mixtos son amistosos y no afectan tu clasificación.';
-
-  @override
-  String get gameCreationAlwaysMixed => 'Tus juegos son siempre mixtos';
-
-  @override
   String get registrationGenderRequired =>
       'Por favor selecciona un género para continuar';
 

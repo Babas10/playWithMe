@@ -7,12 +7,8 @@ import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
-import '../../../../core/data/models/game_model.dart';
-import '../../../../core/data/models/user_model.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/domain/repositories/group_repository.dart';
-import '../../../../core/domain/repositories/user_repository.dart';
-import '../../../../core/services/service_locator.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_bloc.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_state.dart';
 import '../bloc/game_creation/game_creation_bloc.dart';
@@ -24,8 +20,6 @@ class GameCreationPage extends StatefulWidget {
   final String groupName;
   final GameRepository? gameRepository;
   final GroupRepository? groupRepository;
-  /// Optional override for testing — production code uses the service locator.
-  final UserRepository? userRepository;
 
   const GameCreationPage({
     super.key,
@@ -33,7 +27,6 @@ class GameCreationPage extends StatefulWidget {
     required this.groupName,
     this.gameRepository,
     this.groupRepository,
-    this.userRepository,
   });
 
   @override
@@ -48,7 +41,6 @@ class _GameCreationPageState extends State<GameCreationPage> {
   final _addressController = TextEditingController();
 
   DateTime? _selectedDateTime;
-  UserModel? _currentUser;
 
   @override
   void initState() {
@@ -58,20 +50,6 @@ class _GameCreationPageState extends State<GameCreationPage> {
           groupId: widget.groupId,
           groupName: widget.groupName,
         ));
-    // Load the current user's profile to determine gender type (Story 26.8)
-    final repo = widget.userRepository ?? sl<UserRepository>();
-    repo.currentUser.first.then((user) {
-      if (!mounted) return;
-      setState(() => _currentUser = user);
-      // For mix-only users silently default to mix; for gendered users default to null (Normal)
-      if (user != null) {
-        final defaultType =
-            user.isMixOnly ? GameGenderType.mix : null;
-        context
-            .read<GameCreationBloc>()
-            .add(SetGameGenderType(gameGenderType: defaultType));
-      }
-    });
   }
 
   @override
@@ -267,84 +245,6 @@ class _GameCreationPageState extends State<GameCreationPage> {
     });
 
     bloc.add(SetDateTime(dateTime: dateTime));
-  }
-
-  /// Builds the game type selector (Normal / Mixed) for gendered users,
-  /// or an informational label for mix-only users (Story 26.8).
-  Widget _buildGameTypeSelector(
-    BuildContext context,
-    GameCreationState creationState,
-    AppLocalizations l10n,
-    bool isSubmitting,
-  ) {
-    final currentGameGenderType = creationState is GameCreationFormState
-        ? creationState.gameGenderType
-        : null;
-
-    final isMixOnly = _currentUser?.isMixOnly ?? true;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.gameCreationGameTypeSectionLabel,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textMuted,
-          ),
-        ),
-        const SizedBox(height: 8),
-        if (isMixOnly)
-          // Mix-only user: no choice — show info label
-          Row(
-            children: [
-              const Icon(Icons.info_outline, size: 16, color: AppColors.textMuted),
-              const SizedBox(width: 6),
-              Text(
-                l10n.gameCreationAlwaysMixed,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textMuted,
-                ),
-              ),
-            ],
-          )
-        else ...[
-          // Gendered user: show Normal / Mixed toggle
-          Row(
-            children: [
-              _GameTypeOption(
-                label: l10n.gameCreationGameTypeNormal,
-                isSelected: currentGameGenderType == null,
-                enabled: !isSubmitting,
-                onTap: () => context
-                    .read<GameCreationBloc>()
-                    .add(const SetGameGenderType(gameGenderType: null)),
-              ),
-              const SizedBox(width: 8),
-              _GameTypeOption(
-                label: l10n.gameCreationGameTypeMixed,
-                isSelected: currentGameGenderType == GameGenderType.mix,
-                enabled: !isSubmitting,
-                onTap: () => context
-                    .read<GameCreationBloc>()
-                    .add(const SetGameGenderType(
-                        gameGenderType: GameGenderType.mix)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.gameCreationGameTypeDescription,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textMuted,
-            ),
-          ),
-        ],
-      ],
-    );
   }
 
   void _handleSubmit(BuildContext context, String userId) {
@@ -544,10 +444,6 @@ class _GameCreationPageState extends State<GameCreationPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Game Type Selector (Story 26.8)
-                      _buildGameTypeSelector(context, creationState, l10n, isSubmitting),
-                      const SizedBox(height: 24),
-
                       // Submit Button
                       ElevatedButton(
                         onPressed: isSubmitting
@@ -579,47 +475,3 @@ class _GameCreationPageState extends State<GameCreationPage> {
   }
 }
 
-/// Pill-style toggle option for the game type selector (Story 26.8).
-class _GameTypeOption extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final bool enabled;
-  final VoidCallback onTap;
-
-  const _GameTypeOption({
-    required this.label,
-    required this.isSelected,
-    required this.enabled,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: enabled ? onTap : null,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.primary
-                : AppColors.textMuted.withValues(alpha: 0.4),
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isSelected
-                ? Colors.white
-                : (enabled ? AppColors.textMuted : AppColors.textMuted.withValues(alpha: 0.5)),
-          ),
-        ),
-      ),
-    );
-  }
-}

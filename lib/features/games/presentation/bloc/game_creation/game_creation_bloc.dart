@@ -28,7 +28,6 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
     on<SetMinPlayers>(_onSetMinPlayers);
     on<SetGameType>(_onSetGameType);
     on<SetSkillLevel>(_onSetSkillLevel);
-    on<SetGameGenderType>(_onSetGameGenderType);
     on<ValidateForm>(_onValidateForm);
     on<SubmitGame>(_onSubmitGame);
     on<ResetForm>(_onResetForm);
@@ -120,33 +119,6 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
     emit(formState);
   }
 
-  void _onSetGameGenderType(
-      SetGameGenderType event, Emitter<GameCreationState> emit) {
-    // copyWith cannot clear nullable fields (null ?? existing keeps the old value).
-    // Reconstruct the form state directly so gameGenderType can be set to null (Normal).
-    final current = _currentFormState;
-    emit(GameCreationFormState(
-      groupId: current.groupId,
-      groupName: current.groupName,
-      dateTime: current.dateTime,
-      locationName: current.locationName,
-      address: current.address,
-      title: current.title,
-      description: current.description,
-      maxPlayers: current.maxPlayers,
-      minPlayers: current.minPlayers,
-      gameType: current.gameType,
-      skillLevel: current.skillLevel,
-      gameGenderType: event.gameGenderType,
-      groupError: current.groupError,
-      dateTimeError: current.dateTimeError,
-      locationError: current.locationError,
-      titleError: current.titleError,
-      playersError: current.playersError,
-      isValid: current.isValid,
-    ));
-  }
-
   void _onValidateForm(ValidateForm event, Emitter<GameCreationState> emit) {
     emit(_validateAndEmit(_currentFormState));
   }
@@ -182,7 +154,6 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
         minPlayers: formState.minPlayers,
         gameType: formState.gameType,
         skillLevel: formState.skillLevel,
-        gameGenderType: formState.gameGenderType, // Creator's intent (Story 26.8)
         playerIds: [event.createdBy], // Creator is automatically a player
       );
 

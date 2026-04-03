@@ -1930,22 +1930,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to delete your account. Please try again.';
 
   @override
-  String get gameCreationGameTypeSectionLabel => 'Game Type';
-
-  @override
-  String get gameCreationGameTypeNormal => 'Normal';
-
-  @override
-  String get gameCreationGameTypeMixed => 'Mixed';
-
-  @override
-  String get gameCreationGameTypeDescription =>
-      'Normal games count for your gender ELO. Mixed games are friendly and do not affect your rating.';
-
-  @override
-  String get gameCreationAlwaysMixed => 'Your games are always mixed';
-
-  @override
   String get registrationGenderRequired => 'Please select a gender to continue';
 
   @override
