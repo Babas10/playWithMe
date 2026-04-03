@@ -611,26 +611,6 @@
   "deleteAccountConfirm": "Supprimer définitivement",
   "deleteAccountSuccess": "Votre compte a été supprimé.",
   "deleteAccountError": "Impossible de supprimer votre compte. Veuillez réessayer.",
-  "gameCreationGameTypeSectionLabel": "Type de partie",
-  "@gameCreationGameTypeSectionLabel": {
-    "description": "Section label for the game type selector in game creation (Story 26.8)"
-  },
-  "gameCreationGameTypeNormal": "Normal",
-  "@gameCreationGameTypeNormal": {
-    "description": "Option label for gender-specific game in game creation (Story 26.8)"
-  },
-  "gameCreationGameTypeMixed": "Mixte",
-  "@gameCreationGameTypeMixed": {
-    "description": "Option label for mixed-gender game in game creation (Story 26.8)"
-  },
-  "gameCreationGameTypeDescription": "Les parties normales comptent pour votre ELO. Les parties mixtes sont amicales et n'affectent pas votre classement.",
-  "@gameCreationGameTypeDescription": {
-    "description": "Explanatory text under the game type selector (Story 26.8)"
-  },
-  "gameCreationAlwaysMixed": "Vos parties sont toujours mixtes",
-  "@gameCreationAlwaysMixed": {
-    "description": "Info label shown to no-gender users instead of the selector (Story 26.8)"
-  },
   "registrationGenderRequired": "Veuillez sélectionner un genre pour continuer",
   "@registrationGenderRequired": {
     "description": "Validation error on registration when no gender is selected"

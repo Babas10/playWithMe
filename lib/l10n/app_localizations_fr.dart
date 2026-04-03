@@ -1968,22 +1968,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de supprimer votre compte. Veuillez réessayer.';
 
   @override
-  String get gameCreationGameTypeSectionLabel => 'Type de partie';
-
-  @override
-  String get gameCreationGameTypeNormal => 'Normal';
-
-  @override
-  String get gameCreationGameTypeMixed => 'Mixte';
-
-  @override
-  String get gameCreationGameTypeDescription =>
-      'Les parties normales comptent pour votre ELO. Les parties mixtes sont amicales et n\'affectent pas votre classement.';
-
-  @override
-  String get gameCreationAlwaysMixed => 'Vos parties sont toujours mixtes';
-
-  @override
   String get registrationGenderRequired =>
       'Veuillez sélectionner un genre pour continuer';
 

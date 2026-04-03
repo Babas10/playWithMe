@@ -47,7 +47,6 @@ const DEFAULT_PASSWORD = "test1010";
 // ---------------------------------------------------------------------------
 
 type Gender = "male" | "female" | "none";
-type GameGenderType = "male" | "female" | "mix";
 
 interface TestUser {
   uid: string;
@@ -259,7 +258,6 @@ async function createCompletedGame(
   teamB: string[],
   teamAWins: boolean,
   label: string,
-  gameGenderType: GameGenderType,
 ): Promise<string> {
   const ref = db.collection("games").doc();
 
@@ -267,7 +265,6 @@ async function createCompletedGame(
     title: label,
     description: "Gender test environment game",
     groupId,
-    gameGenderType,
     createdBy: teamA[0],
     createdAt:   admin.firestore.Timestamp.fromDate(gameDate),
     updatedAt:   admin.firestore.Timestamp.fromDate(gameDate),
@@ -320,7 +317,6 @@ async function createFutureGame(
   title: string,
   playerIds: string[],
   createdBy: string,
-  gameGenderType: GameGenderType,
 ): Promise<string> {
   const ref  = db.collection("games").doc();
   const date = new Date(Date.now() + daysFromNow * 24 * 60 * 60_000);
@@ -329,7 +325,6 @@ async function createFutureGame(
     title,
     description: "Join us for a great game!",
     groupId,
-    gameGenderType,
     createdBy,
     createdAt:   admin.firestore.Timestamp.now(),
     updatedAt:   admin.firestore.Timestamp.now(),
@@ -404,7 +399,7 @@ async function seedMaleGames(groupId: string, M: TestUser[]): Promise<string[]> 
     const id   = await createCompletedGame(
       groupId, date,
       tA.map((u) => u.uid), tB.map((u) => u.uid),
-      aWins, label, "male",
+      aWins, label,
     );
     ids.push(id);
     console.log(`  ✅ [male]   ${label} (${daysAgo}d ago) — ${aWins ? "Team A" : "Team B"} won`);
@@ -430,7 +425,7 @@ async function seedFemaleGames(groupId: string, F: TestUser[]): Promise<string[]
     const id   = await createCompletedGame(
       groupId, date,
       tA.map((u) => u.uid), tB.map((u) => u.uid),
-      aWins, label, "female",
+      aWins, label,
     );
     ids.push(id);
     console.log(`  ✅ [female] ${label} (${daysAgo}d ago) — ${aWins ? "Team A" : "Team B"} won`);
@@ -459,7 +454,7 @@ async function seedMixedGames(
     const id   = await createCompletedGame(
       groupId, date,
       tA.map((u) => u.uid), tB.map((u) => u.uid),
-      aWins, label, "mix",
+      aWins, label,
     );
     ids.push(id);
     console.log(`  ✅ [mix]    ${label} (${daysAgo}d ago) — ${aWins ? "Team A" : "Team B"} won  ← ELO skipped`);
@@ -475,19 +470,19 @@ async function seedFutureGames(
 
   ids.push(await createFutureGame(
     groupId, 1, "Men's Showdown",
-    [M[0].uid, M[1].uid, M[2].uid, M[3].uid], M[0].uid, "male",
+    [M[0].uid, M[1].uid, M[2].uid, M[3].uid], M[0].uid,
   ));
   console.log(`  ✅ [male]   Men's Showdown (tomorrow)`);
 
   ids.push(await createFutureGame(
     groupId, 5, "Women's Match",
-    [F[0].uid, F[1].uid, F[2].uid, F[3].uid], F[0].uid, "female",
+    [F[0].uid, F[1].uid, F[2].uid, F[3].uid], F[0].uid,
   ));
   console.log(`  ✅ [female] Women's Match (+5 days)`);
 
   ids.push(await createFutureGame(
     groupId, 14, "Mixed Open",
-    [M[0].uid, F[0].uid, N[0].uid, N[1].uid], M[0].uid, "mix",
+    [M[0].uid, F[0].uid, N[0].uid, N[1].uid], M[0].uid,
   ));
   console.log(`  ✅ [mix]    Mixed Open (+14 days)`);
 

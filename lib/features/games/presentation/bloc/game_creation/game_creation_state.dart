@@ -25,8 +25,6 @@ class GameCreationFormState extends GameCreationState {
   final int minPlayers;
   final GameType? gameType;
   final GameSkillLevel? skillLevel;
-  // Gender classification chosen at creation (Story 26.8)
-  final GameGenderType? gameGenderType;
 
   // Validation errors
   final String? groupError;
@@ -50,7 +48,6 @@ class GameCreationFormState extends GameCreationState {
     this.minPlayers = 2,
     this.gameType,
     this.skillLevel,
-    this.gameGenderType,
     this.groupError,
     this.dateTimeError,
     this.locationError,
@@ -71,7 +68,6 @@ class GameCreationFormState extends GameCreationState {
     int? minPlayers,
     GameType? gameType,
     GameSkillLevel? skillLevel,
-    GameGenderType? gameGenderType,
     String? groupError,
     String? dateTimeError,
     String? locationError,
@@ -91,7 +87,6 @@ class GameCreationFormState extends GameCreationState {
       minPlayers: minPlayers ?? this.minPlayers,
       gameType: gameType ?? this.gameType,
       skillLevel: skillLevel ?? this.skillLevel,
-      gameGenderType: gameGenderType ?? this.gameGenderType,
       groupError: groupError,
       dateTimeError: dateTimeError,
       locationError: locationError,
@@ -114,7 +109,6 @@ class GameCreationFormState extends GameCreationState {
         minPlayers,
         gameType,
         skillLevel,
-        gameGenderType,
         groupError,
         dateTimeError,
         locationError,
