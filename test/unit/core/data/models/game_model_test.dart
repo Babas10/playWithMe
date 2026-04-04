@@ -1688,4 +1688,212 @@ void main() {
       expect(updated.gameGenderType, GameGenderType.mix);
     });
   });
+
+  // ── Story 28.1: guestPlayerIds field ─────────────────────────────────────
+
+  group('guestPlayerIds (Story 28.1)', () {
+    GameModel baseGame({
+      List<String> playerIds = const [],
+      List<String> guestPlayerIds = const [],
+      int maxPlayers = 4,
+      int minPlayers = 2,
+    }) {
+      final now = DateTime.now();
+      return GameModel(
+        id: 'game-28',
+        title: 'Guest Game',
+        groupId: 'group-1',
+        createdBy: 'creator-1',
+        createdAt: now,
+        scheduledAt: now.add(const Duration(days: 1)),
+        location: const GameLocation(name: 'Court'),
+        maxPlayers: maxPlayers,
+        minPlayers: minPlayers,
+        playerIds: playerIds,
+        guestPlayerIds: guestPlayerIds,
+      );
+    }
+
+    test('defaults to empty list', () {
+      final game = baseGame();
+      expect(game.guestPlayerIds, isEmpty);
+    });
+
+    group('isGuestPlayer', () {
+      test('returns true for user in guestPlayerIds', () {
+        final game = baseGame(guestPlayerIds: ['guest-1']);
+        expect(game.isGuestPlayer('guest-1'), isTrue);
+      });
+
+      test('returns false for user not in guestPlayerIds', () {
+        final game = baseGame(guestPlayerIds: ['guest-1']);
+        expect(game.isGuestPlayer('other-user'), isFalse);
+      });
+    });
+
+    group('isParticipant', () {
+      test('returns true for regular player', () {
+        final game = baseGame(playerIds: ['player-1']);
+        expect(game.isParticipant('player-1'), isTrue);
+      });
+
+      test('returns true for guest player', () {
+        final game = baseGame(guestPlayerIds: ['guest-1']);
+        expect(game.isParticipant('guest-1'), isTrue);
+      });
+
+      test('returns false for non-participant', () {
+        final game = baseGame(playerIds: ['player-1'], guestPlayerIds: ['guest-1']);
+        expect(game.isParticipant('stranger'), isFalse);
+      });
+    });
+
+    group('currentPlayerCount', () {
+      test('counts regular players only when no guests', () {
+        final game = baseGame(playerIds: ['p1', 'p2']);
+        expect(game.currentPlayerCount, 2);
+      });
+
+      test('counts both regular and guest players', () {
+        final game = baseGame(playerIds: ['p1', 'p2'], guestPlayerIds: ['g1']);
+        expect(game.currentPlayerCount, 3);
+      });
+    });
+
+    group('availableSpots', () {
+      test('subtracts both regular and guest players', () {
+        final game = baseGame(
+          maxPlayers: 4,
+          playerIds: ['p1', 'p2'],
+          guestPlayerIds: ['g1'],
+        );
+        expect(game.availableSpots, 1);
+      });
+
+      test('returns 0 when all spots filled by guests', () {
+        final game = baseGame(
+          maxPlayers: 2,
+          playerIds: [],
+          guestPlayerIds: ['g1', 'g2'],
+        );
+        expect(game.availableSpots, 0);
+      });
+    });
+
+    group('isFull', () {
+      test('is true when regular + guest players fill all spots', () {
+        final game = baseGame(
+          maxPlayers: 3,
+          playerIds: ['p1'],
+          guestPlayerIds: ['g1', 'g2'],
+        );
+        expect(game.isFull, isTrue);
+      });
+
+      test('is false when there are still open spots', () {
+        final game = baseGame(
+          maxPlayers: 4,
+          playerIds: ['p1'],
+          guestPlayerIds: ['g1'],
+        );
+        expect(game.isFull, isFalse);
+      });
+
+      test('is true when only guests fill all spots', () {
+        final game = baseGame(
+          maxPlayers: 2,
+          playerIds: [],
+          guestPlayerIds: ['g1', 'g2'],
+        );
+        expect(game.isFull, isTrue);
+      });
+    });
+
+    group('hasMinimumPlayers', () {
+      test('counts guests toward minimum', () {
+        final game = baseGame(
+          minPlayers: 2,
+          playerIds: ['p1'],
+          guestPlayerIds: ['g1'],
+        );
+        expect(game.hasMinimumPlayers, isTrue);
+      });
+
+      test('is false when combined count is below minimum', () {
+        final game = baseGame(
+          minPlayers: 3,
+          playerIds: ['p1'],
+          guestPlayerIds: ['g1'],
+        );
+        expect(game.hasMinimumPlayers, isFalse);
+      });
+    });
+
+    group('canUserJoin', () {
+      test('returns false for existing guest player', () {
+        final now = DateTime.now();
+        final game = GameModel(
+          id: 'g',
+          title: 'T',
+          groupId: 'grp',
+          createdBy: 'c',
+          createdAt: now,
+          scheduledAt: now.add(const Duration(days: 1)),
+          location: const GameLocation(name: 'Court'),
+          guestPlayerIds: ['guest-1'],
+        );
+        expect(game.canUserJoin('guest-1'), isFalse);
+      });
+    });
+
+    group('canUserEnterResults', () {
+      test('guest player can enter results for past completed game', () {
+        final past = DateTime.now().subtract(const Duration(hours: 1));
+        final game = GameModel(
+          id: 'g',
+          title: 'T',
+          groupId: 'grp',
+          createdBy: 'creator',
+          createdAt: past,
+          scheduledAt: past,
+          location: const GameLocation(name: 'Court'),
+          status: GameStatus.completed,
+          playerIds: ['p1', 'p2'],
+          guestPlayerIds: ['guest-1'],
+        );
+        expect(game.canUserEnterResults('guest-1'), isTrue);
+      });
+    });
+
+    test('guestPlayerIds is included in toJson output', () {
+      final now = DateTime.now();
+      final game = GameModel(
+        id: 'g',
+        title: 'T',
+        groupId: 'grp',
+        createdBy: 'u',
+        createdAt: now,
+        scheduledAt: now.add(const Duration(days: 1)),
+        location: const GameLocation(name: 'Court'),
+        guestPlayerIds: ['guest-1', 'guest-2'],
+      );
+      final json = game.toJson();
+      expect(json['guestPlayerIds'], ['guest-1', 'guest-2']);
+    });
+
+    test('guestPlayerIds is deserialized from JSON map', () {
+      final now = DateTime.now();
+      final game = GameModel.fromJson({
+        'id': 'g',
+        'title': 'T',
+        'groupId': 'grp',
+        'createdBy': 'u',
+        'createdAt': now.toIso8601String(),
+        'scheduledAt': now.add(const Duration(days: 1)).toIso8601String(),
+        'location': {'name': 'Court'},
+        'guestPlayerIds': ['guest-1', 'guest-2'],
+      });
+      expect(game.guestPlayerIds, ['guest-1', 'guest-2']);
+    });
+  });
 }

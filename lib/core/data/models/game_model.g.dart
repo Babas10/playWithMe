@@ -33,6 +33,11 @@ _$GameModelImpl _$$GameModelImplFromJson(
           ?.map((e) => e as String)
           .toList() ??
       const [],
+  guestPlayerIds:
+      (json['guestPlayerIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
   allowWaitlist: json['allowWaitlist'] as bool? ?? true,
   allowPlayerInvites: json['allowPlayerInvites'] as bool? ?? true,
   visibility:
@@ -48,10 +53,6 @@ _$GameModelImpl _$$GameModelImplFromJson(
   courtInfo: json['courtInfo'] as String?,
   gameType: $enumDecodeNullable(_$GameTypeEnumMap, json['gameType']),
   skillLevel: $enumDecodeNullable(_$GameSkillLevelEnumMap, json['skillLevel']),
-  gameGenderType: $enumDecodeNullable(
-    _$GameGenderTypeEnumMap,
-    json['gameGenderType'],
-  ),
   scores:
       (json['scores'] as List<dynamic>?)
           ?.map((e) => GameScore.fromJson(e as Map<String, dynamic>))
@@ -75,6 +76,10 @@ _$GameModelImpl _$$GameModelImplFromJson(
   completedAt: const TimestampConverter().fromJson(json['completedAt']),
   weatherDependent: json['weatherDependent'] as bool? ?? true,
   weatherNotes: json['weatherNotes'] as String?,
+  gameGenderType: $enumDecodeNullable(
+    _$GameGenderTypeEnumMap,
+    json['gameGenderType'],
+  ),
 );
 
 Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
@@ -95,6 +100,7 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'minPlayers': instance.minPlayers,
       'playerIds': instance.playerIds,
       'waitlistIds': instance.waitlistIds,
+      'guestPlayerIds': instance.guestPlayerIds,
       'allowWaitlist': instance.allowWaitlist,
       'allowPlayerInvites': instance.allowPlayerInvites,
       'visibility': _$GameVisibilityEnumMap[instance.visibility]!,
@@ -104,7 +110,6 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'courtInfo': instance.courtInfo,
       'gameType': _$GameTypeEnumMap[instance.gameType],
       'skillLevel': _$GameSkillLevelEnumMap[instance.skillLevel],
-      'gameGenderType': _$GameGenderTypeEnumMap[instance.gameGenderType],
       'scores': instance.scores,
       'winnerId': instance.winnerId,
       'teams': instance.teams,
@@ -116,6 +121,7 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'completedAt': const TimestampConverter().toJson(instance.completedAt),
       'weatherDependent': instance.weatherDependent,
       'weatherNotes': instance.weatherNotes,
+      'gameGenderType': _$GameGenderTypeEnumMap[instance.gameGenderType],
     };
 
 const _$GameStatusEnumMap = {

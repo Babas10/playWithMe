@@ -88,3 +88,14 @@ class GroupInviteLinkException implements Exception {
   @override
   String toString() => message;
 }
+
+/// Exception thrown by GameInvitationRepository operations (Story 28.1).
+class GameInvitationException implements Exception {
+  final String message;
+  final String? code;
+
+  GameInvitationException(this.message, {this.code});
+
+  @override
+  String toString() => message;
+}
