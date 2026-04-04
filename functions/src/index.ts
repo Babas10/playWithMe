@@ -124,3 +124,6 @@ export {
   cleanupUnverifiedAccounts,
 } from "./scheduled";
 
+// Epic 28: Cross-Group Game Invitations
+export {inviteGuestToGame} from "./inviteGuestToGame"; // Story 28.2
+
