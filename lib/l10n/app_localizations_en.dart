@@ -1900,7 +1900,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genderFemale => 'Female';
 
   @override
-  String get genderPreferNotToSay => 'None of them';
+  String get genderPreferNotToSay => 'Other';
 
   @override
   String get genderSelectionContinue => 'Continue';

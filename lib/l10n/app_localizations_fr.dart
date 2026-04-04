@@ -1938,7 +1938,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get genderFemale => 'Femme';
 
   @override
-  String get genderPreferNotToSay => 'Aucun des deux';
+  String get genderPreferNotToSay => 'Autre';
 
   @override
   String get genderSelectionContinue => 'Continuer';

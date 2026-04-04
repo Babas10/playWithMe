@@ -3545,7 +3545,7 @@ abstract class AppLocalizations {
   /// Gender option: Prefer not to say (maps to UserGender.none)
   ///
   /// In en, this message translates to:
-  /// **'None of them'**
+  /// **'Other'**
   String get genderPreferNotToSay;
 
   /// Continue button label on gender selection screen

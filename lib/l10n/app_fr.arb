@@ -592,7 +592,7 @@
   "@genderFemale": {
     "description": "Gender option: Female"
   },
-  "genderPreferNotToSay": "Aucun des deux",
+  "genderPreferNotToSay": "Autre",
   "@genderPreferNotToSay": {
     "description": "Gender option: Prefer not to say"
   },

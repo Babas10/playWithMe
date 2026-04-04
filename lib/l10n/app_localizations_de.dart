@@ -1935,7 +1935,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get genderFemale => 'Weiblich';
 
   @override
-  String get genderPreferNotToSay => 'Keines davon';
+  String get genderPreferNotToSay => 'Andere';
 
   @override
   String get genderSelectionContinue => 'Weiter';
