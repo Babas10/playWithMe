@@ -252,11 +252,27 @@ jobs:
   deploy_ios:
     name: 🍎 Build & Upload iOS (TestFlight)
     needs: test
-    runs-on: macos-15
+    runs-on: macos-latest  # macos-latest must include Xcode 26+ (iOS 26 SDK required from April 28 2026 — ITMS-90725)
 
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: 🔨 Select Xcode (latest stable — iOS 26 SDK required from April 28 2026)
+        # Explicitly selects the latest stable Xcode on the runner to ensure we
+        # build against the iOS 26 SDK. Using 'latest-stable' means this
+        # automatically picks up new Xcode versions as GitHub updates the runner.
+        # If the runner does not yet ship Xcode 26, pin runs-on to macos-26 once available.
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd  # v1.6.0
+        with:
+          xcode-version: 'latest-stable'
+
+      - name: 🔍 Log Xcode & SDK version
+        # Surfacing these early makes it obvious when the wrong SDK is in use.
+        run: |
+          echo "Xcode path: $(xcode-select -p)"
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
 
       - name: 🔧 Setup Flutter
         uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff  # v2.18.0
