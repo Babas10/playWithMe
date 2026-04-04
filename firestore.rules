@@ -316,6 +316,32 @@ service cloud.firestore {
       }
     }
 
+    // ============================================
+    // Game Invitations (Epic 28 — Story 28.1)
+    // ============================================
+    // Cross-group game invitations. A user outside the game's group is invited
+    // by the game creator to join as a guest player.
+    //
+    // WRITE POLICY: All mutations go through Cloud Functions (Admin SDK) only.
+    //   - inviteGuestToGame (Story 28.2) — creates the invitation
+    //   - acceptGameGuestInvitation / declineGameGuestInvitation (Story 28.4) — update status
+    //   - auto-expire trigger (Story 28.5) — sets status to 'expired'
+    //
+    // READ POLICY: Only the invitee or the inviter may read a document.
+    match /gameInvitations/{invitationId} {
+      allow get: if isAuthenticated() &&
+                    (request.auth.uid == resource.data.inviteeId ||
+                     request.auth.uid == resource.data.inviterId);
+
+      // List queries must be scoped to the caller (invitee or inviter)
+      allow list: if isAuthenticated() &&
+                     (request.auth.uid == resource.data.inviteeId ||
+                      request.auth.uid == resource.data.inviterId);
+
+      // All writes are via Cloud Functions (Admin SDK bypasses these rules)
+      allow create, update, delete: if false;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

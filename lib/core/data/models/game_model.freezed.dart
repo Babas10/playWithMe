@@ -42,6 +42,8 @@ mixin _$GameModel {
   int get minPlayers => throw _privateConstructorUsedError;
   List<String> get playerIds => throw _privateConstructorUsedError;
   List<String> get waitlistIds =>
+      throw _privateConstructorUsedError; // Guest players — cross-group invitees who accepted a game invitation (Story 28.1)
+  List<String> get guestPlayerIds =>
       throw _privateConstructorUsedError; // Game settings
   bool get allowWaitlist => throw _privateConstructorUsedError;
   bool get allowPlayerInvites => throw _privateConstructorUsedError;
@@ -111,6 +113,7 @@ abstract class $GameModelCopyWith<$Res> {
     int minPlayers,
     List<String> playerIds,
     List<String> waitlistIds,
+    List<String> guestPlayerIds,
     bool allowWaitlist,
     bool allowPlayerInvites,
     GameVisibility visibility,
@@ -170,6 +173,7 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
     Object? minPlayers = null,
     Object? playerIds = null,
     Object? waitlistIds = null,
+    Object? guestPlayerIds = null,
     Object? allowWaitlist = null,
     Object? allowPlayerInvites = null,
     Object? visibility = null,
@@ -257,6 +261,10 @@ class _$GameModelCopyWithImpl<$Res, $Val extends GameModel>
             waitlistIds: null == waitlistIds
                 ? _value.waitlistIds
                 : waitlistIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            guestPlayerIds: null == guestPlayerIds
+                ? _value.guestPlayerIds
+                : guestPlayerIds // ignore: cast_nullable_to_non_nullable
                       as List<String>,
             allowWaitlist: null == allowWaitlist
                 ? _value.allowWaitlist
@@ -412,6 +420,7 @@ abstract class _$$GameModelImplCopyWith<$Res>
     int minPlayers,
     List<String> playerIds,
     List<String> waitlistIds,
+    List<String> guestPlayerIds,
     bool allowWaitlist,
     bool allowPlayerInvites,
     GameVisibility visibility,
@@ -473,6 +482,7 @@ class __$$GameModelImplCopyWithImpl<$Res>
     Object? minPlayers = null,
     Object? playerIds = null,
     Object? waitlistIds = null,
+    Object? guestPlayerIds = null,
     Object? allowWaitlist = null,
     Object? allowPlayerInvites = null,
     Object? visibility = null,
@@ -560,6 +570,10 @@ class __$$GameModelImplCopyWithImpl<$Res>
         waitlistIds: null == waitlistIds
             ? _value._waitlistIds
             : waitlistIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        guestPlayerIds: null == guestPlayerIds
+            ? _value._guestPlayerIds
+            : guestPlayerIds // ignore: cast_nullable_to_non_nullable
                   as List<String>,
         allowWaitlist: null == allowWaitlist
             ? _value.allowWaitlist
@@ -670,6 +684,7 @@ class _$GameModelImpl extends _GameModel {
     this.minPlayers = 2,
     final List<String> playerIds = const [],
     final List<String> waitlistIds = const [],
+    final List<String> guestPlayerIds = const [],
     this.allowWaitlist = true,
     this.allowPlayerInvites = true,
     this.visibility = GameVisibility.group,
@@ -693,6 +708,7 @@ class _$GameModelImpl extends _GameModel {
     this.gameGenderType,
   }) : _playerIds = playerIds,
        _waitlistIds = waitlistIds,
+       _guestPlayerIds = guestPlayerIds,
        _equipment = equipment,
        _scores = scores,
        _confirmedBy = confirmedBy,
@@ -754,6 +770,17 @@ class _$GameModelImpl extends _GameModel {
     if (_waitlistIds is EqualUnmodifiableListView) return _waitlistIds;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_waitlistIds);
+  }
+
+  // Guest players — cross-group invitees who accepted a game invitation (Story 28.1)
+  final List<String> _guestPlayerIds;
+  // Guest players — cross-group invitees who accepted a game invitation (Story 28.1)
+  @override
+  @JsonKey()
+  List<String> get guestPlayerIds {
+    if (_guestPlayerIds is EqualUnmodifiableListView) return _guestPlayerIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_guestPlayerIds);
   }
 
   // Game settings
@@ -855,7 +882,7 @@ class _$GameModelImpl extends _GameModel {
 
   @override
   String toString() {
-    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, eloUpdates: $eloUpdates, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes, gameGenderType: $gameGenderType)';
+    return 'GameModel(id: $id, title: $title, description: $description, groupId: $groupId, createdBy: $createdBy, createdAt: $createdAt, updatedAt: $updatedAt, scheduledAt: $scheduledAt, startedAt: $startedAt, endedAt: $endedAt, location: $location, status: $status, maxPlayers: $maxPlayers, minPlayers: $minPlayers, playerIds: $playerIds, waitlistIds: $waitlistIds, guestPlayerIds: $guestPlayerIds, allowWaitlist: $allowWaitlist, allowPlayerInvites: $allowPlayerInvites, visibility: $visibility, notes: $notes, equipment: $equipment, estimatedDuration: $estimatedDuration, courtInfo: $courtInfo, gameType: $gameType, skillLevel: $skillLevel, scores: $scores, winnerId: $winnerId, teams: $teams, result: $result, resultSubmittedBy: $resultSubmittedBy, confirmedBy: $confirmedBy, eloCalculated: $eloCalculated, eloUpdates: $eloUpdates, completedAt: $completedAt, weatherDependent: $weatherDependent, weatherNotes: $weatherNotes, gameGenderType: $gameGenderType)';
   }
 
   @override
@@ -893,6 +920,10 @@ class _$GameModelImpl extends _GameModel {
             const DeepCollectionEquality().equals(
               other._waitlistIds,
               _waitlistIds,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._guestPlayerIds,
+              _guestPlayerIds,
             ) &&
             (identical(other.allowWaitlist, allowWaitlist) ||
                 other.allowWaitlist == allowWaitlist) &&
@@ -960,6 +991,7 @@ class _$GameModelImpl extends _GameModel {
     minPlayers,
     const DeepCollectionEquality().hash(_playerIds),
     const DeepCollectionEquality().hash(_waitlistIds),
+    const DeepCollectionEquality().hash(_guestPlayerIds),
     allowWaitlist,
     allowPlayerInvites,
     visibility,
@@ -1015,6 +1047,7 @@ abstract class _GameModel extends GameModel {
     final int minPlayers,
     final List<String> playerIds,
     final List<String> waitlistIds,
+    final List<String> guestPlayerIds,
     final bool allowWaitlist,
     final bool allowPlayerInvites,
     final GameVisibility visibility,
@@ -1078,7 +1111,9 @@ abstract class _GameModel extends GameModel {
   @override
   List<String> get playerIds;
   @override
-  List<String> get waitlistIds; // Game settings
+  List<String> get waitlistIds; // Guest players — cross-group invitees who accepted a game invitation (Story 28.1)
+  @override
+  List<String> get guestPlayerIds; // Game settings
   @override
   bool get allowWaitlist;
   @override
