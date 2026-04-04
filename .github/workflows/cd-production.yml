@@ -2,9 +2,16 @@ name: CD — Production (App Store + Google Play)
 
 # Triggered by production tags only: v1.0.0, v1.2.3, etc.
 # The regex pattern explicitly excludes pre-release suffixes (-beta, -rc, etc.).
-# Builds and uploads the prod flavor to:
-#   - Google Play Production track (Android) — goes live immediately
-#   - App Store Connect (iOS) — enters Apple review (~1-2 days), then goes live
+#
+# PROMOTE OVER REBUILD:
+# This pipeline does NOT rebuild from source. It locates the tested beta artifacts
+# (AAB / IPA saved by cd-beta.yml) and promotes them:
+#   - Android: download beta AAB → upload to Google Play Production track
+#   - iOS:     submit the already-uploaded TestFlight build for App Store review
+#              via the App Store Connect REST API (no Xcode / rebuild needed)
+#
+# Required secrets (in addition to secrets already used by cd-beta.yml):
+#   ASC_APPLE_APP_ID  — numeric app ID from App Store Connect (visible in the URL)
 on:
   push:
     tags:
@@ -41,124 +48,162 @@ jobs:
       flutter-version: '3.32.6'
     secrets: inherit
 
-  # ─── Job 2: Deploy Android ───────────────────────────────────────────────────
-  deploy_android:
-    name: 🤖 Build & Upload Android (Play Production)
-    needs: test
+  # ─── Job 3: Find Beta Run ─────────────────────────────────────────────────────
+  find_beta:
+    name: 🔍 Find corresponding beta run
+    needs: [guard, test]
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.find.outputs.run_id }}
+      beta_version: ${{ steps.find.outputs.beta_version }}
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: 🏷️ Extract Version from Tag
+        uses: ./.github/actions/extract-version
+
+      - name: 🔍 Find latest successful beta run for this version
+        id: find
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ env.VERSION_NAME }}"  # e.g. "0.7.1"
+
+          # Search the last 50 successful beta runs for one whose head_branch
+          # starts with v{VERSION}-beta (covers v0.7.1-beta, v0.7.1-beta2, etc.)
+          RUN_ID=$(gh api \
+            "repos/${{ github.repository }}/actions/workflows/cd-beta.yml/runs?per_page=50&status=success" \
+            --jq ".workflow_runs[] | select(.head_branch | startswith(\"v${VERSION}-beta\")) | .id" \
+            | head -1)
+
+          if [ -z "$RUN_ID" ]; then
+            echo "❌ No successful beta run found for v${VERSION}-beta*"
+            echo "Make sure a cd-beta.yml run completed successfully before pushing the production tag."
+            exit 1
+          fi
+
+          # Retrieve the head_branch of that run to get the exact beta VERSION_NAME
+          # (e.g. "v0.7.1-beta" → beta_version = "0.7.1-beta")
+          BETA_HEAD=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}" \
+            --jq '.head_branch')
+          BETA_VERSION="${BETA_HEAD#v}"  # strip leading "v"
+
+          echo "✅ Beta run found: $RUN_ID  (tag: $BETA_HEAD)"
+          echo "run_id=$RUN_ID"       >> $GITHUB_OUTPUT
+          echo "beta_version=$BETA_VERSION" >> $GITHUB_OUTPUT
+
+  # ─── Job 4: Deploy Cloud Functions ──────────────────────────────────────────
+  deploy_functions:
+    name: ☁️ Deploy Cloud Functions (gatherli-prod)
+    needs: [guard, test]
     runs-on: ubuntu-latest
 
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
-      - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff  # v2.18.0
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a  # v4.2.0
         with:
-          flutter-version: '3.32.6'
-          channel: 'stable'
-          cache: true
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: functions/package-lock.json
 
-      - name: ☕ Setup Java
-        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12  # v4.7.0
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: 💾 Setup Gradle Build Cache
+      - name: 💾 Cache Firebase CLI
+        # Caches the global firebase-tools install across runs.
+        # Key is tied to functions/package-lock.json as a stable proxy — any
+        # functions dependency change invalidates the cache (conservative but safe).
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.android/build-cache
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/buildSrc/**/*.kt') }}
+          path: ~/.npm-global
+          key: ${{ runner.os }}-firebase-cli-${{ hashFiles('functions/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-firebase-cli-
 
-      - name: 💾 Cache pub packages
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
+      - name: 📦 Install Firebase CLI
+        run: |
+          npm config set prefix ~/.npm-global
+          echo "$HOME/.npm-global/bin" >> $GITHUB_PATH
+          # Skip download entirely if the binary is already present in the restored cache
+          if ! "$HOME/.npm-global/bin/firebase" --version 2>/dev/null; then
+            npm install -g firebase-tools
+          fi
 
-      - name: 📦 Get Dependencies
-        run: flutter pub get
+      - name: 📦 Install Functions Dependencies
+        run: npm --prefix functions ci
+
+      - name: 🚀 Deploy Functions + Firestore Rules & Indexes to gatherli-prod
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          # trap guarantees cleanup on every exit path (success, failure, signal)
+          trap 'rm -f /tmp/sa.json' EXIT
+          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > /tmp/sa.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json
+          firebase deploy --only functions,firestore,storage --project ${{ secrets.FIREBASE_PROD_PROJECT_ID }} --non-interactive --force
+          rm -f /tmp/sa.json  # explicit redundant cleanup before EXIT
+
+      - name: 🩺 Smoke test deployed functions
+        # Verifies functions are actually running after deploy, not just accepted by the API.
+        # A zero exit from firebase deploy only means the bundle was accepted — not that the
+        # function started. This catches cold-start errors, missing env vars, and bad triggers.
+        # Waits 45s for cold-start, then retries up to 3 times with 15s between attempts.
+        run: |
+          sleep 45
+          for i in 1 2 3; do
+            if curl -sf -X POST \
+              "https://europe-west6-${{ secrets.FIREBASE_PROD_PROJECT_ID }}.cloudfunctions.net/healthCheck" \
+              -H "Content-Type: application/json" \
+              -d '{"data": {}}' | grep -q '"ok"'; then
+              echo "✅ Smoke test passed — functions are serving traffic"
+              exit 0
+            fi
+            if [ "$i" -eq 3 ]; then
+              echo "❌ Smoke test failed after 3 attempts — functions may not be running"
+              exit 1
+            fi
+            echo "⏳ Attempt $i failed, retrying in 15s..."
+            sleep 15
+          done
+
+  # ─── Job 5: Promote Android ──────────────────────────────────────────────────
+  promote_android:
+    name: 🤖 Promote Android AAB → Play Production
+    needs: [guard, test, find_beta]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: 🏷️ Extract Version from Tag
         uses: ./.github/actions/extract-version
 
-      - name: 🔧 Generate Mock Firebase Dev Config (required by firebase_options_provider.dart)
-        run: dart run tools/generate_mock_firebase_configs.dart
-
-      - name: 🔧 Generate Firebase Prod Config
+      - name: 📥 Download Android AAB from beta run
+        # Downloads the exact AAB that was tested on the Play Internal track.
+        # Artifact name matches what cd-beta.yml saved: android-release-aab-{beta_version}
         env:
-          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
-          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
-          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
-          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
-          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
-          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
-          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
-          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
-        run: dart run tools/generate_firebase_config_from_secrets.dart prod
-
-      - name: 🔧 Generate google-services.json for prod flavor
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p android/app/src/prod
-          cat <<EOF > android/app/src/prod/google-services.json
-          {
-            "project_info": {
-              "project_number": "${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}",
-              "project_id": "${{ secrets.FIREBASE_PROD_PROJECT_ID }}",
-              "storage_bucket": "${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}"
-            },
-            "client": [
-              {
-                "client_info": {
-                  "mobilesdk_app_id": "${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}",
-                  "android_client_info": {
-                    "package_name": "${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}"
-                  }
-                },
-                "oauth_client": [],
-                "api_key": [{"current_key": "${{ secrets.FIREBASE_PROD_API_KEY }}"}],
-                "services": {"appinvite_service": {"other_platform_oauth_client": []}}
-              }
-            ],
-            "configuration_version": "1"
-          }
-          EOF
-
-      - name: 🔑 Decode Android Keystore
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode \
-            > android/app/release.jks
-
-      - name: 🔨 Build Release AAB (prod flavor)
-        env:
-          ANDROID_KEYSTORE_PATH: release.jks
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
-        run: |
-          flutter build appbundle --release --flavor prod \
-            -t lib/main_prod.dart \
-            --build-name=${{ env.VERSION_NAME }} \
-            --build-number=${{ env.BUILD_NUMBER }}
+          gh run download ${{ needs.find_beta.outputs.run_id }} \
+            --name "android-release-aab-${{ needs.find_beta.outputs.beta_version }}" \
+            --dir ./aab
+          echo "Downloaded AAB:"
+          find ./aab -name "*.aab"
 
       - name: 🔑 Decode Google Play Service Account
         run: |
           echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | base64 --decode \
             > service-account.json
 
-      - name: 🚀 Upload to Google Play Production
+      - name: 🚀 Promote AAB to Google Play Production track
         uses: r0adkll/upload-google-play@935ef9c68bb393a8e6116b1575626a7f5be3a7fb  # v1.1.3
         with:
           serviceAccountJson: service-account.json
           packageName: org.gatherli.app
-          releaseFiles: build/app/outputs/bundle/prodRelease/app-prod-release.aab
+          releaseFiles: ./aab/app-prod-release.aab
           track: production
           status: completed
           releaseName: ${{ env.VERSION_NAME }}
@@ -167,157 +212,41 @@ jobs:
         if: always()
         run: rm -f service-account.json
 
-  # ─── Job 3: Deploy iOS ───────────────────────────────────────────────────────
-  deploy_ios:
-    name: 🍎 Build & Upload iOS (App Store Connect)
-    needs: test
-    runs-on: macos-latest  # must include Xcode 26+ (iOS 26 SDK required from April 28 2026 — ITMS-90725)
+  # ─── Job 6: Submit iOS for App Store Review ──────────────────────────────────
+  submit_ios:
+    name: 🍎 Submit iOS build for App Store review
+    needs: [guard, test, find_beta]
+    # No Xcode needed — we call the App Store Connect REST API directly.
+    # ubuntu-latest is 10× cheaper than macos-latest.
+    runs-on: ubuntu-latest
 
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
-      - name: 🔨 Select Xcode (latest stable — iOS 26 SDK required from April 28 2026)
-        # Explicitly selects the latest stable Xcode on the runner to ensure we
-        # build against the iOS 26 SDK. Using 'latest-stable' means this
-        # automatically picks up new Xcode versions as GitHub updates the runner.
-        # If the runner does not yet ship Xcode 26, pin runs-on to macos-26 once available.
-        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd  # v1.6.0
-        with:
-          xcode-version: 'latest-stable'
-
-      - name: 🔍 Log Xcode & SDK version
-        # Surfacing these early makes it obvious when the wrong SDK is in use.
-        run: |
-          echo "Xcode path: $(xcode-select -p)"
-          xcodebuild -version
-          xcrun --sdk iphoneos --show-sdk-version
-
-      - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff  # v2.18.0
-        with:
-          flutter-version: '3.32.6'
-          channel: 'stable'
-          cache: true
-
-      - name: 💾 Cache pub packages
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
-
-      - name: 💾 Cache CocoaPods
-        # CocoaPods install is the single most expensive step on the macOS runner
-        # (~4–6 min, billed at 10× Linux rate). Cache the resolved Pods/ dir and
-        # the global spec repo keyed on Podfile.lock so the cache is only
-        # invalidated when a Flutter plugin adds/removes a native iOS dependency.
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf  # v4.2.2
-        with:
-          path: |
-            ios/Pods
-            ~/.cocoapods
-          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
-
-      - name: 📦 Get Dependencies
-        run: flutter pub get
-
       - name: 🏷️ Extract Version from Tag
         uses: ./.github/actions/extract-version
 
-      - name: 🔧 Generate Mock Firebase Dev Config (required by firebase_options_provider.dart)
-        run: dart run tools/generate_mock_firebase_configs.dart
-
-      - name: 🔧 Generate Firebase Prod Config
-        env:
-          FIREBASE_PROD_PROJECT_ID: ${{ secrets.FIREBASE_PROD_PROJECT_ID }}
-          FIREBASE_PROD_STORAGE_BUCKET: ${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}
-          FIREBASE_PROD_ANDROID_APP_ID: ${{ secrets.FIREBASE_PROD_ANDROID_APP_ID }}
-          FIREBASE_PROD_IOS_APP_ID: ${{ secrets.FIREBASE_PROD_IOS_APP_ID }}
-          FIREBASE_PROD_API_KEY: ${{ secrets.FIREBASE_PROD_API_KEY }}
-          FIREBASE_PROD_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}
-          FIREBASE_PROD_ANDROID_PACKAGE_NAME: ${{ secrets.FIREBASE_PROD_ANDROID_PACKAGE_NAME }}
-          FIREBASE_PROD_IOS_BUNDLE_ID: ${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}
-        run: dart run tools/generate_firebase_config_from_secrets.dart prod
-
-      - name: 🔧 Generate GoogleService-Info.plist for iOS prod flavor
-        run: |
-          mkdir -p ios/Runner/Firebase/prod
-          cat <<EOF > ios/Runner/Firebase/prod/GoogleService-Info.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>API_KEY</key>
-            <string>${{ secrets.FIREBASE_PROD_API_KEY }}</string>
-            <key>GCM_SENDER_ID</key>
-            <string>${{ secrets.FIREBASE_PROD_MESSAGING_SENDER_ID }}</string>
-            <key>PLIST_VERSION</key>
-            <string>1</string>
-            <key>BUNDLE_ID</key>
-            <string>${{ secrets.FIREBASE_PROD_IOS_BUNDLE_ID }}</string>
-            <key>PROJECT_ID</key>
-            <string>${{ secrets.FIREBASE_PROD_PROJECT_ID }}</string>
-            <key>STORAGE_BUCKET</key>
-            <string>${{ secrets.FIREBASE_PROD_STORAGE_BUCKET }}</string>
-            <key>IS_ADS_ENABLED</key>
-            <false/>
-            <key>IS_ANALYTICS_ENABLED</key>
-            <false/>
-            <key>IS_APPINVITE_ENABLED</key>
-            <true/>
-            <key>IS_GCM_ENABLED</key>
-            <true/>
-            <key>IS_SIGNIN_ENABLED</key>
-            <true/>
-            <key>GOOGLE_APP_ID</key>
-            <string>${{ secrets.FIREBASE_PROD_IOS_APP_ID }}</string>
-          </dict>
-          </plist>
-          EOF
-
-      - name: 🔑 Install Distribution Certificate
-        run: |
-          CERT_PATH=$RUNNER_TEMP/distribution.p12
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-          echo "${{ secrets.IOS_DISTRIBUTION_CERT_BASE64 }}" | base64 --decode > "$CERT_PATH"
-          security create-keychain -p "" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "" "$KEYCHAIN_PATH"
-          security import "$CERT_PATH" -P "${{ secrets.IOS_DISTRIBUTION_CERT_PASSWORD }}" \
-            -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
-          security list-keychain -d user -s "$KEYCHAIN_PATH"
-
-      - name: 🔑 Install Provisioning Profile
-        run: |
-          PP_PATH=$RUNNER_TEMP/profile.mobileprovision
-          echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > "$PP_PATH"
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          UUID=$(grep -a -o '<string>[0-9A-Fa-f\-]\{36\}</string>' "$PP_PATH" | head -1 | sed 's/<string>//;s/<\/string>//')
-          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/"$UUID".mobileprovision
-
-      - name: 🔑 Install App Store Connect API Key (for upload)
+      - name: 🔑 Install App Store Connect API Key
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}" | base64 --decode \
             > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
 
-      - name: 🔨 Build & Upload IPA to App Store Connect (prod flavor)
+      - name: 🍎 Submit beta build for App Store review via ASC API
+        # The build was already uploaded to App Store Connect during the beta TestFlight run.
+        # This step finds that build by version string and submits it for App Store review
+        # without re-uploading — ensuring the exact tested binary ships to users.
+        #
+        # Script: .github/scripts/asc_submit_for_review.py
+        # Requires secret: ASC_APPLE_APP_ID (numeric app ID from App Store Connect)
         env:
-          IOS_PROVISIONING_PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          ASC_APP_ID: ${{ secrets.ASC_APPLE_APP_ID }}
         run: |
-          flutter build ipa --release --flavor prod \
-            -t lib/main_prod.dart \
-            --build-name=${{ env.VERSION_NAME }} \
-            --build-number=${{ env.BUILD_NUMBER }} \
-            --export-options-plist=ios/ExportOptions.plist
-
-      - name: 🧹 Clean up keychain and provisioning profile
-        if: always()
-        run: |
-          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
+          # Strip beta suffix for iOS version string: 0.7.1-beta → 0.7.1
+          export ASC_IOS_VERSION=$(echo "${{ env.VERSION_NAME }}" | sed 's/-beta[0-9]*//')
+          export ASC_KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          pip3 install --quiet PyJWT cryptography
+          python3 .github/scripts/asc_submit_for_review.py

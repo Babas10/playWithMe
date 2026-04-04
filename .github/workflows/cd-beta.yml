@@ -223,11 +223,12 @@ jobs:
             --build-number=${{ env.BUILD_NUMBER }}
 
       - name: 💾 Save AAB as artifact
+        # 30-day retention so the production promote job can download this binary.
         uses: actions/upload-artifact@v4
         with:
           name: android-release-aab-${{ env.VERSION_NAME }}
           path: build/app/outputs/bundle/prodRelease/app-prod-release.aab
-          retention-days: 7
+          retention-days: 30
 
       - name: 🔑 Decode Google Play Service Account
         run: |
@@ -435,6 +436,16 @@ jobs:
             -f "$(find build/ios/ipa -name '*.ipa' | head -1)" \
             --apiKey "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" \
             --apiIssuer "${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}"
+
+      - name: 💾 Save IPA as artifact
+        # 30-day retention so the production promote job can submit this exact binary for
+        # App Store review — ensuring the same binary that was tested on TestFlight ships.
+        # The IPA is already signed for App Store distribution (method: app-store in ExportOptions.plist).
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release-ipa-${{ env.VERSION_NAME }}
+          path: build/ios/ipa/*.ipa
+          retention-days: 30
 
       - name: 🧹 Clean up keychain and provisioning profile
         if: always()
