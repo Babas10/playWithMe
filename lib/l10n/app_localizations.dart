@@ -3643,6 +3643,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to send invitation'**
   String get invitePlayerError;
+
+  /// Title of the pending game invitations page (Story 28.7)
+  ///
+  /// In en, this message translates to:
+  /// **'Game Invitations'**
+  String get gameInvitations;
+
+  /// Empty state message on the pending game invitations page
+  ///
+  /// In en, this message translates to:
+  /// **'No pending game invitations'**
+  String get noPendingGameInvitations;
+
+  /// Label on a game invitation card showing the source group
+  ///
+  /// In en, this message translates to:
+  /// **'From: {groupName}'**
+  String fromGroup(String groupName);
+
+  /// Snackbar shown after the user accepts a game invitation
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation accepted'**
+  String get gameInvitationAccepted;
+
+  /// Snackbar shown after the user declines a game invitation
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation declined'**
+  String get gameInvitationDeclined;
+
+  /// Snackbar shown when accepting or declining a game invitation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to process invitation'**
+  String get gameInvitationActionError;
 }
 
 class _AppLocalizationsDelegate

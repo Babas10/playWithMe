@@ -2860,5 +2860,32 @@
   "invitePlayerError": "Failed to send invitation",
   "@invitePlayerError": {
     "description": "Snackbar message when sending a guest invitation fails (Story 28.6)"
+  },
+  "gameInvitations": "Game Invitations",
+  "@gameInvitations": {
+    "description": "Title of the pending game invitations page (Story 28.7)"
+  },
+  "noPendingGameInvitations": "No pending game invitations",
+  "@noPendingGameInvitations": {
+    "description": "Empty state message on the pending game invitations page"
+  },
+  "fromGroup": "From: {groupName}",
+  "@fromGroup": {
+    "description": "Label on a game invitation card showing the source group",
+    "placeholders": {
+      "groupName": {"type": "String"}
+    }
+  },
+  "gameInvitationAccepted": "Invitation accepted",
+  "@gameInvitationAccepted": {
+    "description": "Snackbar shown after the user accepts a game invitation"
+  },
+  "gameInvitationDeclined": "Invitation declined",
+  "@gameInvitationDeclined": {
+    "description": "Snackbar shown after the user declines a game invitation"
+  },
+  "gameInvitationActionError": "Failed to process invitation",
+  "@gameInvitationActionError": {
+    "description": "Snackbar shown when accepting or declining a game invitation fails"
   }
 }
