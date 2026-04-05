@@ -126,4 +126,5 @@ export {
 
 // Epic 28: Cross-Group Game Invitations
 export {inviteGuestToGame} from "./inviteGuestToGame"; // Story 28.2
+export {getInvitablePlayersForGame} from "./getInvitablePlayersForGame"; // Story 28.3
 
