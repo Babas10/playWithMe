@@ -1,4 +1,4 @@
-// Unit tests for gameGenderClassification Cloud Functions (Story 26.4)
+// Unit tests for gameGenderClassification Cloud Functions (Stories 26.4, 28.8)
 // Validates onCreate and onUpdate triggers that classify game gender type
 
 import * as admin from "firebase-admin";
@@ -174,10 +174,25 @@ describe("onGamePlayersChangedClassifyGender", () => {
     jest.clearAllMocks();
   });
 
-  function makeChange(beforePlayers: string[], afterPlayers: string[]) {
+  function makeChange(
+    beforePlayers: string[],
+    afterPlayers: string[],
+    beforeGuests: string[] = [],
+    afterGuests: string[] = []
+  ) {
     return {
-      before: { data: jest.fn().mockReturnValue({ playerIds: beforePlayers }) },
-      after: { data: jest.fn().mockReturnValue({ playerIds: afterPlayers }) },
+      before: {
+        data: jest.fn().mockReturnValue({
+          playerIds: beforePlayers,
+          guestPlayerIds: beforeGuests,
+        }),
+      },
+      after: {
+        data: jest.fn().mockReturnValue({
+          playerIds: afterPlayers,
+          guestPlayerIds: afterGuests,
+        }),
+      },
     };
   }
 
@@ -255,5 +270,55 @@ describe("onGamePlayersChangedClassifyGender", () => {
         makeContext()
       )
     ).resolves.toBeNull();
+  });
+
+  // Story 28.8: guestPlayerIds included in classification
+
+  test("returns null when neither playerIds nor guestPlayerIds changed", async () => {
+    (admin.firestore as unknown as jest.Mock).mockReturnValue(makeDb({}));
+    const result = await (onGamePlayersChangedClassifyGender as any)(
+      makeChange(["u1"], ["u1"], ["g1"], ["g1"]),
+      makeContext()
+    );
+    expect(result).toBeNull();
+  });
+
+  test("reclassifies when guestPlayerIds changes (guest accepts invitation)", async () => {
+    (admin.firestore as unknown as jest.Mock).mockReturnValue(
+      makeDb({ u1: "male", u2: "male", g1: "female" })
+    );
+    await (onGamePlayersChangedClassifyGender as any)(
+      makeChange(["u1", "u2"], ["u1", "u2"], [], ["g1"]),
+      makeContext()
+    );
+    expect(mockGameRef.update).toHaveBeenCalledWith(
+      expect.objectContaining({ gameGenderType: "mix" })
+    );
+  });
+
+  test("classifies as 'mix' when regular players are male and guest is female", async () => {
+    (admin.firestore as unknown as jest.Mock).mockReturnValue(
+      makeDb({ u1: "male", u2: "male", g1: "female" })
+    );
+    await (onGamePlayersChangedClassifyGender as any)(
+      makeChange(["u1"], ["u1", "u2"], [], ["g1"]),
+      makeContext()
+    );
+    expect(mockGameRef.update).toHaveBeenCalledWith(
+      expect.objectContaining({ gameGenderType: "mix" })
+    );
+  });
+
+  test("reclassifies back to 'male' when female guest declines (guestPlayerIds shrinks)", async () => {
+    (admin.firestore as unknown as jest.Mock).mockReturnValue(
+      makeDb({ u1: "male", u2: "male" })
+    );
+    await (onGamePlayersChangedClassifyGender as any)(
+      makeChange(["u1", "u2"], ["u1", "u2"], ["g1"], []),
+      makeContext()
+    );
+    expect(mockGameRef.update).toHaveBeenCalledWith(
+      expect.objectContaining({ gameGenderType: "male" })
+    );
   });
 });

@@ -53,7 +53,8 @@ export const onGameCreatedClassifyGender = functions
 
 /**
  * Reclassifies the game gender type whenever the player list changes.
- * Fires on any game document update, but only writes when playerIds changed.
+ * Fires on any game document update, but only writes when playerIds or
+ * guestPlayerIds changed (Story 28.8: guest players included in classification).
  */
 export const onGamePlayersChangedClassifyGender = functions
   .region("europe-west6")
@@ -65,24 +66,33 @@ export const onGamePlayersChangedClassifyGender = functions
 
     const beforePlayers: string[] = before.playerIds || [];
     const afterPlayers: string[] = after.playerIds || [];
+    const beforeGuests: string[] = before.guestPlayerIds || [];
+    const afterGuests: string[] = after.guestPlayerIds || [];
 
-    // Only reclassify when playerIds actually changed
-    const playersChanged =
-      beforePlayers.length !== afterPlayers.length ||
-      afterPlayers.some((id: string) => !beforePlayers.includes(id)) ||
-      beforePlayers.some((id: string) => !afterPlayers.includes(id));
+    // Reclassify when playerIds or guestPlayerIds changed
+    const listChanged = (a: string[], b: string[]) =>
+      a.length !== b.length ||
+      b.some((id: string) => !a.includes(id)) ||
+      a.some((id: string) => !b.includes(id));
 
-    if (!playersChanged) {
+    if (!listChanged(beforePlayers, afterPlayers) && !listChanged(beforeGuests, afterGuests)) {
       return null;
     }
 
+    const allPlayerIds = [...afterPlayers, ...afterGuests];
+
     functions.logger.info(
       "[onGamePlayersChangedClassifyGender] Player list changed, reclassifying",
-      { gameId, before: beforePlayers.length, after: afterPlayers.length }
+      {
+        gameId,
+        regularPlayers: afterPlayers.length,
+        guestPlayers: afterGuests.length,
+        total: allPlayerIds.length,
+      }
     );
 
     try {
-      const gameGenderType = await classifyGameGenderType(afterPlayers);
+      const gameGenderType = await classifyGameGenderType(allPlayerIds);
 
       if (gameGenderType === null) {
         // All players left — remove the field
