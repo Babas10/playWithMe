@@ -3607,6 +3607,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your gender determines whether games you play are classified as mixed or non-mixed.'**
   String get registrationGenderTooltip;
+
+  /// Title of the invite guest players bottom sheet (Story 28.6)
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Guest Players'**
+  String get inviteGuestPlayers;
+
+  /// Button label to invite a guest player (Story 28.6)
+  ///
+  /// In en, this message translates to:
+  /// **'Invite'**
+  String get inviteGuest;
+
+  /// Section label for the list of guest players in game details (Story 28.6)
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Players'**
+  String get guestPlayers;
+
+  /// Empty state when there are no players to invite as guests (Story 28.6)
+  ///
+  /// In en, this message translates to:
+  /// **'No players available to invite'**
+  String get noInvitablePlayers;
+
+  /// Snackbar message after successfully sending a guest invitation (Story 28.6)
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation sent successfully'**
+  String get invitePlayerSuccess;
+
+  /// Snackbar message when sending a guest invitation fails (Story 28.6)
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send invitation'**
+  String get invitePlayerError;
 }
 
 class _AppLocalizationsDelegate

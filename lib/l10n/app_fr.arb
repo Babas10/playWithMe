@@ -618,5 +618,30 @@
   "registrationGenderTooltip": "Votre genre détermine si vos parties sont classées comme mixtes ou non mixtes.",
   "@registrationGenderTooltip": {
     "description": "Tooltip explaining why gender is asked during registration"
+  },
+
+  "inviteGuestPlayers": "Inviter des joueurs invités",
+  "@inviteGuestPlayers": {
+    "description": "Title of the invite guest players bottom sheet (Story 28.6)"
+  },
+  "inviteGuest": "Inviter",
+  "@inviteGuest": {
+    "description": "Button label to invite a guest player (Story 28.6)"
+  },
+  "guestPlayers": "Joueurs invités",
+  "@guestPlayers": {
+    "description": "Section label for the list of guest players in game details (Story 28.6)"
+  },
+  "noInvitablePlayers": "Aucun joueur disponible à inviter",
+  "@noInvitablePlayers": {
+    "description": "Empty state when there are no players to invite as guests (Story 28.6)"
+  },
+  "invitePlayerSuccess": "Invitation envoyée avec succès",
+  "@invitePlayerSuccess": {
+    "description": "Snackbar message after successfully sending a guest invitation (Story 28.6)"
+  },
+  "invitePlayerError": "Échec de l'envoi de l'invitation",
+  "@invitePlayerError": {
+    "description": "Snackbar message when sending a guest invitation fails (Story 28.6)"
   }
 }

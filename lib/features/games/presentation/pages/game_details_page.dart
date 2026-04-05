@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/presentation/widgets/mix_game_badge.dart';
+import '../../../../core/domain/repositories/game_guest_invitation_repository.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/data/models/game_model.dart';
@@ -19,6 +20,8 @@ import '../../../auth/presentation/bloc/authentication/authentication_state.dart
 import '../bloc/game_details/game_details_bloc.dart';
 import '../bloc/game_details/game_details_event.dart';
 import '../bloc/game_details/game_details_state.dart';
+import '../bloc/game_guest_invitation/game_guest_invitation_bloc.dart';
+import '../widgets/invite_guest_players_sheet.dart';
 import 'record_results_page.dart';
 import 'game_result_view_page.dart';
 
@@ -26,22 +29,34 @@ class GameDetailsPage extends StatelessWidget {
   final String gameId;
   final GameRepository? gameRepository;
   final UserRepository? userRepository;
+  final GameGuestInvitationRepository? gameGuestInvitationRepository;
 
   const GameDetailsPage({
     super.key,
     required this.gameId,
     this.gameRepository,
     this.userRepository,
+    this.gameGuestInvitationRepository,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => GameDetailsBloc(
-        gameRepository: gameRepository ?? sl<GameRepository>(),
-        userRepository: userRepository ?? sl<UserRepository>(),
-        analytics: sl(),
-      )..add(LoadGameDetails(gameId: gameId)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => GameDetailsBloc(
+            gameRepository: gameRepository ?? sl<GameRepository>(),
+            userRepository: userRepository ?? sl<UserRepository>(),
+            analytics: sl(),
+          )..add(LoadGameDetails(gameId: gameId)),
+        ),
+        BlocProvider(
+          create: (_) => GameGuestInvitationBloc(
+            repository: gameGuestInvitationRepository ??
+                sl<GameGuestInvitationRepository>(),
+          ),
+        ),
+      ],
       child: const _GameDetailsView(),
     );
   }
@@ -356,6 +371,11 @@ class _PlayersCard extends StatelessWidget {
                 : <String, dynamic>{};
         final isOperationInProgress = state is GameDetailsOperationInProgress;
 
+        final isCreator = currentUserId != null &&
+            currentUserId == game.createdBy &&
+            game.status == GameStatus.scheduled &&
+            !game.isFull;
+
         return Card(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -372,15 +392,34 @@ class _PlayersCard extends StatelessWidget {
                             color: AppColors.secondary,
                           ),
                     ),
-                    Chip(
-                      label: Text(
-                        '${game.currentPlayerCount}/${game.maxPlayers}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isCreator)
+                          TextButton.icon(
+                            onPressed: () => showInviteGuestPlayersSheet(
+                                context, game.id),
+                            icon: const Icon(Icons.person_add_outlined,
+                                size: 18),
+                            label: Text(l10n.inviteGuestPlayers),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              tapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        Chip(
+                          label: Text(
+                            '${game.currentPlayerCount}/${game.maxPlayers}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.secondary,
+                            ),
+                          ),
+                          backgroundColor: AppColors.primary,
                         ),
-                      ),
-                      backgroundColor: AppColors.primary,
+                      ],
                     ),
                   ],
                 ),
