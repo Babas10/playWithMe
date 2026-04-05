@@ -21,7 +21,9 @@ import 'package:play_with_me/core/domain/repositories/training_feedback_reposito
 import 'package:play_with_me/core/domain/repositories/image_storage_repository.dart';
 import 'package:play_with_me/core/domain/repositories/invitation_repository.dart';
 import 'package:play_with_me/core/domain/repositories/friend_repository.dart';
+import 'package:play_with_me/core/domain/repositories/game_guest_invitation_repository.dart';
 import 'package:play_with_me/core/domain/repositories/group_invite_link_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_game_guest_invitation_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_user_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_group_repository.dart';
 import 'package:play_with_me/core/data/repositories/firestore_game_repository.dart';
@@ -47,6 +49,7 @@ import 'package:play_with_me/features/friends/presentation/bloc/friend_bloc.dart
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_details/game_details_bloc.dart';
+import 'package:play_with_me/features/games/presentation/bloc/game_guest_invitation/game_guest_invitation_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_creation/training_session_creation_bloc.dart';
 import 'package:play_with_me/features/training/presentation/bloc/training_session_participation/training_session_participation_bloc.dart';
@@ -216,6 +219,12 @@ Future<void> initializeDependencies() async {
     );
   }
 
+  if (!sl.isRegistered<GameGuestInvitationRepository>()) {
+    sl.registerLazySingleton<GameGuestInvitationRepository>(
+      () => FirestoreGameGuestInvitationRepository(functions: sl()),
+    );
+  }
+
   // Register services
   if (!sl.isRegistered<ImagePickerService>()) {
     sl.registerLazySingleton<ImagePickerService>(
@@ -370,6 +379,12 @@ Future<void> initializeDependencies() async {
         userRepository: sl(),
         analytics: sl(),
       ),
+    );
+  }
+
+  if (!sl.isRegistered<GameGuestInvitationBloc>()) {
+    sl.registerFactory<GameGuestInvitationBloc>(
+      () => GameGuestInvitationBloc(repository: sl()),
     );
   }
 

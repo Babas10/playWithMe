@@ -1971,4 +1971,22 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get registrationGenderTooltip =>
       'Ihr Geschlecht bestimmt, ob Ihre Spiele als gemischt oder nicht gemischt eingestuft werden.';
+
+  @override
+  String get inviteGuestPlayers => 'Gastspieler einladen';
+
+  @override
+  String get inviteGuest => 'Einladen';
+
+  @override
+  String get guestPlayers => 'Gastspieler';
+
+  @override
+  String get noInvitablePlayers => 'Keine Spieler zum Einladen verfügbar';
+
+  @override
+  String get invitePlayerSuccess => 'Einladung erfolgreich gesendet';
+
+  @override
+  String get invitePlayerError => 'Einladung konnte nicht gesendet werden';
 }

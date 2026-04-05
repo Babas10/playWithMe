@@ -1974,4 +1974,22 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get registrationGenderTooltip =>
       'Votre genre détermine si vos parties sont classées comme mixtes ou non mixtes.';
+
+  @override
+  String get inviteGuestPlayers => 'Inviter des joueurs invités';
+
+  @override
+  String get inviteGuest => 'Inviter';
+
+  @override
+  String get guestPlayers => 'Joueurs invités';
+
+  @override
+  String get noInvitablePlayers => 'Aucun joueur disponible à inviter';
+
+  @override
+  String get invitePlayerSuccess => 'Invitation envoyée avec succès';
+
+  @override
+  String get invitePlayerError => 'Échec de l\'envoi de l\'invitation';
 }
