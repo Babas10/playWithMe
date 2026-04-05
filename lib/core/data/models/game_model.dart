@@ -23,8 +23,6 @@ class GameModel with _$GameModel {
     @Default(2) int minPlayers,
     @Default([]) List<String> playerIds,
     @Default([]) List<String> waitlistIds,
-    // Guest players — cross-group invitees who accepted a game invitation (Story 28.1)
-    @Default([]) List<String> guestPlayerIds,
     // Game settings
     @Default(true) bool allowWaitlist,
     @Default(true) bool allowPlayerInvites,
@@ -159,14 +157,11 @@ class GameModel with _$GameModel {
 
   /// Business logic methods
 
-  /// Check if user is a regular group player in the game
+  /// Check if user is a player in the game
   bool isPlayer(String userId) => playerIds.contains(userId);
 
-  /// Check if user is a guest player (cross-group invitee who accepted)
-  bool isGuestPlayer(String userId) => guestPlayerIds.contains(userId);
-
-  /// Check if user is any kind of participant (regular or guest)
-  bool isParticipant(String userId) => isPlayer(userId) || isGuestPlayer(userId);
+  /// Check if user is a participant (alias for isPlayer — all accepted players are in playerIds)
+  bool isParticipant(String userId) => isPlayer(userId);
 
   /// Check if user is on the waitlist
   bool isOnWaitlist(String userId) => waitlistIds.contains(userId);
@@ -177,17 +172,17 @@ class GameModel with _$GameModel {
   /// Check if user can manage the game
   bool canManage(String userId) => createdBy == userId;
 
-  /// Check if game is full (counts both regular players and accepted guests)
-  bool get isFull => playerIds.length + guestPlayerIds.length >= maxPlayers;
+  /// Check if game is full
+  bool get isFull => playerIds.length >= maxPlayers;
 
-  /// Check if game has minimum players (counts both regular players and accepted guests)
-  bool get hasMinimumPlayers => playerIds.length + guestPlayerIds.length >= minPlayers;
+  /// Check if game has minimum players
+  bool get hasMinimumPlayers => playerIds.length >= minPlayers;
 
-  /// Get available spots (accounts for accepted guests filling spots)
-  int get availableSpots => maxPlayers - (playerIds.length + guestPlayerIds.length);
+  /// Get available spots
+  int get availableSpots => maxPlayers - playerIds.length;
 
-  /// Get current player count (regular players + accepted guests)
-  int get currentPlayerCount => playerIds.length + guestPlayerIds.length;
+  /// Get current player count
+  int get currentPlayerCount => playerIds.length;
 
   /// Get waitlist count
   int get waitlistCount => waitlistIds.length;
@@ -228,7 +223,7 @@ class GameModel with _$GameModel {
 
   /// Check if user can join the game
   bool canUserJoin(String userId) {
-    if (isPlayer(userId) || isGuestPlayer(userId) || isOnWaitlist(userId)) return false;
+    if (isPlayer(userId) || isOnWaitlist(userId)) return false;
     if (status != GameStatus.scheduled) return false;
     if (isPast) return false;
     return !isFull || allowWaitlist;
@@ -244,7 +239,7 @@ class GameModel with _$GameModel {
   /// Allows participants (or creator) to enter results if the game is ready
   /// (completed, in-progress, or past scheduled time) and has enough players
   bool canUserEnterResults(String userId) {
-    final isParticipant = isPlayer(userId) || isGuestPlayer(userId) || isCreator(userId);
+    final isParticipant = isPlayer(userId) || isCreator(userId);
     final hasExistingResult = result != null;
     final isCancelled = status == GameStatus.cancelled;
     final isVerification = status == GameStatus.verification;

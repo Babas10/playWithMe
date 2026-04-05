@@ -54,7 +54,6 @@ const makeGameData = (overrides: Partial<Record<string, any>> = {}) => ({
   groupId: "group-abc",
   createdBy: "creator-uid",
   playerIds: [],
-  guestPlayerIds: [],
   scheduledAt: new Date("2026-06-01"),
   ...overrides,
 });
@@ -219,9 +218,9 @@ describe("inviteGuestToGame", () => {
       ).rejects.toMatchObject({ code: "already-exists" });
     });
 
-    it("throws already-exists when invitee is already a guest player", async () => {
+    it("throws already-exists when invitee is already in playerIds", async () => {
       const { db } = buildMockDb({
-        gameData: makeGameData({ guestPlayerIds: ["invitee-uid"] }),
+        gameData: makeGameData({ playerIds: ["invitee-uid"] }),
       });
       (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
 
