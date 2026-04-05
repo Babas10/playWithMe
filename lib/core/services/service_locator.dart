@@ -69,6 +69,9 @@ import 'package:play_with_me/core/presentation/bloc/account_status/account_statu
 import 'package:play_with_me/core/presentation/bloc/deep_link/deep_link_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/invite_join_bloc.dart';
 import 'package:play_with_me/features/invitations/presentation/bloc/invite_registration/invite_registration_bloc.dart';
+import 'package:play_with_me/core/domain/repositories/game_invitations_repository.dart';
+import 'package:play_with_me/core/data/repositories/firestore_game_invitations_repository.dart';
+import 'package:play_with_me/features/games/presentation/bloc/game_invitations/game_invitations_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -451,6 +454,18 @@ Future<void> initializeDependencies() async {
         repository: sl(),
         pendingInviteStorage: sl(),
       ),
+    );
+  }
+
+  if (!sl.isRegistered<GameInvitationsRepository>()) {
+    sl.registerLazySingleton<GameInvitationsRepository>(
+      () => FirestoreGameInvitationsRepository(),
+    );
+  }
+
+  if (!sl.isRegistered<GameInvitationsBloc>()) {
+    sl.registerFactory<GameInvitationsBloc>(
+      () => GameInvitationsBloc(repository: sl()),
     );
   }
 

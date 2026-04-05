@@ -130,4 +130,5 @@ export {getInvitablePlayersForGame} from "./getInvitablePlayersForGame"; // Stor
 export {acceptGameGuestInvitation} from "./acceptGameGuestInvitation"; // Story 28.4
 export {declineGameGuestInvitation} from "./declineGameGuestInvitation"; // Story 28.4
 export {onGameStatusChangedExpireInvitations} from "./onGameStatusChangedExpireInvitations"; // Story 28.5
+export {getGameInvitationsForUser} from "./getGameInvitationsForUser"; // Story 28.7
 

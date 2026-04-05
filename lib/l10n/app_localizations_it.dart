@@ -1972,4 +1972,24 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get invitePlayerError => 'Invio dell\'invito non riuscito';
+
+  @override
+  String get gameInvitations => 'Inviti alla partita';
+
+  @override
+  String get noPendingGameInvitations => 'Nessun invito di gioco in sospeso';
+
+  @override
+  String fromGroup(String groupName) {
+    return 'Da: $groupName';
+  }
+
+  @override
+  String get gameInvitationAccepted => 'Invito accettato';
+
+  @override
+  String get gameInvitationDeclined => 'Invito rifiutato';
+
+  @override
+  String get gameInvitationActionError => 'Impossibile elaborare l\'invito';
 }
