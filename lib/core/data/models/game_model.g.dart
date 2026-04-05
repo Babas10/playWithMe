@@ -33,11 +33,6 @@ _$GameModelImpl _$$GameModelImplFromJson(
           ?.map((e) => e as String)
           .toList() ??
       const [],
-  guestPlayerIds:
-      (json['guestPlayerIds'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
-      const [],
   allowWaitlist: json['allowWaitlist'] as bool? ?? true,
   allowPlayerInvites: json['allowPlayerInvites'] as bool? ?? true,
   visibility:
@@ -100,7 +95,6 @@ Map<String, dynamic> _$$GameModelImplToJson(_$GameModelImpl instance) =>
       'minPlayers': instance.minPlayers,
       'playerIds': instance.playerIds,
       'waitlistIds': instance.waitlistIds,
-      'guestPlayerIds': instance.guestPlayerIds,
       'allowWaitlist': instance.allowWaitlist,
       'allowPlayerInvites': instance.allowPlayerInvites,
       'visibility': _$GameVisibilityEnumMap[instance.visibility]!,

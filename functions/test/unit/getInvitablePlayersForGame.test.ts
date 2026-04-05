@@ -52,7 +52,6 @@ const makeGameData = (overrides: Partial<Record<string, any>> = {}) => ({
   groupId: "game-group",
   createdBy: "creator-uid",
   playerIds: [],
-  guestPlayerIds: [],
   ...overrides,
 });
 
@@ -211,9 +210,9 @@ describe("getInvitablePlayersForGame", () => {
       expect(result.players.map((p) => p.uid)).not.toContain("alice");
     });
 
-    it("excludes users already in guestPlayerIds", async () => {
+    it("excludes users already in playerIds", async () => {
       const db = buildMockDb({
-        gameData: makeGameData({ guestPlayerIds: ["bob"] }),
+        gameData: makeGameData({ playerIds: ["bob"] }),
         userDocs: [makeUserDoc("alice")],
       });
       (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
@@ -300,7 +299,7 @@ describe("getInvitablePlayersForGame", () => {
 
     it("returns empty list when all candidates are excluded", async () => {
       const db = buildMockDb({
-        gameData: makeGameData({ playerIds: ["alice"], guestPlayerIds: ["bob"] }),
+        gameData: makeGameData({ playerIds: ["alice", "bob"] }),
         userDocs: [],
       });
       (admin.firestore as unknown as jest.Mock).mockReturnValue(db);

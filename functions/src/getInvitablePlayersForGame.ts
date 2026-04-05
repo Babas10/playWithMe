@@ -36,7 +36,7 @@ export interface GetInvitablePlayersForGameResponse {
  * 2. Load game — verify caller is the creator
  * 3. Load all groups the caller belongs to, EXCLUDING the game's own group
  * 4. Collect unique member UIDs from those groups (first occurrence wins for sourceGroup)
- * 5. Subtract playerIds, guestPlayerIds, and UIDs with pending invitations
+ * 5. Subtract playerIds and UIDs with pending invitations
  * 6. Batch-fetch user profiles for remaining UIDs
  * 7. Return deduplicated list with sourceGroupId / sourceGroupName
  */
@@ -93,7 +93,6 @@ export async function getInvitablePlayersForGameHandler(
     const gameGroupId: string = game.groupId;
     const alreadyIn = new Set<string>([
       ...(game.playerIds ?? []),
-      ...(game.guestPlayerIds ?? []),
       callerId, // never suggest inviting yourself
     ]);
 
@@ -207,7 +206,7 @@ export async function getInvitablePlayersForGameHandler(
  *
  * Returns candidates the game creator can invite as guest players:
  *  - Members of the creator's other groups (not the game's own group)
- *  - Excluding players already in the game (playerIds / guestPlayerIds)
+ *  - Excluding players already in the game (playerIds)
  *  - Excluding users who already have a pending invitation
  *  - Returns only non-sensitive fields: uid, displayName, photoUrl, sourceGroupId, sourceGroupName
  */

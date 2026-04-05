@@ -24,7 +24,7 @@ const INACTIVE_GAME_STATUSES = new Set(["completed", "cancelled"]);
  * Atomically:
  *  - Verifies the invitation is pending and belongs to the caller
  *  - Verifies the game is still active and not full
- *  - Adds inviteeId to game.guestPlayerIds
+ *  - Adds inviteeId to game.playerIds (guest players are treated as regular players)
  *  - Sets invitation status to "accepted"
  *
  * Idempotent: calling again on an already-accepted invitation returns success.
@@ -145,15 +145,14 @@ export async function acceptGameGuestInvitationHandler(
 
       // Capacity check
       const playerIds: string[] = game.playerIds ?? [];
-      const guestPlayerIds: string[] = game.guestPlayerIds ?? [];
       const maxPlayers: number = game.maxPlayers ?? 4;
 
-      if (playerIds.length + guestPlayerIds.length >= maxPlayers) {
+      if (playerIds.length >= maxPlayers) {
         functions.logger.warn("[acceptGameGuestInvitation] Game is full", {
           callerId,
           invitationId,
           gameId: invitation.gameId,
-          currentCount: playerIds.length + guestPlayerIds.length,
+          currentCount: playerIds.length,
           maxPlayers,
         });
         throw new functions.https.HttpsError(
@@ -162,9 +161,9 @@ export async function acceptGameGuestInvitationHandler(
         );
       }
 
-      // Atomic writes
+      // Atomic writes — guest players join playerIds like any regular player
       tx.update(gameRef, {
-        guestPlayerIds: admin.firestore.FieldValue.arrayUnion(callerId),
+        playerIds: admin.firestore.FieldValue.arrayUnion(callerId),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 

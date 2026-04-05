@@ -27,7 +27,7 @@ export interface InviteGuestToGameResponse {
  * Logic:
  * 1. Validate auth + inputs
  * 2. Load game — verify caller is the creator
- * 3. Verify invitee not already in playerIds or guestPlayerIds
+ * 3. Verify invitee not already in playerIds
  * 4. Verify no pending invitation already exists for (gameId, inviteeId)
  * 5. Load all groups where caller is a member
  * 6. Verify invitee is a member of at least one of those groups
@@ -96,11 +96,10 @@ export async function inviteGuestToGameHandler(
       );
     }
 
-    // ── 4. Invitee not already a player or guest ──────────────────────────
+    // ── 4. Invitee not already a player ──────────────────────────────────
     const playerIds: string[] = game.playerIds ?? [];
-    const guestPlayerIds: string[] = game.guestPlayerIds ?? [];
 
-    if (playerIds.includes(inviteeId) || guestPlayerIds.includes(inviteeId)) {
+    if (playerIds.includes(inviteeId)) {
       functions.logger.warn("[inviteGuestToGame] Invitee already in game", {
         callerId,
         gameId,

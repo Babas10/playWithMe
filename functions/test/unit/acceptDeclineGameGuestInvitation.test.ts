@@ -64,7 +64,6 @@ const makeGame = (overrides: Partial<Record<string, any>> = {}) => ({
   status: "scheduled",
   maxPlayers: 4,
   playerIds: ["p1", "p2"],
-  guestPlayerIds: [],
   ...overrides,
 });
 
@@ -300,7 +299,7 @@ describe("acceptGameGuestInvitation", () => {
 
   it("throws failed-precondition when game is full", async () => {
     const { db } = buildAcceptDb({
-      gameData: makeGame({ maxPlayers: 2, playerIds: ["p1", "p2"], guestPlayerIds: [] }),
+      gameData: makeGame({ maxPlayers: 2, playerIds: ["p1", "p2"] }),
     });
     (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
 
@@ -309,9 +308,9 @@ describe("acceptGameGuestInvitation", () => {
     ).rejects.toMatchObject({ code: "failed-precondition" });
   });
 
-  it("throws failed-precondition when game is full counting existing guests", async () => {
+  it("throws failed-precondition when game is full with 3 existing players", async () => {
     const { db } = buildAcceptDb({
-      gameData: makeGame({ maxPlayers: 3, playerIds: ["p1", "p2"], guestPlayerIds: ["g1"] }),
+      gameData: makeGame({ maxPlayers: 3, playerIds: ["p1", "p2", "p3"] }),
     });
     (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
 
