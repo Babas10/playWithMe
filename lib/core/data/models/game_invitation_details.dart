@@ -46,7 +46,7 @@ class GameInvitationDetails {
       gameScheduledAt: DateTime.parse(map['gameScheduledAt'] as String),
       gameLocationName: map['gameLocationName'] as String,
       groupName: map['groupName'] as String,
-      inviterDisplayName: map['inviterDisplayName'] as String,
+      inviterDisplayName: map['inviterDisplayName'] as String? ?? '',
     );
   }
 }

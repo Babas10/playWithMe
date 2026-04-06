@@ -117,7 +117,8 @@ void main() {
             .having((s) => s.processingInvitationId, 'processingId', 'inv-1'),
         isA<GameInvitationActionSuccess>()
             .having((s) => s.accepted, 'accepted', true)
-            .having((s) => s.invitations, 'invitations', isEmpty),
+            .having((s) => s.invitations, 'invitations', isEmpty)
+            .having((s) => s.gameId, 'gameId', 'game-1'),
       ],
     );
 

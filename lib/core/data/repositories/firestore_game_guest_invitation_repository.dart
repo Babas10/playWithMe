@@ -22,9 +22,9 @@ class FirestoreGameGuestInvitationRepository
           _functions.httpsCallable('getInvitablePlayersForGame');
       final result = await callable.call({'gameId': gameId});
 
-      final data = result.data as Map<String, dynamic>;
+      final data = Map<String, dynamic>.from(result.data as Map);
       final players = (data['players'] as List<dynamic>? ?? [])
-          .cast<Map<String, dynamic>>()
+          .map((e) => Map<String, dynamic>.from(e as Map))
           .map(InvitablePlayerModel.fromMap)
           .toList();
       return players;
@@ -51,7 +51,7 @@ class FirestoreGameGuestInvitationRepository
         'inviteeId': inviteeId,
       });
 
-      final data = result.data as Map<String, dynamic>;
+      final data = Map<String, dynamic>.from(result.data as Map);
       return data['invitationId'] as String;
     } on FirebaseFunctionsException catch (e) {
       throw GameInvitationException(
