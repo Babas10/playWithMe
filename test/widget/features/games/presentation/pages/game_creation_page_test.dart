@@ -16,6 +16,7 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_bloc.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_event.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_creation/game_creation_state.dart';
+import 'package:play_with_me/features/games/presentation/bloc/game_invitations/game_invitations_bloc.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_creation_page.dart';
 
 class MockGameCreationBloc
@@ -28,6 +29,10 @@ class MockInvitationBloc
     extends MockBloc<InvitationEvent, InvitationState>
     implements InvitationBloc {}
 
+class MockGameInvitationsBloc
+    extends MockBloc<GameInvitationsEvent, GameInvitationsState>
+    implements GameInvitationsBloc {}
+
 class FakeGameCreationEvent extends Fake implements GameCreationEvent {}
 
 class FakeGameCreationState extends Fake implements GameCreationState {}
@@ -36,6 +41,7 @@ void main() {
   late MockGameCreationBloc mockGameCreationBloc;
   late MockAuthenticationBloc mockAuthBloc;
   late MockInvitationBloc mockInvitationBloc;
+  late MockGameInvitationsBloc mockGameInvitationsBloc;
 
   const testUserId = 'test-user-123';
   const testGroupId = 'test-group-123';
@@ -50,7 +56,10 @@ void main() {
     mockGameCreationBloc = MockGameCreationBloc();
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
+    mockGameInvitationsBloc = MockGameInvitationsBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(() => mockGameInvitationsBloc.state)
+        .thenReturn(const GameInvitationsInitial());
 
     when(() => mockGameCreationBloc.state)
         .thenReturn(const GameCreationInitial());
@@ -88,6 +97,8 @@ void main() {
           BlocProvider<GameCreationBloc>.value(value: mockGameCreationBloc),
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
           BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+          BlocProvider<GameInvitationsBloc>.value(
+              value: mockGameInvitationsBloc),
         ],
         child: GameCreationPage(
           groupId: testGroupId,
