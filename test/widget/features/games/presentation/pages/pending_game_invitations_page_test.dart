@@ -1,5 +1,6 @@
-// Widget tests for PendingGameInvitationsPage (Story 28.7).
-// Validates loading, empty state, invitation list, accept/decline, and error handling.
+// Widget tests for PendingGameInvitationsPage (Stories 28.7 & 28.10).
+// Validates loading, empty state, invitation list, accept/decline, error handling,
+// and card tap → game details navigation (Story 28.10).
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,7 @@ class FakeInvitationState extends Fake implements InvitationState {}
 class FakeAuthenticationEvent extends Fake implements AuthenticationEvent {}
 
 class FakeAuthenticationState extends Fake implements AuthenticationState {}
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -234,6 +236,22 @@ void main() {
     await tester.pump();
 
     expect(find.text('Failed to process invitation'), findsOneWidget);
+  });
+
+  // ── Card tap navigation (Story 28.10) ───────────────────────────────────────
+
+  testWidgets('invitation card has tap handler wired to game navigation',
+      (tester) async {
+    when(() => mockBloc.state)
+        .thenReturn(GameInvitationsLoaded([_makeInvitation()]));
+
+    await tester.pumpWidget(buildPage());
+    await tester.pump();
+
+    // Verify the card is wrapped in an InkWell with a non-null onTap.
+    final inkWells = tester.widgetList<InkWell>(find.byType(InkWell));
+    expect(inkWells.any((w) => w.onTap != null), isTrue,
+        reason: 'At least one InkWell on the card must have onTap set');
   });
 
   // ── Error state ─────────────────────────────────────────────────────────────

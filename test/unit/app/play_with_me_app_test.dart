@@ -10,6 +10,7 @@ import 'package:play_with_me/core/services/service_locator.dart';
 import 'package:play_with_me/features/profile/domain/entities/locale_preferences_entity.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.dart';
+import 'package:play_with_me/features/games/presentation/bloc/game_invitations/game_invitations_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 import '../helpers/test_helpers.dart';
 import '../features/auth/data/mock_auth_repository.dart';
@@ -170,6 +171,9 @@ void main() {
             BlocProvider<InvitationBloc>(
               create: (context) => sl<InvitationBloc>(),
             ),
+            BlocProvider<GameInvitationsBloc>(
+              create: (context) => sl<GameInvitationsBloc>(),
+            ),
           ],
           child: const MaterialApp(
             localizationsDelegates: [
@@ -211,6 +215,9 @@ void main() {
             ),
             BlocProvider<InvitationBloc>(
               create: (context) => sl<InvitationBloc>(),
+            ),
+            BlocProvider<GameInvitationsBloc>(
+              create: (context) => sl<GameInvitationsBloc>(),
             ),
           ],
           child: const MaterialApp(
