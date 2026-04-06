@@ -16,12 +16,16 @@ class GameInvitationCard extends StatelessWidget {
   final VoidCallback onAccept;
   final VoidCallback onDecline;
 
+  /// Optional tap handler — navigates to game details when set.
+  final VoidCallback? onTap;
+
   const GameInvitationCard({
     super.key,
     required this.invitation,
     required this.isProcessing,
     required this.onAccept,
     required this.onDecline,
+    this.onTap,
   });
 
   @override
@@ -33,8 +37,11 @@ class GameInvitationCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 2,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,6 +122,7 @@ class GameInvitationCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

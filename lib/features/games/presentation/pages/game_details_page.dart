@@ -396,18 +396,12 @@ class _PlayersCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (isCreator)
-                          TextButton.icon(
+                          IconButton(
                             onPressed: () => showInviteGuestPlayersSheet(
                                 context, game.id),
-                            icon: const Icon(Icons.person_add_outlined,
-                                size: 18),
-                            label: Text(l10n.inviteGuestPlayers),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                            ),
+                            icon: const Icon(Icons.person_add_outlined),
+                            tooltip: l10n.inviteGuestPlayers,
+                            visualDensity: VisualDensity.compact,
                           ),
                         Chip(
                           label: Text(

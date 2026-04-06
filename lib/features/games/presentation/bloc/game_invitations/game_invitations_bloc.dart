@@ -45,11 +45,15 @@ class GameInvitationsBloc
 
     emit(GameInvitationActionInFlight(current, event.invitationId));
     try {
+      final accepted = current.firstWhere(
+        (i) => i.invitationId == event.invitationId,
+        orElse: () => current.first,
+      );
       await _repository.acceptGameInvitation(event.invitationId);
       final updated =
           current.where((i) => i.invitationId != event.invitationId).toList();
       emit(GameInvitationActionSuccess(updated, event.invitationId,
-          accepted: true));
+          accepted: true, gameId: accepted.gameId));
     } on GameInvitationException catch (e) {
       emit(GameInvitationActionError(current, e.message, errorCode: e.code));
     } catch (e) {

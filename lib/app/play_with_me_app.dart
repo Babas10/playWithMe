@@ -92,6 +92,9 @@ class PlayWithMeApp extends StatelessWidget {
         BlocProvider<InviteJoinBloc>(
           create: (context) => sl<InviteJoinBloc>(),
         ),
+        BlocProvider<GameInvitationsBloc>(
+          create: (context) => sl<GameInvitationsBloc>(),
+        ),
         BlocProvider<LocalePreferencesBloc>(
           create: (context) => LocalePreferencesBloc(
             repository: sl<LocalePreferencesRepository>(),
@@ -106,6 +109,9 @@ class PlayWithMeApp extends StatelessWidget {
                 context.read<InvitationBloc>().add(
                   LoadPendingInvitations(userId: state.user.uid),
                 );
+                context
+                    .read<GameInvitationsBloc>()
+                    .add(const LoadGameInvitations());
                 // Check for pending invite token (from "I Have an Account" flow).
                 // If found, navigate to join confirmation and clear the stack.
                 final deepLinkState = context.read<DeepLinkBloc>().state;
@@ -383,8 +389,8 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (ctx) => sl<GameInvitationsBloc>(),
+            builder: (_) => BlocProvider.value(
+              value: context.read<GameInvitationsBloc>(),
               child: const PendingGameInvitationsPage(),
             ),
           ),

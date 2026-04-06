@@ -6,6 +6,8 @@ import 'package:play_with_me/core/presentation/bloc/invitation/invitation_state.
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
+import 'package:play_with_me/features/games/presentation/bloc/game_invitations/game_invitations_bloc.dart';
+import 'package:play_with_me/features/games/presentation/pages/pending_game_invitations_page.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
 import 'package:play_with_me/features/profile/presentation/pages/profile_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -83,7 +85,7 @@ class PlayWithMeAppBar {
     final l10n = AppLocalizations.of(context)!;
 
     return [
-      // Invitation badge
+      // Invitation badge (group invitations)
       BlocBuilder<InvitationBloc, InvitationState>(
         builder: (context, state) {
           int pendingCount = 0;
@@ -131,6 +133,78 @@ class PlayWithMeAppBar {
                   ),
                 ),
             ],
+          );
+        },
+      ),
+      // Game invitation badge — only rendered when GameInvitationsBloc is in scope
+      Builder(
+        builder: (context) {
+          GameInvitationsBloc? gameInvBloc;
+          try {
+            gameInvBloc = context.read<GameInvitationsBloc>();
+          } catch (_) {}
+          if (gameInvBloc == null) return const SizedBox.shrink();
+
+          return BlocBuilder<GameInvitationsBloc, GameInvitationsState>(
+            bloc: gameInvBloc,
+            builder: (context, state) {
+              int pendingCount = 0;
+              if (state is GameInvitationsLoaded) {
+                pendingCount = state.invitations.length;
+              } else if (state is GameInvitationActionInFlight) {
+                pendingCount = state.invitations.length;
+              } else if (state is GameInvitationActionSuccess) {
+                pendingCount = state.invitations.length;
+              } else if (state is GameInvitationActionError) {
+                pendingCount = state.invitations.length;
+              }
+
+              return Stack(
+                children: [
+                  IconButton(
+                    icon:
+                        const Icon(Icons.sports_volleyball_outlined, size: 22),
+                    tooltip: l10n.gameInvitations,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BlocProvider.value(
+                            value: gameInvBloc!,
+                            child: const PendingGameInvitationsPage(),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  if (pendingCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          pendingCount > 9 ? '9+' : '$pendingCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           );
         },
       ),
