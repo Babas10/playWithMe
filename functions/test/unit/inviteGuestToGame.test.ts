@@ -16,6 +16,7 @@ jest.mock("firebase-admin", () => {
       {
         FieldValue: {
           serverTimestamp: jest.fn(() => "MOCK_TIMESTAMP"),
+          arrayUnion: jest.fn((...args: any[]) => ({ _type: "arrayUnion", args })),
         },
       }
     ),
@@ -76,9 +77,10 @@ function buildMockDb({
   pendingInvitationExists?: boolean;
   callerGroupDocs?: { id: string; data: () => any }[];
   invitationDocId?: string;
-} = {}): { db: any; invitationSetMock: jest.Mock } {
-  const invitationSetMock = jest.fn().mockResolvedValue(undefined);
-  const mockInvitationRef = { id: invitationDocId, set: invitationSetMock };
+} = {}): { db: any; batchSetMock: jest.Mock; batchCommitMock: jest.Mock } {
+  const batchSetMock = jest.fn();
+  const batchCommitMock = jest.fn().mockResolvedValue(undefined);
+  const mockInvitationRef = { id: invitationDocId };
 
   const db = {
     collection: jest.fn((col: string) => {
@@ -114,9 +116,14 @@ function buildMockDb({
 
       return {};
     }),
+    batch: jest.fn(() => ({
+      set: batchSetMock,
+      update: jest.fn(),
+      commit: batchCommitMock,
+    })),
   };
 
-  return { db, invitationSetMock };
+  return { db, batchSetMock, batchCommitMock };
 }
 
 // ── Tests ────────────────────────────────────────────────────────────────────
@@ -301,7 +308,7 @@ describe("inviteGuestToGame", () => {
 
   describe("success", () => {
     it("creates an invitation document and returns invitationId", async () => {
-      const { db, invitationSetMock } = buildMockDb();
+      const { db, batchSetMock } = buildMockDb();
       (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
 
       const result = await inviteGuestToGameHandler(
@@ -311,8 +318,9 @@ describe("inviteGuestToGame", () => {
 
       expect(result).toEqual({ success: true, invitationId: "new-inv-id" });
 
-      // Verify the document was written with the correct shape
-      expect(invitationSetMock).toHaveBeenCalledWith(
+      // Verify the document was written with the correct shape via batch.set
+      expect(batchSetMock).toHaveBeenCalledWith(
+        expect.anything(),
         expect.objectContaining({
           gameId: "game-1",
           groupId: "group-abc",
