@@ -523,10 +523,12 @@ class SetScore with _$SetScore {
 /// Most commonly a single set (first to 21), but can be best-of format
 @freezed
 class IndividualGame with _$IndividualGame {
+  @JsonSerializable(explicitToJson: true)
   const factory IndividualGame({
     required int gameNumber, // 1, 2, 3, etc. within the session
     @SetScoreListConverter() required List<SetScore> sets,
     required String winner, // 'teamA' or 'teamB'
+    GameTeams? teams, // per-game teams override; null means use session-level GameModel.teams
   }) = _IndividualGame;
 
   const IndividualGame._();

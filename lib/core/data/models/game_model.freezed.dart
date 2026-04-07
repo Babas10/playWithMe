@@ -2097,7 +2097,8 @@ mixin _$IndividualGame {
       throw _privateConstructorUsedError; // 1, 2, 3, etc. within the session
   @SetScoreListConverter()
   List<SetScore> get sets => throw _privateConstructorUsedError;
-  String get winner => throw _privateConstructorUsedError;
+  String get winner => throw _privateConstructorUsedError; // 'teamA' or 'teamB'
+  GameTeams? get teams => throw _privateConstructorUsedError;
 
   /// Serializes this IndividualGame to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2120,7 +2121,10 @@ abstract class $IndividualGameCopyWith<$Res> {
     int gameNumber,
     @SetScoreListConverter() List<SetScore> sets,
     String winner,
+    GameTeams? teams,
   });
+
+  $GameTeamsCopyWith<$Res>? get teams;
 }
 
 /// @nodoc
@@ -2141,6 +2145,7 @@ class _$IndividualGameCopyWithImpl<$Res, $Val extends IndividualGame>
     Object? gameNumber = null,
     Object? sets = null,
     Object? winner = null,
+    Object? teams = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -2156,9 +2161,27 @@ class _$IndividualGameCopyWithImpl<$Res, $Val extends IndividualGame>
                 ? _value.winner
                 : winner // ignore: cast_nullable_to_non_nullable
                       as String,
+            teams: freezed == teams
+                ? _value.teams
+                : teams // ignore: cast_nullable_to_non_nullable
+                      as GameTeams?,
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of IndividualGame
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GameTeamsCopyWith<$Res>? get teams {
+    if (_value.teams == null) {
+      return null;
+    }
+
+    return $GameTeamsCopyWith<$Res>(_value.teams!, (value) {
+      return _then(_value.copyWith(teams: value) as $Val);
+    });
   }
 }
 
@@ -2175,7 +2198,11 @@ abstract class _$$IndividualGameImplCopyWith<$Res>
     int gameNumber,
     @SetScoreListConverter() List<SetScore> sets,
     String winner,
+    GameTeams? teams,
   });
+
+  @override
+  $GameTeamsCopyWith<$Res>? get teams;
 }
 
 /// @nodoc
@@ -2195,6 +2222,7 @@ class __$$IndividualGameImplCopyWithImpl<$Res>
     Object? gameNumber = null,
     Object? sets = null,
     Object? winner = null,
+    Object? teams = freezed,
   }) {
     return _then(
       _$IndividualGameImpl(
@@ -2210,18 +2238,24 @@ class __$$IndividualGameImplCopyWithImpl<$Res>
             ? _value.winner
             : winner // ignore: cast_nullable_to_non_nullable
                   as String,
+        teams: freezed == teams
+            ? _value.teams
+            : teams // ignore: cast_nullable_to_non_nullable
+                  as GameTeams?,
       ),
     );
   }
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(explicitToJson: true)
 class _$IndividualGameImpl extends _IndividualGame {
   const _$IndividualGameImpl({
     required this.gameNumber,
     @SetScoreListConverter() required final List<SetScore> sets,
     required this.winner,
+    this.teams,
   }) : _sets = sets,
        super._();
 
@@ -2243,10 +2277,13 @@ class _$IndividualGameImpl extends _IndividualGame {
 
   @override
   final String winner;
+  // 'teamA' or 'teamB'
+  @override
+  final GameTeams? teams;
 
   @override
   String toString() {
-    return 'IndividualGame(gameNumber: $gameNumber, sets: $sets, winner: $winner)';
+    return 'IndividualGame(gameNumber: $gameNumber, sets: $sets, winner: $winner, teams: $teams)';
   }
 
   @override
@@ -2257,7 +2294,8 @@ class _$IndividualGameImpl extends _IndividualGame {
             (identical(other.gameNumber, gameNumber) ||
                 other.gameNumber == gameNumber) &&
             const DeepCollectionEquality().equals(other._sets, _sets) &&
-            (identical(other.winner, winner) || other.winner == winner));
+            (identical(other.winner, winner) || other.winner == winner) &&
+            (identical(other.teams, teams) || other.teams == teams));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2267,6 +2305,7 @@ class _$IndividualGameImpl extends _IndividualGame {
     gameNumber,
     const DeepCollectionEquality().hash(_sets),
     winner,
+    teams,
   );
 
   /// Create a copy of IndividualGame
@@ -2291,6 +2330,7 @@ abstract class _IndividualGame extends IndividualGame {
     required final int gameNumber,
     @SetScoreListConverter() required final List<SetScore> sets,
     required final String winner,
+    final GameTeams? teams,
   }) = _$IndividualGameImpl;
   const _IndividualGame._() : super._();
 
@@ -2303,7 +2343,9 @@ abstract class _IndividualGame extends IndividualGame {
   @SetScoreListConverter()
   List<SetScore> get sets;
   @override
-  String get winner;
+  String get winner; // 'teamA' or 'teamB'
+  @override
+  GameTeams? get teams;
 
   /// Create a copy of IndividualGame
   /// with the given fields replaced by the non-null parameter values.
