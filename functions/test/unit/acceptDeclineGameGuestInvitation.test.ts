@@ -15,6 +15,7 @@ jest.mock("firebase-admin", () => {
         FieldValue: {
           serverTimestamp: jest.fn(() => "MOCK_TIMESTAMP"),
           arrayUnion: jest.fn((...args: any[]) => ({ _type: "arrayUnion", args })),
+          arrayRemove: jest.fn((...args: any[]) => ({ _type: "arrayRemove", args })),
         },
       }
     ),
@@ -158,8 +159,9 @@ function buildDeclineDb({
 }: {
   invitationData?: ReturnType<typeof makeInvitation>;
   invitationExists?: boolean;
-} = {}): { db: any; updateMock: jest.Mock } {
-  const updateMock = jest.fn().mockResolvedValue(undefined);
+} = {}): { db: any; batchUpdateMock: jest.Mock; batchCommitMock: jest.Mock } {
+  const batchUpdateMock = jest.fn();
+  const batchCommitMock = jest.fn().mockResolvedValue(undefined);
 
   const db: any = {
     collection: jest.fn((col: string) => {
@@ -170,15 +172,21 @@ function buildDeclineDb({
               exists: invitationExists,
               data: () => invitationData,
             }),
-            update: updateMock,
           })),
         };
       }
+      if (col === "games") {
+        return { doc: jest.fn(() => ({})) };
+      }
       return {};
     }),
+    batch: jest.fn(() => ({
+      update: batchUpdateMock,
+      commit: batchCommitMock,
+    })),
   };
 
-  return { db, updateMock };
+  return { db, batchUpdateMock, batchCommitMock };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -385,7 +393,7 @@ describe("declineGameGuestInvitation", () => {
   });
 
   it("returns success immediately when already declined (idempotent)", async () => {
-    const { db, updateMock } = buildDeclineDb({
+    const { db, batchCommitMock } = buildDeclineDb({
       invitationData: makeInvitation({ status: "declined" }),
     });
     (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
@@ -396,7 +404,7 @@ describe("declineGameGuestInvitation", () => {
     );
 
     expect(result).toEqual({ success: true });
-    expect(updateMock).not.toHaveBeenCalled();
+    expect(batchCommitMock).not.toHaveBeenCalled();
   });
 
   it("throws failed-precondition when invitation is accepted", async () => {
@@ -424,7 +432,7 @@ describe("declineGameGuestInvitation", () => {
   // ── Happy path ─────────────────────────────────────────────────────────────
 
   it("updates invitation to declined and returns success", async () => {
-    const { db, updateMock } = buildDeclineDb();
+    const { db, batchUpdateMock } = buildDeclineDb();
     (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
 
     const result = await declineGameGuestInvitationHandler(
@@ -433,7 +441,8 @@ describe("declineGameGuestInvitation", () => {
     );
 
     expect(result).toEqual({ success: true });
-    expect(updateMock).toHaveBeenCalledWith(
+    expect(batchUpdateMock).toHaveBeenCalledWith(
+      expect.anything(),
       expect.objectContaining({ status: "declined" })
     );
   });
