@@ -1,4 +1,4 @@
-// Validates invite-guest-players sheet renders states correctly (Story 28.6).
+// Validates invite-from-other-groups sheet renders states correctly (Story 28.6).
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -30,7 +30,13 @@ final _bob = InvitablePlayerModel(
   sourceGroupName: 'Downtown Ballers',
 );
 
-/// Pumps a Material app with the sheet open via [showInviteGuestPlayersSheet].
+final _carol = InvitablePlayerModel(
+  uid: 'carol',
+  displayName: 'Carol',
+  sourceGroupId: 'group-x',
+  sourceGroupName: 'Beach Crew',
+);
+
 Future<void> pumpSheet(
   WidgetTester tester,
   GameGuestInvitationBloc bloc,
@@ -59,7 +65,6 @@ Future<void> pumpSheet(
     ),
   );
 
-  // Open the sheet
   await tester.tap(find.text('Open'));
   await tester.pumpAndSettle();
 }
@@ -70,6 +75,8 @@ void main() {
   setUpAll(() {
     registerFallbackValue(const LoadInvitablePlayers(gameId: 'x'));
     registerFallbackValue(const InviteGuestPlayer(gameId: 'x', inviteeId: 'y'));
+    registerFallbackValue(
+        const InviteGroupPlayers(gameId: 'x', groupId: 'g'));
   });
 
   setUp(() {
@@ -79,7 +86,6 @@ void main() {
   group('InviteGuestPlayersSheet', () {
     testWidgets('shows loading indicator while fetching players',
         (tester) async {
-      // Use a Completer so the future never resolves during the test.
       final completer = Completer<List<InvitablePlayerModel>>();
       when(() => mockRepo.getInvitablePlayers(any()))
           .thenAnswer((_) => completer.future);
@@ -99,7 +105,8 @@ void main() {
             child: Builder(
               builder: (ctx) => Scaffold(
                 body: ElevatedButton(
-                  onPressed: () => showInviteGuestPlayersSheet(ctx, 'game-1'),
+                  onPressed: () =>
+                      showInviteGuestPlayersSheet(ctx, 'game-1'),
                   child: const Text('Open'),
                 ),
               ),
@@ -109,12 +116,11 @@ void main() {
       );
 
       await tester.tap(find.text('Open'));
-      await tester.pump(); // sheet opens
-      await tester.pump(); // bloc emits loading
+      await tester.pump();
+      await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsWidgets);
 
-      // Complete the future to avoid pending timer warning.
       completer.complete([]);
     });
 
@@ -129,21 +135,34 @@ void main() {
       expect(find.text('No players available to invite'), findsOneWidget);
     });
 
-    testWidgets('renders players grouped by source group name', (tester) async {
+    testWidgets('renders group cards with group names', (tester) async {
       when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => [_alice, _bob]);
+          .thenAnswer((_) async => [_alice, _bob, _carol]);
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
       await tester.pumpAndSettle();
 
-      expect(find.text('Alice'), findsOneWidget);
-      expect(find.text('Bob'), findsOneWidget);
+      // One card per group (Beach Crew and Downtown Ballers)
       expect(find.text('Beach Crew'), findsOneWidget);
       expect(find.text('Downtown Ballers'), findsOneWidget);
     });
 
-    testWidgets('tapping Invite sends InviteGuestPlayer event', (tester) async {
+    testWidgets('shows correct member count on each group card',
+        (tester) async {
+      when(() => mockRepo.getInvitablePlayers(any()))
+          .thenAnswer((_) async => [_alice, _carol, _bob]);
+      final bloc = GameGuestInvitationBloc(repository: mockRepo);
+
+      await pumpSheet(tester, bloc, 'game-1');
+      await tester.pumpAndSettle();
+
+      expect(find.text('2 people'), findsOneWidget); // Beach Crew
+      expect(find.text('1 person'), findsOneWidget); // Downtown Ballers
+    });
+
+    testWidgets('tapping a group card fires InviteGroupPlayers event',
+        (tester) async {
       when(() => mockRepo.getInvitablePlayers(any()))
           .thenAnswer((_) async => [_alice]);
       when(() => mockRepo.inviteGuestPlayer(
@@ -155,7 +174,7 @@ void main() {
       await pumpSheet(tester, bloc, 'game-1');
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Invite').first);
+      await tester.tap(find.text('Beach Crew'));
       await tester.pumpAndSettle();
 
       verify(() => mockRepo.inviteGuestPlayer(
@@ -164,7 +183,33 @@ void main() {
           )).called(1);
     });
 
-    testWidgets('shows success snackbar after invitation sent', (tester) async {
+    testWidgets('tapping a group invites all its members', (tester) async {
+      when(() => mockRepo.getInvitablePlayers(any()))
+          .thenAnswer((_) async => [_alice, _carol]); // both in Beach Crew
+      when(() => mockRepo.inviteGuestPlayer(
+            gameId: any(named: 'gameId'),
+            inviteeId: any(named: 'inviteeId'),
+          )).thenAnswer((_) async => 'inv-1');
+      final bloc = GameGuestInvitationBloc(repository: mockRepo);
+
+      await pumpSheet(tester, bloc, 'game-1');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Beach Crew'));
+      await tester.pumpAndSettle();
+
+      // Both Alice and Carol should be invited
+      verify(() => mockRepo.inviteGuestPlayer(
+            gameId: 'game-1',
+            inviteeId: 'alice',
+          )).called(1);
+      verify(() => mockRepo.inviteGuestPlayer(
+            gameId: 'game-1',
+            inviteeId: 'carol',
+          )).called(1);
+    });
+
+    testWidgets('shows success snackbar after group invited', (tester) async {
       when(() => mockRepo.getInvitablePlayers(any()))
           .thenAnswer((_) async => [_alice]);
       when(() => mockRepo.inviteGuestPlayer(
@@ -176,36 +221,28 @@ void main() {
       await pumpSheet(tester, bloc, 'game-1');
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Invite').first);
+      await tester.tap(find.text('Beach Crew'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Invitation sent successfully'), findsOneWidget);
+      expect(find.text('Group invited successfully'), findsOneWidget);
     });
 
-    testWidgets('shows error snackbar when invitation fails', (tester) async {
+    testWidgets('shows Invited badge after group is invited', (tester) async {
       when(() => mockRepo.getInvitablePlayers(any()))
           .thenAnswer((_) async => [_alice]);
       when(() => mockRepo.inviteGuestPlayer(
             gameId: any(named: 'gameId'),
             inviteeId: any(named: 'inviteeId'),
-          )).thenThrow(Exception('network'));
+          )).thenAnswer((_) async => 'inv-1');
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Invite').first);
+      await tester.tap(find.text('Beach Crew'));
       await tester.pumpAndSettle();
 
-      expect(
-        find.byWidgetPredicate(
-          (w) =>
-              w is SnackBar &&
-              (w.content as Text).data?.contains('Failed to send invitation') ==
-                  true,
-        ),
-        findsOneWidget,
-      );
+      expect(find.text('Invited'), findsOneWidget);
     });
 
     testWidgets('shows retry button on load error', (tester) async {
@@ -219,7 +256,8 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
     });
 
-    testWidgets('Invite buttons disabled while sending', (tester) async {
+    testWidgets('shows loading spinner on group card while sending',
+        (tester) async {
       final inviteCompleter = Completer<String>();
       when(() => mockRepo.getInvitablePlayers(any()))
           .thenAnswer((_) async => [_alice, _bob]);
@@ -232,15 +270,13 @@ void main() {
       await pumpSheet(tester, bloc, 'game-1');
       await tester.pumpAndSettle();
 
-      // Tap Invite for Alice; while in-flight, all Invite buttons should be disabled
-      await tester.tap(find.text('Invite').first);
-      await tester.pump();
+      // Tap Beach Crew; the bloc emits InviteGroupSending which shows a spinner
+      await tester.tap(find.text('Beach Crew'));
+      await tester.pump(); // trigger event
+      await tester.pump(); // rebuild after BLoC emits InviteGroupSending
 
-      final buttons = tester.widgetList<TextButton>(find.byType(TextButton));
-      final disabled = buttons.where((b) => b.onPressed == null).toList();
-      expect(disabled, isNotEmpty);
+      expect(find.byType(CircularProgressIndicator), findsWidgets);
 
-      // Resolve completer to avoid pending timer warning.
       inviteCompleter.complete('inv-1');
     });
   });

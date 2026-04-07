@@ -161,9 +161,10 @@ export async function acceptGameGuestInvitationHandler(
         );
       }
 
-      // Atomic writes — guest players join playerIds like any regular player
+      // Atomic writes — move from pendingInviteeIds to playerIds
       tx.update(gameRef, {
         playerIds: admin.firestore.FieldValue.arrayUnion(callerId),
+        pendingInviteeIds: admin.firestore.FieldValue.arrayRemove(callerId),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 

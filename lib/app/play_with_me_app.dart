@@ -39,7 +39,7 @@ import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.d
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_invitations/game_invitations_bloc.dart';
-import 'package:play_with_me/features/games/presentation/pages/pending_game_invitations_page.dart';
+import 'package:play_with_me/features/games/presentation/pages/my_games_page.dart';
 import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
 import 'package:play_with_me/features/friends/presentation/pages/my_community_page.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
@@ -391,7 +391,7 @@ class _HomePageState extends State<HomePage> {
           MaterialPageRoute(
             builder: (_) => BlocProvider.value(
               value: context.read<GameInvitationsBloc>(),
-              child: const PendingGameInvitationsPage(),
+              child: const MyGamesPage(),
             ),
           ),
         );
@@ -615,6 +615,7 @@ class _HomeTab extends StatelessWidget {
                         );
                       },
                     ),
+
 
                     const SizedBox(height: 25),
 

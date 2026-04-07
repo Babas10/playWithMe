@@ -23,3 +23,14 @@ class InviteGuestPlayer extends GameGuestInvitationEvent {
   @override
   List<Object?> get props => [gameId, inviteeId];
 }
+
+/// Invite every invitable player from [groupId] to [gameId] in one action.
+class InviteGroupPlayers extends GameGuestInvitationEvent {
+  final String gameId;
+  final String groupId;
+
+  const InviteGroupPlayers({required this.gameId, required this.groupId});
+
+  @override
+  List<Object?> get props => [gameId, groupId];
+}

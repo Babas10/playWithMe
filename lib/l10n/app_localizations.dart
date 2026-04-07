@@ -2078,6 +2078,12 @@ abstract class AppLocalizations {
   /// **'Completed'**
   String get completed;
 
+  /// Status label for games awaiting result verification
+  ///
+  /// In en, this message translates to:
+  /// **'Verification'**
+  String get verification;
+
   /// Empty state message when no participants
   ///
   /// In en, this message translates to:
@@ -3611,7 +3617,7 @@ abstract class AppLocalizations {
   /// Title of the invite guest players bottom sheet (Story 28.6)
   ///
   /// In en, this message translates to:
-  /// **'Invite Guest Players'**
+  /// **'Invite people from other groups'**
   String get inviteGuestPlayers;
 
   /// Button label to invite a guest player (Story 28.6)
@@ -3638,6 +3644,24 @@ abstract class AppLocalizations {
   /// **'Invitation sent successfully'**
   String get invitePlayerSuccess;
 
+  /// Snackbar message after inviting all players in a group (Story 28.6)
+  ///
+  /// In en, this message translates to:
+  /// **'Group invited successfully'**
+  String get inviteGroupSuccess;
+
+  /// Member count label on a group invite card
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 person} other{{count} people}}'**
+  String groupMembersCount(int count);
+
+  /// Label shown on a group card after all its players have been invited
+  ///
+  /// In en, this message translates to:
+  /// **'Invited'**
+  String get invitedLabel;
+
   /// Snackbar message when sending a guest invitation fails (Story 28.6)
   ///
   /// In en, this message translates to:
@@ -3655,6 +3679,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No pending game invitations'**
   String get noPendingGameInvitations;
+
+  /// Empty state message on the My Games page when the user has no games and no pending invitations
+  ///
+  /// In en, this message translates to:
+  /// **'No games yet — join one or accept an invitation'**
+  String get noMyGamesYet;
 
   /// Label on a game invitation card showing the source group
   ///
@@ -3679,6 +3709,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to process invitation'**
   String get gameInvitationActionError;
+
+  /// Section header for upcoming games in MyGamesPage
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcoming;
+
+  /// Section header for past games in MyGamesPage
+  ///
+  /// In en, this message translates to:
+  /// **'Past Games'**
+  String get pastGames;
 }
 
 class _AppLocalizationsDelegate

@@ -162,4 +162,72 @@ void main() {
       ],
     );
   });
+
+  group('InviteGroupPlayers', () {
+    final player2 = InvitablePlayerModel(
+      uid: 'player-2',
+      displayName: 'Carol',
+      sourceGroupId: 'group-x',
+      sourceGroupName: 'Beach Crew',
+    );
+
+    blocTest<GameGuestInvitationBloc, GameGuestInvitationState>(
+      'emits [groupSending, groupSuccess] and calls CF for each member',
+      build: () {
+        when(() => mockRepo.getInvitablePlayers('game-1'))
+            .thenAnswer((_) async => [_player, player2]);
+        when(() => mockRepo.inviteGuestPlayer(
+              gameId: 'game-1',
+              inviteeId: any(named: 'inviteeId'),
+            )).thenAnswer((_) async => 'inv-1');
+        return GameGuestInvitationBloc(repository: mockRepo);
+      },
+      act: (bloc) async {
+        bloc.add(const LoadInvitablePlayers(gameId: 'game-1'));
+        await Future<void>.delayed(Duration.zero);
+        bloc.add(const InviteGroupPlayers(gameId: 'game-1', groupId: 'group-x'));
+      },
+      skip: 2,
+      expect: () => [
+        isA<InviteGroupSending>()
+            .having((s) => s.groupId, 'groupId', 'group-x'),
+        isA<InviteGroupSuccess>()
+            .having((s) => s.groupId, 'groupId', 'group-x'),
+      ],
+      verify: (_) {
+        verify(() => mockRepo.inviteGuestPlayer(
+              gameId: 'game-1',
+              inviteeId: 'player-1',
+            )).called(1);
+        verify(() => mockRepo.inviteGuestPlayer(
+              gameId: 'game-1',
+              inviteeId: 'player-2',
+            )).called(1);
+      },
+    );
+
+    blocTest<GameGuestInvitationBloc, GameGuestInvitationState>(
+      'swallows already-exists errors and still emits groupSuccess',
+      build: () {
+        when(() => mockRepo.getInvitablePlayers('game-1'))
+            .thenAnswer((_) async => [_player]);
+        when(() => mockRepo.inviteGuestPlayer(
+              gameId: 'game-1',
+              inviteeId: 'player-1',
+            )).thenThrow(
+              GameInvitationException('Already invited', code: 'already-exists'));
+        return GameGuestInvitationBloc(repository: mockRepo);
+      },
+      act: (bloc) async {
+        bloc.add(const LoadInvitablePlayers(gameId: 'game-1'));
+        await Future<void>.delayed(Duration.zero);
+        bloc.add(const InviteGroupPlayers(gameId: 'game-1', groupId: 'group-x'));
+      },
+      skip: 2,
+      expect: () => [
+        isA<InviteGroupSending>(),
+        isA<InviteGroupSuccess>(),
+      ],
+    );
+  });
 }

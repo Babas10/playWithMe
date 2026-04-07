@@ -7,7 +7,7 @@ import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_bloc.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_invitations/game_invitations_bloc.dart';
-import 'package:play_with_me/features/games/presentation/pages/pending_game_invitations_page.dart';
+import 'package:play_with_me/features/games/presentation/pages/my_games_page.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
 import 'package:play_with_me/features/profile/presentation/pages/profile_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
@@ -165,16 +165,20 @@ class PlayWithMeAppBar {
                     icon:
                         const Icon(Icons.sports_volleyball_outlined, size: 22),
                     tooltip: l10n.gameInvitations,
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      final bloc = gameInvBloc!;
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => BlocProvider.value(
-                            value: gameInvBloc!,
-                            child: const PendingGameInvitationsPage(),
+                            value: bloc,
+                            child: const MyGamesPage(),
                           ),
                         ),
                       );
+                      // Reload so badge reflects any accepts/declines made
+                      // while on MyGamesPage or GameDetailsPage.
+                      bloc.add(const LoadGameInvitations());
                     },
                   ),
                   if (pendingCount > 0)

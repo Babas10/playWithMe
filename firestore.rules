@@ -190,14 +190,21 @@ service cloud.firestore {
 
     // Games: Group members can read, creators can manage
     match /games/{gameId} {
-      // Individual game reads allowed for members (used by GameDetailsPage)
+      // Individual game reads allowed for:
+      //  - players already in the game (playerIds)
+      //  - group members (via group membership)
+      //  - pending invitees (pendingInviteeIds, managed by CFs — allows reading before accepting)
       allow get: if isAuthenticated() &&
-                    request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds;
+                    (request.auth.uid in resource.data.playerIds ||
+                     request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds ||
+                     ('pendingInviteeIds' in resource.data && request.auth.uid in resource.data.pendingInviteeIds));
 
-      // List/query operations allowed for group members
-      // Each document is checked individually - user must be member of the game's group
+      // List/query operations allowed for group members OR players in the game.
+      // Supports getMyGames() query (playerIds array-contains uid) for guest players.
       allow list: if isAuthenticated() &&
-                     request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds;
+                     (request.auth.uid in resource.data.playerIds ||
+                      request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds ||
+                      ('pendingInviteeIds' in resource.data && request.auth.uid in resource.data.pendingInviteeIds));
 
       // Game creation allowed for authenticated users
       allow create: if isAuthenticated() &&
@@ -205,11 +212,13 @@ service cloud.firestore {
                        // Verify user is a member of the group they're creating a game for
                        request.auth.uid in get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.memberIds;
 
-      // Game updates allowed for creator or group members (for RSVP, scores, etc.)
+      // Game updates allowed for creator, group members, or existing players
+      // (playerIds covers guest players invited from another group — Story 28.11).
       // Special validation for result confirmation (Story 14.11)
       allow update: if isAuthenticated() &&
                        (request.auth.uid == resource.data.createdBy ||
-                        request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds) &&
+                        request.auth.uid in get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.memberIds ||
+                        request.auth.uid in resource.data.playerIds) &&
                        // CRITICAL: Result confirmation security validation
                        (
                          // Normal updates (not changing status from verification to completed)

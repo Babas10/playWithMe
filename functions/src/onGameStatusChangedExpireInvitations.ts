@@ -58,6 +58,9 @@ export async function onGameStatusChangedExpireInvitationsHandler(
   const expiredAt = admin.firestore.FieldValue.serverTimestamp();
   const totalDocs = pendingSnapshot.docs.length;
 
+  // Collect invitee IDs to clear from pendingInviteeIds on the game
+  const inviteeIds = pendingSnapshot.docs.map((doc) => doc.data().inviteeId as string);
+
   // ── 3. Batch-update in chunks of 500 (Firestore limit) ───────────────────
   let expiredCount = 0;
 
@@ -75,6 +78,12 @@ export async function onGameStatusChangedExpireInvitationsHandler(
     await batch.commit();
     expiredCount += chunk.length;
   }
+
+  // ── 4. Clear pendingInviteeIds on the game document ──────────────────────
+  await db.collection("games").doc(gameId).update({
+    pendingInviteeIds: admin.firestore.FieldValue.arrayRemove(...inviteeIds),
+    updatedAt: expiredAt,
+  });
 
   functions.logger.info(
     "[onGameStatusChangedExpireInvitations] Done",
