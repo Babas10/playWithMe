@@ -86,6 +86,15 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Stream<List<GameModel>> getMyGames(String userId) {
+    return _gamesController.stream.map((games) => games
+        .where((game) =>
+            game.playerIds.contains(userId) &&
+            game.status != GameStatus.cancelled)
+        .toList());
+  }
+
+  @override
   Stream<List<GameModel>> getGamesForUser(String userId) {
     return _gamesController.stream.map((games) =>
         games.where((game) => game.playerIds.contains(userId)).toList());

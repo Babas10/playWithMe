@@ -19,9 +19,10 @@ class FirestoreGameInvitationsRepository implements GameInvitationsRepository {
       final callable =
           _functions.httpsCallable('getGameInvitationsForUser');
       final result = await callable.call<Map<String, dynamic>>();
-      final raw = result.data['invitations'] as List<dynamic>;
+      final data = Map<String, dynamic>.from(result.data as Map);
+      final raw = data['invitations'] as List<dynamic>;
       return raw
-          .cast<Map<String, dynamic>>()
+          .map((e) => Map<String, dynamic>.from(e as Map))
           .map(GameInvitationDetails.fromMap)
           .toList();
     } on FirebaseFunctionsException catch (e) {

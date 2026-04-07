@@ -1073,6 +1073,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get completed => 'Abgeschlossen';
 
   @override
+  String get verification => 'Verifizierung';
+
+  @override
   String get noParticipantsYet => 'Noch keine Teilnehmer';
 
   @override
@@ -1973,7 +1976,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ihr Geschlecht bestimmt, ob Ihre Spiele als gemischt oder nicht gemischt eingestuft werden.';
 
   @override
-  String get inviteGuestPlayers => 'Gastspieler einladen';
+  String get inviteGuestPlayers => 'Personen aus anderen Gruppen einladen';
 
   @override
   String get inviteGuest => 'Einladen';
@@ -1988,6 +1991,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get invitePlayerSuccess => 'Einladung erfolgreich gesendet';
 
   @override
+  String get inviteGroupSuccess => 'Gruppe erfolgreich eingeladen';
+
+  @override
+  String groupMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Personen',
+      one: '1 Person',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get invitedLabel => 'Eingeladen';
+
+  @override
   String get invitePlayerError => 'Einladung konnte nicht gesendet werden';
 
   @override
@@ -1995,6 +2015,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noPendingGameInvitations => 'Keine ausstehenden Spieleinladungen';
+
+  @override
+  String get noMyGamesYet =>
+      'Noch keine Spiele — tritt einem bei oder akzeptiere eine Einladung';
 
   @override
   String fromGroup(String groupName) {
@@ -2010,4 +2034,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get gameInvitationActionError =>
       'Einladung konnte nicht verarbeitet werden';
+
+  @override
+  String get upcoming => 'Bevorstehend';
+
+  @override
+  String get pastGames => 'Vergangene Spiele';
 }

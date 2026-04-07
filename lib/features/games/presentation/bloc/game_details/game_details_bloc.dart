@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/core/domain/exceptions/repository_exceptions.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/domain/repositories/game_invitations_repository.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/data/models/user_model.dart';
@@ -14,6 +15,7 @@ import 'game_details_state.dart';
 class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
   final GameRepository _gameRepository;
   final UserRepository _userRepository;
+  final GameInvitationsRepository? _invitationsRepository;
   final FirebaseAnalytics _analytics;
   StreamSubscription<dynamic>? _gameSubscription;
 
@@ -21,8 +23,10 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     required GameRepository gameRepository,
     required UserRepository userRepository,
     required FirebaseAnalytics analytics,
+    GameInvitationsRepository? invitationsRepository,
   })  : _gameRepository = gameRepository,
         _userRepository = userRepository,
+        _invitationsRepository = invitationsRepository,
         _analytics = analytics,
         super(const GameDetailsInitial()) {
     on<LoadGameDetails>(_onLoadGameDetails);
@@ -31,6 +35,7 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     on<LeaveGameDetails>(_onLeaveGameDetails);
     on<MarkGameCompleted>(_onMarkGameCompleted);
     on<ConfirmGameResult>(_onConfirmGameResult);
+    on<JoinAsGuest>(_onJoinAsGuest);
   }
 
   Future<void> _onLoadGameDetails(
@@ -268,6 +273,37 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       emit(GameDetailsError(
         message: 'Failed to confirm result: ${e.toString()}',
         errorCode: 'CONFIRM_RESULT_ERROR',
+      ));
+    }
+  }
+
+  Future<void> _onJoinAsGuest(
+    JoinAsGuest event,
+    Emitter<GameDetailsState> emit,
+  ) async {
+    try {
+      if (state is GameDetailsLoaded) {
+        final currentState = state as GameDetailsLoaded;
+        emit(GameDetailsOperationInProgress(
+          game: currentState.game,
+          operation: 'join',
+          players: currentState.players,
+          playerEloUpdates: currentState.playerEloUpdates,
+        ));
+      }
+
+      await _invitationsRepository?.acceptGameInvitation(event.invitationId);
+
+      // Stream will automatically update state once Firestore reflects the change
+    } on GameException catch (e) {
+      emit(GameDetailsError(
+        message: e.message,
+        errorCode: e.code ?? 'JOIN_AS_GUEST_ERROR',
+      ));
+    } catch (e) {
+      emit(GameDetailsError(
+        message: 'Failed to join game: ${e.toString()}',
+        errorCode: 'JOIN_AS_GUEST_ERROR',
       ));
     }
   }

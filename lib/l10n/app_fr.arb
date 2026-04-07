@@ -329,6 +329,7 @@
   "organizedBy": "Organisé par {name}",
   "scheduled": "Programmé",
   "completed": "Terminé",
+  "verification": "Vérification",
   "noParticipantsYet": "Aucun participant pour le moment",
   "beFirstToJoin": "Soyez le premier à rejoindre !",
   "participation": "Participation",
@@ -620,7 +621,7 @@
     "description": "Tooltip explaining why gender is asked during registration"
   },
 
-  "inviteGuestPlayers": "Inviter des joueurs invités",
+  "inviteGuestPlayers": "Inviter des personnes d'autres groupes",
   "@inviteGuestPlayers": {
     "description": "Title of the invite guest players bottom sheet (Story 28.6)"
   },
@@ -640,6 +641,10 @@
   "@invitePlayerSuccess": {
     "description": "Snackbar message after successfully sending a guest invitation (Story 28.6)"
   },
+  "inviteGroupSuccess": "Groupe invité avec succès",
+  "groupMembersCount": "{count, plural, =1{1 personne} other{{count} personnes}}",
+  "@groupMembersCount": {"placeholders": {"count": {"type": "int"}}},
+  "invitedLabel": "Invité",
   "invitePlayerError": "Échec de l'envoi de l'invitation",
   "@invitePlayerError": {
     "description": "Snackbar message when sending a guest invitation fails (Story 28.6)"
@@ -651,6 +656,10 @@
   "noPendingGameInvitations": "Aucune invitation de match en attente",
   "@noPendingGameInvitations": {
     "description": "Empty state message on the pending game invitations page"
+  },
+  "noMyGamesYet": "Aucun match pour l'instant — rejoins-en un ou accepte une invitation",
+  "@noMyGamesYet": {
+    "description": "Empty state message on the My Games page when the user has no games and no pending invitations"
   },
   "fromGroup": "De : {groupName}",
   "@fromGroup": {
@@ -670,5 +679,15 @@
   "gameInvitationActionError": "Impossible de traiter l'invitation",
   "@gameInvitationActionError": {
     "description": "Snackbar shown when accepting or declining a game invitation fails"
+  },
+
+  "upcoming": "À venir",
+  "@upcoming": {
+    "description": "Section header for upcoming games in MyGamesPage"
+  },
+
+  "pastGames": "Parties passées",
+  "@pastGames": {
+    "description": "Section header for past games in MyGamesPage"
   }
 }

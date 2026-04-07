@@ -18,11 +18,11 @@ class InvitablePlayerModel {
 
   factory InvitablePlayerModel.fromMap(Map<String, dynamic> map) {
     return InvitablePlayerModel(
-      uid: map['uid'] as String,
-      displayName: map['displayName'] as String,
+      uid: map['uid'] as String? ?? '',
+      displayName: map['displayName'] as String? ?? '',
       photoUrl: map['photoUrl'] as String?,
-      sourceGroupId: map['sourceGroupId'] as String,
-      sourceGroupName: map['sourceGroupName'] as String,
+      sourceGroupId: map['sourceGroupId'] as String? ?? '',
+      sourceGroupName: map['sourceGroupName'] as String? ?? '',
     );
   }
 }

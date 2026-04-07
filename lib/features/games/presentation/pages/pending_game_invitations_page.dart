@@ -7,6 +7,7 @@ import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:play_with_me/core/data/models/game_invitation_details.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_invitations/game_invitations_bloc.dart';
+import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_invitation_card.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
@@ -75,10 +76,13 @@ class _PendingGameInvitationsViewState
         ),
       );
       // Navigate to game details after accept
-      if (state.accepted) {
-        // Find the invitation that was processed (already removed from list —
-        // we can't navigate since we only have the id, not the gameId anymore).
-        // No-op: user can find the game in their upcoming games list.
+      if (state.accepted && state.gameId != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => GameDetailsPage(gameId: state.gameId!),
+          ),
+        );
       }
     }
 
@@ -175,6 +179,12 @@ class _PendingGameInvitationsViewState
             onDecline: () => context
                 .read<GameInvitationsBloc>()
                 .add(DeclineGameInvitation(inv.invitationId)),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => GameDetailsPage(gameId: inv.gameId),
+              ),
+            ),
           );
         },
       ),

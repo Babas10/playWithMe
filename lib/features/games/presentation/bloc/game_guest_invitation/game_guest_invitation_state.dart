@@ -73,6 +73,30 @@ class InvitePlayerSuccess extends GameGuestInvitationState
   List<Object?> get props => [players, inviteeId];
 }
 
+/// All players from [groupId] are being invited (bulk action).
+class InviteGroupSending extends GameGuestInvitationState
+    implements LoadingState {
+  final List<InvitablePlayerModel> players;
+  final String groupId;
+
+  const InviteGroupSending({required this.players, required this.groupId});
+
+  @override
+  List<Object?> get props => [players, groupId];
+}
+
+/// All players from [groupId] have been invited (bulk action succeeded).
+class InviteGroupSuccess extends GameGuestInvitationState
+    implements SuccessState {
+  final List<InvitablePlayerModel> players;
+  final String groupId;
+
+  const InviteGroupSuccess({required this.players, required this.groupId});
+
+  @override
+  List<Object?> get props => [players, groupId];
+}
+
 class InvitePlayerError extends GameGuestInvitationState implements ErrorState {
   final List<InvitablePlayerModel> players;
   @override

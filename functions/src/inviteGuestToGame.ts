@@ -164,10 +164,13 @@ export async function inviteGuestToGameHandler(
       sharedGroupId: sharedGroup.id,
     });
 
-    // ── 7. Atomically create the gameInvitations document ─────────────────
+    // ── 7. Atomically create the invitation and update pendingInviteeIds ──────
     const invitationRef = db.collection("gameInvitations").doc();
+    const gameRef = db.collection("games").doc(gameId);
 
-    await invitationRef.set({
+    const batch = db.batch();
+
+    batch.set(invitationRef, {
       gameId,
       groupId: game.groupId,
       inviteeId,
@@ -177,6 +180,14 @@ export async function inviteGuestToGameHandler(
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       expiresAt: game.scheduledAt ?? null,
     });
+
+    // Track pending invitees on the game so security rules can grant them read access.
+    batch.update(gameRef, {
+      pendingInviteeIds: admin.firestore.FieldValue.arrayUnion(inviteeId),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
 
     functions.logger.info("[inviteGuestToGame] Invitation created successfully", {
       callerId,

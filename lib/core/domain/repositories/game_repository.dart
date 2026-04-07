@@ -35,6 +35,11 @@ abstract class GameRepository {
   /// Get count of upcoming games for a group
   Stream<int> getUpcomingGamesCount(String groupId);
 
+  /// Get all non-cancelled games where the user is a player (playerIds array-contains).
+  /// Covers own-group games AND cross-group games accepted via invitation.
+  /// Ordered by scheduledAt descending (most recent first).
+  Stream<List<GameModel>> getMyGames(String userId);
+
   /// Get upcoming games for a user
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId);
 

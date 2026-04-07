@@ -39,7 +39,7 @@ import 'package:play_with_me/core/presentation/bloc/invitation/invitation_bloc.d
 import 'package:play_with_me/core/presentation/bloc/invitation/invitation_event.dart';
 import 'package:play_with_me/features/invitations/presentation/pages/pending_invitations_page.dart';
 import 'package:play_with_me/features/games/presentation/bloc/game_invitations/game_invitations_bloc.dart';
-import 'package:play_with_me/features/games/presentation/pages/pending_game_invitations_page.dart';
+import 'package:play_with_me/features/games/presentation/pages/my_games_page.dart';
 import 'package:play_with_me/features/notifications/data/services/notification_service.dart';
 import 'package:play_with_me/features/friends/presentation/pages/my_community_page.dart';
 import 'package:play_with_me/features/friends/presentation/bloc/friend_request_count_bloc.dart';
@@ -92,6 +92,9 @@ class PlayWithMeApp extends StatelessWidget {
         BlocProvider<InviteJoinBloc>(
           create: (context) => sl<InviteJoinBloc>(),
         ),
+        BlocProvider<GameInvitationsBloc>(
+          create: (context) => sl<GameInvitationsBloc>(),
+        ),
         BlocProvider<LocalePreferencesBloc>(
           create: (context) => LocalePreferencesBloc(
             repository: sl<LocalePreferencesRepository>(),
@@ -106,6 +109,9 @@ class PlayWithMeApp extends StatelessWidget {
                 context.read<InvitationBloc>().add(
                   LoadPendingInvitations(userId: state.user.uid),
                 );
+                context
+                    .read<GameInvitationsBloc>()
+                    .add(const LoadGameInvitations());
                 // Check for pending invite token (from "I Have an Account" flow).
                 // If found, navigate to join confirmation and clear the stack.
                 final deepLinkState = context.read<DeepLinkBloc>().state;
@@ -383,9 +389,9 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (ctx) => sl<GameInvitationsBloc>(),
-              child: const PendingGameInvitationsPage(),
+            builder: (_) => BlocProvider.value(
+              value: context.read<GameInvitationsBloc>(),
+              child: const MyGamesPage(),
             ),
           ),
         );
@@ -609,6 +615,7 @@ class _HomeTab extends StatelessWidget {
                         );
                       },
                     ),
+
 
                     const SizedBox(height: 25),
 

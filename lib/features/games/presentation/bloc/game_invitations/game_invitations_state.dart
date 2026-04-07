@@ -36,11 +36,18 @@ class GameInvitationActionInFlight extends GameInvitationsState {
 
 /// An accept/decline call succeeded; [invitationId] has been removed from [invitations].
 /// [accepted] distinguishes which action was taken (for snackbar copy).
+/// [gameId] is set when accepted=true so the UI can navigate to game details.
 class GameInvitationActionSuccess extends GameInvitationsState {
   final List<GameInvitationDetails> invitations;
   final String invitationId;
   final bool accepted;
-  const GameInvitationActionSuccess(this.invitations, this.invitationId, {required this.accepted});
+  final String? gameId;
+  const GameInvitationActionSuccess(
+    this.invitations,
+    this.invitationId, {
+    required this.accepted,
+    this.gameId,
+  });
 }
 
 /// An accept/decline call failed; the original [invitations] list is preserved.

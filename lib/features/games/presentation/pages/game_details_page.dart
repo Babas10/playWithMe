@@ -1,6 +1,8 @@
 // Game details page displaying game information and allowing RSVP actions.
 
 import 'package:flutter/material.dart';
+import 'package:play_with_me/app/play_with_me_app.dart';
+import 'package:play_with_me/core/presentation/widgets/global_bottom_nav_bar.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:play_with_me/core/data/models/rating_history_entry.dart';
 import 'package:play_with_me/core/presentation/widgets/mix_game_badge.dart';
 import '../../../../core/domain/repositories/game_guest_invitation_repository.dart';
+import '../../../../core/domain/repositories/game_invitations_repository.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
 import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/data/models/game_model.dart';
@@ -27,16 +30,24 @@ import 'game_result_view_page.dart';
 
 class GameDetailsPage extends StatelessWidget {
   final String gameId;
+
+  /// Non-null when arriving from a cross-group guest invitation.
+  /// "I'm In" will call [JoinAsGuest] instead of [JoinGameDetails].
+  final String? invitationId;
+
   final GameRepository? gameRepository;
   final UserRepository? userRepository;
   final GameGuestInvitationRepository? gameGuestInvitationRepository;
+  final GameInvitationsRepository? gameInvitationsRepository;
 
   const GameDetailsPage({
     super.key,
     required this.gameId,
+    this.invitationId,
     this.gameRepository,
     this.userRepository,
     this.gameGuestInvitationRepository,
+    this.gameInvitationsRepository,
   });
 
   @override
@@ -48,6 +59,10 @@ class GameDetailsPage extends StatelessWidget {
             gameRepository: gameRepository ?? sl<GameRepository>(),
             userRepository: userRepository ?? sl<UserRepository>(),
             analytics: sl(),
+            invitationsRepository: gameInvitationsRepository ??
+                (sl.isRegistered<GameInvitationsRepository>()
+                    ? sl<GameInvitationsRepository>()
+                    : null),
           )..add(LoadGameDetails(gameId: gameId)),
         ),
         BlocProvider(
@@ -57,13 +72,15 @@ class GameDetailsPage extends StatelessWidget {
           ),
         ),
       ],
-      child: const _GameDetailsView(),
+      child: _GameDetailsView(invitationId: invitationId),
     );
   }
 }
 
 class _GameDetailsView extends StatelessWidget {
-  const _GameDetailsView();
+  final String? invitationId;
+
+  const _GameDetailsView({this.invitationId});
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +89,13 @@ class _GameDetailsView extends StatelessWidget {
       appBar: PlayWithMeAppBar.build(
         context: context,
         title: l10n.gameDetails,
+      ),
+      bottomNavigationBar: GlobalBottomNavBar(
+        selectedIndex: 0,
+        onTabSelected: (index) {
+          HomePage.onNavigateToTab?.call(index);
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
       ),
       body: BlocBuilder<GameDetailsBloc, GameDetailsState>(
         builder: (context, state) => _buildBody(context, state, l10n),
@@ -208,6 +232,7 @@ class _GameDetailsView extends StatelessWidget {
           _RsvpButtons(
             game: game,
             isOperationInProgress: isOperationInProgress,
+            invitationId: invitationId,
           ),
         ],
       );
@@ -396,18 +421,12 @@ class _PlayersCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (isCreator)
-                          TextButton.icon(
+                          IconButton(
                             onPressed: () => showInviteGuestPlayersSheet(
                                 context, game.id),
-                            icon: const Icon(Icons.person_add_outlined,
-                                size: 18),
-                            label: Text(l10n.inviteGuestPlayers),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                            ),
+                            icon: const Icon(Icons.person_add_outlined),
+                            tooltip: l10n.inviteGuestPlayers,
+                            visualDensity: VisualDensity.compact,
                           ),
                         Chip(
                           label: Text(
@@ -693,10 +712,12 @@ class _PlayersCard extends StatelessWidget {
 class _RsvpButtons extends StatelessWidget {
   final GameModel game;
   final bool isOperationInProgress;
+  final String? invitationId;
 
   const _RsvpButtons({
     required this.game,
     required this.isOperationInProgress,
+    this.invitationId,
   });
 
   @override
@@ -815,12 +836,18 @@ class _RsvpButtons extends StatelessWidget {
                   onPressed: isOperationInProgress
                       ? null
                       : () {
-                          context.read<GameDetailsBloc>().add(
-                                JoinGameDetails(
-                                  gameId: game.id,
-                                  userId: userId,
-                                ),
-                              );
+                          if (invitationId != null) {
+                            context.read<GameDetailsBloc>().add(
+                                  JoinAsGuest(invitationId: invitationId!),
+                                );
+                          } else {
+                            context.read<GameDetailsBloc>().add(
+                                  JoinGameDetails(
+                                    gameId: game.id,
+                                    userId: userId,
+                                  ),
+                                );
+                          }
                         },
                   icon: isOperationInProgress
                       ? const SizedBox(
