@@ -6,6 +6,8 @@ tools/load_test/*service-account*.json
 # Generated environment scripts configs (contain credentials)
 functions/scripts/accessConfig.json
 functions/scripts/screenshotConfig.json
+functions/scripts/mainTestConfig.json
+functions/scripts/genderTestConfig.json
 
 # Production environment scripts (contain credentials / destructive operations)
 functions/scripts/setupAccessEnvironment.ts
