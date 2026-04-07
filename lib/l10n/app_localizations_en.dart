@@ -2005,4 +2005,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get open => 'Open';
+
+  @override
+  String get teamsForThisGame => 'Teams';
+
+  @override
+  String get selectTeamsPrompt => 'Who played this game?';
+
+  @override
+  String get vsLabel => 'vs';
 }

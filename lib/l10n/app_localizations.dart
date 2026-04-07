@@ -3727,6 +3727,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open'**
   String get open;
+
+  /// Section label for per-game team picker
+  ///
+  /// In en, this message translates to:
+  /// **'Teams'**
+  String get teamsForThisGame;
+
+  /// Prompt shown in per-game team picker when no team is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Who played this game?'**
+  String get selectTeamsPrompt;
+
+  /// Label between two teams in a matchup, e.g. Alice & Bob vs Carol & Dave
+  ///
+  /// In en, this message translates to:
+  /// **'vs'**
+  String get vsLabel;
 }
 
 class _AppLocalizationsDelegate

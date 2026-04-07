@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../../core/data/models/game_model.dart';
+import '../../../../../core/data/models/user_model.dart';
 
 abstract class ScoreEntryState extends Equatable {
   const ScoreEntryState();
@@ -97,24 +98,30 @@ class SetScoreData {
 class GameData {
   final int numberOfSets; // 1, 2, or 3
   final List<SetScoreData> sets;
+  final GameTeams? teams; // null means team not yet selected for this game
 
   const GameData({
     this.numberOfSets = 1,
     this.sets = const [],
+    this.teams,
   });
 
   GameData copyWith({
     int? numberOfSets,
     List<SetScoreData>? sets,
+    GameTeams? teams,
+    bool clearTeams = false,
   }) {
     return GameData(
       numberOfSets: numberOfSets ?? this.numberOfSets,
       sets: sets ?? this.sets,
+      teams: clearTeams ? null : (teams ?? this.teams),
     );
   }
 
-  /// Check if all required sets have valid scores
+  /// Check if all required sets have valid scores and teams are selected
   bool get isComplete {
+    if (teams == null) return false;
     if (sets.length < numberOfSets) return false;
     for (int i = 0; i < numberOfSets; i++) {
       if (!sets[i].isValid) return false;
@@ -146,15 +153,17 @@ class ScoreEntryLoaded extends ScoreEntryState {
   final GameModel game;
   final int? gameCount; // null = not set yet, 1-10 = number of games
   final List<GameData> games; // Score data for each game
+  final Map<String, UserModel> players; // for display names in team picker
 
   const ScoreEntryLoaded({
     required this.game,
     this.gameCount,
     this.games = const [],
+    this.players = const {},
   });
 
   @override
-  List<Object?> get props => [game, gameCount, games];
+  List<Object?> get props => [game, gameCount, games, players];
 
   /// Check if all games have valid scores
   bool get allGamesComplete {
@@ -194,12 +203,14 @@ class ScoreEntryLoaded extends ScoreEntryState {
     GameModel? game,
     int? gameCount,
     List<GameData>? games,
+    Map<String, UserModel>? players,
     bool clearGameCount = false,
   }) {
     return ScoreEntryLoaded(
       game: game ?? this.game,
       gameCount: clearGameCount ? null : (gameCount ?? this.gameCount),
       games: games ?? this.games,
+      players: players ?? this.players,
     );
   }
 }

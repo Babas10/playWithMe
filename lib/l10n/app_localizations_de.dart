@@ -2043,4 +2043,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get open => 'Offen';
+
+  @override
+  String get teamsForThisGame => 'Teams';
+
+  @override
+  String get selectTeamsPrompt => 'Wer hat dieses Spiel gespielt?';
+
+  @override
+  String get vsLabel => 'vs';
 }
