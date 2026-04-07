@@ -21,6 +21,7 @@ jest.mock("firebase-admin", () => {
       {
         FieldValue: {
           serverTimestamp: jest.fn(() => "MOCK_TIMESTAMP"),
+          arrayRemove: jest.fn((...args: any[]) => ({ _type: "arrayRemove", args })),
         },
       }
     ),
@@ -66,19 +67,29 @@ function makePendingDocs(count: number) {
   return Array.from({ length: count }, (_, i) => ({
     id: `inv-${i}`,
     ref: { id: `inv-${i}` },
+    data: () => ({ inviteeId: `invitee-${i}`, status: "pending" }),
   }));
 }
 
 /** Build a mock Firestore db */
 function buildDb(pendingDocs: any[] = []) {
   const db: any = {
-    collection: jest.fn(() => ({
-      where: jest.fn().mockReturnThis(),
-      get: jest.fn().mockResolvedValue({
-        empty: pendingDocs.length === 0,
-        docs: pendingDocs,
-      }),
-    })),
+    collection: jest.fn((col: string) => {
+      if (col === "games") {
+        return {
+          doc: jest.fn(() => ({
+            update: jest.fn().mockResolvedValue(undefined),
+          })),
+        };
+      }
+      return {
+        where: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({
+          empty: pendingDocs.length === 0,
+          docs: pendingDocs,
+        }),
+      };
+    }),
     batch: jest.fn(() => mockBatch),
   };
   return db;
