@@ -86,6 +86,15 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Stream<List<GameModel>> getMyGames(String userId) {
+    return _gamesController.stream.map((games) => games
+        .where((game) =>
+            game.playerIds.contains(userId) &&
+            game.status != GameStatus.cancelled)
+        .toList());
+  }
+
+  @override
   Stream<List<GameModel>> getGamesForUser(String userId) {
     return _gamesController.stream.map((games) =>
         games.where((game) => game.playerIds.contains(userId)).toList());
@@ -124,6 +133,16 @@ class MockGameRepository implements GameRepository {
               game.status == GameStatus.scheduled)
           .length;
     }
+  }
+
+  @override
+  Stream<List<GameModel>> getGroupGamesForUser(String userId) {
+    final now = DateTime.now();
+    return _gamesController.stream.map((games) => games
+        .where((game) =>
+            game.status != GameStatus.cancelled &&
+            game.scheduledAt.isAfter(now))
+        .toList());
   }
 
   @override

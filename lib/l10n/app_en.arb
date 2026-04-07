@@ -1733,6 +1733,11 @@
     "description": "Status label for completed sessions"
   },
 
+  "verification": "Verification",
+  "@verification": {
+    "description": "Status label for games awaiting result verification"
+  },
+
   "noParticipantsYet": "No participants yet",
   "@noParticipantsYet": {
     "description": "Empty state message when no participants"
@@ -2837,7 +2842,7 @@
     "description": "Tooltip explaining why gender is asked during registration"
   },
 
-  "inviteGuestPlayers": "Invite Guest Players",
+  "inviteGuestPlayers": "Invite people from other groups",
   "@inviteGuestPlayers": {
     "description": "Title of the invite guest players bottom sheet (Story 28.6)"
   },
@@ -2857,6 +2862,24 @@
   "@invitePlayerSuccess": {
     "description": "Snackbar message after successfully sending a guest invitation (Story 28.6)"
   },
+
+  "inviteGroupSuccess": "Group invited successfully",
+  "@inviteGroupSuccess": {
+    "description": "Snackbar message after inviting all players in a group (Story 28.6)"
+  },
+
+  "groupMembersCount": "{count, plural, =1{1 person} other{{count} people}}",
+  "@groupMembersCount": {
+    "description": "Member count label on a group invite card",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "invitedLabel": "Invited",
+  "@invitedLabel": {
+    "description": "Label shown on a group card after all its players have been invited"
+  },
   "invitePlayerError": "Failed to send invitation",
   "@invitePlayerError": {
     "description": "Snackbar message when sending a guest invitation fails (Story 28.6)"
@@ -2868,6 +2891,10 @@
   "noPendingGameInvitations": "No pending game invitations",
   "@noPendingGameInvitations": {
     "description": "Empty state message on the pending game invitations page"
+  },
+  "noMyGamesYet": "No games yet — join one or accept an invitation",
+  "@noMyGamesYet": {
+    "description": "Empty state message on the My Games page when the user has no games and no pending invitations"
   },
   "fromGroup": "From: {groupName}",
   "@fromGroup": {
@@ -2887,5 +2914,19 @@
   "gameInvitationActionError": "Failed to process invitation",
   "@gameInvitationActionError": {
     "description": "Snackbar shown when accepting or declining a game invitation fails"
+  },
+
+  "upcoming": "Upcoming",
+  "@upcoming": {
+    "description": "Section header for upcoming games in MyGamesPage"
+  },
+
+  "pastGames": "Past Games",
+  "open": "Open",
+  "@open": {
+    "description": "Badge on un-joined group game tiles"
+  },
+  "@pastGames": {
+    "description": "Section header for past games in MyGamesPage"
   }
 }

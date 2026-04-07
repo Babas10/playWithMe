@@ -16,6 +16,7 @@ class GameGuestInvitationBloc
         super(const GameGuestInvitationInitial()) {
     on<LoadInvitablePlayers>(_onLoadInvitablePlayers);
     on<InviteGuestPlayer>(_onInviteGuestPlayer);
+    on<InviteGroupPlayers>(_onInviteGroupPlayers);
   }
 
   Future<void> _onLoadInvitablePlayers(
@@ -39,18 +40,50 @@ class GameGuestInvitationBloc
     }
   }
 
-  Future<void> _onInviteGuestPlayer(
-    InviteGuestPlayer event,
-    Emitter<GameGuestInvitationState> emit,
-  ) async {
-    final currentState = state;
-    final loadedPlayers = switch (currentState) {
+  List<InvitablePlayerModel> _getPlayers() {
+    return switch (state) {
       InvitablePlayersLoaded s => s.players,
       InvitePlayerSuccess s => s.players,
       InvitePlayerError s => s.players,
       InvitePlayerSending s => s.players,
+      InviteGroupSending s => s.players,
+      InviteGroupSuccess s => s.players,
       _ => const <InvitablePlayerModel>[],
     };
+  }
+
+  Future<void> _onInviteGroupPlayers(
+    InviteGroupPlayers event,
+    Emitter<GameGuestInvitationState> emit,
+  ) async {
+    final players = _getPlayers();
+    final groupPlayers =
+        players.where((p) => p.sourceGroupId == event.groupId).toList();
+
+    emit(InviteGroupSending(players: List.unmodifiable(players), groupId: event.groupId));
+
+    for (final player in groupPlayers) {
+      try {
+        await _repository.inviteGuestPlayer(
+          gameId: event.gameId,
+          inviteeId: player.uid,
+        );
+      } on GameInvitationException catch (e) {
+        if (e.code == 'already-exists') continue;
+        // best-effort: skip this player, continue inviting others
+      } catch (_) {
+        // best-effort
+      }
+    }
+
+    emit(InviteGroupSuccess(players: List.unmodifiable(players), groupId: event.groupId));
+  }
+
+  Future<void> _onInviteGuestPlayer(
+    InviteGuestPlayer event,
+    Emitter<GameGuestInvitationState> emit,
+  ) async {
+    final loadedPlayers = _getPlayers();
 
     try {
       emit(InvitePlayerSending(

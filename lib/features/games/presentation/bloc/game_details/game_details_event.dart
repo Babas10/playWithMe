@@ -73,3 +73,13 @@ class ConfirmGameResult extends GameDetailsEvent {
   @override
   List<Object?> get props => [gameId, userId];
 }
+
+/// Join a game via a cross-group guest invitation (calls acceptGameGuestInvitation CF).
+class JoinAsGuest extends GameDetailsEvent {
+  final String invitationId;
+
+  const JoinAsGuest({required this.invitationId});
+
+  @override
+  List<Object?> get props => [invitationId];
+}

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
@@ -79,6 +81,38 @@ class FirestoreGameRepository implements GameRepository {
       throw GameException('Failed to get games: ${e.message}', code: e.code);
     } catch (e) {
       throw GameException('Failed to get games: $e', code: 'unknown');
+    }
+  }
+
+  @override
+  @override
+  Stream<List<GameModel>> getMyGames(String userId) {
+    try {
+      return _firestore
+          .collection(_collection)
+          .where('playerIds', arrayContains: userId)
+          .snapshots()
+          .map((snapshot) {
+        final games = snapshot.docs
+            .where((doc) => doc.exists)
+            .map((doc) => GameModel.fromFirestore(doc))
+            .where((game) => game.status != GameStatus.cancelled)
+            .toList();
+        games.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
+        return games;
+      })
+          .handleError((error) {
+        if (error is FirebaseException) {
+          debugPrint('[getMyGames] FirebaseException: code=${error.code} message=${error.message}');
+          throw GameException('Failed to get my games: ${error.message}',
+              code: error.code);
+        }
+        debugPrint('[getMyGames] Unexpected error: $error');
+        throw GameException('Failed to get my games: $error',
+            code: 'stream-error');
+      });
+    } catch (e) {
+      throw GameException('Failed to get my games: $e', code: 'stream-error');
     }
   }
 
@@ -227,6 +261,75 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Stream<List<GameModel>> getGroupGamesForUser(String userId) {
+    final controller = StreamController<List<GameModel>>();
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? groupsSub;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? gamesSub;
+
+    groupsSub = _firestore
+        .collection('groups')
+        .where('memberIds', arrayContains: userId)
+        .snapshots()
+        .listen(
+      (groupsSnapshot) {
+        gamesSub?.cancel();
+        final groupIds = groupsSnapshot.docs.map((d) => d.id).toList();
+        if (groupIds.isEmpty) {
+          controller.add([]);
+          return;
+        }
+
+        // Firestore 'whereIn' is limited to 30 values
+        gamesSub = _firestore
+            .collection(_collection)
+            .where('groupId', whereIn: groupIds.take(30).toList())
+            .where('status', whereIn: ['scheduled', 'inProgress'])
+            .where('scheduledAt', isGreaterThan: Timestamp.now())
+            .orderBy('scheduledAt')
+            .snapshots()
+            .listen(
+          (gamesSnapshot) {
+            final games = gamesSnapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GameModel.fromFirestore(doc))
+                .toList();
+            controller.add(games);
+          },
+          onError: (Object error) {
+            if (error is FirebaseException) {
+              controller.addError(GameException(
+                  'Failed to get group games: ${error.message}',
+                  code: error.code));
+            } else {
+              controller.addError(GameException(
+                  'Failed to get group games: $error',
+                  code: 'stream-error'));
+            }
+          },
+        );
+      },
+      onError: (Object error) {
+        if (error is FirebaseException) {
+          controller.addError(GameException(
+              'Failed to get group games: ${error.message}',
+              code: error.code));
+        } else {
+          controller.addError(GameException(
+              'Failed to get group games: $error',
+              code: 'stream-error'));
+        }
+      },
+    );
+
+    controller.onCancel = () {
+      groupsSub?.cancel();
+      gamesSub?.cancel();
+    };
+
+    return controller.stream;
+  }
+
+  @override
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId) {
     try {
       final now = Timestamp.now();
@@ -259,23 +362,40 @@ class FirestoreGameRepository implements GameRepository {
   Stream<GameModel?> getNextGameForUser(String userId) {
     final controller = StreamController<GameModel?>();
     StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? groupsSub;
-    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? gamesSub;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? groupGamesSub;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? playerGamesSub;
 
+    // Latest results from each source — merged and deduplicated in emitBest().
+    List<GameModel> latestGroupGames = [];
+    List<GameModel> latestPlayerGames = [];
+
+    void emitBest() {
+      final Map<String, GameModel> byId = {};
+      for (final g in [...latestGroupGames, ...latestPlayerGames]) {
+        byId[g.id] = g;
+      }
+      final games = byId.values.toList()
+        ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+      controller.add(games.isEmpty ? null : games.first);
+    }
+
+    // Stream 1: games in the user's own groups (existing logic).
     groupsSub = _firestore
         .collection('groups')
         .where('memberIds', arrayContains: userId)
         .snapshots()
         .listen(
       (groupsSnapshot) {
-        gamesSub?.cancel();
+        groupGamesSub?.cancel();
         final groupIds = groupsSnapshot.docs.map((d) => d.id).toList();
         if (groupIds.isEmpty) {
-          controller.add(null);
+          latestGroupGames = [];
+          emitBest();
           return;
         }
 
         // Firestore 'whereIn' is limited to 30 values
-        gamesSub = _firestore
+        groupGamesSub = _firestore
             .collection(_collection)
             .where('groupId', whereIn: groupIds.take(30).toList())
             .where('status', isEqualTo: 'scheduled')
@@ -284,12 +404,11 @@ class FirestoreGameRepository implements GameRepository {
             .snapshots()
             .listen(
           (gamesSnapshot) {
-            final games = gamesSnapshot.docs
+            latestGroupGames = gamesSnapshot.docs
                 .where((doc) => doc.exists)
                 .map((doc) => GameModel.fromFirestore(doc))
                 .toList();
-
-            controller.add(games.isEmpty ? null : games.first);
+            emitBest();
           },
           onError: (Object error) {
             if (error is FirebaseException) {
@@ -317,9 +436,38 @@ class FirestoreGameRepository implements GameRepository {
       },
     );
 
+    // Stream 2: games where the user is explicitly in playerIds (catches
+    // accepted cross-group guest invitations).
+    // Uses the existing playerIds + scheduledAt composite index.
+    // Status is filtered in Dart to avoid an extra compound index.
+    playerGamesSub = _firestore
+        .collection(_collection)
+        .where('playerIds', arrayContains: userId)
+        .where('scheduledAt', isGreaterThan: Timestamp.now())
+        .orderBy('scheduledAt')
+        .snapshots()
+        .listen(
+      (gamesSnapshot) {
+        latestPlayerGames = gamesSnapshot.docs
+            .where((doc) => doc.exists)
+            .map((doc) => GameModel.fromFirestore(doc))
+            .where((g) => g.status == GameStatus.scheduled)
+            .toList();
+        emitBest();
+      },
+      onError: (Object error) {
+        // Non-fatal: group-based stream still provides results.
+        if (error is FirebaseException) {
+          debugPrint(
+              '[getNextGameForUser] playerIds stream error: ${error.message}');
+        }
+      },
+    );
+
     controller.onCancel = () {
       groupsSub?.cancel();
-      gamesSub?.cancel();
+      groupGamesSub?.cancel();
+      playerGamesSub?.cancel();
     };
 
     return controller.stream;

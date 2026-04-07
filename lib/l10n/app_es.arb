@@ -329,6 +329,7 @@
   "organizedBy": "Organizado por {name}",
   "scheduled": "Programado",
   "completed": "Completado",
+  "verification": "Verificación",
   "noParticipantsYet": "Sin participantes aún",
   "beFirstToJoin": "¡Sé el primero en unirte!",
   "participation": "Participación",
@@ -620,7 +621,7 @@
     "description": "Tooltip explaining why gender is asked during registration"
   },
 
-  "inviteGuestPlayers": "Invitar jugadores invitados",
+  "inviteGuestPlayers": "Invitar personas de otros grupos",
   "@inviteGuestPlayers": {
     "description": "Title of the invite guest players bottom sheet (Story 28.6)"
   },
@@ -640,6 +641,10 @@
   "@invitePlayerSuccess": {
     "description": "Snackbar message after successfully sending a guest invitation (Story 28.6)"
   },
+  "inviteGroupSuccess": "Grupo invitado correctamente",
+  "groupMembersCount": "{count, plural, =1{1 persona} other{{count} personas}}",
+  "@groupMembersCount": {"placeholders": {"count": {"type": "int"}}},
+  "invitedLabel": "Invitado",
   "invitePlayerError": "Error al enviar la invitación",
   "@invitePlayerError": {
     "description": "Snackbar message when sending a guest invitation fails (Story 28.6)"
@@ -651,6 +656,10 @@
   "noPendingGameInvitations": "Sin invitaciones de partido pendientes",
   "@noPendingGameInvitations": {
     "description": "Empty state message on the pending game invitations page"
+  },
+  "noMyGamesYet": "Aún no hay partidos — únete a uno o acepta una invitación",
+  "@noMyGamesYet": {
+    "description": "Empty state message on the My Games page when the user has no games and no pending invitations"
   },
   "fromGroup": "De: {groupName}",
   "@fromGroup": {
@@ -670,5 +679,19 @@
   "gameInvitationActionError": "No se pudo procesar la invitación",
   "@gameInvitationActionError": {
     "description": "Snackbar shown when accepting or declining a game invitation fails"
+  },
+
+  "upcoming": "Próximamente",
+  "@upcoming": {
+    "description": "Section header for upcoming games in MyGamesPage"
+  },
+
+  "pastGames": "Partidos pasados",
+  "open": "Abierto",
+  "@open": {
+    "description": "Badge on un-joined group game tiles"
+  },
+  "@pastGames": {
+    "description": "Section header for past games in MyGamesPage"
   }
 }

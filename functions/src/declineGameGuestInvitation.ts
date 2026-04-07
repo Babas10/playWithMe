@@ -100,11 +100,21 @@ export async function declineGameGuestInvitationHandler(
       );
     }
 
-    // ── 4. Update invitation status ────────────────────────────────────────
-    await invitationRef.update({
+    // ── 4. Update invitation + remove from game's pendingInviteeIds ───────────
+    const gameRef = db.collection("games").doc(invitation.gameId);
+    const batch = db.batch();
+
+    batch.update(invitationRef, {
       status: "declined",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    batch.update(gameRef, {
+      pendingInviteeIds: admin.firestore.FieldValue.arrayRemove(callerId),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
 
     functions.logger.info("[declineGameGuestInvitation] Declined successfully", {
       callerId,
