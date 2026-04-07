@@ -397,7 +397,15 @@ class _HomePageState extends State<HomePage> {
         );
         break;
       case 'game_created':
-        debugPrint('Game created notification tapped: ${data['gameId']}');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: context.read<GameInvitationsBloc>(),
+              child: const MyGamesPage(),
+            ),
+          ),
+        );
         break;
       case 'member_joined':
       case 'member_left':

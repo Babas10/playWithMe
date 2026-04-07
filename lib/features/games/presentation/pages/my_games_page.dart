@@ -1,6 +1,8 @@
-// Ball-icon destination page showing upcoming and past games (Story 28.11).
-// Upcoming = pending invitations + joined scheduled/in-progress games (unified list).
-// Past = completed/verification games the user played.
+// Ball-icon destination page showing upcoming and past games (Stories 28.11 / 28.12).
+// Upcoming = pending invitations + un-joined group games + joined scheduled/in-progress.
+// Past = completed/verification/overdue-scheduled games the user played.
+
+import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,16 +39,39 @@ class _MyGamesView extends StatefulWidget {
 
 class _MyGamesViewState extends State<_MyGamesView> {
   late final String _userId;
-  late final Stream<List<GameModel>> _gamesStream;
-  List<GameModel> _lastGames = [];
-  bool _gamesStreamHasEmitted = false;
+  late final Stream<List<GameModel>> _joinedGamesStream;
+  StreamSubscription<List<GameModel>>? _groupGamesSub;
+
+  List<GameModel> _lastJoinedGames = [];
+  List<GameModel> _lastGroupGames = [];
+  bool _joinedStreamHasEmitted = false;
 
   @override
   void initState() {
     super.initState();
     _userId = FirebaseAuth.instance.currentUser!.uid;
-    _gamesStream = sl<GameRepository>().getMyGames(_userId);
+    final repo = sl<GameRepository>();
+
+    _joinedGamesStream = repo.getMyGames(_userId);
+
+    // Group games stream — subscribe separately so we can setState on emission
+    // without nesting a second StreamBuilder.
+    _groupGamesSub = repo.getGroupGamesForUser(_userId).listen(
+      (games) {
+        if (mounted) setState(() => _lastGroupGames = games);
+      },
+      onError: (Object e) {
+        debugPrint('[MyGamesPage] group games stream error: $e');
+      },
+    );
+
     context.read<GameInvitationsBloc>().add(const LoadGameInvitations());
+  }
+
+  @override
+  void dispose() {
+    _groupGamesSub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -70,42 +95,48 @@ class _MyGamesViewState extends State<_MyGamesView> {
           final invitations = _extractInvitations(invState);
 
           return StreamBuilder<List<GameModel>>(
-            stream: _gamesStream,
+            stream: _joinedGamesStream,
             builder: (context, snapshot) {
               if (snapshot.hasData || snapshot.hasError) {
-                _gamesStreamHasEmitted = true;
+                _joinedStreamHasEmitted = true;
               }
               if (snapshot.hasError) {
-                debugPrint('[MyGamesPage] stream error: ${snapshot.error}');
+                debugPrint('[MyGamesPage] joined stream error: ${snapshot.error}');
               }
-              // Keep spinner until both data sources have settled to avoid
-              // flashing empty state while one is still loading.
-              if (!_gamesStreamHasEmitted || invState is GameInvitationsLoading) {
+              // Keep spinner until joined games and invitations have settled.
+              if (!_joinedStreamHasEmitted || invState is GameInvitationsLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
-              if (snapshot.hasData) _lastGames = snapshot.data!;
+              if (snapshot.hasData) _lastJoinedGames = snapshot.data!;
 
-              // Build unified MyGameItem lists
-              final joinedItems = _lastGames
-                  .map(MyGameItem.fromGame)
-                  .toList();
+              // Joined games (user is in playerIds)
+              final joinedItems = _lastJoinedGames.map(MyGameItem.fromGame).toList();
+              final joinedGameIds = _lastJoinedGames.map((g) => g.id).toSet();
 
-              // Exclude invitations for games the user has already joined
-              // (prevents duplicates when the invitation is accepted but the
-              // GameInvitationsBloc state hasn't refreshed yet)
-              final joinedGameIds = _lastGames.map((g) => g.id).toSet();
+              // Cross-group invitations — exclude games already joined
+              final invitedGameIds = invitations.map((i) => i.gameId).toSet();
               final invitedItems = invitations
                   .where((inv) => !joinedGameIds.contains(inv.gameId))
                   .map(MyGameItem.fromInvitation)
                   .toList();
 
-              // Upcoming: invitations + joined scheduled/in-progress, sorted by date
+              // Un-joined group games — exclude already joined and already invited
+              final groupGameItems = _lastGroupGames
+                  .where((g) =>
+                      !joinedGameIds.contains(g.id) &&
+                      !invitedGameIds.contains(g.id) &&
+                      g.status != GameStatus.cancelled)
+                  .map((g) => MyGameItem.fromGroupGame(g, groupName: ''))
+                  .toList();
+
+              // Upcoming: invitations + un-joined group games + joined upcoming
               final upcoming = [
                 ...invitedItems,
+                ...groupGameItems.where((g) => g.isUpcoming),
                 ...joinedItems.where((g) => g.isUpcoming),
               ]..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
 
-              // Past: joined completed/verification games, most recent first
+              // Past: joined completed/verification/overdue games, most recent first
               final past = joinedItems
                   .where((g) => g.isPast)
                   .toList()

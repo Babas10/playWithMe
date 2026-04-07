@@ -136,6 +136,16 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
+  Stream<List<GameModel>> getGroupGamesForUser(String userId) {
+    final now = DateTime.now();
+    return _gamesController.stream.map((games) => games
+        .where((game) =>
+            game.status != GameStatus.cancelled &&
+            game.scheduledAt.isAfter(now))
+        .toList());
+  }
+
+  @override
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId) {
     final now = DateTime.now();
     return _gamesController.stream.map((games) =>
