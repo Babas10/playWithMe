@@ -650,6 +650,129 @@ describe("processGameEloUpdates", () => {
     await expect(processGameEloUpdates(gameId, gameData)).resolves.not.toThrow();
   });
 
+  // ========================================================================
+  // Story 14.12: Per-game team fallback
+  // ========================================================================
+
+  test("uses per-game teams when individualGame.teams is present (Story 14.12)", async () => {
+    // Game session: p1+p2 vs p3+p4 at session level
+    // Game 1: p1+p3 vs p2+p4 (different split — per-game override)
+    // All 4 players must still have ELO updated.
+    const gameId = "game-per-game-teams";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1", "p2"], // session-level (should NOT be used inside the loop)
+        teamBPlayerIds: ["p3", "p4"],
+      },
+      result: {
+        overallWinner: "teamA",
+        games: [
+          {
+            gameNumber: 1,
+            winner: "teamA",
+            teams: {
+              teamAPlayerIds: ["p1", "p3"], // per-game override
+              teamBPlayerIds: ["p2", "p4"],
+            },
+          },
+        ],
+      },
+    };
+
+    const playerMap: {[key: string]: any} = {
+      p1: { eloRating: 1200, displayName: "P1" },
+      p2: { eloRating: 1200, displayName: "P2" },
+      p3: { eloRating: 1200, displayName: "P3" },
+      p4: { eloRating: 1200, displayName: "P4" },
+    };
+
+    const subCollectionMock = { doc: jest.fn(() => ({ id: "historyId" })) };
+    const docRefMock = { collection: jest.fn(() => subCollectionMock) };
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = { exists: true, id: gameId, ref: gameRef, data: () => gameData };
+
+    db.collection.mockReturnValue({
+      doc: jest.fn((id: string) => {
+        if (id === gameId) return { ...docRefMock, get: jest.fn().mockResolvedValue(gameDocMock) };
+        return { id, exists: true, data: () => playerMap[id], ...docRefMock };
+      }),
+    });
+
+    transaction.get.mockImplementation((ref: any) => Promise.resolve({
+      exists: true,
+      id: ref.id,
+      data: () => playerMap[ref.id] || {},
+    }));
+
+    await processGameEloUpdates(gameId, gameData);
+
+    // All 4 players must have received an ELO update
+    const updatedIds = transaction.update.mock.calls
+      .filter((call: any) => ["p1", "p2", "p3", "p4"].includes(call[0]?.id))
+      .map((call: any) => call[0].id);
+    expect(updatedIds).toContain("p1");
+    expect(updatedIds).toContain("p2");
+    expect(updatedIds).toContain("p3");
+    expect(updatedIds).toContain("p4");
+  });
+
+  test("falls back to session-level teams when individualGame.teams is absent (Story 14.12)", async () => {
+    // Old game shape: no per-game teams — must behave identically to pre-14.12
+    const gameId = "game-no-per-game-teams";
+    const gameData = {
+      teams: {
+        teamAPlayerIds: ["p1", "p2"],
+        teamBPlayerIds: ["p3", "p4"],
+      },
+      result: {
+        overallWinner: "teamA",
+        games: [
+          {
+            gameNumber: 1,
+            winner: "teamA",
+            // no `teams` field — fallback expected
+          },
+        ],
+      },
+    };
+
+    const playerMap: {[key: string]: any} = {
+      p1: { eloRating: 1200, displayName: "P1" },
+      p2: { eloRating: 1200, displayName: "P2" },
+      p3: { eloRating: 1200, displayName: "P3" },
+      p4: { eloRating: 1200, displayName: "P4" },
+    };
+
+    const subCollectionMock = { doc: jest.fn(() => ({ id: "historyId" })) };
+    const docRefMock = { collection: jest.fn(() => subCollectionMock) };
+    const gameRef = { parent: { id: "games" } };
+    const gameDocMock = { exists: true, id: gameId, ref: gameRef, data: () => gameData };
+
+    db.collection.mockReturnValue({
+      doc: jest.fn((id: string) => {
+        if (id === gameId) return { ...docRefMock, get: jest.fn().mockResolvedValue(gameDocMock) };
+        return { id, exists: true, data: () => playerMap[id], ...docRefMock };
+      }),
+    });
+
+    transaction.get.mockImplementation((ref: any) => Promise.resolve({
+      exists: true,
+      id: ref.id,
+      data: () => playerMap[ref.id] || {},
+    }));
+
+    // Should not throw and must update all 4 players using session-level teams
+    await expect(processGameEloUpdates(gameId, gameData)).resolves.not.toThrow();
+
+    const updatedIds = transaction.update.mock.calls
+      .filter((call: any) => ["p1", "p2", "p3", "p4"].includes(call[0]?.id))
+      .map((call: any) => call[0].id);
+    expect(updatedIds).toContain("p1");
+    expect(updatedIds).toContain("p2");
+    expect(updatedIds).toContain("p3");
+    expect(updatedIds).toContain("p4");
+  });
+
   test("rejects when game document doesn't exist (Story 15.5)", async () => {
     const gameId = "nonexistent";
     const gameData = {
