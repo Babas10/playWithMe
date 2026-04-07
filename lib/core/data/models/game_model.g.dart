@@ -232,9 +232,9 @@ _$IndividualGameImpl _$$IndividualGameImplFromJson(Map<String, dynamic> json) =>
       gameNumber: (json['gameNumber'] as num).toInt(),
       sets: const SetScoreListConverter().fromJson(json['sets'] as List),
       winner: json['winner'] as String,
-      teams: json['teams'] == null
-          ? null
-          : GameTeams.fromJson(json['teams'] as Map<String, dynamic>),
+      teams: const GameTeamsConverter().fromJson(
+        json['teams'] as Map<String, dynamic>?,
+      ),
     );
 
 Map<String, dynamic> _$$IndividualGameImplToJson(
@@ -243,7 +243,7 @@ Map<String, dynamic> _$$IndividualGameImplToJson(
   'gameNumber': instance.gameNumber,
   'sets': const SetScoreListConverter().toJson(instance.sets),
   'winner': instance.winner,
-  'teams': instance.teams?.toJson(),
+  'teams': const GameTeamsConverter().toJson(instance.teams),
 };
 
 _$GameResultImpl _$$GameResultImplFromJson(Map<String, dynamic> json) =>

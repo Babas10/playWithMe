@@ -2098,6 +2098,7 @@ mixin _$IndividualGame {
   @SetScoreListConverter()
   List<SetScore> get sets => throw _privateConstructorUsedError;
   String get winner => throw _privateConstructorUsedError; // 'teamA' or 'teamB'
+  @GameTeamsConverter()
   GameTeams? get teams => throw _privateConstructorUsedError;
 
   /// Serializes this IndividualGame to a JSON map.
@@ -2121,7 +2122,7 @@ abstract class $IndividualGameCopyWith<$Res> {
     int gameNumber,
     @SetScoreListConverter() List<SetScore> sets,
     String winner,
-    GameTeams? teams,
+    @GameTeamsConverter() GameTeams? teams,
   });
 
   $GameTeamsCopyWith<$Res>? get teams;
@@ -2198,7 +2199,7 @@ abstract class _$$IndividualGameImplCopyWith<$Res>
     int gameNumber,
     @SetScoreListConverter() List<SetScore> sets,
     String winner,
-    GameTeams? teams,
+    @GameTeamsConverter() GameTeams? teams,
   });
 
   @override
@@ -2248,14 +2249,13 @@ class __$$IndividualGameImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _$IndividualGameImpl extends _IndividualGame {
   const _$IndividualGameImpl({
     required this.gameNumber,
     @SetScoreListConverter() required final List<SetScore> sets,
     required this.winner,
-    this.teams,
+    @GameTeamsConverter() this.teams,
   }) : _sets = sets,
        super._();
 
@@ -2279,6 +2279,7 @@ class _$IndividualGameImpl extends _IndividualGame {
   final String winner;
   // 'teamA' or 'teamB'
   @override
+  @GameTeamsConverter()
   final GameTeams? teams;
 
   @override
@@ -2330,7 +2331,7 @@ abstract class _IndividualGame extends IndividualGame {
     required final int gameNumber,
     @SetScoreListConverter() required final List<SetScore> sets,
     required final String winner,
-    final GameTeams? teams,
+    @GameTeamsConverter() final GameTeams? teams,
   }) = _$IndividualGameImpl;
   const _IndividualGame._() : super._();
 
@@ -2345,6 +2346,7 @@ abstract class _IndividualGame extends IndividualGame {
   @override
   String get winner; // 'teamA' or 'teamB'
   @override
+  @GameTeamsConverter()
   GameTeams? get teams;
 
   /// Create a copy of IndividualGame
