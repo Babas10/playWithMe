@@ -527,6 +527,7 @@ class IndividualGame with _$IndividualGame {
     required int gameNumber, // 1, 2, 3, etc. within the session
     @SetScoreListConverter() required List<SetScore> sets,
     required String winner, // 'teamA' or 'teamB'
+    @GameTeamsConverter() GameTeams? teams, // per-game teams override; null means use session-level GameModel.teams
   }) = _IndividualGame;
 
   const IndividualGame._();
@@ -749,6 +750,20 @@ class SetScoreListConverter implements JsonConverter<List<SetScore>, List<dynami
   List<dynamic> toJson(List<SetScore> object) {
     return object.map((e) => e.toJson()).toList();
   }
+}
+
+/// Custom converter for nullable GameTeams to ensure proper JSON serialization
+class GameTeamsConverter implements JsonConverter<GameTeams?, Map<String, dynamic>?> {
+  const GameTeamsConverter();
+
+  @override
+  GameTeams? fromJson(Map<String, dynamic>? json) {
+    if (json == null) return null;
+    return GameTeams.fromJson(json);
+  }
+
+  @override
+  Map<String, dynamic>? toJson(GameTeams? object) => object?.toJson();
 }
 
 /// Custom converter for List&lt;IndividualGame&gt; to handle proper JSON serialization

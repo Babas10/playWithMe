@@ -1403,6 +1403,118 @@ void main() {
       expect(game.setsWon['teamA'], 2);
       expect(game.setsWon['teamB'], 1);
     });
+
+    // ── Per-game teams (Story 14.10) ──────────────────────────────────────────
+
+    test('teams is null by default (backward compatible)', () {
+      const game = IndividualGame(
+        gameNumber: 1,
+        sets: [SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1)],
+        winner: 'teamA',
+      );
+
+      expect(game.teams, isNull);
+    });
+
+    test('teams can be set per game', () {
+      const game = IndividualGame(
+        gameNumber: 1,
+        sets: [SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1)],
+        winner: 'teamA',
+        teams: GameTeams(
+          teamAPlayerIds: ['p1', 'p2'],
+          teamBPlayerIds: ['p3', 'p4'],
+        ),
+      );
+
+      expect(game.teams, isNotNull);
+      expect(game.teams!.teamAPlayerIds, ['p1', 'p2']);
+      expect(game.teams!.teamBPlayerIds, ['p3', 'p4']);
+    });
+
+    test('fromJson without teams field deserializes to null (old format)', () {
+      final json = <String, dynamic>{
+        'gameNumber': 1,
+        'sets': [
+          {'teamAPoints': 21, 'teamBPoints': 18, 'setNumber': 1},
+        ],
+        'winner': 'teamA',
+        // no 'teams' key — old document
+      };
+
+      final game = IndividualGame.fromJson(json);
+
+      expect(game.teams, isNull);
+    });
+
+    test('fromJson with teams field deserializes correctly (new format)', () {
+      final json = <String, dynamic>{
+        'gameNumber': 2,
+        'sets': [
+          {'teamAPoints': 21, 'teamBPoints': 15, 'setNumber': 1},
+        ],
+        'winner': 'teamB',
+        'teams': {
+          'teamAPlayerIds': ['p1', 'p2'],
+          'teamBPlayerIds': ['p3', 'p4'],
+        },
+      };
+
+      final game = IndividualGame.fromJson(json);
+
+      expect(game.teams, isNotNull);
+      expect(game.teams!.teamAPlayerIds, ['p1', 'p2']);
+      expect(game.teams!.teamBPlayerIds, ['p3', 'p4']);
+    });
+
+    test('toJson omits teams key when null', () {
+      const game = IndividualGame(
+        gameNumber: 1,
+        sets: [SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1)],
+        winner: 'teamA',
+      );
+
+      final json = game.toJson();
+
+      // null field is serialized as null (Firestore ignores null-value fields
+      // set explicitly; old clients reading documents without the key get null)
+      expect(json['teams'], isNull);
+    });
+
+    test('toJson includes teams when set', () {
+      const game = IndividualGame(
+        gameNumber: 1,
+        sets: [SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1)],
+        winner: 'teamA',
+        teams: GameTeams(
+          teamAPlayerIds: ['p1', 'p2'],
+          teamBPlayerIds: ['p3', 'p4'],
+        ),
+      );
+
+      final json = game.toJson();
+
+      expect(json['teams'], isA<Map<String, dynamic>>());
+      final teamsJson = json['teams'] as Map<String, dynamic>;
+      expect(teamsJson['teamAPlayerIds'], ['p1', 'p2']);
+      expect(teamsJson['teamBPlayerIds'], ['p3', 'p4']);
+    });
+
+    test('round-trip serialization preserves teams', () {
+      const original = IndividualGame(
+        gameNumber: 3,
+        sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+        winner: 'teamA',
+        teams: GameTeams(
+          teamAPlayerIds: ['alice', 'bob'],
+          teamBPlayerIds: ['carol', 'dave'],
+        ),
+      );
+
+      final roundTripped = IndividualGame.fromJson(original.toJson());
+
+      expect(roundTripped, original);
+    });
   });
 
   group('GameResult', () {
