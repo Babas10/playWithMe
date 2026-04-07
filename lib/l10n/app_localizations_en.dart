@@ -2002,4 +2002,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pastGames => 'Past Games';
+
+  @override
+  String get open => 'Open';
 }

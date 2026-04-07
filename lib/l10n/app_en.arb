@@ -2922,6 +2922,10 @@
   },
 
   "pastGames": "Past Games",
+  "open": "Open",
+  "@open": {
+    "description": "Badge on un-joined group game tiles"
+  },
   "@pastGames": {
     "description": "Section header for past games in MyGamesPage"
   }

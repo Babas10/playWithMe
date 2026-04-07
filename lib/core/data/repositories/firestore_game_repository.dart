@@ -261,6 +261,75 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
+  Stream<List<GameModel>> getGroupGamesForUser(String userId) {
+    final controller = StreamController<List<GameModel>>();
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? groupsSub;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? gamesSub;
+
+    groupsSub = _firestore
+        .collection('groups')
+        .where('memberIds', arrayContains: userId)
+        .snapshots()
+        .listen(
+      (groupsSnapshot) {
+        gamesSub?.cancel();
+        final groupIds = groupsSnapshot.docs.map((d) => d.id).toList();
+        if (groupIds.isEmpty) {
+          controller.add([]);
+          return;
+        }
+
+        // Firestore 'whereIn' is limited to 30 values
+        gamesSub = _firestore
+            .collection(_collection)
+            .where('groupId', whereIn: groupIds.take(30).toList())
+            .where('status', whereIn: ['scheduled', 'inProgress'])
+            .where('scheduledAt', isGreaterThan: Timestamp.now())
+            .orderBy('scheduledAt')
+            .snapshots()
+            .listen(
+          (gamesSnapshot) {
+            final games = gamesSnapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GameModel.fromFirestore(doc))
+                .toList();
+            controller.add(games);
+          },
+          onError: (Object error) {
+            if (error is FirebaseException) {
+              controller.addError(GameException(
+                  'Failed to get group games: ${error.message}',
+                  code: error.code));
+            } else {
+              controller.addError(GameException(
+                  'Failed to get group games: $error',
+                  code: 'stream-error'));
+            }
+          },
+        );
+      },
+      onError: (Object error) {
+        if (error is FirebaseException) {
+          controller.addError(GameException(
+              'Failed to get group games: ${error.message}',
+              code: error.code));
+        } else {
+          controller.addError(GameException(
+              'Failed to get group games: $error',
+              code: 'stream-error'));
+        }
+      },
+    );
+
+    controller.onCancel = () {
+      groupsSub?.cancel();
+      gamesSub?.cancel();
+    };
+
+    return controller.stream;
+  }
+
+  @override
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId) {
     try {
       final now = Timestamp.now();

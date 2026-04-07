@@ -2040,4 +2040,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pastGames => 'Vergangene Spiele';
+
+  @override
+  String get open => 'Offen';
 }

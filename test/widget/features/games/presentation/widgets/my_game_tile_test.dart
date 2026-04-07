@@ -13,9 +13,11 @@ MyGameItem _makeItem({
   GameStatus status = GameStatus.scheduled,
   String? invitationId,
   String groupName = '',
+  MyGameItemSource source = MyGameItemSource.joined,
 }) {
   return MyGameItem(
     gameId: 'game-1',
+    source: source,
     invitationId: invitationId,
     title: 'Beach Volleyball',
     scheduledAt: DateTime.now().add(const Duration(days: 1)),

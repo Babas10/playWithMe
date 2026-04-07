@@ -2043,4 +2043,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get pastGames => 'Parties passées';
+
+  @override
+  String get open => 'Ouvert';
 }

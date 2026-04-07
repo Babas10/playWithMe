@@ -84,7 +84,9 @@ class MyGameTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              _StatusBadge(status: item.status, l10n: l10n),
+              item.isGroupGame
+                  ? _OpenBadge(l10n: l10n)
+                  : _StatusBadge(status: item.status, l10n: l10n),
               const Icon(Icons.chevron_right, size: 18, color: _kTextMuted),
             ],
           ),
@@ -176,6 +178,32 @@ class _StatusBadge extends StatelessWidget {
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: fg,
+        ),
+      ),
+    );
+  }
+}
+
+/// Badge shown on un-joined group games — invites the user to join.
+class _OpenBadge extends StatelessWidget {
+  final AppLocalizations l10n;
+  const _OpenBadge({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.green.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        l10n.open,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: Colors.green.shade700,
         ),
       ),
     );
