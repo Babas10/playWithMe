@@ -1,3 +1,5 @@
+// Result view page for a completed game (Story 14.13).
+// Shows ELO rating changes with per-player win/loss counts and per-game team names.
 import 'package:flutter/material.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/core/theme/play_with_me_app_bar.dart';
@@ -19,26 +21,30 @@ class GameResultViewPage extends StatelessWidget {
     this.playerEloUpdates = const {},
   });
 
-  /// Generate team name from player IDs (e.g., "Alice & Bob" or "Team A")
-  String _getTeamName(List<String> playerIds, String fallbackName) {
-    if (players == null || players!.isEmpty || playerIds.isEmpty) {
-      return fallbackName;
+  /// Per-player win and loss counts across all individual games.
+  /// Uses per-game teams when present, session-level teams as fallback.
+  Map<String, ({int wins, int losses})> _computeWinLoss(GameResult result) {
+    final counts = <String, ({int wins, int losses})>{};
+
+    for (final individualGame in result.games) {
+      final gameTeams = individualGame.teams ?? game.teams;
+      if (gameTeams == null) continue;
+      final winner = individualGame.winner;
+
+      for (final id in gameTeams.teamAPlayerIds) {
+        final prev = counts[id] ?? (wins: 0, losses: 0);
+        counts[id] = winner == 'teamA'
+            ? (wins: prev.wins + 1, losses: prev.losses)
+            : (wins: prev.wins, losses: prev.losses + 1);
+      }
+      for (final id in gameTeams.teamBPlayerIds) {
+        final prev = counts[id] ?? (wins: 0, losses: 0);
+        counts[id] = winner == 'teamB'
+            ? (wins: prev.wins + 1, losses: prev.losses)
+            : (wins: prev.wins, losses: prev.losses + 1);
+      }
     }
-
-    // Get up to 2 player names
-    final names = playerIds
-        .take(2)
-        .map((id) {
-          final player = players![id];
-          if (player == null) return null;
-          return player.displayName ?? player.email.split('@').first;
-        })
-        .where((name) => name != null)
-        .toList();
-
-    if (names.isEmpty) return fallbackName;
-    if (names.length == 1) return names[0]!;
-    return '${names[0]} & ${names[1]}';
+    return counts;
   }
 
   @override
@@ -77,15 +83,11 @@ class GameResultViewPage extends StatelessWidget {
     }
 
     final result = game.result!;
-    final teams = game.teams;
-
-    // Generate team names
-    final teamAName = teams != null
-        ? _getTeamName(teams.teamAPlayerIds, l10n.teamA)
-        : l10n.teamA;
-    final teamBName = teams != null
-        ? _getTeamName(teams.teamBPlayerIds, l10n.teamB)
-        : l10n.teamB;
+    final winLoss = _computeWinLoss(result);
+    final allPlayerIds = [
+      ...?game.teams?.teamAPlayerIds,
+      ...?game.teams?.teamBPlayerIds,
+    ];
 
     return Scaffold(
       appBar: PlayWithMeAppBar.build(
@@ -97,23 +99,16 @@ class GameResultViewPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Overall Result Card
-            _OverallResultCard(
-              result: result,
-              teams: teams,
-              teamAName: teamAName,
-              teamBName: teamBName,
-            ),
-            const SizedBox(height: 16),
-            // ELO Updates Card (if ELO is calculated)
+            // ELO Rating Changes card (replaces the old "Final Score" card)
             if (playerEloUpdates.isNotEmpty)
               _EloUpdatesCard(
-                playerIds: [...teams?.teamAPlayerIds ?? [], ...teams?.teamBPlayerIds ?? []],
+                playerIds: allPlayerIds,
                 players: players,
                 playerEloUpdates: playerEloUpdates,
+                winLoss: winLoss,
               ),
             if (playerEloUpdates.isNotEmpty) const SizedBox(height: 20),
-            // Individual Games List
+            // Individual Games section
             Text(
               l10n.individualGames,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -124,10 +119,14 @@ class GameResultViewPage extends StatelessWidget {
             const SizedBox(height: 16),
             ...result.games.asMap().entries.map((entry) {
               final index = entry.key;
-              final game = entry.value;
+              final individualGame = entry.value;
+              // Per-game teams with session-level fallback
+              final gameTeams = individualGame.teams ?? game.teams;
               return _IndividualGameCard(
                 gameNumber: index + 1,
-                game: game,
+                game: individualGame,
+                gameTeams: gameTeams,
+                players: players,
                 isLast: index == result.games.length - 1,
               );
             }),
@@ -138,172 +137,15 @@ class GameResultViewPage extends StatelessWidget {
   }
 }
 
-class _OverallResultCard extends StatelessWidget {
-  final GameResult result;
-  final GameTeams? teams;
-  final String teamAName;
-  final String teamBName;
-
-  const _OverallResultCard({
-    required this.result,
-    required this.teams,
-    required this.teamAName,
-    required this.teamBName,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final gamesWon = result.gamesWon;
-
-    return Card(
-      elevation: 3,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primary.withValues(alpha: 0.15),
-              AppColors.primary.withValues(alpha: 0.05),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.emoji_events, color: AppColors.primary, size: 28),
-                  const SizedBox(width: 10),
-                  Text(
-                    l10n.finalScore,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
-                        ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: _TeamScore(
-                      teamName: teamAName,
-                      score: gamesWon['teamA'] ?? 0,
-                      isWinner: result.overallWinner == 'teamA',
-                      isTied: result.overallWinner == null,
-                      isTeamA: true,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _TeamScore(
-                      teamName: teamBName,
-                      score: gamesWon['teamB'] ?? 0,
-                      isWinner: result.overallWinner == 'teamB',
-                      isTied: result.overallWinner == null,
-                      isTeamA: false,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TeamScore extends StatelessWidget {
-  final String teamName;
-  final int score;
-  final bool isWinner;
-  final bool isTied;
-  final bool isTeamA;
-
-  const _TeamScore({
-    required this.teamName,
-    required this.score,
-    required this.isWinner,
-    this.isTied = false,
-    this.isTeamA = true,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color backgroundColor;
-    final Color textColor;
-    final Color borderColor;
-
-    if (isWinner) {
-      backgroundColor = AppColors.secondary;
-      textColor = Colors.white;
-      borderColor = AppColors.secondary;
-    } else if (isTied) {
-      // Tie: Team A gets yellow/gold, Team B gets blue — visually distinct
-      backgroundColor = isTeamA ? AppColors.primary : AppColors.secondary;
-      textColor = isTeamA ? AppColors.secondary : Colors.white;
-      borderColor = isTeamA ? AppColors.primary : AppColors.secondary;
-    } else {
-      backgroundColor = AppColors.primary;
-      textColor = AppColors.secondary;
-      borderColor = AppColors.primary;
-    }
-
-    return Column(
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: borderColor,
-              width: isWinner ? 2.5 : 1.5,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              score.toString(),
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          teamName,
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: isWinner ? FontWeight.bold : FontWeight.w500,
-                color: AppColors.secondary,
-                height: 1.2,
-              ),
-        ),
-      ],
-    );
-  }
-}
-
 class _EloUpdatesCard extends StatelessWidget {
   final List<String> playerIds;
   final Map<String, UserModel>? players;
   final Map<String, RatingHistoryEntry?> playerEloUpdates;
+  final Map<String, ({int wins, int losses})> winLoss;
 
   const _EloUpdatesCard({
     required this.playerIds,
+    required this.winLoss,
     this.players,
     this.playerEloUpdates = const {},
   });
@@ -311,19 +153,16 @@ class _EloUpdatesCard extends StatelessWidget {
   String _getPlayerName(BuildContext context, String playerId) {
     final l10n = AppLocalizations.of(context)!;
     return players?[playerId]?.displayName ??
-           players?[playerId]?.email ??
-           l10n.unknownPlayer;
+        players?[playerId]?.email ??
+        l10n.unknownPlayer;
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Filter to only players with ELO updates
     final playersWithElo = playerIds.where((id) => playerEloUpdates[id] != null).toList();
 
-    if (playersWithElo.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (playersWithElo.isEmpty) return const SizedBox.shrink();
 
     return Card(
       child: Padding(
@@ -354,69 +193,92 @@ class _EloUpdatesCard extends StatelessWidget {
               final newRating = eloEntry.newRating.toInt();
               final isGain = eloEntry.isGain;
               final isLoss = eloEntry.isLoss;
+              final record = winLoss[playerId];
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Player name
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        playerName,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Previous ELO
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        '$oldRating',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
-                            ),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                    // Arrow
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Icon(
-                        isGain ? Icons.arrow_forward : Icons.arrow_forward,
-                        size: 16,
-                        color: isGain ? Colors.green : (isLoss ? Colors.red : Colors.grey),
-                      ),
-                    ),
-                    // New ELO
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        '$newRating',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isGain ? Colors.green : (isLoss ? Colors.red : Colors.grey),
-                            ),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Change delta
-                    SizedBox(
-                      width: 60,
-                      child: Text(
-                        eloEntry.formattedChange,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: isGain ? Colors.green : (isLoss ? Colors.red : Colors.grey),
+                    Row(
+                      children: [
+                        // Player name
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            playerName,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        textAlign: TextAlign.right,
-                      ),
+                        const SizedBox(width: 12),
+                        // Previous ELO
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            '$oldRating',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.grey[600],
+                                ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        // Arrow
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Icon(
+                            Icons.arrow_forward,
+                            size: 16,
+                            color: isGain
+                                ? Colors.green
+                                : (isLoss ? Colors.red : Colors.grey),
+                          ),
+                        ),
+                        // New ELO
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            '$newRating',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: isGain
+                                      ? Colors.green
+                                      : (isLoss ? Colors.red : Colors.grey),
+                                ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Change delta
+                        SizedBox(
+                          width: 60,
+                          child: Text(
+                            eloEntry.formattedChange,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isGain
+                                  ? Colors.green
+                                  : (isLoss ? Colors.red : Colors.grey),
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
+                    // Win/loss record below the ELO row
+                    if (record != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0),
+                        child: Text(
+                          l10n.winsLosses(record.wins, record.losses),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                        ),
+                      ),
                   ],
                 ),
               );
@@ -431,13 +293,30 @@ class _EloUpdatesCard extends StatelessWidget {
 class _IndividualGameCard extends StatelessWidget {
   final int gameNumber;
   final IndividualGame game;
+  final GameTeams? gameTeams;
+  final Map<String, UserModel>? players;
   final bool isLast;
 
   const _IndividualGameCard({
     required this.gameNumber,
     required this.game,
     required this.isLast,
+    this.gameTeams,
+    this.players,
   });
+
+  String _playerName(String playerId) {
+    final user = players?[playerId];
+    if (user == null) return playerId;
+    return user.displayName ?? user.email.split('@').first;
+  }
+
+  String _teamLabel(List<String> ids, String fallback) {
+    if (ids.isEmpty) return fallback;
+    final names = ids.take(2).map(_playerName).toList();
+    if (names.length == 1) return names[0];
+    return '${names[0]} & ${names[1]}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -451,6 +330,7 @@ class _IndividualGameCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Game header: number badge + title
             Row(
               children: [
                 Container(
@@ -481,6 +361,15 @@ class _IndividualGameCard extends StatelessWidget {
                 ),
               ],
             ),
+            // Per-game team names (Story 14.13)
+            if (gameTeams != null) ...[
+              const SizedBox(height: 10),
+              _TeamMatchupRow(
+                teamALabel: _teamLabel(gameTeams!.teamAPlayerIds, l10n.teamA),
+                teamBLabel: _teamLabel(gameTeams!.teamBPlayerIds, l10n.teamB),
+                winner: game.winner,
+              ),
+            ],
             const SizedBox(height: 12),
             // Sets won summary
             Row(
@@ -534,7 +423,9 @@ class _IndividualGameCard extends StatelessWidget {
                                   : AppColors.primary,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: teamAWon ? AppColors.secondary : AppColors.primary,
+                                color: teamAWon
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
                                 width: teamAWon ? 2 : 1,
                               ),
                             ),
@@ -542,13 +433,16 @@ class _IndividualGameCard extends StatelessWidget {
                               set.teamAPoints.toString(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: teamAWon ? Colors.white : AppColors.secondary,
+                                color: teamAWon
+                                    ? Colors.white
+                                    : AppColors.secondary,
                                 fontSize: 16,
                               ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               '-',
                               style: TextStyle(
@@ -569,7 +463,9 @@ class _IndividualGameCard extends StatelessWidget {
                                   : AppColors.primary,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: teamBWon ? AppColors.secondary : AppColors.primary,
+                                color: teamBWon
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
                                 width: teamBWon ? 2 : 1,
                               ),
                             ),
@@ -577,7 +473,9 @@ class _IndividualGameCard extends StatelessWidget {
                               set.teamBPoints.toString(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: teamBWon ? Colors.white : AppColors.secondary,
+                                color: teamBWon
+                                    ? Colors.white
+                                    : AppColors.secondary,
                                 fontSize: 16,
                               ),
                             ),
@@ -592,6 +490,62 @@ class _IndividualGameCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Compact "Alice & Bob  vs  Charlie & Dave" row with winner highlighted.
+class _TeamMatchupRow extends StatelessWidget {
+  final String teamALabel;
+  final String teamBLabel;
+  final String? winner;
+
+  const _TeamMatchupRow({
+    required this.teamALabel,
+    required this.teamBLabel,
+    this.winner,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final teamAWon = winner == 'teamA';
+    final teamBWon = winner == 'teamB';
+
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            teamALabel,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight:
+                      teamAWon ? FontWeight.bold : FontWeight.normal,
+                  color: teamAWon ? AppColors.secondary : Colors.grey[600],
+                ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: Text(
+            'vs',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[500],
+                ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            teamBLabel,
+            textAlign: TextAlign.right,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight:
+                      teamBWon ? FontWeight.bold : FontWeight.normal,
+                  color: teamBWon ? AppColors.secondary : Colors.grey[600],
+                ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }
