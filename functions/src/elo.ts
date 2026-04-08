@@ -135,7 +135,11 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
 
         // Per-game teams with session-level fallback (Story 14.12)
         // New games carry per-game teams; old games fall back to session-level assignment.
-        const gameTeams = individualGame.teams ?? gameData.teams;
+        // Explicit existence check (not just ??) to guard against partial/null team objects.
+        const hasPerGameTeams = !!(individualGame.teams &&
+          individualGame.teams.teamAPlayerIds &&
+          individualGame.teams.teamBPlayerIds);
+        const gameTeams = hasPerGameTeams ? individualGame.teams : gameData.teams;
         const gameTeamAIds: string[] = gameTeams.teamAPlayerIds;
         const gameTeamBIds: string[] = gameTeams.teamBPlayerIds;
 
