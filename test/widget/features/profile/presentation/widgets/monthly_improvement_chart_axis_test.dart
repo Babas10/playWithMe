@@ -31,14 +31,15 @@ void main() {
       final history = createHistory([1600, 1625, 1650]);
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1650,
@@ -63,14 +64,15 @@ void main() {
       final history = createHistory([1600, 1625, 1650]);
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1650,
@@ -95,14 +97,15 @@ void main() {
       final history = createHistory([1600, 1625, 1650]);
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          theme: ThemeData.light(),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          theme: ThemeData.light(),
           home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
@@ -133,14 +136,15 @@ void main() {
       final history = createHistory([1600, 1625, 1650]);
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1650,
@@ -200,14 +204,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: currentYearHistory,
               currentElo: 1650,
@@ -228,8 +233,11 @@ void main() {
         }
       }
 
-      expect(monthLabelCount, greaterThanOrEqualTo(2),
-          reason: 'Should have found month labels for data points');
+      expect(
+        monthLabelCount,
+        greaterThanOrEqualTo(2),
+        reason: 'Should have found month labels for data points',
+      );
     });
 
     testWidgets('shows year label centered within year range', (tester) async {
@@ -270,14 +278,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: previousYearHistory,
               currentElo: 1650,
@@ -299,11 +308,16 @@ void main() {
         }
       }
 
-      expect(foundYearLabel, isTrue,
-          reason: 'Should have found year label for previous year');
+      expect(
+        foundYearLabel,
+        isTrue,
+        reason: 'Should have found year label for previous year',
+      );
     });
 
-    testWidgets('shows year labels centered for each year in dataset', (tester) async {
+    testWidgets('shows year labels centered for each year in dataset', (
+      tester,
+    ) async {
       final now = DateTime.now();
       final previousYear = now.year - 1;
       // Story 302.7: Need at least 3 games
@@ -341,14 +355,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: mixedYearHistory,
               currentElo: 1650,
@@ -378,12 +393,21 @@ void main() {
         }
       }
 
-      expect(foundPreviousYearLabel, isTrue,
-          reason: 'Should have year label for previous year');
-      expect(foundCurrentYearLabel, isTrue,
-          reason: 'Should have year label for current year (year transition)');
-      expect(monthLabelCount, greaterThanOrEqualTo(2),
-          reason: 'Should have month labels for both data points');
+      expect(
+        foundPreviousYearLabel,
+        isTrue,
+        reason: 'Should have year label for previous year',
+      );
+      expect(
+        foundCurrentYearLabel,
+        isTrue,
+        reason: 'Should have year label for current year (year transition)',
+      );
+      expect(
+        monthLabelCount,
+        greaterThanOrEqualTo(2),
+        reason: 'Should have month labels for both data points',
+      );
     });
 
     testWidgets('reserved space increased for two-tier labels', (tester) async {
@@ -423,14 +447,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1650,
@@ -444,8 +469,11 @@ void main() {
       final bottomTitles = chart.data.titlesData.bottomTitles;
 
       // Verify reserved size is increased for two-tier labels (42 vs old 32)
-      expect(bottomTitles.sideTitles.reservedSize, equals(42),
-          reason: 'Reserved size should be 42 for two-tier labels');
+      expect(
+        bottomTitles.sideTitles.reservedSize,
+        equals(42),
+        reason: 'Reserved size should be 42 for two-tier labels',
+      );
     });
 
     testWidgets('column layout used for two-tier labels', (tester) async {
@@ -465,14 +493,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1620,
@@ -484,8 +513,11 @@ void main() {
 
       // Verify Column widgets are used for label structure
       final columns = tester.widgetList<Column>(find.byType(Column));
-      expect(columns.length, greaterThan(0),
-          reason: 'Should have Column widgets for two-tier structure');
+      expect(
+        columns.length,
+        greaterThan(0),
+        reason: 'Should have Column widgets for two-tier structure',
+      );
     });
   });
 }

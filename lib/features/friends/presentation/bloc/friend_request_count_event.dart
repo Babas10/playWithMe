@@ -11,5 +11,6 @@ class FriendRequestCountEvent with _$FriendRequestCountEvent {
   }) = FriendRequestCountStartListening;
 
   /// Stop listening to friend request count updates
-  const factory FriendRequestCountEvent.stopListening() = FriendRequestCountStopListening;
+  const factory FriendRequestCountEvent.stopListening() =
+      FriendRequestCountStopListening;
 }

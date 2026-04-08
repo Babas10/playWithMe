@@ -7,10 +7,7 @@ import '../../../../core/data/models/exercise_model.dart';
 class ExerciseFormDialog extends StatefulWidget {
   final ExerciseModel? exercise;
 
-  const ExerciseFormDialog({
-    super.key,
-    this.exercise,
-  });
+  const ExerciseFormDialog({super.key, this.exercise});
 
   @override
   State<ExerciseFormDialog> createState() => _ExerciseFormDialogState();
@@ -28,8 +25,9 @@ class _ExerciseFormDialogState extends State<ExerciseFormDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.exercise?.name ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.exercise?.description ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.exercise?.description ?? '',
+    );
     _durationController = TextEditingController(
       text: widget.exercise?.durationMinutes?.toString() ?? '',
     );
@@ -48,8 +46,9 @@ class _ExerciseFormDialogState extends State<ExerciseFormDialog> {
       final name = _nameController.text.trim();
       final description = _descriptionController.text.trim();
       final durationText = _durationController.text.trim();
-      final durationMinutes =
-          durationText.isEmpty ? null : int.tryParse(durationText);
+      final durationMinutes = durationText.isEmpty
+          ? null
+          : int.tryParse(durationText);
 
       Navigator.of(context).pop({
         'name': name,
@@ -106,9 +105,7 @@ class _ExerciseFormDialogState extends State<ExerciseFormDialog> {
                   suffixText: 'min',
                 ),
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) {
                   if (value != null && value.trim().isNotEmpty) {
                     final duration = int.tryParse(value);

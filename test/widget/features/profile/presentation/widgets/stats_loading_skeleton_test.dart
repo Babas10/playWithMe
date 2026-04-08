@@ -7,11 +7,7 @@ void main() {
   group('StatsLoadingSkeleton Widget Tests', () {
     testWidgets('renders with default properties', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StatsLoadingSkeleton(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: StatsLoadingSkeleton())),
       );
       await tester.pump(); // Use pump() for animated widgets
 
@@ -23,12 +19,7 @@ void main() {
     testWidgets('renders with custom height and width', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: StatsLoadingSkeleton(
-              height: 100,
-              width: 200,
-            ),
-          ),
+          home: Scaffold(body: StatsLoadingSkeleton(height: 100, width: 200)),
         ),
       );
       await tester.pump();
@@ -44,58 +35,56 @@ void main() {
 
     testWidgets('animates continuously', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StatsLoadingSkeleton(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: StatsLoadingSkeleton())),
       );
 
       // Initial pump
       await tester.pump();
       final initialWidget = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(AnimatedBuilder),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(AnimatedBuilder),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       // Advance animation
       await tester.pump(const Duration(milliseconds: 750));
       final animatedWidget = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(AnimatedBuilder),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(AnimatedBuilder),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       // Decorations should be different due to animation
-      expect(initialWidget.decoration, isNot(equals(animatedWidget.decoration)));
+      expect(
+        initialWidget.decoration,
+        isNot(equals(animatedWidget.decoration)),
+      );
     });
   });
 
   group('LoadingStatCard Widget Tests', () {
     testWidgets('renders card with loading skeletons', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: LoadingStatCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: LoadingStatCard())),
       );
       await tester.pump(); // Use pump() for animated widgets
 
       expect(find.byType(Card), findsOneWidget);
-      expect(find.byType(StatsLoadingSkeleton), findsNWidgets(9)); // Title + 4 stat items (2 skeletons each)
+      expect(
+        find.byType(StatsLoadingSkeleton),
+        findsNWidgets(9),
+      ); // Title + 4 stat items (2 skeletons each)
     });
 
     testWidgets('has correct layout structure', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: LoadingStatCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: LoadingStatCard())),
       );
       await tester.pump(); // Use pump() for animated widgets
 
@@ -107,25 +96,20 @@ void main() {
   group('CompactStatLoadingSkeleton Widget Tests', () {
     testWidgets('renders compact loading card', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: CompactStatLoadingSkeleton(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: CompactStatLoadingSkeleton())),
       );
       await tester.pump(); // Use pump() for animated widgets
 
       expect(find.byType(Card), findsOneWidget);
-      expect(find.byType(StatsLoadingSkeleton), findsNWidgets(2)); // Label + value
+      expect(
+        find.byType(StatsLoadingSkeleton),
+        findsNWidgets(2),
+      ); // Label + value
     });
 
     testWidgets('has correct compact layout', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: CompactStatLoadingSkeleton(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: CompactStatLoadingSkeleton())),
       );
       await tester.pump(); // Use pump() for animated widgets
 

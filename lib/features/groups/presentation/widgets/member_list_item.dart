@@ -6,19 +6,16 @@ class MemberListItem extends StatelessWidget {
   final UserModel user;
   final bool isAdmin;
 
-  const MemberListItem({
-    super.key,
-    required this.user,
-    this.isAdmin = false,
-  });
+  const MemberListItem({super.key, required this.user, this.isAdmin = false});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
-        backgroundImage:
-            user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
+        backgroundImage: user.photoUrl != null
+            ? NetworkImage(user.photoUrl!)
+            : null,
         child: user.photoUrl == null
             ? Text(
                 _getInitials(user.displayName ?? user.email),
@@ -36,10 +33,7 @@ class MemberListItem extends StatelessWidget {
       subtitle: user.displayName != null ? Text(user.email) : null,
       trailing: isAdmin
           ? Chip(
-              label: const Text(
-                'Admin',
-                style: TextStyle(fontSize: 12),
-              ),
+              label: const Text('Admin', style: TextStyle(fontSize: 12)),
               backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
               labelStyle: TextStyle(
                 color: Color(0xFF004E64),

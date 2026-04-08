@@ -70,15 +70,11 @@ class NextTrainingSessionCard extends StatelessWidget {
                   left: 0,
                   top: 0,
                   bottom: 0,
-                  child: Container(
-                    width: 6,
-                    color: _kPrimary,
-                  ),
+                  child: Container(width: 6, color: _kPrimary),
                 ),
                 // Card content
                 Padding(
-                  padding:
-                      const EdgeInsets.fromLTRB(22, 20, 16, 20),
+                  padding: const EdgeInsets.fromLTRB(22, 20, 16, 20),
                   child: _buildSessionContent(context, l10n),
                 ),
               ],
@@ -153,54 +149,33 @@ class NextTrainingSessionCard extends StatelessWidget {
         // Date/time + Location + Duration
         Row(
           children: [
-            Icon(
-              Icons.calendar_today,
-              size: 14,
-              color: _kTextMuted,
-            ),
+            Icon(Icons.calendar_today, size: 14, color: _kTextMuted),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 _formatDateTime(context, session!.startTime),
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: _kTextMuted,
-                ),
+                style: const TextStyle(fontSize: 14, color: _kTextMuted),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 6),
-            Icon(
-              Icons.location_on,
-              size: 14,
-              color: _kTextMuted,
-            ),
+            Icon(Icons.location_on, size: 14, color: _kTextMuted),
             const SizedBox(width: 2),
             Expanded(
               child: Text(
                 session!.location.name,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: _kTextMuted,
-                ),
+                style: const TextStyle(fontSize: 14, color: _kTextMuted),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 6),
-            Icon(
-              Icons.access_time,
-              size: 14,
-              color: _kTextMuted,
-            ),
+            Icon(Icons.access_time, size: 14, color: _kTextMuted),
             const SizedBox(width: 2),
             Text(
               _formatDuration(context, session!.duration),
-              style: const TextStyle(
-                fontSize: 14,
-                color: _kTextMuted,
-              ),
+              style: const TextStyle(fontSize: 14, color: _kTextMuted),
             ),
           ],
         ),
@@ -211,8 +186,7 @@ class NextTrainingSessionCard extends StatelessWidget {
     );
   }
 
-  Widget _buildParticipationBadge(
-      BuildContext context, AppLocalizations l10n) {
+  Widget _buildParticipationBadge(BuildContext context, AppLocalizations l10n) {
     final isParticipant = session!.isParticipant(userId);
 
     if (isParticipant) {
@@ -250,8 +224,7 @@ class NextTrainingSessionCard extends StatelessWidget {
     );
   }
 
-  Widget _buildParticipantBar(
-      BuildContext context, AppLocalizations l10n) {
+  Widget _buildParticipantBar(BuildContext context, AppLocalizations l10n) {
     final progress =
         session!.currentParticipantCount / session!.maxParticipants;
     return Container(
@@ -264,7 +237,9 @@ class NextTrainingSessionCard extends StatelessWidget {
         children: [
           Text(
             l10n.participantsCount(
-                session!.currentParticipantCount, session!.maxParticipants),
+              session!.currentParticipantCount,
+              session!.maxParticipants,
+            ),
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -337,20 +312,19 @@ class _DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        const Radius.circular(16),
-      ));
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          const Radius.circular(16),
+        ),
+      );
 
     final dashPath = Path();
     for (final metric in path.computeMetrics()) {
       double distance = 0;
       while (distance < metric.length) {
         final end = (distance + 8).clamp(0.0, metric.length);
-        dashPath.addPath(
-          metric.extractPath(distance, end),
-          Offset.zero,
-        );
+        dashPath.addPath(metric.extractPath(distance, end), Offset.zero);
         distance += 16;
       }
     }

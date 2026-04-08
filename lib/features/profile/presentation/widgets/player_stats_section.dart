@@ -30,12 +30,15 @@ class PlayerStatsSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: Text(
                   l10n.performanceStats,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
 
@@ -76,9 +79,15 @@ class PlayerStatsSection extends StatelessWidget {
                   StatCard(
                     label: l10n.streakLabel,
                     value: user.streakValue.toString(),
-                    subLabel: user.isOnWinningStreak ? l10n.winning : (user.isOnLosingStreak ? l10n.losingStreak : l10n.noStreak),
+                    subLabel: user.isOnWinningStreak
+                        ? l10n.winning
+                        : (user.isOnLosingStreak
+                              ? l10n.losingStreak
+                              : l10n.noStreak),
                     icon: Icons.local_fire_department,
-                    iconColor: user.isOnWinningStreak ? Colors.orange : Colors.grey,
+                    iconColor: user.isOnWinningStreak
+                        ? Colors.orange
+                        : Colors.grey,
                   ),
                   StatCard(
                     label: l10n.gamesPlayedLabel,
@@ -109,10 +118,10 @@ class _BestTeammateCard extends StatelessWidget {
 
   String? _getBestTeammateId() {
     if (teammateStats.isEmpty) return null;
-    
+
     String? bestId;
     int maxWins = -1;
-    
+
     teammateStats.forEach((key, value) {
       final wins = value['gamesWon'] as int? ?? 0;
       if (wins > maxWins) {
@@ -120,7 +129,7 @@ class _BestTeammateCard extends StatelessWidget {
         bestId = key;
       }
     });
-    
+
     return bestId;
   }
 
@@ -136,15 +145,21 @@ class _BestTeammateCard extends StatelessWidget {
     final stats = _getStatsForId(bestId);
     final wins = stats?['gamesWon'] ?? 0;
     final played = stats?['gamesPlayed'] ?? 0;
-    final winRate = played > 0 ? (wins / played * 100).toStringAsFixed(1) : '0.0';
+    final winRate = played > 0
+        ? (wins / played * 100).toStringAsFixed(1)
+        : '0.0';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Card(
         child: ListTile(
-          leading: const CircleAvatar(child: Icon(Icons.person)), // Placeholder for avatar
+          leading: const CircleAvatar(
+            child: Icon(Icons.person),
+          ), // Placeholder for avatar
           title: Text(AppLocalizations.of(context)!.bestTeammate),
-          subtitle: Text('ID: ${bestId.substring(0, 5)}... • $wins wins ($winRate%)'), // ID is temporary until we resolve name
+          subtitle: Text(
+            'ID: ${bestId.substring(0, 5)}... • $wins wins ($winRate%)',
+          ), // ID is temporary until we resolve name
           trailing: const Icon(Icons.star, color: Colors.amber),
         ),
       ),

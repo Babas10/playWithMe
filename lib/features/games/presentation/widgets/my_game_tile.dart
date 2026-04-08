@@ -13,11 +13,7 @@ class MyGameTile extends StatelessWidget {
   final MyGameItem item;
   final VoidCallback onTap;
 
-  const MyGameTile({
-    super.key,
-    required this.item,
-    required this.onTap,
-  });
+  const MyGameTile({super.key, required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +37,9 @@ class MyGameTile extends StatelessWidget {
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: _statusColor(_effectiveStatus(item.status, item.scheduledAt)),
+                  color: _statusColor(
+                    _effectiveStatus(item.status, item.scheduledAt),
+                  ),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -86,7 +84,10 @@ class MyGameTile extends StatelessWidget {
               const SizedBox(width: 8),
               item.isGroupGame
                   ? _OpenBadge(l10n: l10n)
-                  : _StatusBadge(status: _effectiveStatus(item.status, item.scheduledAt), l10n: l10n),
+                  : _StatusBadge(
+                      status: _effectiveStatus(item.status, item.scheduledAt),
+                      l10n: l10n,
+                    ),
               const Icon(Icons.chevron_right, size: 18, color: _kTextMuted),
             ],
           ),
@@ -148,30 +149,30 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (label, bg, fg) = switch (status) {
       GameStatus.scheduled => (
-          l10n.scheduled,
-          Colors.blue.withValues(alpha: 0.1),
-          Colors.blue.shade700,
-        ),
+        l10n.scheduled,
+        Colors.blue.withValues(alpha: 0.1),
+        Colors.blue.shade700,
+      ),
       GameStatus.inProgress => (
-          'Live',
-          Colors.green.withValues(alpha: 0.1),
-          Colors.green.shade700,
-        ),
+        'Live',
+        Colors.green.withValues(alpha: 0.1),
+        Colors.green.shade700,
+      ),
       GameStatus.verification => (
-          l10n.verification,
-          Colors.orange.withValues(alpha: 0.1),
-          Colors.orange.shade700,
-        ),
+        l10n.verification,
+        Colors.orange.withValues(alpha: 0.1),
+        Colors.orange.shade700,
+      ),
       GameStatus.completed => (
-          l10n.completed,
-          Colors.grey.withValues(alpha: 0.1),
-          Colors.grey.shade600,
-        ),
+        l10n.completed,
+        Colors.grey.withValues(alpha: 0.1),
+        Colors.grey.shade600,
+      ),
       GameStatus.cancelled => (
-          l10n.cancelled,
-          Colors.red.withValues(alpha: 0.1),
-          Colors.red.shade700,
-        ),
+        l10n.cancelled,
+        Colors.red.withValues(alpha: 0.1),
+        Colors.red.shade700,
+      ),
     };
 
     return Container(
@@ -183,11 +184,7 @@ class _StatusBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: fg,
-        ),
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg),
       ),
     );
   }

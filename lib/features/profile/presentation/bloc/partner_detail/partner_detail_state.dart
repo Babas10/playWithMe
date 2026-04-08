@@ -15,7 +15,6 @@ class PartnerDetailState with _$PartnerDetailState {
     required UserModel partnerProfile,
   }) = PartnerDetailLoaded;
 
-  const factory PartnerDetailState.error({
-    required String message,
-  }) = PartnerDetailError;
+  const factory PartnerDetailState.error({required String message}) =
+      PartnerDetailError;
 }

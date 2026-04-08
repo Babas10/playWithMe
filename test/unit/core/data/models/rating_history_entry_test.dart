@@ -302,7 +302,6 @@ void main() {
         expect(restored.timestamp, DateTime.fromMillisecondsSinceEpoch(0));
       });
     });
-
   });
 }
 

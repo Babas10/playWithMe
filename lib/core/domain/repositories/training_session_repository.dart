@@ -18,11 +18,13 @@ abstract class TrainingSessionRepository {
 
   /// Get training sessions for a group
   Stream<List<TrainingSessionModel>> getTrainingSessionsForGroup(
-      String groupId);
+    String groupId,
+  );
 
   /// Get upcoming training sessions for a group
   Stream<List<TrainingSessionModel>> getUpcomingTrainingSessionsForGroup(
-      String groupId);
+    String groupId,
+  );
 
   /// Get past training sessions for a group
   Future<List<TrainingSessionModel>> getPastTrainingSessionsForGroup(
@@ -187,15 +189,17 @@ abstract class TrainingSessionRepository {
   ///
   /// This method returns participant IDs from the denormalized participantIds array.
   /// For full participant information, use getTrainingSessionParticipantsStream().
-  @Deprecated('Use getTrainingSessionParticipantsStream() for full participant information')
+  @Deprecated(
+    'Use getTrainingSessionParticipantsStream() for full participant information',
+  )
   Future<List<String>> getTrainingSessionParticipants(String sessionId);
 
   /// Stream training session participants from participants subcollection
   ///
   /// Returns a stream of participants with their join timestamps and status.
   /// Only includes participants with 'joined' status (excludes those who left).
-  Stream<List<TrainingSessionParticipantModel>> getTrainingSessionParticipantsStream(
-      String sessionId);
+  Stream<List<TrainingSessionParticipantModel>>
+  getTrainingSessionParticipantsStream(String sessionId);
 
   /// Stream participant count for a training session
   ///
@@ -220,13 +224,15 @@ abstract class TrainingSessionRepository {
   ///
   /// Returns all training sessions that have the specified parentSessionId
   Stream<List<TrainingSessionModel>> getRecurringSessionInstances(
-      String parentSessionId);
+    String parentSessionId,
+  );
 
   /// Get upcoming instances of a recurring training session
   ///
   /// Returns only future instances that are scheduled
   Stream<List<TrainingSessionModel>> getUpcomingRecurringSessionInstances(
-      String parentSessionId);
+    String parentSessionId,
+  );
 
   /// Generate recurring training session instances via Cloud Function
   ///

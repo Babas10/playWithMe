@@ -19,8 +19,7 @@ import 'package:play_with_me/features/invitations/presentation/bloc/invite_regis
 import 'package:play_with_me/features/invitations/presentation/pages/invite_onboarding_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
-class MockInviteJoinBloc
-    extends MockBloc<InviteJoinEvent, InviteJoinState>
+class MockInviteJoinBloc extends MockBloc<InviteJoinEvent, InviteJoinState>
     implements InviteJoinBloc {}
 
 class MockInviteRegistrationBloc
@@ -54,8 +53,7 @@ void main() {
       sl.unregister<InviteRegistrationBloc>();
     }
     final mockRegBloc = MockInviteRegistrationBloc();
-    when(() => mockRegBloc.state)
-        .thenReturn(const InviteRegistrationInitial());
+    when(() => mockRegBloc.state).thenReturn(const InviteRegistrationInitial());
     sl.registerFactory<InviteRegistrationBloc>(() => mockRegBloc);
   });
 
@@ -144,8 +142,9 @@ void main() {
         expect(find.text('I have an account'), findsOneWidget);
       });
 
-      testWidgets('create account button navigates to InviteRegistrationPage',
-          (tester) async {
+      testWidgets('create account button navigates to InviteRegistrationPage', (
+        tester,
+      ) async {
         when(() => mockBloc.state).thenReturn(validatedState);
 
         await tester.pumpWidget(
@@ -202,13 +201,14 @@ void main() {
                       MaterialPageRoute(
                         builder: (_) => MultiBlocProvider(
                           providers: [
-                            BlocProvider<InviteJoinBloc>.value(
-                                value: mockBloc),
+                            BlocProvider<InviteJoinBloc>.value(value: mockBloc),
                             BlocProvider<DeepLinkBloc>.value(
-                                value: mockDeepLinkBloc),
+                              value: mockDeepLinkBloc,
+                            ),
                           ],
                           child: const InviteOnboardingPage(
-                              token: 'test-token'),
+                            token: 'test-token',
+                          ),
                         ),
                       ),
                     );
@@ -246,11 +246,12 @@ void main() {
         expect(find.text('Continue to app'), findsOneWidget);
       });
 
-      testWidgets('continue button clears deep link and pops to root',
-          (tester) async {
-        when(() => mockBloc.state).thenReturn(
-          const InviteJoinInvalidToken(reason: 'Expired'),
-        );
+      testWidgets('continue button clears deep link and pops to root', (
+        tester,
+      ) async {
+        when(
+          () => mockBloc.state,
+        ).thenReturn(const InviteJoinInvalidToken(reason: 'Expired'));
 
         // Build with a root page and push InviteOnboardingPage on top,
         // so popUntil(isFirst) pops back to the root.
@@ -275,13 +276,14 @@ void main() {
                       MaterialPageRoute(
                         builder: (_) => MultiBlocProvider(
                           providers: [
-                            BlocProvider<InviteJoinBloc>.value(
-                                value: mockBloc),
+                            BlocProvider<InviteJoinBloc>.value(value: mockBloc),
                             BlocProvider<DeepLinkBloc>.value(
-                                value: mockDeepLinkBloc),
+                              value: mockDeepLinkBloc,
+                            ),
                           ],
                           child: const InviteOnboardingPage(
-                              token: 'test-token'),
+                            token: 'test-token',
+                          ),
                         ),
                       ),
                     );
@@ -302,8 +304,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // Verify ClearPendingInvite was dispatched to DeepLinkBloc
-        verify(() => mockDeepLinkBloc.add(const ClearPendingInvite()))
-            .called(1);
+        verify(
+          () => mockDeepLinkBloc.add(const ClearPendingInvite()),
+        ).called(1);
 
         // After popUntil(isFirst), we should be back at the root page
         expect(find.text('Root Page'), findsOneWidget);
@@ -312,9 +315,9 @@ void main() {
 
     group('error state', () {
       testWidgets('shows error icon and error message', (tester) async {
-        when(() => mockBloc.state).thenReturn(
-          const InviteJoinError(message: 'Network error occurred'),
-        );
+        when(
+          () => mockBloc.state,
+        ).thenReturn(const InviteJoinError(message: 'Network error occurred'));
 
         await tester.pumpWidget(createTestWidget());
 

@@ -7,10 +7,9 @@ import 'package:play_with_me/features/auth/presentation/bloc/password_reset/pass
 class PasswordResetBloc extends Bloc<PasswordResetEvent, PasswordResetState> {
   final AuthRepository _authRepository;
 
-  PasswordResetBloc({
-    required AuthRepository authRepository,
-  })  : _authRepository = authRepository,
-        super(const PasswordResetInitial()) {
+  PasswordResetBloc({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(const PasswordResetInitial()) {
     on<PasswordResetRequested>(_onPasswordResetRequested);
     on<PasswordResetFormReset>(_onPasswordResetFormReset);
   }
@@ -22,7 +21,9 @@ class PasswordResetBloc extends Bloc<PasswordResetEvent, PasswordResetState> {
     emit(const PasswordResetLoading());
 
     try {
-      debugPrint('🔐 PasswordResetBloc: Requesting password reset for: ${event.email}');
+      debugPrint(
+        '🔐 PasswordResetBloc: Requesting password reset for: ${event.email}',
+      );
 
       // Basic validation
       if (event.email.trim().isEmpty) {
@@ -35,9 +36,7 @@ class PasswordResetBloc extends Bloc<PasswordResetEvent, PasswordResetState> {
         return;
       }
 
-      await _authRepository.sendPasswordResetEmail(
-        email: event.email.trim(),
-      );
+      await _authRepository.sendPasswordResetEmail(email: event.email.trim());
 
       debugPrint('✅ PasswordResetBloc: Password reset email sent successfully');
       emit(PasswordResetSuccess(event.email.trim()));

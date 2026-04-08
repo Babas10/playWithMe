@@ -9,9 +9,13 @@ import 'package:play_with_me/core/data/repositories/firebase_image_storage_repos
 
 // Mocktail mocks
 class MockFirebaseStorage extends Mock implements FirebaseStorage {}
+
 class MockReference extends Mock implements Reference {}
+
 class MockUploadTask extends Mock implements UploadTask {}
+
 class MockTaskSnapshot extends Mock implements TaskSnapshot {}
+
 class MockListResult extends Mock implements ListResult {}
 
 // Fake Upload Task that properly implements Future interface
@@ -25,7 +29,10 @@ class FakeUploadTask extends Fake implements UploadTask {
   Stream<TaskSnapshot> get snapshotEvents => _snapshotEvents;
 
   @override
-  Future<S> then<S>(FutureOr<S> Function(TaskSnapshot) onValue, {Function? onError}) {
+  Future<S> then<S>(
+    FutureOr<S> Function(TaskSnapshot) onValue, {
+    Function? onError,
+  }) {
     return Future.value(_snapshot).then(onValue, onError: onError);
   }
 }
@@ -71,9 +78,12 @@ void main() {
 
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child(any())).thenReturn(mockUserRef);
-        when(() => mockUserRef.putFile(any())).thenAnswer((_) => fakeUploadTask);
-        when(() => mockUserRef.getDownloadURL())
-            .thenAnswer((_) async => downloadUrl);
+        when(
+          () => mockUserRef.putFile(any()),
+        ).thenAnswer((_) => fakeUploadTask);
+        when(
+          () => mockUserRef.getDownloadURL(),
+        ).thenAnswer((_) async => downloadUrl);
 
         // Act
         final result = await repository.uploadAvatar(
@@ -84,8 +94,9 @@ void main() {
         // Assert
         expect(result, downloadUrl);
         verify(() => mockStorage.ref()).called(1);
-        verify(() => mockRef.child(any(that: contains('avatars/$userId'))))
-            .called(1);
+        verify(
+          () => mockRef.child(any(that: contains('avatars/$userId'))),
+        ).called(1);
         verify(() => mockUserRef.putFile(testFile)).called(1);
         verify(() => mockUserRef.getDownloadURL()).called(1);
       });
@@ -105,18 +116,17 @@ void main() {
 
         final fakeUploadTask = FakeUploadTask(
           mockSnapshot,
-          Stream.fromIterable([
-            mockSnapshot,
-            mockSnapshot,
-            mockSnapshot,
-          ]),
+          Stream.fromIterable([mockSnapshot, mockSnapshot, mockSnapshot]),
         );
 
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child(any())).thenReturn(mockUserRef);
-        when(() => mockUserRef.putFile(any())).thenAnswer((_) => fakeUploadTask);
-        when(() => mockUserRef.getDownloadURL())
-            .thenAnswer((_) async => downloadUrl);
+        when(
+          () => mockUserRef.putFile(any()),
+        ).thenAnswer((_) => fakeUploadTask);
+        when(
+          () => mockUserRef.getDownloadURL(),
+        ).thenAnswer((_) async => downloadUrl);
 
         // Act
         await repository.uploadAvatar(
@@ -137,20 +147,24 @@ void main() {
 
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child(any())).thenReturn(mockUserRef);
-        when(() => mockUserRef.putFile(any()))
-            .thenThrow(FirebaseException(plugin: 'storage', code: 'unknown', message: 'Upload failed'));
+        when(() => mockUserRef.putFile(any())).thenThrow(
+          FirebaseException(
+            plugin: 'storage',
+            code: 'unknown',
+            message: 'Upload failed',
+          ),
+        );
 
         // Act & Assert
         expect(
-          () => repository.uploadAvatar(
-            userId: userId,
-            imageFile: testFile,
+          () => repository.uploadAvatar(userId: userId, imageFile: testFile),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Failed to upload avatar'),
+            ),
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Failed to upload avatar'),
-          )),
         );
       });
     });
@@ -164,7 +178,9 @@ void main() {
 
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child('avatars/$userId')).thenReturn(mockUserRef);
-        when(() => mockUserRef.listAll()).thenAnswer((_) async => mockListResult);
+        when(
+          () => mockUserRef.listAll(),
+        ).thenAnswer((_) async => mockListResult);
         when(() => mockListResult.items).thenReturn([mockItem1, mockItem2]);
         when(() => mockItem1.delete()).thenAnswer((_) async {});
         when(() => mockItem2.delete()).thenAnswer((_) async {});
@@ -185,10 +201,7 @@ void main() {
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child('avatars/$userId')).thenReturn(mockUserRef);
         when(() => mockUserRef.listAll()).thenThrow(
-          FirebaseException(
-            plugin: 'storage',
-            code: 'object-not-found',
-          ),
+          FirebaseException(plugin: 'storage', code: 'object-not-found'),
         );
 
         // Act & Assert - should not throw
@@ -214,11 +227,13 @@ void main() {
         // Act & Assert
         expect(
           () => repository.deleteAvatar(userId: userId),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Failed to delete avatar'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Failed to delete avatar'),
+            ),
+          ),
         );
       });
     });
@@ -232,9 +247,13 @@ void main() {
 
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child('avatars/$userId')).thenReturn(mockUserRef);
-        when(() => mockUserRef.listAll()).thenAnswer((_) async => mockListResult);
+        when(
+          () => mockUserRef.listAll(),
+        ).thenAnswer((_) async => mockListResult);
         when(() => mockListResult.items).thenReturn([mockItem]);
-        when(() => mockItem.getDownloadURL()).thenAnswer((_) async => downloadUrl);
+        when(
+          () => mockItem.getDownloadURL(),
+        ).thenAnswer((_) async => downloadUrl);
 
         // Act
         final result = await repository.getAvatarUrl(userId: userId);
@@ -252,7 +271,9 @@ void main() {
 
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child('avatars/$userId')).thenReturn(mockUserRef);
-        when(() => mockUserRef.listAll()).thenAnswer((_) async => emptyListResult);
+        when(
+          () => mockUserRef.listAll(),
+        ).thenAnswer((_) async => emptyListResult);
         when(() => emptyListResult.items).thenReturn([]);
 
         // Act
@@ -271,10 +292,7 @@ void main() {
         when(() => mockStorage.ref()).thenReturn(mockRef);
         when(() => mockRef.child('avatars/$userId')).thenReturn(notFoundRef);
         when(() => notFoundRef.listAll()).thenThrow(
-          FirebaseException(
-            plugin: 'storage',
-            code: 'object-not-found',
-          ),
+          FirebaseException(plugin: 'storage', code: 'object-not-found'),
         );
 
         // Act
@@ -303,11 +321,13 @@ void main() {
         // Act & Assert
         expect(
           () => repository.getAvatarUrl(userId: userId),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Failed to get avatar URL'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Failed to get avatar URL'),
+            ),
+          ),
         );
       });
     });

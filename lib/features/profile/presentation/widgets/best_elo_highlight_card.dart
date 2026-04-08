@@ -39,9 +39,7 @@ class BestEloHighlightCard extends StatelessWidget {
     return Card(
       elevation: 0,
       color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -97,11 +95,7 @@ class BestEloHighlightCard extends StatelessWidget {
           child: Row(
             children: [
               // Trophy icon
-              Icon(
-                Icons.emoji_events,
-                size: 20,
-                color: AppColors.primary,
-              ),
+              Icon(Icons.emoji_events, size: 20, color: AppColors.primary),
               const SizedBox(width: 12),
               // Content
               Expanded(
@@ -119,7 +113,9 @@ class BestEloHighlightCard extends StatelessWidget {
                     Text(
                       dateFormatter.format(bestElo!.date),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.7,
+                        ),
                         fontSize: 11,
                       ),
                     ),

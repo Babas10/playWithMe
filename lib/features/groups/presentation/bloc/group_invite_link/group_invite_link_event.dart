@@ -25,10 +25,7 @@ class RevokeInvite extends GroupInviteLinkEvent {
   final String groupId;
   final String inviteId;
 
-  const RevokeInvite({
-    required this.groupId,
-    required this.inviteId,
-  });
+  const RevokeInvite({required this.groupId, required this.inviteId});
 
   @override
   List<Object?> get props => [groupId, inviteId];

@@ -37,7 +37,9 @@ void main() {
     mockLoginBloc.close();
   });
 
-  Widget createTestWidget({Route<dynamic>? Function(RouteSettings)? onGenerateRoute}) {
+  Widget createTestWidget({
+    Route<dynamic>? Function(RouteSettings)? onGenerateRoute,
+  }) {
     return MaterialApp(
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -45,23 +47,27 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en')],      home: BlocProvider<LoginBloc>.value(
+      supportedLocales: const [Locale('en')],
+      home: BlocProvider<LoginBloc>.value(
         value: mockLoginBloc,
         child: const LoginPage(),
       ),
-      onGenerateRoute: onGenerateRoute ?? (settings) {
-        if (settings.name == '/register') {
-          return MaterialPageRoute(
-            builder: (_) => const Scaffold(body: Text('Registration Page')),
-          );
-        }
-        if (settings.name == '/forgot-password') {
-          return MaterialPageRoute(
-            builder: (_) => const Scaffold(body: Text('Password Reset Page')),
-          );
-        }
-        return null;
-      },
+      onGenerateRoute:
+          onGenerateRoute ??
+          (settings) {
+            if (settings.name == '/register') {
+              return MaterialPageRoute(
+                builder: (_) => const Scaffold(body: Text('Registration Page')),
+              );
+            }
+            if (settings.name == '/forgot-password') {
+              return MaterialPageRoute(
+                builder: (_) =>
+                    const Scaffold(body: Text('Password Reset Page')),
+              );
+            }
+            return null;
+          },
     );
   }
 
@@ -155,8 +161,9 @@ void main() {
         expect(find.text('Email is required'), findsOneWidget);
       });
 
-      testWidgets('shows validation error for invalid email format',
-          (tester) async {
+      testWidgets('shows validation error for invalid email format', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         final emailField = find.widgetWithText(TextFormField, 'Email');
@@ -199,8 +206,9 @@ void main() {
 
         // Also check the EditableText has obscureText set
         final editableTexts = find.byType(EditableText);
-        final editableTextWidgets =
-            tester.widgetList<EditableText>(editableTexts);
+        final editableTextWidgets = tester.widgetList<EditableText>(
+          editableTexts,
+        );
 
         // The second EditableText should be the password field
         final passwordEditableText = editableTextWidgets.elementAt(1);
@@ -246,8 +254,9 @@ void main() {
     });
 
     group('Login Button', () {
-      testWidgets('triggers LoginWithEmailAndPasswordSubmitted event on tap',
-          (tester) async {
+      testWidgets('triggers LoginWithEmailAndPasswordSubmitted event on tap', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Enter valid credentials
@@ -282,9 +291,7 @@ void main() {
         await tester.tap(loginButton);
         await tester.pump();
 
-        verifyNever(
-          () => mockLoginBloc.add(any()),
-        );
+        verifyNever(() => mockLoginBloc.add(any()));
       });
     });
 
@@ -311,8 +318,9 @@ void main() {
     });
 
     group('Navigation', () {
-      testWidgets('navigates to registration page on Sign Up tap',
-          (tester) async {
+      testWidgets('navigates to registration page on Sign Up tap', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Scroll to make Sign Up button visible
@@ -326,8 +334,9 @@ void main() {
         expect(find.text('Registration Page'), findsOneWidget);
       });
 
-      testWidgets('navigates to password reset page on Forgot Password tap',
-          (tester) async {
+      testWidgets('navigates to password reset page on Forgot Password tap', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Scroll to make Forgot Password button visible
@@ -362,8 +371,9 @@ void main() {
         expect(find.byType(SnackBar), findsOneWidget);
       });
 
-      testWidgets('snackbar has red background color on failure',
-          (tester) async {
+      testWidgets('snackbar has red background color on failure', (
+        tester,
+      ) async {
         whenListen(
           mockLoginBloc,
           Stream.fromIterable([
@@ -383,8 +393,9 @@ void main() {
     });
 
     group('Form Submission via Enter Key', () {
-      testWidgets('submits form when pressing enter on password field',
-          (tester) async {
+      testWidgets('submits form when pressing enter on password field', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Enter valid credentials

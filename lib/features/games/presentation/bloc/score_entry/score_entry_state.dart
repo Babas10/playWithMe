@@ -54,20 +54,20 @@ class SetScoreData {
   /// Get a user-friendly error message if the score is invalid
   String? get validationError {
     if (!isComplete) return null;
-    
+
     final maxPoints = teamAPoints! > teamBPoints! ? teamAPoints! : teamBPoints!;
     final minPoints = teamAPoints! < teamBPoints! ? teamAPoints! : teamBPoints!;
 
     if (maxPoints < 21) {
       return 'Winning team must reach at least 21 points';
     }
-    
+
     if (maxPoints == 21) {
       if (minPoints > 19) {
         return 'Must win by at least 2 points (e.g., 21-19)';
       }
     }
-    
+
     if (maxPoints > 21) {
       if ((maxPoints - minPoints) != 2) {
         return 'In extra points, must win by exactly 2 points';
@@ -100,11 +100,7 @@ class GameData {
   final List<SetScoreData> sets;
   final GameTeams? teams; // null means team not yet selected for this game
 
-  const GameData({
-    this.numberOfSets = 1,
-    this.sets = const [],
-    this.teams,
-  });
+  const GameData({this.numberOfSets = 1, this.sets = const [], this.teams});
 
   GameData copyWith({
     int? numberOfSets,
@@ -220,10 +216,7 @@ class ScoreEntrySaving extends ScoreEntryState {
   final GameModel game;
   final GameResult result;
 
-  const ScoreEntrySaving({
-    required this.game,
-    required this.result,
-  });
+  const ScoreEntrySaving({required this.game, required this.result});
 
   @override
   List<Object?> get props => [game, result];
@@ -234,10 +227,7 @@ class ScoreEntrySaved extends ScoreEntryState {
   final GameModel game;
   final GameResult result;
 
-  const ScoreEntrySaved({
-    required this.game,
-    required this.result,
-  });
+  const ScoreEntrySaved({required this.game, required this.result});
 
   @override
   List<Object?> get props => [game, result];

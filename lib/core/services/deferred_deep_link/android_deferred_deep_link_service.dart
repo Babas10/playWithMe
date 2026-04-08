@@ -15,8 +15,7 @@ abstract class InstallReferrerClient {
 
 /// Production implementation — delegates to the native channel.
 class PlayInstallReferrerClient implements InstallReferrerClient {
-  static const _channel =
-      MethodChannel('org.gatherli.app/install_referrer');
+  static const _channel = MethodChannel('org.gatherli.app/install_referrer');
 
   @override
   Future<String?> getReferrerString() async {
@@ -35,7 +34,7 @@ class AndroidDeferredDeepLinkService implements DeferredDeepLinkService {
   final InstallReferrerClient _client;
 
   AndroidDeferredDeepLinkService({InstallReferrerClient? client})
-      : _client = client ?? PlayInstallReferrerClient();
+    : _client = client ?? PlayInstallReferrerClient();
 
   @override
   Future<String?> retrieveDeferredToken() async {

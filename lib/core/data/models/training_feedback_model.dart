@@ -12,17 +12,23 @@ class TrainingFeedbackModel with _$TrainingFeedbackModel {
   const factory TrainingFeedbackModel({
     required String id,
     required String trainingSessionId,
+
     /// Exercises quality rating (1-5)
     required int exercisesQuality,
+
     /// Training intensity rating (1-5)
     required int trainingIntensity,
+
     /// Coaching clarity rating (1-5)
     required int coachingClarity,
+
     /// Optional written feedback
     String? comment,
+
     /// Hash of participant ID to prevent duplicates without exposing identity
     /// Hash is SHA-256 of: trainingSessionId + userId + salt
     required String participantHash,
+
     /// Timestamp when feedback was submitted
     @TimestampConverter() required DateTime submittedAt,
   }) = _TrainingFeedbackModel;
@@ -34,15 +40,18 @@ class TrainingFeedbackModel with _$TrainingFeedbackModel {
 
   /// Factory constructor for creating from Firestore DocumentSnapshot
   factory TrainingFeedbackModel.fromFirestore(
-      DocumentSnapshot doc, String trainingSessionId) {
+    DocumentSnapshot doc,
+    String trainingSessionId,
+  ) {
     final data = doc.data() as Map<String, dynamic>;
 
     // Convert Firestore Timestamps to DateTime strings for JSON deserialization
     final jsonData = Map<String, dynamic>.from(data);
 
     if (data['submittedAt'] is Timestamp) {
-      jsonData['submittedAt'] =
-          (data['submittedAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['submittedAt'] = (data['submittedAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
 
     return TrainingFeedbackModel.fromJson({
@@ -57,7 +66,8 @@ class TrainingFeedbackModel with _$TrainingFeedbackModel {
     final json = toJson();
     json.remove('id'); // Remove id as it's the document ID
     json.remove(
-        'trainingSessionId'); // Remove trainingSessionId as it's in the path
+      'trainingSessionId',
+    ); // Remove trainingSessionId as it's in the path
 
     // Convert DateTime fields to Firestore Timestamps
     if (json['submittedAt'] is String) {
@@ -70,16 +80,22 @@ class TrainingFeedbackModel with _$TrainingFeedbackModel {
   /// Validation methods
 
   /// Validate exercises quality rating is in valid range (1-5)
-  bool get hasValidExercisesQuality => exercisesQuality >= 1 && exercisesQuality <= 5;
+  bool get hasValidExercisesQuality =>
+      exercisesQuality >= 1 && exercisesQuality <= 5;
 
   /// Validate training intensity rating is in valid range (1-5)
-  bool get hasValidTrainingIntensity => trainingIntensity >= 1 && trainingIntensity <= 5;
+  bool get hasValidTrainingIntensity =>
+      trainingIntensity >= 1 && trainingIntensity <= 5;
 
   /// Validate coaching clarity rating is in valid range (1-5)
-  bool get hasValidCoachingClarity => coachingClarity >= 1 && coachingClarity <= 5;
+  bool get hasValidCoachingClarity =>
+      coachingClarity >= 1 && coachingClarity <= 5;
 
   /// Check if all ratings are valid
-  bool get hasValidRatings => hasValidExercisesQuality && hasValidTrainingIntensity && hasValidCoachingClarity;
+  bool get hasValidRatings =>
+      hasValidExercisesQuality &&
+      hasValidTrainingIntensity &&
+      hasValidCoachingClarity;
 
   /// Check if feedback has a comment
   bool get hasComment => comment != null && comment!.trim().isNotEmpty;
@@ -92,7 +108,8 @@ class TrainingFeedbackModel with _$TrainingFeedbackModel {
   }
 
   /// Get average of all three ratings (for overall score)
-  double get averageRating => (exercisesQuality + trainingIntensity + coachingClarity) / 3;
+  double get averageRating =>
+      (exercisesQuality + trainingIntensity + coachingClarity) / 3;
 }
 
 /// Timestamp converter for Freezed models

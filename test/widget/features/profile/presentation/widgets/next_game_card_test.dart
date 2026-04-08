@@ -26,11 +26,7 @@ void main() {
           ],
           supportedLocales: const [Locale('en')],
           home: Scaffold(
-            body: NextGameCard(
-              game: game,
-              userId: testUserId,
-              onTap: onTap,
-            ),
+            body: NextGameCard(game: game, userId: testUserId, onTap: onTap),
           ),
         ),
       );
@@ -71,7 +67,9 @@ void main() {
       expect(find.text('No games organized yet'), findsNothing);
     });
 
-    testWidgets('shows user joined badge when user is in playerIds', (tester) async {
+    testWidgets('shows user joined badge when user is in playerIds', (
+      tester,
+    ) async {
       // Arrange
       final game = GameModel(
         id: 'game-1',
@@ -94,7 +92,9 @@ void main() {
       expect(find.text('JOINED'), findsOneWidget);
     });
 
-    testWidgets('shows WAITING LIST badge when user is on waitlist', (tester) async {
+    testWidgets('shows WAITING LIST badge when user is on waitlist', (
+      tester,
+    ) async {
       // Arrange
       final game = GameModel(
         id: 'game-1',
@@ -119,7 +119,9 @@ void main() {
       expect(find.text('JOINED'), findsNothing);
     });
 
-    testWidgets('calls onTap callback when game card is tapped', (tester) async {
+    testWidgets('calls onTap callback when game card is tapped', (
+      tester,
+    ) async {
       // Arrange
       bool tapped = false;
       final game = GameModel(
@@ -222,7 +224,9 @@ void main() {
       expect(find.textContaining('Today'), findsOneWidget);
     });
 
-    testWidgets('displays correct date formatting for tomorrow', (tester) async {
+    testWidgets('displays correct date formatting for tomorrow', (
+      tester,
+    ) async {
       // Arrange
       final tomorrow = DateTime.now().add(const Duration(days: 1));
       final tomorrowGame = GameModel(
@@ -231,7 +235,13 @@ void main() {
         groupId: 'group-1',
         createdBy: 'creator-1',
         createdAt: DateTime.now(),
-        scheduledAt: DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 18, 0),
+        scheduledAt: DateTime(
+          tomorrow.year,
+          tomorrow.month,
+          tomorrow.day,
+          18,
+          0,
+        ),
         location: const GameLocation(name: 'Court 1'),
         status: GameStatus.scheduled,
         playerIds: [testUserId],

@@ -9,14 +9,14 @@ import 'notification_state.dart';
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final NotificationRepository _repository;
 
-  NotificationBloc({
-    required NotificationRepository repository,
-  })  : _repository = repository,
-        super(const NotificationState.initial()) {
+  NotificationBloc({required NotificationRepository repository})
+    : _repository = repository,
+      super(const NotificationState.initial()) {
     on<NotificationEvent>((event, emit) async {
       await event.when(
         loadPreferences: () => _handleLoadPreferences(emit),
-        updatePreferences: (preferences) => _handleUpdatePreferences(emit, preferences),
+        updatePreferences: (preferences) =>
+            _handleUpdatePreferences(emit, preferences),
         toggleGroupInvitations: (enabled) => _handleToggle(
           emit,
           (prefs) => prefs.copyWith(groupInvitations: enabled),
@@ -33,10 +33,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
           emit,
           (prefs) => prefs.copyWith(memberJoined: enabled),
         ),
-        toggleMemberLeft: (enabled) => _handleToggle(
-          emit,
-          (prefs) => prefs.copyWith(memberLeft: enabled),
-        ),
+        toggleMemberLeft: (enabled) =>
+            _handleToggle(emit, (prefs) => prefs.copyWith(memberLeft: enabled)),
         toggleRoleChanged: (enabled) => _handleToggle(
           emit,
           (prefs) => prefs.copyWith(roleChanged: enabled),
@@ -49,11 +47,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
             quietHoursEnd: end,
           ),
         ),
-        toggleGroupSpecific: (groupId, enabled) => _handleToggleGroupSpecific(
-          emit,
-          groupId,
-          enabled,
-        ),
+        toggleGroupSpecific: (groupId, enabled) =>
+            _handleToggleGroupSpecific(emit, groupId, enabled),
         // Training session notification toggle handlers (Story 15.13)
         toggleTrainingSessionCreated: (enabled) => _handleToggle(
           emit,
@@ -110,7 +105,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
   Future<void> _handleToggle(
     Emitter<NotificationState> emit,
-    NotificationPreferencesEntity Function(NotificationPreferencesEntity) updateFn,
+    NotificationPreferencesEntity Function(NotificationPreferencesEntity)
+    updateFn,
   ) async {
     final currentState = state;
 
@@ -134,13 +130,10 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     String groupId,
     bool enabled,
   ) async {
-    await _handleToggle(
-      emit,
-      (prefs) {
-        final groupSpecific = Map<String, bool>.from(prefs.groupSpecific);
-        groupSpecific[groupId] = enabled;
-        return prefs.copyWith(groupSpecific: groupSpecific);
-      },
-    );
+    await _handleToggle(emit, (prefs) {
+      final groupSpecific = Map<String, bool>.from(prefs.groupSpecific);
+      groupSpecific[groupId] = enabled;
+      return prefs.copyWith(groupSpecific: groupSpecific);
+    });
   }
 }

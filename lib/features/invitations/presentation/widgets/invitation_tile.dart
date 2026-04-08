@@ -31,9 +31,9 @@ class InvitationTile extends StatelessWidget {
             // Group name
             Text(
               invitation.groupName,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
@@ -47,10 +47,12 @@ class InvitationTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  AppLocalizations.of(context)!.invitedBy(invitation.inviterName),
+                  AppLocalizations.of(
+                    context,
+                  )!.invitedBy(invitation.inviterName),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -68,8 +70,8 @@ class InvitationTile extends StatelessWidget {
                 Text(
                   timeago.format(invitation.createdAt),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -84,9 +86,7 @@ class InvitationTile extends StatelessWidget {
                   onPressed: isLoading ? null : onDecline,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.secondary,
-                    side: const BorderSide(
-                      color: AppColors.secondary,
-                    ),
+                    side: const BorderSide(color: AppColors.secondary),
                   ),
                   child: Text(AppLocalizations.of(context)!.decline),
                 ),

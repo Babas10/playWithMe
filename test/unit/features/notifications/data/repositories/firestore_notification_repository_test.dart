@@ -8,14 +8,22 @@ import 'package:play_with_me/features/notifications/data/repositories/firestore_
 import 'package:play_with_me/features/notifications/domain/entities/notification_preferences_entity.dart';
 
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
+
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
+
 class MockUser extends Mock implements User {}
+
 // ignore: subtype_of_sealed_class
-class MockCollectionReference extends Mock implements CollectionReference<Map<String, dynamic>> {}
+class MockCollectionReference extends Mock
+    implements CollectionReference<Map<String, dynamic>> {}
+
 // ignore: subtype_of_sealed_class
-class MockDocumentReference extends Mock implements DocumentReference<Map<String, dynamic>> {}
+class MockDocumentReference extends Mock
+    implements DocumentReference<Map<String, dynamic>> {}
+
 // ignore: subtype_of_sealed_class
-class MockDocumentSnapshot extends Mock implements DocumentSnapshot<Map<String, dynamic>> {}
+class MockDocumentSnapshot extends Mock
+    implements DocumentSnapshot<Map<String, dynamic>> {}
 
 void main() {
   late FirestoreNotificationRepository repository;
@@ -62,20 +70,22 @@ void main() {
       verify(() => mockDocument.get()).called(1);
     });
 
-    test('returns default preferences when notificationPreferences field is null', () async {
-      // Arrange
-      when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
-      when(() => mockSnapshot.data()).thenReturn({
-        'displayName': 'Test User',
-        'email': 'test@example.com',
-      });
+    test(
+      'returns default preferences when notificationPreferences field is null',
+      () async {
+        // Arrange
+        when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
+        when(
+          () => mockSnapshot.data(),
+        ).thenReturn({'displayName': 'Test User', 'email': 'test@example.com'});
 
-      // Act
-      final result = await repository.getPreferences();
+        // Act
+        final result = await repository.getPreferences();
 
-      // Assert
-      expect(result, const NotificationPreferencesEntity());
-    });
+        // Assert
+        expect(result, const NotificationPreferencesEntity());
+      },
+    );
 
     test('returns stored preferences when they exist', () async {
       // Arrange
@@ -93,9 +103,9 @@ void main() {
       };
 
       when(() => mockDocument.get()).thenAnswer((_) async => mockSnapshot);
-      when(() => mockSnapshot.data()).thenReturn({
-        'notificationPreferences': prefsData,
-      });
+      when(
+        () => mockSnapshot.data(),
+      ).thenReturn({'notificationPreferences': prefsData});
 
       // Act
       final result = await repository.getPreferences();
@@ -120,11 +130,13 @@ void main() {
       // Act & Assert
       expect(
         () => repository.getPreferences(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('User not authenticated'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('User not authenticated'),
+          ),
+        ),
       );
     });
   });
@@ -146,9 +158,11 @@ void main() {
       await repository.updatePreferences(preferences);
 
       // Assert
-      verify(() => mockDocument.update({
-        'notificationPreferences': preferences.toJson(),
-      })).called(1);
+      verify(
+        () => mockDocument.update({
+          'notificationPreferences': preferences.toJson(),
+        }),
+      ).called(1);
     });
 
     test('converts preferences to JSON correctly before updating', () async {
@@ -196,19 +210,22 @@ void main() {
       // Act & Assert
       expect(
         () => repository.updatePreferences(preferences),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('User not authenticated'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('User not authenticated'),
+          ),
+        ),
       );
     });
 
     test('propagates Firestore errors', () async {
       // Arrange
       const preferences = NotificationPreferencesEntity();
-      when(() => mockDocument.update(any()))
-          .thenThrow(FirebaseException(plugin: 'firestore', message: 'Update failed'));
+      when(() => mockDocument.update(any())).thenThrow(
+        FirebaseException(plugin: 'firestore', message: 'Update failed'),
+      );
 
       // Act & Assert
       expect(
@@ -226,30 +243,32 @@ void main() {
       // Act & Assert
       expect(
         () => repository.preferencesStream(),
-        throwsA(isA<Exception>().having(
-          (e) => e.toString(),
-          'message',
-          contains('User not authenticated'),
-        )),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('User not authenticated'),
+          ),
+        ),
       );
     });
 
-    test('emits default preferences when no preferences exist in snapshot', () async {
-      // Arrange
-      when(() => mockDocument.snapshots()).thenAnswer((_) {
-        return Stream.value(mockSnapshot);
-      });
-      when(() => mockSnapshot.data()).thenReturn({});
+    test(
+      'emits default preferences when no preferences exist in snapshot',
+      () async {
+        // Arrange
+        when(() => mockDocument.snapshots()).thenAnswer((_) {
+          return Stream.value(mockSnapshot);
+        });
+        when(() => mockSnapshot.data()).thenReturn({});
 
-      // Act
-      final stream = repository.preferencesStream();
+        // Act
+        final stream = repository.preferencesStream();
 
-      // Assert
-      await expectLater(
-        stream,
-        emits(const NotificationPreferencesEntity()),
-      );
-    });
+        // Assert
+        await expectLater(stream, emits(const NotificationPreferencesEntity()));
+      },
+    );
 
     test('emits stored preferences when they exist', () async {
       // Arrange
@@ -264,9 +283,9 @@ void main() {
       when(() => mockDocument.snapshots()).thenAnswer((_) {
         return Stream.value(mockSnapshot);
       });
-      when(() => mockSnapshot.data()).thenReturn({
-        'notificationPreferences': prefsData,
-      });
+      when(
+        () => mockSnapshot.data(),
+      ).thenReturn({'notificationPreferences': prefsData});
 
       // Act
       final stream = repository.preferencesStream();
@@ -274,13 +293,15 @@ void main() {
       // Assert
       await expectLater(
         stream,
-        emits(predicate<NotificationPreferencesEntity>((prefs) {
-          return prefs.groupInvitations == false &&
-                 prefs.gameCreated == true &&
-                 prefs.quietHoursEnabled == true &&
-                 prefs.quietHoursStart == '22:00' &&
-                 prefs.quietHoursEnd == '08:00';
-        })),
+        emits(
+          predicate<NotificationPreferencesEntity>((prefs) {
+            return prefs.groupInvitations == false &&
+                prefs.gameCreated == true &&
+                prefs.quietHoursEnabled == true &&
+                prefs.quietHoursStart == '22:00' &&
+                prefs.quietHoursEnd == '08:00';
+          }),
+        ),
       );
     });
 
@@ -307,8 +328,12 @@ void main() {
       await expectLater(
         stream,
         emitsInOrder([
-          predicate<NotificationPreferencesEntity>((p) => p.groupInvitations == true),
-          predicate<NotificationPreferencesEntity>((p) => p.groupInvitations == false),
+          predicate<NotificationPreferencesEntity>(
+            (p) => p.groupInvitations == true,
+          ),
+          predicate<NotificationPreferencesEntity>(
+            (p) => p.groupInvitations == false,
+          ),
         ]),
       );
     });

@@ -32,10 +32,7 @@ class GlobalBottomNavBar extends StatelessWidget {
       currentIndex: selectedIndex,
       onTap: onTabSelected,
       items: [
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.home),
-          label: l10n.home,
-        ),
+        BottomNavigationBarItem(icon: const Icon(Icons.home), label: l10n.home),
         BottomNavigationBarItem(
           icon: const Icon(Icons.bar_chart),
           label: l10n.stats,
@@ -59,7 +56,10 @@ class GlobalBottomNavBar extends StatelessWidget {
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                    constraints: const BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
                     child: Text(
                       friendRequestCount > 9 ? '9+' : '$friendRequestCount',
                       style: const TextStyle(

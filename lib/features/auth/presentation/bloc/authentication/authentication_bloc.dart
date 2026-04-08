@@ -6,14 +6,14 @@ import 'package:play_with_me/features/auth/domain/repositories/auth_repository.d
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 
-class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
+class AuthenticationBloc
+    extends Bloc<AuthenticationEvent, AuthenticationState> {
   final AuthRepository _authRepository;
   StreamSubscription<dynamic>? _userSubscription;
 
-  AuthenticationBloc({
-    required AuthRepository authRepository,
-  })  : _authRepository = authRepository,
-        super(const AuthenticationUnknown()) {
+  AuthenticationBloc({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(const AuthenticationUnknown()) {
     on<AuthenticationStarted>(_onAuthenticationStarted);
     on<AuthenticationUserChanged>(_onAuthenticationUserChanged);
     on<AuthenticationLogoutRequested>(_onAuthenticationLogoutRequested);
@@ -27,7 +27,9 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
 
     _userSubscription = _authRepository.authStateChanges.listen(
       (user) {
-        debugPrint('🔐 AuthenticationBloc: Auth state changed - user: ${user?.email ?? 'null'}');
+        debugPrint(
+          '🔐 AuthenticationBloc: Auth state changed - user: ${user?.email ?? 'null'}',
+        );
         add(AuthenticationUserChanged(user));
       },
       onError: (error) {
@@ -42,7 +44,9 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     Emitter<AuthenticationState> emit,
   ) {
     if (event.user != null) {
-      debugPrint('✅ AuthenticationBloc: User authenticated - ${event.user!.email}');
+      debugPrint(
+        '✅ AuthenticationBloc: User authenticated - ${event.user!.email}',
+      );
       emit(AuthenticationAuthenticated(event.user!));
     } else {
       debugPrint('🚫 AuthenticationBloc: User unauthenticated');

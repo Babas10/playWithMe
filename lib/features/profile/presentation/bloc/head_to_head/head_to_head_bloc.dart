@@ -9,9 +9,8 @@ import 'head_to_head_state.dart';
 class HeadToHeadBloc extends Bloc<HeadToHeadEvent, HeadToHeadState> {
   final UserRepository userRepository;
 
-  HeadToHeadBloc({
-    required this.userRepository,
-  }) : super(const HeadToHeadState.initial()) {
+  HeadToHeadBloc({required this.userRepository})
+    : super(const HeadToHeadState.initial()) {
     on<LoadHeadToHead>(_onLoadHeadToHead);
   }
 
@@ -29,17 +28,21 @@ class HeadToHeadBloc extends Bloc<HeadToHeadEvent, HeadToHeadState> {
       );
 
       if (stats == null) {
-        emit(const HeadToHeadState.error(
-          message: 'No head-to-head statistics found for this opponent',
-        ));
+        emit(
+          const HeadToHeadState.error(
+            message: 'No head-to-head statistics found for this opponent',
+          ),
+        );
         return;
       }
 
       emit(HeadToHeadState.loaded(stats: stats));
     } catch (e) {
-      emit(HeadToHeadState.error(
-        message: 'Failed to load head-to-head details: ${e.toString()}',
-      ));
+      emit(
+        HeadToHeadState.error(
+          message: 'Failed to load head-to-head details: ${e.toString()}',
+        ),
+      );
     }
   }
 }

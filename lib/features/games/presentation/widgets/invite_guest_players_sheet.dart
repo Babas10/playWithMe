@@ -15,9 +15,9 @@ import '../bloc/game_guest_invitation/game_guest_invitation_state.dart';
 /// Must be called from a context that already has [GameGuestInvitationBloc]
 /// provided above it in the tree.
 void showInviteGuestPlayersSheet(BuildContext context, String gameId) {
-  context
-      .read<GameGuestInvitationBloc>()
-      .add(LoadInvitablePlayers(gameId: gameId));
+  context.read<GameGuestInvitationBloc>().add(
+    LoadInvitablePlayers(gameId: gameId),
+  );
 
   showModalBottomSheet<void>(
     context: context,
@@ -77,106 +77,113 @@ class _InviteGroupsSheetState extends State<_InviteGroupsSheet> {
               child: Text(
                 l10n.inviteGuestPlayers,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.secondary,
+                ),
               ),
             ),
             const Divider(height: 1),
             Expanded(
-              child: BlocConsumer<GameGuestInvitationBloc,
-                  GameGuestInvitationState>(
-                listener: (context, state) {
-                  if (state is InviteGroupSuccess) {
-                    setState(() => _invitedGroupIds.add(state.groupId));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.inviteGroupSuccess)),
-                    );
-                  } else if (state is InvitePlayerError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.message),
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                      ),
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (state is InvitablePlayersLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              child:
+                  BlocConsumer<
+                    GameGuestInvitationBloc,
+                    GameGuestInvitationState
+                  >(
+                    listener: (context, state) {
+                      if (state is InviteGroupSuccess) {
+                        setState(() => _invitedGroupIds.add(state.groupId));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.inviteGroupSuccess)),
+                        );
+                      } else if (state is InvitePlayerError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message),
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.error,
+                          ),
+                        );
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state is InvitablePlayersLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                  if (state is InvitablePlayersError) {
-                    return _ErrorView(
-                      message: state.message,
-                      gameId: widget.gameId,
-                    );
-                  }
+                      if (state is InvitablePlayersError) {
+                        return _ErrorView(
+                          message: state.message,
+                          gameId: widget.gameId,
+                        );
+                      }
 
-                  final players = switch (state) {
-                    InvitablePlayersLoaded s => s.players,
-                    InviteGroupSending s => s.players,
-                    InviteGroupSuccess s => s.players,
-                    InvitePlayerSending s => s.players,
-                    InvitePlayerSuccess s => s.players,
-                    InvitePlayerError s => s.players,
-                    _ => const <InvitablePlayerModel>[],
-                  };
+                      final players = switch (state) {
+                        InvitablePlayersLoaded s => s.players,
+                        InviteGroupSending s => s.players,
+                        InviteGroupSuccess s => s.players,
+                        InvitePlayerSending s => s.players,
+                        InvitePlayerSuccess s => s.players,
+                        InvitePlayerError s => s.players,
+                        _ => const <InvitablePlayerModel>[],
+                      };
 
-                  if (players.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          l10n.noInvitablePlayers,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
+                      if (players.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Text(
+                              l10n.noInvitablePlayers,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ),
+                        );
+                      }
+
+                      // Group players by sourceGroupId
+                      final grouped = <String, List<InvitablePlayerModel>>{};
+                      for (final p in players) {
+                        grouped.putIfAbsent(p.sourceGroupId, () => []).add(p);
+                      }
+
+                      final sendingGroupId = state is InviteGroupSending
+                          ? state.groupId
+                          : null;
+                      final isSendingAny = sendingGroupId != null;
+
+                      return ListView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
-                      ),
-                    );
-                  }
+                        children: grouped.entries.map((entry) {
+                          final groupId = entry.key;
+                          final members = entry.value;
+                          final groupName = members.first.sourceGroupName;
+                          final isThisSending = sendingGroupId == groupId;
+                          final isInvited = _invitedGroupIds.contains(groupId);
 
-                  // Group players by sourceGroupId
-                  final grouped = <String, List<InvitablePlayerModel>>{};
-                  for (final p in players) {
-                    grouped.putIfAbsent(p.sourceGroupId, () => []).add(p);
-                  }
-
-                  final sendingGroupId = state is InviteGroupSending
-                      ? state.groupId
-                      : null;
-                  final isSendingAny = sendingGroupId != null;
-
-                  return ListView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    children: grouped.entries.map((entry) {
-                      final groupId = entry.key;
-                      final members = entry.value;
-                      final groupName = members.first.sourceGroupName;
-                      final isThisSending = sendingGroupId == groupId;
-                      final isInvited = _invitedGroupIds.contains(groupId);
-
-                      return _GroupCard(
-                        groupName: groupName,
-                        members: members,
-                        isSending: isThisSending,
-                        isInvited: isInvited,
-                        isDisabled: isSendingAny || isInvited,
-                        onTap: () {
-                          context.read<GameGuestInvitationBloc>().add(
+                          return _GroupCard(
+                            groupName: groupName,
+                            members: members,
+                            isSending: isThisSending,
+                            isInvited: isInvited,
+                            isDisabled: isSendingAny || isInvited,
+                            onTap: () {
+                              context.read<GameGuestInvitationBloc>().add(
                                 InviteGroupPlayers(
                                   gameId: widget.gameId,
                                   groupId: groupId,
                                 ),
                               );
-                        },
+                            },
+                          );
+                        }).toList(),
                       );
-                    }).toList(),
-                  );
-                },
-              ),
+                    },
+                  ),
             ),
           ],
         );
@@ -214,9 +221,7 @@ class _GroupCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isInvited
-              ? Colors.green.shade200
-              : Colors.grey.shade200,
+          color: isInvited ? Colors.green.shade200 : Colors.grey.shade200,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -276,8 +281,11 @@ class _GroupCard extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.check_circle,
-                        size: 18, color: Colors.green.shade600),
+                    Icon(
+                      Icons.check_circle,
+                      size: 18,
+                      color: Colors.green.shade600,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       l10n.invitedLabel,
@@ -290,8 +298,11 @@ class _GroupCard extends StatelessWidget {
                   ],
                 )
               else
-                const Icon(Icons.chevron_right,
-                    size: 20, color: Color(0xFF64748B)),
+                const Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: Color(0xFF64748B),
+                ),
             ],
           ),
         ),
@@ -317,15 +328,18 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline,
-                size: 48, color: Theme.of(context).colorScheme.error),
+            Icon(
+              Icons.error_outline,
+              size: 48,
+              color: Theme.of(context).colorScheme.error,
+            ),
             const SizedBox(height: 12),
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: () => context
-                  .read<GameGuestInvitationBloc>()
-                  .add(LoadInvitablePlayers(gameId: gameId)),
+              onPressed: () => context.read<GameGuestInvitationBloc>().add(
+                LoadInvitablePlayers(gameId: gameId),
+              ),
               child: Text(l10n.retry),
             ),
           ],

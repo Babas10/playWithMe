@@ -61,9 +61,7 @@ class GroupDetailsPage extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => sl<GroupMemberBloc>()),
         BlocProvider(create: (context) => sl<GroupInviteLinkBloc>()),
-        BlocProvider(
-          create: (context) => sl<GamesListBloc>(),
-        ),
+        BlocProvider(create: (context) => sl<GamesListBloc>()),
       ],
       child: _GroupDetailsPageContent(
         groupId: groupId,
@@ -116,8 +114,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
   @override
   void initState() {
     super.initState();
-    _groupRepository =
-        widget.groupRepositoryOverride ?? sl<GroupRepository>();
+    _groupRepository = widget.groupRepositoryOverride ?? sl<GroupRepository>();
     _userRepository = widget.userRepositoryOverride ?? sl<UserRepository>();
     _friendRepository = sl<FriendRepository>();
     _tabController = TabController(length: 2, vsync: this);
@@ -135,11 +132,11 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
       final authState = context.read<AuthenticationBloc>().state;
       if (authState is AuthenticationAuthenticated && _group != null) {
         context.read<GamesListBloc>().add(
-              LoadGamesForGroup(
-                groupId: widget.groupId,
-                userId: authState.user.uid,
-              ),
-            );
+          LoadGamesForGroup(
+            groupId: widget.groupId,
+            userId: authState.user.uid,
+          ),
+        );
       }
     }
   }
@@ -202,8 +199,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
     if (authState is! AuthenticationAuthenticated) return;
 
     final currentUserId = authState.user.uid;
-    final otherMemberIds =
-        group.memberIds.where((id) => id != currentUserId).toList();
+    final otherMemberIds = group.memberIds
+        .where((id) => id != currentUserId)
+        .toList();
 
     setState(() {
       _isLoadingFriendships = true;
@@ -211,8 +209,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
 
     // Phase 1: Load member names immediately so the list is visible.
     try {
-      final members =
-          await _userRepository.getUsersByIds(group.memberIds);
+      final members = await _userRepository.getUsersByIds(group.memberIds);
       if (!mounted) return;
       setState(() {
         _members = members;
@@ -268,8 +265,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
       if (!mounted) return;
 
       try {
-        (_friendRepository as dynamic)
-            .invalidateFriendshipCacheForUser(targetUserId);
+        (_friendRepository as dynamic).invalidateFriendshipCacheForUser(
+          targetUserId,
+        );
       } catch (_) {}
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -304,39 +302,30 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
 
     switch (action) {
       case MemberAction.promote:
-        final confirmed =
-            await showPromoteConfirmationDialog(context, member);
+        final confirmed = await showPromoteConfirmationDialog(context, member);
         if (confirmed && mounted) {
           context.read<GroupMemberBloc>().add(
-                PromoteMemberToAdmin(
-                  groupId: _group!.id,
-                  userId: member.uid,
-                ),
-              );
+            PromoteMemberToAdmin(groupId: _group!.id, userId: member.uid),
+          );
         }
         break;
       case MemberAction.demote:
-        final confirmed =
-            await showDemoteConfirmationDialog(context, member);
+        final confirmed = await showDemoteConfirmationDialog(context, member);
         if (confirmed && mounted) {
           context.read<GroupMemberBloc>().add(
-                DemoteMemberFromAdmin(
-                  groupId: _group!.id,
-                  userId: member.uid,
-                ),
-              );
+            DemoteMemberFromAdmin(groupId: _group!.id, userId: member.uid),
+          );
         }
         break;
       case MemberAction.remove:
-        final confirmed =
-            await showRemoveMemberConfirmationDialog(context, member);
+        final confirmed = await showRemoveMemberConfirmationDialog(
+          context,
+          member,
+        );
         if (confirmed && mounted) {
           context.read<GroupMemberBloc>().add(
-                RemoveMemberFromGroup(
-                  groupId: _group!.id,
-                  userId: member.uid,
-                ),
-              );
+            RemoveMemberFromGroup(groupId: _group!.id, userId: member.uid),
+          );
         }
         break;
     }
@@ -416,8 +405,11 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                         value: 'leave',
                         child: Row(
                           children: [
-                            const Icon(Icons.exit_to_app,
-                                size: 20, color: Colors.red),
+                            const Icon(
+                              Icons.exit_to_app,
+                              size: 20,
+                              color: Colors.red,
+                            ),
                             const SizedBox(width: 12),
                             Text(
                               l10n.leaveGroup,
@@ -442,7 +434,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
   }
 
   Widget _buildBody(
-      BuildContext context, AuthenticationAuthenticated authState) {
+    BuildContext context,
+    AuthenticationAuthenticated authState,
+  ) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -550,10 +544,8 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                       child: Text(
                         'Members (${_members.length})',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                     );
                   }
@@ -564,9 +556,13 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                       final l10n = AppLocalizations.of(context)!;
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor:
-                              AppColors.secondary.withValues(alpha: 0.1),
-                          child: Icon(Icons.person_add, color: AppColors.secondary),
+                          backgroundColor: AppColors.secondary.withValues(
+                            alpha: 0.1,
+                          ),
+                          child: Icon(
+                            Icons.person_add,
+                            color: AppColors.secondary,
+                          ),
                         ),
                         title: Text(
                           l10n.inviteMember,
@@ -584,13 +580,16 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                           inviteLinkState is GroupInviteLinkLoading;
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor:
-                              AppColors.secondary.withValues(alpha: 0.1),
+                          backgroundColor: AppColors.secondary.withValues(
+                            alpha: 0.1,
+                          ),
                           child: isGenerating
                               ? const SizedBox(
                                   width: 20,
                                   height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : Icon(Icons.link, color: AppColors.secondary),
                         ),
@@ -604,8 +603,8 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                         onTap: isGenerating
                             ? null
                             : () => context.read<GroupInviteLinkBloc>().add(
-                                  GenerateInvite(groupId: widget.groupId),
-                                ),
+                                GenerateInvite(groupId: widget.groupId),
+                              ),
                       );
                     }
                   }
@@ -623,8 +622,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                   if (_isLoadingFriendships && !isCurrentUser) {
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor:
-                            const Color(0xFFEACE6A).withValues(alpha: 0.25),
+                        backgroundColor: const Color(
+                          0xFFEACE6A,
+                        ).withValues(alpha: 0.25),
                         backgroundImage: member.photoUrl != null
                             ? NetworkImage(member.photoUrl!)
                             : null,
@@ -717,8 +717,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () =>
-                              _navigateToTrainingCreation(context),
+                          onPressed: () => _navigateToTrainingCreation(context),
                           icon: const Icon(Icons.fitness_center),
                           label: Text(l10n.createTraining),
                           style: OutlinedButton.styleFrom(
@@ -759,8 +758,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                           Icon(
                             Icons.sports_volleyball,
                             size: 48,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(height: 12),
                           Text(
@@ -770,12 +770,12 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                           const SizedBox(height: 4),
                           Text(
                             l10n.createFirstActivity,
-                            style:
-                                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -785,27 +785,46 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                 else if (state is GamesListLoaded) ...[
                   if (state.upcomingActivities.isNotEmpty) ...[
                     _buildActivitySectionHeader(
-                        context, l10n.upcomingActivities),
-                    ...state.upcomingActivities.map((activity) =>
-                        _buildActivityItem(
-                            context, activity, state.userId, false)),
+                      context,
+                      l10n.upcomingActivities,
+                    ),
+                    ...state.upcomingActivities.map(
+                      (activity) => _buildActivityItem(
+                        context,
+                        activity,
+                        state.userId,
+                        false,
+                      ),
+                    ),
                   ],
                   if (state.pastActivities.isNotEmpty) ...[
                     _buildActivitySectionHeader(context, l10n.pastActivities),
-                    ...state.pastActivities.map((activity) =>
-                        _buildActivityItem(
-                            context, activity, state.userId, true)),
+                    ...state.pastActivities.map(
+                      (activity) => _buildActivityItem(
+                        context,
+                        activity,
+                        state.userId,
+                        true,
+                      ),
+                    ),
                   ],
                   // Older activities (loaded on demand)
                   if (state.olderPastActivities.isNotEmpty)
-                    ...state.olderPastActivities.map((activity) =>
-                        _buildActivityItem(
-                            context, activity, state.userId, true)),
+                    ...state.olderPastActivities.map(
+                      (activity) => _buildActivityItem(
+                        context,
+                        activity,
+                        state.userId,
+                        true,
+                      ),
+                    ),
                   // "Load older activities" button
                   if (!state.olderActivitiesLoaded)
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       child: state.isLoadingOlderActivities
                           ? const Center(child: CircularProgressIndicator())
                           : OutlinedButton(
@@ -814,10 +833,8 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
                                   .add(const LoadOlderActivities()),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: AppColors.secondary,
-                                side:
-                                    BorderSide(color: AppColors.secondary),
-                                minimumSize:
-                                    const Size(double.infinity, 44),
+                                side: BorderSide(color: AppColors.secondary),
+                                minimumSize: const Size(double.infinity, 44),
                               ),
                               child: Text(l10n.loadOlderActivities),
                             ),
@@ -838,9 +855,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.secondary,
-            ),
+          fontWeight: FontWeight.bold,
+          color: AppColors.secondary,
+        ),
       ),
     );
   }
@@ -858,9 +875,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
         isPast: isPast,
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => GameDetailsPage(gameId: game.id),
-          ),
+          MaterialPageRoute(builder: (_) => GameDetailsPage(gameId: game.id)),
         ),
       ),
       training: (session) => TrainingSessionListItem(
@@ -894,9 +909,9 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
           Text(
             _group!.name,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.secondary,
-                ),
+              fontWeight: FontWeight.bold,
+              color: AppColors.secondary,
+            ),
           ),
           const SizedBox(height: 8),
           if (_group!.description != null && _group!.description!.isNotEmpty)
@@ -918,8 +933,8 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
               Text(
                 '${_group!.memberCount} members',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -1034,10 +1049,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
     if (!confirmed || !context.mounted) return;
 
     context.read<GroupMemberBloc>().add(
-          LeaveGroup(
-            groupId: widget.groupId,
-            userId: userId,
-          ),
-        );
+      LeaveGroup(groupId: widget.groupId, userId: userId),
+    );
   }
 }

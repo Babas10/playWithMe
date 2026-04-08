@@ -133,11 +133,15 @@ void main() {
         final pendingJson = testFriendship.toJson();
         expect(pendingJson['status'], 'pending');
 
-        final acceptedFriendship = testFriendship.copyWith(status: FriendshipStatus.accepted);
+        final acceptedFriendship = testFriendship.copyWith(
+          status: FriendshipStatus.accepted,
+        );
         final acceptedJson = acceptedFriendship.toJson();
         expect(acceptedJson['status'], 'accepted');
 
-        final declinedFriendship = testFriendship.copyWith(status: FriendshipStatus.declined);
+        final declinedFriendship = testFriendship.copyWith(
+          status: FriendshipStatus.declined,
+        );
         final declinedJson = declinedFriendship.toJson();
         expect(declinedJson['status'], 'declined');
       });
@@ -181,14 +185,18 @@ void main() {
       });
 
       test('isAccepted returns true for accepted status', () {
-        final accepted = testFriendship.copyWith(status: FriendshipStatus.accepted);
+        final accepted = testFriendship.copyWith(
+          status: FriendshipStatus.accepted,
+        );
         expect(accepted.isPending, false);
         expect(accepted.isAccepted, true);
         expect(accepted.isDeclined, false);
       });
 
       test('isDeclined returns true for declined status', () {
-        final declined = testFriendship.copyWith(status: FriendshipStatus.declined);
+        final declined = testFriendship.copyWith(
+          status: FriendshipStatus.declined,
+        );
         expect(declined.isPending, false);
         expect(declined.isAccepted, false);
         expect(declined.isDeclined, true);
@@ -245,7 +253,9 @@ void main() {
       });
 
       test('accept does nothing if not pending', () {
-        final alreadyAccepted = testFriendship.copyWith(status: FriendshipStatus.accepted);
+        final alreadyAccepted = testFriendship.copyWith(
+          status: FriendshipStatus.accepted,
+        );
         final result = alreadyAccepted.accept();
 
         expect(result, alreadyAccepted);
@@ -262,7 +272,9 @@ void main() {
       });
 
       test('decline does nothing if not pending', () {
-        final alreadyAccepted = testFriendship.copyWith(status: FriendshipStatus.accepted);
+        final alreadyAccepted = testFriendship.copyWith(
+          status: FriendshipStatus.accepted,
+        );
         final result = alreadyAccepted.decline();
 
         expect(result, alreadyAccepted);
@@ -279,7 +291,10 @@ void main() {
 
     group('Name update methods', () {
       test('updateUserName updates initiator name', () {
-        final updated = testFriendship.updateUserName('user-1', 'Alice Updated');
+        final updated = testFriendship.updateUserName(
+          'user-1',
+          'Alice Updated',
+        );
 
         expect(updated.initiatorName, 'Alice Updated');
         expect(updated.recipientName, 'Bob');

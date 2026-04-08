@@ -34,8 +34,8 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
     super.initState();
     // Load aggregated feedback when widget is created
     context.read<TrainingFeedbackBloc>().add(
-          LoadAggregatedFeedback(widget.trainingSessionId),
-        );
+      LoadAggregatedFeedback(widget.trainingSessionId),
+    );
   }
 
   @override
@@ -44,9 +44,7 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
       builder: (context, state) {
         // Loading state
         if (state is LoadingAggregatedFeedback) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
         // Error state
@@ -57,11 +55,7 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.red,
-                  ),
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
                   Text(
                     'Error loading feedback',
@@ -77,8 +71,8 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
                   ElevatedButton.icon(
                     onPressed: () {
                       context.read<TrainingFeedbackBloc>().add(
-                            LoadAggregatedFeedback(widget.trainingSessionId),
-                          );
+                        LoadAggregatedFeedback(widget.trainingSessionId),
+                      );
                     },
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
@@ -100,17 +94,11 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
           }
 
           // Display feedback
-          return _buildFeedbackDisplay(
-            context,
-            aggregation,
-            hasUserSubmitted,
-          );
+          return _buildFeedbackDisplay(context, aggregation, hasUserSubmitted);
         }
 
         // Initial/unknown state - show loading
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
+        return const Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -122,11 +110,7 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.feedback_outlined,
-              size: 80,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.feedback_outlined, size: 80, color: Colors.grey[400]),
             const SizedBox(height: 24),
             Text(
               'No Feedback Yet',
@@ -138,10 +122,7 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
                   ? 'You have submitted feedback, but no other participants have provided feedback yet.'
                   : 'Be the first to provide feedback for this training session!',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 16,
-              ),
+              style: const TextStyle(color: Colors.grey, fontSize: 16),
             ),
             const SizedBox(height: 32),
             if (!hasUserSubmitted)
@@ -194,7 +175,9 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
                         child: Text(
                           'Share your thoughts about this session',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -202,8 +185,12 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
                       ElevatedButton(
                         onPressed: () => _navigateToSubmitFeedback(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.onPrimary,
                         ),
                         child: const Text('Submit'),
                       ),
@@ -255,8 +242,9 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
         // Individual feedback list
         SliverToBoxAdapter(
           child: StreamBuilder<List<dynamic>>(
-            stream: sl<TrainingFeedbackRepository>()
-                .getFeedbackListStream(widget.trainingSessionId),
+            stream: sl<TrainingFeedbackRepository>().getFeedbackListStream(
+              widget.trainingSessionId,
+            ),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
@@ -282,9 +270,7 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
         ),
 
         // Bottom padding
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 16),
-        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
       ],
     );
   }
@@ -307,9 +293,7 @@ class _FeedbackDisplayWidgetState extends State<FeedbackDisplayWidget> {
     ).then((_) {
       // Reload feedback after returning from submission page
       if (mounted) {
-        feedbackBloc.add(
-          LoadAggregatedFeedback(widget.trainingSessionId),
-        );
+        feedbackBloc.add(LoadAggregatedFeedback(widget.trainingSessionId));
       }
     });
   }

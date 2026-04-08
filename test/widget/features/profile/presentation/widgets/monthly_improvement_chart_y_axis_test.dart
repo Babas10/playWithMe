@@ -45,18 +45,20 @@ void main() {
       final history = createHistory([1600, 1650, 1700]);
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1700,
-              timePeriod: TimePeriod.allTime, // Story 302.7: Use allTime to include older test data
+              timePeriod: TimePeriod
+                  .allTime, // Story 302.7: Use allTime to include older test data
             ),
           ),
         ),
@@ -94,18 +96,20 @@ void main() {
       final history = createHistory([1599, 1600, 1601]);
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1601,
-              timePeriod: TimePeriod.allTime, // Story 302.7: Use allTime to include older test data
+              timePeriod: TimePeriod
+                  .allTime, // Story 302.7: Use allTime to include older test data
             ),
           ),
         ),
@@ -146,18 +150,20 @@ void main() {
       final history = createHistory([1600, 1659, 1718]);
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1718,
-              timePeriod: TimePeriod.allTime, // Story 302.7: Use allTime to include older test data
+              timePeriod: TimePeriod
+                  .allTime, // Story 302.7: Use allTime to include older test data
             ),
           ),
         ),

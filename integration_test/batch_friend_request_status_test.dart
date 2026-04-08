@@ -34,17 +34,19 @@ void main() {
           displayName: 'Current User',
         );
 
-        final userNoRequest = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'no-request@test.com',
-          password: 'password123',
-          displayName: 'No Request User',
-        );
+        final userNoRequest =
+            await FirebaseEmulatorHelper.createCompleteTestUser(
+              email: 'no-request@test.com',
+              password: 'password123',
+              displayName: 'No Request User',
+            );
 
-        final userSentToMe = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'sent-to-me@test.com',
-          password: 'password123',
-          displayName: 'Sent To Me User',
-        );
+        final userSentToMe =
+            await FirebaseEmulatorHelper.createCompleteTestUser(
+              email: 'sent-to-me@test.com',
+              password: 'password123',
+              displayName: 'Sent To Me User',
+            );
 
         final userISentTo = await FirebaseEmulatorHelper.createCompleteTestUser(
           email: 'i-sent-to@test.com',
@@ -60,8 +62,9 @@ void main() {
         );
 
         // 3. Send friend request to userISentTo
-        final sendRequestCallable =
-            FirebaseFunctions.instance.httpsCallable('sendFriendRequest');
+        final sendRequestCallable = FirebaseFunctions.instance.httpsCallable(
+          'sendFriendRequest',
+        );
         await sendRequestCallable.call({'targetUserId': userISentTo.uid});
         await FirebaseEmulatorHelper.waitForFirestore();
 
@@ -82,21 +85,19 @@ void main() {
         );
 
         // 6. Call batchCheckFriendRequestStatus
-        final batchCheckCallable = FirebaseFunctions.instance
-            .httpsCallable('batchCheckFriendRequestStatus');
+        final batchCheckCallable = FirebaseFunctions.instance.httpsCallable(
+          'batchCheckFriendRequestStatus',
+        );
         final result = await batchCheckCallable.call({
-          'userIds': [
-            userNoRequest.uid,
-            userSentToMe.uid,
-            userISentTo.uid,
-          ],
+          'userIds': [userNoRequest.uid, userSentToMe.uid, userISentTo.uid],
         });
 
         expect(result.data, isNotNull);
         expect(result.data['requestStatuses'], isNotNull);
 
-        final statuses =
-            Map<String, dynamic>.from(result.data['requestStatuses'] as Map);
+        final statuses = Map<String, dynamic>.from(
+          result.data['requestStatuses'] as Map,
+        );
 
         // 7. Verify each status
         expect(statuses[userNoRequest.uid], equals('none'));
@@ -105,241 +106,230 @@ void main() {
       },
     );
 
-    test(
-      'Should return empty map for empty userIds list',
-      () async {
-        // 1. Create and sign in as test user
-        await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'test@test.com',
+    test('Should return empty map for empty userIds list', () async {
+      // 1. Create and sign in as test user
+      await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'test@test.com',
+        password: 'password123',
+        displayName: 'Test User',
+      );
+
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'test@test.com',
+        password: 'password123',
+      );
+
+      // 2. Call batchCheckFriendRequestStatus with empty list
+      final batchCheckCallable = FirebaseFunctions.instance.httpsCallable(
+        'batchCheckFriendRequestStatus',
+      );
+      final result = await batchCheckCallable.call({'userIds': []});
+
+      expect(result.data, isNotNull);
+      expect(result.data['requestStatuses'], isNotNull);
+
+      final statuses = Map<String, dynamic>.from(
+        result.data['requestStatuses'] as Map,
+      );
+      expect(statuses.isEmpty, isTrue);
+    });
+
+    test('Should handle large batch of users (50 users)', () async {
+      // 1. Create current user
+      await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'current@test.com',
+        password: 'password123',
+        displayName: 'Current User',
+      );
+
+      // 2. Create 50 test users
+      final List<String> userIds = [];
+      for (int i = 0; i < 50; i++) {
+        final user = await FirebaseEmulatorHelper.createCompleteTestUser(
+          email: 'user$i@test.com',
           password: 'password123',
-          displayName: 'Test User',
+          displayName: 'User $i',
         );
+        userIds.add(user.uid);
+      }
 
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'test@test.com',
-          password: 'password123',
-        );
+      // 3. Sign in as currentUser
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'current@test.com',
+        password: 'password123',
+      );
 
-        // 2. Call batchCheckFriendRequestStatus with empty list
-        final batchCheckCallable = FirebaseFunctions.instance
-            .httpsCallable('batchCheckFriendRequestStatus');
-        final result = await batchCheckCallable.call({
-          'userIds': [],
-        });
+      // 4. Send requests to first 10 users
+      final sendRequestCallable = FirebaseFunctions.instance.httpsCallable(
+        'sendFriendRequest',
+      );
+      for (int i = 0; i < 10; i++) {
+        await sendRequestCallable.call({'targetUserId': userIds[i]});
+      }
+      await FirebaseEmulatorHelper.waitForFirestore();
 
-        expect(result.data, isNotNull);
-        expect(result.data['requestStatuses'], isNotNull);
+      // 5. Call batchCheckFriendRequestStatus
+      final batchCheckCallable = FirebaseFunctions.instance.httpsCallable(
+        'batchCheckFriendRequestStatus',
+      );
+      final result = await batchCheckCallable.call({'userIds': userIds});
 
-        final statuses =
-            Map<String, dynamic>.from(result.data['requestStatuses'] as Map);
-        expect(statuses.isEmpty, isTrue);
-      },
-    );
+      expect(result.data, isNotNull);
+      expect(result.data['requestStatuses'], isNotNull);
 
-    test(
-      'Should handle large batch of users (50 users)',
-      () async {
-        // 1. Create current user
-        await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'current@test.com',
-          password: 'password123',
-          displayName: 'Current User',
-        );
+      final statuses = Map<String, dynamic>.from(
+        result.data['requestStatuses'] as Map,
+      );
 
-        // 2. Create 50 test users
-        final List<String> userIds = [];
-        for (int i = 0; i < 50; i++) {
-          final user = await FirebaseEmulatorHelper.createCompleteTestUser(
-            email: 'user$i@test.com',
-            password: 'password123',
-            displayName: 'User $i',
-          );
-          userIds.add(user.uid);
-        }
+      // 6. Verify all 50 users have status
+      expect(statuses.length, equals(50));
 
-        // 3. Sign in as currentUser
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'current@test.com',
-          password: 'password123',
-        );
+      // 7. Verify first 10 are sentByMe
+      for (int i = 0; i < 10; i++) {
+        expect(statuses[userIds[i]], equals('sentByMe'));
+      }
 
-        // 4. Send requests to first 10 users
-        final sendRequestCallable =
-            FirebaseFunctions.instance.httpsCallable('sendFriendRequest');
-        for (int i = 0; i < 10; i++) {
-          await sendRequestCallable.call({'targetUserId': userIds[i]});
-        }
-        await FirebaseEmulatorHelper.waitForFirestore();
+      // 8. Verify remaining are none
+      for (int i = 10; i < 50; i++) {
+        expect(statuses[userIds[i]], equals('none'));
+      }
+    });
 
-        // 5. Call batchCheckFriendRequestStatus
-        final batchCheckCallable = FirebaseFunctions.instance
-            .httpsCallable('batchCheckFriendRequestStatus');
-        final result = await batchCheckCallable.call({
-          'userIds': userIds,
-        });
+    test('Should reject more than 100 users', () async {
+      // 1. Create and sign in as test user
+      await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'test@test.com',
+        password: 'password123',
+        displayName: 'Test User',
+      );
 
-        expect(result.data, isNotNull);
-        expect(result.data['requestStatuses'], isNotNull);
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'test@test.com',
+        password: 'password123',
+      );
 
-        final statuses =
-            Map<String, dynamic>.from(result.data['requestStatuses'] as Map);
+      // 2. Create list of 101 fake user IDs
+      final List<String> userIds = List.generate(101, (i) => 'fake-user-id-$i');
 
-        // 6. Verify all 50 users have status
-        expect(statuses.length, equals(50));
+      // 3. Call batchCheckFriendRequestStatus should fail
+      final batchCheckCallable = FirebaseFunctions.instance.httpsCallable(
+        'batchCheckFriendRequestStatus',
+      );
 
-        // 7. Verify first 10 are sentByMe
-        for (int i = 0; i < 10; i++) {
-          expect(statuses[userIds[i]], equals('sentByMe'));
-        }
-
-        // 8. Verify remaining are none
-        for (int i = 10; i < 50; i++) {
-          expect(statuses[userIds[i]], equals('none'));
-        }
-      },
-    );
-
-    test(
-      'Should reject more than 100 users',
-      () async {
-        // 1. Create and sign in as test user
-        await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'test@test.com',
-          password: 'password123',
-          displayName: 'Test User',
-        );
-
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'test@test.com',
-          password: 'password123',
-        );
-
-        // 2. Create list of 101 fake user IDs
-        final List<String> userIds =
-            List.generate(101, (i) => 'fake-user-id-$i');
-
-        // 3. Call batchCheckFriendRequestStatus should fail
-        final batchCheckCallable = FirebaseFunctions.instance
-            .httpsCallable('batchCheckFriendRequestStatus');
-
-        expect(
-          () => batchCheckCallable.call({'userIds': userIds}),
-          throwsA(
-            isA<FirebaseFunctionsException>().having(
-              (e) => e.code,
-              'code',
-              'invalid-argument',
-            ),
+      expect(
+        () => batchCheckCallable.call({'userIds': userIds}),
+        throwsA(
+          isA<FirebaseFunctionsException>().having(
+            (e) => e.code,
+            'code',
+            'invalid-argument',
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
 
-    test(
-      'Should require authentication',
-      () async {
-        // 1. Ensure signed out
-        await FirebaseEmulatorHelper.signOut();
+    test('Should require authentication', () async {
+      // 1. Ensure signed out
+      await FirebaseEmulatorHelper.signOut();
 
-        // 2. Try to call batchCheckFriendRequestStatus without auth
-        final batchCheckCallable = FirebaseFunctions.instance
-            .httpsCallable('batchCheckFriendRequestStatus');
+      // 2. Try to call batchCheckFriendRequestStatus without auth
+      final batchCheckCallable = FirebaseFunctions.instance.httpsCallable(
+        'batchCheckFriendRequestStatus',
+      );
 
-        expect(
-          () => batchCheckCallable.call({
-            'userIds': ['fake-user-id'],
-          }),
-          throwsA(
-            isA<FirebaseFunctionsException>().having(
-              (e) => e.code,
-              'code',
-              'unauthenticated',
-            ),
+      expect(
+        () => batchCheckCallable.call({
+          'userIds': ['fake-user-id'],
+        }),
+        throwsA(
+          isA<FirebaseFunctionsException>().having(
+            (e) => e.code,
+            'code',
+            'unauthenticated',
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
 
-    test(
-      'Should handle mix of friends and non-friends correctly',
-      () async {
-        // 1. Create test users
-        await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'current@test.com',
-          password: 'password123',
-          displayName: 'Current User',
-        );
+    test('Should handle mix of friends and non-friends correctly', () async {
+      // 1. Create test users
+      await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'current@test.com',
+        password: 'password123',
+        displayName: 'Current User',
+      );
 
-        final friendUser = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'friend@test.com',
-          password: 'password123',
-          displayName: 'Friend User',
-        );
+      final friendUser = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'friend@test.com',
+        password: 'password123',
+        displayName: 'Friend User',
+      );
 
-        final pendingUser = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'pending@test.com',
-          password: 'password123',
-          displayName: 'Pending User',
-        );
+      final pendingUser = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'pending@test.com',
+        password: 'password123',
+        displayName: 'Pending User',
+      );
 
-        // 2. Create accepted friendship with friendUser
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'current@test.com',
-          password: 'password123',
-        );
+      // 2. Create accepted friendship with friendUser
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'current@test.com',
+        password: 'password123',
+      );
 
-        final sendRequestCallable =
-            FirebaseFunctions.instance.httpsCallable('sendFriendRequest');
-        final requestResult =
-            await sendRequestCallable.call({'targetUserId': friendUser.uid});
-        final friendshipId = requestResult.data['friendshipId'];
-        await FirebaseEmulatorHelper.waitForFirestore();
+      final sendRequestCallable = FirebaseFunctions.instance.httpsCallable(
+        'sendFriendRequest',
+      );
+      final requestResult = await sendRequestCallable.call({
+        'targetUserId': friendUser.uid,
+      });
+      final friendshipId = requestResult.data['friendshipId'];
+      await FirebaseEmulatorHelper.waitForFirestore();
 
-        // Accept the friend request
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'friend@test.com',
-          password: 'password123',
-        );
+      // Accept the friend request
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'friend@test.com',
+        password: 'password123',
+      );
 
-        final acceptCallable =
-            FirebaseFunctions.instance.httpsCallable('acceptFriendRequest');
-        await acceptCallable.call({'friendshipId': friendshipId});
-        await FirebaseEmulatorHelper.waitForFirestore();
+      final acceptCallable = FirebaseFunctions.instance.httpsCallable(
+        'acceptFriendRequest',
+      );
+      await acceptCallable.call({'friendshipId': friendshipId});
+      await FirebaseEmulatorHelper.waitForFirestore();
 
-        // 3. Send pending request to pendingUser
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'current@test.com',
-          password: 'password123',
-        );
+      // 3. Send pending request to pendingUser
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'current@test.com',
+        password: 'password123',
+      );
 
-        await sendRequestCallable.call({'targetUserId': pendingUser.uid});
-        await FirebaseEmulatorHelper.waitForFirestore();
+      await sendRequestCallable.call({'targetUserId': pendingUser.uid});
+      await FirebaseEmulatorHelper.waitForFirestore();
 
-        // 4. Call batchCheckFriendRequestStatus
-        // Note: friendUser should NOT appear in request statuses because they're already friends
-        final batchCheckCallable = FirebaseFunctions.instance
-            .httpsCallable('batchCheckFriendRequestStatus');
-        final result = await batchCheckCallable.call({
-          'userIds': [
-            friendUser.uid,
-            pendingUser.uid,
-          ],
-        });
+      // 4. Call batchCheckFriendRequestStatus
+      // Note: friendUser should NOT appear in request statuses because they're already friends
+      final batchCheckCallable = FirebaseFunctions.instance.httpsCallable(
+        'batchCheckFriendRequestStatus',
+      );
+      final result = await batchCheckCallable.call({
+        'userIds': [friendUser.uid, pendingUser.uid],
+      });
 
-        final statuses =
-            Map<String, dynamic>.from(result.data['requestStatuses'] as Map);
+      final statuses = Map<String, dynamic>.from(
+        result.data['requestStatuses'] as Map,
+      );
 
-        // 5. Verify: friendUser shows 'none' (they're friends, not pending)
-        // and pendingUser shows 'sentByMe'
-        expect(statuses[friendUser.uid], equals('none'));
-        expect(statuses[pendingUser.uid], equals('sentByMe'));
-      },
-    );
+      // 5. Verify: friendUser shows 'none' (they're friends, not pending)
+      // and pendingUser shows 'sentByMe'
+      expect(statuses[friendUser.uid], equals('none'));
+      expect(statuses[pendingUser.uid], equals('sentByMe'));
+    });
   });
 }

@@ -55,9 +55,15 @@ class _StatsLoadingSkeletonState extends State<StatsLoadingSkeleton>
               begin: Alignment(-1.0 - _controller.value * 2, 0.0),
               end: Alignment(1.0 + _controller.value * 2, 0.0),
               colors: [
-                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
+                theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
+                theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
               ],
               stops: const [0.0, 0.5, 1.0],
             ),
@@ -82,33 +88,22 @@ class LoadingStatCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title skeleton
-            const StatsLoadingSkeleton(
-              height: 24,
-              width: 180,
-            ),
+            const StatsLoadingSkeleton(height: 24, width: 180),
             const SizedBox(height: 16),
             // Stats grid skeleton
             Row(
               children: [
-                Expanded(
-                  child: _StatItemSkeleton(),
-                ),
+                Expanded(child: _StatItemSkeleton()),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: _StatItemSkeleton(),
-                ),
+                Expanded(child: _StatItemSkeleton()),
               ],
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(
-                  child: _StatItemSkeleton(),
-                ),
+                Expanded(child: _StatItemSkeleton()),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: _StatItemSkeleton(),
-                ),
+                Expanded(child: _StatItemSkeleton()),
               ],
             ),
           ],
@@ -134,16 +129,10 @@ class _StatItemSkeleton extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Label skeleton
-          const StatsLoadingSkeleton(
-            height: 12,
-            width: 80,
-          ),
+          const StatsLoadingSkeleton(height: 12, width: 80),
           const SizedBox(height: 8),
           // Value skeleton
-          const StatsLoadingSkeleton(
-            height: 20,
-            width: 50,
-          ),
+          const StatsLoadingSkeleton(height: 20, width: 50),
         ],
       ),
     );
@@ -162,15 +151,9 @@ class CompactStatLoadingSkeleton extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const StatsLoadingSkeleton(
-              height: 14,
-              width: 70,
-            ),
+            const StatsLoadingSkeleton(height: 14, width: 70),
             const SizedBox(height: 8),
-            const StatsLoadingSkeleton(
-              height: 24,
-              width: 50,
-            ),
+            const StatsLoadingSkeleton(height: 24, width: 50),
           ],
         ),
       ),

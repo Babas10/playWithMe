@@ -52,15 +52,15 @@ void main() {
           ),
         ];
 
-        when(() => mockUserRepository.getRatingHistory('user-123', limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory('user-123', limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         return EloHistoryBloc(userRepository: mockUserRepository);
       },
-      act: (bloc) => bloc.add(const EloHistoryEvent.loadHistory(
-        userId: 'user-123',
-        limit: 100,
-      )),
+      act: (bloc) => bloc.add(
+        const EloHistoryEvent.loadHistory(userId: 'user-123', limit: 100),
+      ),
       expect: () => [
         const EloHistoryState.loading(),
         isA<EloHistoryLoaded>()
@@ -98,8 +98,9 @@ void main() {
           ),
         ];
 
-        when(() => mockUserRepository.getRatingHistory('user-123', limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory('user-123', limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         return EloHistoryBloc(userRepository: mockUserRepository);
       },
@@ -135,10 +136,12 @@ void main() {
       },
       act: (bloc) {
         final now = DateTime.now();
-        return bloc.add(EloHistoryEvent.filterByDateRange(
-          startDate: now.subtract(const Duration(days: 5)),
-          endDate: now,
-        ));
+        return bloc.add(
+          EloHistoryEvent.filterByDateRange(
+            startDate: now.subtract(const Duration(days: 5)),
+            endDate: now,
+          ),
+        );
       },
       expect: () => [
         isA<EloHistoryLoaded>()
@@ -182,7 +185,11 @@ void main() {
             .having((s) => s.filteredHistory.length, 'filtered length', 1)
             .having((s) => s.filterStartDate, 'start date', null)
             .having((s) => s.filterEndDate, 'end date', null)
-            .having((s) => s.selectedPeriod, 'selected period', TimePeriod.allTime),
+            .having(
+              (s) => s.selectedPeriod,
+              'selected period',
+              TimePeriod.allTime,
+            ),
       ],
     );
 
@@ -231,8 +238,11 @@ void main() {
           isA<EloHistoryLoaded>()
               .having((s) => s.history.length, 'history length', 2)
               .having((s) => s.filteredHistory.length, 'filtered length', 1)
-              .having((s) => s.selectedPeriod, 'selected period',
-                  TimePeriod.thirtyDays),
+              .having(
+                (s) => s.selectedPeriod,
+                'selected period',
+                TimePeriod.thirtyDays,
+              ),
         ],
       );
 
@@ -272,15 +282,17 @@ void main() {
             filterEndDate: null,
           );
         },
-        act: (bloc) => bloc.add(
-          const EloHistoryEvent.filterByPeriod(TimePeriod.allTime),
-        ),
+        act: (bloc) =>
+            bloc.add(const EloHistoryEvent.filterByPeriod(TimePeriod.allTime)),
         expect: () => [
           isA<EloHistoryLoaded>()
               .having((s) => s.history.length, 'history length', 2)
               .having((s) => s.filteredHistory.length, 'filtered length', 2)
-              .having((s) => s.selectedPeriod, 'selected period',
-                  TimePeriod.allTime),
+              .having(
+                (s) => s.selectedPeriod,
+                'selected period',
+                TimePeriod.allTime,
+              ),
         ],
       );
 
@@ -407,41 +419,52 @@ void main() {
             ),
           ];
 
-          when(() => mockUserRepository.getRatingHistory('user-123', limit: 100))
-              .thenAnswer((_) => Stream.value(testHistory));
+          when(
+            () => mockUserRepository.getRatingHistory('user-123', limit: 100),
+          ).thenAnswer((_) => Stream.value(testHistory));
 
           return EloHistoryBloc(userRepository: mockUserRepository);
         },
-        act: (bloc) => bloc.add(const EloHistoryEvent.loadHistory(
-          userId: 'user-123',
-          limit: 100,
-        )),
+        act: (bloc) => bloc.add(
+          const EloHistoryEvent.loadHistory(userId: 'user-123', limit: 100),
+        ),
         expect: () => [
           const EloHistoryState.loading(),
           isA<EloHistoryLoaded>()
               .having((s) => s.bestEloInPeriod, 'best ELO', isNotNull)
               .having((s) => s.bestEloInPeriod?.elo, 'best ELO value', 1650)
-              .having((s) => s.bestEloInPeriod?.gameId, 'best ELO game ID', 'game-2')
-              .having((s) => s.bestEloInPeriod?.date, 'best ELO date', DateTime(2025, 12, 20)),
+              .having(
+                (s) => s.bestEloInPeriod?.gameId,
+                'best ELO game ID',
+                'game-2',
+              )
+              .having(
+                (s) => s.bestEloInPeriod?.date,
+                'best ELO date',
+                DateTime(2025, 12, 20),
+              ),
         ],
       );
 
       blocTest<EloHistoryBloc, EloHistoryState>(
         'returns null best ELO when history is empty',
         build: () {
-          when(() => mockUserRepository.getRatingHistory('user-123', limit: 100))
-              .thenAnswer((_) => Stream.value([]));
+          when(
+            () => mockUserRepository.getRatingHistory('user-123', limit: 100),
+          ).thenAnswer((_) => Stream.value([]));
 
           return EloHistoryBloc(userRepository: mockUserRepository);
         },
-        act: (bloc) => bloc.add(const EloHistoryEvent.loadHistory(
-          userId: 'user-123',
-          limit: 100,
-        )),
+        act: (bloc) => bloc.add(
+          const EloHistoryEvent.loadHistory(userId: 'user-123', limit: 100),
+        ),
         expect: () => [
           const EloHistoryState.loading(),
-          isA<EloHistoryLoaded>()
-              .having((s) => s.bestEloInPeriod, 'best ELO', null),
+          isA<EloHistoryLoaded>().having(
+            (s) => s.bestEloInPeriod,
+            'best ELO',
+            null,
+          ),
         ],
       );
 
@@ -489,7 +512,11 @@ void main() {
               .having((s) => s.filteredHistory.length, 'filtered length', 1)
               .having((s) => s.bestEloInPeriod, 'best ELO', isNotNull)
               .having((s) => s.bestEloInPeriod?.elo, 'best ELO value', 1650)
-              .having((s) => s.bestEloInPeriod?.gameId, 'best ELO game ID', 'game-1'),
+              .having(
+                (s) => s.bestEloInPeriod?.gameId,
+                'best ELO game ID',
+                'game-1',
+              ),
         ],
       );
 
@@ -567,17 +594,23 @@ void main() {
         },
         act: (bloc) {
           final now = DateTime.now();
-          return bloc.add(EloHistoryEvent.filterByDateRange(
-            startDate: now.subtract(const Duration(days: 5)),
-            endDate: now,
-          ));
+          return bloc.add(
+            EloHistoryEvent.filterByDateRange(
+              startDate: now.subtract(const Duration(days: 5)),
+              endDate: now,
+            ),
+          );
         },
         expect: () => [
           isA<EloHistoryLoaded>()
               .having((s) => s.filteredHistory.length, 'filtered length', 1)
               .having((s) => s.bestEloInPeriod, 'best ELO', isNotNull)
               .having((s) => s.bestEloInPeriod?.elo, 'best ELO value', 1700)
-              .having((s) => s.bestEloInPeriod?.gameId, 'best ELO game ID', 'game-1'),
+              .having(
+                (s) => s.bestEloInPeriod?.gameId,
+                'best ELO game ID',
+                'game-1',
+              ),
         ],
       );
 
@@ -629,8 +662,16 @@ void main() {
               .having((s) => s.filteredHistory.length, 'filtered length', 2)
               .having((s) => s.bestEloInPeriod, 'best ELO', isNotNull)
               .having((s) => s.bestEloInPeriod?.elo, 'best ELO value', 1800)
-              .having((s) => s.bestEloInPeriod?.gameId, 'best ELO game ID', 'game-2')
-              .having((s) => s.selectedPeriod, 'selected period', TimePeriod.allTime),
+              .having(
+                (s) => s.bestEloInPeriod?.gameId,
+                'best ELO game ID',
+                'game-2',
+              )
+              .having(
+                (s) => s.selectedPeriod,
+                'selected period',
+                TimePeriod.allTime,
+              ),
         ],
       );
 
@@ -660,22 +701,26 @@ void main() {
             ),
           ];
 
-          when(() => mockUserRepository.getRatingHistory('user-123', limit: 100))
-              .thenAnswer((_) => Stream.value(testHistory));
+          when(
+            () => mockUserRepository.getRatingHistory('user-123', limit: 100),
+          ).thenAnswer((_) => Stream.value(testHistory));
 
           return EloHistoryBloc(userRepository: mockUserRepository);
         },
-        act: (bloc) => bloc.add(const EloHistoryEvent.loadHistory(
-          userId: 'user-123',
-          limit: 100,
-        )),
+        act: (bloc) => bloc.add(
+          const EloHistoryEvent.loadHistory(userId: 'user-123', limit: 100),
+        ),
         expect: () => [
           const EloHistoryState.loading(),
           isA<EloHistoryLoaded>()
               .having((s) => s.bestEloInPeriod, 'best ELO', isNotNull)
               .having((s) => s.bestEloInPeriod?.elo, 'best ELO value', 1700)
               // When ELO values are identical, reduce picks the last one
-              .having((s) => s.bestEloInPeriod?.gameId, 'best ELO game ID', 'game-2'),
+              .having(
+                (s) => s.bestEloInPeriod?.gameId,
+                'best ELO game ID',
+                'game-2',
+              ),
         ],
       );
     });

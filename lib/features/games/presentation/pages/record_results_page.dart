@@ -30,10 +30,11 @@ class RecordResultsPage extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           recordResultsBloc ??
-          RecordResultsBloc(
-            gameRepository: sl<GameRepository>(),
-            userRepository: sl<UserRepository>(),
-          )..add(LoadGameForResults(gameId: gameId)),
+                RecordResultsBloc(
+                  gameRepository: sl<GameRepository>(),
+                  userRepository: sl<UserRepository>(),
+                )
+            ..add(LoadGameForResults(gameId: gameId)),
       child: const _RecordResultsView(),
     );
   }
@@ -79,7 +80,11 @@ class _RecordResultsView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       state.message,
@@ -120,8 +125,8 @@ class _RecordResultsView extends StatelessWidget {
                             color: AppColors.primary,
                             onRemove: (playerId) {
                               context.read<RecordResultsBloc>().add(
-                                    RemovePlayerFromTeam(playerId: playerId),
-                                  );
+                                RemovePlayerFromTeam(playerId: playerId),
+                              );
                             },
                           ),
                           const SizedBox(height: 16),
@@ -133,8 +138,8 @@ class _RecordResultsView extends StatelessWidget {
                             color: AppColors.secondary,
                             onRemove: (playerId) {
                               context.read<RecordResultsBloc>().add(
-                                    RemovePlayerFromTeam(playerId: playerId),
-                                  );
+                                RemovePlayerFromTeam(playerId: playerId),
+                              );
                             },
                           ),
                           const SizedBox(height: 16),
@@ -144,13 +149,13 @@ class _RecordResultsView extends StatelessWidget {
                             players: state.players,
                             onAssignToTeamA: (playerId) {
                               context.read<RecordResultsBloc>().add(
-                                    AssignPlayerToTeamA(playerId: playerId),
-                                  );
+                                AssignPlayerToTeamA(playerId: playerId),
+                              );
                             },
                             onAssignToTeamB: (playerId) {
                               context.read<RecordResultsBloc>().add(
-                                    AssignPlayerToTeamB(playerId: playerId),
-                                  );
+                                AssignPlayerToTeamB(playerId: playerId),
+                              );
                             },
                           ),
                         ],
@@ -162,11 +167,13 @@ class _RecordResultsView extends StatelessWidget {
                   _SaveButton(
                     canSave: state.canSave,
                     onSave: () {
-                      final authState = context.read<AuthenticationBloc>().state;
+                      final authState = context
+                          .read<AuthenticationBloc>()
+                          .state;
                       if (authState is AuthenticationAuthenticated) {
                         context.read<RecordResultsBloc>().add(
-                              SaveTeams(userId: authState.user.uid),
-                            );
+                          SaveTeams(userId: authState.user.uid),
+                        );
                       }
                     },
                   ),
@@ -219,15 +226,17 @@ class _TeamSection extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
                 ),
                 const Spacer(),
                 Text(
                   playerIds.length == 1
                       ? AppLocalizations.of(context)!.playerCountSingular
-                      : AppLocalizations.of(context)!.playerCountPlural(playerIds.length),
+                      : AppLocalizations.of(
+                          context,
+                        )!.playerCountPlural(playerIds.length),
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -239,21 +248,23 @@ class _TeamSection extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   AppLocalizations.of(context)!.noPlayersAssigned,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                 ),
               )
             else
-              ...playerIds.map((playerId) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: _PlayerChip(
-                      playerId: playerId,
-                      players: players,
-                      color: color,
-                      onRemove: () => onRemove(playerId),
-                    ),
-                  )),
+              ...playerIds.map(
+                (playerId) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: _PlayerChip(
+                    playerId: playerId,
+                    players: players,
+                    color: color,
+                    onRemove: () => onRemove(playerId),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -286,9 +297,9 @@ class _UnassignedPlayersSection extends StatelessWidget {
             Text(
               AppLocalizations.of(context)!.unassignedPlayers,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondary,
+              ),
             ),
             const SizedBox(height: 12),
             if (unassignedPlayerIds.isEmpty)
@@ -315,23 +326,25 @@ class _UnassignedPlayersSection extends StatelessWidget {
                     Text(
                       AppLocalizations.of(context)!.allPlayersAssigned,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.secondary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
               )
             else
-              ...unassignedPlayerIds.map((playerId) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: _UnassignedPlayerItem(
-                      playerId: playerId,
-                      players: players,
-                      onAssignToTeamA: () => onAssignToTeamA(playerId),
-                      onAssignToTeamB: () => onAssignToTeamB(playerId),
-                    ),
-                  )),
+              ...unassignedPlayerIds.map(
+                (playerId) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: _UnassignedPlayerItem(
+                    playerId: playerId,
+                    players: players,
+                    onAssignToTeamA: () => onAssignToTeamA(playerId),
+                    onAssignToTeamB: () => onAssignToTeamB(playerId),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -486,10 +499,7 @@ class _SaveButton extends StatelessWidget {
   final bool canSave;
   final VoidCallback onSave;
 
-  const _SaveButton({
-    required this.canSave,
-    required this.onSave,
-  });
+  const _SaveButton({required this.canSave, required this.onSave});
 
   @override
   Widget build(BuildContext context) {

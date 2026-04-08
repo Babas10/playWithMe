@@ -41,10 +41,12 @@ void main() {
   group('LocalePreferencesRepositoryImpl', () {
     group('loadPreferences', () {
       test('returns default preferences when no saved data exists', () async {
-        when(() => mockSharedPreferences.getString('user_locale_language'))
-            .thenReturn(null);
-        when(() => mockSharedPreferences.getString('user_locale_country'))
-            .thenReturn(null);
+        when(
+          () => mockSharedPreferences.getString('user_locale_language'),
+        ).thenReturn(null);
+        when(
+          () => mockSharedPreferences.getString('user_locale_country'),
+        ).thenReturn(null);
 
         final result = await repository.loadPreferences();
 
@@ -52,14 +54,18 @@ void main() {
       });
 
       test('returns saved preferences when data exists', () async {
-        when(() => mockSharedPreferences.getString('user_locale_language'))
-            .thenReturn('es');
-        when(() => mockSharedPreferences.getString('user_locale_country'))
-            .thenReturn('Spain');
-        when(() => mockSharedPreferences.getString('user_timezone'))
-            .thenReturn('Europe/Madrid');
-        when(() => mockSharedPreferences.getInt('user_locale_last_synced'))
-            .thenReturn(1234567890);
+        when(
+          () => mockSharedPreferences.getString('user_locale_language'),
+        ).thenReturn('es');
+        when(
+          () => mockSharedPreferences.getString('user_locale_country'),
+        ).thenReturn('Spain');
+        when(
+          () => mockSharedPreferences.getString('user_timezone'),
+        ).thenReturn('Europe/Madrid');
+        when(
+          () => mockSharedPreferences.getInt('user_locale_last_synced'),
+        ).thenReturn(1234567890);
 
         final result = await repository.loadPreferences();
 
@@ -78,21 +84,29 @@ void main() {
           lastSyncedAt: null,
         );
 
-        when(() => mockSharedPreferences.setString(any(), any()))
-            .thenAnswer((_) async => true);
-        when(() => mockSharedPreferences.setInt(any(), any()))
-            .thenAnswer((_) async => true);
+        when(
+          () => mockSharedPreferences.setString(any(), any()),
+        ).thenAnswer((_) async => true);
+        when(
+          () => mockSharedPreferences.setInt(any(), any()),
+        ).thenAnswer((_) async => true);
 
         await repository.savePreferences(preferences);
 
-        verify(() => mockSharedPreferences.setString(
-            'user_locale_language', 'fr')).called(1);
-        verify(() => mockSharedPreferences.setString(
-            'user_locale_country', 'France')).called(1);
-        verify(() => mockSharedPreferences.setString(
-            'user_timezone', 'Europe/Paris')).called(1);
-        verify(() => mockSharedPreferences.setInt(
-            'user_locale_last_synced', any())).called(1);
+        verify(
+          () => mockSharedPreferences.setString('user_locale_language', 'fr'),
+        ).called(1);
+        verify(
+          () =>
+              mockSharedPreferences.setString('user_locale_country', 'France'),
+        ).called(1);
+        verify(
+          () =>
+              mockSharedPreferences.setString('user_timezone', 'Europe/Paris'),
+        ).called(1);
+        verify(
+          () => mockSharedPreferences.setInt('user_locale_last_synced', any()),
+        ).called(1);
       });
     });
 
@@ -108,9 +122,13 @@ void main() {
         final mockCollection = MockCollectionReference();
         final mockDoc = MockDocumentReference();
 
-        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(
+          () => mockFirestore.collection('users'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
-        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(
+          () => mockDoc.collection('preferences'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
         when(() => mockDoc.set(any(), any())).thenAnswer((_) async {});
 
@@ -131,12 +149,17 @@ void main() {
         final mockCollection = MockCollectionReference();
         final mockDoc = MockDocumentReference();
 
-        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(
+          () => mockFirestore.collection('users'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
-        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(
+          () => mockDoc.collection('preferences'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
-        when(() => mockDoc.set(any(), any()))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockDoc.set(any(), any()),
+        ).thenThrow(Exception('Network error'));
 
         final preferences = const LocalePreferencesEntity(
           locale: Locale('de'),
@@ -158,9 +181,13 @@ void main() {
         final mockDoc = MockDocumentReference();
         final mockSnapshot = MockDocumentSnapshot();
 
-        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(
+          () => mockFirestore.collection('users'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
-        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(
+          () => mockDoc.collection('preferences'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
         when(() => mockDoc.get()).thenAnswer((_) async => mockSnapshot);
         when(() => mockSnapshot.exists).thenReturn(true);
@@ -184,9 +211,13 @@ void main() {
         final mockDoc = MockDocumentReference();
         final mockSnapshot = MockDocumentSnapshot();
 
-        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(
+          () => mockFirestore.collection('users'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
-        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(
+          () => mockDoc.collection('preferences'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
         when(() => mockDoc.get()).thenAnswer((_) async => mockSnapshot);
         when(() => mockSnapshot.exists).thenReturn(false);
@@ -201,9 +232,13 @@ void main() {
         final mockDoc = MockDocumentReference();
         final mockSnapshot = MockDocumentSnapshot();
 
-        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(
+          () => mockFirestore.collection('users'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
-        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(
+          () => mockDoc.collection('preferences'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
         when(() => mockDoc.get()).thenAnswer((_) async => mockSnapshot);
         when(() => mockSnapshot.exists).thenReturn(true);
@@ -218,9 +253,13 @@ void main() {
         final mockCollection = MockCollectionReference();
         final mockDoc = MockDocumentReference();
 
-        when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+        when(
+          () => mockFirestore.collection('users'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('user123')).thenReturn(mockDoc);
-        when(() => mockDoc.collection('preferences')).thenReturn(mockCollection);
+        when(
+          () => mockDoc.collection('preferences'),
+        ).thenReturn(mockCollection);
         when(() => mockCollection.doc('locale')).thenReturn(mockDoc);
         when(() => mockDoc.get()).thenThrow(Exception('Network error'));
 
@@ -233,21 +272,27 @@ void main() {
 
     group('Error Handling', () {
       test('loadPreferences handles corrupted data gracefully', () async {
-        when(() => mockSharedPreferences.getString('user_locale_language'))
-            .thenReturn('invalid_locale_code_that_is_very_long');
-        when(() => mockSharedPreferences.getString('user_locale_country'))
-            .thenReturn('Country Name');
+        when(
+          () => mockSharedPreferences.getString('user_locale_language'),
+        ).thenReturn('invalid_locale_code_that_is_very_long');
+        when(
+          () => mockSharedPreferences.getString('user_locale_country'),
+        ).thenReturn('Country Name');
 
         final result = await repository.loadPreferences();
 
         // Should still return a valid entity
-        expect(result.locale.languageCode, 'invalid_locale_code_that_is_very_long');
+        expect(
+          result.locale.languageCode,
+          'invalid_locale_code_that_is_very_long',
+        );
         expect(result.country, 'Country Name');
       });
 
       test('savePreferences handles SharedPreferences failure', () async {
-        when(() => mockSharedPreferences.setString(any(), any()))
-            .thenThrow(Exception('Storage full'));
+        when(
+          () => mockSharedPreferences.setString(any(), any()),
+        ).thenThrow(Exception('Storage full'));
 
         final preferences = const LocalePreferencesEntity(
           locale: Locale('fr'),

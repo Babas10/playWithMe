@@ -25,9 +25,9 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
   GamesListBloc({
     required GameRepository gameRepository,
     required TrainingSessionRepository trainingSessionRepository,
-  })  : _gameRepository = gameRepository,
-        _trainingSessionRepository = trainingSessionRepository,
-        super(const GamesListInitial()) {
+  }) : _gameRepository = gameRepository,
+       _trainingSessionRepository = trainingSessionRepository,
+       super(const GamesListInitial()) {
     on<LoadGamesForGroup>(_onLoadGamesForGroup);
     on<ActivityListUpdated>(_onActivityListUpdated);
     on<RefreshGamesList>(_onRefreshGamesList);
@@ -54,46 +54,51 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
         _gamesSubscription = _gameRepository
             .getRecentGamesForGroup(event.groupId)
             .listen(
-          (games) {
-            _currentGames = games;
-            _emitMerged();
-          },
-          onError: (error) {
-            debugPrint('❌ GamesListBloc: Games stream error: $error');
-          },
-        );
+              (games) {
+                _currentGames = games;
+                _emitMerged();
+              },
+              onError: (error) {
+                debugPrint('❌ GamesListBloc: Games stream error: $error');
+              },
+            );
 
         // Subscribe to trainings — emits independently as soon as data arrives
         _trainingsSubscription = _trainingSessionRepository
             .getRecentTrainingSessionsForGroup(event.groupId)
             .listen(
-          (trainings) {
-            _currentTrainings = trainings;
-            _emitMerged();
-          },
-          onError: (error) {
-            debugPrint('❌ GamesListBloc: Trainings stream error: $error');
-          },
-        );
+              (trainings) {
+                _currentTrainings = trainings;
+                _emitMerged();
+              },
+              onError: (error) {
+                debugPrint('❌ GamesListBloc: Trainings stream error: $error');
+              },
+            );
       });
     } on GameException catch (e) {
       emit(GamesListError(message: e.message));
     } on TrainingSessionException catch (e) {
       emit(GamesListError(message: e.message));
     } catch (e) {
-      emit(GamesListError(
-          message: 'Failed to load activities: ${e.toString()}'));
+      emit(
+        GamesListError(message: 'Failed to load activities: ${e.toString()}'),
+      );
     }
   }
 
   void _emitMerged() {
-    final gameActivities =
-        _currentGames.map((game) => GroupActivityItem.game(game)).toList();
+    final gameActivities = _currentGames
+        .map((game) => GroupActivityItem.game(game))
+        .toList();
     final trainingActivities = _currentTrainings
         .map((session) => GroupActivityItem.training(session))
         .toList();
-    add(ActivityListUpdated(
-        activities: [...gameActivities, ...trainingActivities]));
+    add(
+      ActivityListUpdated(
+        activities: [...gameActivities, ...trainingActivities],
+      ),
+    );
   }
 
   Future<void> _onActivityListUpdated(
@@ -102,15 +107,17 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
   ) async {
     final now = DateTime.now();
 
-    final upcomingActivities = event.activities
-        .where((activity) => activity.startTime.isAfter(now))
-        .toList()
-      ..sort((a, b) => a.startTime.compareTo(b.startTime));
+    final upcomingActivities =
+        event.activities
+            .where((activity) => activity.startTime.isAfter(now))
+            .toList()
+          ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
-    final pastActivities = event.activities
-        .where((activity) => !activity.startTime.isAfter(now))
-        .toList()
-      ..sort((a, b) => b.startTime.compareTo(a.startTime));
+    final pastActivities =
+        event.activities
+            .where((activity) => !activity.startTime.isAfter(now))
+            .toList()
+          ..sort((a, b) => b.startTime.compareTo(a.startTime));
 
     if (upcomingActivities.isEmpty && pastActivities.isEmpty) {
       emit(GamesListEmpty(userId: _currentUserId ?? ''));
@@ -125,13 +132,15 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
         ? (state as GamesListLoaded).olderActivitiesLoaded
         : false;
 
-    emit(GamesListLoaded(
-      upcomingActivities: upcomingActivities,
-      pastActivities: pastActivities,
-      olderPastActivities: previousOlder,
-      olderActivitiesLoaded: previousOlderLoaded,
-      userId: _currentUserId ?? '',
-    ));
+    emit(
+      GamesListLoaded(
+        upcomingActivities: upcomingActivities,
+        pastActivities: pastActivities,
+        olderPastActivities: previousOlder,
+        olderActivitiesLoaded: previousOlderLoaded,
+        userId: _currentUserId ?? '',
+      ),
+    );
   }
 
   Future<void> _onRefreshGamesList(
@@ -139,10 +148,9 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
     Emitter<GamesListState> emit,
   ) async {
     if (_currentGroupId != null && _currentUserId != null) {
-      add(LoadGamesForGroup(
-        groupId: _currentGroupId!,
-        userId: _currentUserId!,
-      ));
+      add(
+        LoadGamesForGroup(groupId: _currentGroupId!, userId: _currentUserId!),
+      );
     }
   }
 
@@ -161,33 +169,35 @@ class GamesListBloc extends Bloc<GamesListEvent, GamesListState> {
     try {
       final results = await Future.wait([
         _gameRepository.getOlderGamesForGroup(_currentGroupId!),
-        _trainingSessionRepository
-            .getOlderTrainingSessionsForGroup(_currentGroupId!),
+        _trainingSessionRepository.getOlderTrainingSessionsForGroup(
+          _currentGroupId!,
+        ),
       ]);
 
       final olderGames = (results[0] as List<GameModel>)
           .map((g) => GroupActivityItem.game(g))
           .toList();
-      final olderTrainings =
-          (results[1] as List<TrainingSessionModel>)
-              .map((s) => GroupActivityItem.training(s))
-              .toList();
+      final olderTrainings = (results[1] as List<TrainingSessionModel>)
+          .map((s) => GroupActivityItem.training(s))
+          .toList();
 
       final olderActivities = [...olderGames, ...olderTrainings]
         ..sort((a, b) => b.startTime.compareTo(a.startTime));
 
       if (state is GamesListLoaded) {
-        emit((state as GamesListLoaded).copyWith(
-          olderPastActivities: olderActivities,
-          isLoadingOlderActivities: false,
-          olderActivitiesLoaded: true,
-        ));
+        emit(
+          (state as GamesListLoaded).copyWith(
+            olderPastActivities: olderActivities,
+            isLoadingOlderActivities: false,
+            olderActivitiesLoaded: true,
+          ),
+        );
       }
     } catch (e) {
       if (state is GamesListLoaded) {
-        emit((state as GamesListLoaded).copyWith(
-          isLoadingOlderActivities: false,
-        ));
+        emit(
+          (state as GamesListLoaded).copyWith(isLoadingOlderActivities: false),
+        );
       }
       debugPrint('❌ GamesListBloc: Failed to load older activities: $e');
     }

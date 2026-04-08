@@ -6,7 +6,8 @@ import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 
 class MockGameRepository implements GameRepository {
-  final StreamController<List<GameModel>> _gamesController = StreamController<List<GameModel>>.broadcast();
+  final StreamController<List<GameModel>> _gamesController =
+      StreamController<List<GameModel>>.broadcast();
   final Map<String, StreamController<GameModel?>> _gameStreamControllers = {};
   final Map<String, GameModel> _games = {};
   String _lastCreatedGameId = '';
@@ -87,17 +88,23 @@ class MockGameRepository implements GameRepository {
 
   @override
   Stream<List<GameModel>> getMyGames(String userId) {
-    return _gamesController.stream.map((games) => games
-        .where((game) =>
-            game.playerIds.contains(userId) &&
-            game.status != GameStatus.cancelled)
-        .toList());
+    return _gamesController.stream.map(
+      (games) => games
+          .where(
+            (game) =>
+                game.playerIds.contains(userId) &&
+                game.status != GameStatus.cancelled,
+          )
+          .toList(),
+    );
   }
 
   @override
   Stream<List<GameModel>> getGamesForUser(String userId) {
-    return _gamesController.stream.map((games) =>
-        games.where((game) => game.playerIds.contains(userId)).toList());
+    return _gamesController.stream.map(
+      (games) =>
+          games.where((game) => game.playerIds.contains(userId)).toList(),
+    );
   }
 
   @override
@@ -117,20 +124,24 @@ class MockGameRepository implements GameRepository {
 
     // Emit current count immediately
     yield _games.values
-        .where((game) =>
-            game.groupId == groupId &&
-            game.scheduledAt.isAfter(now) &&
-            game.status == GameStatus.scheduled)
+        .where(
+          (game) =>
+              game.groupId == groupId &&
+              game.scheduledAt.isAfter(now) &&
+              game.status == GameStatus.scheduled,
+        )
         .length;
 
     // Then emit future updates
     await for (final games in _gamesController.stream) {
       final updatedNow = DateTime.now();
       yield games
-          .where((game) =>
-              game.groupId == groupId &&
-              game.scheduledAt.isAfter(updatedNow) &&
-              game.status == GameStatus.scheduled)
+          .where(
+            (game) =>
+                game.groupId == groupId &&
+                game.scheduledAt.isAfter(updatedNow) &&
+                game.status == GameStatus.scheduled,
+          )
           .length;
     }
   }
@@ -138,20 +149,29 @@ class MockGameRepository implements GameRepository {
   @override
   Stream<List<GameModel>> getGroupGamesForUser(String userId) {
     final now = DateTime.now();
-    return _gamesController.stream.map((games) => games
-        .where((game) =>
-            game.status != GameStatus.cancelled &&
-            game.scheduledAt.isAfter(now))
-        .toList());
+    return _gamesController.stream.map(
+      (games) => games
+          .where(
+            (game) =>
+                game.status != GameStatus.cancelled &&
+                game.scheduledAt.isAfter(now),
+          )
+          .toList(),
+    );
   }
 
   @override
   Stream<List<GameModel>> getUpcomingGamesForUser(String userId) {
     final now = DateTime.now();
-    return _gamesController.stream.map((games) =>
-        games.where((game) =>
-            game.playerIds.contains(userId) &&
-            game.scheduledAt.isAfter(now)).toList());
+    return _gamesController.stream.map(
+      (games) => games
+          .where(
+            (game) =>
+                game.playerIds.contains(userId) &&
+                game.scheduledAt.isAfter(now),
+          )
+          .toList(),
+    );
   }
 
   @override
@@ -170,12 +190,16 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
-  Future<List<GameModel>> getPastGamesForUser(String userId, {int limit = 20}) async {
+  Future<List<GameModel>> getPastGamesForUser(
+    String userId, {
+    int limit = 20,
+  }) async {
     final now = DateTime.now();
     return _games.values
-        .where((game) =>
-            game.playerIds.contains(userId) &&
-            game.scheduledAt.isBefore(now))
+        .where(
+          (game) =>
+              game.playerIds.contains(userId) && game.scheduledAt.isBefore(now),
+        )
         .take(limit)
         .toList();
   }
@@ -193,7 +217,8 @@ class MockGameRepository implements GameRepository {
   String get lastCreatedGameId => _lastCreatedGameId;
 
   @override
-  Future<void> updateGameInfo(String gameId, {
+  Future<void> updateGameInfo(
+    String gameId, {
     String? title,
     String? description,
     DateTime? scheduledAt,
@@ -220,7 +245,8 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
-  Future<void> updateGameSettings(String gameId, {
+  Future<void> updateGameSettings(
+    String gameId, {
     int? maxPlayers,
     int? minPlayers,
     bool? allowWaitlist,
@@ -283,7 +309,8 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
-  Future<void> endGame(String gameId, {
+  Future<void> endGame(
+    String gameId, {
     String? winnerId,
     List<GameScore>? finalScores,
   }) async {
@@ -341,7 +368,11 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
-  Future<void> updateGameTeams(String gameId, String userId, GameTeams teams) async {
+  Future<void> updateGameTeams(
+    String gameId,
+    String userId,
+    GameTeams teams,
+  ) async {
     final game = _games[gameId];
     if (game == null) throw Exception('Game not found');
 
@@ -362,14 +393,13 @@ class MockGameRepository implements GameRepository {
 
     if (!teams.areAllPlayersAssigned(game.playerIds)) {
       final unassigned = teams.getUnassignedPlayers(game.playerIds);
-      throw Exception('All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}');
+      throw Exception(
+        'All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}',
+      );
     }
 
     // Update game with teams
-    final updatedGame = game.copyWith(
-      teams: teams,
-      updatedAt: DateTime.now(),
-    );
+    final updatedGame = game.copyWith(teams: teams, updatedAt: DateTime.now());
 
     _games[gameId] = updatedGame;
     _emitGames();
@@ -377,7 +407,11 @@ class MockGameRepository implements GameRepository {
   }
 
   @override
-  Future<void> updateGameResult(String gameId, String userId, GameResult result) async {
+  Future<void> updateGameResult(
+    String gameId,
+    String userId,
+    GameResult result,
+  ) async {
     final game = _games[gameId];
     if (game == null) throw Exception('Game not found');
 
@@ -398,7 +432,9 @@ class MockGameRepository implements GameRepository {
 
     // Validate result
     if (!result.isValid()) {
-      throw Exception('Invalid game result. Check that all sets are valid and winner is correct.');
+      throw Exception(
+        'Invalid game result. Check that all sets are valid and winner is correct.',
+      );
     }
 
     // Update game with result
@@ -440,12 +476,16 @@ class MockGameRepository implements GameRepository {
 
     if (!teams.areAllPlayersAssigned(game.playerIds)) {
       final unassigned = teams.getUnassignedPlayers(game.playerIds);
-      throw Exception('All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}');
+      throw Exception(
+        'All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}',
+      );
     }
 
     // Validate result
     if (!result.isValid()) {
-      throw Exception('Invalid game result. Check that all sets are valid and winner is correct.');
+      throw Exception(
+        'Invalid game result. Check that all sets are valid and winner is correct.',
+      );
     }
 
     // Update game with teams, result, eloCalculated flag, and completedAt timestamp
@@ -534,9 +574,11 @@ class MockGameRepository implements GameRepository {
     final endOfDay = startOfDay.add(const Duration(days: 1));
 
     return _games.values
-        .where((game) =>
-            game.scheduledAt.isAfter(startOfDay) &&
-            game.scheduledAt.isBefore(endOfDay))
+        .where(
+          (game) =>
+              game.scheduledAt.isAfter(startOfDay) &&
+              game.scheduledAt.isBefore(endOfDay),
+        )
         .toList();
   }
 
@@ -547,9 +589,11 @@ class MockGameRepository implements GameRepository {
     final endOfWeek = startOfWeek.add(const Duration(days: 7));
 
     return _games.values
-        .where((game) =>
-            game.scheduledAt.isAfter(startOfWeek) &&
-            game.scheduledAt.isBefore(endOfWeek))
+        .where(
+          (game) =>
+              game.scheduledAt.isAfter(startOfWeek) &&
+              game.scheduledAt.isBefore(endOfWeek),
+        )
         .toList();
   }
 
@@ -557,9 +601,11 @@ class MockGameRepository implements GameRepository {
   Future<List<GameModel>> searchGames(String query, {int limit = 20}) async {
     final queryLower = query.toLowerCase();
     return _games.values
-        .where((game) =>
-            game.title.toLowerCase().contains(queryLower) ||
-            (game.description?.toLowerCase().contains(queryLower) == true))
+        .where(
+          (game) =>
+              game.title.toLowerCase().contains(queryLower) ||
+              (game.description?.toLowerCase().contains(queryLower) == true),
+        )
         .take(limit)
         .toList();
   }
@@ -624,17 +670,19 @@ class MockGameRepository implements GameRepository {
   }) async* {
     final cutoff = DateTime.now().subtract(Duration(days: pastDays));
     yield _games.values
-        .where((game) =>
-            game.groupId == groupId &&
-            game.scheduledAt.isAfter(cutoff))
+        .where(
+          (game) => game.groupId == groupId && game.scheduledAt.isAfter(cutoff),
+        )
         .toList();
 
     await for (final games in _gamesController.stream) {
       final updatedCutoff = DateTime.now().subtract(Duration(days: pastDays));
       yield games
-          .where((game) =>
-              game.groupId == groupId &&
-              game.scheduledAt.isAfter(updatedCutoff))
+          .where(
+            (game) =>
+                game.groupId == groupId &&
+                game.scheduledAt.isAfter(updatedCutoff),
+          )
           .toList();
     }
   }
@@ -646,9 +694,10 @@ class MockGameRepository implements GameRepository {
   }) async {
     final cutoff = DateTime.now().subtract(Duration(days: pastDays));
     final games = _games.values
-        .where((game) =>
-            game.groupId == groupId &&
-            !game.scheduledAt.isAfter(cutoff))
+        .where(
+          (game) =>
+              game.groupId == groupId && !game.scheduledAt.isAfter(cutoff),
+        )
         .toList();
     games.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
     return games;
@@ -669,10 +718,14 @@ class MockGameRepository implements GameRepository {
       if (groupId != null && game.groupId != groupId) return false;
       if (game.status != GameStatus.completed) return false;
       if (userId != null && !game.playerIds.contains(userId)) return false;
-      if (startDate != null && game.completedAt != null && game.completedAt!.isBefore(startDate)) {
+      if (startDate != null &&
+          game.completedAt != null &&
+          game.completedAt!.isBefore(startDate)) {
         return false;
       }
-      if (endDate != null && game.completedAt != null && game.completedAt!.isAfter(endDate)) {
+      if (endDate != null &&
+          game.completedAt != null &&
+          game.completedAt!.isAfter(endDate)) {
         return false;
       }
       return true;
@@ -689,11 +742,9 @@ class MockGameRepository implements GameRepository {
       games = games.sublist(0, limit);
     }
 
-    controller.add(GameHistoryPage(
-      games: games,
-      lastDocument: null,
-      hasMore: hasMore,
-    ));
+    controller.add(
+      GameHistoryPage(games: games, lastDocument: null, hasMore: hasMore),
+    );
 
     return controller.stream;
   }

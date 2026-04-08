@@ -285,11 +285,7 @@ void main() {
       });
 
       test('handles empty gameId', () {
-        final record = BestEloRecord(
-          elo: 1500.0,
-          date: testDate,
-          gameId: '',
-        );
+        final record = BestEloRecord(elo: 1500.0, date: testDate, gameId: '');
 
         expect(record.gameId, equals(''));
       });

@@ -4,10 +4,7 @@ import 'package:play_with_me/features/profile/presentation/widgets/verification_
 
 /// Header section of the profile page containing avatar, name, and email
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({
-    super.key,
-    required this.user,
-  });
+  const ProfileHeader({super.key, required this.user});
 
   final UserEntity user;
 

@@ -16,14 +16,19 @@ void main() {
     late DateTime createdAt;
     late TrainingSessionModel baseSession;
 
-    const testLocation = GameLocation(name: 'Beach Court 1', address: '123 Beach Rd');
+    const testLocation = GameLocation(
+      name: 'Beach Court 1',
+      address: '123 Beach Rd',
+    );
 
     setUp(() {
       now = DateTime.now();
       futureStart = now.add(const Duration(days: 1));
       futureEnd = now.add(const Duration(days: 1, hours: 2));
       pastStart = now.subtract(const Duration(days: 1));
-      pastEnd = now.subtract(const Duration(days: 1)).add(const Duration(hours: 2));
+      pastEnd = now
+          .subtract(const Duration(days: 1))
+          .add(const Duration(hours: 2));
       createdAt = now.subtract(const Duration(days: 7));
 
       baseSession = TrainingSessionModel(
@@ -338,13 +343,19 @@ void main() {
       test('updates startTime and endTime', () {
         final newStart = now.add(const Duration(days: 3));
         final newEnd = now.add(const Duration(days: 3, hours: 3));
-        final updated = baseSession.updateInfo(startTime: newStart, endTime: newEnd);
+        final updated = baseSession.updateInfo(
+          startTime: newStart,
+          endTime: newEnd,
+        );
         expect(updated.startTime, equals(newStart));
         expect(updated.endTime, equals(newEnd));
       });
 
       test('updates location', () {
-        const newLocation = GameLocation(name: 'New Court', address: '456 New Rd');
+        const newLocation = GameLocation(
+          name: 'New Court',
+          address: '456 New Rd',
+        );
         final updated = baseSession.updateInfo(location: newLocation);
         expect(updated.location, equals(newLocation));
       });
@@ -600,18 +611,17 @@ void main() {
           'maxParticipants': 8,
           'createdBy': 'creator-user',
           'createdAt': createdAt.toIso8601String(),
-          'recurrenceRule': {
-            'frequency': 'weekly',
-            'interval': 1,
-            'count': 10,
-          },
+          'recurrenceRule': {'frequency': 'weekly', 'interval': 1, 'count': 10},
           'status': 'scheduled',
         };
 
         final session = TrainingSessionModel.fromJson(json);
 
         expect(session.recurrenceRule, isNotNull);
-        expect(session.recurrenceRule!.frequency, equals(RecurrenceFrequency.weekly));
+        expect(
+          session.recurrenceRule!.frequency,
+          equals(RecurrenceFrequency.weekly),
+        );
       });
     });
 

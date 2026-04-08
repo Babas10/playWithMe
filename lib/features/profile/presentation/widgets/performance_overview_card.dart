@@ -17,10 +17,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 class PerformanceOverviewCard extends StatelessWidget {
   final UserModel user;
 
-  const PerformanceOverviewCard({
-    super.key,
-    required this.user,
-  });
+  const PerformanceOverviewCard({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +55,13 @@ class PerformanceOverviewCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _StatCard(child: _buildCurrentEloContent(context))),
+                Expanded(
+                  child: _StatCard(child: _buildCurrentEloContent(context)),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _StatCard(child: _buildPeakEloContent(context))),
+                Expanded(
+                  child: _StatCard(child: _buildPeakEloContent(context)),
+                ),
               ],
             ),
           ),
@@ -70,9 +71,13 @@ class PerformanceOverviewCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _StatCard(child: _buildWinRateContent(context))),
+                Expanded(
+                  child: _StatCard(child: _buildWinRateContent(context)),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _StatCard(child: _buildGamesPlayedContent(context))),
+                Expanded(
+                  child: _StatCard(child: _buildGamesPlayedContent(context)),
+                ),
               ],
             ),
           ),
@@ -103,8 +108,11 @@ class PerformanceOverviewCard extends StatelessWidget {
               AppLocalizations.of(context)!.currentElo,
               style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),
-            Icon(Icons.show_chart, size: 16,
-                color: AppColors.textMuted.withValues(alpha: 0.5)),
+            Icon(
+              Icons.show_chart,
+              size: 16,
+              color: AppColors.textMuted.withValues(alpha: 0.5),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -165,7 +173,10 @@ class PerformanceOverviewCard extends StatelessWidget {
             children: [
               Text(
                 AppLocalizations.of(context)!.winRate,
-                style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textMuted,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -179,7 +190,10 @@ class PerformanceOverviewCard extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 '${user.gamesWon}W - ${user.gamesLost}L',
-                style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textMuted,
+                ),
               ),
             ],
           ),
@@ -197,11 +211,16 @@ class PerformanceOverviewCard extends StatelessWidget {
                   value: user.winRate,
                   strokeWidth: 5,
                   backgroundColor: AppColors.divider,
-                  valueColor:
-                      const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.primary,
+                  ),
                 ),
               ),
-              const Icon(Icons.emoji_events, size: 14, color: AppColors.primary),
+              const Icon(
+                Icons.emoji_events,
+                size: 14,
+                color: AppColors.primary,
+              ),
             ],
           ),
         ),
@@ -258,7 +277,9 @@ class PerformanceOverviewCard extends StatelessWidget {
               style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),
             Icon(
-              bestWin != null ? Icons.emoji_events : Icons.emoji_events_outlined,
+              bestWin != null
+                  ? Icons.emoji_events
+                  : Icons.emoji_events_outlined,
               size: 16,
               color: bestWin != null
                   ? AppColors.primary
@@ -271,9 +292,9 @@ class PerformanceOverviewCard extends StatelessWidget {
           // Opponent names — primary value
           if (bestWin.opponentNames != null)
             Text(
-              AppLocalizations.of(context)!.teamLabel(
-                bestWin.opponentNames!.replaceAll(' & ', ' · '),
-              ),
+              AppLocalizations.of(
+                context,
+              )!.teamLabel(bestWin.opponentNames!.replaceAll(' & ', ' · ')),
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -329,7 +350,11 @@ class PerformanceOverviewCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(Icons.compare_arrows, size: 16, color: AppColors.secondary),
+            const Icon(
+              Icons.compare_arrows,
+              size: 16,
+              color: AppColors.secondary,
+            ),
             const SizedBox(width: 6),
             Text(
               AppLocalizations.of(context)!.avgPointDifferential,
@@ -348,8 +373,9 @@ class PerformanceOverviewCard extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context)!.inWins,
                     style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                      fontSize: 11,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -363,16 +389,22 @@ class PerformanceOverviewCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    AppLocalizations.of(context)!.setsCount(pointStats.winningSetsCount),
+                    AppLocalizations.of(
+                      context,
+                    )!.setsCount(pointStats.winningSetsCount),
                     style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+                      fontSize: 11,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
                   ),
                 ],
               ),
             ),
-            Container(width: 1, height: 50,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.1)),
+            Container(
+              width: 1,
+              height: 50,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+            ),
             const SizedBox(width: 16),
             // Losing sets
             Expanded(
@@ -382,8 +414,9 @@ class PerformanceOverviewCard extends StatelessWidget {
                   Text(
                     AppLocalizations.of(context)!.inLosses,
                     style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                      fontSize: 11,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -397,10 +430,13 @@ class PerformanceOverviewCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    AppLocalizations.of(context)!.setsCount(pointStats.losingSetsCount),
+                    AppLocalizations.of(
+                      context,
+                    )!.setsCount(pointStats.losingSetsCount),
                     style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+                      fontSize: 11,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
                   ),
                 ],
               ),
@@ -411,8 +447,9 @@ class PerformanceOverviewCard extends StatelessWidget {
         Text(
           pointStats.statsSubtitle,
           style: TextStyle(
-              fontSize: 11,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+            fontSize: 11,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
         ),
       ],
     );
@@ -431,8 +468,11 @@ class PerformanceOverviewCard extends StatelessWidget {
               AppLocalizations.of(context)!.avgPointDiff,
               style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),
-            Icon(Icons.trending_up_outlined, size: 16,
-                color: AppColors.textMuted.withValues(alpha: 0.4)),
+            Icon(
+              Icons.trending_up_outlined,
+              size: 16,
+              color: AppColors.textMuted.withValues(alpha: 0.4),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -448,8 +488,9 @@ class PerformanceOverviewCard extends StatelessWidget {
         Text(
           AppLocalizations.of(context)!.winAndLoseSetsToSee,
           style: TextStyle(
-              fontSize: 11,
-              color: AppColors.textMuted.withValues(alpha: 0.7)),
+            fontSize: 11,
+            color: AppColors.textMuted.withValues(alpha: 0.7),
+          ),
         ),
       ],
     );
@@ -466,10 +507,7 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: child,
-      ),
+      child: Padding(padding: const EdgeInsets.all(16), child: child),
     );
   }
 }

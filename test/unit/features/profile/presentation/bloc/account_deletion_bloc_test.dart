@@ -27,8 +27,7 @@ void main() {
     blocTest<AccountDeletionBloc, AccountDeletionState>(
       'emits [inProgress, success] when deleteAccount succeeds',
       build: () {
-        when(() => mockAuthRepository.deleteAccount())
-            .thenAnswer((_) async {});
+        when(() => mockAuthRepository.deleteAccount()).thenAnswer((_) async {});
         return buildBloc();
       },
       act: (bloc) => bloc.add(const AccountDeletionEvent.deleteRequested()),
@@ -44,8 +43,9 @@ void main() {
     blocTest<AccountDeletionBloc, AccountDeletionState>(
       'emits [inProgress, failure] when deleteAccount throws',
       build: () {
-        when(() => mockAuthRepository.deleteAccount())
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockAuthRepository.deleteAccount(),
+        ).thenThrow(Exception('Network error'));
         return buildBloc();
       },
       act: (bloc) => bloc.add(const AccountDeletionEvent.deleteRequested()),
@@ -58,8 +58,7 @@ void main() {
     blocTest<AccountDeletionBloc, AccountDeletionState>(
       'calls deleteAccount exactly once per event',
       build: () {
-        when(() => mockAuthRepository.deleteAccount())
-            .thenAnswer((_) async {});
+        when(() => mockAuthRepository.deleteAccount()).thenAnswer((_) async {});
         return buildBloc();
       },
       act: (bloc) => bloc.add(const AccountDeletionEvent.deleteRequested()),

@@ -12,9 +12,9 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   RegistrationBloc({
     required AuthRepository authRepository,
     required FirebaseAnalytics analytics,
-  })  : _authRepository = authRepository,
-        _analytics = analytics,
-        super(const RegistrationInitial()) {
+  }) : _authRepository = authRepository,
+       _analytics = analytics,
+       super(const RegistrationInitial()) {
     on<RegistrationSubmitted>(_onRegistrationSubmitted);
     on<RegistrationFormReset>(_onRegistrationFormReset);
   }
@@ -26,7 +26,9 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     emit(const RegistrationLoading());
 
     try {
-      debugPrint('🔐 RegistrationBloc: Attempting registration with email: ${event.email}');
+      debugPrint(
+        '🔐 RegistrationBloc: Attempting registration with email: ${event.email}',
+      );
 
       // Validate input
       final validationError = _validateInput(event);
@@ -53,24 +55,34 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
             .updateUserProfile(displayName: event.displayName.trim())
             .then((_) => debugPrint('✅ RegistrationBloc: Display name updated'))
             .catchError((e) {
-          debugPrint('⚠️ RegistrationBloc: Failed to update display name: $e');
-        }),
+              debugPrint(
+                '⚠️ RegistrationBloc: Failed to update display name: $e',
+              );
+            }),
         _authRepository
             .updateUserNames(
               firstName: event.firstName.trim(),
               lastName: event.lastName.trim(),
               gender: event.gender,
             )
-            .then((_) => debugPrint('✅ RegistrationBloc: Names/gender persisted'))
+            .then(
+              (_) => debugPrint('✅ RegistrationBloc: Names/gender persisted'),
+            )
             .catchError((e) {
-          debugPrint('⚠️ RegistrationBloc: Failed to persist names/gender: $e');
-        }),
+              debugPrint(
+                '⚠️ RegistrationBloc: Failed to persist names/gender: $e',
+              );
+            }),
         _authRepository
             .sendEmailVerification()
-            .then((_) => debugPrint('✅ RegistrationBloc: Email verification sent'))
+            .then(
+              (_) => debugPrint('✅ RegistrationBloc: Email verification sent'),
+            )
             .catchError((e) {
-          debugPrint('⚠️ RegistrationBloc: Failed to send email verification: $e');
-        }),
+              debugPrint(
+                '⚠️ RegistrationBloc: Failed to send email verification: $e',
+              );
+            }),
       ]);
 
       await _analytics.logEvent(name: 'onboarding_completed');

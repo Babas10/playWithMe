@@ -11,8 +11,8 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
   StreamSubscription<dynamic>? _invitationsSubscription;
 
   InvitationBloc({required InvitationRepository invitationRepository})
-      : _invitationRepository = invitationRepository,
-        super(const InvitationInitial()) {
+    : _invitationRepository = invitationRepository,
+      super(const InvitationInitial()) {
     on<SendInvitation>(_onSendInvitation);
     on<LoadPendingInvitations>(_onLoadPendingInvitations);
     on<LoadInvitations>(_onLoadInvitations);
@@ -41,11 +41,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
       final (message, isRetryable) = e is Exception
           ? InvitationErrorMessages.getErrorMessage(e)
           : ('Failed to send invitation', true);
-      emit(InvitationError(
-        message: message,
-        errorCode: 'SEND_INVITATION_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        InvitationError(
+          message: message,
+          errorCode: 'SEND_INVITATION_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -80,11 +82,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
       final (message, isRetryable) = e is Exception
           ? InvitationErrorMessages.getErrorMessage(e)
           : ('Failed to load pending invitations', true);
-      emit(InvitationError(
-        message: message,
-        errorCode: 'LOAD_PENDING_INVITATIONS_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        InvitationError(
+          message: message,
+          errorCode: 'LOAD_PENDING_INVITATIONS_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -95,18 +99,22 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
     try {
       emit(const InvitationLoading());
 
-      final invitations = await _invitationRepository.getInvitations(event.userId);
+      final invitations = await _invitationRepository.getInvitations(
+        event.userId,
+      );
 
       emit(InvitationsLoaded(invitations: invitations));
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? InvitationErrorMessages.getErrorMessage(e)
           : ('Failed to load invitations', true);
-      emit(InvitationError(
-        message: message,
-        errorCode: 'LOAD_INVITATIONS_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        InvitationError(
+          message: message,
+          errorCode: 'LOAD_INVITATIONS_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -127,11 +135,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
       final (message, isRetryable) = e is Exception
           ? InvitationErrorMessages.getErrorMessage(e)
           : ('Failed to accept invitation', true);
-      emit(InvitationError(
-        message: message,
-        errorCode: 'ACCEPT_INVITATION_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        InvitationError(
+          message: message,
+          errorCode: 'ACCEPT_INVITATION_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -152,11 +162,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
       final (message, isRetryable) = e is Exception
           ? InvitationErrorMessages.getErrorMessage(e)
           : ('Failed to decline invitation', true);
-      emit(InvitationError(
-        message: message,
-        errorCode: 'DECLINE_INVITATION_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        InvitationError(
+          message: message,
+          errorCode: 'DECLINE_INVITATION_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -177,11 +189,13 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
       final (message, isRetryable) = e is Exception
           ? InvitationErrorMessages.getErrorMessage(e)
           : ('Failed to delete invitation', true);
-      emit(InvitationError(
-        message: message,
-        errorCode: 'DELETE_INVITATION_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        InvitationError(
+          message: message,
+          errorCode: 'DELETE_INVITATION_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 

@@ -57,24 +57,26 @@ class ProfileInfoCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          user.email,
-                          style: theme.textTheme.bodyMedium,
-                        ),
+                        Text(user.email, style: theme.textTheme.bodyMedium),
                         const SizedBox(height: 8),
                         Row(
                           children: [
                             VerificationBadge(isVerified: user.isEmailVerified),
-                            if (!user.isEmailVerified && onVerificationTap != null) ...[
+                            if (!user.isEmailVerified &&
+                                onVerificationTap != null) ...[
                               const SizedBox(width: 8),
                               TextButton.icon(
                                 onPressed: onVerificationTap,
                                 icon: const Icon(Icons.send, size: 16),
                                 label: Text(l10n.verify),
                                 style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
                                   minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
                               ),
                             ],
@@ -139,11 +141,7 @@ class _InfoRow extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(icon, size: 20, color: theme.colorScheme.primary),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -156,10 +154,7 @@ class _InfoRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                value,
-                style: theme.textTheme.bodyMedium,
-              ),
+              Text(value, style: theme.textTheme.bodyMedium),
             ],
           ),
         ),

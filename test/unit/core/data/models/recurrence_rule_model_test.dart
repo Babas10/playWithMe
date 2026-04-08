@@ -21,10 +21,7 @@ void main() {
 
       test('weekly() with endDate instead of count', () {
         final endDate = DateTime.now().add(const Duration(days: 90));
-        final rule = RecurrenceRuleModel.weekly(
-          interval: 2,
-          endDate: endDate,
-        );
+        final rule = RecurrenceRuleModel.weekly(interval: 2, endDate: endDate);
 
         expect(rule.frequency, RecurrenceFrequency.weekly);
         expect(rule.interval, 2);
@@ -33,10 +30,7 @@ void main() {
       });
 
       test('monthly() creates valid monthly recurrence rule', () {
-        final rule = RecurrenceRuleModel.monthly(
-          interval: 1,
-          count: 6,
-        );
+        final rule = RecurrenceRuleModel.monthly(interval: 1, count: 6);
 
         expect(rule.frequency, RecurrenceFrequency.monthly);
         expect(rule.interval, 1);
@@ -47,10 +41,7 @@ void main() {
 
       test('monthly() with endDate instead of count', () {
         final endDate = DateTime.now().add(const Duration(days: 180));
-        final rule = RecurrenceRuleModel.monthly(
-          interval: 2,
-          endDate: endDate,
-        );
+        final rule = RecurrenceRuleModel.monthly(interval: 2, endDate: endDate);
 
         expect(rule.frequency, RecurrenceFrequency.monthly);
         expect(rule.interval, 2);
@@ -90,10 +81,7 @@ void main() {
       });
 
       test('isValid returns true for valid monthly rule', () {
-        final rule = RecurrenceRuleModel.monthly(
-          interval: 1,
-          count: 12,
-        );
+        final rule = RecurrenceRuleModel.monthly(interval: 1, count: 12);
 
         expect(rule.isValid, isTrue);
       });
@@ -123,14 +111,17 @@ void main() {
         expect(rule.isValid, isFalse);
       });
 
-      test('isValid returns false when neither count nor endDate is provided', () {
-        final rule = RecurrenceRuleModel(
-          frequency: RecurrenceFrequency.weekly,
-          interval: 1,
-        );
+      test(
+        'isValid returns false when neither count nor endDate is provided',
+        () {
+          final rule = RecurrenceRuleModel(
+            frequency: RecurrenceFrequency.weekly,
+            interval: 1,
+          );
 
-        expect(rule.isValid, isFalse);
-      });
+          expect(rule.isValid, isFalse);
+        },
+      );
 
       test('isValid returns false when daysOfWeek contains invalid day', () {
         final rule = RecurrenceRuleModel(
@@ -199,10 +190,7 @@ void main() {
       });
 
       test('returns correct description for every 2 weeks', () {
-        final rule = RecurrenceRuleModel.weekly(
-          interval: 2,
-          count: 5,
-        );
+        final rule = RecurrenceRuleModel.weekly(interval: 2, count: 5);
 
         final description = rule.getDescription();
         expect(description, contains('Every 2 weeklys'));
@@ -210,10 +198,7 @@ void main() {
 
       test('returns correct description for monthly with endDate', () {
         final endDate = DateTime(2025, 12, 31);
-        final rule = RecurrenceRuleModel.monthly(
-          interval: 1,
-          endDate: endDate,
-        );
+        final rule = RecurrenceRuleModel.monthly(interval: 1, endDate: endDate);
 
         final description = rule.getDescription();
         expect(description, contains('Every monthly'));
@@ -222,10 +207,7 @@ void main() {
       });
 
       test('returns correct description for every 3 months', () {
-        final rule = RecurrenceRuleModel.monthly(
-          interval: 3,
-          count: 4,
-        );
+        final rule = RecurrenceRuleModel.monthly(interval: 3, count: 4);
 
         final description = rule.getDescription();
         expect(description, contains('Every 3 monthlys'));
@@ -268,10 +250,7 @@ void main() {
 
         expect(restored.endDate, isNotNull);
         // Compare ISO strings to avoid microsecond precision issues
-        expect(
-          restored.endDate!.toIso8601String(),
-          endDate.toIso8601String(),
-        );
+        expect(restored.endDate!.toIso8601String(), endDate.toIso8601String());
       });
 
       test('toJson handles null fields correctly', () {
@@ -288,10 +267,7 @@ void main() {
 
     group('Edge cases', () {
       test('handles maximum count (100)', () {
-        final rule = RecurrenceRuleModel.weekly(
-          interval: 1,
-          count: 100,
-        );
+        final rule = RecurrenceRuleModel.weekly(interval: 1, count: 100);
 
         expect(rule.isValid, isTrue);
         expect(rule.count, 100);
@@ -309,10 +285,7 @@ void main() {
       });
 
       test('copyWith works correctly', () {
-        final original = RecurrenceRuleModel.weekly(
-          interval: 1,
-          count: 10,
-        );
+        final original = RecurrenceRuleModel.weekly(interval: 1, count: 10);
 
         final modified = original.copyWith(count: 20);
 

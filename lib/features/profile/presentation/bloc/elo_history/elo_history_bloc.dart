@@ -11,9 +11,8 @@ import 'elo_history_state.dart';
 class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
   final UserRepository userRepository;
 
-  EloHistoryBloc({
-    required this.userRepository,
-  }) : super(const EloHistoryState.initial()) {
+  EloHistoryBloc({required this.userRepository})
+    : super(const EloHistoryState.initial()) {
     on<LoadEloHistory>(_onLoadHistory);
     on<FilterByPeriod>(_onFilterByPeriod);
     on<FilterByDateRange>(_onFilterByDateRange);
@@ -44,17 +43,16 @@ class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
         ),
       );
     } catch (e) {
-      emit(EloHistoryState.error(
-        message: 'Failed to load ELO history: ${e.toString()}',
-      ));
+      emit(
+        EloHistoryState.error(
+          message: 'Failed to load ELO history: ${e.toString()}',
+        ),
+      );
     }
   }
 
   /// Handle filtering by time period (Story 302.3)
-  void _onFilterByPeriod(
-    FilterByPeriod event,
-    Emitter<EloHistoryState> emit,
-  ) {
+  void _onFilterByPeriod(FilterByPeriod event, Emitter<EloHistoryState> emit) {
     final currentState = state;
     if (currentState is! EloHistoryLoaded) return;
 
@@ -69,14 +67,16 @@ class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
     // Calculate best ELO in filtered period (Story 302.6)
     final bestElo = _calculateBestElo(filtered);
 
-    emit(EloHistoryState.loaded(
-      history: currentState.history,
-      filteredHistory: filtered,
-      filterStartDate: startDate,
-      filterEndDate: endDate,
-      selectedPeriod: event.period,
-      bestEloInPeriod: bestElo,
-    ));
+    emit(
+      EloHistoryState.loaded(
+        history: currentState.history,
+        filteredHistory: filtered,
+        filterStartDate: startDate,
+        filterEndDate: endDate,
+        selectedPeriod: event.period,
+        bestEloInPeriod: bestElo,
+      ),
+    );
   }
 
   void _onFilterByDateRange(
@@ -95,34 +95,35 @@ class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
     // Calculate best ELO in filtered period (Story 302.6)
     final bestElo = _calculateBestElo(filtered);
 
-    emit(EloHistoryState.loaded(
-      history: currentState.history,
-      filteredHistory: filtered,
-      filterStartDate: event.startDate,
-      filterEndDate: event.endDate,
-      selectedPeriod: currentState.selectedPeriod,
-      bestEloInPeriod: bestElo,
-    ));
+    emit(
+      EloHistoryState.loaded(
+        history: currentState.history,
+        filteredHistory: filtered,
+        filterStartDate: event.startDate,
+        filterEndDate: event.endDate,
+        selectedPeriod: currentState.selectedPeriod,
+        bestEloInPeriod: bestElo,
+      ),
+    );
   }
 
-  void _onClearFilter(
-    ClearFilter event,
-    Emitter<EloHistoryState> emit,
-  ) {
+  void _onClearFilter(ClearFilter event, Emitter<EloHistoryState> emit) {
     final currentState = state;
     if (currentState is! EloHistoryLoaded) return;
 
     // Calculate best ELO for all-time (Story 302.6)
     final bestElo = _calculateBestElo(currentState.history);
 
-    emit(EloHistoryState.loaded(
-      history: currentState.history,
-      filteredHistory: currentState.history,
-      filterStartDate: null,
-      filterEndDate: null,
-      selectedPeriod: TimePeriod.allTime,
-      bestEloInPeriod: bestElo,
-    ));
+    emit(
+      EloHistoryState.loaded(
+        history: currentState.history,
+        filteredHistory: currentState.history,
+        filterStartDate: null,
+        filterEndDate: null,
+        selectedPeriod: TimePeriod.allTime,
+        bestEloInPeriod: bestElo,
+      ),
+    );
   }
 
   /// Calculate the best ELO from a list of rating history entries.
@@ -130,9 +131,7 @@ class EloHistoryBloc extends Bloc<EloHistoryEvent, EloHistoryState> {
   BestEloRecord? _calculateBestElo(List<RatingHistoryEntry> entries) {
     if (entries.isEmpty) return null;
 
-    final best = entries.reduce((a, b) =>
-      a.newRating > b.newRating ? a : b
-    );
+    final best = entries.reduce((a, b) => a.newRating > b.newRating ? a : b);
 
     return BestEloRecord(
       elo: best.newRating,

@@ -31,17 +31,13 @@ void main() {
             {
               'client_info': {
                 'mobilesdk_app_id': '1:19710393704:android:abcdef123456',
-                'android_client_info': {
-                  'package_name': 'org.gatherli.app.dev',
-                }
+                'android_client_info': {'package_name': 'org.gatherli.app.dev'},
               },
               'api_key': [
-                {
-                  'current_key': 'AIzaSyRealApiKeyWithoutPlaceholder123456',
-                }
-              ]
-            }
-          ]
+                {'current_key': 'AIzaSyRealApiKeyWithoutPlaceholder123456'},
+              ],
+            },
+          ],
         };
 
         await configFile.writeAsString(jsonEncode(validConfig));
@@ -59,21 +55,17 @@ void main() {
       test('should detect project ID mismatch', () async {
         final configFile = File('${tempDir.path}/google-services.json');
         final invalidConfig = {
-          'project_info': {
-            'project_id': 'wrong-project-id',
-          },
+          'project_info': {'project_id': 'wrong-project-id'},
           'client': [
             {
               'client_info': {
-                'android_client_info': {
-                  'package_name': 'org.gatherli.app.dev',
-                }
+                'android_client_info': {'package_name': 'org.gatherli.app.dev'},
               },
               'api_key': [
-                {'current_key': 'real-key'}
-              ]
-            }
-          ]
+                {'current_key': 'real-key'},
+              ],
+            },
+          ],
         };
 
         await configFile.writeAsString(jsonEncode(invalidConfig));
@@ -90,21 +82,17 @@ void main() {
       test('should detect bundle ID mismatch', () async {
         final configFile = File('${tempDir.path}/google-services.json');
         final invalidConfig = {
-          'project_info': {
-            'project_id': 'gatherli-dev',
-          },
+          'project_info': {'project_id': 'gatherli-dev'},
           'client': [
             {
               'client_info': {
-                'android_client_info': {
-                  'package_name': 'com.wrong.bundle.id',
-                }
+                'android_client_info': {'package_name': 'com.wrong.bundle.id'},
               },
               'api_key': [
-                {'current_key': 'real-key'}
-              ]
-            }
-          ]
+                {'current_key': 'real-key'},
+              ],
+            },
+          ],
         };
 
         await configFile.writeAsString(jsonEncode(invalidConfig));
@@ -121,21 +109,17 @@ void main() {
       test('should detect placeholder API keys', () async {
         final configFile = File('${tempDir.path}/google-services.json');
         final configWithPlaceholder = {
-          'project_info': {
-            'project_id': 'gatherli-dev',
-          },
+          'project_info': {'project_id': 'gatherli-dev'},
           'client': [
             {
               'client_info': {
-                'android_client_info': {
-                  'package_name': 'org.gatherli.app.dev',
-                }
+                'android_client_info': {'package_name': 'org.gatherli.app.dev'},
               },
               'api_key': [
-                {'current_key': 'AIzaSyDEV-placeholder-key-for-development'}
-              ]
-            }
-          ]
+                {'current_key': 'AIzaSyDEV-placeholder-key-for-development'},
+              ],
+            },
+          ],
         };
 
         await configFile.writeAsString(jsonEncode(configWithPlaceholder));
@@ -146,7 +130,10 @@ void main() {
         );
 
         expect(result.isValid, isTrue); // Valid structure but has warnings
-        expect(result.warnings, contains(contains('API key appears to be a placeholder')));
+        expect(
+          result.warnings,
+          contains(contains('API key appears to be a placeholder')),
+        );
       });
 
       test('should handle missing config file', () async {
@@ -273,27 +260,57 @@ void main() {
         );
 
         expect(result.isValid, isTrue); // Valid structure but has warnings
-        expect(result.warnings, contains(contains('API key appears to be a placeholder')));
+        expect(
+          result.warnings,
+          contains(contains('API key appears to be a placeholder')),
+        );
       });
     });
 
     group('Expected Constants', () {
       test('should have correct expected bundle IDs for Android', () {
-        expect(FirebaseConfigValidator.expectedAndroidBundleIds['dev'], 'org.gatherli.app.dev');
-        expect(FirebaseConfigValidator.expectedAndroidBundleIds['prod'], 'org.gatherli.app');
-        expect(FirebaseConfigValidator.expectedAndroidBundleIds.containsKey('stg'), isFalse);
+        expect(
+          FirebaseConfigValidator.expectedAndroidBundleIds['dev'],
+          'org.gatherli.app.dev',
+        );
+        expect(
+          FirebaseConfigValidator.expectedAndroidBundleIds['prod'],
+          'org.gatherli.app',
+        );
+        expect(
+          FirebaseConfigValidator.expectedAndroidBundleIds.containsKey('stg'),
+          isFalse,
+        );
       });
 
       test('should have correct expected bundle IDs for iOS', () {
-        expect(FirebaseConfigValidator.expectediOSBundleIds['dev'], 'org.gatherli.app.dev');
-        expect(FirebaseConfigValidator.expectediOSBundleIds['prod'], 'org.gatherli.app');
-        expect(FirebaseConfigValidator.expectediOSBundleIds.containsKey('stg'), isFalse);
+        expect(
+          FirebaseConfigValidator.expectediOSBundleIds['dev'],
+          'org.gatherli.app.dev',
+        );
+        expect(
+          FirebaseConfigValidator.expectediOSBundleIds['prod'],
+          'org.gatherli.app',
+        );
+        expect(
+          FirebaseConfigValidator.expectediOSBundleIds.containsKey('stg'),
+          isFalse,
+        );
       });
 
       test('should have correct expected project IDs', () {
-        expect(FirebaseConfigValidator.expectedProjectIds['dev'], 'gatherli-dev');
-        expect(FirebaseConfigValidator.expectedProjectIds['prod'], 'gatherli-prod');
-        expect(FirebaseConfigValidator.expectedProjectIds.containsKey('stg'), isFalse);
+        expect(
+          FirebaseConfigValidator.expectedProjectIds['dev'],
+          'gatherli-dev',
+        );
+        expect(
+          FirebaseConfigValidator.expectedProjectIds['prod'],
+          'gatherli-prod',
+        );
+        expect(
+          FirebaseConfigValidator.expectedProjectIds.containsKey('stg'),
+          isFalse,
+        );
       });
     });
 
@@ -304,9 +321,7 @@ void main() {
           warnings: ['Some warning'],
         );
 
-        final resultWithoutWarnings = ConfigValidationResult(
-          isValid: true,
-        );
+        final resultWithoutWarnings = ConfigValidationResult(isValid: true);
 
         expect(resultWithWarnings.hasWarnings, isTrue);
         expect(resultWithoutWarnings.hasWarnings, isFalse);

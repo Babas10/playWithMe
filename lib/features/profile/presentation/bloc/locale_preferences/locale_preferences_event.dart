@@ -10,14 +10,18 @@ class LocalePreferencesEvent with _$LocalePreferencesEvent {
   const factory LocalePreferencesEvent.loadPreferences() = LoadPreferences;
 
   /// Update the selected language
-  const factory LocalePreferencesEvent.updateLanguage(Locale locale) = UpdateLanguage;
+  const factory LocalePreferencesEvent.updateLanguage(Locale locale) =
+      UpdateLanguage;
 
   /// Update the selected country
-  const factory LocalePreferencesEvent.updateCountry(String country) = UpdateCountry;
+  const factory LocalePreferencesEvent.updateCountry(String country) =
+      UpdateCountry;
 
   /// Save preferences to local storage and Firestore
-  const factory LocalePreferencesEvent.savePreferences(String userId) = SavePreferences;
+  const factory LocalePreferencesEvent.savePreferences(String userId) =
+      SavePreferences;
 
   /// Load preferences from Firestore
-  const factory LocalePreferencesEvent.loadFromFirestore(String userId) = LoadFromFirestore;
+  const factory LocalePreferencesEvent.loadFromFirestore(String userId) =
+      LoadFromFirestore;
 }

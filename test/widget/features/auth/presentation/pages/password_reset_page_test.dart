@@ -32,8 +32,9 @@ void main() {
 
   setUp(() {
     mockPasswordResetBloc = MockPasswordResetBloc();
-    when(() => mockPasswordResetBloc.state)
-        .thenReturn(const PasswordResetInitial());
+    when(
+      () => mockPasswordResetBloc.state,
+    ).thenReturn(const PasswordResetInitial());
   });
 
   tearDown(() {
@@ -48,7 +49,8 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en')],      home: BlocProvider<PasswordResetBloc>.value(
+      supportedLocales: const [Locale('en')],
+      home: BlocProvider<PasswordResetBloc>.value(
         value: mockPasswordResetBloc,
         child: const PasswordResetPage(),
       ),
@@ -87,7 +89,8 @@ void main() {
 
         expect(
           find.text(
-              "Enter your email address and we'll send you a link to reset your password."),
+            "Enter your email address and we'll send you a link to reset your password.",
+          ),
           findsOneWidget,
         );
       });
@@ -103,7 +106,10 @@ void main() {
       testWidgets('renders send reset email button', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        expect(find.widgetWithText(AuthButton, 'Send Reset Email'), findsOneWidget);
+        expect(
+          find.widgetWithText(AuthButton, 'Send Reset Email'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('renders back to login button', (tester) async {
@@ -128,22 +134,29 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         // Tap send reset button without entering email
-        final sendButton = find.widgetWithText(ElevatedButton, 'Send Reset Email');
+        final sendButton = find.widgetWithText(
+          ElevatedButton,
+          'Send Reset Email',
+        );
         await tester.tap(sendButton);
         await tester.pumpAndSettle();
 
         expect(find.text('Email is required'), findsOneWidget);
       });
 
-      testWidgets('shows validation error for invalid email format',
-          (tester) async {
+      testWidgets('shows validation error for invalid email format', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         final emailField = find.byType(TextFormField);
         await tester.enterText(emailField, 'invalidemail');
         await tester.pump();
 
-        final sendButton = find.widgetWithText(ElevatedButton, 'Send Reset Email');
+        final sendButton = find.widgetWithText(
+          ElevatedButton,
+          'Send Reset Email',
+        );
         await tester.tap(sendButton);
         await tester.pumpAndSettle();
 
@@ -157,7 +170,10 @@ void main() {
         await tester.enterText(emailField, 'valid@example.com');
         await tester.pump();
 
-        final sendButton = find.widgetWithText(ElevatedButton, 'Send Reset Email');
+        final sendButton = find.widgetWithText(
+          ElevatedButton,
+          'Send Reset Email',
+        );
         await tester.tap(sendButton);
         await tester.pump();
 
@@ -168,8 +184,9 @@ void main() {
     });
 
     group('Send Reset Button', () {
-      testWidgets('dispatches PasswordResetRequested event on tap',
-          (tester) async {
+      testWidgets('dispatches PasswordResetRequested event on tap', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Enter valid email
@@ -178,7 +195,10 @@ void main() {
         await tester.pump();
 
         // Tap send reset button
-        final sendButton = find.widgetWithText(ElevatedButton, 'Send Reset Email');
+        final sendButton = find.widgetWithText(
+          ElevatedButton,
+          'Send Reset Email',
+        );
         await tester.tap(sendButton);
         await tester.pump();
 
@@ -193,7 +213,10 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         // Tap send reset without entering email
-        final sendButton = find.widgetWithText(ElevatedButton, 'Send Reset Email');
+        final sendButton = find.widgetWithText(
+          ElevatedButton,
+          'Send Reset Email',
+        );
         await tester.tap(sendButton);
         await tester.pump();
 
@@ -203,8 +226,9 @@ void main() {
 
     group('Loading State', () {
       testWidgets('shows loading indicator during request', (tester) async {
-        when(() => mockPasswordResetBloc.state)
-            .thenReturn(const PasswordResetLoading());
+        when(
+          () => mockPasswordResetBloc.state,
+        ).thenReturn(const PasswordResetLoading());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -212,8 +236,9 @@ void main() {
       });
 
       testWidgets('button is disabled during loading', (tester) async {
-        when(() => mockPasswordResetBloc.state)
-            .thenReturn(const PasswordResetLoading());
+        when(
+          () => mockPasswordResetBloc.state,
+        ).thenReturn(const PasswordResetLoading());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -309,7 +334,8 @@ void main() {
         );
         expect(
           find.text(
-              'Please check your email and follow the instructions to reset your password.'),
+            'Please check your email and follow the instructions to reset your password.',
+          ),
           findsOneWidget,
         );
       });
@@ -356,14 +382,15 @@ void main() {
     group('Navigation', () {
       testWidgets('back to login button navigates back', (tester) async {
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: BlocProvider<PasswordResetBloc>.value(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: BlocProvider<PasswordResetBloc>.value(
               value: mockPasswordResetBloc,
               child: Navigator(
                 onGenerateRoute: (settings) {
@@ -383,8 +410,9 @@ void main() {
     });
 
     group('Form Submission via Enter Key', () {
-      testWidgets('submits form when pressing done on email field',
-          (tester) async {
+      testWidgets('submits form when pressing done on email field', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Enter valid email
@@ -412,7 +440,10 @@ void main() {
         await tester.enterText(emailField, 'user@mail.example.com');
         await tester.pump();
 
-        final sendButton = find.widgetWithText(ElevatedButton, 'Send Reset Email');
+        final sendButton = find.widgetWithText(
+          ElevatedButton,
+          'Send Reset Email',
+        );
         await tester.tap(sendButton);
         await tester.pump();
 
@@ -431,7 +462,10 @@ void main() {
         await tester.enterText(emailField, '   ');
         await tester.pump();
 
-        final sendButton = find.widgetWithText(ElevatedButton, 'Send Reset Email');
+        final sendButton = find.widgetWithText(
+          ElevatedButton,
+          'Send Reset Email',
+        );
         await tester.tap(sendButton);
         await tester.pumpAndSettle();
 
@@ -445,7 +479,10 @@ void main() {
         await tester.enterText(emailField, 'user@');
         await tester.pump();
 
-        final sendButton = find.widgetWithText(ElevatedButton, 'Send Reset Email');
+        final sendButton = find.widgetWithText(
+          ElevatedButton,
+          'Send Reset Email',
+        );
         await tester.tap(sendButton);
         await tester.pumpAndSettle();
 

@@ -55,32 +55,36 @@ void main() {
         );
 
         // Create group with all 3 users
-        final groupDoc = await FirebaseFirestore.instance.collection('groups').add({
-          'name': 'Beach Volleyball Group',
-          'description': 'Test group for architecture validation',
-          'createdBy': userA.uid,
-          'adminIds': [userA.uid],
-          'memberIds': [userA.uid, userB.uid, userC.uid],
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
+        final groupDoc = await FirebaseFirestore.instance
+            .collection('groups')
+            .add({
+              'name': 'Beach Volleyball Group',
+              'description': 'Test group for architecture validation',
+              'createdBy': userA.uid,
+              'adminIds': [userA.uid],
+              'memberIds': [userA.uid, userB.uid, userC.uid],
+              'createdAt': FieldValue.serverTimestamp(),
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
 
         final groupId = groupDoc.id;
 
         // Create game in the group
-        final gameDoc = await FirebaseFirestore.instance.collection('games').add({
-          'groupId': groupId,
-          'title': 'Saturday Morning Game',
-          'description': 'Architecture test game',
-          'scheduledAt': Timestamp.fromDate(
-            DateTime.now().add(const Duration(days: 1)),
-          ),
-          'maxPlayers': 4,
-          'createdBy': userA.uid,
-          'status': 'scheduled',
-          'rsvps': [userA.uid],
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        final gameDoc = await FirebaseFirestore.instance
+            .collection('games')
+            .add({
+              'groupId': groupId,
+              'title': 'Saturday Morning Game',
+              'description': 'Architecture test game',
+              'scheduledAt': Timestamp.fromDate(
+                DateTime.now().add(const Duration(days: 1)),
+              ),
+              'maxPlayers': 4,
+              'createdBy': userA.uid,
+              'status': 'scheduled',
+              'rsvps': [userA.uid],
+              'createdAt': FieldValue.serverTimestamp(),
+            });
 
         final gameId = gameDoc.id;
 
@@ -93,8 +97,11 @@ void main() {
         final gameData = gameSnapshot.data()!;
         final gameLinkGroupId = gameData['groupId'] as String;
 
-        expect(gameLinkGroupId, equals(groupId),
-            reason: 'Game should reference groupId');
+        expect(
+          gameLinkGroupId,
+          equals(groupId),
+          reason: 'Game should reference groupId',
+        );
 
         // Retrieve group to get member list
         final groupSnapshot = await FirebaseFirestore.instance
@@ -113,8 +120,10 @@ void main() {
 
         // Fetch player details using memberIds
         final playerDocs = await Future.wait(
-          memberIds.map((id) =>
-              FirebaseFirestore.instance.collection('users').doc(id).get()),
+          memberIds.map(
+            (id) =>
+                FirebaseFirestore.instance.collection('users').doc(id).get(),
+          ),
         );
 
         final playerNames = playerDocs
@@ -148,11 +157,12 @@ void main() {
           displayName: 'Group Member',
         );
 
-        final nonMemberUser = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'nonmember@test.com',
-          password: 'password123',
-          displayName: 'Non Member',
-        );
+        final nonMemberUser =
+            await FirebaseEmulatorHelper.createCompleteTestUser(
+              email: 'nonmember@test.com',
+              password: 'password123',
+              displayName: 'Non Member',
+            );
 
         // Sign in as member user to create group
         await FirebaseEmulatorHelper.signOut();
@@ -162,31 +172,35 @@ void main() {
         );
 
         // Create group with only memberUser
-        final groupDoc = await FirebaseFirestore.instance.collection('groups').add({
-          'name': 'Exclusive Group',
-          'description': 'Group membership validation test',
-          'createdBy': memberUser.uid,
-          'adminIds': [memberUser.uid],
-          'memberIds': [memberUser.uid], // Only member user
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
+        final groupDoc = await FirebaseFirestore.instance
+            .collection('groups')
+            .add({
+              'name': 'Exclusive Group',
+              'description': 'Group membership validation test',
+              'createdBy': memberUser.uid,
+              'adminIds': [memberUser.uid],
+              'memberIds': [memberUser.uid], // Only member user
+              'createdAt': FieldValue.serverTimestamp(),
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
 
         final groupId = groupDoc.id;
 
         // Create game in the group
-        final gameDoc = await FirebaseFirestore.instance.collection('games').add({
-          'groupId': groupId,
-          'title': 'Members Only Game',
-          'scheduledAt': Timestamp.fromDate(
-            DateTime.now().add(const Duration(days: 1)),
-          ),
-          'maxPlayers': 4,
-          'createdBy': memberUser.uid,
-          'status': 'scheduled',
-          'rsvps': [],
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        final gameDoc = await FirebaseFirestore.instance
+            .collection('games')
+            .add({
+              'groupId': groupId,
+              'title': 'Members Only Game',
+              'scheduledAt': Timestamp.fromDate(
+                DateTime.now().add(const Duration(days: 1)),
+              ),
+              'maxPlayers': 4,
+              'createdBy': memberUser.uid,
+              'status': 'scheduled',
+              'rsvps': [],
+              'createdAt': FieldValue.serverTimestamp(),
+            });
 
         final gameId = gameDoc.id;
 
@@ -265,13 +279,15 @@ void main() {
         );
 
         // Create group with all users
-        final groupDoc = await FirebaseFirestore.instance.collection('groups').add({
-          'name': 'Active Group',
-          'createdBy': users[0].uid,
-          'adminIds': [users[0].uid],
-          'memberIds': users.map((u) => u.uid).toList(),
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        final groupDoc = await FirebaseFirestore.instance
+            .collection('groups')
+            .add({
+              'name': 'Active Group',
+              'createdBy': users[0].uid,
+              'adminIds': [users[0].uid],
+              'memberIds': users.map((u) => u.uid).toList(),
+              'createdAt': FieldValue.serverTimestamp(),
+            });
 
         final groupId = groupDoc.id;
 
@@ -320,8 +336,11 @@ void main() {
           final gameSnapshot = await gameDoc.get();
           final gameGroupId = gameSnapshot.data()!['groupId'] as String;
 
-          expect(gameGroupId, equals(groupId),
-              reason: 'All games should reference the same group');
+          expect(
+            gameGroupId,
+            equals(groupId),
+            reason: 'All games should reference the same group',
+          );
         }
 
         // Verify: Single query to group provides players for all games

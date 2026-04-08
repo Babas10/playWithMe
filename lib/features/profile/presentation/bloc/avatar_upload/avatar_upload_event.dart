@@ -15,18 +15,20 @@ class AvatarUploadEvent with _$AvatarUploadEvent {
   }) = AvatarUploadImageSourceSelected;
 
   /// Event when an image has been picked successfully
-  const factory AvatarUploadEvent.imagePicked({
-    required File imageFile,
-  }) = AvatarUploadImagePicked;
+  const factory AvatarUploadEvent.imagePicked({required File imageFile}) =
+      AvatarUploadImagePicked;
 
   /// Event to upload the selected image
-  const factory AvatarUploadEvent.uploadRequested() = AvatarUploadUploadRequested;
+  const factory AvatarUploadEvent.uploadRequested() =
+      AvatarUploadUploadRequested;
 
   /// Event to cancel the upload
-  const factory AvatarUploadEvent.uploadCancelled() = AvatarUploadUploadCancelled;
+  const factory AvatarUploadEvent.uploadCancelled() =
+      AvatarUploadUploadCancelled;
 
   /// Event to delete the current avatar
-  const factory AvatarUploadEvent.deleteRequested() = AvatarUploadDeleteRequested;
+  const factory AvatarUploadEvent.deleteRequested() =
+      AvatarUploadDeleteRequested;
 
   /// Event to reset the upload state
   const factory AvatarUploadEvent.reset() = AvatarUploadReset;

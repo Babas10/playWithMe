@@ -14,10 +14,7 @@ import '../widgets/friend_selector_widget.dart';
 class GroupCreationPage extends StatefulWidget {
   final FriendRepository? friendRepository;
 
-  const GroupCreationPage({
-    super.key,
-    this.friendRepository,
-  });
+  const GroupCreationPage({super.key, this.friendRepository});
 
   @override
   State<GroupCreationPage> createState() => _GroupCreationPageState();
@@ -72,19 +69,20 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
       lastActivity: now, // Set initial activity to creation time
     );
 
-    context.read<GroupBloc>().add(CreateGroup(
-          group: newGroup,
-          friendIdsToInvite: _selectedFriendIds.isNotEmpty ? _selectedFriendIds : null,
-        ));
+    context.read<GroupBloc>().add(
+      CreateGroup(
+        group: newGroup,
+        friendIdsToInvite: _selectedFriendIds.isNotEmpty
+            ? _selectedFriendIds
+            : null,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PlayWithMeAppBar.build(
-        context: context,
-        title: 'Create Group',
-      ),
+      appBar: PlayWithMeAppBar.build(context: context, title: 'Create Group'),
       body: BlocConsumer<GroupBloc, GroupState>(
         listener: (context, state) {
           if (state is GroupCreated) {
@@ -126,10 +124,7 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                       // Header text
                       const Text(
                         'Create a new group for organizing volleyball games',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
@@ -141,13 +136,22 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                         decoration: InputDecoration(
                           labelText: 'Group Name *',
                           hintText: 'e.g., Beach Volleyball Crew',
-                          prefixIcon: Icon(Icons.group, color: AppColors.secondary),
-                          border: const OutlineInputBorder(),
-                          floatingLabelStyle: TextStyle(color: AppColors.secondary),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: AppColors.primary, width: 2),
+                          prefixIcon: Icon(
+                            Icons.group,
+                            color: AppColors.secondary,
                           ),
-                          helperText: 'Choose a name for your group (min 3 characters)',
+                          border: const OutlineInputBorder(),
+                          floatingLabelStyle: TextStyle(
+                            color: AppColors.secondary,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: AppColors.primary,
+                              width: 2,
+                            ),
+                          ),
+                          helperText:
+                              'Choose a name for your group (min 3 characters)',
                         ),
                         validator: _validateGroupName,
                         textCapitalization: TextCapitalization.words,
@@ -162,14 +166,24 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                         enabled: !isLoading,
                         decoration: InputDecoration(
                           labelText: 'Description (Optional)',
-                          hintText: 'e.g., Weekly beach volleyball games at Santa Monica',
-                          prefixIcon: Icon(Icons.description, color: AppColors.secondary),
-                          border: const OutlineInputBorder(),
-                          floatingLabelStyle: TextStyle(color: AppColors.secondary),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: AppColors.primary, width: 2),
+                          hintText:
+                              'e.g., Weekly beach volleyball games at Santa Monica',
+                          prefixIcon: Icon(
+                            Icons.description,
+                            color: AppColors.secondary,
                           ),
-                          helperText: 'Add a description to help others understand your group',
+                          border: const OutlineInputBorder(),
+                          floatingLabelStyle: TextStyle(
+                            color: AppColors.secondary,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: AppColors.primary,
+                              width: 2,
+                            ),
+                          ),
+                          helperText:
+                              'Add a description to help others understand your group',
                           alignLabelWithHint: true,
                         ),
                         maxLines: 3,
@@ -206,7 +220,10 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
                             children: [
-                              Icon(Icons.info_outline, color: AppColors.secondary),
+                              Icon(
+                                Icons.info_outline,
+                                color: AppColors.secondary,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -227,7 +244,10 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
                       FilledButton.icon(
                         onPressed: isLoading
                             ? null
-                            : () => _handleCreateGroup(context, authState.user.uid),
+                            : () => _handleCreateGroup(
+                                context,
+                                authState.user.uid,
+                              ),
                         icon: isLoading
                             ? const SizedBox(
                                 width: 20,
@@ -247,7 +267,9 @@ class _GroupCreationPageState extends State<GroupCreationPage> {
 
                       // Cancel button
                       OutlinedButton(
-                        onPressed: isLoading ? null : () => Navigator.of(context).pop(),
+                        onPressed: isLoading
+                            ? null
+                            : () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),

@@ -51,8 +51,7 @@ void main() {
 
       expect(find.text('Invite Members'), findsOneWidget);
       expect(
-        find.text(
-            'Share this link to invite people to join the group.'),
+        find.text('Share this link to invite people to join the group.'),
         findsOneWidget,
       );
     });
@@ -67,8 +66,9 @@ void main() {
       expect(find.byIcon(Icons.link), findsOneWidget);
     });
 
-    testWidgets('tapping generate button dispatches GenerateInvite event',
-        (tester) async {
+    testWidgets('tapping generate button dispatches GenerateInvite event', (
+      tester,
+    ) async {
       when(() => mockBloc.state).thenReturn(const GroupInviteLinkInitial());
 
       await tester.pumpWidget(buildTestWidget());
@@ -91,30 +91,32 @@ void main() {
       expect(find.text('Generate Invite Link'), findsNothing);
     });
 
-    testWidgets('shows generated link with copy and share buttons',
-        (tester) async {
-      when(() => mockBloc.state).thenReturn(const GroupInviteLinkGenerated(
-        deepLinkUrl: 'https://gatherli.org/invite/abc123',
-        inviteId: 'invite-456',
-      ));
+    testWidgets('shows generated link with copy and share buttons', (
+      tester,
+    ) async {
+      when(() => mockBloc.state).thenReturn(
+        const GroupInviteLinkGenerated(
+          deepLinkUrl: 'https://gatherli.org/invite/abc123',
+          inviteId: 'invite-456',
+        ),
+      );
 
       await tester.pumpWidget(buildTestWidget());
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('https://gatherli.org/invite/abc123'),
-        findsOneWidget,
-      );
+      expect(find.text('https://gatherli.org/invite/abc123'), findsOneWidget);
       expect(find.text('Copy Link'), findsOneWidget);
       expect(find.text('Share'), findsOneWidget);
       expect(find.text('Revoke Invite'), findsOneWidget);
     });
 
     testWidgets('copy button copies link to clipboard', (tester) async {
-      when(() => mockBloc.state).thenReturn(const GroupInviteLinkGenerated(
-        deepLinkUrl: 'https://gatherli.org/invite/abc123',
-        inviteId: 'invite-456',
-      ));
+      when(() => mockBloc.state).thenReturn(
+        const GroupInviteLinkGenerated(
+          deepLinkUrl: 'https://gatherli.org/invite/abc123',
+          inviteId: 'invite-456',
+        ),
+      );
 
       // Set up clipboard mock
       final List<MethodCall> clipboardCalls = [];
@@ -148,12 +150,13 @@ void main() {
       );
     });
 
-    testWidgets('revoke button dispatches RevokeInvite event',
-        (tester) async {
-      when(() => mockBloc.state).thenReturn(const GroupInviteLinkGenerated(
-        deepLinkUrl: 'https://gatherli.org/invite/abc123',
-        inviteId: 'invite-456',
-      ));
+    testWidgets('revoke button dispatches RevokeInvite event', (tester) async {
+      when(() => mockBloc.state).thenReturn(
+        const GroupInviteLinkGenerated(
+          deepLinkUrl: 'https://gatherli.org/invite/abc123',
+          inviteId: 'invite-456',
+        ),
+      );
 
       await tester.pumpWidget(buildTestWidget());
       await tester.pumpAndSettle();
@@ -161,10 +164,9 @@ void main() {
       await tester.tap(find.text('Revoke Invite'));
 
       verify(
-        () => mockBloc.add(const RevokeInvite(
-          groupId: 'group-123',
-          inviteId: 'invite-456',
-        )),
+        () => mockBloc.add(
+          const RevokeInvite(groupId: 'group-123', inviteId: 'invite-456'),
+        ),
       ).called(1);
     });
 
@@ -178,9 +180,9 @@ void main() {
     });
 
     testWidgets('shows generate button after error', (tester) async {
-      when(() => mockBloc.state).thenReturn(const GroupInviteLinkError(
-        message: 'Some error',
-      ));
+      when(
+        () => mockBloc.state,
+      ).thenReturn(const GroupInviteLinkError(message: 'Some error'));
 
       await tester.pumpWidget(buildTestWidget());
       await tester.pumpAndSettle();
@@ -188,14 +190,14 @@ void main() {
       expect(find.text('Generate Invite Link'), findsOneWidget);
     });
 
-    testWidgets('shows error snackbar when error state emitted',
-        (tester) async {
+    testWidgets('shows error snackbar when error state emitted', (
+      tester,
+    ) async {
       when(() => mockBloc.state).thenReturn(const GroupInviteLinkInitial());
       whenListen(
         mockBloc,
         Stream<GroupInviteLinkState>.fromIterable([
-          const GroupInviteLinkError(
-              message: 'Failed to generate invite link'),
+          const GroupInviteLinkError(message: 'Failed to generate invite link'),
         ]),
         initialState: const GroupInviteLinkInitial(),
       );
@@ -203,14 +205,12 @@ void main() {
       await tester.pumpWidget(buildTestWidget());
       await tester.pump();
 
-      expect(
-        find.text('Failed to generate invite link'),
-        findsOneWidget,
-      );
+      expect(find.text('Failed to generate invite link'), findsOneWidget);
     });
 
-    testWidgets('shows revoked snackbar when revoked state emitted',
-        (tester) async {
+    testWidgets('shows revoked snackbar when revoked state emitted', (
+      tester,
+    ) async {
       when(() => mockBloc.state).thenReturn(const GroupInviteLinkInitial());
       whenListen(
         mockBloc,
@@ -227,10 +227,12 @@ void main() {
     });
 
     testWidgets('shows copy and share icons', (tester) async {
-      when(() => mockBloc.state).thenReturn(const GroupInviteLinkGenerated(
-        deepLinkUrl: 'https://gatherli.org/invite/test',
-        inviteId: 'inv-1',
-      ));
+      when(() => mockBloc.state).thenReturn(
+        const GroupInviteLinkGenerated(
+          deepLinkUrl: 'https://gatherli.org/invite/test',
+          inviteId: 'inv-1',
+        ),
+      );
 
       await tester.pumpWidget(buildTestWidget());
       await tester.pumpAndSettle();

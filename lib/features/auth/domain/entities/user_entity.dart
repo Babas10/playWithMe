@@ -35,8 +35,9 @@ class UserEntity with _$UserEntity {
   /// Cache is considered stale after 24 hours
   bool get needsFriendCacheRefresh {
     if (friendsLastUpdated == null) return true;
-    final hoursSinceUpdate =
-        DateTime.now().difference(friendsLastUpdated!).inHours;
+    final hoursSinceUpdate = DateTime.now()
+        .difference(friendsLastUpdated!)
+        .inHours;
     return hoursSinceUpdate > 24;
   }
 }

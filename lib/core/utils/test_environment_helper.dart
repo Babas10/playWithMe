@@ -3,8 +3,8 @@ class TestEnvironmentHelper {
   /// Check if tests are running in CI environment
   static bool get isCI {
     return const bool.fromEnvironment('CI', defaultValue: false) ||
-           _hasGitHubActionsEnv() ||
-           _hasCIEnvVar();
+        _hasGitHubActionsEnv() ||
+        _hasCIEnvVar();
   }
 
   /// Check if tests are running locally (not in CI)
@@ -27,10 +27,10 @@ class TestEnvironmentHelper {
   static bool _hasCIEnvVar() {
     // Check common CI environment variable names
     return const String.fromEnvironment('CONTINUOUS_INTEGRATION').isNotEmpty ||
-           const String.fromEnvironment('GITLAB_CI').isNotEmpty ||
-           const String.fromEnvironment('JENKINS_URL').isNotEmpty ||
-           const String.fromEnvironment('BUILDKITE').isNotEmpty ||
-           const String.fromEnvironment('CIRCLECI').isNotEmpty;
+        const String.fromEnvironment('GITLAB_CI').isNotEmpty ||
+        const String.fromEnvironment('JENKINS_URL').isNotEmpty ||
+        const String.fromEnvironment('BUILDKITE').isNotEmpty ||
+        const String.fromEnvironment('CIRCLECI').isNotEmpty;
   }
 
   /// Get a descriptive message for why a test is being skipped

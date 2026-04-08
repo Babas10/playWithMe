@@ -22,9 +22,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ProfileHeader(user: testUser),
-          ),
+          home: Scaffold(body: ProfileHeader(user: testUser)),
         ),
       );
 
@@ -46,9 +44,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ProfileHeader(user: testUser),
-          ),
+          home: Scaffold(body: ProfileHeader(user: testUser)),
         ),
       );
 
@@ -56,7 +52,9 @@ void main() {
       expect(find.text('test@example.com'), findsWidgets);
     });
 
-    testWidgets('displays default person icon when photoUrl is null', (tester) async {
+    testWidgets('displays default person icon when photoUrl is null', (
+      tester,
+    ) async {
       final testUser = UserEntity(
         uid: 'test-uid',
         email: 'test@example.com',
@@ -70,9 +68,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ProfileHeader(user: testUser),
-          ),
+          home: Scaffold(body: ProfileHeader(user: testUser)),
         ),
       );
 
@@ -94,9 +90,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ProfileHeader(user: testUser),
-          ),
+          home: Scaffold(body: ProfileHeader(user: testUser)),
         ),
       );
 
@@ -117,17 +111,17 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ProfileHeader(user: testUser),
-          ),
+          home: Scaffold(body: ProfileHeader(user: testUser)),
         ),
       );
 
       final container = tester.widget<Container>(
-        find.ancestor(
-          of: find.byType(CircleAvatar),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.byType(CircleAvatar),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       final decoration = container.decoration as BoxDecoration;
 

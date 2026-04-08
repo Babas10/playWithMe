@@ -15,10 +15,9 @@ class LocalePreferencesBloc
   // Current form values
   LocalePreferencesEntity? _currentPreferences;
 
-  LocalePreferencesBloc({
-    required LocalePreferencesRepository repository,
-  })  : _repository = repository,
-        super(const LocalePreferencesState.initial()) {
+  LocalePreferencesBloc({required LocalePreferencesRepository repository})
+    : _repository = repository,
+      super(const LocalePreferencesState.initial()) {
     on<LoadPreferences>(_onLoadPreferences);
     on<UpdateLanguage>(_onUpdateLanguage);
     on<UpdateCountry>(_onUpdateCountry);
@@ -48,14 +47,16 @@ class LocalePreferencesBloc
       _originalPreferences = updatedPreferences;
       _currentPreferences = updatedPreferences;
 
-      emit(LocalePreferencesState.loaded(
-        preferences: updatedPreferences,
-        hasUnsavedChanges: false,
-      ));
+      emit(
+        LocalePreferencesState.loaded(
+          preferences: updatedPreferences,
+          hasUnsavedChanges: false,
+        ),
+      );
     } catch (e) {
-      emit(LocalePreferencesState.error(
-        message: 'Failed to load preferences: $e',
-      ));
+      emit(
+        LocalePreferencesState.error(message: 'Failed to load preferences: $e'),
+      );
     }
   }
 
@@ -75,10 +76,12 @@ class LocalePreferencesBloc
 
     final hasChanges = _hasUnsavedChanges();
 
-    emit(LocalePreferencesState.loaded(
-      preferences: _currentPreferences!,
-      hasUnsavedChanges: hasChanges,
-    ));
+    emit(
+      LocalePreferencesState.loaded(
+        preferences: _currentPreferences!,
+        hasUnsavedChanges: hasChanges,
+      ),
+    );
   }
 
   /// Update the selected country
@@ -97,10 +100,12 @@ class LocalePreferencesBloc
 
     final hasChanges = _hasUnsavedChanges();
 
-    emit(LocalePreferencesState.loaded(
-      preferences: _currentPreferences!,
-      hasUnsavedChanges: hasChanges,
-    ));
+    emit(
+      LocalePreferencesState.loaded(
+        preferences: _currentPreferences!,
+        hasUnsavedChanges: hasChanges,
+      ),
+    );
   }
 
   /// Save preferences to local storage and Firestore
@@ -116,9 +121,7 @@ class LocalePreferencesBloc
       return;
     }
 
-    emit(LocalePreferencesState.saving(
-      preferences: _currentPreferences!,
-    ));
+    emit(LocalePreferencesState.saving(preferences: _currentPreferences!));
 
     try {
       // Update timezone before saving
@@ -144,15 +147,19 @@ class LocalePreferencesBloc
       emit(const LocalePreferencesState.saved());
 
       // Then immediately emit loaded state so the app updates the locale
-      emit(LocalePreferencesState.loaded(
-        preferences: preferencesToSave,
-        hasUnsavedChanges: false,
-      ));
+      emit(
+        LocalePreferencesState.loaded(
+          preferences: preferencesToSave,
+          hasUnsavedChanges: false,
+        ),
+      );
     } catch (e) {
-      emit(LocalePreferencesState.error(
-        message: 'Failed to save preferences: $e',
-        preferences: _currentPreferences,
-      ));
+      emit(
+        LocalePreferencesState.error(
+          message: 'Failed to save preferences: $e',
+          preferences: _currentPreferences,
+        ),
+      );
     }
   }
 
@@ -179,18 +186,22 @@ class LocalePreferencesBloc
         _originalPreferences = updatedPreferences;
         _currentPreferences = updatedPreferences;
 
-        emit(LocalePreferencesState.loaded(
-          preferences: updatedPreferences,
-          hasUnsavedChanges: false,
-        ));
+        emit(
+          LocalePreferencesState.loaded(
+            preferences: updatedPreferences,
+            hasUnsavedChanges: false,
+          ),
+        );
       } else {
         // No Firestore preferences, load from local
         add(const LocalePreferencesEvent.loadPreferences());
       }
     } catch (e) {
-      emit(LocalePreferencesState.error(
-        message: 'Failed to load preferences from Firestore: $e',
-      ));
+      emit(
+        LocalePreferencesState.error(
+          message: 'Failed to load preferences from Firestore: $e',
+        ),
+      );
     }
   }
 

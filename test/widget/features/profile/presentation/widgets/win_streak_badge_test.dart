@@ -10,16 +10,14 @@ void main() {
     testWidgets('displays for winning streak of 1', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: 1),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: 1)),
         ),
       );
       await tester.pumpAndSettle();
@@ -31,16 +29,14 @@ void main() {
     testWidgets('displays for losing streak of -1', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: -1),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: -1)),
         ),
       );
       await tester.pumpAndSettle();
@@ -52,16 +48,14 @@ void main() {
     testWidgets('does not display for zero streak', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: 0),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: 0)),
         ),
       );
       await tester.pumpAndSettle();
@@ -72,16 +66,14 @@ void main() {
     testWidgets('displays fire emoji for winning streak', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: 5),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: 5)),
         ),
       );
       await tester.pumpAndSettle();
@@ -94,16 +86,14 @@ void main() {
     testWidgets('displays snowflake emoji for losing streak', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: -3),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: -3)),
         ),
       );
       await tester.pumpAndSettle();
@@ -116,16 +106,14 @@ void main() {
     testWidgets('displays correct text for streak of 2', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: 2),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: 2)),
         ),
       );
       await tester.pumpAndSettle();
@@ -133,20 +121,19 @@ void main() {
       expect(find.text('2 wins'), findsOneWidget);
     });
 
-    testWidgets('displays correct text for large winning streak',
-        (tester) async {
+    testWidgets('displays correct text for large winning streak', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: 15),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: 15)),
         ),
       );
       await tester.pumpAndSettle();
@@ -155,20 +142,19 @@ void main() {
       expect(find.text('15 wins'), findsOneWidget);
     });
 
-    testWidgets('displays correct text for large losing streak',
-        (tester) async {
+    testWidgets('displays correct text for large losing streak', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: -10),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: -10)),
         ),
       );
       await tester.pumpAndSettle();
@@ -180,16 +166,14 @@ void main() {
     testWidgets('uses green color for winning streaks', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: 5),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: 5)),
         ),
       );
       await tester.pumpAndSettle();
@@ -204,16 +188,14 @@ void main() {
     testWidgets('uses blue color for losing streaks', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: Scaffold(
-            body: WinStreakBadge(currentStreak: -5),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: WinStreakBadge(currentStreak: -5)),
         ),
       );
       await tester.pumpAndSettle();

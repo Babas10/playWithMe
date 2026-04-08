@@ -47,10 +47,7 @@ class RestrictedModeBanner extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 l10n.accountDeletionWarning(daysUntilDeletion),
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
           ),

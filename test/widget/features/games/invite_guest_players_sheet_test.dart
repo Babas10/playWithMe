@@ -75,8 +75,7 @@ void main() {
   setUpAll(() {
     registerFallbackValue(const LoadInvitablePlayers(gameId: 'x'));
     registerFallbackValue(const InviteGuestPlayer(gameId: 'x', inviteeId: 'y'));
-    registerFallbackValue(
-        const InviteGroupPlayers(gameId: 'x', groupId: 'g'));
+    registerFallbackValue(const InviteGroupPlayers(gameId: 'x', groupId: 'g'));
   });
 
   setUp(() {
@@ -84,11 +83,13 @@ void main() {
   });
 
   group('InviteGuestPlayersSheet', () {
-    testWidgets('shows loading indicator while fetching players',
-        (tester) async {
+    testWidgets('shows loading indicator while fetching players', (
+      tester,
+    ) async {
       final completer = Completer<List<InvitablePlayerModel>>();
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) => completer.future);
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) => completer.future);
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await tester.pumpWidget(
@@ -105,8 +106,7 @@ void main() {
             child: Builder(
               builder: (ctx) => Scaffold(
                 body: ElevatedButton(
-                  onPressed: () =>
-                      showInviteGuestPlayersSheet(ctx, 'game-1'),
+                  onPressed: () => showInviteGuestPlayersSheet(ctx, 'game-1'),
                   child: const Text('Open'),
                 ),
               ),
@@ -125,8 +125,9 @@ void main() {
     });
 
     testWidgets('shows empty state when no players available', (tester) async {
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => []);
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) async => []);
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
@@ -136,8 +137,9 @@ void main() {
     });
 
     testWidgets('renders group cards with group names', (tester) async {
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => [_alice, _bob, _carol]);
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) async => [_alice, _bob, _carol]);
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
@@ -148,10 +150,12 @@ void main() {
       expect(find.text('Downtown Ballers'), findsOneWidget);
     });
 
-    testWidgets('shows correct member count on each group card',
-        (tester) async {
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => [_alice, _carol, _bob]);
+    testWidgets('shows correct member count on each group card', (
+      tester,
+    ) async {
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) async => [_alice, _carol, _bob]);
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
@@ -161,14 +165,18 @@ void main() {
       expect(find.text('1 person'), findsOneWidget); // Downtown Ballers
     });
 
-    testWidgets('tapping a group card fires InviteGroupPlayers event',
-        (tester) async {
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => [_alice]);
-      when(() => mockRepo.inviteGuestPlayer(
-            gameId: any(named: 'gameId'),
-            inviteeId: any(named: 'inviteeId'),
-          )).thenAnswer((_) async => 'inv-1');
+    testWidgets('tapping a group card fires InviteGroupPlayers event', (
+      tester,
+    ) async {
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) async => [_alice]);
+      when(
+        () => mockRepo.inviteGuestPlayer(
+          gameId: any(named: 'gameId'),
+          inviteeId: any(named: 'inviteeId'),
+        ),
+      ).thenAnswer((_) async => 'inv-1');
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
@@ -177,19 +185,21 @@ void main() {
       await tester.tap(find.text('Beach Crew'));
       await tester.pumpAndSettle();
 
-      verify(() => mockRepo.inviteGuestPlayer(
-            gameId: 'game-1',
-            inviteeId: 'alice',
-          )).called(1);
+      verify(
+        () => mockRepo.inviteGuestPlayer(gameId: 'game-1', inviteeId: 'alice'),
+      ).called(1);
     });
 
     testWidgets('tapping a group invites all its members', (tester) async {
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => [_alice, _carol]); // both in Beach Crew
-      when(() => mockRepo.inviteGuestPlayer(
-            gameId: any(named: 'gameId'),
-            inviteeId: any(named: 'inviteeId'),
-          )).thenAnswer((_) async => 'inv-1');
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) async => [_alice, _carol]); // both in Beach Crew
+      when(
+        () => mockRepo.inviteGuestPlayer(
+          gameId: any(named: 'gameId'),
+          inviteeId: any(named: 'inviteeId'),
+        ),
+      ).thenAnswer((_) async => 'inv-1');
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
@@ -199,23 +209,24 @@ void main() {
       await tester.pumpAndSettle();
 
       // Both Alice and Carol should be invited
-      verify(() => mockRepo.inviteGuestPlayer(
-            gameId: 'game-1',
-            inviteeId: 'alice',
-          )).called(1);
-      verify(() => mockRepo.inviteGuestPlayer(
-            gameId: 'game-1',
-            inviteeId: 'carol',
-          )).called(1);
+      verify(
+        () => mockRepo.inviteGuestPlayer(gameId: 'game-1', inviteeId: 'alice'),
+      ).called(1);
+      verify(
+        () => mockRepo.inviteGuestPlayer(gameId: 'game-1', inviteeId: 'carol'),
+      ).called(1);
     });
 
     testWidgets('shows success snackbar after group invited', (tester) async {
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => [_alice]);
-      when(() => mockRepo.inviteGuestPlayer(
-            gameId: any(named: 'gameId'),
-            inviteeId: any(named: 'inviteeId'),
-          )).thenAnswer((_) async => 'inv-1');
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) async => [_alice]);
+      when(
+        () => mockRepo.inviteGuestPlayer(
+          gameId: any(named: 'gameId'),
+          inviteeId: any(named: 'inviteeId'),
+        ),
+      ).thenAnswer((_) async => 'inv-1');
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
@@ -228,12 +239,15 @@ void main() {
     });
 
     testWidgets('shows Invited badge after group is invited', (tester) async {
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => [_alice]);
-      when(() => mockRepo.inviteGuestPlayer(
-            gameId: any(named: 'gameId'),
-            inviteeId: any(named: 'inviteeId'),
-          )).thenAnswer((_) async => 'inv-1');
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) async => [_alice]);
+      when(
+        () => mockRepo.inviteGuestPlayer(
+          gameId: any(named: 'gameId'),
+          inviteeId: any(named: 'inviteeId'),
+        ),
+      ).thenAnswer((_) async => 'inv-1');
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
@@ -246,8 +260,9 @@ void main() {
     });
 
     testWidgets('shows retry button on load error', (tester) async {
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenThrow(Exception('network error'));
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenThrow(Exception('network error'));
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');
@@ -256,15 +271,19 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
     });
 
-    testWidgets('shows loading spinner on group card while sending',
-        (tester) async {
+    testWidgets('shows loading spinner on group card while sending', (
+      tester,
+    ) async {
       final inviteCompleter = Completer<String>();
-      when(() => mockRepo.getInvitablePlayers(any()))
-          .thenAnswer((_) async => [_alice, _bob]);
-      when(() => mockRepo.inviteGuestPlayer(
-            gameId: any(named: 'gameId'),
-            inviteeId: any(named: 'inviteeId'),
-          )).thenAnswer((_) => inviteCompleter.future);
+      when(
+        () => mockRepo.getInvitablePlayers(any()),
+      ).thenAnswer((_) async => [_alice, _bob]);
+      when(
+        () => mockRepo.inviteGuestPlayer(
+          gameId: any(named: 'gameId'),
+          inviteeId: any(named: 'inviteeId'),
+        ),
+      ).thenAnswer((_) => inviteCompleter.future);
       final bloc = GameGuestInvitationBloc(repository: mockRepo);
 
       await pumpSheet(tester, bloc, 'game-1');

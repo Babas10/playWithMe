@@ -78,10 +78,10 @@ void main() {
     mockInvitationBloc = MockInvitationBloc();
     mockAuthBloc = MockAuthenticationBloc();
 
-    when(() => mockInvitationBloc.state)
-        .thenReturn(const InvitationInitial());
-    when(() => mockAuthBloc.state)
-        .thenReturn(AuthenticationAuthenticated(testUser));
+    when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
+    when(
+      () => mockAuthBloc.state,
+    ).thenReturn(AuthenticationAuthenticated(testUser));
   });
 
   tearDown(() {
@@ -97,7 +97,8 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en')],      home: MultiBlocProvider(
+      supportedLocales: const [Locale('en')],
+      home: MultiBlocProvider(
         providers: [
           BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
@@ -109,8 +110,9 @@ void main() {
 
   group('PendingInvitationsPage Widget Tests', () {
     group('Initial UI Rendering', () {
-      testWidgets('renders app bar with Pending Invitations title',
-          (tester) async {
+      testWidgets('renders app bar with Pending Invitations title', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -125,9 +127,9 @@ void main() {
       });
 
       testWidgets('renders empty state when no invitations', (tester) async {
-        when(() => mockInvitationBloc.state).thenReturn(
-          const InvitationsLoaded(invitations: []),
-        );
+        when(
+          () => mockInvitationBloc.state,
+        ).thenReturn(const InvitationsLoaded(invitations: []));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -137,7 +139,8 @@ void main() {
         expect(find.text('No Pending Invitations'), findsOneWidget);
         expect(
           find.text(
-              "You don't have any pending group invitations at the moment."),
+            "You don't have any pending group invitations at the moment.",
+          ),
           findsOneWidget,
         );
       });
@@ -145,8 +148,9 @@ void main() {
 
     group('Unauthenticated State', () {
       testWidgets('shows login prompt when not authenticated', (tester) async {
-        when(() => mockAuthBloc.state)
-            .thenReturn(const AuthenticationUnauthenticated());
+        when(
+          () => mockAuthBloc.state,
+        ).thenReturn(const AuthenticationUnauthenticated());
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -157,9 +161,12 @@ void main() {
     });
 
     group('Loading State', () {
-      testWidgets('shows loading indicator during initial load', (tester) async {
-        when(() => mockInvitationBloc.state)
-            .thenReturn(const InvitationLoading());
+      testWidgets('shows loading indicator during initial load', (
+        tester,
+      ) async {
+        when(
+          () => mockInvitationBloc.state,
+        ).thenReturn(const InvitationLoading());
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -182,9 +189,9 @@ void main() {
       });
 
       testWidgets('displays single invitation', (tester) async {
-        when(() => mockInvitationBloc.state).thenReturn(
-          InvitationsLoaded(invitations: [testInvitation1]),
-        );
+        when(
+          () => mockInvitationBloc.state,
+        ).thenReturn(InvitationsLoaded(invitations: [testInvitation1]));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -194,11 +201,12 @@ void main() {
     });
 
     group('Accept Invitation', () {
-      testWidgets('dispatches AcceptInvitation event when accept is tapped',
-          (tester) async {
-        when(() => mockInvitationBloc.state).thenReturn(
-          InvitationsLoaded(invitations: [testInvitation1]),
-        );
+      testWidgets('dispatches AcceptInvitation event when accept is tapped', (
+        tester,
+      ) async {
+        when(
+          () => mockInvitationBloc.state,
+        ).thenReturn(InvitationsLoaded(invitations: [testInvitation1]));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -220,8 +228,9 @@ void main() {
         }
       });
 
-      testWidgets('shows success snackbar after accepting invitation',
-          (tester) async {
+      testWidgets('shows success snackbar after accepting invitation', (
+        tester,
+      ) async {
         whenListen(
           mockInvitationBloc,
           Stream.fromIterable([
@@ -241,8 +250,9 @@ void main() {
         expect(find.byType(SnackBar), findsOneWidget);
       });
 
-      testWidgets('snackbar has green background on accept success',
-          (tester) async {
+      testWidgets('snackbar has green background on accept success', (
+        tester,
+      ) async {
         whenListen(
           mockInvitationBloc,
           Stream.fromIterable([
@@ -287,11 +297,12 @@ void main() {
     });
 
     group('Decline Invitation', () {
-      testWidgets('dispatches DeclineInvitation event when decline is tapped',
-          (tester) async {
-        when(() => mockInvitationBloc.state).thenReturn(
-          InvitationsLoaded(invitations: [testInvitation1]),
-        );
+      testWidgets('dispatches DeclineInvitation event when decline is tapped', (
+        tester,
+      ) async {
+        when(
+          () => mockInvitationBloc.state,
+        ).thenReturn(InvitationsLoaded(invitations: [testInvitation1]));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -435,9 +446,9 @@ void main() {
 
     group('Empty State', () {
       testWidgets('displays empty state icon', (tester) async {
-        when(() => mockInvitationBloc.state).thenReturn(
-          const InvitationsLoaded(invitations: []),
-        );
+        when(
+          () => mockInvitationBloc.state,
+        ).thenReturn(const InvitationsLoaded(invitations: []));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -447,9 +458,9 @@ void main() {
       });
 
       testWidgets('displays empty state title', (tester) async {
-        when(() => mockInvitationBloc.state).thenReturn(
-          const InvitationsLoaded(invitations: []),
-        );
+        when(
+          () => mockInvitationBloc.state,
+        ).thenReturn(const InvitationsLoaded(invitations: []));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -458,37 +469,41 @@ void main() {
       });
 
       testWidgets('displays empty state description', (tester) async {
-        when(() => mockInvitationBloc.state).thenReturn(
-          const InvitationsLoaded(invitations: []),
-        );
+        when(
+          () => mockInvitationBloc.state,
+        ).thenReturn(const InvitationsLoaded(invitations: []));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
         expect(
           find.text(
-              "You don't have any pending group invitations at the moment."),
+            "You don't have any pending group invitations at the moment.",
+          ),
           findsOneWidget,
         );
       });
     });
 
     group('Bloc Override', () {
-      testWidgets('uses provided bloc when blocOverride is set', (tester) async {
+      testWidgets('uses provided bloc when blocOverride is set', (
+        tester,
+      ) async {
         final overrideBloc = MockInvitationBloc();
-        when(() => overrideBloc.state).thenReturn(
-          InvitationsLoaded(invitations: [testInvitation1]),
-        );
+        when(
+          () => overrideBloc.state,
+        ).thenReturn(InvitationsLoaded(invitations: [testInvitation1]));
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: MultiBlocProvider(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: MultiBlocProvider(
               providers: [
                 BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
               ],

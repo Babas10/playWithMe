@@ -102,7 +102,8 @@ class ExercisesLocked extends ExerciseState {
   final String message;
 
   const ExercisesLocked({
-    this.message = 'Cannot modify exercises: Training session has already started',
+    this.message =
+        'Cannot modify exercises: Training session has already started',
   });
 
   @override

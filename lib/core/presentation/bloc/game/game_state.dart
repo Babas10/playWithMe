@@ -35,10 +35,7 @@ class GameCreated extends GameState implements SuccessState {
   final String gameId;
   final GameModel game;
 
-  const GameCreated({
-    required this.gameId,
-    required this.game,
-  });
+  const GameCreated({required this.gameId, required this.game});
 
   @override
   List<Object?> get props => [gameId, game];
@@ -48,10 +45,7 @@ class GameUpdated extends GameState implements SuccessState {
   final GameModel game;
   final String message;
 
-  const GameUpdated({
-    required this.game,
-    required this.message,
-  });
+  const GameUpdated({required this.game, required this.message});
 
   @override
   List<Object?> get props => [game, message];

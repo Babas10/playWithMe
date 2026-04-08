@@ -33,14 +33,17 @@ class NotificationPreferencesEntity with _$NotificationPreferencesEntity {
 
   /// Check if notifications are allowed during current time
   bool isInQuietHours(DateTime now) {
-    if (!quietHoursEnabled || quietHoursStart == null || quietHoursEnd == null) {
+    if (!quietHoursEnabled ||
+        quietHoursStart == null ||
+        quietHoursEnd == null) {
       return false;
     }
 
     final currentMinutes = now.hour * 60 + now.minute;
 
     final startParts = quietHoursStart!.split(':');
-    final startMinutes = int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
+    final startMinutes =
+        int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
 
     final endParts = quietHoursEnd!.split(':');
     final endMinutes = int.parse(endParts[0]) * 60 + int.parse(endParts[1]);

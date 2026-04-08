@@ -17,10 +17,10 @@ Future<void> mainCommon() async {
 
     // Route Flutter framework errors (widget build failures, layout errors, etc.)
     // to Crashlytics. Disabled in debug mode so the development console stays clean.
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(!kDebugMode);
-    FlutterError.onError =
-        FirebaseCrashlytics.instance.recordFlutterFatalError;
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      !kDebugMode,
+    );
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
     // Route uncaught async/platform errors (Dart isolate errors, plugin errors)
     // to Crashlytics.
@@ -38,33 +38,34 @@ Future<void> mainCommon() async {
     await sl<DeferredDeepLinkOrchestrator>().checkOnce();
 
     runApp(const PlayWithMeApp());
-
   } catch (e) {
     debugPrint('❌ App initialization failed: $e');
 
     // Run app with error state
-    runApp(MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              const Text(
-                'Failed to initialize app',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Error: $e',
-                style: const TextStyle(color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-            ],
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                const Text(
+                  'Failed to initialize app',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Error: $e',
+                  style: const TextStyle(color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 }

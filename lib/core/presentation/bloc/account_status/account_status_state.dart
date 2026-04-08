@@ -32,10 +32,7 @@ class AccountStatusPending extends AccountStatusState {
   @override
   List<Object?> get props => [daysRemaining, isDismissed];
 
-  AccountStatusPending copyWith({
-    int? daysRemaining,
-    bool? isDismissed,
-  }) {
+  AccountStatusPending copyWith({int? daysRemaining, bool? isDismissed}) {
     return AccountStatusPending(
       daysRemaining: daysRemaining ?? this.daysRemaining,
       isDismissed: isDismissed ?? this.isDismissed,

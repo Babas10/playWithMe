@@ -7,11 +7,7 @@ void main() {
   group('OfflineBanner', () {
     testWidgets('displays offline icon', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: OfflineBanner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: OfflineBanner())),
       );
 
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
@@ -19,11 +15,7 @@ void main() {
 
     testWidgets('displays offline message', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: OfflineBanner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: OfflineBanner())),
       );
 
       expect(
@@ -36,27 +28,16 @@ void main() {
 
     testWidgets('has orange background color', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: OfflineBanner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: OfflineBanner())),
       );
 
       final container = tester.widget<Container>(find.byType(Container));
-      expect(
-        container.color,
-        Colors.orange.shade700,
-      );
+      expect(container.color, Colors.orange.shade700);
     });
 
     testWidgets('has white text color', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: OfflineBanner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: OfflineBanner())),
       );
 
       final text = tester.widget<Text>(
@@ -69,11 +50,7 @@ void main() {
 
     testWidgets('has white icon color', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: OfflineBanner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: OfflineBanner())),
       );
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.cloud_off));
@@ -82,11 +59,7 @@ void main() {
 
     testWidgets('spans full width', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: OfflineBanner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: OfflineBanner())),
       );
 
       final container = tester.widget<Container>(find.byType(Container));
@@ -95,11 +68,7 @@ void main() {
 
     testWidgets('centers content horizontally', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: OfflineBanner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: OfflineBanner())),
       );
 
       final row = tester.widget<Row>(find.byType(Row));
@@ -108,11 +77,7 @@ void main() {
 
     testWidgets('text has ellipsis overflow', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: OfflineBanner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: OfflineBanner())),
       );
 
       final text = tester.widget<Text>(

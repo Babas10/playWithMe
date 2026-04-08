@@ -24,56 +24,79 @@ void main() {
       await FirebaseTestHelper.teardownTestEnvironment();
     });
 
-    test('Firebase configuration is valid for all environments with real configs', () {
-      // Test all environments have valid configurations
-      final environments = [Environment.dev, Environment.prod];
+    test(
+      'Firebase configuration is valid for all environments with real configs',
+      () {
+        // Test all environments have valid configurations
+        final environments = [Environment.dev, Environment.prod];
 
-      for (final env in environments) {
-        // Arrange
-        EnvironmentConfig.setEnvironment(env);
+        for (final env in environments) {
+          // Arrange
+          EnvironmentConfig.setEnvironment(env);
 
-        // Act & Assert
-        final isValid = FirebaseOptionsProvider.validateConfiguration();
+          // Act & Assert
+          final isValid = FirebaseOptionsProvider.validateConfiguration();
 
-        // With real Firebase configs, validation should now pass
-        expect(isValid, isTrue,
-            reason: 'Firebase configuration should be valid for ${env.name} environment');
+          // With real Firebase configs, validation should now pass
+          expect(
+            isValid,
+            isTrue,
+            reason:
+                'Firebase configuration should be valid for ${env.name} environment',
+          );
 
-        // Verify configuration summary is complete
-        final summary = FirebaseOptionsProvider.getConfigurationSummary();
-        expect(summary['environment'], isNotEmpty);
-        expect(summary['projectId'], isNotEmpty);
-        expect(summary['appId'], isNotEmpty);
-        expect(summary['storageBucket'], isNotEmpty);
+          // Verify configuration summary is complete
+          final summary = FirebaseOptionsProvider.getConfigurationSummary();
+          expect(summary['environment'], isNotEmpty);
+          expect(summary['projectId'], isNotEmpty);
+          expect(summary['appId'], isNotEmpty);
+          expect(summary['storageBucket'], isNotEmpty);
 
-        // Real configs should not have placeholder values
-        expect(summary['hasPlaceholders'], equals('false'),
-            reason: 'Real Firebase configs should not contain placeholders');
+          // Real configs should not have placeholder values
+          expect(
+            summary['hasPlaceholders'],
+            equals('false'),
+            reason: 'Real Firebase configs should not contain placeholders',
+          );
 
-        print('✅ Configuration valid for ${env.name}: ${summary['projectId']}');
-      }
-    });
+          print(
+            '✅ Configuration valid for ${env.name}: ${summary['projectId']}',
+          );
+        }
+      },
+    );
 
     test('Firebase initialization handles test environment gracefully', () async {
       // Arrange
       EnvironmentConfig.setEnvironment(Environment.dev);
 
       // Act
-      final initializationSuccessful = await FirebaseTestHelper.safeInitializeFirebase();
+      final initializationSuccessful =
+          await FirebaseTestHelper.safeInitializeFirebase();
 
       // Assert
       // In test mode, initialization should be skipped gracefully
-      expect(initializationSuccessful, isTrue,
-          reason: 'Firebase initialization should handle test environment gracefully');
+      expect(
+        initializationSuccessful,
+        isTrue,
+        reason:
+            'Firebase initialization should handle test environment gracefully',
+      );
 
       // Verify test mode is active
-      expect(FirebaseTestHelper.isTestMode, isTrue,
-          reason: 'Test mode should be enabled in test environment');
+      expect(
+        FirebaseTestHelper.isTestMode,
+        isTrue,
+        reason: 'Test mode should be enabled in test environment',
+      );
 
       // Test configuration access without platform channels
       final configValid = FirebaseTestHelper.testFirebaseConfigValidity();
-      expect(configValid, isTrue,
-          reason: 'Configuration should be accessible without platform channels');
+      expect(
+        configValid,
+        isTrue,
+        reason: 'Configuration should be accessible without platform channels',
+      );
 
       print('✅ Firebase test environment handling works correctly');
     });
@@ -81,8 +104,16 @@ void main() {
     test('Environment switching works correctly with real configs', () {
       // Test switching between environments with real configurations
       final testCases = [
-        (Environment.dev, CITestHelper.getExpectedProjectId(Environment.dev), 'Development'),
-        (Environment.prod, CITestHelper.getExpectedProjectId(Environment.prod), 'Production'),
+        (
+          Environment.dev,
+          CITestHelper.getExpectedProjectId(Environment.dev),
+          'Development',
+        ),
+        (
+          Environment.prod,
+          CITestHelper.getExpectedProjectId(Environment.prod),
+          'Production',
+        ),
       ];
 
       for (final (env, expectedProjectId, expectedName) in testCases) {
@@ -94,15 +125,28 @@ void main() {
         final connectionInfo = FirebaseTestHelper.getMockConnectionInfo();
 
         // Assert - verify project ID matches expected for current environment
-        expect(options.projectId, equals(expectedProjectId),
-            reason: 'Firebase options project ID should match expected for ${env.name}');
+        expect(
+          options.projectId,
+          equals(expectedProjectId),
+          reason:
+              'Firebase options project ID should match expected for ${env.name}',
+        );
         expect(connectionInfo['environment'], equals(expectedName));
-        expect(connectionInfo['projectId'], equals(expectedProjectId),
-            reason: 'Connection info project ID should match expected for ${env.name}');
-        expect(connectionInfo['testMode'], isTrue,
-            reason: 'Should be in test mode during integration tests');
+        expect(
+          connectionInfo['projectId'],
+          equals(expectedProjectId),
+          reason:
+              'Connection info project ID should match expected for ${env.name}',
+        );
+        expect(
+          connectionInfo['testMode'],
+          isTrue,
+          reason: 'Should be in test mode during integration tests',
+        );
 
-        print('✅ Environment ${env.name} configured correctly: $expectedProjectId');
+        print(
+          '✅ Environment ${env.name} configured correctly: $expectedProjectId',
+        );
       }
     });
 
@@ -114,12 +158,21 @@ void main() {
       final connectionInfo = FirebaseTestHelper.getMockConnectionInfo();
 
       // Assert
-      expect(connectionInfo['isInitialized'], isFalse,
-          reason: 'Firebase should not be initialized in test mode');
-      expect(connectionInfo['testMode'], isTrue,
-          reason: 'Test mode should be active');
+      expect(
+        connectionInfo['isInitialized'],
+        isFalse,
+        reason: 'Firebase should not be initialized in test mode',
+      );
+      expect(
+        connectionInfo['testMode'],
+        isTrue,
+        reason: 'Test mode should be active',
+      );
       expect(connectionInfo['environment'], equals('Development'));
-      expect(connectionInfo['projectId'], equals(CITestHelper.getExpectedProjectId(Environment.dev)));
+      expect(
+        connectionInfo['projectId'],
+        equals(CITestHelper.getExpectedProjectId(Environment.dev)),
+      );
 
       print('✅ Mock Firebase behavior works correctly in test environment');
     });
@@ -139,18 +192,32 @@ void main() {
         final options = FirebaseOptionsProvider.getFirebaseOptions();
 
         // Assert
-        expect(options.projectId, equals(expectedProjects[env]),
-            reason: 'Project ID should match expected value for ${env.name}');
+        expect(
+          options.projectId,
+          equals(expectedProjects[env]),
+          reason: 'Project ID should match expected value for ${env.name}',
+        );
 
         // Verify other required fields are present and not empty
-        expect(options.apiKey, isNotEmpty,
-            reason: 'API key should not be empty for ${env.name}');
-        expect(options.appId, isNotEmpty,
-            reason: 'App ID should not be empty for ${env.name}');
-        expect(options.messagingSenderId, isNotEmpty,
-            reason: 'Messaging sender ID should not be empty for ${env.name}');
+        expect(
+          options.apiKey,
+          isNotEmpty,
+          reason: 'API key should not be empty for ${env.name}',
+        );
+        expect(
+          options.appId,
+          isNotEmpty,
+          reason: 'App ID should not be empty for ${env.name}',
+        );
+        expect(
+          options.messagingSenderId,
+          isNotEmpty,
+          reason: 'Messaging sender ID should not be empty for ${env.name}',
+        );
 
-        print('✅ Real Firebase config verified for ${env.name}: ${options.projectId}');
+        print(
+          '✅ Real Firebase config verified for ${env.name}: ${options.projectId}',
+        );
       }
     });
 
@@ -175,15 +242,23 @@ void main() {
       }
 
       // Verify all configurations are unique
-      final projectIds = [
-        testData['dev_project'],
-        testData['prod_project'],
-      ];
+      final projectIds = [testData['dev_project'], testData['prod_project']];
 
-      expect(projectIds.toSet().length, equals(2),
-          reason: 'All environments should have unique project IDs');
-      expect(projectIds.contains(CITestHelper.getExpectedProjectId(Environment.dev)), isTrue);
-      expect(projectIds.contains(CITestHelper.getExpectedProjectId(Environment.prod)), isTrue);
+      expect(
+        projectIds.toSet().length,
+        equals(2),
+        reason: 'All environments should have unique project IDs',
+      );
+      expect(
+        projectIds.contains(CITestHelper.getExpectedProjectId(Environment.dev)),
+        isTrue,
+      );
+      expect(
+        projectIds.contains(
+          CITestHelper.getExpectedProjectId(Environment.prod),
+        ),
+        isTrue,
+      );
     });
 
     test('Firebase configuration accessibility in all environments', () {
@@ -194,12 +269,18 @@ void main() {
 
         // Test configuration accessibility without platform channels
         final configValid = FirebaseTestHelper.testFirebaseConfigValidity();
-        expect(configValid, isTrue,
-            reason: 'Configuration should be accessible in ${env.name}');
+        expect(
+          configValid,
+          isTrue,
+          reason: 'Configuration should be accessible in ${env.name}',
+        );
 
         final connectionInfo = FirebaseTestHelper.getMockConnectionInfo();
-        expect(connectionInfo['projectId'], isNotEmpty,
-            reason: 'Project ID should not be empty in ${env.name}');
+        expect(
+          connectionInfo['projectId'],
+          isNotEmpty,
+          reason: 'Project ID should not be empty in ${env.name}',
+        );
 
         print('✅ Configuration accessible in ${env.name} environment');
       }
@@ -219,7 +300,9 @@ void main() {
         // Verify connection info shows correct project ID
         expect(connectionInfo['projectId'], equals(expectedProjectId));
 
-        print('✅ Environment ${env.name} correctly shows project: $expectedProjectId');
+        print(
+          '✅ Environment ${env.name} correctly shows project: $expectedProjectId',
+        );
       }
     });
 

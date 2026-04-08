@@ -17,30 +17,21 @@ void main() {
         final startDate = TimePeriod.thirtyDays.getStartDate();
         final expectedDate = testNow.subtract(const Duration(days: 30));
 
-        expect(
-          startDate.difference(expectedDate).abs().inSeconds,
-          lessThan(2),
-        );
+        expect(startDate.difference(expectedDate).abs().inSeconds, lessThan(2));
       });
 
       test('ninetyDays returns date 90 days ago', () {
         final startDate = TimePeriod.ninetyDays.getStartDate();
         final expectedDate = testNow.subtract(const Duration(days: 90));
 
-        expect(
-          startDate.difference(expectedDate).abs().inSeconds,
-          lessThan(2),
-        );
+        expect(startDate.difference(expectedDate).abs().inSeconds, lessThan(2));
       });
 
       test('oneYear returns date 365 days ago', () {
         final startDate = TimePeriod.oneYear.getStartDate();
         final expectedDate = testNow.subtract(const Duration(days: 365));
 
-        expect(
-          startDate.difference(expectedDate).abs().inSeconds,
-          lessThan(2),
-        );
+        expect(startDate.difference(expectedDate).abs().inSeconds, lessThan(2));
       });
 
       test('allTime returns app launch date (January 1, 2020)', () {
@@ -91,7 +82,9 @@ void main() {
       });
 
       test('all display names are unique', () {
-        final displayNames = TimePeriod.values.map((p) => p.displayName).toSet();
+        final displayNames = TimePeriod.values
+            .map((p) => p.displayName)
+            .toSet();
         expect(
           displayNames.length,
           equals(TimePeriod.values.length),
@@ -120,10 +113,7 @@ void main() {
         final secondCall = period.getStartDate();
 
         // Should be very close (within 1 second)
-        expect(
-          firstCall.difference(secondCall).abs().inSeconds,
-          lessThan(2),
-        );
+        expect(firstCall.difference(secondCall).abs().inSeconds, lessThan(2));
       });
 
       test('periods are ordered from shortest to longest', () {

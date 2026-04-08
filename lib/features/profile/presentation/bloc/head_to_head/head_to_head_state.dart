@@ -9,11 +9,9 @@ class HeadToHeadState with _$HeadToHeadState {
 
   const factory HeadToHeadState.loading() = HeadToHeadLoading;
 
-  const factory HeadToHeadState.loaded({
-    required HeadToHeadStats stats,
-  }) = HeadToHeadLoaded;
+  const factory HeadToHeadState.loaded({required HeadToHeadStats stats}) =
+      HeadToHeadLoaded;
 
-  const factory HeadToHeadState.error({
-    required String message,
-  }) = HeadToHeadError;
+  const factory HeadToHeadState.error({required String message}) =
+      HeadToHeadError;
 }

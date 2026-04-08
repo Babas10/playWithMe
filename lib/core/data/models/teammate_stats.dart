@@ -43,11 +43,11 @@ class TeammateStats with _$TeammateStats {
       _$TeammateStatsFromJson(json);
 
   /// Factory constructor for creating from Firestore map
-  factory TeammateStats.fromFirestore(String userId, Map<String, dynamic> data) {
-    return TeammateStats.fromJson({
-      'userId': userId,
-      ...data,
-    });
+  factory TeammateStats.fromFirestore(
+    String userId,
+    Map<String, dynamic> data,
+  ) {
+    return TeammateStats.fromJson({'userId': userId, ...data});
   }
 
   /// Convert to Firestore-compatible map
@@ -61,13 +61,16 @@ class TeammateStats with _$TeammateStats {
   double get winRate => gamesPlayed > 0 ? (gamesWon / gamesPlayed) * 100 : 0.0;
 
   /// Calculate loss rate as a percentage (0-100)
-  double get lossRate => gamesPlayed > 0 ? (gamesLost / gamesPlayed) * 100 : 0.0;
+  double get lossRate =>
+      gamesPlayed > 0 ? (gamesLost / gamesPlayed) * 100 : 0.0;
 
   /// Calculate average points scored per game
-  double get avgPointsScored => gamesPlayed > 0 ? pointsScored / gamesPlayed : 0.0;
+  double get avgPointsScored =>
+      gamesPlayed > 0 ? pointsScored / gamesPlayed : 0.0;
 
   /// Calculate average points allowed per game
-  double get avgPointsAllowed => gamesPlayed > 0 ? pointsAllowed / gamesPlayed : 0.0;
+  double get avgPointsAllowed =>
+      gamesPlayed > 0 ? pointsAllowed / gamesPlayed : 0.0;
 
   /// Calculate average point differential per game
   double get avgPointDifferential => avgPointsScored - avgPointsAllowed;
@@ -164,8 +167,5 @@ class RecentGameResult with _$RecentGameResult {
 
   /// Result with color (green for wins, red for losses)
   /// Returns a tuple-like map for UI rendering
-  Map<String, dynamic> get resultDisplay => {
-        'text': resultLetter,
-        'won': won,
-      };
+  Map<String, dynamic> get resultDisplay => {'text': resultLetter, 'won': won};
 }

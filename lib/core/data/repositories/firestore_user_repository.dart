@@ -31,8 +31,9 @@ class FirestoreUserRepository implements UserRepository {
     FirebaseAuth? auth,
     FirebaseFunctions? functions,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance,
-        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
+       _auth = auth ?? FirebaseAuth.instance,
+       _functions =
+           functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
 
   @override
   Stream<UserModel?> get currentUser {
@@ -106,51 +107,54 @@ class FirestoreUserRepository implements UserRepository {
   Future<List<UserModel>> getUsersByIds(List<String> uids) {
     if (uids.isEmpty) return Future.value([]);
     return PerformanceTracer.trace('repo_get_users_by_ids', () async {
-    try {
-      final now = DateTime.now();
+      try {
+        final now = DateTime.now();
 
-      // Separate cache hits from misses
-      final missing = uids.where((id) {
-        final cached = _userCache[id];
-        return cached == null || now.difference(cached.fetchedAt) > _userCacheTtl;
-      }).toList();
+        // Separate cache hits from misses
+        final missing = uids.where((id) {
+          final cached = _userCache[id];
+          return cached == null ||
+              now.difference(cached.fetchedAt) > _userCacheTtl;
+        }).toList();
 
-      if (missing.isNotEmpty) {
-        // Use Cloud Function for secure cross-user query
-        final callable = _functions.httpsCallable('getUsersByIds');
-        final result = await callable.call({'userIds': missing});
+        if (missing.isNotEmpty) {
+          // Use Cloud Function for secure cross-user query
+          final callable = _functions.httpsCallable('getUsersByIds');
+          final result = await callable.call({'userIds': missing});
 
-        // Convert result.data to Map<String, dynamic> safely
-        final data = Map<String, dynamic>.from(result.data as Map);
-        final usersData = List<Map<String, dynamic>>.from(
-          (data['users'] as List).map((u) => Map<String, dynamic>.from(u as Map))
-        );
-
-        for (final userData in usersData) {
-          final user = UserModel(
-            uid: userData['uid'] as String,
-            email: userData['email'] as String,
-            displayName: userData['displayName'] as String?,
-            photoUrl: userData['photoUrl'] as String?,
-            firstName: userData['firstName'] as String?,
-            lastName: userData['lastName'] as String?,
-            isEmailVerified: false, // Not returned by Cloud Function
-            isAnonymous: false, // Not returned by Cloud Function
+          // Convert result.data to Map<String, dynamic> safely
+          final data = Map<String, dynamic>.from(result.data as Map);
+          final usersData = List<Map<String, dynamic>>.from(
+            (data['users'] as List).map(
+              (u) => Map<String, dynamic>.from(u as Map),
+            ),
           );
-          _userCache[user.uid] = (user: user, fetchedAt: now);
-        }
-      }
 
-      // Return all requested uids from cache (preserves original order)
-      return uids
-          .where((id) => _userCache.containsKey(id))
-          .map((id) => _userCache[id]!.user)
-          .toList();
-    } on FirebaseFunctionsException catch (e) {
-      throw UserException('Failed to get users: ${e.message ?? e.code}');
-    } catch (e) {
-      throw UserException('Failed to get users: $e');
-    }
+          for (final userData in usersData) {
+            final user = UserModel(
+              uid: userData['uid'] as String,
+              email: userData['email'] as String,
+              displayName: userData['displayName'] as String?,
+              photoUrl: userData['photoUrl'] as String?,
+              firstName: userData['firstName'] as String?,
+              lastName: userData['lastName'] as String?,
+              isEmailVerified: false, // Not returned by Cloud Function
+              isAnonymous: false, // Not returned by Cloud Function
+            );
+            _userCache[user.uid] = (user: user, fetchedAt: now);
+          }
+        }
+
+        // Return all requested uids from cache (preserves original order)
+        return uids
+            .where((id) => _userCache.containsKey(id))
+            .map((id) => _userCache[id]!.user)
+            .toList();
+      } on FirebaseFunctionsException catch (e) {
+        throw UserException('Failed to get users: ${e.message ?? e.code}');
+      } catch (e) {
+        throw UserException('Failed to get users: $e');
+      }
     });
   }
 
@@ -177,7 +181,8 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> updateUserProfile(String uid, {
+  Future<void> updateUserProfile(
+    String uid, {
     String? displayName,
     String? photoUrl,
     String? firstName,
@@ -220,7 +225,8 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> updateUserPreferences(String uid, {
+  Future<void> updateUserPreferences(
+    String uid, {
     bool? notificationsEnabled,
     bool? emailNotifications,
     bool? pushNotifications,
@@ -244,7 +250,8 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> updateUserPrivacy(String uid, {
+  Future<void> updateUserPrivacy(
+    String uid, {
     UserPrivacyLevel? privacyLevel,
     bool? showEmail,
     bool? showPhoneNumber,
@@ -298,7 +305,9 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> addGameParticipation(String uid, String gameId, {
+  Future<void> addGameParticipation(
+    String uid,
+    String gameId, {
     bool won = false,
     int score = 0,
   }) async {
@@ -326,9 +335,7 @@ class FirestoreUserRepository implements UserRepository {
       // - Case-insensitive search by email and displayName
       // - Filtering out self, friends, and pending requests
       final callable = _functions.httpsCallable('searchUsers');
-      final result = await callable.call({
-        'query': query,
-      });
+      final result = await callable.call({'query': query});
 
       // Convert result.data to Map<String, dynamic> safely
       final data = Map<String, dynamic>.from(result.data as Map);
@@ -399,9 +406,7 @@ class FirestoreUserRepository implements UserRepository {
       // Step 2: Use Cloud Function to get user data securely
       // This follows the Cross-User Query Pattern from CLAUDE.md
       final callable = _functions.httpsCallable('getUsersByIds');
-      final result = await callable.call({
-        'userIds': memberIds,
-      });
+      final result = await callable.call({'userIds': memberIds});
 
       // Convert result.data to Map<String, dynamic> safely
       final data = Map<String, dynamic>.from(result.data as Map);
@@ -435,10 +440,7 @@ class FirestoreUserRepository implements UserRepository {
             code: 'permission-denied',
           );
         case 'invalid-argument':
-          throw UserException(
-            'Invalid group data',
-            code: 'invalid-argument',
-          );
+          throw UserException('Invalid group data', code: 'invalid-argument');
         default:
           throw UserException('Failed to get users in group: ${e.message}');
       }
@@ -478,10 +480,12 @@ class FirestoreUserRepository implements UserRepository {
         .orderBy('timestamp', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .where((doc) => doc.exists)
-            .map((doc) => RatingHistoryEntry.fromFirestore(doc))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => RatingHistoryEntry.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   @override
@@ -495,13 +499,18 @@ class FirestoreUserRepository implements UserRepository {
         .collection(_collection)
         .doc(userId)
         .collection('ratingHistory')
-        .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .where(
+          'timestamp',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+        )
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .where((doc) => doc.exists)
-            .map((doc) => RatingHistoryEntry.fromFirestore(doc))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => RatingHistoryEntry.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   @override
@@ -516,7 +525,10 @@ class FirestoreUserRepository implements UserRepository {
           .collection(_collection)
           .doc(userId)
           .collection('ratingHistory')
-          .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+          .where(
+            'timestamp',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+          )
           .orderBy('newRating', descending: true)
           .limit(1)
           .get();
@@ -540,7 +552,10 @@ class FirestoreUserRepository implements UserRepository {
     String teammateId,
   ) async {
     try {
-      final userDoc = await _firestore.collection(_collection).doc(userId).get();
+      final userDoc = await _firestore
+          .collection(_collection)
+          .doc(userId)
+          .get();
       if (!userDoc.exists) return null;
 
       final userData = userDoc.data();
@@ -548,12 +563,12 @@ class FirestoreUserRepository implements UserRepository {
 
       final teammateStatsMap =
           userData['teammateStats'] as Map<String, dynamic>?;
-      if (teammateStatsMap == null || !teammateStatsMap.containsKey(teammateId)) {
+      if (teammateStatsMap == null ||
+          !teammateStatsMap.containsKey(teammateId)) {
         return null;
       }
 
-      final statsData =
-          teammateStatsMap[teammateId] as Map<String, dynamic>;
+      final statsData = teammateStatsMap[teammateId] as Map<String, dynamic>;
       return TeammateStats.fromFirestore(teammateId, statsData);
     } catch (e) {
       throw UserException('Failed to get teammate stats: $e');
@@ -562,11 +577,9 @@ class FirestoreUserRepository implements UserRepository {
 
   @override
   Stream<List<TeammateStats>> getAllTeammateStats(String userId) {
-    return _firestore
-        .collection(_collection)
-        .doc(userId)
-        .snapshots()
-        .map((doc) {
+    return _firestore.collection(_collection).doc(userId).snapshots().map((
+      doc,
+    ) {
       if (!doc.exists) return <TeammateStats>[];
 
       final userData = doc.data();
@@ -605,43 +618,49 @@ class FirestoreUserRepository implements UserRepository {
     String opponentId,
   ) {
     return PerformanceTracer.trace('repo_get_head_to_head_stats', () async {
-    try {
-      // Call Cloud Function to get head-to-head stats
-      // Security: Function validates that the caller is requesting their own stats
-      final callable = _functions.httpsCallable('getHeadToHeadStats');
-      final result = await callable.call({
-        'opponentId': opponentId,
-      });
+      try {
+        // Call Cloud Function to get head-to-head stats
+        // Security: Function validates that the caller is requesting their own stats
+        final callable = _functions.httpsCallable('getHeadToHeadStats');
+        final result = await callable.call({'opponentId': opponentId});
 
-      if (result.data == null) return null;
+        if (result.data == null) return null;
 
-      // Convert Cloud Function result to HeadToHeadStats model
-      // Cloud Function returns JSON-serializable data with ISO string timestamps
-      final data = Map<String, dynamic>.from(result.data as Map);
+        // Convert Cloud Function result to HeadToHeadStats model
+        // Cloud Function returns JSON-serializable data with ISO string timestamps
+        final data = Map<String, dynamic>.from(result.data as Map);
 
-      // Convert nested recentMatchups list
-      if (data['recentMatchups'] != null) {
-        data['recentMatchups'] = (data['recentMatchups'] as List)
-            .map((matchup) => Map<String, dynamic>.from(matchup as Map))
-            .toList();
+        // Convert nested recentMatchups list
+        if (data['recentMatchups'] != null) {
+          data['recentMatchups'] = (data['recentMatchups'] as List)
+              .map((matchup) => Map<String, dynamic>.from(matchup as Map))
+              .toList();
+        }
+
+        return HeadToHeadStats.fromJson(data);
+      } on FirebaseFunctionsException catch (e) {
+        // Handle specific Cloud Function errors
+        switch (e.code) {
+          case 'unauthenticated':
+            throw UserException(
+              'You must be logged in to view head-to-head statistics',
+              code: 'unauthenticated',
+            );
+          case 'permission-denied':
+            throw UserException(
+              'You don\'t have permission to view these statistics',
+              code: 'permission-denied',
+            );
+          case 'not-found':
+            return null;
+          default:
+            throw UserException(
+              'Failed to get head-to-head stats: ${e.message}',
+            );
+        }
+      } catch (e) {
+        throw UserException('Failed to get head-to-head stats: $e');
       }
-
-      return HeadToHeadStats.fromJson(data);
-    } on FirebaseFunctionsException catch (e) {
-      // Handle specific Cloud Function errors
-      switch (e.code) {
-        case 'unauthenticated':
-          throw UserException('You must be logged in to view head-to-head statistics', code: 'unauthenticated');
-        case 'permission-denied':
-          throw UserException('You don\'t have permission to view these statistics', code: 'permission-denied');
-        case 'not-found':
-          return null;
-        default:
-          throw UserException('Failed to get head-to-head stats: ${e.message}');
-      }
-    } catch (e) {
-      throw UserException('Failed to get head-to-head stats: $e');
-    }
     });
   }
 
@@ -653,34 +672,42 @@ class FirestoreUserRepository implements UserRepository {
         .collection('headToHead')
         .orderBy('gamesPlayed', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .where((doc) => doc.exists)
-            .map((doc) => HeadToHeadStats.fromFirestore(doc))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => HeadToHeadStats.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   @override
   Future<UserRanking> getUserRanking(String userId) {
     return PerformanceTracer.trace('repo_calculate_user_ranking', () async {
-    try {
-      final callable = _functions.httpsCallable('calculateUserRanking');
-      final result = await callable.call<Map<String, dynamic>>();
+      try {
+        final callable = _functions.httpsCallable('calculateUserRanking');
+        final result = await callable.call<Map<String, dynamic>>();
 
-      return UserRanking.fromJson(result.data);
-    } on FirebaseFunctionsException catch (e) {
-      switch (e.code) {
-        case 'unauthenticated':
-          throw UserException('You must be logged in to view rankings', code: 'unauthenticated');
-        case 'not-found':
-          throw UserException('User not found', code: 'not-found');
-        case 'internal':
-          throw UserException('Failed to calculate ranking. Please try again.', code: 'internal');
-        default:
-          throw UserException('Failed to get ranking: ${e.message}');
+        return UserRanking.fromJson(result.data);
+      } on FirebaseFunctionsException catch (e) {
+        switch (e.code) {
+          case 'unauthenticated':
+            throw UserException(
+              'You must be logged in to view rankings',
+              code: 'unauthenticated',
+            );
+          case 'not-found':
+            throw UserException('User not found', code: 'not-found');
+          case 'internal':
+            throw UserException(
+              'Failed to calculate ranking. Please try again.',
+              code: 'internal',
+            );
+          default:
+            throw UserException('Failed to get ranking: ${e.message}');
+        }
+      } catch (e) {
+        throw UserException('Failed to get ranking: $e');
       }
-    } catch (e) {
-      throw UserException('Failed to get ranking: $e');
-    }
     });
   }
 }

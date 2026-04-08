@@ -36,14 +36,16 @@ void main() {
       expect(result, AccountStatus.pendingVerification);
     });
 
-    test('returns pendingVerification when createdAt is null and unverified',
-        () {
-      final result = computeAccountStatus(
-        isEmailVerified: false,
-        accountCreatedAt: null,
-      );
-      expect(result, AccountStatus.pendingVerification);
-    });
+    test(
+      'returns pendingVerification when createdAt is null and unverified',
+      () {
+        final result = computeAccountStatus(
+          isEmailVerified: false,
+          accountCreatedAt: null,
+        );
+        expect(result, AccountStatus.pendingVerification);
+      },
+    );
 
     test('returns pendingVerification for account created today', () {
       final result = computeAccountStatus(
@@ -128,12 +130,15 @@ void main() {
 
   group('AccountStatus enum', () {
     test('has all expected values', () {
-      expect(AccountStatus.values, containsAll([
-        AccountStatus.active,
-        AccountStatus.pendingVerification,
-        AccountStatus.restricted,
-        AccountStatus.scheduledForDeletion,
-      ]));
+      expect(
+        AccountStatus.values,
+        containsAll([
+          AccountStatus.active,
+          AccountStatus.pendingVerification,
+          AccountStatus.restricted,
+          AccountStatus.scheduledForDeletion,
+        ]),
+      );
     });
 
     test('has exactly 4 values', () {

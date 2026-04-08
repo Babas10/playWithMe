@@ -47,9 +47,7 @@ class RankingStatsCards extends StatelessWidget {
             const SizedBox(width: 6),
             Expanded(child: _PercentileCard(ranking: ranking!)),
             const SizedBox(width: 6),
-            Expanded(
-              child: _FriendsRankCard(ranking: ranking!),
-            ),
+            Expanded(child: _FriendsRankCard(ranking: ranking!)),
             const SizedBox(width: 6),
             Expanded(child: _StreakCard(currentStreak: currentStreak)),
           ],
@@ -116,7 +114,9 @@ class _PercentileCard extends StatelessWidget {
       customIcon: const SizedBox(
         width: 18,
         height: 18,
-        child: CustomPaint(painter: _GaussianCurvePainter(color: AppColors.secondary)),
+        child: CustomPaint(
+          painter: _GaussianCurvePainter(color: AppColors.secondary),
+        ),
       ),
       label: AppLocalizations.of(context)!.percentile,
       value: ranking.percentileDisplay,

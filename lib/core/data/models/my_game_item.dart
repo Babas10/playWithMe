@@ -56,34 +56,36 @@ class MyGameItem {
       (status == GameStatus.scheduled && !scheduledAt.isAfter(DateTime.now()));
 
   factory MyGameItem.fromGame(GameModel game) => MyGameItem(
-        gameId: game.id,
-        source: MyGameItemSource.joined,
-        title: game.title,
-        scheduledAt: game.scheduledAt,
-        locationName: game.location.name,
-        groupName: '',
-        status: game.status,
-      );
+    gameId: game.id,
+    source: MyGameItemSource.joined,
+    title: game.title,
+    scheduledAt: game.scheduledAt,
+    locationName: game.location.name,
+    groupName: '',
+    status: game.status,
+  );
 
-  factory MyGameItem.fromGroupGame(GameModel game, {required String groupName}) =>
-      MyGameItem(
-        gameId: game.id,
-        source: MyGameItemSource.groupGame,
-        title: game.title,
-        scheduledAt: game.scheduledAt,
-        locationName: game.location.name,
-        groupName: groupName,
-        status: game.status,
-      );
+  factory MyGameItem.fromGroupGame(
+    GameModel game, {
+    required String groupName,
+  }) => MyGameItem(
+    gameId: game.id,
+    source: MyGameItemSource.groupGame,
+    title: game.title,
+    scheduledAt: game.scheduledAt,
+    locationName: game.location.name,
+    groupName: groupName,
+    status: game.status,
+  );
 
   factory MyGameItem.fromInvitation(GameInvitationDetails inv) => MyGameItem(
-        gameId: inv.gameId,
-        source: MyGameItemSource.invitation,
-        invitationId: inv.invitationId,
-        title: inv.gameTitle,
-        scheduledAt: inv.gameScheduledAt,
-        locationName: inv.gameLocationName,
-        groupName: inv.groupName,
-        status: GameStatus.scheduled,
-      );
+    gameId: inv.gameId,
+    source: MyGameItemSource.invitation,
+    invitationId: inv.invitationId,
+    title: inv.gameTitle,
+    scheduledAt: inv.gameScheduledAt,
+    locationName: inv.gameLocationName,
+    groupName: inv.groupName,
+    status: GameStatus.scheduled,
+  );
 }

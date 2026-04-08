@@ -10,8 +10,7 @@ import 'package:play_with_me/features/games/presentation/bloc/game_history/game_
 import 'package:play_with_me/features/games/presentation/bloc/game_history/game_history_state.dart';
 import 'package:play_with_me/features/games/presentation/widgets/game_history_card.dart';
 
-class MockGameHistoryBloc
-    extends MockBloc<GameHistoryEvent, GameHistoryState>
+class MockGameHistoryBloc extends MockBloc<GameHistoryEvent, GameHistoryState>
     implements GameHistoryBloc {}
 
 class FakeGameHistoryEvent extends Fake implements GameHistoryEvent {}
@@ -42,7 +41,10 @@ void main() {
     createdAt: DateTime(2025, 1, 12, 11, 0),
     scheduledAt: DateTime(2025, 1, 14, 18, 0),
     endedAt: DateTime(2025, 1, 14, 20, 0),
-    location: const GameLocation(name: 'Sports Center', address: '456 Sports Ave'),
+    location: const GameLocation(
+      name: 'Sports Center',
+      address: '456 Sports Ave',
+    ),
     status: GameStatus.completed,
     playerIds: ['user-1', 'user-3', 'user-5', 'user-6'],
   );
@@ -67,8 +69,9 @@ void main() {
 
   setUp(() {
     mockGameHistoryBloc = MockGameHistoryBloc();
-    when(() => mockGameHistoryBloc.state)
-        .thenReturn(const GameHistoryState.initial());
+    when(
+      () => mockGameHistoryBloc.state,
+    ).thenReturn(const GameHistoryState.initial());
   });
 
   tearDown(() {
@@ -77,12 +80,9 @@ void main() {
 
   Widget buildContentWidget(GameHistoryState state) {
     return state.when(
-      initial: () => const Center(
-        child: Text('Select filters to view game history'),
-      ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      initial: () =>
+          const Center(child: Text('Select filters to view game history')),
+      loading: () => const Center(child: CircularProgressIndicator()),
       loaded: (games, hasMore, filter, startDate, endDate, isLoadingMore) {
         if (games.isEmpty) {
           return Center(
@@ -110,10 +110,7 @@ void main() {
               );
             }
             final game = games[index];
-            return GameHistoryCard(
-              game: game,
-              onTap: () {},
-            );
+            return GameHistoryCard(game: game, onTap: () {});
           },
         );
       },
@@ -125,10 +122,7 @@ void main() {
             const SizedBox(height: 16),
             Text(message),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Retry'),
-            ),
+            ElevatedButton(onPressed: () {}, child: const Text('Retry')),
           ],
         ),
       ),
@@ -136,11 +130,7 @@ void main() {
   }
 
   Widget createTestWidget(GameHistoryState state) {
-    return MaterialApp(
-      home: Scaffold(
-        body: buildContentWidget(state),
-      ),
-    );
+    return MaterialApp(home: Scaffold(body: buildContentWidget(state)));
   }
 
   group('GameHistoryScreen Widget Tests', () {
@@ -150,12 +140,17 @@ void main() {
           createTestWidget(const GameHistoryState.initial()),
         );
 
-        expect(find.text('Select filters to view game history'), findsOneWidget);
+        expect(
+          find.text('Select filters to view game history'),
+          findsOneWidget,
+        );
       });
     });
 
     group('Loading State', () {
-      testWidgets('shows loading indicator during initial load', (tester) async {
+      testWidgets('shows loading indicator during initial load', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           createTestWidget(const GameHistoryState.loading()),
         );
@@ -193,8 +188,9 @@ void main() {
         expect(find.text('No completed games yet'), findsOneWidget);
       });
 
-      testWidgets('displays empty state description when no games',
-          (tester) async {
+      testWidgets('displays empty state description when no games', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           createTestWidget(
             const GameHistoryState.loaded(
@@ -242,8 +238,9 @@ void main() {
         expect(find.byType(GameHistoryCard), findsOneWidget);
       });
 
-      testWidgets('shows pagination loading indicator when hasMore is true',
-          (tester) async {
+      testWidgets('shows pagination loading indicator when hasMore is true', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           createTestWidget(
             GameHistoryState.loaded(
@@ -263,8 +260,9 @@ void main() {
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
 
-      testWidgets('does not show pagination indicator when hasMore is false',
-          (tester) async {
+      testWidgets('does not show pagination indicator when hasMore is false', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           createTestWidget(
             GameHistoryState.loaded(
@@ -308,9 +306,7 @@ void main() {
       testWidgets('displays retry button on error', (tester) async {
         await tester.pumpWidget(
           createTestWidget(
-            const GameHistoryState.error(
-              message: 'Network error',
-            ),
+            const GameHistoryState.error(message: 'Network error'),
           ),
         );
 
@@ -321,9 +317,7 @@ void main() {
       testWidgets('displays different error messages', (tester) async {
         await tester.pumpWidget(
           createTestWidget(
-            const GameHistoryState.error(
-              message: 'Connection timeout',
-            ),
+            const GameHistoryState.error(message: 'Connection timeout'),
           ),
         );
 
@@ -465,8 +459,9 @@ void main() {
         expect(find.text('Retry'), findsOneWidget);
       });
 
-      testWidgets('handles empty games list with filters active',
-          (tester) async {
+      testWidgets('handles empty games list with filters active', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           createTestWidget(
             GameHistoryState.loaded(

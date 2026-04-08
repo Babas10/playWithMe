@@ -15,10 +15,9 @@ class TrainingFeedbackBloc
   final TrainingFeedbackRepository _feedbackRepository;
   StreamSubscription? _aggregatedFeedbackSubscription;
 
-  TrainingFeedbackBloc({
-    required TrainingFeedbackRepository feedbackRepository,
-  })  : _feedbackRepository = feedbackRepository,
-        super(const FeedbackInitial()) {
+  TrainingFeedbackBloc({required TrainingFeedbackRepository feedbackRepository})
+    : _feedbackRepository = feedbackRepository,
+      super(const FeedbackInitial()) {
     on<SubmitFeedback>(_onSubmitFeedback);
     on<LoadAggregatedFeedback>(_onLoadAggregatedFeedback);
     on<CheckFeedbackSubmission>(_onCheckFeedbackSubmission);
@@ -44,20 +43,26 @@ class TrainingFeedbackBloc
 
       emit(FeedbackSubmitted(trainingSessionId: event.trainingSessionId));
     } on FirebaseFunctionsException catch (e) {
-      emit(FeedbackError(
-        message: _getFriendlyErrorMessage(e),
-        trainingSessionId: event.trainingSessionId,
-      ));
+      emit(
+        FeedbackError(
+          message: _getFriendlyErrorMessage(e),
+          trainingSessionId: event.trainingSessionId,
+        ),
+      );
     } on FirebaseException catch (e) {
-      emit(FeedbackError(
-        message: _getFirestoreErrorMessage(e),
-        trainingSessionId: event.trainingSessionId,
-      ));
+      emit(
+        FeedbackError(
+          message: _getFirestoreErrorMessage(e),
+          trainingSessionId: event.trainingSessionId,
+        ),
+      );
     } catch (e) {
-      emit(FeedbackError(
-        message: 'Failed to submit feedback. Please try again.',
-        trainingSessionId: event.trainingSessionId,
-      ));
+      emit(
+        FeedbackError(
+          message: 'Failed to submit feedback. Please try again.',
+          trainingSessionId: event.trainingSessionId,
+        ),
+      );
     }
   }
 
@@ -72,39 +77,42 @@ class TrainingFeedbackBloc
       await _aggregatedFeedbackSubscription?.cancel();
 
       // Check if user has submitted feedback (this is separate from aggregated data)
-      final hasSubmitted = await _feedbackRepository
-          .hasUserSubmittedFeedback(event.trainingSessionId);
+      final hasSubmitted = await _feedbackRepository.hasUserSubmittedFeedback(
+        event.trainingSessionId,
+      );
 
       // Subscribe to aggregated feedback stream
       _aggregatedFeedbackSubscription = _feedbackRepository
           .getAggregatedFeedbackStream(event.trainingSessionId)
           .listen(
-        (aggregation) {
-          // Only emit if we're still in a loading or loaded state
-          if (state is LoadingAggregatedFeedback ||
-              state is AggregatedFeedbackLoaded) {
-            if (aggregation != null) {
-              add(_AggregatedFeedbackUpdated(
-                aggregation: aggregation,
-                hasUserSubmitted: hasSubmitted,
-              ));
-            }
-          }
-        },
-        onError: (error) {
-          if (state is LoadingAggregatedFeedback ||
-              state is AggregatedFeedbackLoaded) {
-            add(_AggregatedFeedbackError(
-              message: _getErrorMessage(error),
-            ));
-          }
-        },
-      );
+            (aggregation) {
+              // Only emit if we're still in a loading or loaded state
+              if (state is LoadingAggregatedFeedback ||
+                  state is AggregatedFeedbackLoaded) {
+                if (aggregation != null) {
+                  add(
+                    _AggregatedFeedbackUpdated(
+                      aggregation: aggregation,
+                      hasUserSubmitted: hasSubmitted,
+                    ),
+                  );
+                }
+              }
+            },
+            onError: (error) {
+              if (state is LoadingAggregatedFeedback ||
+                  state is AggregatedFeedbackLoaded) {
+                add(_AggregatedFeedbackError(message: _getErrorMessage(error)));
+              }
+            },
+          );
     } catch (e) {
-      emit(FeedbackError(
-        message: _getErrorMessage(e),
-        trainingSessionId: event.trainingSessionId,
-      ));
+      emit(
+        FeedbackError(
+          message: _getErrorMessage(e),
+          trainingSessionId: event.trainingSessionId,
+        ),
+      );
     }
   }
 
@@ -115,18 +123,23 @@ class TrainingFeedbackBloc
     emit(CheckingFeedbackSubmission(event.trainingSessionId));
 
     try {
-      final hasSubmitted = await _feedbackRepository
-          .hasUserSubmittedFeedback(event.trainingSessionId);
+      final hasSubmitted = await _feedbackRepository.hasUserSubmittedFeedback(
+        event.trainingSessionId,
+      );
 
-      emit(FeedbackSubmissionChecked(
-        trainingSessionId: event.trainingSessionId,
-        hasSubmitted: hasSubmitted,
-      ));
+      emit(
+        FeedbackSubmissionChecked(
+          trainingSessionId: event.trainingSessionId,
+          hasSubmitted: hasSubmitted,
+        ),
+      );
     } catch (e) {
-      emit(FeedbackError(
-        message: 'Failed to check feedback status. Please try again.',
-        trainingSessionId: event.trainingSessionId,
-      ));
+      emit(
+        FeedbackError(
+          message: 'Failed to check feedback status. Please try again.',
+          trainingSessionId: event.trainingSessionId,
+        ),
+      );
     }
   }
 
@@ -143,10 +156,12 @@ class TrainingFeedbackBloc
     _AggregatedFeedbackUpdated event,
     Emitter<TrainingFeedbackState> emit,
   ) {
-    emit(AggregatedFeedbackLoaded(
-      aggregation: event.aggregation,
-      hasUserSubmitted: event.hasUserSubmitted,
-    ));
+    emit(
+      AggregatedFeedbackLoaded(
+        aggregation: event.aggregation,
+        hasUserSubmitted: event.hasUserSubmitted,
+      ),
+    );
   }
 
   /// Internal event to handle aggregated feedback stream errors

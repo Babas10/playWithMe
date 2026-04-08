@@ -40,12 +40,9 @@ class FriendState with _$FriendState {
   }) = FriendStatusResult;
 
   /// Error state
-  const factory FriendState.error({
-    required String message,
-  }) = FriendError;
+  const factory FriendState.error({required String message}) = FriendError;
 
   /// Action success state (for showing success messages)
-  const factory FriendState.actionSuccess({
-    required String message,
-  }) = FriendActionSuccess;
+  const factory FriendState.actionSuccess({required String message}) =
+      FriendActionSuccess;
 }

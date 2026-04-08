@@ -59,7 +59,8 @@ class GameDetailsPage extends StatelessWidget {
             gameRepository: gameRepository ?? sl<GameRepository>(),
             userRepository: userRepository ?? sl<UserRepository>(),
             analytics: sl(),
-            invitationsRepository: gameInvitationsRepository ??
+            invitationsRepository:
+                gameInvitationsRepository ??
                 (sl.isRegistered<GameInvitationsRepository>()
                     ? sl<GameInvitationsRepository>()
                     : null),
@@ -67,7 +68,8 @@ class GameDetailsPage extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => GameGuestInvitationBloc(
-            repository: gameGuestInvitationRepository ??
+            repository:
+                gameGuestInvitationRepository ??
                 sl<GameGuestInvitationRepository>(),
           ),
         ),
@@ -86,10 +88,7 @@ class _GameDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: PlayWithMeAppBar.build(
-        context: context,
-        title: l10n.gameDetails,
-      ),
+      appBar: PlayWithMeAppBar.build(context: context, title: l10n.gameDetails),
       bottomNavigationBar: GlobalBottomNavBar(
         selectedIndex: 0,
         onTabSelected: (index) {
@@ -103,11 +102,13 @@ class _GameDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, GameDetailsState state, AppLocalizations l10n) {
+  Widget _buildBody(
+    BuildContext context,
+    GameDetailsState state,
+    AppLocalizations l10n,
+  ) {
     if (state is GameDetailsLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (state is GameDetailsError) {
@@ -265,9 +266,9 @@ class _GameInfoCard extends StatelessWidget {
                   child: Text(
                     game.title,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.secondary,
+                    ),
                   ),
                 ),
                 if (game.gameGenderType == GameGenderType.mix) ...[
@@ -314,8 +315,8 @@ class _GameInfoCard extends StatelessWidget {
                 child: Text(
                   game.location.address!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ],
@@ -325,15 +326,12 @@ class _GameInfoCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Notes',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
-              Text(
-                game.notes!,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              Text(game.notes!, style: Theme.of(context).textTheme.bodyMedium),
             ],
           ],
         ),
@@ -357,17 +355,10 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: AppColors.primary,
-        ),
+        Icon(icon, size: 20, color: AppColors.primary),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          child: Text(value, style: Theme.of(context).textTheme.bodyMedium),
         ),
       ],
     );
@@ -392,11 +383,12 @@ class _PlayersCard extends StatelessWidget {
         final players = (state is GameDetailsLoaded)
             ? state.players
             : (state is GameDetailsOperationInProgress)
-                ? state.players
-                : <String, dynamic>{};
+            ? state.players
+            : <String, dynamic>{};
         final isOperationInProgress = state is GameDetailsOperationInProgress;
 
-        final isCreator = currentUserId != null &&
+        final isCreator =
+            currentUserId != null &&
             currentUserId == game.createdBy &&
             game.status == GameStatus.scheduled &&
             !game.isFull;
@@ -413,17 +405,17 @@ class _PlayersCard extends StatelessWidget {
                     Text(
                       'Confirmed Players',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.secondary,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
+                      ),
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (isCreator)
                           IconButton(
-                            onPressed: () => showInviteGuestPlayersSheet(
-                                context, game.id),
+                            onPressed: () =>
+                                showInviteGuestPlayersSheet(context, game.id),
                             icon: const Icon(Icons.person_add_outlined),
                             tooltip: l10n.inviteGuestPlayers,
                             visualDensity: VisualDensity.compact,
@@ -436,7 +428,9 @@ class _PlayersCard extends StatelessWidget {
                               color: AppColors.secondary,
                             ),
                           ),
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.25),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.25,
+                          ),
                         ),
                       ],
                     ),
@@ -450,11 +444,10 @@ class _PlayersCard extends StatelessWidget {
                       child: Text(
                         'No players yet. Be the first to join!',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.6),
-                            ),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
                       ),
                     ),
                   )
@@ -463,7 +456,8 @@ class _PlayersCard extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: game.playerIds.length,
-                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    separatorBuilder: (context, index) =>
+                        const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final playerId = game.playerIds[index];
                       final isCreator = playerId == game.createdBy;
@@ -471,13 +465,16 @@ class _PlayersCard extends StatelessWidget {
                       final player = players[playerId];
 
                       // Get display name with fallback
-                      final displayName = player?.displayName ?? player?.email ?? 'Player';
+                      final displayName =
+                          player?.displayName ?? player?.email ?? 'Player';
 
                       return ListTile(
                         dense: true,
                         contentPadding: EdgeInsets.zero,
                         leading: CircleAvatar(
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.25),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.25,
+                          ),
                           child: Text(
                             '${index + 1}',
                             style: const TextStyle(color: AppColors.secondary),
@@ -508,39 +505,42 @@ class _PlayersCard extends StatelessWidget {
                   Text(
                     'Waitlist (${game.waitlistIds.length})',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   ...game.waitlistIds.asMap().entries.map((entry) {
                     final playerId = entry.value;
                     final isCurrentUser = playerId == currentUserId;
                     final player = players[playerId];
-                    final displayName = player?.displayName ?? player?.email ?? 'Player';
+                    final displayName =
+                        player?.displayName ?? player?.email ?? 'Player';
 
                     return ListTile(
                       dense: true,
                       contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.surface.withValues(alpha: 0.5),
                         child: Text('${entry.key + 1}'),
                       ),
                       title: Text(displayName),
                       subtitle: player != null && player.displayName != null
                           ? Text(player.email)
                           : null,
-                      trailing: isCurrentUser && game.status == GameStatus.scheduled
+                      trailing:
+                          isCurrentUser && game.status == GameStatus.scheduled
                           ? PopupMenuButton<String>(
                               icon: const Icon(Icons.more_vert),
                               onSelected: (value) {
                                 if (value == 'leave') {
                                   context.read<GameDetailsBloc>().add(
-                                        LeaveGameDetails(
-                                          gameId: game.id,
-                                          userId: playerId,
-                                        ),
-                                      );
+                                    LeaveGameDetails(
+                                      gameId: game.id,
+                                      userId: playerId,
+                                    ),
+                                  );
                                 }
                               },
                               itemBuilder: (context) => [
@@ -551,13 +551,17 @@ class _PlayersCard extends StatelessWidget {
                                       Icon(
                                         Icons.exit_to_app,
                                         size: 20,
-                                        color: Theme.of(context).colorScheme.error,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.error,
                                       ),
                                       const SizedBox(width: 12),
                                       Text(
                                         l10n.leaveWaitlist,
                                         style: TextStyle(
-                                          color: Theme.of(context).colorScheme.error,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.error,
                                         ),
                                       ),
                                     ],
@@ -595,10 +599,9 @@ class _PlayersCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .secondary
-                    .withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.secondary.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.secondary,
@@ -618,11 +621,8 @@ class _PlayersCard extends StatelessWidget {
               onSelected: (value) {
                 if (value == 'leave') {
                   context.read<GameDetailsBloc>().add(
-                        LeaveGameDetails(
-                          gameId: game.id,
-                          userId: playerId,
-                        ),
-                      );
+                    LeaveGameDetails(gameId: game.id, userId: playerId),
+                  );
                 }
               },
               itemBuilder: (context) => [
@@ -656,9 +656,7 @@ class _PlayersCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.secondary,
-          ),
+          border: Border.all(color: Theme.of(context).colorScheme.secondary),
         ),
         child: Text(
           l10n.organizer,
@@ -678,11 +676,8 @@ class _PlayersCard extends StatelessWidget {
         onSelected: (value) {
           if (value == 'leave') {
             context.read<GameDetailsBloc>().add(
-                  LeaveGameDetails(
-                    gameId: game.id,
-                    userId: playerId,
-                  ),
-                );
+              LeaveGameDetails(gameId: game.id, userId: playerId),
+            );
           }
         },
         itemBuilder: (context) => [
@@ -698,9 +693,7 @@ class _PlayersCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   l10n.leaveGame,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ],
             ),
@@ -782,7 +775,9 @@ class _RsvpButtons extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 8),
+                            horizontal: 24,
+                            vertical: 8,
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -842,15 +837,12 @@ class _RsvpButtons extends StatelessWidget {
                       : () {
                           if (invitationId != null) {
                             context.read<GameDetailsBloc>().add(
-                                  JoinAsGuest(invitationId: invitationId!),
-                                );
+                              JoinAsGuest(invitationId: invitationId!),
+                            );
                           } else {
                             context.read<GameDetailsBloc>().add(
-                                  JoinGameDetails(
-                                    gameId: game.id,
-                                    userId: userId,
-                                  ),
-                                );
+                              JoinGameDetails(gameId: game.id, userId: userId),
+                            );
                           }
                         },
                   icon: isOperationInProgress
@@ -948,21 +940,21 @@ class _ViewResultsCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.emoji_events,
-                    color: AppColors.primary,
-                    size: 28,
-                  ),
+                  Icon(Icons.emoji_events, color: AppColors.primary, size: 28),
                   const SizedBox(width: 12),
                   Text(
                     'Game Results',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.secondary,
+                    ),
                   ),
                   const Spacer(),
-                  Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.secondary),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: AppColors.secondary,
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -979,8 +971,8 @@ class _ViewResultsCard extends StatelessWidget {
                   Text(
                     'vs',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.secondary,
-                        ),
+                      color: AppColors.secondary,
+                    ),
                   ),
                   _QuickScoreDisplay(
                     teamName: teamBName,
@@ -996,9 +988,9 @@ class _ViewResultsCard extends StatelessWidget {
                 child: Text(
                   'Tap to view detailed results',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.secondary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    color: AppColors.secondary,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -1053,10 +1045,7 @@ class _QuickScoreDisplay extends StatelessWidget {
           decoration: BoxDecoration(
             color: backgroundColor,
             shape: BoxShape.circle,
-            border: Border.all(
-              color: borderColor,
-              width: isWinner ? 2 : 1,
-            ),
+            border: Border.all(color: borderColor, width: isWinner ? 2 : 1),
           ),
           child: Center(
             child: Text(
@@ -1076,9 +1065,9 @@ class _QuickScoreDisplay extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
-                color: AppColors.secondary,
-              ),
+            fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
+            color: AppColors.secondary,
+          ),
         ),
       ],
     );
@@ -1162,11 +1151,11 @@ class _VerificationSection extends StatelessWidget {
                             ? null
                             : () {
                                 context.read<GameDetailsBloc>().add(
-                                      ConfirmGameResult(
-                                        gameId: game.id,
-                                        userId: userId,
-                                      ),
-                                    );
+                                  ConfirmGameResult(
+                                    gameId: game.id,
+                                    userId: userId,
+                                  ),
+                                );
                               },
                         icon: const Icon(Icons.check),
                         label: const Text('Confirm'),

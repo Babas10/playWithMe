@@ -21,8 +21,9 @@ class UserSearchResultTile extends StatelessWidget {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
-        backgroundImage:
-            user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
+        backgroundImage: user.photoUrl != null
+            ? NetworkImage(user.photoUrl!)
+            : null,
         child: user.photoUrl == null
             ? Text(
                 _getInitials(user.displayName ?? user.email),
@@ -45,10 +46,7 @@ class UserSearchResultTile extends StatelessWidget {
   Widget _buildTrailing(BuildContext context) {
     if (isAlreadyMember) {
       return Chip(
-        label: const Text(
-          'Member',
-          style: TextStyle(fontSize: 12),
-        ),
+        label: const Text('Member', style: TextStyle(fontSize: 12)),
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         labelStyle: TextStyle(
           color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -59,10 +57,7 @@ class UserSearchResultTile extends StatelessWidget {
 
     if (isAlreadyInvited) {
       return Chip(
-        label: const Text(
-          'Invited',
-          style: TextStyle(fontSize: 12),
-        ),
+        label: const Text('Invited', style: TextStyle(fontSize: 12)),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         labelStyle: TextStyle(
           color: Theme.of(context).colorScheme.onSecondaryContainer,

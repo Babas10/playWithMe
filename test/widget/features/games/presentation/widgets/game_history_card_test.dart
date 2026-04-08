@@ -26,10 +26,7 @@ void main() {
         teamAPlayerIds: ['user1'],
         teamBPlayerIds: ['user2'],
       ),
-      result: const GameResult(
-        games: [],
-        overallWinner: 'teamA',
-      ),
+      result: const GameResult(games: [], overallWinner: 'teamA'),
       eloCalculated: true,
     );
 
@@ -37,10 +34,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GameHistoryCard(
-              game: testGame,
-              onTap: () {},
-            ),
+            body: GameHistoryCard(game: testGame, onTap: () {}),
           ),
         ),
       );
@@ -53,10 +47,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GameHistoryCard(
-              game: testGame,
-              onTap: () {},
-            ),
+            body: GameHistoryCard(game: testGame, onTap: () {}),
           ),
         ),
       );
@@ -70,10 +61,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GameHistoryCard(
-              game: testGame,
-              onTap: () {},
-            ),
+            body: GameHistoryCard(game: testGame, onTap: () {}),
           ),
         ),
       );
@@ -85,10 +73,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GameHistoryCard(
-              game: testGame,
-              onTap: () {},
-            ),
+            body: GameHistoryCard(game: testGame, onTap: () {}),
           ),
         ),
       );
@@ -98,18 +83,12 @@ void main() {
     });
 
     testWidgets('shows message when no scores recorded', (tester) async {
-      final gameWithoutScores = testGame.copyWith(
-        teams: null,
-        result: null,
-      );
+      final gameWithoutScores = testGame.copyWith(teams: null, result: null);
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GameHistoryCard(
-              game: gameWithoutScores,
-              onTap: () {},
-            ),
+            body: GameHistoryCard(game: gameWithoutScores, onTap: () {}),
           ),
         ),
       );
@@ -123,10 +102,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GameHistoryCard(
-              game: testGame,
-              onTap: () => tapped = true,
-            ),
+            body: GameHistoryCard(game: testGame, onTap: () => tapped = true),
           ),
         ),
       );

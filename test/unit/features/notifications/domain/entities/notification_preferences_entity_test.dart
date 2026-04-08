@@ -90,16 +90,19 @@ void main() {
         expect(preferences.isInQuietHours(now), true);
       });
 
-      test('returns false when current time is before same-day quiet hours', () {
-        const preferences = NotificationPreferencesEntity(
-          quietHoursEnabled: true,
-          quietHoursStart: '14:00',
-          quietHoursEnd: '18:00',
-        );
+      test(
+        'returns false when current time is before same-day quiet hours',
+        () {
+          const preferences = NotificationPreferencesEntity(
+            quietHoursEnabled: true,
+            quietHoursStart: '14:00',
+            quietHoursEnd: '18:00',
+          );
 
-        final now = DateTime(2024, 1, 1, 12, 0); // 12:00 PM
-        expect(preferences.isInQuietHours(now), false);
-      });
+          final now = DateTime(2024, 1, 1, 12, 0); // 12:00 PM
+          expect(preferences.isInQuietHours(now), false);
+        },
+      );
 
       test('returns false when current time is after same-day quiet hours', () {
         const preferences = NotificationPreferencesEntity(
@@ -112,38 +115,47 @@ void main() {
         expect(preferences.isInQuietHours(now), false);
       });
 
-      test('returns true when current time is within overnight quiet hours (after start)', () {
-        const preferences = NotificationPreferencesEntity(
-          quietHoursEnabled: true,
-          quietHoursStart: '22:00',
-          quietHoursEnd: '08:00',
-        );
+      test(
+        'returns true when current time is within overnight quiet hours (after start)',
+        () {
+          const preferences = NotificationPreferencesEntity(
+            quietHoursEnabled: true,
+            quietHoursStart: '22:00',
+            quietHoursEnd: '08:00',
+          );
 
-        final now = DateTime(2024, 1, 1, 23, 30); // 11:30 PM
-        expect(preferences.isInQuietHours(now), true);
-      });
+          final now = DateTime(2024, 1, 1, 23, 30); // 11:30 PM
+          expect(preferences.isInQuietHours(now), true);
+        },
+      );
 
-      test('returns true when current time is within overnight quiet hours (before end)', () {
-        const preferences = NotificationPreferencesEntity(
-          quietHoursEnabled: true,
-          quietHoursStart: '22:00',
-          quietHoursEnd: '08:00',
-        );
+      test(
+        'returns true when current time is within overnight quiet hours (before end)',
+        () {
+          const preferences = NotificationPreferencesEntity(
+            quietHoursEnabled: true,
+            quietHoursStart: '22:00',
+            quietHoursEnd: '08:00',
+          );
 
-        final now = DateTime(2024, 1, 1, 6, 30); // 6:30 AM
-        expect(preferences.isInQuietHours(now), true);
-      });
+          final now = DateTime(2024, 1, 1, 6, 30); // 6:30 AM
+          expect(preferences.isInQuietHours(now), true);
+        },
+      );
 
-      test('returns false when current time is outside overnight quiet hours', () {
-        const preferences = NotificationPreferencesEntity(
-          quietHoursEnabled: true,
-          quietHoursStart: '22:00',
-          quietHoursEnd: '08:00',
-        );
+      test(
+        'returns false when current time is outside overnight quiet hours',
+        () {
+          const preferences = NotificationPreferencesEntity(
+            quietHoursEnabled: true,
+            quietHoursStart: '22:00',
+            quietHoursEnd: '08:00',
+          );
 
-        final now = DateTime(2024, 1, 1, 15, 0); // 3:00 PM
-        expect(preferences.isInQuietHours(now), false);
-      });
+          final now = DateTime(2024, 1, 1, 15, 0); // 3:00 PM
+          expect(preferences.isInQuietHours(now), false);
+        },
+      );
 
       test('handles exact start time boundary', () {
         const preferences = NotificationPreferencesEntity(
@@ -170,9 +182,7 @@ void main() {
 
     group('isEnabledForGroup', () {
       test('returns default value when group has no specific override', () {
-        const preferences = NotificationPreferencesEntity(
-          groupSpecific: {},
-        );
+        const preferences = NotificationPreferencesEntity(groupSpecific: {});
 
         expect(preferences.isEnabledForGroup('group1', true), true);
         expect(preferences.isEnabledForGroup('group1', false), false);

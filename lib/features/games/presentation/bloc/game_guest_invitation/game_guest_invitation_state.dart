@@ -50,10 +50,7 @@ class InvitePlayerSending extends GameGuestInvitationState
   final List<InvitablePlayerModel> players;
   final String inviteeId;
 
-  const InvitePlayerSending({
-    required this.players,
-    required this.inviteeId,
-  });
+  const InvitePlayerSending({required this.players, required this.inviteeId});
 
   @override
   List<Object?> get props => [players, inviteeId];
@@ -64,10 +61,7 @@ class InvitePlayerSuccess extends GameGuestInvitationState
   final List<InvitablePlayerModel> players;
   final String inviteeId;
 
-  const InvitePlayerSuccess({
-    required this.players,
-    required this.inviteeId,
-  });
+  const InvitePlayerSuccess({required this.players, required this.inviteeId});
 
   @override
   List<Object?> get props => [players, inviteeId];

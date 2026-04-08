@@ -43,10 +43,9 @@ class _TrainingSessionCreationPageState
   void initState() {
     super.initState();
     // Initialize the bloc with the group information
-    context.read<TrainingSessionCreationBloc>().add(SelectTrainingGroup(
-          groupId: widget.groupId,
-          groupName: widget.groupName,
-        ));
+    context.read<TrainingSessionCreationBloc>().add(
+      SelectTrainingGroup(groupId: widget.groupId, groupName: widget.groupName),
+    );
   }
 
   @override
@@ -133,13 +132,17 @@ class _TrainingSessionCreationPageState
 
     if (date == null || !context.mounted) return;
 
-    final isToday = date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
+    final isToday =
+        date.year == now.year && date.month == now.month && date.day == now.day;
     final minPickerTime = isToday ? now : null;
     DateTime pickerTime = isToday
-        ? DateTime(date.year, date.month, date.day, now.hour, now.minute)
-            .add(const Duration(hours: 1))
+        ? DateTime(
+            date.year,
+            date.month,
+            date.day,
+            now.hour,
+            now.minute,
+          ).add(const Duration(hours: 1))
         : DateTime(date.year, date.month, date.day, 14, 0);
 
     TimeOfDay? time;
@@ -151,22 +154,23 @@ class _TrainingSessionCreationPageState
         return Dialog(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
-                      child: Text(l10n.cancel,
-                          style:
-                              const TextStyle(color: blue, fontSize: 16)),
+                      child: Text(
+                        l10n.cancel,
+                        style: const TextStyle(color: blue, fontSize: 16),
+                      ),
                     ),
                     Column(
                       children: [
@@ -182,7 +186,9 @@ class _TrainingSessionCreationPageState
                           Text(
                             '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} ${l10n.orLater}',
                             style: const TextStyle(
-                                color: Colors.grey, fontSize: 12),
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
                           ),
                       ],
                     ),
@@ -245,15 +251,15 @@ class _TrainingSessionCreationPageState
     final l10n = AppLocalizations.of(context)!;
 
     if (_selectedStartTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.pleaseSelectStartTimeFirst)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.pleaseSelectStartTimeFirst)));
       return;
     }
 
     // End time must be after start time
-    DateTime pickerTime = _selectedEndTime ??
-        _selectedStartTime!.add(const Duration(hours: 2));
+    DateTime pickerTime =
+        _selectedEndTime ?? _selectedStartTime!.add(const Duration(hours: 2));
 
     TimeOfDay? time;
 
@@ -263,22 +269,23 @@ class _TrainingSessionCreationPageState
         return Dialog(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
-                      child: Text(l10n.cancel,
-                          style:
-                              const TextStyle(color: blue, fontSize: 16)),
+                      child: Text(
+                        l10n.cancel,
+                        style: const TextStyle(color: blue, fontSize: 16),
+                      ),
                     ),
                     Column(
                       children: [
@@ -293,7 +300,9 @@ class _TrainingSessionCreationPageState
                         Text(
                           '${_selectedStartTime!.hour.toString().padLeft(2, '0')}:${_selectedStartTime!.minute.toString().padLeft(2, '0')} ${l10n.orLater}',
                           style: const TextStyle(
-                              color: Colors.grey, fontSize: 12),
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
@@ -356,16 +365,16 @@ class _TrainingSessionCreationPageState
     }
 
     if (_selectedStartTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.pleaseSelectStartTime)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.pleaseSelectStartTime)));
       return;
     }
 
     if (_selectedEndTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.pleaseSelectEndTime)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.pleaseSelectEndTime)));
       return;
     }
 
@@ -375,11 +384,14 @@ class _TrainingSessionCreationPageState
     bloc.add(SetTrainingTitle(title: _titleController.text.trim()));
 
     if (_descriptionController.text.trim().isNotEmpty) {
-      bloc.add(SetTrainingDescription(
-          description: _descriptionController.text.trim()));
+      bloc.add(
+        SetTrainingDescription(description: _descriptionController.text.trim()),
+      );
     }
 
-    bloc.add(SetTrainingLocation(locationName: _locationController.text.trim()));
+    bloc.add(
+      SetTrainingLocation(locationName: _locationController.text.trim()),
+    );
     bloc.add(SetStartTime(startTime: _selectedStartTime!));
     bloc.add(SetEndTime(endTime: _selectedEndTime!));
     bloc.add(SetMinParticipants(minParticipants: _minParticipants));
@@ -391,8 +403,10 @@ class _TrainingSessionCreationPageState
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<TrainingSessionCreationBloc,
-        TrainingSessionCreationState>(
+    return BlocListener<
+      TrainingSessionCreationBloc,
+      TrainingSessionCreationState
+    >(
       listener: (context, state) {
         final l10n = AppLocalizations.of(context)!;
         if (state is TrainingSessionCreationSuccess) {
@@ -416,10 +430,7 @@ class _TrainingSessionCreationPageState
           );
         } else if (state is TrainingSessionCreationError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
         }
       },
@@ -434,202 +445,222 @@ class _TrainingSessionCreationPageState
             body: BlocBuilder<AuthenticationBloc, AuthenticationState>(
               builder: (context, authState) {
                 if (authState is! AuthenticationAuthenticated) {
-                  return Center(
-                    child: Text(l10n.pleaseLogInToCreateTraining),
-                  );
+                  return Center(child: Text(l10n.pleaseLogInToCreateTraining));
                 }
 
-            return BlocBuilder<TrainingSessionCreationBloc,
-                TrainingSessionCreationState>(
-              builder: (context, state) {
-                final isLoading = state is TrainingSessionCreationSubmitting;
+                return BlocBuilder<
+                  TrainingSessionCreationBloc,
+                  TrainingSessionCreationState
+                >(
+                  builder: (context, state) {
+                    final isLoading =
+                        state is TrainingSessionCreationSubmitting;
 
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          widget.groupName,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 24),
-                        TextFormField(
-                          controller: _titleController,
-                          decoration: InputDecoration(
-                            labelText: l10n.title,
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.fitness_center),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.pleaseEnterTitle;
-                            }
-                            return null;
-                          },
-                          enabled: !isLoading,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _descriptionController,
-                          decoration: InputDecoration(
-                            labelText: l10n.descriptionOptional,
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.description),
-                          ),
-                          maxLines: 3,
-                          enabled: !isLoading,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _locationController,
-                          decoration: InputDecoration(
-                            labelText: l10n.location,
-                            border: const OutlineInputBorder(),
-                            prefixIcon: const Icon(Icons.location_on),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.pleaseEnterLocation;
-                            }
-                            return null;
-                          },
-                          enabled: !isLoading,
-                        ),
-                        const SizedBox(height: 16),
-                        ListTile(
-                          title: Text(l10n.startTime),
-                          subtitle: Text(_selectedStartTime != null
-                              ? '${_selectedStartTime!.day}/${_selectedStartTime!.month}/${_selectedStartTime!.year} at ${_selectedStartTime!.hour}:${_selectedStartTime!.minute.toString().padLeft(2, '0')}'
-                              : l10n.notSelected),
-                          trailing: const Icon(Icons.calendar_today),
-                          onTap: isLoading
-                              ? null
-                              : () => _selectStartTime(context),
-                          tileColor:
-                              Theme.of(context).colorScheme.surfaceContainerHighest,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ListTile(
-                          title: Text(l10n.endTime),
-                          subtitle: Text(_selectedEndTime != null
-                              ? '${_selectedEndTime!.day}/${_selectedEndTime!.month}/${_selectedEndTime!.year} at ${_selectedEndTime!.hour}:${_selectedEndTime!.minute.toString().padLeft(2, '0')}'
-                              : l10n.notSelected),
-                          trailing: const Icon(Icons.access_time),
-                          onTap: isLoading
-                              ? null
-                              : () => _selectEndTime(context),
-                          tileColor:
-                              Theme.of(context).colorScheme.surfaceContainerHighest,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.minParticipantsLabel,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                  Slider(
-                                    value: _minParticipants.toDouble(),
-                                    min: 2,
-                                    max: 20,
-                                    divisions: 18,
-                                    label: _minParticipants.toString(),
-                                    onChanged: isLoading
-                                        ? null
-                                        : (value) {
-                                            setState(() {
-                                              _minParticipants = value.toInt();
-                                              if (_minParticipants >
-                                                  _maxParticipants) {
-                                                _maxParticipants =
-                                                    _minParticipants;
-                                              }
-                                            });
-                                          },
-                                  ),
-                                  Text('$_minParticipants',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium),
-                                ],
+                            Text(
+                              widget.groupName,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 24),
+                            TextFormField(
+                              controller: _titleController,
+                              decoration: InputDecoration(
+                                labelText: l10n.title,
+                                border: const OutlineInputBorder(),
+                                prefixIcon: const Icon(Icons.fitness_center),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return l10n.pleaseEnterTitle;
+                                }
+                                return null;
+                              },
+                              enabled: !isLoading,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _descriptionController,
+                              decoration: InputDecoration(
+                                labelText: l10n.descriptionOptional,
+                                border: const OutlineInputBorder(),
+                                prefixIcon: const Icon(Icons.description),
+                              ),
+                              maxLines: 3,
+                              enabled: !isLoading,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _locationController,
+                              decoration: InputDecoration(
+                                labelText: l10n.location,
+                                border: const OutlineInputBorder(),
+                                prefixIcon: const Icon(Icons.location_on),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return l10n.pleaseEnterLocation;
+                                }
+                                return null;
+                              },
+                              enabled: !isLoading,
+                            ),
+                            const SizedBox(height: 16),
+                            ListTile(
+                              title: Text(l10n.startTime),
+                              subtitle: Text(
+                                _selectedStartTime != null
+                                    ? '${_selectedStartTime!.day}/${_selectedStartTime!.month}/${_selectedStartTime!.year} at ${_selectedStartTime!.hour}:${_selectedStartTime!.minute.toString().padLeft(2, '0')}'
+                                    : l10n.notSelected,
+                              ),
+                              trailing: const Icon(Icons.calendar_today),
+                              onTap: isLoading
+                                  ? null
+                                  : () => _selectStartTime(context),
+                              tileColor: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.maxParticipantsLabel,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
+                            const SizedBox(height: 16),
+                            ListTile(
+                              title: Text(l10n.endTime),
+                              subtitle: Text(
+                                _selectedEndTime != null
+                                    ? '${_selectedEndTime!.day}/${_selectedEndTime!.month}/${_selectedEndTime!.year} at ${_selectedEndTime!.hour}:${_selectedEndTime!.minute.toString().padLeft(2, '0')}'
+                                    : l10n.notSelected,
+                              ),
+                              trailing: const Icon(Icons.access_time),
+                              onTap: isLoading
+                                  ? null
+                                  : () => _selectEndTime(context),
+                              tileColor: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.minParticipantsLabel,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium,
+                                      ),
+                                      Slider(
+                                        value: _minParticipants.toDouble(),
+                                        min: 2,
+                                        max: 20,
+                                        divisions: 18,
+                                        label: _minParticipants.toString(),
+                                        onChanged: isLoading
+                                            ? null
+                                            : (value) {
+                                                setState(() {
+                                                  _minParticipants = value
+                                                      .toInt();
+                                                  if (_minParticipants >
+                                                      _maxParticipants) {
+                                                    _maxParticipants =
+                                                        _minParticipants;
+                                                  }
+                                                });
+                                              },
+                                      ),
+                                      Text(
+                                        '$_minParticipants',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                    ],
                                   ),
-                                  Slider(
-                                    value: _maxParticipants.toDouble(),
-                                    min: 2,
-                                    max: 20,
-                                    divisions: 18,
-                                    label: _maxParticipants.toString(),
-                                    onChanged: isLoading
-                                        ? null
-                                        : (value) {
-                                            setState(() {
-                                              _maxParticipants = value.toInt();
-                                              if (_maxParticipants <
-                                                  _minParticipants) {
-                                                _minParticipants =
-                                                    _maxParticipants;
-                                              }
-                                            });
-                                          },
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.maxParticipantsLabel,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium,
+                                      ),
+                                      Slider(
+                                        value: _maxParticipants.toDouble(),
+                                        min: 2,
+                                        max: 20,
+                                        divisions: 18,
+                                        label: _maxParticipants.toString(),
+                                        onChanged: isLoading
+                                            ? null
+                                            : (value) {
+                                                setState(() {
+                                                  _maxParticipants = value
+                                                      .toInt();
+                                                  if (_maxParticipants <
+                                                      _minParticipants) {
+                                                    _minParticipants =
+                                                        _maxParticipants;
+                                                  }
+                                                });
+                                              },
+                                      ),
+                                      Text(
+                                        '$_maxParticipants',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                    ],
                                   ),
-                                  Text('$_maxParticipants',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium),
-                                ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            FilledButton(
+                              onPressed: isLoading
+                                  ? null
+                                  : () => _handleSubmit(
+                                      context,
+                                      authState.user.uid,
+                                    ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(l10n.createTrainingSession),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
-                        FilledButton(
-                          onPressed: isLoading
-                              ? null
-                              : () => _handleSubmit(context, authState.user.uid),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(l10n.createTrainingSession),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 );
-              },
-            );
               },
             ),
           );

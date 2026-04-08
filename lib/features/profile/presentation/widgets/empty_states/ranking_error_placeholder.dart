@@ -43,10 +43,7 @@ class RankingErrorPlaceholder extends StatelessWidget {
               ],
             ),
           ),
-          TextButton(
-            onPressed: onRetry,
-            child: const Text('Retry'),
-          ),
+          TextButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       ),
     );

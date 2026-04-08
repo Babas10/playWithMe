@@ -12,10 +12,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 class PartnersCard extends StatelessWidget {
   final UserModel user;
 
-  const PartnersCard({
-    super.key,
-    required this.user,
-  });
+  const PartnersCard({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +41,13 @@ class PartnersCard extends StatelessWidget {
             child: InkWell(
               onTap: bestPartner != null
                   ? () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => PartnerDetailPage(
-                            userId: user.uid,
-                            partnerId: bestPartner.userId,
-                          ),
+                      MaterialPageRoute(
+                        builder: (context) => PartnerDetailPage(
+                          userId: user.uid,
+                          partnerId: bestPartner.userId,
                         ),
-                      )
+                      ),
+                    )
                   : null,
               borderRadius: BorderRadius.circular(16),
               child: Padding(
@@ -70,8 +67,8 @@ class PartnersCard extends StatelessWidget {
   Widget _buildPartnerInfo(BuildContext context, _PartnerData partner) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final winRate =
-        (partner.gamesWon / partner.gamesPlayed * 100).toStringAsFixed(1);
+    final winRate = (partner.gamesWon / partner.gamesPlayed * 100)
+        .toStringAsFixed(1);
 
     return Row(
       children: [
@@ -125,8 +122,7 @@ class PartnersCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
                 color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
@@ -209,8 +205,7 @@ class PartnersCard extends StatelessWidget {
       final stats = entry.value as Map<String, dynamic>;
       final gamesWon = stats['gamesWon'] as int? ?? 0;
       final gamesPlayed = stats['gamesPlayed'] as int? ?? 0;
-      final displayName =
-          stats['teammateName'] as String? ?? 'Unknown Player';
+      final displayName = stats['teammateName'] as String? ?? 'Unknown Player';
 
       if (gamesPlayed < minGames) continue;
 

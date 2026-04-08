@@ -89,7 +89,9 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                     if (value == null || value.trim().isEmpty) {
                       return l10n.emailRequired;
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return l10n.validEmailRequired;
                     }
                     return null;
@@ -124,8 +126,8 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
   void _submitPasswordReset() {
     if (_formKey.currentState!.validate()) {
       context.read<PasswordResetBloc>().add(
-            PasswordResetRequested(email: _emailController.text),
-          );
+        PasswordResetRequested(email: _emailController.text),
+      );
     }
   }
 
@@ -136,19 +138,12 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          icon: Icon(
-            Icons.check_circle,
-            color: Colors.green,
-            size: 48,
-          ),
+          icon: Icon(Icons.check_circle, color: Colors.green, size: 48),
           title: Text(l10n.emailSent),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                l10n.resetLinkSentTo,
-                textAlign: TextAlign.center,
-              ),
+              Text(l10n.resetLinkSentTo, textAlign: TextAlign.center),
               const SizedBox(height: 8),
               Text(
                 email,

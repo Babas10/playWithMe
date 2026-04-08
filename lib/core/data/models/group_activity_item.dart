@@ -16,28 +16,24 @@ class GroupActivityItem with _$GroupActivityItem {
   const GroupActivityItem._();
 
   /// Get the activity ID (either game.id or session.id)
-  String get id => when(
-        game: (game) => game.id,
-        training: (session) => session.id,
-      );
+  String get id =>
+      when(game: (game) => game.id, training: (session) => session.id);
 
   /// Get the activity start time for sorting
   DateTime get startTime => when(
-        game: (game) => game.scheduledAt,
-        training: (session) => session.startTime,
-      );
+    game: (game) => game.scheduledAt,
+    training: (session) => session.startTime,
+  );
 
   /// Get the activity title
-  String get title => when(
-        game: (game) => game.title,
-        training: (session) => session.title,
-      );
+  String get title =>
+      when(game: (game) => game.title, training: (session) => session.title);
 
   /// Get the group ID
   String get groupId => when(
-        game: (game) => game.groupId,
-        training: (session) => session.groupId,
-      );
+    game: (game) => game.groupId,
+    training: (session) => session.groupId,
+  );
 
   /// Check if activity is in the past
   bool get isPast => startTime.isBefore(DateTime.now());

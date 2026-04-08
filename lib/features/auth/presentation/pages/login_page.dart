@@ -64,98 +64,102 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                Icon(
-                  Icons.sports_volleyball,
-                  size: 64,
-                  color: Theme.of(context).primaryColor,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.welcomeBack,
-                  style: Theme.of(context).textTheme.headlineMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.signInToContinue,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-                AuthFormField(
-                  controller: _emailController,
-                  hintText: l10n.emailHint,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  prefixIcon: Icons.email,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return l10n.emailRequired;
-                    }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                      return l10n.validEmailRequired;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                AuthFormField(
-                  controller: _passwordController,
-                  hintText: l10n.passwordHint,
-                  obscureText: _obscurePassword,
-                  textInputAction: TextInputAction.done,
-                  prefixIcon: Icons.lock,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
+                  Icon(
+                    Icons.sports_volleyball,
+                    size: 64,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    l10n.welcomeBack,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.signInToContinue,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  AuthFormField(
+                    controller: _emailController,
+                    hintText: l10n.emailHint,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    prefixIcon: Icons.email,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return l10n.emailRequired;
+                      }
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
+                        return l10n.validEmailRequired;
+                      }
+                      return null;
                     },
                   ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return l10n.passwordRequired;
-                    }
-                    return null;
-                  },
-                  onFieldSubmitted: (_) => _submitLogin(),
-                ),
-                const SizedBox(height: 24),
-                BlocBuilder<LoginBloc, LoginState>(
-                  builder: (context, state) {
-                    return AuthButton(
-                      text: l10n.login,
-                      isLoading: state is LoginLoading,
-                      onPressed: _submitLogin,
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(l10n.dontHaveAccount),
-                    TextButton(
+                  const SizedBox(height: 16),
+                  AuthFormField(
+                    controller: _passwordController,
+                    hintText: l10n.passwordHint,
+                    obscureText: _obscurePassword,
+                    textInputAction: TextInputAction.done,
+                    prefixIcon: Icons.lock,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/register');
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
                       },
-                      child: Text(l10n.signUp),
                     ),
-                  ],
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/forgot-password');
-                  },
-                  child: Text(l10n.forgotPassword),
-                ),
-              ],
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return l10n.passwordRequired;
+                      }
+                      return null;
+                    },
+                    onFieldSubmitted: (_) => _submitLogin(),
+                  ),
+                  const SizedBox(height: 24),
+                  BlocBuilder<LoginBloc, LoginState>(
+                    builder: (context, state) {
+                      return AuthButton(
+                        text: l10n.login,
+                        isLoading: state is LoginLoading,
+                        onPressed: _submitLogin,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(l10n.dontHaveAccount),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/register');
+                        },
+                        child: Text(l10n.signUp),
+                      ),
+                    ],
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/forgot-password');
+                    },
+                    child: Text(l10n.forgotPassword),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
         ),
       ),
     );
@@ -164,11 +168,11 @@ class _LoginPageState extends State<LoginPage> {
   void _submitLogin() {
     if (_formKey.currentState!.validate()) {
       context.read<LoginBloc>().add(
-            LoginWithEmailAndPasswordSubmitted(
-              email: _emailController.text,
-              password: _passwordController.text,
-            ),
-          );
+        LoginWithEmailAndPasswordSubmitted(
+          email: _emailController.text,
+          password: _passwordController.text,
+        ),
+      );
     }
   }
 }

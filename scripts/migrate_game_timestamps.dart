@@ -45,7 +45,9 @@ void main() async {
       } else if (scheduledAt is Timestamp) {
         print('⏭️  Game ${doc.id} already has Timestamp, skipping');
       } else {
-        print('⚠️  Game ${doc.id} has unexpected type: ${scheduledAt.runtimeType}');
+        print(
+          '⚠️  Game ${doc.id} has unexpected type: ${scheduledAt.runtimeType}',
+        );
       }
     } catch (e) {
       print('❌ Error migrating game ${doc.id}: $e');

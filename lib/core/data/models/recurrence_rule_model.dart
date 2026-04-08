@@ -39,10 +39,7 @@ class RecurrenceRuleModel with _$RecurrenceRuleModel {
     /// The date until which to generate occurrences
     /// Either count or endDate should be specified, not both
     // ignore: invalid_annotation_target
-    @JsonKey(
-      fromJson: _dateTimeFromJson,
-      toJson: _dateTimeToJson,
-    )
+    @JsonKey(fromJson: _dateTimeFromJson, toJson: _dateTimeToJson)
     DateTime? endDate,
 
     /// Days of the week for weekly recurrence (1 = Monday, 7 = Sunday)
@@ -88,9 +85,7 @@ class RecurrenceRuleModel with _$RecurrenceRuleModel {
 
   /// Create a non-recurring rule (default)
   factory RecurrenceRuleModel.none() {
-    return const RecurrenceRuleModel(
-      frequency: RecurrenceFrequency.none,
-    );
+    return const RecurrenceRuleModel(frequency: RecurrenceFrequency.none);
   }
 
   /// Validation: Check if the recurrence rule is valid
@@ -138,7 +133,9 @@ class RecurrenceRuleModel with _$RecurrenceRuleModel {
     }
 
     // Days of week for weekly recurrence
-    if (frequency == RecurrenceFrequency.weekly && daysOfWeek != null && daysOfWeek!.isNotEmpty) {
+    if (frequency == RecurrenceFrequency.weekly &&
+        daysOfWeek != null &&
+        daysOfWeek!.isNotEmpty) {
       final dayNames = daysOfWeek!.map((day) => _getDayName(day)).join(', ');
       buffer.write(' on $dayNames');
     }
@@ -156,14 +153,22 @@ class RecurrenceRuleModel with _$RecurrenceRuleModel {
   /// Helper method to get day name from day number (1=Monday, 7=Sunday)
   String _getDayName(int day) {
     switch (day) {
-      case 1: return 'Monday';
-      case 2: return 'Tuesday';
-      case 3: return 'Wednesday';
-      case 4: return 'Thursday';
-      case 5: return 'Friday';
-      case 6: return 'Saturday';
-      case 7: return 'Sunday';
-      default: return 'Unknown';
+      case 1:
+        return 'Monday';
+      case 2:
+        return 'Tuesday';
+      case 3:
+        return 'Wednesday';
+      case 4:
+        return 'Thursday';
+      case 5:
+        return 'Friday';
+      case 6:
+        return 'Saturday';
+      case 7:
+        return 'Sunday';
+      default:
+        return 'Unknown';
     }
   }
 

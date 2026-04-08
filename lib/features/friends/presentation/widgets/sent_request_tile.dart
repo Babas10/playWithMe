@@ -40,10 +40,7 @@ class SentRequestTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Chip(
-            label: Text(
-              l10n.pending,
-              style: const TextStyle(fontSize: 12),
-            ),
+            label: Text(l10n.pending, style: const TextStyle(fontSize: 12)),
             backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
             labelStyle: TextStyle(
               color: Theme.of(context).colorScheme.onSecondaryContainer,
@@ -51,10 +48,7 @@ class SentRequestTile extends StatelessWidget {
             padding: EdgeInsets.zero,
           ),
           const SizedBox(width: 8),
-          TextButton(
-            onPressed: onCancel,
-            child: Text(l10n.cancel),
-          ),
+          TextButton(onPressed: onCancel, child: Text(l10n.cancel)),
         ],
       ),
     );

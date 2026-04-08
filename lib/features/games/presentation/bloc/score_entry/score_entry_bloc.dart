@@ -12,10 +12,8 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
   final GameRepository gameRepository;
   final UserRepository userRepository;
 
-  ScoreEntryBloc({
-    required this.gameRepository,
-    required this.userRepository,
-  }) : super(const ScoreEntryInitial()) {
+  ScoreEntryBloc({required this.gameRepository, required this.userRepository})
+    : super(const ScoreEntryInitial()) {
     on<LoadGameForScoreEntry>(_onLoadGameForScoreEntry);
     on<SetGameCount>(_onSetGameCount);
     on<SetGameFormat>(_onSetGameFormat);
@@ -40,7 +38,11 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
 
       // Validate game state
       if (game.status == GameStatus.cancelled) {
-        emit(const ScoreEntryError(message: 'Cannot enter scores for a cancelled game'));
+        emit(
+          const ScoreEntryError(
+            message: 'Cannot enter scores for a cancelled game',
+          ),
+        );
         return;
       }
 
@@ -73,19 +75,23 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
           // Restore per-game teams; fall back to session-level teams for old docs
           final gameTeams = individualGame.teams ?? game.teams;
 
-          loadedGames.add(GameData(
-            numberOfSets: individualGame.sets.length,
-            sets: sets,
-            teams: gameTeams,
-          ));
+          loadedGames.add(
+            GameData(
+              numberOfSets: individualGame.sets.length,
+              sets: sets,
+              teams: gameTeams,
+            ),
+          );
         }
 
-        emit(ScoreEntryLoaded(
-          game: game,
-          gameCount: result.games.length,
-          games: loadedGames,
-          players: players,
-        ));
+        emit(
+          ScoreEntryLoaded(
+            game: game,
+            gameCount: result.games.length,
+            games: loadedGames,
+            players: players,
+          ),
+        );
       } else {
         emit(ScoreEntryLoaded(game: game, players: players));
       }
@@ -112,10 +118,7 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
       ),
     );
 
-    emit(currentState.copyWith(
-      gameCount: event.count,
-      games: games,
-    ));
+    emit(currentState.copyWith(gameCount: event.count, games: games));
   }
 
   Future<void> _onSetGameFormat(
@@ -135,16 +138,13 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
     final currentGame = updatedGames[event.gameIndex];
 
     // Update the game with new number of sets
-    final newSets = List.generate(
-      event.numberOfSets,
-      (index) {
-        // Keep existing set data if it exists
-        if (index < currentGame.sets.length) {
-          return currentGame.sets[index];
-        }
-        return const SetScoreData();
-      },
-    );
+    final newSets = List.generate(event.numberOfSets, (index) {
+      // Keep existing set data if it exists
+      if (index < currentGame.sets.length) {
+        return currentGame.sets[index];
+      }
+      return const SetScoreData();
+    });
 
     updatedGames[event.gameIndex] = currentGame.copyWith(
       numberOfSets: event.numberOfSets,
@@ -215,7 +215,11 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
 
     // Validate that we can save
     if (!currentState.canSave) {
-      emit(const ScoreEntryError(message: 'Please select teams and enter valid scores for all games'));
+      emit(
+        const ScoreEntryError(
+          message: 'Please select teams and enter valid scores for all games',
+        ),
+      );
       emit(currentState); // Return to loaded state
       return;
     }
@@ -223,26 +227,34 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
     // Build individual games list
     final individualGames = <IndividualGame>[];
 
-    for (int gameIndex = 0; gameIndex < currentState.games.length; gameIndex++) {
+    for (
+      int gameIndex = 0;
+      gameIndex < currentState.games.length;
+      gameIndex++
+    ) {
       final gameData = currentState.games[gameIndex];
 
       // Build sets for this game
       final sets = <SetScore>[];
       for (int setIndex = 0; setIndex < gameData.numberOfSets; setIndex++) {
         final setData = gameData.sets[setIndex];
-        sets.add(SetScore(
-          teamAPoints: setData.teamAPoints!,
-          teamBPoints: setData.teamBPoints!,
-          setNumber: setIndex + 1,
-        ));
+        sets.add(
+          SetScore(
+            teamAPoints: setData.teamAPoints!,
+            teamBPoints: setData.teamBPoints!,
+            setNumber: setIndex + 1,
+          ),
+        );
       }
 
-      individualGames.add(IndividualGame(
-        gameNumber: gameIndex + 1,
-        sets: sets,
-        winner: gameData.winner!,
-        teams: gameData.teams,
-      ));
+      individualGames.add(
+        IndividualGame(
+          gameNumber: gameIndex + 1,
+          sets: sets,
+          winner: gameData.winner!,
+          teams: gameData.teams,
+        ),
+      );
     }
 
     // Create result
@@ -253,7 +265,11 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
 
     // Validate result
     if (!result.isValid()) {
-      emit(const ScoreEntryError(message: 'Invalid game result. Please check all scores.'));
+      emit(
+        const ScoreEntryError(
+          message: 'Invalid game result. Please check all scores.',
+        ),
+      );
       emit(currentState); // Return to loaded state
       return;
     }

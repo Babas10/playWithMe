@@ -26,10 +26,7 @@ class JoinGameDetails extends GameDetailsEvent {
   final String gameId;
   final String userId;
 
-  const JoinGameDetails({
-    required this.gameId,
-    required this.userId,
-  });
+  const JoinGameDetails({required this.gameId, required this.userId});
 
   @override
   List<Object?> get props => [gameId, userId];
@@ -39,10 +36,7 @@ class LeaveGameDetails extends GameDetailsEvent {
   final String gameId;
   final String userId;
 
-  const LeaveGameDetails({
-    required this.gameId,
-    required this.userId,
-  });
+  const LeaveGameDetails({required this.gameId, required this.userId});
 
   @override
   List<Object?> get props => [gameId, userId];
@@ -52,10 +46,7 @@ class MarkGameCompleted extends GameDetailsEvent {
   final String gameId;
   final String userId;
 
-  const MarkGameCompleted({
-    required this.gameId,
-    required this.userId,
-  });
+  const MarkGameCompleted({required this.gameId, required this.userId});
 
   @override
   List<Object?> get props => [gameId, userId];
@@ -65,10 +56,7 @@ class ConfirmGameResult extends GameDetailsEvent {
   final String gameId;
   final String userId;
 
-  const ConfirmGameResult({
-    required this.gameId,
-    required this.userId,
-  });
+  const ConfirmGameResult({required this.gameId, required this.userId});
 
   @override
   List<Object?> get props => [gameId, userId];

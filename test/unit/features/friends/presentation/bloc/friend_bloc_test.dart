@@ -82,14 +82,19 @@ void main() {
         'emits [loading, loaded] when data loads successfully',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => [testFriend]);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenAnswer((_) async => [testReceivedRequest]);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenAnswer((_) async => [testSentRequest]);
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => [testFriend]);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenAnswer((_) async => [testReceivedRequest]);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenAnswer((_) async => [testSentRequest]);
           return friendBloc;
         },
         act: (bloc) => bloc.add(const FriendEvent.loadRequested()),
@@ -104,12 +109,16 @@ void main() {
         verify: (_) {
           verify(() => mockAuthRepository.currentUser).called(1);
           verify(() => mockFriendRepository.getFriends(testUser.uid)).called(1);
-          verify(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).called(1);
-          verify(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).called(1);
+          verify(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).called(1);
+          verify(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).called(1);
         },
       );
 
@@ -130,14 +139,19 @@ void main() {
         'emits [loading, loaded] with empty friends when getFriends throws',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenThrow(FriendshipException('Failed to load friends'));
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenAnswer((_) async => [testReceivedRequest]);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenAnswer((_) async => [testSentRequest]);
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenThrow(FriendshipException('Failed to load friends'));
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenAnswer((_) async => [testReceivedRequest]);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenAnswer((_) async => [testSentRequest]);
           return friendBloc;
         },
         act: (bloc) => bloc.add(const FriendEvent.loadRequested()),
@@ -155,14 +169,19 @@ void main() {
         'emits [loading, loaded] with empty received requests when getPendingRequests(received) throws',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => [testFriend]);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenThrow(FriendshipException('Failed'));
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenAnswer((_) async => [testSentRequest]);
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => [testFriend]);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenThrow(FriendshipException('Failed'));
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenAnswer((_) async => [testSentRequest]);
           return friendBloc;
         },
         act: (bloc) => bloc.add(const FriendEvent.loadRequested()),
@@ -180,14 +199,19 @@ void main() {
         'emits [loading, loaded] with empty sent requests when getPendingRequests(sent) throws',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => [testFriend]);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenAnswer((_) async => [testReceivedRequest]);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenThrow(FriendshipException('Failed'));
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => [testFriend]);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenAnswer((_) async => [testReceivedRequest]);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenThrow(FriendshipException('Failed'));
           return friendBloc;
         },
         act: (bloc) => bloc.add(const FriendEvent.loadRequested()),
@@ -205,14 +229,19 @@ void main() {
         'emits [loading, loaded] with all empty lists when all three calls fail',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenThrow(FriendshipException('Failed'));
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenThrow(FriendshipException('Failed'));
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenThrow(FriendshipException('Failed'));
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenThrow(FriendshipException('Failed'));
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenThrow(FriendshipException('Failed'));
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenThrow(FriendshipException('Failed'));
           return friendBloc;
         },
         act: (bloc) => bloc.add(const FriendEvent.loadRequested()),
@@ -230,14 +259,19 @@ void main() {
         'preserves partial results when getFriends succeeds but both pending requests fail',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => [testFriend]);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenThrow(Exception('ExecutionException'));
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenThrow(Exception('ExecutionException'));
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => [testFriend]);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenThrow(Exception('ExecutionException'));
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenThrow(Exception('ExecutionException'));
           return friendBloc;
         },
         act: (bloc) => bloc.add(const FriendEvent.loadRequested()),
@@ -256,17 +290,23 @@ void main() {
       blocTest<FriendBloc, FriendState>(
         'emits [actionSuccess, loading, loaded] when request sent successfully',
         build: () {
-          when(() => mockFriendRepository.sendFriendRequest(any()))
-              .thenAnswer((_) async => 'friendship-id');
+          when(
+            () => mockFriendRepository.sendFriendRequest(any()),
+          ).thenAnswer((_) async => 'friendship-id');
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenAnswer((_) async => [testSentRequest]);
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenAnswer((_) async => [testSentRequest]);
           return friendBloc;
         },
         act: (bloc) => bloc.add(
@@ -284,60 +324,66 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockFriendRepository.sendFriendRequest('target-user-id'))
-              .called(1);
+          verify(
+            () => mockFriendRepository.sendFriendRequest('target-user-id'),
+          ).called(1);
         },
       );
 
       blocTest<FriendBloc, FriendState>(
         'emits [error] when repository throws exception',
         build: () {
-          when(() => mockFriendRepository.sendFriendRequest(any()))
-              .thenThrow(FriendshipException('User not found'));
+          when(
+            () => mockFriendRepository.sendFriendRequest(any()),
+          ).thenThrow(FriendshipException('User not found'));
           return friendBloc;
         },
         act: (bloc) => bloc.add(
           const FriendEvent.requestSent(targetUserId: 'target-user-id'),
         ),
-        expect: () => [
-          const FriendState.error(message: 'User not found'),
-        ],
+        expect: () => [const FriendState.error(message: 'User not found')],
       );
 
       // Story 21.5: already-exists (Cloud Function code) should show green tick
       blocTest<FriendBloc, FriendState>(
         'emits [actionSuccess] instead of error when request already exists (already-exists / pending request)',
         build: () {
-          when(() => mockFriendRepository.sendFriendRequest(any()))
-              .thenThrow(FriendshipException(
-            'A friend request already exists between you and this user',
-            code: 'already-exists',
-          ));
+          when(() => mockFriendRepository.sendFriendRequest(any())).thenThrow(
+            FriendshipException(
+              'A friend request already exists between you and this user',
+              code: 'already-exists',
+            ),
+          );
           return friendBloc;
         },
         act: (bloc) => bloc.add(
           const FriendEvent.requestSent(targetUserId: 'target-user-id'),
         ),
         expect: () => [
-          const FriendState.actionSuccess(message: 'Friend request already pending'),
+          const FriendState.actionSuccess(
+            message: 'Friend request already pending',
+          ),
         ],
       );
 
       blocTest<FriendBloc, FriendState>(
         'emits [actionSuccess] instead of error when already friends (already-exists / accepted)',
         build: () {
-          when(() => mockFriendRepository.sendFriendRequest(any()))
-              .thenThrow(FriendshipException(
-            'You are already friends with this user',
-            code: 'already-exists',
-          ));
+          when(() => mockFriendRepository.sendFriendRequest(any())).thenThrow(
+            FriendshipException(
+              'You are already friends with this user',
+              code: 'already-exists',
+            ),
+          );
           return friendBloc;
         },
         act: (bloc) => bloc.add(
           const FriendEvent.requestSent(targetUserId: 'target-user-id'),
         ),
         expect: () => [
-          const FriendState.actionSuccess(message: 'Friend request already pending'),
+          const FriendState.actionSuccess(
+            message: 'Friend request already pending',
+          ),
         ],
       );
     });
@@ -346,17 +392,23 @@ void main() {
       blocTest<FriendBloc, FriendState>(
         'emits [actionSuccess, loading, loaded] when request accepted successfully',
         build: () {
-          when(() => mockFriendRepository.acceptFriendRequest(any()))
-              .thenAnswer((_) async {});
+          when(
+            () => mockFriendRepository.acceptFriendRequest(any()),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => [testFriend]);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => [testFriend]);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenAnswer((_) async => []);
           return friendBloc;
         },
         act: (bloc) => bloc.add(
@@ -372,8 +424,9 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockFriendRepository.acceptFriendRequest('friendship-1'))
-              .called(1);
+          verify(
+            () => mockFriendRepository.acceptFriendRequest('friendship-1'),
+          ).called(1);
         },
       );
     });
@@ -382,17 +435,23 @@ void main() {
       blocTest<FriendBloc, FriendState>(
         'emits [actionSuccess, loading, loaded] when request declined successfully',
         build: () {
-          when(() => mockFriendRepository.declineFriendRequest(any()))
-              .thenAnswer((_) async {});
+          when(
+            () => mockFriendRepository.declineFriendRequest(any()),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenAnswer((_) async => []);
           return friendBloc;
         },
         act: (bloc) => bloc.add(
@@ -408,8 +467,9 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockFriendRepository.declineFriendRequest('friendship-1'))
-              .called(1);
+          verify(
+            () => mockFriendRepository.declineFriendRequest('friendship-1'),
+          ).called(1);
         },
       );
     });
@@ -418,17 +478,23 @@ void main() {
       blocTest<FriendBloc, FriendState>(
         'emits [actionSuccess, loading, loaded] when request cancelled successfully',
         build: () {
-          when(() => mockFriendRepository.declineFriendRequest(any()))
-              .thenAnswer((_) async {});
+          when(
+            () => mockFriendRepository.declineFriendRequest(any()),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenAnswer((_) async => []);
           return friendBloc;
         },
         act: (bloc) => bloc.add(
@@ -444,8 +510,9 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockFriendRepository.declineFriendRequest('friendship-2'))
-              .called(1);
+          verify(
+            () => mockFriendRepository.declineFriendRequest('friendship-2'),
+          ).called(1);
         },
       );
     });
@@ -454,22 +521,27 @@ void main() {
       blocTest<FriendBloc, FriendState>(
         'emits [actionSuccess, loading, loaded] when friend removed successfully',
         build: () {
-          when(() => mockFriendRepository.removeFriend(any()))
-              .thenAnswer((_) async {});
+          when(
+            () => mockFriendRepository.removeFriend(any()),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.getFriends(any()))
-              .thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.received,
-              )).thenAnswer((_) async => []);
-          when(() => mockFriendRepository.getPendingRequests(
-                type: FriendRequestType.sent,
-              )).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getFriends(any()),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.received,
+            ),
+          ).thenAnswer((_) async => []);
+          when(
+            () => mockFriendRepository.getPendingRequests(
+              type: FriendRequestType.sent,
+            ),
+          ).thenAnswer((_) async => []);
           return friendBloc;
         },
-        act: (bloc) => bloc.add(
-          const FriendEvent.removed(friendshipId: 'friendship-1'),
-        ),
+        act: (bloc) =>
+            bloc.add(const FriendEvent.removed(friendshipId: 'friendship-1')),
         expect: () => [
           const FriendState.actionSuccess(message: 'Friend removed'),
           const FriendState.loading(),
@@ -480,8 +552,9 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockFriendRepository.removeFriend('friendship-1'))
-              .called(1);
+          verify(
+            () => mockFriendRepository.removeFriend('friendship-1'),
+          ).called(1);
         },
       );
     });
@@ -490,8 +563,9 @@ void main() {
       blocTest<FriendBloc, FriendState>(
         'emits [loading, statusResult] when status checked successfully',
         build: () {
-          when(() => mockFriendRepository.checkFriendshipStatus(any()))
-              .thenAnswer(
+          when(
+            () => mockFriendRepository.checkFriendshipStatus(any()),
+          ).thenAnswer(
             (_) async => const FriendshipStatusResult(
               isFriend: true,
               hasPendingRequest: false,
@@ -499,9 +573,8 @@ void main() {
           );
           return friendBloc;
         },
-        act: (bloc) => bloc.add(
-          const FriendEvent.statusChecked(userId: 'user-id'),
-        ),
+        act: (bloc) =>
+            bloc.add(const FriendEvent.statusChecked(userId: 'user-id')),
         expect: () => [
           const FriendState.loading(),
           const FriendState.statusResult(
@@ -512,8 +585,9 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockFriendRepository.checkFriendshipStatus('user-id'))
-              .called(1);
+          verify(
+            () => mockFriendRepository.checkFriendshipStatus('user-id'),
+          ).called(1);
         },
       );
     });
@@ -523,12 +597,15 @@ void main() {
         'emits [searchLoading, searchResult] when user is found',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.searchUserByEmail('friend@example.com'))
-              .thenAnswer((_) async => UserSearchResult(
-                    user: testFriend,
-                    isFriend: false,
-                    hasPendingRequest: false,
-                  ));
+          when(
+            () => mockFriendRepository.searchUserByEmail('friend@example.com'),
+          ).thenAnswer(
+            (_) async => UserSearchResult(
+              user: testFriend,
+              isFriend: false,
+              hasPendingRequest: false,
+            ),
+          );
           return friendBloc;
         },
         act: (bloc) => bloc.add(
@@ -572,12 +649,15 @@ void main() {
         'emits [searchLoading, searchResult] with isSelfSearch false when user not found',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockFriendRepository.searchUserByEmail('unknown@example.com'))
-              .thenAnswer((_) async => UserSearchResult(
-                    user: null,
-                    isFriend: false,
-                    hasPendingRequest: false,
-                  ));
+          when(
+            () => mockFriendRepository.searchUserByEmail('unknown@example.com'),
+          ).thenAnswer(
+            (_) async => UserSearchResult(
+              user: null,
+              isFriend: false,
+              hasPendingRequest: false,
+            ),
+          );
           return friendBloc;
         },
         act: (bloc) => bloc.add(

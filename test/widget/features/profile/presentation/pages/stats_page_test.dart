@@ -18,8 +18,7 @@ import 'package:play_with_me/features/profile/presentation/bloc/player_stats/pla
 import 'package:play_with_me/features/profile/presentation/widgets/expanded_stats_section.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
-class MockPlayerStatsBloc
-    extends MockBloc<PlayerStatsEvent, PlayerStatsState>
+class MockPlayerStatsBloc extends MockBloc<PlayerStatsEvent, PlayerStatsState>
     implements PlayerStatsBloc {}
 
 class MockUserRepository extends Mock implements UserRepository {}
@@ -66,21 +65,28 @@ void main() {
     sl.registerSingleton<UserRepository>(mockUserRepository);
 
     // Stub repository methods used by internal blocs
-    when(() => mockUserRepository.getUserStream(any()))
-        .thenAnswer((_) => Stream.value(testUserModel));
-    when(() => mockUserRepository.getRatingHistory(any(), limit: any(named: 'limit')))
-        .thenAnswer((_) => Stream.value(testHistory));
-    when(() => mockUserRepository.getRatingHistory(any()))
-        .thenAnswer((_) => Stream.value(testHistory));
-    when(() => mockUserRepository.getUserRanking(any()))
-        .thenAnswer((_) async => UserRanking(
-              globalRank: 1,
-              totalUsers: 10,
-              percentile: 90.0,
-              friendsRank: 1,
-              totalFriends: 5,
-              calculatedAt: DateTime.now(),
-            ));
+    when(
+      () => mockUserRepository.getUserStream(any()),
+    ).thenAnswer((_) => Stream.value(testUserModel));
+    when(
+      () => mockUserRepository.getRatingHistory(
+        any(),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer((_) => Stream.value(testHistory));
+    when(
+      () => mockUserRepository.getRatingHistory(any()),
+    ).thenAnswer((_) => Stream.value(testHistory));
+    when(() => mockUserRepository.getUserRanking(any())).thenAnswer(
+      (_) async => UserRanking(
+        globalRank: 1,
+        totalUsers: 10,
+        percentile: 90.0,
+        friendsRank: 1,
+        totalFriends: 5,
+        calculatedAt: DateTime.now(),
+      ),
+    );
   });
 
   tearDown(() async {
@@ -105,9 +111,14 @@ void main() {
   }
 
   group('StatsPage', () {
-    testWidgets('displays loading indicator when stats are loading', (tester) async {
-      whenListen(mockBloc, const Stream<PlayerStatsState>.empty(),
-          initialState: PlayerStatsLoading());
+    testWidgets('displays loading indicator when stats are loading', (
+      tester,
+    ) async {
+      whenListen(
+        mockBloc,
+        const Stream<PlayerStatsState>.empty(),
+        initialState: PlayerStatsLoading(),
+      );
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -115,15 +126,20 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('displays ExpandedStatsSection when stats are loaded', (tester) async {
+    testWidgets('displays ExpandedStatsSection when stats are loaded', (
+      tester,
+    ) async {
       final loadedState = PlayerStatsLoaded(
         user: testUserModel,
         history: testHistory,
         ranking: null,
         rankingLoadFailed: false,
       );
-      whenListen(mockBloc, const Stream<PlayerStatsState>.empty(),
-          initialState: loadedState);
+      whenListen(
+        mockBloc,
+        const Stream<PlayerStatsState>.empty(),
+        initialState: loadedState,
+      );
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -136,10 +152,15 @@ void main() {
       expect(find.text('PERFORMANCE OVERVIEW'), findsOneWidget);
     });
 
-    testWidgets('displays error message when stats fail to load', (tester) async {
+    testWidgets('displays error message when stats fail to load', (
+      tester,
+    ) async {
       const errorState = PlayerStatsError('Network error');
-      whenListen(mockBloc, const Stream<PlayerStatsState>.empty(),
-          initialState: errorState);
+      whenListen(
+        mockBloc,
+        const Stream<PlayerStatsState>.empty(),
+        initialState: errorState,
+      );
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -155,8 +176,11 @@ void main() {
         ranking: null,
         rankingLoadFailed: false,
       );
-      whenListen(mockBloc, const Stream<PlayerStatsState>.empty(),
-          initialState: loadedState);
+      whenListen(
+        mockBloc,
+        const Stream<PlayerStatsState>.empty(),
+        initialState: loadedState,
+      );
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();

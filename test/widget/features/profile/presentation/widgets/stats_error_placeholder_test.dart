@@ -7,17 +7,15 @@ void main() {
   group('StatsErrorPlaceholder Widget Tests', () {
     testWidgets('renders with default properties', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StatsErrorPlaceholder(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: StatsErrorPlaceholder())),
       );
       await tester.pumpAndSettle();
 
       expect(find.text('Unable to Load Stats'), findsOneWidget);
-      expect(find.text('Something went wrong while loading your statistics.'),
-          findsOneWidget);
+      expect(
+        find.text('Something went wrong while loading your statistics.'),
+        findsOneWidget,
+      );
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
       expect(find.byType(Card), findsOneWidget);
     });
@@ -47,15 +45,12 @@ void main() {
       expect(retryTapped, isTrue);
     });
 
-    testWidgets('does not render retry button when onRetry is null',
-        (tester) async {
+    testWidgets('does not render retry button when onRetry is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: StatsErrorPlaceholder(
-              onRetry: null,
-            ),
-          ),
+          home: Scaffold(body: StatsErrorPlaceholder(onRetry: null)),
         ),
       );
       await tester.pump();
@@ -86,9 +81,7 @@ void main() {
     testWidgets('renders network error variant', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: StatsErrorPlaceholder.network(),
-          ),
+          home: Scaffold(body: StatsErrorPlaceholder.network()),
         ),
       );
       await tester.pumpAndSettle();
@@ -125,9 +118,7 @@ void main() {
     testWidgets('renders permission error variant', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: StatsErrorPlaceholder.permission(),
-          ),
+          home: Scaffold(body: StatsErrorPlaceholder.permission()),
         ),
       );
       await tester.pumpAndSettle();
@@ -145,9 +136,7 @@ void main() {
     testWidgets('renders calculation error variant', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: StatsErrorPlaceholder.calculation(),
-          ),
+          home: Scaffold(body: StatsErrorPlaceholder.calculation()),
         ),
       );
       await tester.pumpAndSettle();
@@ -164,11 +153,7 @@ void main() {
   group('CompactStatsError Widget Tests', () {
     testWidgets('renders compact error with default message', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: CompactStatsError(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: CompactStatsError())),
       );
       await tester.pumpAndSettle();
 
@@ -180,11 +165,7 @@ void main() {
     testWidgets('renders with custom message', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: CompactStatsError(
-              message: 'Failed to load',
-            ),
-          ),
+          home: Scaffold(body: CompactStatsError(message: 'Failed to load')),
         ),
       );
       await tester.pumpAndSettle();
@@ -217,15 +198,12 @@ void main() {
       expect(retryTapped, isTrue);
     });
 
-    testWidgets('does not render retry button when onRetry is null',
-        (tester) async {
+    testWidgets('does not render retry button when onRetry is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: CompactStatsError(
-              onRetry: null,
-            ),
-          ),
+          home: Scaffold(body: CompactStatsError(onRetry: null)),
         ),
       );
       await tester.pumpAndSettle();

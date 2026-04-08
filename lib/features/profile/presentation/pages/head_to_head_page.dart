@@ -23,18 +23,16 @@ class HeadToHeadPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HeadToHeadBloc(
-        userRepository: sl<UserRepository>(),
-      )..add(HeadToHeadEvent.loadHeadToHead(
-          userId: userId,
-          opponentId: opponentId,
-        )),
+      create: (context) => HeadToHeadBloc(userRepository: sl<UserRepository>())
+        ..add(
+          HeadToHeadEvent.loadHeadToHead(
+            userId: userId,
+            opponentId: opponentId,
+          ),
+        ),
       child: Scaffold(
         backgroundColor: AppColors.scaffoldBackground,
-        appBar: PlayWithMeAppBar.build(
-          context: context,
-          title: 'Head-to-Head',
-        ),
+        appBar: PlayWithMeAppBar.build(context: context, title: 'Head-to-Head'),
         body: BlocBuilder<HeadToHeadBloc, HeadToHeadState>(
           builder: (context, state) {
             return state.when(
@@ -45,11 +43,17 @@ class HeadToHeadPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 40, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 40,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 12),
-                    Text(message,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 13)),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 13),
+                    ),
                   ],
                 ),
               ),
@@ -121,10 +125,7 @@ class HeadToHeadPage extends StatelessWidget {
           const SizedBox(height: 12),
           Card(
             margin: EdgeInsets.zero,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: child,
-            ),
+            child: Padding(padding: const EdgeInsets.all(16), child: child),
           ),
           const SizedBox(height: 16),
         ],
@@ -148,7 +149,11 @@ class HeadToHeadPage extends StatelessWidget {
                     ? NetworkImage(stats.opponentPhotoUrl!)
                     : null,
                 child: stats.opponentPhotoUrl == null
-                    ? const Icon(Icons.person, size: 30, color: AppColors.secondary)
+                    ? const Icon(
+                        Icons.person,
+                        size: 30,
+                        color: AppColors.secondary,
+                      )
                     : null,
               ),
               const SizedBox(width: 14),
@@ -164,7 +169,8 @@ class HeadToHeadPage extends StatelessWidget {
                         color: AppColors.onSurface,
                       ),
                     ),
-                    if (stats.opponentName != null && stats.opponentEmail != null) ...[
+                    if (stats.opponentName != null &&
+                        stats.opponentEmail != null) ...[
                       const SizedBox(height: 2),
                       Text(
                         stats.opponentEmail!,
@@ -223,17 +229,15 @@ class HeadToHeadPage extends StatelessWidget {
           '${stats.winRate.toStringAsFixed(1)}%',
           stats.winRate >= 50 ? Colors.green : Colors.red,
         ),
-        _buildStatColumn(
-          'Record',
-          stats.recordString,
-          AppColors.secondary,
-        ),
+        _buildStatColumn('Record', stats.recordString, AppColors.secondary),
       ],
     );
   }
 
   Widget _buildPointDifferentialContent(
-      BuildContext context, HeadToHeadStats stats) {
+    BuildContext context,
+    HeadToHeadStats stats,
+  ) {
     final isPositive = stats.avgPointDifferential >= 0;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -281,7 +285,9 @@ class HeadToHeadPage extends StatelessWidget {
   }
 
   Widget _buildRecentMatchupsContent(
-      BuildContext context, HeadToHeadStats stats) {
+    BuildContext context,
+    HeadToHeadStats stats,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -289,8 +295,7 @@ class HeadToHeadPage extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: stats.isOnWinningStreak
                     ? Colors.green.withValues(alpha: 0.1)
@@ -318,8 +323,7 @@ class HeadToHeadPage extends StatelessWidget {
             ),
           )
         else
-          ...stats.recentMatchups
-              .map((matchup) => _buildMatchupTile(matchup)),
+          ...stats.recentMatchups.map((matchup) => _buildMatchupTile(matchup)),
       ],
     );
   }
@@ -411,10 +415,7 @@ class HeadToHeadPage extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 11,
-            color: AppColors.textMuted,
-          ),
+          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
         ),
       ],
     );

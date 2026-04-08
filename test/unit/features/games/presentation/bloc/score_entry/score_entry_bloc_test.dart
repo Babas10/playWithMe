@@ -25,9 +25,9 @@ void main() {
 
   // Helper to build the bloc with both required repositories
   ScoreEntryBloc buildBloc() => ScoreEntryBloc(
-        gameRepository: mockGameRepository,
-        userRepository: mockUserRepository,
-      );
+    gameRepository: mockGameRepository,
+    userRepository: mockUserRepository,
+  );
 
   // Teams used across tests for a 4-player game
   const testTeams = GameTeams(
@@ -53,7 +53,8 @@ void main() {
           mockGameRepository.addGame(game);
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
+        act: (bloc) =>
+            bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
         expect: () => [
           const ScoreEntryLoading(),
           isA<ScoreEntryLoaded>()
@@ -76,7 +77,8 @@ void main() {
           mockGameRepository.addGame(game);
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
+        act: (bloc) =>
+            bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
         expect: () => [
           const ScoreEntryLoading(),
           isA<ScoreEntryLoaded>()
@@ -99,7 +101,9 @@ void main() {
               games: [
                 IndividualGame(
                   gameNumber: 1,
-                  sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+                  sets: [
+                    SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1),
+                  ],
                   winner: 'teamA',
                   teams: const GameTeams(
                     teamAPlayerIds: ['player1', 'player2'],
@@ -108,7 +112,9 @@ void main() {
                 ),
                 IndividualGame(
                   gameNumber: 2,
-                  sets: [SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1)],
+                  sets: [
+                    SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1),
+                  ],
                   winner: 'teamB',
                 ),
               ],
@@ -118,25 +124,43 @@ void main() {
           mockGameRepository.addGame(game);
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
+        act: (bloc) =>
+            bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
         expect: () => [
           const ScoreEntryLoading(),
           isA<ScoreEntryLoaded>()
               .having((state) => state.gameCount, 'game count', 2)
               .having((state) => state.games.length, 'games length', 2)
-              .having((state) => state.games[0].sets[0].teamAPoints, 'game 1 set 1 teamA', 21)
-              .having((state) => state.games[1].sets[0].teamBPoints, 'game 2 set 1 teamB', 21)
+              .having(
+                (state) => state.games[0].sets[0].teamAPoints,
+                'game 1 set 1 teamA',
+                21,
+              )
+              .having(
+                (state) => state.games[1].sets[0].teamBPoints,
+                'game 2 set 1 teamB',
+                21,
+              )
               // game 1 has explicit per-game teams
-              .having((state) => state.games[0].teams, 'game 1 teams', isNotNull)
+              .having(
+                (state) => state.games[0].teams,
+                'game 1 teams',
+                isNotNull,
+              )
               // game 2 falls back to session-level teams
-              .having((state) => state.games[1].teams, 'game 2 teams (fallback)', isNotNull),
+              .having(
+                (state) => state.games[1].teams,
+                'game 2 teams (fallback)',
+                isNotNull,
+              ),
         ],
       );
 
       blocTest<ScoreEntryBloc, ScoreEntryState>(
         'emits error when game not found',
         build: () => buildBloc(),
-        act: (bloc) => bloc.add(const LoadGameForScoreEntry(gameId: 'non-existent')),
+        act: (bloc) =>
+            bloc.add(const LoadGameForScoreEntry(gameId: 'non-existent')),
         expect: () => [
           const ScoreEntryLoading(),
           const ScoreEntryError(message: 'Game not found'),
@@ -152,11 +176,9 @@ void main() {
           mockGameRepository.addGame(scheduledGame);
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
-        expect: () => [
-          const ScoreEntryLoading(),
-          isA<ScoreEntryLoaded>(),
-        ],
+        act: (bloc) =>
+            bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
+        expect: () => [const ScoreEntryLoading(), isA<ScoreEntryLoaded>()],
       );
 
       blocTest<ScoreEntryBloc, ScoreEntryState>(
@@ -165,16 +187,15 @@ void main() {
           final game = TestGameData.testGame.copyWith(
             status: GameStatus.completed,
             endedAt: DateTime.now(),
-            teams: null, // No session-level teams; per-game teams are selected in UI
+            teams:
+                null, // No session-level teams; per-game teams are selected in UI
           );
           mockGameRepository.addGame(game);
           return buildBloc();
         },
-        act: (bloc) => bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
-        expect: () => [
-          const ScoreEntryLoading(),
-          isA<ScoreEntryLoaded>(),
-        ],
+        act: (bloc) =>
+            bloc.add(const LoadGameForScoreEntry(gameId: 'test-game-123')),
+        expect: () => [const ScoreEntryLoading(), isA<ScoreEntryLoaded>()],
       );
     });
 
@@ -183,9 +204,7 @@ void main() {
         'sets game count and initializes games with no teams selected',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
         ),
         act: (bloc) => bloc.add(const SetGameCount(count: 3)),
         expect: () => [
@@ -195,9 +214,21 @@ void main() {
               .having((state) => state.games[0].numberOfSets, 'game 0 sets', 1)
               .having((state) => state.games[1].numberOfSets, 'game 1 sets', 1)
               .having((state) => state.games[2].numberOfSets, 'game 2 sets', 1)
-              .having((state) => state.games[0].teams, 'game 0 teams null', null)
-              .having((state) => state.games[1].teams, 'game 1 teams null', null)
-              .having((state) => state.games[2].teams, 'game 2 teams null', null),
+              .having(
+                (state) => state.games[0].teams,
+                'game 0 teams null',
+                null,
+              )
+              .having(
+                (state) => state.games[1].teams,
+                'game 1 teams null',
+                null,
+              )
+              .having(
+                (state) => state.games[2].teams,
+                'game 2 teams null',
+                null,
+              ),
         ],
       );
 
@@ -205,9 +236,7 @@ void main() {
         'sets game count to 1 for single game',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
         ),
         act: (bloc) => bloc.add(const SetGameCount(count: 1)),
         expect: () => [
@@ -223,20 +252,23 @@ void main() {
         'changes game format to best of 2',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
           gameCount: 2,
           games: [
             GameData(numberOfSets: 1, sets: [const SetScoreData()]),
             GameData(numberOfSets: 1, sets: [const SetScoreData()]),
           ],
         ),
-        act: (bloc) => bloc.add(const SetGameFormat(gameIndex: 0, numberOfSets: 2)),
+        act: (bloc) =>
+            bloc.add(const SetGameFormat(gameIndex: 0, numberOfSets: 2)),
         expect: () => [
           isA<ScoreEntryLoaded>()
               .having((state) => state.games[0].numberOfSets, 'game 0 sets', 2)
-              .having((state) => state.games[0].sets.length, 'game 0 sets length', 2)
+              .having(
+                (state) => state.games[0].sets.length,
+                'game 0 sets length',
+                2,
+              )
               .having((state) => state.games[1].numberOfSets, 'game 1 sets', 1),
         ],
       );
@@ -245,19 +277,22 @@ void main() {
         'changes game format to best of 3',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
           gameCount: 1,
           games: [
             GameData(numberOfSets: 1, sets: [const SetScoreData()]),
           ],
         ),
-        act: (bloc) => bloc.add(const SetGameFormat(gameIndex: 0, numberOfSets: 3)),
+        act: (bloc) =>
+            bloc.add(const SetGameFormat(gameIndex: 0, numberOfSets: 3)),
         expect: () => [
           isA<ScoreEntryLoaded>()
               .having((state) => state.games[0].numberOfSets, 'game 0 sets', 3)
-              .having((state) => state.games[0].sets.length, 'game 0 sets length', 3),
+              .having(
+                (state) => state.games[0].sets.length,
+                'game 0 sets length',
+                3,
+              ),
         ],
       );
     });
@@ -267,26 +302,38 @@ void main() {
         'updates score for specific set in specific game',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
           gameCount: 2,
           games: [
             GameData(numberOfSets: 1, sets: [const SetScoreData()]),
             GameData(numberOfSets: 1, sets: [const SetScoreData()]),
           ],
         ),
-        act: (bloc) => bloc.add(const UpdateSetScore(
-          gameIndex: 0,
-          setIndex: 0,
-          teamAPoints: 21,
-          teamBPoints: 19,
-        )),
+        act: (bloc) => bloc.add(
+          const UpdateSetScore(
+            gameIndex: 0,
+            setIndex: 0,
+            teamAPoints: 21,
+            teamBPoints: 19,
+          ),
+        ),
         expect: () => [
           isA<ScoreEntryLoaded>()
-              .having((state) => state.games[0].sets[0].teamAPoints, 'game 0 set 0 teamA', 21)
-              .having((state) => state.games[0].sets[0].teamBPoints, 'game 0 set 0 teamB', 19)
-              .having((state) => state.games[1].sets[0].teamAPoints, 'game 1 unchanged', null),
+              .having(
+                (state) => state.games[0].sets[0].teamAPoints,
+                'game 0 set 0 teamA',
+                21,
+              )
+              .having(
+                (state) => state.games[0].sets[0].teamBPoints,
+                'game 0 set 0 teamB',
+                19,
+              )
+              .having(
+                (state) => state.games[1].sets[0].teamAPoints,
+                'game 1 unchanged',
+                null,
+              ),
         ],
       );
 
@@ -294,24 +341,55 @@ void main() {
         'updates multiple sets independently',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
           gameCount: 1,
           games: [
-            GameData(numberOfSets: 2, sets: [const SetScoreData(), const SetScoreData()]),
+            GameData(
+              numberOfSets: 2,
+              sets: [const SetScoreData(), const SetScoreData()],
+            ),
           ],
         ),
         act: (bloc) => bloc
-          ..add(const UpdateSetScore(gameIndex: 0, setIndex: 0, teamAPoints: 21, teamBPoints: 19))
-          ..add(const UpdateSetScore(gameIndex: 0, setIndex: 1, teamAPoints: 19, teamBPoints: 21)),
+          ..add(
+            const UpdateSetScore(
+              gameIndex: 0,
+              setIndex: 0,
+              teamAPoints: 21,
+              teamBPoints: 19,
+            ),
+          )
+          ..add(
+            const UpdateSetScore(
+              gameIndex: 0,
+              setIndex: 1,
+              teamAPoints: 19,
+              teamBPoints: 21,
+            ),
+          ),
         expect: () => [
           isA<ScoreEntryLoaded>()
-              .having((state) => state.games[0].sets[0].teamAPoints, 'set 0 teamA', 21)
-              .having((state) => state.games[0].sets[0].teamBPoints, 'set 0 teamB', 19),
+              .having(
+                (state) => state.games[0].sets[0].teamAPoints,
+                'set 0 teamA',
+                21,
+              )
+              .having(
+                (state) => state.games[0].sets[0].teamBPoints,
+                'set 0 teamB',
+                19,
+              ),
           isA<ScoreEntryLoaded>()
-              .having((state) => state.games[0].sets[1].teamAPoints, 'set 1 teamA', 19)
-              .having((state) => state.games[0].sets[1].teamBPoints, 'set 1 teamB', 21),
+              .having(
+                (state) => state.games[0].sets[1].teamAPoints,
+                'set 1 teamA',
+                19,
+              )
+              .having(
+                (state) => state.games[0].sets[1].teamBPoints,
+                'set 1 teamB',
+                21,
+              ),
         ],
       );
 
@@ -319,9 +397,7 @@ void main() {
         'preserves existing values when updating one field',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
           gameCount: 1,
           games: [
             GameData(numberOfSets: 1, sets: [const SetScoreData()]),
@@ -329,16 +405,46 @@ void main() {
         ),
         act: (bloc) => bloc
           // First, set Team A score (Team B is null)
-          ..add(const UpdateSetScore(gameIndex: 0, setIndex: 0, teamAPoints: 21, teamBPoints: null))
+          ..add(
+            const UpdateSetScore(
+              gameIndex: 0,
+              setIndex: 0,
+              teamAPoints: 21,
+              teamBPoints: null,
+            ),
+          )
           // Then, set Team B score (must preserve Team A)
-          ..add(const UpdateSetScore(gameIndex: 0, setIndex: 0, teamAPoints: 21, teamBPoints: 19)),
+          ..add(
+            const UpdateSetScore(
+              gameIndex: 0,
+              setIndex: 0,
+              teamAPoints: 21,
+              teamBPoints: 19,
+            ),
+          ),
         expect: () => [
           isA<ScoreEntryLoaded>()
-              .having((state) => state.games[0].sets[0].teamAPoints, 'first update teamA', 21)
-              .having((state) => state.games[0].sets[0].teamBPoints, 'first update teamB', null),
+              .having(
+                (state) => state.games[0].sets[0].teamAPoints,
+                'first update teamA',
+                21,
+              )
+              .having(
+                (state) => state.games[0].sets[0].teamBPoints,
+                'first update teamB',
+                null,
+              ),
           isA<ScoreEntryLoaded>()
-              .having((state) => state.games[0].sets[0].teamAPoints, 'second update teamA preserved', 21)
-              .having((state) => state.games[0].sets[0].teamBPoints, 'second update teamB', 19),
+              .having(
+                (state) => state.games[0].sets[0].teamAPoints,
+                'second update teamA preserved',
+                21,
+              )
+              .having(
+                (state) => state.games[0].sets[0].teamBPoints,
+                'second update teamB',
+                19,
+              ),
         ],
       );
     });
@@ -355,14 +461,20 @@ void main() {
             GameData(numberOfSets: 1, sets: [const SetScoreData()]),
           ],
         ),
-        act: (bloc) => bloc.add(SelectGameTeams(
-          gameIndex: 0,
-          teams: testTeams,
-        )),
+        act: (bloc) =>
+            bloc.add(SelectGameTeams(gameIndex: 0, teams: testTeams)),
         expect: () => [
           isA<ScoreEntryLoaded>()
-              .having((state) => state.games[0].teams, 'game 0 teams set', testTeams)
-              .having((state) => state.games[1].teams, 'game 1 teams unchanged', null),
+              .having(
+                (state) => state.games[0].teams,
+                'game 0 teams set',
+                testTeams,
+              )
+              .having(
+                (state) => state.games[1].teams,
+                'game 1 teams unchanged',
+                null,
+              ),
         ],
       );
 
@@ -378,23 +490,34 @@ void main() {
           ],
         ),
         act: (bloc) => bloc
-          ..add(SelectGameTeams(
-            gameIndex: 0,
-            teams: testTeams,
-          ))
-          ..add(SelectGameTeams(
-            gameIndex: 1,
-            teams: const GameTeams(
-              teamAPlayerIds: ['p1', 'p3'],
-              teamBPlayerIds: ['p2', 'p4'],
+          ..add(SelectGameTeams(gameIndex: 0, teams: testTeams))
+          ..add(
+            SelectGameTeams(
+              gameIndex: 1,
+              teams: const GameTeams(
+                teamAPlayerIds: ['p1', 'p3'],
+                teamBPlayerIds: ['p2', 'p4'],
+              ),
             ),
-          )),
+          ),
         expect: () => [
           isA<ScoreEntryLoaded>()
-              .having((state) => state.games[0].teams, 'game 0 teams', testTeams)
-              .having((state) => state.games[1].teams, 'game 1 unchanged', null),
+              .having(
+                (state) => state.games[0].teams,
+                'game 0 teams',
+                testTeams,
+              )
+              .having(
+                (state) => state.games[1].teams,
+                'game 1 unchanged',
+                null,
+              ),
           isA<ScoreEntryLoaded>()
-              .having((state) => state.games[0].teams, 'game 0 preserved', testTeams)
+              .having(
+                (state) => state.games[0].teams,
+                'game 0 preserved',
+                testTeams,
+              )
               .having(
                 (state) => state.games[1].teams?.teamAPlayerIds,
                 'game 1 teams set',
@@ -413,10 +536,12 @@ void main() {
             GameData(numberOfSets: 1, sets: [const SetScoreData()]),
           ],
         ),
-        act: (bloc) => bloc.add(SelectGameTeams(
-          gameIndex: 5, // out of range
-          teams: testTeams,
-        )),
+        act: (bloc) => bloc.add(
+          SelectGameTeams(
+            gameIndex: 5, // out of range
+            teams: testTeams,
+          ),
+        ),
         expect: () => [], // no state change
       );
     });
@@ -453,7 +578,11 @@ void main() {
           isA<ScoreEntrySaved>()
               .having((state) => state.result.games.length, 'games count', 1)
               .having((state) => state.result.overallWinner, 'winner', 'teamA')
-              .having((state) => state.result.games[0].teams, 'game 0 teams saved', testTeams),
+              .having(
+                (state) => state.result.games[0].teams,
+                'game 0 teams saved',
+                testTeams,
+              ),
         ],
       );
 
@@ -498,8 +627,16 @@ void main() {
           isA<ScoreEntrySaved>()
               .having((state) => state.result.games.length, 'games count', 3)
               .having((state) => state.result.overallWinner, 'winner', 'teamA')
-              .having((state) => state.result.gamesWon['teamA'], 'teamA wins', 2)
-              .having((state) => state.result.gamesWon['teamB'], 'teamB wins', 1),
+              .having(
+                (state) => state.result.gamesWon['teamA'],
+                'teamA wins',
+                2,
+              )
+              .having(
+                (state) => state.result.gamesWon['teamB'],
+                'teamB wins',
+                1,
+              ),
         ],
       );
 
@@ -539,8 +676,16 @@ void main() {
           isA<ScoreEntrySaved>()
               .having((state) => state.result.games.length, 'games count', 2)
               .having((state) => state.result.overallWinner, 'winner', null)
-              .having((state) => state.result.gamesWon['teamA'], 'teamA wins', 1)
-              .having((state) => state.result.gamesWon['teamB'], 'teamB wins', 1),
+              .having(
+                (state) => state.result.gamesWon['teamA'],
+                'teamA wins',
+                1,
+              )
+              .having(
+                (state) => state.result.gamesWon['teamB'],
+                'teamB wins',
+                1,
+              ),
         ],
       );
 
@@ -590,8 +735,16 @@ void main() {
           isA<ScoreEntrySaved>()
               .having((state) => state.result.games.length, 'games count', 4)
               .having((state) => state.result.overallWinner, 'winner', null)
-              .having((state) => state.result.gamesWon['teamA'], 'teamA wins', 2)
-              .having((state) => state.result.gamesWon['teamB'], 'teamB wins', 2),
+              .having(
+                (state) => state.result.gamesWon['teamA'],
+                'teamA wins',
+                2,
+              )
+              .having(
+                (state) => state.result.gamesWon['teamB'],
+                'teamB wins',
+                2,
+              ),
         ],
       );
 
@@ -599,9 +752,7 @@ void main() {
         'emits error when scores incomplete (no teams selected)',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
           gameCount: 1,
           games: [
             GameData(
@@ -614,7 +765,8 @@ void main() {
         act: (bloc) => bloc.add(const SaveScores(userId: 'test-uid-123')),
         expect: () => [
           const ScoreEntryError(
-              message: 'Please select teams and enter valid scores for all games'),
+            message: 'Please select teams and enter valid scores for all games',
+          ),
           isA<ScoreEntryLoaded>(),
         ],
       );
@@ -623,9 +775,7 @@ void main() {
         'emits error when score values missing (teams set but score incomplete)',
         build: () => buildBloc(),
         seed: () => ScoreEntryLoaded(
-          game: TestGameData.testGame.copyWith(
-            status: GameStatus.completed,
-          ),
+          game: TestGameData.testGame.copyWith(status: GameStatus.completed),
           gameCount: 1,
           games: [
             GameData(
@@ -638,33 +788,37 @@ void main() {
         act: (bloc) => bloc.add(const SaveScores(userId: 'test-uid-123')),
         expect: () => [
           const ScoreEntryError(
-              message: 'Please select teams and enter valid scores for all games'),
+            message: 'Please select teams and enter valid scores for all games',
+          ),
           isA<ScoreEntryLoaded>(),
         ],
       );
     });
 
     group('ScoreEntryLoaded state helpers', () {
-      test('allGamesComplete returns true when all games have teams and complete scores', () {
-        final state = ScoreEntryLoaded(
-          game: TestGameData.testGame,
-          gameCount: 2,
-          games: [
-            GameData(
-              numberOfSets: 1,
-              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
-              teams: testTeams,
-            ),
-            GameData(
-              numberOfSets: 1,
-              sets: [const SetScoreData(teamAPoints: 19, teamBPoints: 21)],
-              teams: testTeams,
-            ),
-          ],
-        );
+      test(
+        'allGamesComplete returns true when all games have teams and complete scores',
+        () {
+          final state = ScoreEntryLoaded(
+            game: TestGameData.testGame,
+            gameCount: 2,
+            games: [
+              GameData(
+                numberOfSets: 1,
+                sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
+                teams: testTeams,
+              ),
+              GameData(
+                numberOfSets: 1,
+                sets: [const SetScoreData(teamAPoints: 19, teamBPoints: 21)],
+                teams: testTeams,
+              ),
+            ],
+          );
 
-        expect(state.allGamesComplete, true);
-      });
+          expect(state.allGamesComplete, true);
+        },
+      );
 
       test('allGamesComplete returns false when teams missing for a game', () {
         final state = ScoreEntryLoaded(
@@ -734,21 +888,24 @@ void main() {
         expect(state.overallWinner, 'teamA');
       });
 
-      test('canSave returns true when all games have teams and complete scores', () {
-        final state = ScoreEntryLoaded(
-          game: TestGameData.testGame,
-          gameCount: 1,
-          games: [
-            GameData(
-              numberOfSets: 1,
-              sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
-              teams: testTeams,
-            ),
-          ],
-        );
+      test(
+        'canSave returns true when all games have teams and complete scores',
+        () {
+          final state = ScoreEntryLoaded(
+            game: TestGameData.testGame,
+            gameCount: 1,
+            games: [
+              GameData(
+                numberOfSets: 1,
+                sets: [const SetScoreData(teamAPoints: 21, teamBPoints: 19)],
+                teams: testTeams,
+              ),
+            ],
+          );
 
-        expect(state.canSave, true);
-      });
+          expect(state.canSave, true);
+        },
+      );
 
       test('canSave returns false when teams missing', () {
         final state = ScoreEntryLoaded(

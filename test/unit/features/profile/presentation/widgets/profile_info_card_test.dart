@@ -9,7 +9,9 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 
 void main() {
   group('ProfileInfoCard', () {
-    testWidgets('displays account type as Regular for non-anonymous users', (tester) async {
+    testWidgets('displays account type as Regular for non-anonymous users', (
+      tester,
+    ) async {
       final testUser = UserEntity(
         uid: 'test-uid-123',
         email: 'test@example.com',
@@ -30,9 +32,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: ProfileInfoCard(user: testUser),
-          ),
+          home: Scaffold(body: ProfileInfoCard(user: testUser)),
         ),
       );
 
@@ -40,7 +40,9 @@ void main() {
       expect(find.text('Regular'), findsOneWidget);
     });
 
-    testWidgets('displays account type as Anonymous for anonymous users', (tester) async {
+    testWidgets('displays account type as Anonymous for anonymous users', (
+      tester,
+    ) async {
       final testUser = UserEntity(
         uid: 'test-uid-123',
         email: 'anon@example.com',
@@ -61,9 +63,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: ProfileInfoCard(user: testUser),
-          ),
+          home: Scaffold(body: ProfileInfoCard(user: testUser)),
         ),
       );
 
@@ -91,9 +91,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: ProfileInfoCard(user: testUser),
-          ),
+          home: Scaffold(body: ProfileInfoCard(user: testUser)),
         ),
       );
 
@@ -122,9 +120,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: ProfileInfoCard(user: testUser),
-          ),
+          home: Scaffold(body: ProfileInfoCard(user: testUser)),
         ),
       );
 
@@ -153,9 +149,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: ProfileInfoCard(user: testUser),
-          ),
+          home: Scaffold(body: ProfileInfoCard(user: testUser)),
         ),
       );
 
@@ -183,9 +177,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: ProfileInfoCard(user: testUser),
-          ),
+          home: Scaffold(body: ProfileInfoCard(user: testUser)),
         ),
       );
 
@@ -213,9 +205,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: ProfileInfoCard(user: testUser),
-          ),
+          home: Scaffold(body: ProfileInfoCard(user: testUser)),
         ),
       );
 

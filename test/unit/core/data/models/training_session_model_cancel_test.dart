@@ -18,7 +18,10 @@ void main() {
         id: 'session-1',
         groupId: 'group-1',
         title: 'Test Training',
-        location: const GameLocation(name: 'Beach Court 1', address: '123 Beach Rd'),
+        location: const GameLocation(
+          name: 'Beach Court 1',
+          address: '123 Beach Rd',
+        ),
         startTime: DateTime.now().add(const Duration(days: 1)),
         endTime: DateTime.now().add(const Duration(days: 1, hours: 2)),
         minParticipants: 4,
@@ -57,13 +60,19 @@ void main() {
         expect(cancelledSession.canUserCancel(creatorUserId), isFalse);
       });
 
-      test('returns false when user is not creator and session is completed', () {
-        expect(completedSession.canUserCancel(otherUserId), isFalse);
-      });
+      test(
+        'returns false when user is not creator and session is completed',
+        () {
+          expect(completedSession.canUserCancel(otherUserId), isFalse);
+        },
+      );
 
-      test('returns false when user is not creator and session is cancelled', () {
-        expect(cancelledSession.canUserCancel(otherUserId), isFalse);
-      });
+      test(
+        'returns false when user is not creator and session is cancelled',
+        () {
+          expect(cancelledSession.canUserCancel(otherUserId), isFalse);
+        },
+      );
     });
 
     group('cancelSession', () {
@@ -85,8 +94,16 @@ void main() {
         final after = DateTime.now();
 
         expect(result.cancelledAt, isNotNull);
-        expect(result.cancelledAt!.isAfter(before.subtract(const Duration(seconds: 1))), isTrue);
-        expect(result.cancelledAt!.isBefore(after.add(const Duration(seconds: 1))), isTrue);
+        expect(
+          result.cancelledAt!.isAfter(
+            before.subtract(const Duration(seconds: 1)),
+          ),
+          isTrue,
+        );
+        expect(
+          result.cancelledAt!.isBefore(after.add(const Duration(seconds: 1))),
+          isTrue,
+        );
       });
 
       test('sets updatedAt to current time', () {
@@ -95,8 +112,16 @@ void main() {
         final after = DateTime.now();
 
         expect(result.updatedAt, isNotNull);
-        expect(result.updatedAt!.isAfter(before.subtract(const Duration(seconds: 1))), isTrue);
-        expect(result.updatedAt!.isBefore(after.add(const Duration(seconds: 1))), isTrue);
+        expect(
+          result.updatedAt!.isAfter(
+            before.subtract(const Duration(seconds: 1)),
+          ),
+          isTrue,
+        );
+        expect(
+          result.updatedAt!.isBefore(after.add(const Duration(seconds: 1))),
+          isTrue,
+        );
       });
 
       test('returns same session when already completed (no-op)', () {
@@ -117,13 +142,19 @@ void main() {
         expect(result.cancelledAt, equals(originalCancelledAt));
       });
 
-      test('allows cancellation without userId for system-triggered cancellations', () {
-        final result = scheduledSession.cancelSession();
+      test(
+        'allows cancellation without userId for system-triggered cancellations',
+        () {
+          final result = scheduledSession.cancelSession();
 
-        expect(result.status, equals(TrainingStatus.cancelled));
-        expect(result.cancelledBy, isNull); // No user specified for system cancellation
-        expect(result.cancelledAt, isNotNull);
-      });
+          expect(result.status, equals(TrainingStatus.cancelled));
+          expect(
+            result.cancelledBy,
+            isNull,
+          ); // No user specified for system cancellation
+          expect(result.cancelledAt, isNotNull);
+        },
+      );
 
       test('preserves other session properties when cancelling', () {
         final result = scheduledSession.cancelSession(creatorUserId);
@@ -134,8 +165,14 @@ void main() {
         expect(result.location, equals(scheduledSession.location));
         expect(result.startTime, equals(scheduledSession.startTime));
         expect(result.endTime, equals(scheduledSession.endTime));
-        expect(result.minParticipants, equals(scheduledSession.minParticipants));
-        expect(result.maxParticipants, equals(scheduledSession.maxParticipants));
+        expect(
+          result.minParticipants,
+          equals(scheduledSession.minParticipants),
+        );
+        expect(
+          result.maxParticipants,
+          equals(scheduledSession.maxParticipants),
+        );
         expect(result.createdBy, equals(scheduledSession.createdBy));
         expect(result.participantIds, equals(scheduledSession.participantIds));
       });

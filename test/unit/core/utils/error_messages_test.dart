@@ -281,7 +281,9 @@ void main() {
     test('returns specific message for "already a member" error', () {
       final exception = Exception('User already a member of this group');
 
-      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'You\'re already a member of this group');
       expect(isRetryable, false);
@@ -290,7 +292,9 @@ void main() {
     test('returns specific message for "group deleted" error', () {
       final exception = Exception('Group deleted by admin');
 
-      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'Group deleted or unavailable');
       expect(isRetryable, false);
@@ -299,7 +303,9 @@ void main() {
     test('returns specific message for "group not found" error', () {
       final exception = Exception('Group not found in database');
 
-      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'Group deleted or unavailable');
       expect(isRetryable, false);
@@ -308,7 +314,9 @@ void main() {
     test('returns specific message for "group is full" error', () {
       final exception = Exception('Group is full, cannot add more members');
 
-      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'This group is full');
       expect(isRetryable, false);
@@ -317,7 +325,9 @@ void main() {
     test('returns specific message for "at capacity" error', () {
       final exception = Exception('Group at capacity');
 
-      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'This group is full');
       expect(isRetryable, false);
@@ -326,7 +336,9 @@ void main() {
     test('returns specific message for "not an admin" error', () {
       final exception = Exception('User not an admin of this group');
 
-      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'Only group admins can perform this action');
       expect(isRetryable, false);
@@ -338,7 +350,9 @@ void main() {
         code: 'permission-denied',
       );
 
-      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = GroupErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'You don\'t have permission to perform this action');
       expect(isRetryable, false);
@@ -349,7 +363,9 @@ void main() {
     test('returns specific message for "user not found" error', () {
       final exception = Exception('User not found in system');
 
-      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'User not found. Please check the email address.');
       expect(isRetryable, false);
@@ -358,7 +374,9 @@ void main() {
     test('returns specific message for "invitee not found" error', () {
       final exception = Exception('Invitee not found');
 
-      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'User not found. Please check the email address.');
       expect(isRetryable, false);
@@ -367,7 +385,9 @@ void main() {
     test('returns specific message for "already invited" error', () {
       final exception = Exception('User already invited to this group');
 
-      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'This user has already been invited');
       expect(isRetryable, false);
@@ -376,7 +396,9 @@ void main() {
     test('returns specific message for "invitation exists" error', () {
       final exception = Exception('Invitation exists for this user');
 
-      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'This user has already been invited');
       expect(isRetryable, false);
@@ -385,7 +407,9 @@ void main() {
     test('returns specific message for "already a member" error', () {
       final exception = Exception('User already a member of group');
 
-      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'This user is already a member of the group');
       expect(isRetryable, false);
@@ -394,7 +418,9 @@ void main() {
     test('returns specific message for "invitation not found" error', () {
       final exception = Exception('Invitation not found in database');
 
-      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'Invitation not found or has expired');
       expect(isRetryable, false);
@@ -403,7 +429,9 @@ void main() {
     test('returns specific message for "cannot invite yourself" error', () {
       final exception = Exception('Cannot invite yourself to a group');
 
-      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'You cannot invite yourself to a group');
       expect(isRetryable, false);
@@ -415,7 +443,9 @@ void main() {
         code: 'unavailable',
       );
 
-      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(exception);
+      final (message, isRetryable) = InvitationErrorMessages.getErrorMessage(
+        exception,
+      );
 
       expect(message, 'Service temporarily unavailable. Please try again.');
       expect(isRetryable, true);

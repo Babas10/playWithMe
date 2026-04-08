@@ -39,7 +39,10 @@ class FirebaseEmulatorHelper {
       );
 
       // Connect to emulators
-      FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, firestorePort);
+      FirebaseFirestore.instance.useFirestoreEmulator(
+        emulatorHost,
+        firestorePort,
+      );
       await FirebaseAuth.instance.useAuthEmulator(emulatorHost, authPort);
 
       _initialized = true;
@@ -58,7 +61,13 @@ class FirebaseEmulatorHelper {
     final firestore = FirebaseFirestore.instance;
 
     // Collections to clear
-    final collections = ['users', 'groups', 'games', 'friendships', 'trainingSessions'];
+    final collections = [
+      'users',
+      'groups',
+      'games',
+      'friendships',
+      'trainingSessions',
+    ];
 
     for (final collection in collections) {
       try {
@@ -78,7 +87,13 @@ class FirebaseEmulatorHelper {
   /// Delete all subcollections of a document reference
   static Future<void> _deleteSubcollections(DocumentReference docRef) async {
     // Known subcollections
-    final subcollections = ['invitations', 'preferences', 'exercises', 'feedback', 'participants'];
+    final subcollections = [
+      'invitations',
+      'preferences',
+      'exercises',
+      'feedback',
+      'participants',
+    ];
 
     for (final subcollection in subcollections) {
       try {
@@ -102,10 +117,8 @@ class FirebaseEmulatorHelper {
     String? displayName,
   }) async {
     try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       if (displayName != null) {
         await userCredential.user!.updateDisplayName(displayName);
@@ -146,10 +159,8 @@ class FirebaseEmulatorHelper {
     required String password,
   }) async {
     try {
-      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
       return userCredential.user!;
     } catch (e) {
       throw Exception('Failed to sign in: $e');
@@ -257,11 +268,14 @@ class FirebaseEmulatorHelper {
     List<String>? participantIds,
     String status = 'scheduled',
   }) async {
-    final sessionRef = FirebaseFirestore.instance.collection('trainingSessions').doc();
+    final sessionRef = FirebaseFirestore.instance
+        .collection('trainingSessions')
+        .doc();
 
     final now = DateTime.now();
     final sessionStartTime = startTime ?? now.add(const Duration(days: 1));
-    final sessionEndTime = endTime ?? sessionStartTime.add(const Duration(hours: 2));
+    final sessionEndTime =
+        endTime ?? sessionStartTime.add(const Duration(hours: 2));
 
     await sessionRef.set({
       'groupId': groupId,
@@ -270,10 +284,7 @@ class FirebaseEmulatorHelper {
       'description': description,
       'startTime': Timestamp.fromDate(sessionStartTime),
       'endTime': Timestamp.fromDate(sessionEndTime),
-      'location': {
-        'name': locationName,
-        'address': locationAddress,
-      },
+      'location': {'name': locationName, 'address': locationAddress},
       'minParticipants': minParticipants,
       'maxParticipants': maxParticipants,
       'participantIds': participantIds ?? [createdBy],

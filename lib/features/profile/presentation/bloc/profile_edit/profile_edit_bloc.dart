@@ -21,9 +21,9 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
   ProfileEditBloc({
     required AuthRepository authRepository,
     required UserRepository userRepository,
-  })  : _authRepository = authRepository,
-        _userRepository = userRepository,
-        super(const ProfileEditState.initial()) {
+  }) : _authRepository = authRepository,
+       _userRepository = userRepository,
+       super(const ProfileEditState.initial()) {
     on<ProfileEditStarted>(_onStarted);
     on<ProfileEditDisplayNameChanged>(_onDisplayNameChanged);
     on<ProfileEditPhotoUrlChanged>(_onPhotoUrlChanged);
@@ -46,11 +46,13 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
     _currentDisplayName = event.currentDisplayName;
     _currentPhotoUrl = event.currentPhotoUrl;
 
-    emit(ProfileEditState.loaded(
-      displayName: _currentDisplayName,
-      photoUrl: _currentPhotoUrl,
-      hasUnsavedChanges: false,
-    ));
+    emit(
+      ProfileEditState.loaded(
+        displayName: _currentDisplayName,
+        photoUrl: _currentPhotoUrl,
+        hasUnsavedChanges: false,
+      ),
+    );
   }
 
   /// Handle display name changes with validation
@@ -62,12 +64,14 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
     final error = _validateDisplayName(event.displayName);
     final hasChanges = _hasUnsavedChanges();
 
-    emit(ProfileEditState.loaded(
-      displayName: _currentDisplayName,
-      photoUrl: _currentPhotoUrl,
-      displayNameError: error,
-      hasUnsavedChanges: hasChanges,
-    ));
+    emit(
+      ProfileEditState.loaded(
+        displayName: _currentDisplayName,
+        photoUrl: _currentPhotoUrl,
+        displayNameError: error,
+        hasUnsavedChanges: hasChanges,
+      ),
+    );
   }
 
   /// Handle photo URL changes with validation
@@ -75,16 +79,20 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
     ProfileEditPhotoUrlChanged event,
     Emitter<ProfileEditState> emit,
   ) {
-    _currentPhotoUrl = event.photoUrl.trim().isEmpty ? null : event.photoUrl.trim();
+    _currentPhotoUrl = event.photoUrl.trim().isEmpty
+        ? null
+        : event.photoUrl.trim();
     final error = _validatePhotoUrl(_currentPhotoUrl);
     final hasChanges = _hasUnsavedChanges();
 
-    emit(ProfileEditState.loaded(
-      displayName: _currentDisplayName,
-      photoUrl: _currentPhotoUrl,
-      photoUrlError: error,
-      hasUnsavedChanges: hasChanges,
-    ));
+    emit(
+      ProfileEditState.loaded(
+        displayName: _currentDisplayName,
+        photoUrl: _currentPhotoUrl,
+        photoUrlError: error,
+        hasUnsavedChanges: hasChanges,
+      ),
+    );
   }
 
   /// Save the profile changes
@@ -97,13 +105,15 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
     final photoUrlError = _validatePhotoUrl(_currentPhotoUrl);
 
     if (displayNameError != null || photoUrlError != null) {
-      emit(ProfileEditState.loaded(
-        displayName: _currentDisplayName,
-        photoUrl: _currentPhotoUrl,
-        displayNameError: displayNameError,
-        photoUrlError: photoUrlError,
-        hasUnsavedChanges: true,
-      ));
+      emit(
+        ProfileEditState.loaded(
+          displayName: _currentDisplayName,
+          photoUrl: _currentPhotoUrl,
+          displayNameError: displayNameError,
+          photoUrlError: photoUrlError,
+          hasUnsavedChanges: true,
+        ),
+      );
       return;
     }
 
@@ -113,10 +123,12 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
       return;
     }
 
-    emit(ProfileEditState.saving(
-      displayName: _currentDisplayName,
-      photoUrl: _currentPhotoUrl,
-    ));
+    emit(
+      ProfileEditState.saving(
+        displayName: _currentDisplayName,
+        photoUrl: _currentPhotoUrl,
+      ),
+    );
 
     try {
       final user = _authRepository.currentUser;
@@ -142,17 +154,21 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
 
       emit(const ProfileEditState.success());
     } on UserException catch (e) {
-      emit(ProfileEditState.error(
-        message: e.message,
-        displayName: _currentDisplayName,
-        photoUrl: _currentPhotoUrl,
-      ));
+      emit(
+        ProfileEditState.error(
+          message: e.message,
+          displayName: _currentDisplayName,
+          photoUrl: _currentPhotoUrl,
+        ),
+      );
     } catch (e) {
-      emit(ProfileEditState.error(
-        message: e.toString().replaceAll('Exception: ', ''),
-        displayName: _currentDisplayName,
-        photoUrl: _currentPhotoUrl,
-      ));
+      emit(
+        ProfileEditState.error(
+          message: e.toString().replaceAll('Exception: ', ''),
+          displayName: _currentDisplayName,
+          photoUrl: _currentPhotoUrl,
+        ),
+      );
     }
   }
 
@@ -201,17 +217,15 @@ class ProfileEditBloc extends Bloc<ProfileEditEvent, ProfileEditState> {
     final trimmed = photoUrl.trim();
 
     // Basic URL validation - must start with http:// or https://
-    final urlPattern = RegExp(
-      r'^https?:\/\/',
-      caseSensitive: false,
-    );
+    final urlPattern = RegExp(r'^https?:\/\/', caseSensitive: false);
 
     if (!urlPattern.hasMatch(trimmed)) {
       return 'URL must start with http:// or https://';
     }
 
     // Must have at least some content after the protocol
-    if (trimmed.length < 12) { // "https://a.co" is minimum
+    if (trimmed.length < 12) {
+      // "https://a.co" is minimum
       return 'Please enter a valid URL';
     }
 

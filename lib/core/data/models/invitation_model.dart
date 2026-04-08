@@ -5,11 +5,7 @@ part 'invitation_model.freezed.dart';
 part 'invitation_model.g.dart';
 
 /// Status of an invitation
-enum InvitationStatus {
-  pending,
-  accepted,
-  declined,
-}
+enum InvitationStatus { pending, accepted, declined }
 
 @freezed
 class InvitationModel with _$InvitationModel {
@@ -33,10 +29,7 @@ class InvitationModel with _$InvitationModel {
   /// Factory constructor for creating from Firestore DocumentSnapshot
   factory InvitationModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return InvitationModel.fromJson({
-      ...data,
-      'id': doc.id,
-    });
+    return InvitationModel.fromJson({...data, 'id': doc.id});
   }
 
   /// Convert to Firestore-compatible map (excludes id since it's the document ID)

@@ -33,7 +33,13 @@ class RecordResultsLoaded extends RecordResultsState {
   });
 
   @override
-  List<Object?> get props => [game, teamAPlayerIds, teamBPlayerIds, unassignedPlayerIds, players];
+  List<Object?> get props => [
+    game,
+    teamAPlayerIds,
+    teamBPlayerIds,
+    unassignedPlayerIds,
+    players,
+  ];
 
   RecordResultsLoaded copyWith({
     GameModel? game,
@@ -53,7 +59,10 @@ class RecordResultsLoaded extends RecordResultsState {
 
   bool get allPlayersAssigned => unassignedPlayerIds.isEmpty;
 
-  bool get canSave => allPlayersAssigned && teamAPlayerIds.isNotEmpty && teamBPlayerIds.isNotEmpty;
+  bool get canSave =>
+      allPlayersAssigned &&
+      teamAPlayerIds.isNotEmpty &&
+      teamBPlayerIds.isNotEmpty;
 }
 
 class RecordResultsSaving extends RecordResultsState {

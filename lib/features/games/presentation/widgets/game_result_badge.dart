@@ -21,20 +21,19 @@ class GameResultBadge extends StatelessWidget {
       return teamKey == 'teamA' ? 'Team A' : 'Team B';
     }
 
-    final playerIds = teamKey == 'teamA' ? teams!.teamAPlayerIds : teams!.teamBPlayerIds;
+    final playerIds = teamKey == 'teamA'
+        ? teams!.teamAPlayerIds
+        : teams!.teamBPlayerIds;
 
     if (playerIds.isEmpty) {
       return teamKey == 'teamA' ? 'Team A' : 'Team B';
     }
 
     // Get player names (up to 2 for brevity)
-    final names = playerIds
-        .take(2)
-        .map((id) {
-          final player = players![id];
-          return player?.displayName ?? player?.email.split('@').first ?? 'Player';
-        })
-        .toList();
+    final names = playerIds.take(2).map((id) {
+      final player = players![id];
+      return player?.displayName ?? player?.email.split('@').first ?? 'Player';
+    }).toList();
 
     if (names.isEmpty) {
       return teamKey == 'teamA' ? 'Team A' : 'Team B';

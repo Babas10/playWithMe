@@ -15,8 +15,8 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
   StreamSubscription? _userSubscription;
 
   PlayerStatsBloc({required UserRepository userRepository})
-      : _userRepository = userRepository,
-        super(PlayerStatsInitial()) {
+    : _userRepository = userRepository,
+      super(PlayerStatsInitial()) {
     on<LoadPlayerStats>(_onLoadPlayerStats);
     on<UpdateUserStats>(_onUpdateUserStats);
     on<LoadRanking>(_onLoadRanking); // Story 302.5
@@ -30,17 +30,20 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
 
     try {
       // Fetch user immediately to ensure we don't hang forever
-      final initialUser = await PerformanceTracer.trace('page_stats_load', () => _userRepository
-          .getUserStream(event.userId)
-          .timeout(
-            const Duration(seconds: 5),
-            onTimeout: (sink) {
-              // Treat timeout as "document not found yet" so the new-user
-              // fallback path below can handle it gracefully.
-              sink.add(null);
-            },
-          )
-          .first);
+      final initialUser = await PerformanceTracer.trace(
+        'page_stats_load',
+        () => _userRepository
+            .getUserStream(event.userId)
+            .timeout(
+              const Duration(seconds: 5),
+              onTimeout: (sink) {
+                // Treat timeout as "document not found yet" so the new-user
+                // fallback path below can handle it gracefully.
+                sink.add(null);
+              },
+            )
+            .first,
+      );
 
       if (initialUser != null) {
         // Trigger the update with the initial user
@@ -48,17 +51,19 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
 
         // Set up stream for future updates
         await _userSubscription?.cancel();
-        _userSubscription = _userRepository.getUserStream(event.userId).listen(
-          (user) {
-            if (user != null) {
-              add(UpdateUserStats(user));
-            }
-          },
-          onError: (error) {
-            // Log error but don't crash
-            debugPrint('PlayerStatsBloc: Error in user stream: $error');
-          },
-        );
+        _userSubscription = _userRepository
+            .getUserStream(event.userId)
+            .listen(
+              (user) {
+                if (user != null) {
+                  add(UpdateUserStats(user));
+                }
+              },
+              onError: (error) {
+                // Log error but don't crash
+                debugPrint('PlayerStatsBloc: Error in user stream: $error');
+              },
+            );
       } else {
         // Story 302.7: Handle new users gracefully - they have no stats yet
         // Get current auth user data to create a minimal UserModel
@@ -66,12 +71,14 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
         if (authUser != null && authUser.uid == event.userId) {
           // Create a minimal UserModel for new users from auth data
           final newUserModel = UserModel.fromFirebaseUser(authUser);
-          emit(PlayerStatsLoaded(
-            user: newUserModel,
-            history: [], // New user has no rating history
-            ranking: null, // No ranking yet
-            rankingLoadFailed: false,
-          ));
+          emit(
+            PlayerStatsLoaded(
+              user: newUserModel,
+              history: [], // New user has no rating history
+              ranking: null, // No ranking yet
+              rankingLoadFailed: false,
+            ),
+          );
         } else {
           // Only emit error if we can't find the auth user either
           emit(PlayerStatsError('User not found'));
@@ -81,16 +88,18 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
         // the Firestore document is created (e.g. after the createUserDocument
         // trigger completes asynchronously post-registration).
         await _userSubscription?.cancel();
-        _userSubscription = _userRepository.getUserStream(event.userId).listen(
-          (user) {
-            if (user != null) {
-              add(UpdateUserStats(user));
-            }
-          },
-          onError: (error) {
-            debugPrint('PlayerStatsBloc: Error in user stream: $error');
-          },
-        );
+        _userSubscription = _userRepository
+            .getUserStream(event.userId)
+            .listen(
+              (user) {
+                if (user != null) {
+                  add(UpdateUserStats(user));
+                }
+              },
+              onError: (error) {
+                debugPrint('PlayerStatsBloc: Error in user stream: $error');
+              },
+            );
       }
     } catch (e) {
       emit(PlayerStatsError('Failed to load player stats: ${e.toString()}'));
@@ -113,19 +122,28 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
       if (history.isEmpty) {
         history = await _userRepository
             .getRatingHistory(event.user.uid)
-            .timeout(const Duration(seconds: 5), onTimeout: (sink) {
-          sink.add([]); // Return empty list on timeout
-        }).first;
+            .timeout(
+              const Duration(seconds: 5),
+              onTimeout: (sink) {
+                sink.add([]); // Return empty list on timeout
+              },
+            )
+            .first;
       } else {
         // Check if we need to refresh history (simple check: gamesPlayed count)
         // If state.user.gamesPlayed < event.user.gamesPlayed, then a new game finished.
         if (state is PlayerStatsLoaded &&
-            (state as PlayerStatsLoaded).user.gamesPlayed < event.user.gamesPlayed) {
+            (state as PlayerStatsLoaded).user.gamesPlayed <
+                event.user.gamesPlayed) {
           history = await _userRepository
               .getRatingHistory(event.user.uid)
-              .timeout(const Duration(seconds: 5), onTimeout: (sink) {
-            sink.add([]); // Return empty list on timeout
-          }).first;
+              .timeout(
+                const Duration(seconds: 5),
+                onTimeout: (sink) {
+                  sink.add([]); // Return empty list on timeout
+                },
+              )
+              .first;
         }
       }
 
@@ -137,12 +155,14 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
           ? (state as PlayerStatsLoaded).rankingLoadFailed
           : false;
 
-      emit(PlayerStatsLoaded(
-        user: event.user,
-        history: history,
-        ranking: ranking,
-        rankingLoadFailed: rankingLoadFailed,
-      ));
+      emit(
+        PlayerStatsLoaded(
+          user: event.user,
+          history: history,
+          ranking: ranking,
+          rankingLoadFailed: rankingLoadFailed,
+        ),
+      );
     } catch (e) {
       emit(PlayerStatsError(e.toString()));
     }
@@ -158,16 +178,17 @@ class PlayerStatsBloc extends Bloc<PlayerStatsEvent, PlayerStatsState> {
 
     try {
       final ranking = await _userRepository.getUserRanking(event.userId);
-      emit(currentState.copyWith(
-        ranking: ranking,
-        rankingLoadFailed: false, // Story 302.7: Clear error on successful load
-      ));
+      emit(
+        currentState.copyWith(
+          ranking: ranking,
+          rankingLoadFailed:
+              false, // Story 302.7: Clear error on successful load
+        ),
+      );
     } catch (e) {
       // Story 302.7: Set error flag instead of silently failing
       debugPrint('PlayerStatsBloc: Failed to load ranking: $e');
-      emit(currentState.copyWith(
-        rankingLoadFailed: true,
-      ));
+      emit(currentState.copyWith(rankingLoadFailed: true));
     }
   }
 

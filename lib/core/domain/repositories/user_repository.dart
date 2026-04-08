@@ -28,7 +28,8 @@ abstract class UserRepository {
   Future<void> createOrUpdateUser(UserModel user);
 
   /// Update user profile
-  Future<void> updateUserProfile(String uid, {
+  Future<void> updateUserProfile(
+    String uid, {
     String? displayName,
     String? photoUrl,
     String? firstName,
@@ -41,14 +42,16 @@ abstract class UserRepository {
   });
 
   /// Update user preferences
-  Future<void> updateUserPreferences(String uid, {
+  Future<void> updateUserPreferences(
+    String uid, {
     bool? notificationsEnabled,
     bool? emailNotifications,
     bool? pushNotifications,
   });
 
   /// Update user privacy settings
-  Future<void> updateUserPrivacy(String uid, {
+  Future<void> updateUserPrivacy(
+    String uid, {
     UserPrivacyLevel? privacyLevel,
     bool? showEmail,
     bool? showPhoneNumber,
@@ -61,7 +64,9 @@ abstract class UserRepository {
   Future<void> leaveGroup(String uid, String groupId);
 
   /// Add game participation
-  Future<void> addGameParticipation(String uid, String gameId, {
+  Future<void> addGameParticipation(
+    String uid,
+    String gameId, {
     bool won = false,
     int score = 0,
   });
@@ -91,10 +96,7 @@ abstract class UserRepository {
 
   /// Get best ELO within a time period (Story 302.1)
   /// Returns the highest ELO rating achieved within the specified time period
-  Future<BestEloRecord?> getBestEloInPeriod(
-    String userId,
-    TimePeriod period,
-  );
+  Future<BestEloRecord?> getBestEloInPeriod(String userId, TimePeriod period);
 
   /// Get teammate statistics for a specific partner (Story 304)
   Future<TeammateStats?> getTeammateStats(String userId, String teammateId);

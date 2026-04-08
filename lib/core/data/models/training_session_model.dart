@@ -54,30 +54,32 @@ class TrainingSessionModel with _$TrainingSessionModel {
     final jsonData = Map<String, dynamic>.from(data);
 
     if (data['createdAt'] is Timestamp) {
-      jsonData['createdAt'] =
-          (data['createdAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['createdAt'] = (data['createdAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['startTime'] is Timestamp) {
-      jsonData['startTime'] =
-          (data['startTime'] as Timestamp).toDate().toIso8601String();
+      jsonData['startTime'] = (data['startTime'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['endTime'] is Timestamp) {
-      jsonData['endTime'] =
-          (data['endTime'] as Timestamp).toDate().toIso8601String();
+      jsonData['endTime'] = (data['endTime'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['updatedAt'] is Timestamp) {
-      jsonData['updatedAt'] =
-          (data['updatedAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['updatedAt'] = (data['updatedAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['cancelledAt'] is Timestamp) {
-      jsonData['cancelledAt'] =
-          (data['cancelledAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['cancelledAt'] = (data['cancelledAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
 
-    return TrainingSessionModel.fromJson({
-      ...jsonData,
-      'id': doc.id,
-    });
+    return TrainingSessionModel.fromJson({...jsonData, 'id': doc.id});
   }
 
   /// Convert to Firestore-compatible map (excludes id since it's the document ID)
@@ -125,8 +127,7 @@ class TrainingSessionModel with _$TrainingSessionModel {
   bool get isFull => participantIds.length >= maxParticipants;
 
   /// Check if training session has minimum participants
-  bool get hasMinimumParticipants =>
-      participantIds.length >= minParticipants;
+  bool get hasMinimumParticipants => participantIds.length >= minParticipants;
 
   /// Get available spots
   int get availableSpots => maxParticipants - participantIds.length;
@@ -173,7 +174,8 @@ class TrainingSessionModel with _$TrainingSessionModel {
   /// Validation methods
 
   /// Validate training session timing
-  bool get hasValidTiming => startTime.isAfter(DateTime.now()) && endTime.isAfter(startTime);
+  bool get hasValidTiming =>
+      startTime.isAfter(DateTime.now()) && endTime.isAfter(startTime);
 
   /// Validate participant limits
   bool get hasValidParticipantLimits =>

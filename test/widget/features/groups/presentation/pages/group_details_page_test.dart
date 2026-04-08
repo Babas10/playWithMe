@@ -33,16 +33,14 @@ import 'package:play_with_me/features/games/presentation/bloc/games_list/games_l
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_event.dart';
 import 'package:play_with_me/features/games/presentation/bloc/games_list/games_list_state.dart';
 
-class MockGroupMemberBloc
-    extends MockBloc<GroupMemberEvent, GroupMemberState>
+class MockGroupMemberBloc extends MockBloc<GroupMemberEvent, GroupMemberState>
     implements GroupMemberBloc {}
 
 class MockAuthenticationBloc
     extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
-class MockInvitationBloc
-    extends MockBloc<InvitationEvent, InvitationState>
+class MockInvitationBloc extends MockBloc<InvitationEvent, InvitationState>
     implements InvitationBloc {}
 
 class MockGroupRepository extends Mock implements GroupRepository {}
@@ -133,14 +131,18 @@ void main() {
     mockUserRepository = MockUserRepository();
     mockFriendRepository = MockFriendRepository();
     mockGroupInviteLinkBloc = MockGroupInviteLinkBloc();
-    when(() => mockGroupInviteLinkBloc.state)
-        .thenReturn(const GroupInviteLinkInitial());
+    when(
+      () => mockGroupInviteLinkBloc.state,
+    ).thenReturn(const GroupInviteLinkInitial());
 
     mockGamesListBloc = MockGamesListBloc();
-    when(() => mockGamesListBloc.state).thenReturn(const GamesListEmpty(userId: testUserId));
+    when(
+      () => mockGamesListBloc.state,
+    ).thenReturn(const GamesListEmpty(userId: testUserId));
 
-    when(() => mockGroupMemberBloc.state)
-        .thenReturn(const GroupMemberInitial());
+    when(
+      () => mockGroupMemberBloc.state,
+    ).thenReturn(const GroupMemberInitial());
 
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
@@ -157,16 +159,21 @@ void main() {
 
     // Setup default repository responses
     // The page now uses watchGroupById (stream) instead of getGroupById.
-    when(() => mockGroupRepository.watchGroupById(testGroupId))
-        .thenAnswer((_) => Stream.value(testGroup));
-    when(() => mockGroupRepository.getGroupById(testGroupId))
-        .thenAnswer((_) async => testGroup);
-    when(() => mockUserRepository.getUsersByIds(any()))
-        .thenAnswer((_) async => testMembers);
-    when(() => mockFriendRepository.batchCheckFriendship(any()))
-        .thenAnswer((_) async => {'member-2': true, 'member-3': false});
-    when(() => mockFriendRepository.batchCheckFriendRequestStatus(any()))
-        .thenAnswer((_) async => {'member-3': FriendRequestStatus.none});
+    when(
+      () => mockGroupRepository.watchGroupById(testGroupId),
+    ).thenAnswer((_) => Stream.value(testGroup));
+    when(
+      () => mockGroupRepository.getGroupById(testGroupId),
+    ).thenAnswer((_) async => testGroup);
+    when(
+      () => mockUserRepository.getUsersByIds(any()),
+    ).thenAnswer((_) async => testMembers);
+    when(
+      () => mockFriendRepository.batchCheckFriendship(any()),
+    ).thenAnswer((_) async => {'member-2': true, 'member-3': false});
+    when(
+      () => mockFriendRepository.batchCheckFriendRequestStatus(any()),
+    ).thenAnswer((_) async => {'member-3': FriendRequestStatus.none});
 
     // Register service locator mocks
     if (sl.isRegistered<GroupMemberBloc>()) {
@@ -216,7 +223,8 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en')],      home: MultiBlocProvider(
+      supportedLocales: const [Locale('en')],
+      home: MultiBlocProvider(
         providers: [
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
           BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
@@ -239,7 +247,7 @@ void main() {
         expect(
           find.descendant(
             of: find.byType(AppBar),
-            matching: find.text('Group Details'),
+            matching: find.text('Group'),
           ),
           findsOneWidget,
         );
@@ -248,8 +256,9 @@ void main() {
       testWidgets('shows loading indicator initially', (tester) async {
         // Use a StreamController that never emits to keep the page in loading state.
         final streamController = StreamController<GroupModel?>();
-        when(() => mockGroupRepository.watchGroupById(testGroupId))
-            .thenAnswer((_) => streamController.stream);
+        when(
+          () => mockGroupRepository.watchGroupById(testGroupId),
+        ).thenAnswer((_) => streamController.stream);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -310,8 +319,9 @@ void main() {
     group('Error State', () {
       testWidgets('shows error message when group not found', (tester) async {
         // Stream emits null to signal group not found.
-        when(() => mockGroupRepository.watchGroupById(testGroupId))
-            .thenAnswer((_) => Stream.value(null));
+        when(
+          () => mockGroupRepository.watchGroupById(testGroupId),
+        ).thenAnswer((_) => Stream.value(null));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -319,11 +329,13 @@ void main() {
         expect(find.text('Group not found'), findsOneWidget);
       });
 
-      testWidgets('shows error state with retry button on load failure',
-          (tester) async {
+      testWidgets('shows error state with retry button on load failure', (
+        tester,
+      ) async {
         // Stream emits an error to trigger the error state.
-        when(() => mockGroupRepository.watchGroupById(testGroupId))
-            .thenAnswer((_) => Stream.error(Exception('Network error')));
+        when(
+          () => mockGroupRepository.watchGroupById(testGroupId),
+        ).thenAnswer((_) => Stream.error(Exception('Network error')));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -336,7 +348,9 @@ void main() {
       testWidgets('retry button reloads group details', (tester) async {
         // First subscription: error stream. Second subscription: success stream.
         var callCount = 0;
-        when(() => mockGroupRepository.watchGroupById(testGroupId)).thenAnswer((_) {
+        when(() => mockGroupRepository.watchGroupById(testGroupId)).thenAnswer((
+          _,
+        ) {
           callCount++;
           if (callCount == 1) {
             return Stream.error(Exception('Network error'));
@@ -361,14 +375,17 @@ void main() {
 
     group('Unauthenticated State', () {
       testWidgets('shows login message when not authenticated', (tester) async {
-        when(() => mockAuthBloc.state)
-            .thenReturn(const AuthenticationUnauthenticated());
+        when(
+          () => mockAuthBloc.state,
+        ).thenReturn(const AuthenticationUnauthenticated());
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
         expect(
-            find.text('Please log in to view group details'), findsOneWidget);
+          find.text('Please log in to view group details'),
+          findsOneWidget,
+        );
       });
     });
 
@@ -400,8 +417,9 @@ void main() {
     });
 
     group('Bottom Navigation Bar', () {
-      testWidgets('shows global bottom navigation bar after loading',
-          (tester) async {
+      testWidgets('shows global bottom navigation bar after loading', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
@@ -409,8 +427,9 @@ void main() {
         expect(find.byType(BottomNavigationBar), findsOneWidget);
       });
 
-      testWidgets('global nav shows 4 items: Home, Stats, Groups, Community',
-          (tester) async {
+      testWidgets('global nav shows 4 items: Home, Stats, Groups, Community', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
@@ -420,7 +439,9 @@ void main() {
         expect(find.text('Community'), findsOneWidget);
       });
 
-      testWidgets('Groups tab is highlighted (selectedIndex == 2)', (tester) async {
+      testWidgets('Groups tab is highlighted (selectedIndex == 2)', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
@@ -432,8 +453,9 @@ void main() {
 
       testWidgets('global bottom nav is visible while loading', (tester) async {
         final streamController = StreamController<GroupModel?>();
-        when(() => mockGroupRepository.watchGroupById(testGroupId))
-            .thenAnswer((_) => streamController.stream);
+        when(
+          () => mockGroupRepository.watchGroupById(testGroupId),
+        ).thenAnswer((_) => streamController.stream);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -457,13 +479,17 @@ void main() {
     });
 
     group('BlocListener State Changes', () {
-      testWidgets('shows success message when member is promoted',
-          (tester) async {
+      testWidgets('shows success message when member is promoted', (
+        tester,
+      ) async {
         whenListen(
           mockGroupMemberBloc,
           Stream.fromIterable([
             const GroupMemberInitial(),
-            const MemberPromotedSuccess(groupId: testGroupId, userId: 'member-2'),
+            const MemberPromotedSuccess(
+              groupId: testGroupId,
+              userId: 'member-2',
+            ),
           ]),
           initialState: const GroupMemberInitial(),
         );
@@ -475,13 +501,17 @@ void main() {
         expect(find.text('Member promoted to admin'), findsOneWidget);
       });
 
-      testWidgets('shows success message when member is demoted',
-          (tester) async {
+      testWidgets('shows success message when member is demoted', (
+        tester,
+      ) async {
         whenListen(
           mockGroupMemberBloc,
           Stream.fromIterable([
             const GroupMemberInitial(),
-            const MemberDemotedSuccess(groupId: testGroupId, userId: 'member-2'),
+            const MemberDemotedSuccess(
+              groupId: testGroupId,
+              userId: 'member-2',
+            ),
           ]),
           initialState: const GroupMemberInitial(),
         );
@@ -493,13 +523,17 @@ void main() {
         expect(find.text('Member demoted to regular member'), findsOneWidget);
       });
 
-      testWidgets('shows success message when member is removed',
-          (tester) async {
+      testWidgets('shows success message when member is removed', (
+        tester,
+      ) async {
         whenListen(
           mockGroupMemberBloc,
           Stream.fromIterable([
             const GroupMemberInitial(),
-            const MemberRemovedSuccess(groupId: testGroupId, userId: 'member-2'),
+            const MemberRemovedSuccess(
+              groupId: testGroupId,
+              userId: 'member-2',
+            ),
           ]),
           initialState: const GroupMemberInitial(),
         );
@@ -573,22 +607,26 @@ void main() {
         expect(find.text('Member Three'), findsOneWidget);
       });
 
-      testWidgets('Members tab shows Invite Member entry at the top for admins',
-          (tester) async {
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+      testWidgets(
+        'Members tab shows Invite Member entry at the top for admins',
+        (tester) async {
+          await tester.pumpWidget(createTestWidget());
+          await tester.pumpAndSettle();
 
-        // Entries are at the top of the list — no scrolling needed
-        expect(find.text('Invite Member'), findsOneWidget);
-      });
+          // Entries are at the top of the list — no scrolling needed
+          expect(find.text('Invite Member'), findsOneWidget);
+        },
+      );
 
-      testWidgets('Members tab shows Invite with Link entry at the top for admins',
-          (tester) async {
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+      testWidgets(
+        'Members tab shows Invite with Link entry at the top for admins',
+        (tester) async {
+          await tester.pumpWidget(createTestWidget());
+          await tester.pumpAndSettle();
 
-        expect(find.text('Invite with Link'), findsOneWidget);
-      });
+          expect(find.text('Invite with Link'), findsOneWidget);
+        },
+      );
 
       testWidgets('Activities tab shows Create Game button', (tester) async {
         await tester.pumpWidget(createTestWidget());
@@ -601,8 +639,9 @@ void main() {
         expect(find.text('Create Game'), findsOneWidget);
       });
 
-      testWidgets('Activities tab shows Create Training button',
-          (tester) async {
+      testWidgets('Activities tab shows Create Training button', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
@@ -612,9 +651,12 @@ void main() {
         expect(find.text('Create Training'), findsOneWidget);
       });
 
-      testWidgets('Activities tab shows empty state when no activities',
-          (tester) async {
-        when(() => mockGamesListBloc.state).thenReturn(const GamesListEmpty(userId: testUserId));
+      testWidgets('Activities tab shows empty state when no activities', (
+        tester,
+      ) async {
+        when(
+          () => mockGamesListBloc.state,
+        ).thenReturn(const GamesListEmpty(userId: testUserId));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();

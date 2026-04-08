@@ -34,10 +34,7 @@ class GroupInviteLinkModel with _$GroupInviteLinkModel {
   /// Factory constructor for creating from Firestore DocumentSnapshot
   factory GroupInviteLinkModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return GroupInviteLinkModel.fromJson({
-      ...data,
-      'id': doc.id,
-    });
+    return GroupInviteLinkModel.fromJson({...data, 'id': doc.id});
   }
 
   /// Convert to Firestore-compatible map (excludes id since it's the document ID)
@@ -48,7 +45,8 @@ class GroupInviteLinkModel with _$GroupInviteLinkModel {
   }
 
   /// Whether the invite has expired based on expiresAt timestamp
-  bool get isExpired => expiresAt != null && expiresAt!.isBefore(DateTime.now());
+  bool get isExpired =>
+      expiresAt != null && expiresAt!.isBefore(DateTime.now());
 
   /// Whether the invite has been manually revoked
   bool get isRevoked => revoked;

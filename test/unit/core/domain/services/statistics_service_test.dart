@@ -32,7 +32,7 @@ void main() {
       expect(result.ratingDelta, 16.0);
       expect(result.teamAExpectedScore, 0.5);
       expect(result.teamAWon, true);
-      
+
       // Verify new ratings helper
       expect(result.getNewRating('a1'), 1616.0);
       expect(result.getNewRating('b1'), 1584.0);
@@ -41,11 +41,14 @@ void main() {
     test('calculateElo favors weak-link weighting', () {
       // Team A: 1400 & 1800. Min=1400, Max=1800.
       // Weighted Rating = (0.7 * 1400) + (0.3 * 1800) = 980 + 540 = 1520
-      
+
       // Team B: 1600 & 1600. Min=1600, Max=1600.
       // Weighted Rating = 1600
-      
-      final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1400); // Weak link
+
+      final teamAP1 = const PlayerRating(
+        playerId: 'a1',
+        rating: 1400,
+      ); // Weak link
       final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1800);
       final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1600);
       final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1600);
@@ -60,10 +63,10 @@ void main() {
 
       expect(result.teamARating, 1520.0);
       expect(result.teamBRating, 1600.0);
-      
+
       // Team A is considered weaker (1520 vs 1600), so expected score < 0.5
       expect(result.teamAExpectedScore, lessThan(0.5));
-      
+
       // Win for weaker team should result in larger delta > 16.0
       expect(result.ratingDelta, greaterThan(16.0));
     });
@@ -84,14 +87,20 @@ void main() {
 
       // Strong team A expected to win almost certainly
       expect(result.teamAExpectedScore, greaterThan(0.9));
-      
+
       // They lost (score 0), so delta is 32 * (0 - 0.9) = -28.8 roughly
       // Result stores absolute delta
-      expect(result.ratingDelta, closeTo(32.0 * 0.99, 1.0)); // Close to max K-factor
-      
+      expect(
+        result.ratingDelta,
+        closeTo(32.0 * 0.99, 1.0),
+      ); // Close to max K-factor
+
       // Verify direction for players
       expect(result.getRatingChange('a1'), lessThan(0)); // Negative for losers
-      expect(result.getRatingChange('b1'), greaterThan(0)); // Positive for winners
+      expect(
+        result.getRatingChange('b1'),
+        greaterThan(0),
+      ); // Positive for winners
     });
 
     test('calculateElo handles expected win (Strong beats Weak)', () {
@@ -396,13 +405,41 @@ void main() {
 
   group('StatisticsService - Best Teammates', () {
     final t1 = const TeammateStats(
-      playerId: '1', displayName: 'A', gamesPlayed: 10, gamesWon: 8, gamesLost: 2, winRate: 0.8, averageRatingChange: 5);
+      playerId: '1',
+      displayName: 'A',
+      gamesPlayed: 10,
+      gamesWon: 8,
+      gamesLost: 2,
+      winRate: 0.8,
+      averageRatingChange: 5,
+    );
     final t2 = const TeammateStats(
-      playerId: '2', displayName: 'B', gamesPlayed: 5, gamesWon: 3, gamesLost: 2, winRate: 0.6, averageRatingChange: 2);
+      playerId: '2',
+      displayName: 'B',
+      gamesPlayed: 5,
+      gamesWon: 3,
+      gamesLost: 2,
+      winRate: 0.6,
+      averageRatingChange: 2,
+    );
     final t3 = const TeammateStats(
-      playerId: '3', displayName: 'C', gamesPlayed: 2, gamesWon: 2, gamesLost: 0, winRate: 1.0, averageRatingChange: 10);
+      playerId: '3',
+      displayName: 'C',
+      gamesPlayed: 2,
+      gamesWon: 2,
+      gamesLost: 0,
+      winRate: 1.0,
+      averageRatingChange: 10,
+    );
     final t4 = const TeammateStats(
-      playerId: '4', displayName: 'D', gamesPlayed: 10, gamesWon: 5, gamesLost: 5, winRate: 0.5, averageRatingChange: 0);
+      playerId: '4',
+      displayName: 'D',
+      gamesPlayed: 10,
+      gamesWon: 5,
+      gamesLost: 5,
+      winRate: 0.5,
+      averageRatingChange: 0,
+    );
 
     test('getBestTeammates filters by minGames', () {
       final best = service.getBestTeammates([t1, t2, t3], minGames: 3);
@@ -414,11 +451,15 @@ void main() {
     test('getBestTeammates sorts by winRate descending', () {
       final best = service.getBestTeammates([t1, t2, t4], minGames: 3);
       expect(best.first.playerId, '1'); // 0.8
-      expect(best.last.playerId, '4');  // 0.5
+      expect(best.last.playerId, '4'); // 0.5
     });
 
     test('getBestTeammates applies limit', () {
-      final best = service.getBestTeammates([t1, t2, t4], minGames: 3, limit: 1);
+      final best = service.getBestTeammates(
+        [t1, t2, t4],
+        minGames: 3,
+        limit: 1,
+      );
       expect(best.length, 1);
       expect(best.first.playerId, '1');
     });
@@ -429,11 +470,27 @@ void main() {
     });
 
     test('getBestTeammates breaks ties with games played', () {
-      final tTie1 = const TeammateStats(playerId: 't1', displayName: 'T1', gamesPlayed: 10, gamesWon: 5, gamesLost: 5, winRate: 0.5, averageRatingChange: 0);
-      final tTie2 = const TeammateStats(playerId: 't2', displayName: 'T2', gamesPlayed: 20, gamesWon: 10, gamesLost: 10, winRate: 0.5, averageRatingChange: 0);
-      
+      final tTie1 = const TeammateStats(
+        playerId: 't1',
+        displayName: 'T1',
+        gamesPlayed: 10,
+        gamesWon: 5,
+        gamesLost: 5,
+        winRate: 0.5,
+        averageRatingChange: 0,
+      );
+      final tTie2 = const TeammateStats(
+        playerId: 't2',
+        displayName: 'T2',
+        gamesPlayed: 20,
+        gamesWon: 10,
+        gamesLost: 10,
+        winRate: 0.5,
+        averageRatingChange: 0,
+      );
+
       final best = service.getBestTeammates([tTie1, tTie2], minGames: 1);
-      
+
       expect(best.first.playerId, 't2'); // More games played comes first
       expect(best.last.playerId, 't1');
     });
@@ -599,30 +656,33 @@ void main() {
 
   group('StatisticsService - Comprehensive ELO Scenarios (Story 14.10)', () {
     group('Equal Teams Scenario (1200 vs 1200)', () {
-      test('equal teams at 1200 rating result in ±16 rating change with K=32', () {
-        final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1200);
-        final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1200);
-        final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1200);
-        final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1200);
+      test(
+        'equal teams at 1200 rating result in ±16 rating change with K=32',
+        () {
+          final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1200);
+          final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1200);
+          final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1200);
+          final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1200);
 
-        final result = service.calculateElo(
-          teamAPlayer1: teamAP1,
-          teamAPlayer2: teamAP2,
-          teamBPlayer1: teamBP1,
-          teamBPlayer2: teamBP2,
-          teamAWon: true,
-          customKFactor: 32,
-        );
+          final result = service.calculateElo(
+            teamAPlayer1: teamAP1,
+            teamAPlayer2: teamAP2,
+            teamBPlayer1: teamBP1,
+            teamBPlayer2: teamBP2,
+            teamAWon: true,
+            customKFactor: 32,
+          );
 
-        // Team A: [1200, 1200] → Team Rating: 1200
-        // Team B: [1200, 1200] → Team Rating: 1200
-        // Expected: E = 0.5
-        // If Team A wins: ΔR = 32 * (1 - 0.5) = +16
-        expect(result.teamARating, 1200);
-        expect(result.teamBRating, 1200);
-        expect(result.teamAExpectedScore, 0.5);
-        expect(result.ratingDelta, closeTo(16, 0.5));
-      });
+          // Team A: [1200, 1200] → Team Rating: 1200
+          // Team B: [1200, 1200] → Team Rating: 1200
+          // Expected: E = 0.5
+          // If Team A wins: ΔR = 32 * (1 - 0.5) = +16
+          expect(result.teamARating, 1200);
+          expect(result.teamBRating, 1200);
+          expect(result.teamAExpectedScore, 0.5);
+          expect(result.ratingDelta, closeTo(16, 0.5));
+        },
+      );
 
       test('equal teams - Team B wins results in opposite delta', () {
         final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1200);
@@ -673,30 +733,36 @@ void main() {
         expect(result.ratingDelta, greaterThan(2));
       });
 
-      test('weak team (1000) beats strong team (1400) with huge gain (upset)', () {
-        final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1000);
-        final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1000);
-        final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1400);
-        final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1400);
+      test(
+        'weak team (1000) beats strong team (1400) with huge gain (upset)',
+        () {
+          final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1000);
+          final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1000);
+          final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1400);
+          final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1400);
 
-        final result = service.calculateElo(
-          teamAPlayer1: teamAP1,
-          teamAPlayer2: teamAP2,
-          teamBPlayer1: teamBP1,
-          teamBPlayer2: teamBP2,
-          teamAWon: true, // Weak team wins (upset!)
-        );
+          final result = service.calculateElo(
+            teamAPlayer1: teamAP1,
+            teamAPlayer2: teamAP2,
+            teamBPlayer1: teamBP1,
+            teamBPlayer2: teamBP2,
+            teamAWon: true, // Weak team wins (upset!)
+          );
 
-        // If Team B (weak) wins: ΔR = 32 * (1 - 0.09) ≈ +29 (upset!)
-        expect(result.teamAExpectedScore, lessThan(0.1));
-        expect(result.ratingDelta, greaterThan(28));
-      });
+          // If Team B (weak) wins: ΔR = 32 * (1 - 0.09) ≈ +29 (upset!)
+          expect(result.teamAExpectedScore, lessThan(0.1));
+          expect(result.ratingDelta, greaterThan(28));
+        },
+      );
     });
 
     group('Weak-Link Effect - Exact Scenario from Issue', () {
       test('weak link drags down team rating: [1500, 1100] vs [1300, 1300]', () {
         final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1500);
-        final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1100); // Weak link
+        final teamAP2 = const PlayerRating(
+          playerId: 'a2',
+          rating: 1100,
+        ); // Weak link
         final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1300);
         final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1300);
 
@@ -778,73 +844,85 @@ void main() {
         expect(result.ratingDelta, closeTo(32, 0.5));
       });
 
-      test('K-factors scale proportionally (K=16 is half of K=32, K=64 is double)', () {
-        final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1200);
-        final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1200);
-        final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1200);
-        final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1200);
+      test(
+        'K-factors scale proportionally (K=16 is half of K=32, K=64 is double)',
+        () {
+          final teamAP1 = const PlayerRating(playerId: 'a1', rating: 1200);
+          final teamAP2 = const PlayerRating(playerId: 'a2', rating: 1200);
+          final teamBP1 = const PlayerRating(playerId: 'b1', rating: 1200);
+          final teamBP2 = const PlayerRating(playerId: 'b2', rating: 1200);
 
-        final resultK16 = service.calculateElo(
-          teamAPlayer1: teamAP1,
-          teamAPlayer2: teamAP2,
-          teamBPlayer1: teamBP1,
-          teamBPlayer2: teamBP2,
-          teamAWon: true,
-          customKFactor: 16,
-        );
+          final resultK16 = service.calculateElo(
+            teamAPlayer1: teamAP1,
+            teamAPlayer2: teamAP2,
+            teamBPlayer1: teamBP1,
+            teamBPlayer2: teamBP2,
+            teamAWon: true,
+            customKFactor: 16,
+          );
 
-        final resultK32 = service.calculateElo(
-          teamAPlayer1: teamAP1,
-          teamAPlayer2: teamAP2,
-          teamBPlayer1: teamBP1,
-          teamBPlayer2: teamBP2,
-          teamAWon: true,
-          customKFactor: 32,
-        );
+          final resultK32 = service.calculateElo(
+            teamAPlayer1: teamAP1,
+            teamAPlayer2: teamAP2,
+            teamBPlayer1: teamBP1,
+            teamBPlayer2: teamBP2,
+            teamAWon: true,
+            customKFactor: 32,
+          );
 
-        final resultK64 = service.calculateElo(
-          teamAPlayer1: teamAP1,
-          teamAPlayer2: teamAP2,
-          teamBPlayer1: teamBP1,
-          teamBPlayer2: teamBP2,
-          teamAWon: true,
-          customKFactor: 64,
-        );
+          final resultK64 = service.calculateElo(
+            teamAPlayer1: teamAP1,
+            teamAPlayer2: teamAP2,
+            teamBPlayer1: teamBP1,
+            teamBPlayer2: teamBP2,
+            teamAWon: true,
+            customKFactor: 64,
+          );
 
-        expect(resultK16.ratingDelta, closeTo(8, 0.5));
-        expect(resultK32.ratingDelta, closeTo(16, 0.5));
-        expect(resultK64.ratingDelta, closeTo(32, 0.5));
+          expect(resultK16.ratingDelta, closeTo(8, 0.5));
+          expect(resultK32.ratingDelta, closeTo(16, 0.5));
+          expect(resultK64.ratingDelta, closeTo(32, 0.5));
 
-        // Verify proportional scaling
-        expect(resultK32.ratingDelta, closeTo(resultK16.ratingDelta * 2, 0.5));
-        expect(resultK64.ratingDelta, closeTo(resultK32.ratingDelta * 2, 0.5));
-      });
+          // Verify proportional scaling
+          expect(
+            resultK32.ratingDelta,
+            closeTo(resultK16.ratingDelta * 2, 0.5),
+          );
+          expect(
+            resultK64.ratingDelta,
+            closeTo(resultK32.ratingDelta * 2, 0.5),
+          );
+        },
+      );
     });
 
     group('Large Rating Gap (>400 points)', () {
-      test('very large rating gap (1200 points) results in minimal change for favorite', () {
-        final teamAP1 = const PlayerRating(playerId: 'a1', rating: 2000);
-        final teamAP2 = const PlayerRating(playerId: 'a2', rating: 2000);
-        final teamBP1 = const PlayerRating(playerId: 'b1', rating: 800);
-        final teamBP2 = const PlayerRating(playerId: 'b2', rating: 800);
+      test(
+        'very large rating gap (1200 points) results in minimal change for favorite',
+        () {
+          final teamAP1 = const PlayerRating(playerId: 'a1', rating: 2000);
+          final teamAP2 = const PlayerRating(playerId: 'a2', rating: 2000);
+          final teamBP1 = const PlayerRating(playerId: 'b1', rating: 800);
+          final teamBP2 = const PlayerRating(playerId: 'b2', rating: 800);
 
-        final result = service.calculateElo(
-          teamAPlayer1: teamAP1,
-          teamAPlayer2: teamAP2,
-          teamBPlayer1: teamBP1,
-          teamBPlayer2: teamBP2,
-          teamAWon: true, // Expected outcome
-        );
+          final result = service.calculateElo(
+            teamAPlayer1: teamAP1,
+            teamAPlayer2: teamAP2,
+            teamBPlayer1: teamBP1,
+            teamBPlayer2: teamBP2,
+            teamAWon: true, // Expected outcome
+          );
 
-        // Team A: [2000, 2000]
-        // Team B: [800, 800]
-        // Expected: E_A ≈ 0.99 (99.6% chance)
-        // Team A win: ΔR ≈ +0.13 (negligible)
-        expect(result.teamARating, 2000);
-        expect(result.teamBRating, 800);
-        expect(result.teamAExpectedScore, greaterThan(0.99));
-        expect(result.ratingDelta, lessThan(1)); // Almost no change
-      });
+          // Team A: [2000, 2000]
+          // Team B: [800, 800]
+          // Expected: E_A ≈ 0.99 (99.6% chance)
+          // Team A win: ΔR ≈ +0.13 (negligible)
+          expect(result.teamARating, 2000);
+          expect(result.teamBRating, 800);
+          expect(result.teamAExpectedScore, greaterThan(0.99));
+          expect(result.ratingDelta, lessThan(1)); // Almost no change
+        },
+      );
 
       test('huge upset (800 beats 2000) results in maximum rating swing', () {
         final teamAP1 = const PlayerRating(playerId: 'a1', rating: 800);
@@ -867,77 +945,92 @@ void main() {
     });
 
     group('Expected Win Probability Validation', () {
-      test('rating difference of 0 results in 50% expected win probability', () {
-        final result = service.calculateElo(
-          teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1500),
-          teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1500),
-          teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1500),
-          teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1500),
-          teamAWon: true,
-        );
+      test(
+        'rating difference of 0 results in 50% expected win probability',
+        () {
+          final result = service.calculateElo(
+            teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1500),
+            teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1500),
+            teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1500),
+            teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1500),
+            teamAWon: true,
+          );
 
-        expect(result.teamAExpectedScore, closeTo(0.5, 0.01));
-      });
+          expect(result.teamAExpectedScore, closeTo(0.5, 0.01));
+        },
+      );
 
-      test('rating difference of 100 results in ~64% expected win probability', () {
-        final result = service.calculateElo(
-          teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1550),
-          teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1550),
-          teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1450),
-          teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1450),
-          teamAWon: true,
-        );
+      test(
+        'rating difference of 100 results in ~64% expected win probability',
+        () {
+          final result = service.calculateElo(
+            teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1550),
+            teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1550),
+            teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1450),
+            teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1450),
+            teamAWon: true,
+          );
 
-        // Rating Difference: 100 → Expected Win: 64%
-        expect(result.teamARating, 1550);
-        expect(result.teamBRating, 1450);
-        expect(result.teamAExpectedScore, closeTo(0.64, 0.02));
-      });
+          // Rating Difference: 100 → Expected Win: 64%
+          expect(result.teamARating, 1550);
+          expect(result.teamBRating, 1450);
+          expect(result.teamAExpectedScore, closeTo(0.64, 0.02));
+        },
+      );
 
-      test('rating difference of 200 results in ~76% expected win probability', () {
-        final result = service.calculateElo(
-          teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1600),
-          teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1600),
-          teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1400),
-          teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1400),
-          teamAWon: true,
-        );
+      test(
+        'rating difference of 200 results in ~76% expected win probability',
+        () {
+          final result = service.calculateElo(
+            teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1600),
+            teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1600),
+            teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1400),
+            teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1400),
+            teamAWon: true,
+          );
 
-        // Rating Difference: 200 → Expected Win: 76%
-        expect(result.teamARating, 1600);
-        expect(result.teamBRating, 1400);
-        expect(result.teamAExpectedScore, closeTo(0.76, 0.02));
-      });
+          // Rating Difference: 200 → Expected Win: 76%
+          expect(result.teamARating, 1600);
+          expect(result.teamBRating, 1400);
+          expect(result.teamAExpectedScore, closeTo(0.76, 0.02));
+        },
+      );
 
-      test('rating difference of 400 results in ~91% expected win probability', () {
-        final result = service.calculateElo(
-          teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1700),
-          teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1700),
-          teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1300),
-          teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1300),
-          teamAWon: true,
-        );
+      test(
+        'rating difference of 400 results in ~91% expected win probability',
+        () {
+          final result = service.calculateElo(
+            teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1700),
+            teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1700),
+            teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1300),
+            teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1300),
+            teamAWon: true,
+          );
 
-        // Rating Difference: 400 → Expected Win: 91%
-        expect(result.teamARating, 1700);
-        expect(result.teamBRating, 1300);
-        expect(result.teamAExpectedScore, closeTo(0.91, 0.02));
-      });
+          // Rating Difference: 400 → Expected Win: 91%
+          expect(result.teamARating, 1700);
+          expect(result.teamBRating, 1300);
+          expect(result.teamAExpectedScore, closeTo(0.91, 0.02));
+        },
+      );
 
-      test('rating difference of 800 results in ~99% expected win probability', () {
-        final result = service.calculateElo(
-          teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1900),
-          teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1900),
-          teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1100),
-          teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1100),
-          teamAWon: true,
-        );
+      test(
+        'rating difference of 800 results in ~99% expected win probability',
+        () {
+          final result = service.calculateElo(
+            teamAPlayer1: const PlayerRating(playerId: 'a1', rating: 1900),
+            teamAPlayer2: const PlayerRating(playerId: 'a2', rating: 1900),
+            teamBPlayer1: const PlayerRating(playerId: 'b1', rating: 1100),
+            teamBPlayer2: const PlayerRating(playerId: 'b2', rating: 1100),
+            teamAWon: true,
+          );
 
-        // Rating Difference: 800 → Expected Win: 99%
-        expect(result.teamARating, 1900);
-        expect(result.teamBRating, 1100);
-        expect(result.teamAExpectedScore, closeTo(0.99, 0.01));
-      });
+          // Rating Difference: 800 → Expected Win: 99%
+          expect(result.teamARating, 1900);
+          expect(result.teamBRating, 1100);
+          expect(result.teamAExpectedScore, closeTo(0.99, 0.01));
+        },
+      );
     });
   });
 }

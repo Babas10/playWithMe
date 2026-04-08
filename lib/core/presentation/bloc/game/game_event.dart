@@ -45,10 +45,7 @@ class LoadPastGamesForUser extends GameEvent {
   final String userId;
   final int limit;
 
-  const LoadPastGamesForUser({
-    required this.userId,
-    this.limit = 20,
-  });
+  const LoadPastGamesForUser({required this.userId, this.limit = 20});
 
   @override
   List<Object?> get props => [userId, limit];
@@ -86,15 +83,15 @@ class UpdateGameInfo extends GameEvent {
 
   @override
   List<Object?> get props => [
-        gameId,
-        title,
-        description,
-        scheduledAt,
-        location,
-        notes,
-        equipment,
-        estimatedDuration,
-      ];
+    gameId,
+    title,
+    description,
+    scheduledAt,
+    location,
+    notes,
+    equipment,
+    estimatedDuration,
+  ];
 }
 
 class UpdateGameSettings extends GameEvent {
@@ -124,27 +121,24 @@ class UpdateGameSettings extends GameEvent {
 
   @override
   List<Object?> get props => [
-        gameId,
-        maxPlayers,
-        minPlayers,
-        allowWaitlist,
-        allowPlayerInvites,
-        visibility,
-        gameType,
-        skillLevel,
-        weatherDependent,
-        weatherNotes,
-      ];
+    gameId,
+    maxPlayers,
+    minPlayers,
+    allowWaitlist,
+    allowPlayerInvites,
+    visibility,
+    gameType,
+    skillLevel,
+    weatherDependent,
+    weatherNotes,
+  ];
 }
 
 class JoinGame extends GameEvent {
   final String gameId;
   final String userId;
 
-  const JoinGame({
-    required this.gameId,
-    required this.userId,
-  });
+  const JoinGame({required this.gameId, required this.userId});
 
   @override
   List<Object?> get props => [gameId, userId];
@@ -154,10 +148,7 @@ class LeaveGame extends GameEvent {
   final String gameId;
   final String userId;
 
-  const LeaveGame({
-    required this.gameId,
-    required this.userId,
-  });
+  const LeaveGame({required this.gameId, required this.userId});
 
   @override
   List<Object?> get props => [gameId, userId];
@@ -177,11 +168,7 @@ class EndGame extends GameEvent {
   final String? winnerId;
   final List<GameScore>? finalScores;
 
-  const EndGame({
-    required this.gameId,
-    this.winnerId,
-    this.finalScores,
-  });
+  const EndGame({required this.gameId, this.winnerId, this.finalScores});
 
   @override
   List<Object?> get props => [gameId, winnerId, finalScores];
@@ -200,10 +187,7 @@ class UpdateGameScores extends GameEvent {
   final String gameId;
   final List<GameScore> scores;
 
-  const UpdateGameScores({
-    required this.gameId,
-    required this.scores,
-  });
+  const UpdateGameScores({required this.gameId, required this.scores});
 
   @override
   List<Object?> get props => [gameId, scores];
@@ -230,10 +214,7 @@ class LoadGamesByStatus extends GameEvent {
   final GameStatus status;
   final int limit;
 
-  const LoadGamesByStatus({
-    required this.status,
-    this.limit = 20,
-  });
+  const LoadGamesByStatus({required this.status, this.limit = 20});
 
   @override
   List<Object?> get props => [status, limit];
@@ -251,10 +232,7 @@ class SearchGames extends GameEvent {
   final String query;
   final int limit;
 
-  const SearchGames({
-    required this.query,
-    this.limit = 20,
-  });
+  const SearchGames({required this.query, this.limit = 20});
 
   @override
   List<Object?> get props => [query, limit];
@@ -270,25 +248,15 @@ class LoadGameStats extends GameEvent {
 }
 
 class DeleteGame extends GameEvent {
-
   final String gameId;
-
-
 
   const DeleteGame({required this.gameId});
 
-
-
   @override
-
   List<Object?> get props => [gameId];
-
 }
 
-
-
 class SaveGameResult extends GameEvent {
-
   final String gameId;
 
   final String userId;
@@ -297,10 +265,7 @@ class SaveGameResult extends GameEvent {
 
   final GameResult result;
 
-
-
   const SaveGameResult({
-
     required this.gameId,
 
     required this.userId,
@@ -308,13 +273,8 @@ class SaveGameResult extends GameEvent {
     required this.teams,
 
     required this.result,
-
   });
 
-
-
   @override
-
   List<Object?> get props => [gameId, userId, teams, result];
-
 }

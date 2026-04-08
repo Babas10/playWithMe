@@ -46,10 +46,9 @@ class _GameCreationPageState extends State<GameCreationPage> {
   void initState() {
     super.initState();
     // Initialize the bloc with the group information
-    context.read<GameCreationBloc>().add(SelectGroup(
-          groupId: widget.groupId,
-          groupName: widget.groupName,
-        ));
+    context.read<GameCreationBloc>().add(
+      SelectGroup(groupId: widget.groupId, groupName: widget.groupName),
+    );
   }
 
   @override
@@ -140,14 +139,18 @@ class _GameCreationPageState extends State<GameCreationPage> {
 
     // Cupertino drum-roll time picker (iPhone alarm style) as a centered dialog
     TimeOfDay? time;
-    final isToday = date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
+    final isToday =
+        date.year == now.year && date.month == now.month && date.day == now.day;
     // If today is selected, start at now + 1 hour (minimum selectable time)
     final minPickerTime = isToday ? now : null;
     DateTime pickerTime = isToday
-        ? DateTime(date.year, date.month, date.day, now.hour, now.minute)
-            .add(const Duration(hours: 1))
+        ? DateTime(
+            date.year,
+            date.month,
+            date.day,
+            now.hour,
+            now.minute,
+          ).add(const Duration(hours: 1))
         : DateTime(date.year, date.month, date.day, 14, 0);
 
     // ignore: use_build_context_synchronously
@@ -157,7 +160,9 @@ class _GameCreationPageState extends State<GameCreationPage> {
         return Dialog(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -258,12 +263,14 @@ class _GameCreationPageState extends State<GameCreationPage> {
     if (_descriptionController.text.trim().isNotEmpty) {
       bloc.add(SetDescription(description: _descriptionController.text.trim()));
     }
-    bloc.add(SetLocation(
-      locationName: _locationController.text.trim(),
-      address: _addressController.text.trim().isNotEmpty
-          ? _addressController.text.trim()
-          : null,
-    ));
+    bloc.add(
+      SetLocation(
+        locationName: _locationController.text.trim(),
+        address: _addressController.text.trim().isNotEmpty
+            ? _addressController.text.trim()
+            : null,
+      ),
+    );
 
     if (_selectedDateTime != null) {
       bloc.add(SetDateTime(dateTime: _selectedDateTime!));
@@ -278,10 +285,7 @@ class _GameCreationPageState extends State<GameCreationPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: PlayWithMeAppBar.build(
-        context: context,
-        title: l10n.createGame,
-      ),
+      appBar: PlayWithMeAppBar.build(context: context, title: l10n.createGame),
       body: BlocConsumer<GameCreationBloc, GameCreationState>(
         listener: (context, state) {
           if (state is GameCreationSuccess) {
@@ -314,9 +318,7 @@ class _GameCreationPageState extends State<GameCreationPage> {
           return BlocBuilder<AuthenticationBloc, AuthenticationState>(
             builder: (context, authState) {
               if (authState is! AuthenticationAuthenticated) {
-                return Center(
-                  child: Text(l10n.pleaseLogInToCreateGame),
-                );
+                return Center(child: Text(l10n.pleaseLogInToCreateGame));
               }
 
               return SingleChildScrollView(
@@ -332,7 +334,10 @@ class _GameCreationPageState extends State<GameCreationPage> {
                           leading: const Icon(Icons.group),
                           title: Text(l10n.group),
                           subtitle: Text(widget.groupName),
-                          trailing: const Icon(Icons.check_circle, color: Colors.green),
+                          trailing: const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -386,7 +391,9 @@ class _GameCreationPageState extends State<GameCreationPage> {
                             : Text(l10n.tapToSelect),
                         leading: const Icon(Icons.calendar_today),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: isSubmitting ? null : () => _selectDateTime(context),
+                        onTap: isSubmitting
+                            ? null
+                            : () => _selectDateTime(context),
                         tileColor: _selectedDateTime == null
                             ? Colors.red.withAlpha(26)
                             : null,
@@ -456,7 +463,9 @@ class _GameCreationPageState extends State<GameCreationPage> {
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : Text(
                                 l10n.createGame,
@@ -474,4 +483,3 @@ class _GameCreationPageState extends State<GameCreationPage> {
     );
   }
 }
-

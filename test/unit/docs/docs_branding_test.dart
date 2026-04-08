@@ -24,8 +24,11 @@ void main() {
     });
 
     test('does not contain PlayWithMe brand name', () {
-      expect(content, isNot(contains('PlayWithMe')),
-          reason: 'README.md should not reference the legacy PlayWithMe brand');
+      expect(
+        content,
+        isNot(contains('PlayWithMe')),
+        reason: 'README.md should not reference the legacy PlayWithMe brand',
+      );
     });
 
     test('references Gatherli environments', () {
@@ -65,8 +68,12 @@ void main() {
     });
 
     test('emulator command references gatherli-dev', () {
-      expect(content,
-          contains('firebase emulators:start --only auth,firestore --project gatherli-dev'));
+      expect(
+        content,
+        contains(
+          'firebase emulators:start --only auth,firestore --project gatherli-dev',
+        ),
+      );
     });
 
     test('section 10 names Gatherli app', () {

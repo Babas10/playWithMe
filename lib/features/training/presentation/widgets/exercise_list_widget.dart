@@ -32,11 +32,11 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
   void initState() {
     super.initState();
     context.read<ExerciseBloc>().add(
-          LoadExercises(
-            trainingSessionId: widget.trainingSessionId,
-            isOrganiser: widget.isOrganiser,
-          ),
-        );
+      LoadExercises(
+        trainingSessionId: widget.trainingSessionId,
+        isOrganiser: widget.isOrganiser,
+      ),
+    );
   }
 
   Future<void> _showAddExerciseDialog() async {
@@ -47,13 +47,13 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
 
     if (result != null && mounted) {
       context.read<ExerciseBloc>().add(
-            AddExercise(
-              trainingSessionId: widget.trainingSessionId,
-              name: result['name'] as String,
-              description: result['description'] as String?,
-              durationMinutes: result['durationMinutes'] as int?,
-            ),
-          );
+        AddExercise(
+          trainingSessionId: widget.trainingSessionId,
+          name: result['name'] as String,
+          description: result['description'] as String?,
+          durationMinutes: result['durationMinutes'] as int?,
+        ),
+      );
     }
   }
 
@@ -65,14 +65,14 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
 
     if (result != null && mounted) {
       context.read<ExerciseBloc>().add(
-            UpdateExercise(
-              trainingSessionId: widget.trainingSessionId,
-              exerciseId: exercise.id,
-              name: result['name'] as String?,
-              description: result['description'] as String?,
-              durationMinutes: result['durationMinutes'] as int?,
-            ),
-          );
+        UpdateExercise(
+          trainingSessionId: widget.trainingSessionId,
+          exerciseId: exercise.id,
+          name: result['name'] as String?,
+          description: result['description'] as String?,
+          durationMinutes: result['durationMinutes'] as int?,
+        ),
+      );
     }
   }
 
@@ -81,9 +81,7 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Exercise'),
-        content: Text(
-          'Are you sure you want to delete "${exercise.name}"?',
-        ),
+        content: Text('Are you sure you want to delete "${exercise.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -103,11 +101,11 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
 
     if (confirmed == true && mounted) {
       context.read<ExerciseBloc>().add(
-            DeleteExercise(
-              trainingSessionId: widget.trainingSessionId,
-              exerciseId: exercise.id,
-            ),
-          );
+        DeleteExercise(
+          trainingSessionId: widget.trainingSessionId,
+          exerciseId: exercise.id,
+        ),
+      );
     }
   }
 
@@ -117,10 +115,7 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
       listener: (context, state) {
         if (state is ExerciseError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
         } else if (state is ExercisesLocked) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -161,9 +156,7 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
       },
       builder: (context, state) {
         if (state is ExercisesLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (state is ExercisesLoaded) {
@@ -274,9 +267,7 @@ class _ExerciseListWidgetState extends State<ExerciseListWidget> {
         }
 
         // Initial or error state
-        return const Center(
-          child: Text('Unable to load exercises'),
-        );
+        return const Center(child: Text('Unable to load exercises'));
       },
     );
   }

@@ -39,14 +39,15 @@ class MomentumConsistencyCard extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => EloHistoryBloc(
-            userRepository: sl<UserRepository>(),
-          )..add(EloHistoryEvent.loadHistory(userId: user.uid)),
+          create: (context) =>
+              EloHistoryBloc(userRepository: sl<UserRepository>())
+                ..add(EloHistoryEvent.loadHistory(userId: user.uid)),
         ),
         BlocProvider(
-          create: (context) => PlayerStatsBloc(
-            userRepository: sl<UserRepository>(),
-          )..add(LoadPlayerStats(user.uid)), // Story 302.5: Load stats (ranking auto-loads via listener)
+          create: (context) =>
+              PlayerStatsBloc(userRepository: sl<UserRepository>())..add(
+                LoadPlayerStats(user.uid),
+              ), // Story 302.5: Load stats (ranking auto-loads via listener)
         ),
       ],
       child: Padding(
@@ -56,7 +57,9 @@ class MomentumConsistencyCard extends StatelessWidget {
           children: [
             // Section label — uppercase, muted, letter-spaced
             Text(
-              AppLocalizations.of(context)!.momentumAndConsistency.toUpperCase(),
+              AppLocalizations.of(
+                context,
+              )!.momentumAndConsistency.toUpperCase(),
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -125,8 +128,8 @@ class MomentumConsistencyCard extends StatelessWidget {
                           selectedPeriod: state.selectedPeriod,
                           onPeriodChanged: (period) {
                             context.read<EloHistoryBloc>().add(
-                                  EloHistoryEvent.filterByPeriod(period),
-                                );
+                              EloHistoryEvent.filterByPeriod(period),
+                            );
                           },
                         ),
                         const SizedBox(height: 16),
@@ -256,8 +259,11 @@ class MomentumConsistencyCard extends StatelessWidget {
   Widget _buildNoStreakState(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.bolt, size: 28,
-            color: AppColors.textMuted.withValues(alpha: 0.35)),
+        Icon(
+          Icons.bolt,
+          size: 28,
+          color: AppColors.textMuted.withValues(alpha: 0.35),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(

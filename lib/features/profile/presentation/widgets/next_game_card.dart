@@ -70,15 +70,11 @@ class NextGameCard extends StatelessWidget {
                   left: 0,
                   top: 0,
                   bottom: 0,
-                  child: Container(
-                    width: 6,
-                    color: _kPrimary,
-                  ),
+                  child: Container(width: 6, color: _kPrimary),
                 ),
                 // Card content
                 Padding(
-                  padding:
-                      const EdgeInsets.fromLTRB(22, 20, 16, 20),
+                  padding: const EdgeInsets.fromLTRB(22, 20, 16, 20),
                   child: _buildGameContent(context, l10n),
                 ),
               ],
@@ -153,37 +149,23 @@ class NextGameCard extends StatelessWidget {
         // Date/time + Location
         Row(
           children: [
-            Icon(
-              Icons.calendar_today,
-              size: 14,
-              color: _kTextMuted,
-            ),
+            Icon(Icons.calendar_today, size: 14, color: _kTextMuted),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 _formatDateTime(context, game!.scheduledAt),
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: _kTextMuted,
-                ),
+                style: const TextStyle(fontSize: 14, color: _kTextMuted),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 15),
-            Icon(
-              Icons.location_on,
-              size: 14,
-              color: _kTextMuted,
-            ),
+            Icon(Icons.location_on, size: 14, color: _kTextMuted),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 game!.location.name,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: _kTextMuted,
-                ),
+                style: const TextStyle(fontSize: 14, color: _kTextMuted),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -293,10 +275,7 @@ class NextGameCard extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               '+${game!.waitlistCount}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: _kTextMuted,
-              ),
+              style: const TextStyle(fontSize: 12, color: _kTextMuted),
             ),
           ],
         ],
@@ -335,20 +314,19 @@ class _DashedBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        const Radius.circular(16),
-      ));
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          const Radius.circular(16),
+        ),
+      );
 
     final dashPath = Path();
     for (final metric in path.computeMetrics()) {
       double distance = 0;
       while (distance < metric.length) {
         final end = (distance + 8).clamp(0.0, metric.length);
-        dashPath.addPath(
-          metric.extractPath(distance, end),
-          Offset.zero,
-        );
+        dashPath.addPath(metric.extractPath(distance, end), Offset.zero);
         distance += 16;
       }
     }

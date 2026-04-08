@@ -5,7 +5,9 @@ import 'package:play_with_me/features/games/presentation/widgets/game_result_bad
 
 void main() {
   group('GameResultBadge', () {
-    testWidgets('displays winner name and score correctly for Team A', (tester) async {
+    testWidgets('displays winner name and score correctly for Team A', (
+      tester,
+    ) async {
       // We need to construct a result with valid data so scoreDescription returns a valid description.
       final validResult = const GameResult(
         games: [
@@ -13,16 +15,14 @@ void main() {
             gameNumber: 1,
             winner: 'teamA',
             sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
-          )
+          ),
         ],
         overallWinner: 'teamA',
       );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: GameResultBadge(result: validResult),
-          ),
+          home: Scaffold(body: GameResultBadge(result: validResult)),
         ),
       );
 
@@ -30,23 +30,23 @@ void main() {
       expect(find.byIcon(Icons.emoji_events), findsOneWidget);
     });
 
-    testWidgets('displays winner name and score correctly for Team B', (tester) async {
+    testWidgets('displays winner name and score correctly for Team B', (
+      tester,
+    ) async {
       final validResult = const GameResult(
         games: [
           IndividualGame(
             gameNumber: 1,
             winner: 'teamB',
             sets: [SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1)],
-          )
+          ),
         ],
         overallWinner: 'teamB',
       );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: GameResultBadge(result: validResult),
-          ),
+          home: Scaffold(body: GameResultBadge(result: validResult)),
         ),
       );
 
@@ -61,7 +61,7 @@ void main() {
             gameNumber: 1,
             winner: 'teamA',
             sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
-          )
+          ),
         ],
         overallWinner: 'teamA',
       );

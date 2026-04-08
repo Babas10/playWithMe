@@ -22,7 +22,9 @@ import '../../../../../unit/core/data/repositories/mock_user_repository.dart';
 
 // Mock classes
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
+
 class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
 
 void main() {
@@ -42,30 +44,36 @@ void main() {
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
     mockAnalytics = MockFirebaseAnalytics();
-    when(() => mockAnalytics.logEvent(
-          name: any(named: 'name'),
-          parameters: any(named: 'parameters'),
-        )).thenAnswer((_) async {});
+    when(
+      () => mockAnalytics.logEvent(
+        name: any(named: 'name'),
+        parameters: any(named: 'parameters'),
+      ),
+    ).thenAnswer((_) async {});
 
     await sl.reset();
     sl.registerLazySingleton<FirebaseAnalytics>(() => mockAnalytics);
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
 
     // Add test users to mock repository
     mockUserRepository.addUser(TestUserData.testUser);
     mockUserRepository.addUser(TestUserData.anotherUser);
     // Add waitlist user for fullGame test
-    mockUserRepository.addUser(UserModel(
-      uid: 'another-uid-101',
-      email: 'waitlist@example.com',
-      displayName: 'Waitlist User',
-      isEmailVerified: true,
-      createdAt: DateTime.now(),
-      lastSignInAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      isAnonymous: false,
-    ));
+    mockUserRepository.addUser(
+      UserModel(
+        uid: 'another-uid-101',
+        email: 'waitlist@example.com',
+        displayName: 'Waitlist User',
+        isEmailVerified: true,
+        createdAt: DateTime.now(),
+        lastSignInAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        isAnonymous: false,
+      ),
+    );
 
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
@@ -164,8 +172,9 @@ void main() {
       expect(find.text('Organizer'), findsOneWidget);
     });
 
-    testWidgets('displays "I\'m In" button when user is not playing',
-        (tester) async {
+    testWidgets('displays "I\'m In" button when user is not playing', (
+      tester,
+    ) async {
       // Create a game where test user is NOT a player and NOT the creator
       final gameWithoutUser = TestGameData.testGame.copyWith(
         playerIds: ['other-user-1', 'other-user-2'],
@@ -183,8 +192,9 @@ void main() {
       expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
     });
 
-    testWidgets('displays leave option via popup menu when user is playing',
-        (tester) async {
+    testWidgets('displays leave option via popup menu when user is playing', (
+      tester,
+    ) async {
       mockGameRepository.addGame(TestGameData.testGame);
 
       await tester.pumpWidget(createApp(gameId: testGameId));
@@ -197,8 +207,9 @@ void main() {
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
     });
 
-    testWidgets('displays "Join Waitlist" button when game is full',
-        (tester) async {
+    testWidgets('displays "Join Waitlist" button when game is full', (
+      tester,
+    ) async {
       // Create a full game where the test user is NOT a player and NOT the creator
       final fullGameWithoutTestUser = TestGameData.fullGame.copyWith(
         playerIds: ['other-user-1', 'other-user-2'],
@@ -213,8 +224,9 @@ void main() {
       expect(find.text('Join Waitlist'), findsOneWidget);
     });
 
-    testWidgets('shows waitlist section when there are waitlisted players',
-        (tester) async {
+    testWidgets('shows waitlist section when there are waitlisted players', (
+      tester,
+    ) async {
       mockGameRepository.addGame(TestGameData.fullGame);
 
       await tester.pumpWidget(createApp(gameId: 'full-game-101'));
@@ -251,8 +263,9 @@ void main() {
       expect(updatedGame!.playerIds.contains(testUserId), true);
     });
 
-    testWidgets('tapping leave via popup menu triggers leave event',
-        (tester) async {
+    testWidgets('tapping leave via popup menu triggers leave event', (
+      tester,
+    ) async {
       mockGameRepository.addGame(TestGameData.testGame);
 
       await tester.pumpWidget(createApp(gameId: testGameId));
@@ -284,9 +297,7 @@ void main() {
     });
 
     testWidgets('displays empty state when no players', (tester) async {
-      final gameWithNoPlayers = TestGameData.testGame.copyWith(
-        playerIds: [],
-      );
+      final gameWithNoPlayers = TestGameData.testGame.copyWith(playerIds: []);
       mockGameRepository.addGame(gameWithNoPlayers);
 
       await tester.pumpWidget(createApp(gameId: testGameId));
@@ -295,7 +306,10 @@ void main() {
       });
       await tester.pumpAndSettle();
 
-      expect(find.text('No players yet. Be the first to join!'), findsOneWidget);
+      expect(
+        find.text('No players yet. Be the first to join!'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays error state when game not found', (tester) async {
@@ -331,8 +345,9 @@ void main() {
     // reliably tested with synchronous mocks. RSVP flow is covered in integration tests.
     // See: integration_test/game_details_rsvp_test.dart
 
-    testWidgets('real-time updates: player list updates when someone joins',
-        (tester) async {
+    testWidgets('real-time updates: player list updates when someone joins', (
+      tester,
+    ) async {
       final gameWithoutUser = TestGameData.testGame.copyWith(
         playerIds: ['other-user-1'],
       );
@@ -376,11 +391,12 @@ void main() {
       expect(find.text('Bring sunscreen!'), findsOneWidget);
     });
 
-    testWidgets('hides RSVP buttons when user is not authenticated',
-        (tester) async {
-      when(() => mockAuthBloc.state).thenReturn(
-        const AuthenticationUnauthenticated(),
-      );
+    testWidgets('hides RSVP buttons when user is not authenticated', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthBloc.state,
+      ).thenReturn(const AuthenticationUnauthenticated());
 
       mockGameRepository.addGame(TestGameData.testGame);
 
@@ -411,7 +427,7 @@ void main() {
       // previously the "I'm Out" button showed. Now with Verification flow,
       // RSVP buttons are hidden for completed games.
       expect(find.text('I\'m Out'), findsNothing);
-      
+
       // With Democratized Entry (Story 14.14), participants can enter results
       // for past/completed games if no result exists yet.
       expect(find.text('Enter Results'), findsOneWidget);

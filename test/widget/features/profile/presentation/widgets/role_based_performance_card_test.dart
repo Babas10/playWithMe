@@ -57,19 +57,18 @@ void main() {
           weakLink: RoleStats(games: 6, wins: 4, winRate: 0.667),
         ),
       );
-
     });
 
     Widget buildWidget(UserModel user) => MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('en')],
-          home: Scaffold(body: RoleBasedPerformanceCard(user: user)),
-        );
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
+      home: Scaffold(body: RoleBasedPerformanceCard(user: user)),
+    );
 
     testWidgets('displays section label', (tester) async {
       await tester.pumpWidget(buildWidget(userWithNoData));
@@ -81,7 +80,12 @@ void main() {
       await tester.pump();
 
       expect(find.text('Adaptability Stats Locked'), findsOneWidget);
-      expect(find.text('Play more games to see how you perform in different team roles'), findsOneWidget);
+      expect(
+        find.text(
+          'Play more games to see how you perform in different team roles',
+        ),
+        findsOneWidget,
+      );
       expect(find.byIcon(Icons.analytics_outlined), findsOneWidget);
     });
 
@@ -92,9 +96,18 @@ void main() {
       expect(find.text('Leading the Team'), findsOneWidget);
       expect(find.text('Playing with Stronger Partners'), findsOneWidget);
       expect(find.text('Balanced Teams'), findsOneWidget);
-      expect(find.text('When you\'re the highest-rated player'), findsOneWidget);
-      expect(find.text('When playing with more experienced teammates'), findsOneWidget);
-      expect(find.text('When playing with similarly-rated teammates'), findsOneWidget);
+      expect(
+        find.text('When you\'re the highest-rated player'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('When playing with more experienced teammates'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('When playing with similarly-rated teammates'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays correct stats for carry role', (tester) async {
@@ -108,17 +121,23 @@ void main() {
       expect(find.text('Balanced Teams'), findsNothing);
     });
 
-    testWidgets('displays correct stats for weak-link role with positive framing', (tester) async {
-      await tester.pumpWidget(buildWidget(userWithOnlyWeakLink));
-      await tester.pump();
+    testWidgets(
+      'displays correct stats for weak-link role with positive framing',
+      (tester) async {
+        await tester.pumpWidget(buildWidget(userWithOnlyWeakLink));
+        await tester.pump();
 
-      expect(find.text('Playing with Stronger Partners'), findsOneWidget);
-      expect(find.text('When playing with more experienced teammates'), findsOneWidget);
-      expect(find.text('4W - 2L (6 games)'), findsOneWidget);
-      expect(find.text('66.7%'), findsOneWidget);
-      expect(find.textContaining('weak'), findsNothing);
-      expect(find.textContaining('Weak'), findsNothing);
-    });
+        expect(find.text('Playing with Stronger Partners'), findsOneWidget);
+        expect(
+          find.text('When playing with more experienced teammates'),
+          findsOneWidget,
+        );
+        expect(find.text('4W - 2L (6 games)'), findsOneWidget);
+        expect(find.text('66.7%'), findsOneWidget);
+        expect(find.textContaining('weak'), findsNothing);
+        expect(find.textContaining('Weak'), findsNothing);
+      },
+    );
 
     testWidgets('win rate color is blue (AppColors.secondary)', (tester) async {
       await tester.pumpWidget(buildWidget(userWithOnlyCarry));
@@ -141,8 +160,8 @@ void main() {
       await tester.pump();
 
       expect(find.byIcon(Icons.emoji_events), findsOneWidget); // Carry
-      expect(find.byIcon(Icons.people), findsOneWidget);       // Weak-link
-      expect(find.byIcon(Icons.balance), findsOneWidget);      // Balanced
+      expect(find.byIcon(Icons.people), findsOneWidget); // Weak-link
+      expect(find.byIcon(Icons.balance), findsOneWidget); // Balanced
     });
 
     testWidgets('shows correct colors for each role icon', (tester) async {
@@ -153,7 +172,10 @@ void main() {
       expect(carryIcon.color, const Color(0xFFEACE6A)); // AppColors.primary
 
       final weakLinkIcon = tester.widget<Icon>(find.byIcon(Icons.people));
-      expect(weakLinkIcon.color, const Color(0xFF004E64)); // AppColors.secondary
+      expect(
+        weakLinkIcon.color,
+        const Color(0xFF004E64),
+      ); // AppColors.secondary
 
       final balancedIcon = tester.widget<Icon>(find.byIcon(Icons.balance));
       expect(balancedIcon.color, const Color(0xFFEACE6A)); // AppColors.primary
@@ -172,7 +194,10 @@ void main() {
       await tester.pumpWidget(buildWidget(userWithAllRoles));
       await tester.pump();
 
-      expect(find.text('See how you perform in different team roles'), findsOneWidget);
+      expect(
+        find.text('See how you perform in different team roles'),
+        findsOneWidget,
+      );
     });
   });
 }

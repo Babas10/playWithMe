@@ -36,12 +36,10 @@ class UserRanking with _$UserRanking {
 
   /// Display global rank as "#42 of 1,500"
   String get globalRankDisplay {
-    final formattedTotal = totalUsers
-        .toString()
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final formattedTotal = totalUsers.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '#$globalRank of $formattedTotal';
   }
 

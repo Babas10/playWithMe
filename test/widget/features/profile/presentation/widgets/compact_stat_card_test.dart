@@ -9,10 +9,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: CompactStatCard(
-              label: 'Win Rate',
-              value: '75%',
-            ),
+            body: CompactStatCard(label: 'Win Rate', value: '75%'),
           ),
         ),
       );
@@ -89,10 +86,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: CompactStatCard(
-              label: 'Test Label',
-              value: '100',
-            ),
+            body: CompactStatCard(label: 'Test Label', value: '100'),
           ),
         ),
       );
@@ -108,10 +102,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: CompactStatCard(
-              label: 'Test Label',
-              value: '100',
-            ),
+            body: CompactStatCard(label: 'Test Label', value: '100'),
           ),
         ),
       );

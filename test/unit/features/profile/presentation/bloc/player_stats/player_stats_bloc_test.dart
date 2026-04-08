@@ -37,7 +37,7 @@ void main() {
       opponentTeam: 'Opponents',
       won: true,
       timestamp: DateTime.now().subtract(const Duration(days: 1)),
-    )
+    ),
   ];
 
   setUp(() {
@@ -58,10 +58,12 @@ void main() {
     blocTest<PlayerStatsBloc, PlayerStatsState>(
       'emits [PlayerStatsLoading, PlayerStatsLoaded] when LoadPlayerStats is added',
       setUp: () {
-        when(() => mockUserRepository.getUserStream(userId))
-            .thenAnswer((_) => Stream.value(testUser));
-        when(() => mockUserRepository.getRatingHistory(userId))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getUserStream(userId),
+        ).thenAnswer((_) => Stream.value(testUser));
+        when(
+          () => mockUserRepository.getRatingHistory(userId),
+        ).thenAnswer((_) => Stream.value(testHistory));
       },
       build: () => playerStatsBloc,
       act: (bloc) => bloc.add(const LoadPlayerStats(userId)),
@@ -74,17 +76,25 @@ void main() {
     blocTest<PlayerStatsBloc, PlayerStatsState>(
       'updates state when user stream emits new data',
       setUp: () {
-        when(() => mockUserRepository.getUserStream(userId))
-            .thenAnswer((_) => Stream.fromIterable([testUser, testUser.copyWith(gamesPlayed: 11)]));
-        when(() => mockUserRepository.getRatingHistory(userId))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(() => mockUserRepository.getUserStream(userId)).thenAnswer(
+          (_) => Stream.fromIterable([
+            testUser,
+            testUser.copyWith(gamesPlayed: 11),
+          ]),
+        );
+        when(
+          () => mockUserRepository.getRatingHistory(userId),
+        ).thenAnswer((_) => Stream.value(testHistory));
       },
       build: () => playerStatsBloc,
       act: (bloc) => bloc.add(const LoadPlayerStats(userId)),
       expect: () => [
         PlayerStatsLoading(),
         PlayerStatsLoaded(user: testUser, history: testHistory),
-        PlayerStatsLoaded(user: testUser.copyWith(gamesPlayed: 11), history: testHistory),
+        PlayerStatsLoaded(
+          user: testUser.copyWith(gamesPlayed: 11),
+          history: testHistory,
+        ),
       ],
     );
 
@@ -92,15 +102,19 @@ void main() {
       'refreshes history if gamesPlayed increases',
       setUp: () {
         final updatedUser = testUser.copyWith(gamesPlayed: 11);
-        when(() => mockUserRepository.getUserStream(userId))
-            .thenAnswer((_) => Stream.fromIterable([testUser, updatedUser]));
-        
+        when(
+          () => mockUserRepository.getUserStream(userId),
+        ).thenAnswer((_) => Stream.fromIterable([testUser, updatedUser]));
+
         // Return initial history first, then updated history
         int callCount = 0;
         when(() => mockUserRepository.getRatingHistory(userId)).thenAnswer((_) {
           callCount++;
           if (callCount == 1) return Stream.value(testHistory);
-          return Stream.value([...testHistory, testHistory.first.copyWith(entryId: 'entry-2')]);
+          return Stream.value([
+            ...testHistory,
+            testHistory.first.copyWith(entryId: 'entry-2'),
+          ]);
         });
       },
       build: () => playerStatsBloc,
@@ -124,8 +138,9 @@ void main() {
       blocTest<PlayerStatsBloc, PlayerStatsState>(
         'loads ranking when state is PlayerStatsLoaded',
         setUp: () {
-          when(() => mockUserRepository.getUserRanking(userId))
-              .thenAnswer((_) async => testRanking);
+          when(
+            () => mockUserRepository.getUserRanking(userId),
+          ).thenAnswer((_) async => testRanking);
         },
         build: () => playerStatsBloc,
         seed: () => PlayerStatsLoaded(user: testUser, history: testHistory),
@@ -142,8 +157,9 @@ void main() {
       blocTest<PlayerStatsBloc, PlayerStatsState>(
         'does nothing when state is not PlayerStatsLoaded',
         setUp: () {
-          when(() => mockUserRepository.getUserRanking(userId))
-              .thenAnswer((_) async => testRanking);
+          when(
+            () => mockUserRepository.getUserRanking(userId),
+          ).thenAnswer((_) async => testRanking);
         },
         build: () => playerStatsBloc,
         seed: () => PlayerStatsInitial(),
@@ -157,8 +173,9 @@ void main() {
       blocTest<PlayerStatsBloc, PlayerStatsState>(
         'preserves user and history when loading ranking',
         setUp: () {
-          when(() => mockUserRepository.getUserRanking(userId))
-              .thenAnswer((_) async => testRanking);
+          when(
+            () => mockUserRepository.getUserRanking(userId),
+          ).thenAnswer((_) async => testRanking);
         },
         build: () => playerStatsBloc,
         seed: () => PlayerStatsLoaded(user: testUser, history: testHistory),
@@ -178,8 +195,9 @@ void main() {
       blocTest<PlayerStatsBloc, PlayerStatsState>(
         'sets rankingLoadFailed to true when ranking fetch fails',
         setUp: () {
-          when(() => mockUserRepository.getUserRanking(userId))
-              .thenThrow(Exception('Network error'));
+          when(
+            () => mockUserRepository.getUserRanking(userId),
+          ).thenThrow(Exception('Network error'));
         },
         build: () => playerStatsBloc,
         seed: () => PlayerStatsLoaded(user: testUser, history: testHistory),
@@ -196,8 +214,9 @@ void main() {
       blocTest<PlayerStatsBloc, PlayerStatsState>(
         'clears rankingLoadFailed when ranking fetch succeeds after failure',
         setUp: () {
-          when(() => mockUserRepository.getUserRanking(userId))
-              .thenAnswer((_) async => testRanking);
+          when(
+            () => mockUserRepository.getUserRanking(userId),
+          ).thenAnswer((_) async => testRanking);
         },
         build: () => playerStatsBloc,
         seed: () => PlayerStatsLoaded(
@@ -219,8 +238,9 @@ void main() {
       blocTest<PlayerStatsBloc, PlayerStatsState>(
         'preserves rankingLoadFailed state when updating user stats',
         setUp: () {
-          when(() => mockUserRepository.getRatingHistory(userId))
-              .thenAnswer((_) => Stream.value(testHistory));
+          when(
+            () => mockUserRepository.getRatingHistory(userId),
+          ).thenAnswer((_) => Stream.value(testHistory));
         },
         build: () => playerStatsBloc,
         seed: () => PlayerStatsLoaded(
@@ -228,11 +248,15 @@ void main() {
           history: testHistory,
           rankingLoadFailed: true,
         ),
-        act: (bloc) => bloc.add(UpdateUserStats(testUser.copyWith(gamesPlayed: 11))),
+        act: (bloc) =>
+            bloc.add(UpdateUserStats(testUser.copyWith(gamesPlayed: 11))),
         verify: (bloc) {
           final state = bloc.state as PlayerStatsLoaded;
-          expect(state.rankingLoadFailed, isTrue,
-              reason: 'rankingLoadFailed should be preserved when user updates');
+          expect(
+            state.rankingLoadFailed,
+            isTrue,
+            reason: 'rankingLoadFailed should be preserved when user updates',
+          );
         },
       );
     });
@@ -248,8 +272,9 @@ void main() {
       blocTest<PlayerStatsBloc, PlayerStatsState>(
         'preserves ranking when updating user stats',
         setUp: () {
-          when(() => mockUserRepository.getRatingHistory(userId))
-              .thenAnswer((_) => Stream.value(testHistory));
+          when(
+            () => mockUserRepository.getRatingHistory(userId),
+          ).thenAnswer((_) => Stream.value(testHistory));
         },
         build: () => playerStatsBloc,
         seed: () => PlayerStatsLoaded(
@@ -257,11 +282,15 @@ void main() {
           history: testHistory,
           ranking: testRanking,
         ),
-        act: (bloc) => bloc.add(UpdateUserStats(testUser.copyWith(gamesPlayed: 11))),
+        act: (bloc) =>
+            bloc.add(UpdateUserStats(testUser.copyWith(gamesPlayed: 11))),
         verify: (bloc) {
           final state = bloc.state as PlayerStatsLoaded;
-          expect(state.ranking, testRanking,
-              reason: 'Ranking should be preserved when user updates');
+          expect(
+            state.ranking,
+            testRanking,
+            reason: 'Ranking should be preserved when user updates',
+          );
         },
       );
     });

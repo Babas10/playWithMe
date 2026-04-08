@@ -39,15 +39,15 @@ class InviteJoinValidated extends InviteJoinState {
 
   @override
   List<Object?> get props => [
-        groupId,
-        groupName,
-        groupDescription,
-        groupPhotoUrl,
-        memberCount,
-        inviterName,
-        inviterPhotoUrl,
-        token,
-      ];
+    groupId,
+    groupName,
+    groupDescription,
+    groupPhotoUrl,
+    memberCount,
+    inviterName,
+    inviterPhotoUrl,
+    token,
+  ];
 }
 
 class InviteJoinJoining extends InviteJoinState {

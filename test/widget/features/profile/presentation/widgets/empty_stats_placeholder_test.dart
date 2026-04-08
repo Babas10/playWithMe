@@ -7,17 +7,15 @@ void main() {
   group('EmptyStatsPlaceholder Widget Tests', () {
     testWidgets('renders with default properties', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptyStatsPlaceholder(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptyStatsPlaceholder())),
       );
       await tester.pumpAndSettle();
 
       expect(find.text('No Stats Yet'), findsOneWidget);
-      expect(find.text('Start playing games to see your statistics!'),
-          findsOneWidget);
+      expect(
+        find.text('Start playing games to see your statistics!'),
+        findsOneWidget,
+      );
       expect(find.byIcon(Icons.insert_chart_outlined), findsOneWidget);
       expect(find.byType(Card), findsOneWidget);
     });
@@ -43,9 +41,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyStatsPlaceholder(
-              icon: Icons.sports_volleyball,
-            ),
+            body: EmptyStatsPlaceholder(icon: Icons.sports_volleyball),
           ),
         ),
       );
@@ -74,11 +70,7 @@ void main() {
     testWidgets('does not render unlock message when null', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: EmptyStatsPlaceholder(
-              unlockMessage: null,
-            ),
-          ),
+          home: Scaffold(body: EmptyStatsPlaceholder(unlockMessage: null)),
         ),
       );
       await tester.pumpAndSettle();

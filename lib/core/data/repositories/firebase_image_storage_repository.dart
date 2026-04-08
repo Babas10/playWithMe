@@ -8,7 +8,7 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
   final FirebaseStorage _storage;
 
   FirebaseImageStorageRepository({FirebaseStorage? storage})
-      : _storage = storage ?? FirebaseStorage.instance;
+    : _storage = storage ?? FirebaseStorage.instance;
 
   @override
   Future<String> uploadAvatar({
@@ -43,23 +43,27 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
 
       // Verify upload was successful
       if (snapshot.state != TaskState.success) {
-        throw ImageStorageException('Upload failed with state: ${snapshot.state}', code: 'upload-failed');
+        throw ImageStorageException(
+          'Upload failed with state: ${snapshot.state}',
+          code: 'upload-failed',
+        );
       }
 
       // Get and return the download URL
       final downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } on FirebaseException catch (e) {
-      throw ImageStorageException('Failed to upload avatar: ${e.code} - ${e.message}', code: e.code);
+      throw ImageStorageException(
+        'Failed to upload avatar: ${e.code} - ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw ImageStorageException('Failed to upload avatar: $e');
     }
   }
 
   @override
-  Future<void> deleteAvatar({
-    required String userId,
-  }) async {
+  Future<void> deleteAvatar({required String userId}) async {
     try {
       // List all files in the user's avatar folder
       final ref = _storage.ref().child('avatars/$userId');
@@ -72,7 +76,10 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
     } on FirebaseException catch (e) {
       // Ignore if folder doesn't exist
       if (e.code != 'object-not-found') {
-        throw ImageStorageException('Failed to delete avatar: ${e.message}', code: e.code);
+        throw ImageStorageException(
+          'Failed to delete avatar: ${e.message}',
+          code: e.code,
+        );
       }
     } catch (e) {
       throw ImageStorageException('Failed to delete avatar: $e');
@@ -80,9 +87,7 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
   }
 
   @override
-  Future<String?> getAvatarUrl({
-    required String userId,
-  }) async {
+  Future<String?> getAvatarUrl({required String userId}) async {
     try {
       // List all files in the user's avatar folder
       final ref = _storage.ref().child('avatars/$userId');
@@ -99,7 +104,10 @@ class FirebaseImageStorageRepository implements ImageStorageRepository {
       if (e.code == 'object-not-found') {
         return null;
       }
-      throw ImageStorageException('Failed to get avatar URL: ${e.message}', code: e.code);
+      throw ImageStorageException(
+        'Failed to get avatar URL: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw ImageStorageException('Failed to get avatar URL: $e');
     }

@@ -57,8 +57,9 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits [validating, validated] on successful validation',
         setUp: () {
-          when(() => mockRepo.validateInviteToken(token: 'test-token'))
-              .thenAnswer((_) async => validResult);
+          when(
+            () => mockRepo.validateInviteToken(token: 'test-token'),
+          ).thenAnswer((_) async => validResult);
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const ValidateInviteToken('test-token')),
@@ -78,29 +79,31 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits [validating, invalidToken] on failed-precondition error',
         setUp: () {
-          when(() => mockRepo.validateInviteToken(token: 'expired-token'))
-              .thenThrow(GroupInviteLinkException(
-            'This invite link has expired.',
-            code: 'failed-precondition',
-          ));
+          when(
+            () => mockRepo.validateInviteToken(token: 'expired-token'),
+          ).thenThrow(
+            GroupInviteLinkException(
+              'This invite link has expired.',
+              code: 'failed-precondition',
+            ),
+          );
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const ValidateInviteToken('expired-token')),
         expect: () => [
           const InviteJoinValidating(),
-          const InviteJoinInvalidToken(
-              reason: 'This invite link has expired.'),
+          const InviteJoinInvalidToken(reason: 'This invite link has expired.'),
         ],
       );
 
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits [validating, error] on other errors',
         setUp: () {
-          when(() => mockRepo.validateInviteToken(token: 'bad-token'))
-              .thenThrow(GroupInviteLinkException(
-            'Resource not found',
-            code: 'not-found',
-          ));
+          when(
+            () => mockRepo.validateInviteToken(token: 'bad-token'),
+          ).thenThrow(
+            GroupInviteLinkException('Resource not found', code: 'not-found'),
+          );
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const ValidateInviteToken('bad-token')),
@@ -113,15 +116,13 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits [validating, error] on unexpected exception',
         setUp: () {
-          when(() => mockRepo.validateInviteToken(token: 'crash-token'))
-              .thenThrow(Exception('network error'));
+          when(
+            () => mockRepo.validateInviteToken(token: 'crash-token'),
+          ).thenThrow(Exception('network error'));
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const ValidateInviteToken('crash-token')),
-        expect: () => [
-          const InviteJoinValidating(),
-          isA<InviteJoinError>(),
-        ],
+        expect: () => [const InviteJoinValidating(), isA<InviteJoinError>()],
       );
     });
 
@@ -129,8 +130,9 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits [joining, joined] on successful join',
         setUp: () {
-          when(() => mockRepo.joinGroupViaInvite(token: 'test-token'))
-              .thenAnswer((_) async => joinResult);
+          when(
+            () => mockRepo.joinGroupViaInvite(token: 'test-token'),
+          ).thenAnswer((_) async => joinResult);
           when(() => mockStorage.clear()).thenAnswer((_) async {});
         },
         build: buildBloc,
@@ -151,12 +153,15 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits [joining, joined] with alreadyMember=true',
         setUp: () {
-          when(() => mockRepo.joinGroupViaInvite(token: 'member-token'))
-              .thenAnswer((_) async => (
-                    groupId: 'group-123',
-                    groupName: 'Beach Volleyball Crew',
-                    alreadyMember: true,
-                  ));
+          when(
+            () => mockRepo.joinGroupViaInvite(token: 'member-token'),
+          ).thenAnswer(
+            (_) async => (
+              groupId: 'group-123',
+              groupName: 'Beach Volleyball Crew',
+              alreadyMember: true,
+            ),
+          );
           when(() => mockStorage.clear()).thenAnswer((_) async {});
         },
         build: buildBloc,
@@ -174,18 +179,20 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits [joining, invalidToken] on failed-precondition',
         setUp: () {
-          when(() => mockRepo.joinGroupViaInvite(token: 'expired-token'))
-              .thenThrow(GroupInviteLinkException(
-            'This invite link has expired.',
-            code: 'failed-precondition',
-          ));
+          when(
+            () => mockRepo.joinGroupViaInvite(token: 'expired-token'),
+          ).thenThrow(
+            GroupInviteLinkException(
+              'This invite link has expired.',
+              code: 'failed-precondition',
+            ),
+          );
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const JoinGroupViaInvite('expired-token')),
         expect: () => [
           const InviteJoinJoining(),
-          const InviteJoinInvalidToken(
-              reason: 'This invite link has expired.'),
+          const InviteJoinInvalidToken(reason: 'This invite link has expired.'),
         ],
       );
     });
@@ -194,10 +201,12 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits [validating, validated] when pending token exists and is valid',
         setUp: () {
-          when(() => mockStorage.retrieve())
-              .thenAnswer((_) async => 'pending-token');
-          when(() => mockRepo.validateInviteToken(token: 'pending-token'))
-              .thenAnswer((_) async => validResult);
+          when(
+            () => mockStorage.retrieve(),
+          ).thenAnswer((_) async => 'pending-token');
+          when(
+            () => mockRepo.validateInviteToken(token: 'pending-token'),
+          ).thenAnswer((_) async => validResult);
           when(() => mockStorage.clear()).thenAnswer((_) async {});
         },
         build: buildBloc,
@@ -218,8 +227,7 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'emits nothing when no pending token',
         setUp: () {
-          when(() => mockStorage.retrieve())
-              .thenAnswer((_) async => null);
+          when(() => mockStorage.retrieve()).thenAnswer((_) async => null);
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const ProcessPendingInvite()),
@@ -229,13 +237,17 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'clears storage and emits [validating, invalidToken] when token is invalid',
         setUp: () {
-          when(() => mockStorage.retrieve())
-              .thenAnswer((_) async => 'bad-token');
-          when(() => mockRepo.validateInviteToken(token: 'bad-token'))
-              .thenThrow(GroupInviteLinkException(
-            'This invite link has been revoked.',
-            code: 'failed-precondition',
-          ));
+          when(
+            () => mockStorage.retrieve(),
+          ).thenAnswer((_) async => 'bad-token');
+          when(
+            () => mockRepo.validateInviteToken(token: 'bad-token'),
+          ).thenThrow(
+            GroupInviteLinkException(
+              'This invite link has been revoked.',
+              code: 'failed-precondition',
+            ),
+          );
           when(() => mockStorage.clear()).thenAnswer((_) async {});
         },
         build: buildBloc,
@@ -243,7 +255,8 @@ void main() {
         expect: () => [
           const InviteJoinValidating(),
           const InviteJoinInvalidToken(
-              reason: 'This invite link has been revoked.'),
+            reason: 'This invite link has been revoked.',
+          ),
         ],
         verify: (_) {
           verify(() => mockStorage.clear()).called(1);
@@ -253,18 +266,17 @@ void main() {
       blocTest<InviteJoinBloc, InviteJoinState>(
         'clears storage on unexpected error',
         setUp: () {
-          when(() => mockStorage.retrieve())
-              .thenAnswer((_) async => 'crash-token');
-          when(() => mockRepo.validateInviteToken(token: 'crash-token'))
-              .thenThrow(Exception('network error'));
+          when(
+            () => mockStorage.retrieve(),
+          ).thenAnswer((_) async => 'crash-token');
+          when(
+            () => mockRepo.validateInviteToken(token: 'crash-token'),
+          ).thenThrow(Exception('network error'));
           when(() => mockStorage.clear()).thenAnswer((_) async {});
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const ProcessPendingInvite()),
-        expect: () => [
-          const InviteJoinValidating(),
-          isA<InviteJoinError>(),
-        ],
+        expect: () => [const InviteJoinValidating(), isA<InviteJoinError>()],
         verify: (_) {
           verify(() => mockStorage.clear()).called(1);
         },

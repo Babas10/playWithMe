@@ -16,8 +16,9 @@ void main() {
   setUp(() {
     mockAppLinks = MockAppLinks();
     linkStreamController = StreamController<Uri>.broadcast();
-    when(() => mockAppLinks.uriLinkStream)
-        .thenAnswer((_) => linkStreamController.stream);
+    when(
+      () => mockAppLinks.uriLinkStream,
+    ).thenAnswer((_) => linkStreamController.stream);
   });
 
   tearDown(() {
@@ -51,9 +52,9 @@ void main() {
       });
 
       test('returns null when HTTPS invite token is empty', () async {
-        when(() => mockAppLinks.getInitialLink()).thenAnswer(
-          (_) async => Uri.parse('https://gatherli.org/invite/'),
-        );
+        when(
+          () => mockAppLinks.getInitialLink(),
+        ).thenAnswer((_) async => Uri.parse('https://gatherli.org/invite/'));
         final service = buildService();
         final token = await service.getInitialInviteToken();
         expect(token, isNull);
@@ -62,8 +63,7 @@ void main() {
 
       test('returns null when HTTPS path has too many segments', () async {
         when(() => mockAppLinks.getInitialLink()).thenAnswer(
-          (_) async =>
-              Uri.parse('https://gatherli.org/invite/abc123/extra'),
+          (_) async => Uri.parse('https://gatherli.org/invite/abc123/extra'),
         );
         final service = buildService();
         final token = await service.getInitialInviteToken();
@@ -74,9 +74,9 @@ void main() {
 
     group('getInitialInviteToken — custom scheme (gatherli://)', () {
       test('extracts token from gatherli://invite/{token}', () async {
-        when(() => mockAppLinks.getInitialLink()).thenAnswer(
-          (_) async => Uri.parse('gatherli://invite/xyz789'),
-        );
+        when(
+          () => mockAppLinks.getInitialLink(),
+        ).thenAnswer((_) async => Uri.parse('gatherli://invite/xyz789'));
         final service = buildService();
         final token = await service.getInitialInviteToken();
         expect(token, 'xyz789');
@@ -84,9 +84,9 @@ void main() {
       });
 
       test('returns null when custom scheme host is not invite', () async {
-        when(() => mockAppLinks.getInitialLink()).thenAnswer(
-          (_) async => Uri.parse('gatherli://other/xyz789'),
-        );
+        when(
+          () => mockAppLinks.getInitialLink(),
+        ).thenAnswer((_) async => Uri.parse('gatherli://other/xyz789'));
         final service = buildService();
         final token = await service.getInitialInviteToken();
         expect(token, isNull);
@@ -94,9 +94,9 @@ void main() {
       });
 
       test('returns null for unknown scheme', () async {
-        when(() => mockAppLinks.getInitialLink()).thenAnswer(
-          (_) async => Uri.parse('unknown://invite/abc123'),
-        );
+        when(
+          () => mockAppLinks.getInitialLink(),
+        ).thenAnswer((_) async => Uri.parse('unknown://invite/abc123'));
         final service = buildService();
         final token = await service.getInitialInviteToken();
         expect(token, isNull);
@@ -104,9 +104,9 @@ void main() {
       });
 
       test('returns null when custom scheme token is empty', () async {
-        when(() => mockAppLinks.getInitialLink()).thenAnswer(
-          (_) async => Uri.parse('gatherli://invite/'),
-        );
+        when(
+          () => mockAppLinks.getInitialLink(),
+        ).thenAnswer((_) async => Uri.parse('gatherli://invite/'));
         final service = buildService();
         final token = await service.getInitialInviteToken();
         expect(token, isNull);
@@ -116,8 +116,7 @@ void main() {
 
     group('getInitialInviteToken — null / error handling', () {
       test('returns null when no initial link', () async {
-        when(() => mockAppLinks.getInitialLink())
-            .thenAnswer((_) async => null);
+        when(() => mockAppLinks.getInitialLink()).thenAnswer((_) async => null);
         final service = buildService();
         final token = await service.getInitialInviteToken();
         expect(token, isNull);
@@ -125,8 +124,9 @@ void main() {
       });
 
       test('returns null when getInitialLink throws', () async {
-        when(() => mockAppLinks.getInitialLink())
-            .thenThrow(Exception('platform error'));
+        when(
+          () => mockAppLinks.getInitialLink(),
+        ).thenThrow(Exception('platform error'));
         final service = buildService();
         final token = await service.getInitialInviteToken();
         expect(token, isNull);
@@ -136,37 +136,40 @@ void main() {
 
     group('inviteTokenStream — foreground deep links', () {
       test('emits token when HTTPS deep link received on stream', () async {
-        when(() => mockAppLinks.getInitialLink())
-            .thenAnswer((_) async => null);
+        when(() => mockAppLinks.getInitialLink()).thenAnswer((_) async => null);
         final service = buildService();
 
         expectLater(service.inviteTokenStream, emits('stream-token-https'));
 
-        linkStreamController
-            .add(Uri.parse('https://gatherli.org/invite/stream-token-https'));
+        linkStreamController.add(
+          Uri.parse('https://gatherli.org/invite/stream-token-https'),
+        );
 
         await Future.delayed(const Duration(milliseconds: 50));
         service.dispose();
       });
 
-      test('emits token when custom scheme deep link received on stream',
-          () async {
-        when(() => mockAppLinks.getInitialLink())
-            .thenAnswer((_) async => null);
-        final service = buildService();
+      test(
+        'emits token when custom scheme deep link received on stream',
+        () async {
+          when(
+            () => mockAppLinks.getInitialLink(),
+          ).thenAnswer((_) async => null);
+          final service = buildService();
 
-        expectLater(service.inviteTokenStream, emits('stream-token-custom'));
+          expectLater(service.inviteTokenStream, emits('stream-token-custom'));
 
-        linkStreamController
-            .add(Uri.parse('gatherli://invite/stream-token-custom'));
+          linkStreamController.add(
+            Uri.parse('gatherli://invite/stream-token-custom'),
+          );
 
-        await Future.delayed(const Duration(milliseconds: 50));
-        service.dispose();
-      });
+          await Future.delayed(const Duration(milliseconds: 50));
+          service.dispose();
+        },
+      );
 
       test('does not emit for unrecognised URIs', () async {
-        when(() => mockAppLinks.getInitialLink())
-            .thenAnswer((_) async => null);
+        when(() => mockAppLinks.getInitialLink()).thenAnswer((_) async => null);
         final service = buildService();
 
         final emitted = <String?>[];

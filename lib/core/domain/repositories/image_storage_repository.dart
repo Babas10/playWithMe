@@ -11,12 +11,8 @@ abstract class ImageStorageRepository {
   });
 
   /// Delete an avatar image for a user
-  Future<void> deleteAvatar({
-    required String userId,
-  });
+  Future<void> deleteAvatar({required String userId});
 
   /// Get the download URL for a user's avatar
-  Future<String?> getAvatarUrl({
-    required String userId,
-  });
+  Future<String?> getAvatarUrl({required String userId});
 }

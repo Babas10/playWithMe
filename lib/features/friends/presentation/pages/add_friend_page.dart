@@ -39,9 +39,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
       _lastSearchSnapshot = null;
       _requestSent = false;
     });
-    context.read<FriendBloc>().add(
-          FriendEvent.searchRequested(email: query),
-        );
+    context.read<FriendBloc>().add(FriendEvent.searchRequested(email: query));
   }
 
   void _clearSearch() {
@@ -64,26 +62,19 @@ class _AddFriendPageState extends State<AddFriendPage> {
               title: 'Add Friend',
               showUserActions: true,
             ),
-            body: const Center(
-              child: Text('Please log in to add friends'),
-            ),
+            body: const Center(child: Text('Please log in to add friends')),
           );
         }
 
         return Scaffold(
-          appBar: PlayWithMeAppBar.build(
-            context: context,
-            title: 'Add Friend',
-          ),
+          appBar: PlayWithMeAppBar.build(context: context, title: 'Add Friend'),
           body: Column(
             children: [
               // Search bar
               _buildSearchBar(context),
 
               // Search results
-              Expanded(
-                child: _buildSearchResults(context, authState),
-              ),
+              Expanded(child: _buildSearchResults(context, authState)),
             ],
           ),
         );
@@ -130,7 +121,9 @@ class _AddFriendPageState extends State<AddFriendPage> {
               const SizedBox(width: 8),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
+                  backgroundColor: const Color(
+                    0xFFEACE6A,
+                  ).withValues(alpha: 0.25),
                   foregroundColor: const Color(0xFF004E64),
                 ),
                 onPressed: isSearching || _searchController.text.trim().isEmpty
@@ -166,10 +159,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         state.whenOrNull(
           error: (message) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(message),
-                backgroundColor: Colors.red,
-              ),
+              SnackBar(content: Text(message), backgroundColor: Colors.red),
             );
           },
           actionSuccess: (_) {
@@ -184,7 +174,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
         // If a request was already sent, keep showing the tile with green tick
         // regardless of subsequent BLoC state changes (loading → loaded).
         if (_requestSent && _lastSearchSnapshot != null) {
-          return _buildSearchResultTile(context, l10n, _lastSearchSnapshot!, isInvited: true);
+          return _buildSearchResultTile(
+            context,
+            l10n,
+            _lastSearchSnapshot!,
+            isInvited: true,
+          );
         }
 
         return state.when(
@@ -193,19 +188,31 @@ class _AddFriendPageState extends State<AddFriendPage> {
           loaded: (friends, receivedRequests, sentRequests) =>
               _buildEmptyState(context, l10n),
           searchLoading: () => const Center(child: CircularProgressIndicator()),
-          searchResult: (user, isFriend, hasPendingRequest, requestDirection,
-              searchedEmail, isSelfSearch) {
-            // Capture snapshot so we can keep showing it after actionSuccess
-            _lastSearchSnapshot = _SearchResultSnapshot(
-              user: user,
-              isFriend: isFriend,
-              hasPendingRequest: hasPendingRequest,
-              requestDirection: requestDirection,
-              searchedEmail: searchedEmail,
-              isSelfSearch: isSelfSearch,
-            );
-            return _buildSearchResultTile(context, l10n, _lastSearchSnapshot!, isInvited: false);
-          },
+          searchResult:
+              (
+                user,
+                isFriend,
+                hasPendingRequest,
+                requestDirection,
+                searchedEmail,
+                isSelfSearch,
+              ) {
+                // Capture snapshot so we can keep showing it after actionSuccess
+                _lastSearchSnapshot = _SearchResultSnapshot(
+                  user: user,
+                  isFriend: isFriend,
+                  hasPendingRequest: hasPendingRequest,
+                  requestDirection: requestDirection,
+                  searchedEmail: searchedEmail,
+                  isSelfSearch: isSelfSearch,
+                );
+                return _buildSearchResultTile(
+                  context,
+                  l10n,
+                  _lastSearchSnapshot!,
+                  isInvited: false,
+                );
+              },
           statusResult: (status) => _buildEmptyState(context, l10n),
           error: (message) => _buildEmptyState(context, l10n),
           actionSuccess: (_) => _buildEmptyState(context, l10n),
@@ -234,11 +241,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
           onSendRequest: snapshot.user != null && !isInvited
               ? () {
                   context.read<FriendBloc>().add(
-                        FriendEvent.requestSent(targetUserId: snapshot.user!.uid),
-                      );
+                    FriendEvent.requestSent(targetUserId: snapshot.user!.uid),
+                  );
                 }
               : null,
-          onAcceptRequest: snapshot.user != null &&
+          onAcceptRequest:
+              snapshot.user != null &&
                   snapshot.requestDirection == 'received' &&
                   !isInvited
               ? () {
@@ -246,10 +254,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(l10n.checkRequestsTab),
-                      action: SnackBarAction(
-                        label: l10n.ok,
-                        onPressed: () {},
-                      ),
+                      action: SnackBarAction(label: l10n.ok, onPressed: () {}),
                     ),
                   );
                 }
@@ -280,8 +285,8 @@ class _AddFriendPageState extends State<AddFriendPage> {
             child: Text(
               l10n.enterEmailToFindFriends,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
           ),

@@ -87,7 +87,6 @@ Future<void> main() async {
         print('    Created: ${data['createdAt']}\n');
       }
     }
-
   } catch (e) {
     print('❌ Error: $e');
   }

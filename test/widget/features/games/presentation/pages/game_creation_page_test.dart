@@ -25,8 +25,7 @@ class MockGameCreationBloc
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
-class MockInvitationBloc
-    extends MockBloc<InvitationEvent, InvitationState>
+class MockInvitationBloc extends MockBloc<InvitationEvent, InvitationState>
     implements InvitationBloc {}
 
 class MockGameInvitationsBloc
@@ -58,11 +57,13 @@ void main() {
     mockInvitationBloc = MockInvitationBloc();
     mockGameInvitationsBloc = MockGameInvitationsBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockGameInvitationsBloc.state)
-        .thenReturn(const GameInvitationsInitial());
+    when(
+      () => mockGameInvitationsBloc.state,
+    ).thenReturn(const GameInvitationsInitial());
 
-    when(() => mockGameCreationBloc.state)
-        .thenReturn(const GameCreationInitial());
+    when(
+      () => mockGameCreationBloc.state,
+    ).thenReturn(const GameCreationInitial());
 
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
@@ -98,12 +99,10 @@ void main() {
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
           BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
           BlocProvider<GameInvitationsBloc>.value(
-              value: mockGameInvitationsBloc),
+            value: mockGameInvitationsBloc,
+          ),
         ],
-        child: GameCreationPage(
-          groupId: testGroupId,
-          groupName: testGroupName,
-        ),
+        child: GameCreationPage(groupId: testGroupId, groupName: testGroupName),
       ),
     );
   }
@@ -174,8 +173,7 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         // Scroll to make button visible
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Game');
+        final createButton = find.widgetWithText(ElevatedButton, 'Create Game');
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
 
@@ -187,10 +185,7 @@ void main() {
 
         verify(
           () => mockGameCreationBloc.add(
-            const SelectGroup(
-              groupId: testGroupId,
-              groupName: testGroupName,
-            ),
+            const SelectGroup(groupId: testGroupId, groupName: testGroupName),
           ),
         ).called(1);
       });
@@ -216,8 +211,7 @@ void main() {
         await tester.pump();
 
         // Scroll to and tap create game button
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Game');
+        final createButton = find.widgetWithText(ElevatedButton, 'Create Game');
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
@@ -240,14 +234,16 @@ void main() {
         await tester.pump();
 
         // Tap create game button
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Game');
+        final createButton = find.widgetWithText(ElevatedButton, 'Create Game');
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
         await tester.pumpAndSettle();
 
-        expect(find.text('Title must be at least 3 characters'), findsOneWidget);
+        expect(
+          find.text('Title must be at least 3 characters'),
+          findsOneWidget,
+        );
       });
     });
 
@@ -255,8 +251,10 @@ void main() {
       testWidgets('can enter description text', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        final descriptionField =
-            find.widgetWithText(TextFormField, 'Description (Optional)');
+        final descriptionField = find.widgetWithText(
+          TextFormField,
+          'Description (Optional)',
+        );
         await tester.enterText(descriptionField, 'Fun game at the beach!');
         await tester.pump();
 
@@ -284,8 +282,7 @@ void main() {
         await tester.pump();
 
         // Tap create game button
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Game');
+        final createButton = find.widgetWithText(ElevatedButton, 'Create Game');
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
@@ -299,8 +296,10 @@ void main() {
       testWidgets('can enter address text', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        final addressField =
-            find.widgetWithText(TextFormField, 'Address (Optional)');
+        final addressField = find.widgetWithText(
+          TextFormField,
+          'Address (Optional)',
+        );
         await tester.enterText(addressField, '123 Beach Street');
         await tester.pump();
 
@@ -327,20 +326,19 @@ void main() {
         expect(find.byType(DatePickerDialog), findsOneWidget);
       });
 
-      testWidgets('shows date validation message when not selected',
-          (tester) async {
+      testWidgets('shows date validation message when not selected', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // The widget shows 'Tap to select' as the validation hint
         // It appears in the ListTile subtitle and as validation text
-        expect(
-          find.text('Tap to select'),
-          findsNWidgets(2),
-        );
+        expect(find.text('Tap to select'), findsNWidgets(2));
       });
 
-      testWidgets('shows time picker as centered Dialog after date confirmed',
-          (tester) async {
+      testWidgets('shows time picker as centered Dialog after date confirmed', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Open date picker
@@ -361,8 +359,9 @@ void main() {
         expect(find.byType(BottomSheet), findsNothing);
       });
 
-      testWidgets('time picker dialog shows title, cancel and ok buttons',
-          (tester) async {
+      testWidgets('time picker dialog shows title, cancel and ok buttons', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Open and confirm date picker
@@ -381,8 +380,9 @@ void main() {
         expect(find.text('OK'), findsOneWidget);
       });
 
-      testWidgets('canceling time picker does not update date time',
-          (tester) async {
+      testWidgets('canceling time picker does not update date time', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Open and confirm date picker
@@ -408,35 +408,39 @@ void main() {
         expect(find.text('Tap to select'), findsNWidgets(2));
       });
 
-      testWidgets('confirming time picker dispatches SetDateTime with future datetime',
-          (tester) async {
-        await tester.pumpWidget(createTestWidget());
+      testWidgets(
+        'confirming time picker dispatches SetDateTime with future datetime',
+        (tester) async {
+          await tester.pumpWidget(createTestWidget());
 
-        // Open and confirm date picker (default is tomorrow)
-        final dateTimeTile = find.ancestor(
-          of: find.byIcon(Icons.calendar_today),
-          matching: find.byType(ListTile),
-        );
-        await tester.tap(dateTimeTile);
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('OK'));
-        await tester.pumpAndSettle();
+          // Open and confirm date picker (default is tomorrow)
+          final dateTimeTile = find.ancestor(
+            of: find.byIcon(Icons.calendar_today),
+            matching: find.byType(ListTile),
+          );
+          await tester.tap(dateTimeTile);
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('OK'));
+          await tester.pumpAndSettle();
 
-        // Confirm the time picker
-        await tester.tap(find.text('OK'));
-        await tester.pumpAndSettle();
+          // Confirm the time picker
+          await tester.tap(find.text('OK'));
+          await tester.pumpAndSettle();
 
-        // SetDateTime should have been called once with a future datetime
-        final captured = verify(
-          () => mockGameCreationBloc.add(captureAny(that: isA<SetDateTime>())),
-        ).captured;
-        expect(captured, hasLength(1));
-        final event = captured.first as SetDateTime;
-        expect(event.dateTime.isAfter(DateTime.now()), isTrue);
-      });
+          // SetDateTime should have been called once with a future datetime
+          final captured = verify(
+            () =>
+                mockGameCreationBloc.add(captureAny(that: isA<SetDateTime>())),
+          ).captured;
+          expect(captured, hasLength(1));
+          final event = captured.first as SetDateTime;
+          expect(event.dateTime.isAfter(DateTime.now()), isTrue);
+        },
+      );
 
-      testWidgets('canceling date picker does not show time picker',
-          (tester) async {
+      testWidgets('canceling date picker does not show time picker', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Open date picker and cancel
@@ -457,8 +461,9 @@ void main() {
 
     group('Loading State', () {
       testWidgets('shows loading indicator during submission', (tester) async {
-        when(() => mockGameCreationBloc.state)
-            .thenReturn(const GameCreationSubmitting());
+        when(
+          () => mockGameCreationBloc.state,
+        ).thenReturn(const GameCreationSubmitting());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -471,8 +476,9 @@ void main() {
       });
 
       testWidgets('button is disabled during loading', (tester) async {
-        when(() => mockGameCreationBloc.state)
-            .thenReturn(const GameCreationSubmitting());
+        when(
+          () => mockGameCreationBloc.state,
+        ).thenReturn(const GameCreationSubmitting());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -486,8 +492,9 @@ void main() {
       });
 
       testWidgets('form fields are disabled during loading', (tester) async {
-        when(() => mockGameCreationBloc.state)
-            .thenReturn(const GameCreationSubmitting());
+        when(
+          () => mockGameCreationBloc.state,
+        ).thenReturn(const GameCreationSubmitting());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -610,14 +617,14 @@ void main() {
 
     group('Unauthenticated State', () {
       testWidgets('shows login message when not authenticated', (tester) async {
-        when(() => mockAuthBloc.state)
-            .thenReturn(const AuthenticationUnauthenticated());
+        when(
+          () => mockAuthBloc.state,
+        ).thenReturn(const AuthenticationUnauthenticated());
 
         await tester.pumpWidget(createTestWidget());
 
         expect(find.text('Please log in to create a game'), findsOneWidget);
       });
     });
-
   });
 }

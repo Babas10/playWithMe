@@ -39,9 +39,7 @@ void main() {
 
   setUp(() {
     mockRepository = MockTrainingFeedbackRepository();
-    bloc = TrainingFeedbackBloc(
-      feedbackRepository: mockRepository,
-    );
+    bloc = TrainingFeedbackBloc(feedbackRepository: mockRepository);
   });
 
   tearDown(() {
@@ -63,91 +61,105 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [SubmittingFeedback, FeedbackSubmitted] when feedback is submitted successfully',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: testComment,
-              )).thenAnswer((_) async {});
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: testComment,
+            ),
+          ).thenAnswer((_) async {});
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-          comment: testComment,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+            comment: testComment,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackSubmitted(trainingSessionId: testSessionId),
         ],
         verify: (_) {
-          verify(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: testComment,
-              )).called(1);
+          verify(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: testComment,
+            ),
+          ).called(1);
         },
       );
 
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [SubmittingFeedback, FeedbackSubmitted] when feedback is submitted without comment',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: null,
-              )).thenAnswer((_) async {});
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: null,
+            ),
+          ).thenAnswer((_) async {});
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackSubmitted(trainingSessionId: testSessionId),
         ],
         verify: (_) {
-          verify(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: null,
-              )).called(1);
+          verify(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: null,
+            ),
+          ).called(1);
         },
       );
 
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [SubmittingFeedback, FeedbackError] when submission fails with unauthenticated error',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: testComment,
-              )).thenThrow(
-            FakeFirebaseFunctionsException('unauthenticated'),
-          );
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: testComment,
+            ),
+          ).thenThrow(FakeFirebaseFunctionsException('unauthenticated'));
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-          comment: testComment,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+            comment: testComment,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackError(
@@ -160,24 +172,26 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [SubmittingFeedback, FeedbackError] when submission fails with failed-precondition error',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: testComment,
-              )).thenThrow(
-            FakeFirebaseFunctionsException('failed-precondition'),
-          );
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: testComment,
+            ),
+          ).thenThrow(FakeFirebaseFunctionsException('failed-precondition'));
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-          comment: testComment,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+            comment: testComment,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackError(
@@ -190,24 +204,26 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [SubmittingFeedback, FeedbackError] when submission fails with already-exists error',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: testComment,
-              )).thenThrow(
-            FakeFirebaseFunctionsException('already-exists'),
-          );
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: testComment,
+            ),
+          ).thenThrow(FakeFirebaseFunctionsException('already-exists'));
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-          comment: testComment,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+            comment: testComment,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackError(
@@ -220,24 +236,26 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [SubmittingFeedback, FeedbackError] when submission fails with Firestore permission-denied error',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: testComment,
-              )).thenThrow(
-            FakeFirebaseException('permission-denied'),
-          );
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: testComment,
+            ),
+          ).thenThrow(FakeFirebaseException('permission-denied'));
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-          comment: testComment,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+            comment: testComment,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackError(
@@ -250,24 +268,26 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [SubmittingFeedback, FeedbackError] when submission fails with generic error',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-                comment: testComment,
-              )).thenThrow(
-            Exception('Network error'),
-          );
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+              comment: testComment,
+            ),
+          ).thenThrow(Exception('Network error'));
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-          comment: testComment,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+            comment: testComment,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackError(
@@ -320,15 +340,15 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [LoadingAggregatedFeedback, AggregatedFeedbackLoaded] when feedback is loaded successfully',
         build: () {
-          when(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .thenAnswer((_) async => false);
-          when(() =>
-                  mockRepository.getAggregatedFeedbackStream(testSessionId))
-              .thenAnswer((_) => Stream.value(testAggregation));
+          when(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).thenAnswer((_) async => false);
+          when(
+            () => mockRepository.getAggregatedFeedbackStream(testSessionId),
+          ).thenAnswer((_) => Stream.value(testAggregation));
           return bloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadAggregatedFeedback(testSessionId)),
+        act: (bloc) => bloc.add(const LoadAggregatedFeedback(testSessionId)),
         expect: () => [
           const LoadingAggregatedFeedback(testSessionId),
           AggregatedFeedbackLoaded(
@@ -337,26 +357,27 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .called(1);
-          verify(() =>
-                  mockRepository.getAggregatedFeedbackStream(testSessionId))
-              .called(1);
+          verify(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).called(1);
+          verify(
+            () => mockRepository.getAggregatedFeedbackStream(testSessionId),
+          ).called(1);
         },
       );
 
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [LoadingAggregatedFeedback, AggregatedFeedbackLoaded] with hasUserSubmitted true',
         build: () {
-          when(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .thenAnswer((_) async => true);
-          when(() =>
-                  mockRepository.getAggregatedFeedbackStream(testSessionId))
-              .thenAnswer((_) => Stream.value(testAggregation));
+          when(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).thenAnswer((_) async => true);
+          when(
+            () => mockRepository.getAggregatedFeedbackStream(testSessionId),
+          ).thenAnswer((_) => Stream.value(testAggregation));
           return bloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadAggregatedFeedback(testSessionId)),
+        act: (bloc) => bloc.add(const LoadAggregatedFeedback(testSessionId)),
         expect: () => [
           const LoadingAggregatedFeedback(testSessionId),
           AggregatedFeedbackLoaded(
@@ -369,16 +390,17 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [LoadingAggregatedFeedback, AggregatedFeedbackLoaded] with empty aggregation when no feedback',
         build: () {
-          when(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .thenAnswer((_) async => false);
-          when(() =>
-                  mockRepository.getAggregatedFeedbackStream(testSessionId))
-              .thenAnswer(
-                  (_) => Stream.value(FeedbackAggregation.empty(testSessionId)));
+          when(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).thenAnswer((_) async => false);
+          when(
+            () => mockRepository.getAggregatedFeedbackStream(testSessionId),
+          ).thenAnswer(
+            (_) => Stream.value(FeedbackAggregation.empty(testSessionId)),
+          );
           return bloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadAggregatedFeedback(testSessionId)),
+        act: (bloc) => bloc.add(const LoadAggregatedFeedback(testSessionId)),
         expect: () => [
           const LoadingAggregatedFeedback(testSessionId),
           AggregatedFeedbackLoaded(
@@ -391,12 +413,12 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [LoadingAggregatedFeedback, FeedbackError] when loading fails',
         build: () {
-          when(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .thenThrow(Exception('Network error'));
+          when(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).thenThrow(Exception('Network error'));
           return bloc;
         },
-        act: (bloc) =>
-            bloc.add(const LoadAggregatedFeedback(testSessionId)),
+        act: (bloc) => bloc.add(const LoadAggregatedFeedback(testSessionId)),
         expect: () => [
           const LoadingAggregatedFeedback(testSessionId),
           const FeedbackError(
@@ -411,12 +433,12 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [CheckingFeedbackSubmission, FeedbackSubmissionChecked] with hasSubmitted true',
         build: () {
-          when(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .thenAnswer((_) async => true);
+          when(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).thenAnswer((_) async => true);
           return bloc;
         },
-        act: (bloc) =>
-            bloc.add(const CheckFeedbackSubmission(testSessionId)),
+        act: (bloc) => bloc.add(const CheckFeedbackSubmission(testSessionId)),
         expect: () => [
           const CheckingFeedbackSubmission(testSessionId),
           const FeedbackSubmissionChecked(
@@ -425,20 +447,21 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .called(1);
+          verify(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).called(1);
         },
       );
 
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [CheckingFeedbackSubmission, FeedbackSubmissionChecked] with hasSubmitted false',
         build: () {
-          when(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .thenAnswer((_) async => false);
+          when(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).thenAnswer((_) async => false);
           return bloc;
         },
-        act: (bloc) =>
-            bloc.add(const CheckFeedbackSubmission(testSessionId)),
+        act: (bloc) => bloc.add(const CheckFeedbackSubmission(testSessionId)),
         expect: () => [
           const CheckingFeedbackSubmission(testSessionId),
           const FeedbackSubmissionChecked(
@@ -451,12 +474,12 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'emits [CheckingFeedbackSubmission, FeedbackError] when check fails',
         build: () {
-          when(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .thenThrow(Exception('Network error'));
+          when(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).thenThrow(Exception('Network error'));
           return bloc;
         },
-        act: (bloc) =>
-            bloc.add(const CheckFeedbackSubmission(testSessionId)),
+        act: (bloc) => bloc.add(const CheckFeedbackSubmission(testSessionId)),
         expect: () => [
           const CheckingFeedbackSubmission(testSessionId),
           const FeedbackError(
@@ -472,9 +495,7 @@ void main() {
         'emits FeedbackInitial when reset is called',
         build: () => bloc,
         act: (bloc) => bloc.add(const ResetFeedbackState()),
-        expect: () => [
-          const FeedbackInitial(),
-        ],
+        expect: () => [const FeedbackInitial()],
       );
     });
 
@@ -482,22 +503,24 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'provides friendly error message for unauthenticated error',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-              )).thenThrow(
-            FakeFirebaseFunctionsException('unauthenticated'),
-          );
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+            ),
+          ).thenThrow(FakeFirebaseFunctionsException('unauthenticated'));
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackError(
@@ -510,22 +533,24 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'provides friendly error message for not-found error',
         build: () {
-          when(() => mockRepository.submitFeedback(
-                trainingSessionId: testSessionId,
-                exercisesQuality: testExercisesQuality,
-                trainingIntensity: testTrainingIntensity,
-                coachingClarity: testCoachingClarity,
-              )).thenThrow(
-            FakeFirebaseFunctionsException('not-found'),
-          );
+          when(
+            () => mockRepository.submitFeedback(
+              trainingSessionId: testSessionId,
+              exercisesQuality: testExercisesQuality,
+              trainingIntensity: testTrainingIntensity,
+              coachingClarity: testCoachingClarity,
+            ),
+          ).thenThrow(FakeFirebaseFunctionsException('not-found'));
           return bloc;
         },
-        act: (bloc) => bloc.add(const SubmitFeedback(
-          trainingSessionId: testSessionId,
-          exercisesQuality: testExercisesQuality,
-          trainingIntensity: testTrainingIntensity,
-          coachingClarity: testCoachingClarity,
-        )),
+        act: (bloc) => bloc.add(
+          const SubmitFeedback(
+            trainingSessionId: testSessionId,
+            exercisesQuality: testExercisesQuality,
+            trainingIntensity: testTrainingIntensity,
+            coachingClarity: testCoachingClarity,
+          ),
+        ),
         expect: () => [
           const SubmittingFeedback(testSessionId),
           const FeedbackError(
@@ -540,10 +565,14 @@ void main() {
       blocTest<TrainingFeedbackBloc, TrainingFeedbackState>(
         'cancels aggregated feedback subscription on close',
         build: () {
-          when(() => mockRepository.hasUserSubmittedFeedback(testSessionId))
-              .thenAnswer((_) async => false);
-          when(() => mockRepository.getAggregatedFeedbackStream(testSessionId))
-              .thenAnswer((_) => Stream.value(FeedbackAggregation.empty(testSessionId)));
+          when(
+            () => mockRepository.hasUserSubmittedFeedback(testSessionId),
+          ).thenAnswer((_) async => false);
+          when(
+            () => mockRepository.getAggregatedFeedbackStream(testSessionId),
+          ).thenAnswer(
+            (_) => Stream.value(FeedbackAggregation.empty(testSessionId)),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const LoadAggregatedFeedback(testSessionId)),

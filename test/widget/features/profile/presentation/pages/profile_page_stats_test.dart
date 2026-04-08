@@ -45,7 +45,7 @@ void main() {
       opponentTeam: 'Opponents',
       won: true,
       timestamp: DateTime.now(),
-    )
+    ),
   ];
 
   setUp(() {
@@ -56,17 +56,20 @@ void main() {
     }
     sl.registerSingleton<UserRepository>(mockUserRepository);
 
-    when(() => mockUserRepository.getUserStream(userId))
-        .thenAnswer((_) => Stream.value(testUserModel).asBroadcastStream());
-    when(() => mockUserRepository.getRatingHistory(userId))
-        .thenAnswer((_) => Stream.value(testHistory).asBroadcastStream());
-    when(() => mockUserRepository.getUserRanking(userId))
-        .thenAnswer((_) async => UserRanking(
-              globalRank: 5,
-              totalUsers: 100,
-              percentile: 95.0,
-              calculatedAt: DateTime(2024, 1, 1),
-            ));
+    when(
+      () => mockUserRepository.getUserStream(userId),
+    ).thenAnswer((_) => Stream.value(testUserModel).asBroadcastStream());
+    when(
+      () => mockUserRepository.getRatingHistory(userId),
+    ).thenAnswer((_) => Stream.value(testHistory).asBroadcastStream());
+    when(() => mockUserRepository.getUserRanking(userId)).thenAnswer(
+      (_) async => UserRanking(
+        globalRank: 5,
+        totalUsers: 100,
+        percentile: 95.0,
+        calculatedAt: DateTime(2024, 1, 1),
+      ),
+    );
   });
 
   tearDown(() {
@@ -83,15 +86,17 @@ void main() {
       ],
       supportedLocales: const [Locale('en')],
       home: BlocProvider<PlayerStatsBloc>(
-        create: (_) => PlayerStatsBloc(
-          userRepository: mockUserRepository,
-        )..add(LoadPlayerStats(userId)),
+        create: (_) =>
+            PlayerStatsBloc(userRepository: mockUserRepository)
+              ..add(LoadPlayerStats(userId)),
         child: const Scaffold(body: StatsPage()),
       ),
     );
   }
 
-  testWidgets('StatsPage displays ExpandedStatsSection and correct stats', (tester) async {
+  testWidgets('StatsPage displays ExpandedStatsSection and correct stats', (
+    tester,
+  ) async {
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pumpAndSettle();
 

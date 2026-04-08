@@ -24,8 +24,8 @@ class FirestoreExerciseRepository implements ExerciseRepository {
   FirestoreExerciseRepository({
     FirebaseFirestore? firestore,
     required TrainingSessionRepository trainingSessionRepository,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _trainingSessionRepository = trainingSessionRepository;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _trainingSessionRepository = trainingSessionRepository;
 
   /// Get reference to exercises subcollection for a training session
   CollectionReference _getExercisesCollection(String trainingSessionId) {
@@ -41,13 +41,15 @@ class FirestoreExerciseRepository implements ExerciseRepository {
     String exerciseId,
   ) async {
     try {
-      final doc = await _getExercisesCollection(trainingSessionId)
-          .doc(exerciseId)
-          .get();
+      final doc = await _getExercisesCollection(
+        trainingSessionId,
+      ).doc(exerciseId).get();
       return doc.exists ? ExerciseModel.fromFirestore(doc) : null;
     } on FirebaseException catch (e) {
-      throw ExerciseException('Failed to get exercise: ${e.message}',
-          code: e.code);
+      throw ExerciseException(
+        'Failed to get exercise: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw ExerciseException('Failed to get exercise: $e', code: 'unknown');
     }
@@ -62,19 +64,27 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       return _getExercisesCollection(trainingSessionId)
           .doc(exerciseId)
           .snapshots()
-          .map((snapshot) =>
-              snapshot.exists ? ExerciseModel.fromFirestore(snapshot) : null)
+          .map(
+            (snapshot) =>
+                snapshot.exists ? ExerciseModel.fromFirestore(snapshot) : null,
+          )
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw ExerciseException('Failed to stream exercise: ${error.message}',
-              code: error.code);
-        }
-        throw ExerciseException('Failed to stream exercise: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw ExerciseException(
+                'Failed to stream exercise: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw ExerciseException(
+              'Failed to stream exercise: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
-      throw ExerciseException('Failed to stream exercise: $e',
-          code: 'stream-error');
+      throw ExerciseException(
+        'Failed to stream exercise: $e',
+        code: 'stream-error',
+      );
     }
   }
 
@@ -86,24 +96,29 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       return _getExercisesCollection(trainingSessionId)
           .orderBy('createdAt', descending: false)
           .snapshots()
-          .map((snapshot) => snapshot.docs
-              .where((doc) => doc.exists)
-              .map((doc) => ExerciseModel.fromFirestore(doc))
-              .toList())
+          .map(
+            (snapshot) => snapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => ExerciseModel.fromFirestore(doc))
+                .toList(),
+          )
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw ExerciseException(
-              'Failed to get exercises for training session: ${error.message}',
-              code: error.code);
-        }
-        throw ExerciseException(
-            'Failed to get exercises for training session: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw ExerciseException(
+                'Failed to get exercises for training session: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw ExerciseException(
+              'Failed to get exercises for training session: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
       throw ExerciseException(
-          'Failed to get exercises for training session: $e',
-          code: 'stream-error');
+        'Failed to get exercises for training session: $e',
+        code: 'stream-error',
+      );
     }
   }
 
@@ -114,17 +129,22 @@ class FirestoreExerciseRepository implements ExerciseRepository {
           .snapshots()
           .map((snapshot) => snapshot.docs.where((doc) => doc.exists).length)
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw ExerciseException(
-              'Failed to get exercise count: ${error.message}',
-              code: error.code);
-        }
-        throw ExerciseException('Failed to get exercise count: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw ExerciseException(
+                'Failed to get exercise count: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw ExerciseException(
+              'Failed to get exercise count: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
-      throw ExerciseException('Failed to get exercise count: $e',
-          code: 'stream-error');
+      throw ExerciseException(
+        'Failed to get exercise count: $e',
+        code: 'stream-error',
+      );
     }
   }
 
@@ -137,40 +157,43 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       // Validate that training session exists and can be modified
       if (!await canModifyExercises(trainingSessionId)) {
         throw ExerciseException(
-            'Cannot create exercise: Training session has already started or does not exist',
-            code: 'failed-precondition');
+          'Cannot create exercise: Training session has already started or does not exist',
+          code: 'failed-precondition',
+        );
       }
 
       // Validate exercise data
       if (!exercise.hasValidName) {
-        throw ExerciseException('Exercise name cannot be empty',
-            code: 'invalid-argument');
+        throw ExerciseException(
+          'Exercise name cannot be empty',
+          code: 'invalid-argument',
+        );
       }
 
       if (!exercise.hasValidDuration) {
         throw ExerciseException(
-            'Exercise duration must be between 1 and 300 minutes',
-            code: 'invalid-argument');
+          'Exercise duration must be between 1 and 300 minutes',
+          code: 'invalid-argument',
+        );
       }
 
       // Create exercise with server timestamp
       final exerciseData = exercise
-          .copyWith(
-            createdAt: DateTime.now(),
-            updatedAt: null,
-          )
+          .copyWith(createdAt: DateTime.now(), updatedAt: null)
           .toFirestore();
 
-      final docRef = await _getExercisesCollection(trainingSessionId).add(
-        exerciseData,
-      );
+      final docRef = await _getExercisesCollection(
+        trainingSessionId,
+      ).add(exerciseData);
 
       return docRef.id;
     } on ExerciseException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw ExerciseException('Failed to create exercise: ${e.message}',
-          code: e.code);
+      throw ExerciseException(
+        'Failed to create exercise: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw ExerciseException('Failed to create exercise: $e', code: 'unknown');
     }
@@ -188,8 +211,9 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       // Validate that training session can be modified
       if (!await canModifyExercises(trainingSessionId)) {
         throw ExerciseException(
-            'Cannot update exercise: Training session has already started',
-            code: 'failed-precondition');
+          'Cannot update exercise: Training session has already started',
+          code: 'failed-precondition',
+        );
       }
 
       // Get existing exercise
@@ -211,24 +235,29 @@ class FirestoreExerciseRepository implements ExerciseRepository {
 
       // Validate updated exercise
       if (!updatedExercise.hasValidName) {
-        throw ExerciseException('Exercise name cannot be empty',
-            code: 'invalid-argument');
+        throw ExerciseException(
+          'Exercise name cannot be empty',
+          code: 'invalid-argument',
+        );
       }
 
       if (!updatedExercise.hasValidDuration) {
         throw ExerciseException(
-            'Exercise duration must be between 1 and 300 minutes',
-            code: 'invalid-argument');
+          'Exercise duration must be between 1 and 300 minutes',
+          code: 'invalid-argument',
+        );
       }
 
-      await _getExercisesCollection(trainingSessionId)
-          .doc(exerciseId)
-          .update(updatedExercise.toFirestore());
+      await _getExercisesCollection(
+        trainingSessionId,
+      ).doc(exerciseId).update(updatedExercise.toFirestore());
     } on ExerciseException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw ExerciseException('Failed to update exercise: ${e.message}',
-          code: e.code);
+      throw ExerciseException(
+        'Failed to update exercise: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw ExerciseException('Failed to update exercise: $e', code: 'unknown');
     }
@@ -243,8 +272,9 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       // Validate that training session can be modified
       if (!await canModifyExercises(trainingSessionId)) {
         throw ExerciseException(
-            'Cannot delete exercise: Training session has already started',
-            code: 'failed-precondition');
+          'Cannot delete exercise: Training session has already started',
+          code: 'failed-precondition',
+        );
       }
 
       // Check if exercise exists
@@ -256,8 +286,10 @@ class FirestoreExerciseRepository implements ExerciseRepository {
     } on ExerciseException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw ExerciseException('Failed to delete exercise: ${e.message}',
-          code: e.code);
+      throw ExerciseException(
+        'Failed to delete exercise: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw ExerciseException('Failed to delete exercise: $e', code: 'unknown');
     }
@@ -269,27 +301,28 @@ class FirestoreExerciseRepository implements ExerciseRepository {
     String exerciseId,
   ) async {
     try {
-      final doc = await _getExercisesCollection(trainingSessionId)
-          .doc(exerciseId)
-          .get();
+      final doc = await _getExercisesCollection(
+        trainingSessionId,
+      ).doc(exerciseId).get();
       return doc.exists;
     } on FirebaseException catch (e) {
       throw ExerciseException(
-          'Failed to check if exercise exists: ${e.message}',
-          code: e.code);
+        'Failed to check if exercise exists: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
-      throw ExerciseException('Failed to check if exercise exists: $e',
-          code: 'unknown');
+      throw ExerciseException(
+        'Failed to check if exercise exists: $e',
+        code: 'unknown',
+      );
     }
   }
 
   @override
   Future<bool> canModifyExercises(String trainingSessionId) async {
     try {
-      final trainingSession =
-          await _trainingSessionRepository.getTrainingSessionById(
-        trainingSessionId,
-      );
+      final trainingSession = await _trainingSessionRepository
+          .getTrainingSessionById(trainingSessionId);
 
       if (trainingSession == null) {
         return false;
@@ -301,16 +334,18 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       rethrow;
     } catch (e) {
       throw ExerciseException(
-          'Failed to check if exercises can be modified: $e',
-          code: 'unknown');
+        'Failed to check if exercises can be modified: $e',
+        code: 'unknown',
+      );
     }
   }
 
   @override
   Future<void> deleteAllExercisesForSession(String trainingSessionId) async {
     try {
-      final exercisesSnapshot =
-          await _getExercisesCollection(trainingSessionId).get();
+      final exercisesSnapshot = await _getExercisesCollection(
+        trainingSessionId,
+      ).get();
 
       // Delete all exercises in batches
       final batch = _firestore.batch();
@@ -321,11 +356,14 @@ class FirestoreExerciseRepository implements ExerciseRepository {
       await batch.commit();
     } on FirebaseException catch (e) {
       throw ExerciseException(
-          'Failed to delete all exercises for session: ${e.message}',
-          code: e.code);
+        'Failed to delete all exercises for session: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
-      throw ExerciseException('Failed to delete all exercises for session: $e',
-          code: 'unknown');
+      throw ExerciseException(
+        'Failed to delete all exercises for session: $e',
+        code: 'unknown',
+      );
     }
   }
 }

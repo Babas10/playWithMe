@@ -10,7 +10,7 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
   final StreamController<List<TrainingSessionModel>> _sessionsController =
       StreamController<List<TrainingSessionModel>>.broadcast();
   final Map<String, StreamController<TrainingSessionModel?>>
-      _sessionStreamControllers = {};
+  _sessionStreamControllers = {};
   final Map<String, TrainingSessionModel> _sessions = {};
 
   MockTrainingSessionRepository() {
@@ -74,7 +74,8 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
 
   @override
   Stream<List<TrainingSessionModel>> getTrainingSessionsForGroup(
-      String groupId) async* {
+    String groupId,
+  ) async* {
     // Emit current state immediately
     yield _sessions.values
         .where((session) => session.groupId == groupId)
@@ -88,13 +89,16 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
 
   @override
   Stream<List<TrainingSessionModel>> getUpcomingTrainingSessionsForGroup(
-      String groupId) async* {
+    String groupId,
+  ) async* {
     final now = DateTime.now();
     await for (final sessions in getTrainingSessionsForGroup(groupId)) {
       yield sessions
-          .where((session) =>
-              session.startTime.isAfter(now) &&
-              session.status == TrainingStatus.scheduled)
+          .where(
+            (session) =>
+                session.startTime.isAfter(now) &&
+                session.status == TrainingStatus.scheduled,
+          )
           .toList();
     }
   }
@@ -105,11 +109,14 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
     int limit = 20,
   }) async {
     final now = DateTime.now();
-    final pastSessions = _sessions.values
-        .where(
-            (session) => session.groupId == groupId && session.startTime.isBefore(now))
-        .toList()
-      ..sort((a, b) => b.startTime.compareTo(a.startTime));
+    final pastSessions =
+        _sessions.values
+            .where(
+              (session) =>
+                  session.groupId == groupId && session.startTime.isBefore(now),
+            )
+            .toList()
+          ..sort((a, b) => b.startTime.compareTo(a.startTime));
 
     return pastSessions.take(limit).toList();
   }
@@ -121,17 +128,20 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
   }) async* {
     final cutoff = DateTime.now().subtract(Duration(days: pastDays));
     yield _sessions.values
-        .where((session) =>
-            session.groupId == groupId &&
-            session.startTime.isAfter(cutoff))
+        .where(
+          (session) =>
+              session.groupId == groupId && session.startTime.isAfter(cutoff),
+        )
         .toList();
 
     await for (final sessions in _sessionsController.stream) {
       final updatedCutoff = DateTime.now().subtract(Duration(days: pastDays));
       yield sessions
-          .where((session) =>
-              session.groupId == groupId &&
-              session.startTime.isAfter(updatedCutoff))
+          .where(
+            (session) =>
+                session.groupId == groupId &&
+                session.startTime.isAfter(updatedCutoff),
+          )
           .toList();
     }
   }
@@ -142,26 +152,29 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
     int pastDays = 90,
   }) async {
     final cutoff = DateTime.now().subtract(Duration(days: pastDays));
-    final sessions = _sessions.values
-        .where((session) =>
-            session.groupId == groupId &&
-            !session.startTime.isAfter(cutoff))
-        .toList()
-      ..sort((a, b) => b.startTime.compareTo(a.startTime));
+    final sessions =
+        _sessions.values
+            .where(
+              (session) =>
+                  session.groupId == groupId &&
+                  !session.startTime.isAfter(cutoff),
+            )
+            .toList()
+          ..sort((a, b) => b.startTime.compareTo(a.startTime));
     return sessions;
   }
 
   @override
   Stream<List<TrainingSessionModel>> getTrainingSessionsForUser(String userId) {
-    return _sessionsController.stream.map((sessions) => sessions
-        .where((session) => session.isParticipant(userId))
-        .toList());
+    return _sessionsController.stream.map(
+      (sessions) =>
+          sessions.where((session) => session.isParticipant(userId)).toList(),
+    );
   }
 
   @override
   Stream<int> getUpcomingTrainingSessionsCount(String groupId) async* {
-    await for (final sessions
-        in getUpcomingTrainingSessionsForGroup(groupId)) {
+    await for (final sessions in getUpcomingTrainingSessionsForGroup(groupId)) {
       yield sessions.length;
     }
   }
@@ -318,36 +331,45 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
 
   @override
   Stream<List<TrainingSessionParticipantModel>>
-      getTrainingSessionParticipantsStream(String sessionId) {
+  getTrainingSessionParticipantsStream(String sessionId) {
     // Mock implementation - not fully implemented
     return Stream.value([]);
   }
 
   @override
   Stream<int> getTrainingSessionParticipantCount(String sessionId) {
-    return getTrainingSessionStream(sessionId).map((session) => session?.currentParticipantCount ?? 0);
+    return getTrainingSessionStream(
+      sessionId,
+    ).map((session) => session?.currentParticipantCount ?? 0);
   }
 
   @override
-  Future<bool> canUserJoinTrainingSession(String sessionId, String userId) async {
+  Future<bool> canUserJoinTrainingSession(
+    String sessionId,
+    String userId,
+  ) async {
     final session = _sessions[sessionId];
     return session?.canUserJoin(userId) ?? false;
   }
 
   @override
   Stream<List<TrainingSessionModel>> getRecurringSessionInstances(
-      String parentSessionId) {
+    String parentSessionId,
+  ) {
     return Stream.value([]);
   }
 
   @override
   Stream<List<TrainingSessionModel>> getUpcomingRecurringSessionInstances(
-      String parentSessionId) {
+    String parentSessionId,
+  ) {
     return Stream.value([]);
   }
 
   @override
-  Future<List<String>> generateRecurringInstances(String parentSessionId) async {
+  Future<List<String>> generateRecurringInstances(
+    String parentSessionId,
+  ) async {
     return [];
   }
 
@@ -360,12 +382,15 @@ class MockTrainingSessionRepository implements TrainingSessionRepository {
   Stream<TrainingSessionModel?> getNextTrainingSessionForUser(String userId) {
     return _sessionsController.stream.map((sessions) {
       final now = DateTime.now();
-      final upcoming = sessions
-          .where((session) =>
-              session.startTime.isAfter(now) &&
-              session.status == TrainingStatus.scheduled)
-          .toList()
-        ..sort((a, b) => a.startTime.compareTo(b.startTime));
+      final upcoming =
+          sessions
+              .where(
+                (session) =>
+                    session.startTime.isAfter(now) &&
+                    session.status == TrainingStatus.scheduled,
+              )
+              .toList()
+            ..sort((a, b) => a.startTime.compareTo(b.startTime));
       return upcoming.isEmpty ? null : upcoming.first;
     });
   }

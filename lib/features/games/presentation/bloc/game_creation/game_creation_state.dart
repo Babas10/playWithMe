@@ -98,24 +98,24 @@ class GameCreationFormState extends GameCreationState {
 
   @override
   List<Object?> get props => [
-        groupId,
-        groupName,
-        dateTime,
-        locationName,
-        address,
-        title,
-        description,
-        maxPlayers,
-        minPlayers,
-        gameType,
-        skillLevel,
-        groupError,
-        dateTimeError,
-        locationError,
-        titleError,
-        playersError,
-        isValid,
-      ];
+    groupId,
+    groupName,
+    dateTime,
+    locationName,
+    address,
+    title,
+    description,
+    maxPlayers,
+    minPlayers,
+    gameType,
+    skillLevel,
+    groupError,
+    dateTimeError,
+    locationError,
+    titleError,
+    playersError,
+    isValid,
+  ];
 }
 
 /// State when submitting the game
@@ -128,10 +128,7 @@ class GameCreationSuccess extends GameCreationState implements SuccessState {
   final String gameId;
   final GameModel game;
 
-  const GameCreationSuccess({
-    required this.gameId,
-    required this.game,
-  });
+  const GameCreationSuccess({required this.gameId, required this.game});
 
   @override
   List<Object?> get props => [gameId, game];

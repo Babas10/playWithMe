@@ -39,8 +39,8 @@ class _TrainingSessionFeedbackPageState
     super.initState();
     // Check if user has already submitted feedback
     context.read<TrainingFeedbackBloc>().add(
-          CheckFeedbackSubmission(widget.trainingSessionId),
-        );
+      CheckFeedbackSubmission(widget.trainingSessionId),
+    );
   }
 
   @override
@@ -94,7 +94,8 @@ class _TrainingSessionFeedbackPageState
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (_hasSubmitted || (state is FeedbackSubmissionChecked && state.hasSubmitted)) {
+          if (_hasSubmitted ||
+              (state is FeedbackSubmissionChecked && state.hasSubmitted)) {
             return _buildAlreadySubmittedView();
           }
 
@@ -120,19 +121,13 @@ class _TrainingSessionFeedbackPageState
             const SizedBox(height: 24),
             Text(
               l10n.feedbackAlreadySubmitted,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Text(
               l10n.alreadyProvidedFeedback(widget.sessionTitle),
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -180,10 +175,7 @@ class _TrainingSessionFeedbackPageState
                     const SizedBox(height: 8),
                     Text(
                       l10n.feedbackIsAnonymous,
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
                     ),
                   ],
                 ),
@@ -221,10 +213,7 @@ class _TrainingSessionFeedbackPageState
             // Comment section
             Text(
               l10n.additionalCommentsOptional,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -242,9 +231,7 @@ class _TrainingSessionFeedbackPageState
 
             // Submit button
             ElevatedButton(
-              onPressed: isSubmitting
-                  ? null
-                  : () => _submitFeedback(context),
+              onPressed: isSubmitting ? null : () => _submitFeedback(context),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: AppColors.secondary,
@@ -312,19 +299,10 @@ class _TrainingSessionFeedbackPageState
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(subtitle, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -353,8 +331,14 @@ class _TrainingSessionFeedbackPageState
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(l10n.needsWork, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                Text(l10n.topLevelTraining, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                Text(
+                  l10n.needsWork,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+                Text(
+                  l10n.topLevelTraining,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
               ],
             );
           },
@@ -365,7 +349,9 @@ class _TrainingSessionFeedbackPageState
 
   void _submitFeedback(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    if (_exercisesQuality == 0 || _trainingIntensity == 0 || _coachingClarity == 0) {
+    if (_exercisesQuality == 0 ||
+        _trainingIntensity == 0 ||
+        _coachingClarity == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.pleaseRateAllCategories),
@@ -376,15 +362,15 @@ class _TrainingSessionFeedbackPageState
     }
 
     context.read<TrainingFeedbackBloc>().add(
-          SubmitFeedback(
-            trainingSessionId: widget.trainingSessionId,
-            exercisesQuality: _exercisesQuality,
-            trainingIntensity: _trainingIntensity,
-            coachingClarity: _coachingClarity,
-            comment: _commentController.text.trim().isEmpty
-                ? null
-                : _commentController.text.trim(),
-          ),
-        );
+      SubmitFeedback(
+        trainingSessionId: widget.trainingSessionId,
+        exercisesQuality: _exercisesQuality,
+        trainingIntensity: _trainingIntensity,
+        coachingClarity: _coachingClarity,
+        comment: _commentController.text.trim().isEmpty
+            ? null
+            : _commentController.text.trim(),
+      ),
+    );
   }
 }

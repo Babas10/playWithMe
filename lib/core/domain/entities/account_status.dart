@@ -40,8 +40,7 @@ AccountStatus computeAccountStatus({
 
   if (accountCreatedAt == null) return AccountStatus.pendingVerification;
 
-  final daysSinceCreation =
-      DateTime.now().difference(accountCreatedAt).inDays;
+  final daysSinceCreation = DateTime.now().difference(accountCreatedAt).inDays;
 
   if (daysSinceCreation <= gracePeriodDays) {
     return AccountStatus.pendingVerification;
@@ -58,8 +57,7 @@ AccountStatus computeAccountStatus({
 int computeDaysRemaining({required DateTime? accountCreatedAt}) {
   if (accountCreatedAt == null) return gracePeriodDays;
 
-  final daysSinceCreation =
-      DateTime.now().difference(accountCreatedAt).inDays;
+  final daysSinceCreation = DateTime.now().difference(accountCreatedAt).inDays;
   final remaining = gracePeriodDays - daysSinceCreation;
 
   return remaining > 0 ? remaining : 0;

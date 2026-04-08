@@ -25,6 +25,7 @@ class MockGameRepository extends Mock implements GameRepository {}
 class MockUserRepository extends Mock implements UserRepository {}
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
@@ -78,17 +79,28 @@ void main() {
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
     sl.registerSingleton<AuthenticationBloc>(mockAuthBloc);
     sl.registerSingleton<GameRepository>(mockGameRepository);
     sl.registerSingleton<UserRepository>(mockUserRepository);
 
-    when(() => mockGameRepository.getGameById(any()))
-        .thenAnswer((_) async => testGame);
-    when(() => mockGameRepository.updateGameTeams(any(), any(), any())).thenAnswer((_) async {});
-    when(() => mockUserRepository.getUsersByIds(any())).thenAnswer((_) async => []);
-    when(() => mockAuthBloc.state).thenReturn(const AuthenticationAuthenticated(testUser));
-    when(() => mockAuthBloc.stream).thenAnswer((_) => Stream.value(const AuthenticationAuthenticated(testUser)));
+    when(
+      () => mockGameRepository.getGameById(any()),
+    ).thenAnswer((_) async => testGame);
+    when(
+      () => mockGameRepository.updateGameTeams(any(), any(), any()),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockUserRepository.getUsersByIds(any()),
+    ).thenAnswer((_) async => []);
+    when(
+      () => mockAuthBloc.state,
+    ).thenReturn(const AuthenticationAuthenticated(testUser));
+    when(() => mockAuthBloc.stream).thenAnswer(
+      (_) => Stream.value(const AuthenticationAuthenticated(testUser)),
+    );
   });
 
   tearDown(() {
@@ -102,16 +114,14 @@ void main() {
         BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
       ],
       child: MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-        home: RecordResultsPage(
-          gameId: gameId,
-        ),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
+        home: RecordResultsPage(gameId: gameId),
       ),
     );
   }
@@ -137,7 +147,10 @@ void main() {
 
       // Find 'user-1' in unassigned section initially
       final unassignedCard = find.byKey(const Key('unassigned_section'));
-      expect(find.descendant(of: unassignedCard, matching: find.text('user-1')), findsOneWidget);
+      expect(
+        find.descendant(of: unassignedCard, matching: find.text('user-1')),
+        findsOneWidget,
+      );
 
       final buttonFinder = find.byKey(const Key('assign_team_A_button_user-1'));
       await tester.scrollUntilVisible(buttonFinder, 500);
@@ -146,43 +159,53 @@ void main() {
 
       // Verify user-1 is now in Team A section
       final teamACard = find.byKey(const Key('team_a_section'));
-      expect(find.descendant(of: teamACard, matching: find.text('user-1')), findsOneWidget);
+      expect(
+        find.descendant(of: teamACard, matching: find.text('user-1')),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('can save teams when all players are assigned and navigates', (tester) async {
+    testWidgets('can save teams when all players are assigned and navigates', (
+      tester,
+    ) async {
       final mockObserver = MockNavigatorObserver();
 
-      await tester.pumpWidget(MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
-          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
-        ],
-        child: MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-          home: RecordResultsPage(
-            gameId: testGameId,
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: RecordResultsPage(gameId: testGameId),
+            navigatorObservers: [mockObserver],
           ),
-          navigatorObservers: [mockObserver],
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Assign all players
       for (final playerId in ['user-1', 'user-2', 'user-3', 'user-4']) {
         final team = (playerId == 'user-1' || playerId == 'user-3') ? 'A' : 'B';
-        final buttonFinder = find.byKey(Key('assign_team_${team}_button_$playerId'));
+        final buttonFinder = find.byKey(
+          Key('assign_team_${team}_button_$playerId'),
+        );
         await tester.scrollUntilVisible(buttonFinder, 500);
         await tester.tap(buttonFinder);
         await tester.pump();
       }
 
-      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Teams');
+      final saveButtonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Save Teams',
+      );
       await tester.scrollUntilVisible(saveButtonFinder, 500);
       await tester.tap(saveButtonFinder);
       await tester.pumpAndSettle();

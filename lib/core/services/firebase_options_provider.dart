@@ -11,7 +11,9 @@ class FirebaseOptionsProvider {
   static FirebaseOptions getFirebaseOptions() {
     final environment = EnvironmentConfig.environment;
 
-    debugPrint('🔧 Getting Firebase options for ${environment.name} environment');
+    debugPrint(
+      '🔧 Getting Firebase options for ${environment.name} environment',
+    );
 
     switch (environment) {
       case Environment.dev:
@@ -65,8 +67,12 @@ class FirebaseOptionsProvider {
       ];
 
       if (placeholderChecks.any((isPlaceholder) => isPlaceholder)) {
-        debugPrint('⚠️  Warning: Firebase configuration contains placeholder values');
-        debugPrint('📋 Please replace placeholder values with real Firebase configuration');
+        debugPrint(
+          '⚠️  Warning: Firebase configuration contains placeholder values',
+        );
+        debugPrint(
+          '📋 Please replace placeholder values with real Firebase configuration',
+        );
         return false;
       }
 
@@ -74,13 +80,14 @@ class FirebaseOptionsProvider {
       if (options.projectId.isEmpty ||
           options.apiKey.isEmpty ||
           options.appId.isEmpty) {
-        debugPrint('❌ Firebase configuration validation failed: Required fields are empty');
+        debugPrint(
+          '❌ Firebase configuration validation failed: Required fields are empty',
+        );
         return false;
       }
 
       debugPrint('✅ Firebase configuration validation passed');
       return true;
-
     } catch (e) {
       debugPrint('❌ Firebase configuration validation failed: $e');
       return false;
@@ -104,7 +111,7 @@ class FirebaseOptionsProvider {
   /// Check if the configuration has placeholder values
   static bool _hasPlaceholderValues(FirebaseOptions options) {
     return options.apiKey.contains('placeholder') ||
-           options.appId.contains('placeholder') ||
-           options.messagingSenderId.contains('placeholder');
+        options.appId.contains('placeholder') ||
+        options.messagingSenderId.contains('placeholder');
   }
 }

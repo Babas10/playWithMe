@@ -28,23 +28,20 @@ void main() {
   }
 
   group('RestrictedModeBanner', () {
-    testWidgets('renders restricted message with days until deletion',
-        (tester) async {
+    testWidgets('renders restricted message with days until deletion', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestWidget(daysUntilDeletion: 15));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('15'), findsWidgets);
     });
 
-    testWidgets('renders deletion warning with days remaining',
-        (tester) async {
+    testWidgets('renders deletion warning with days remaining', (tester) async {
       await tester.pumpWidget(buildTestWidget(daysUntilDeletion: 10));
       await tester.pumpAndSettle();
 
-      expect(
-        find.textContaining('10 days'),
-        findsWidgets,
-      );
+      expect(find.textContaining('10 days'), findsWidgets);
     });
 
     testWidgets('renders Verify Email button', (tester) async {
@@ -68,14 +65,17 @@ void main() {
       expect(find.byIcon(Icons.schedule), findsOneWidget);
     });
 
-    testWidgets('calls onVerifyEmail when Verify Email is tapped',
-        (tester) async {
+    testWidgets('calls onVerifyEmail when Verify Email is tapped', (
+      tester,
+    ) async {
       bool verifyCalled = false;
 
-      await tester.pumpWidget(buildTestWidget(
-        daysUntilDeletion: 15,
-        onVerifyEmail: () => verifyCalled = true,
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(
+          daysUntilDeletion: 15,
+          onVerifyEmail: () => verifyCalled = true,
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Verify Email'));

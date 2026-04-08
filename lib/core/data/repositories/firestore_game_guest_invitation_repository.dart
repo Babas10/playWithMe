@@ -12,14 +12,13 @@ class FirestoreGameGuestInvitationRepository
   final FirebaseFunctions _functions;
 
   FirestoreGameGuestInvitationRepository({FirebaseFunctions? functions})
-      : _functions = functions ??
-            FirebaseFunctions.instanceFor(region: 'europe-west6');
+    : _functions =
+          functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
 
   @override
   Future<List<InvitablePlayerModel>> getInvitablePlayers(String gameId) async {
     try {
-      final callable =
-          _functions.httpsCallable('getInvitablePlayersForGame');
+      final callable = _functions.httpsCallable('getInvitablePlayersForGame');
       final result = await callable.call({'gameId': gameId});
 
       final data = Map<String, dynamic>.from(result.data as Map);
@@ -29,13 +28,9 @@ class FirestoreGameGuestInvitationRepository
           .toList();
       return players;
     } on FirebaseFunctionsException catch (e) {
-      throw GameInvitationException(
-        _mapFunctionsError(e),
-        code: e.code,
-      );
+      throw GameInvitationException(_mapFunctionsError(e), code: e.code);
     } catch (e) {
-      throw GameInvitationException(
-          'Failed to load invitable players: $e');
+      throw GameInvitationException('Failed to load invitable players: $e');
     }
   }
 
@@ -54,10 +49,7 @@ class FirestoreGameGuestInvitationRepository
       final data = Map<String, dynamic>.from(result.data as Map);
       return data['invitationId'] as String;
     } on FirebaseFunctionsException catch (e) {
-      throw GameInvitationException(
-        _mapFunctionsError(e),
-        code: e.code,
-      );
+      throw GameInvitationException(_mapFunctionsError(e), code: e.code);
     } catch (e) {
       throw GameInvitationException('Failed to send invitation: $e');
     }

@@ -32,10 +32,7 @@ class CreateGroup extends GroupEvent {
   final GroupModel group;
   final Set<String>? friendIdsToInvite;
 
-  const CreateGroup({
-    required this.group,
-    this.friendIdsToInvite,
-  });
+  const CreateGroup({required this.group, this.friendIdsToInvite});
 
   @override
   List<Object?> get props => [group, friendIdsToInvite];
@@ -81,24 +78,21 @@ class UpdateGroupSettings extends GroupEvent {
 
   @override
   List<Object?> get props => [
-        groupId,
-        privacy,
-        requiresApproval,
-        maxMembers,
-        allowMembersToCreateGames,
-        allowMembersToInviteOthers,
-        notifyMembersOfNewGames,
-      ];
+    groupId,
+    privacy,
+    requiresApproval,
+    maxMembers,
+    allowMembersToCreateGames,
+    allowMembersToInviteOthers,
+    notifyMembersOfNewGames,
+  ];
 }
 
 class AddMemberToGroup extends GroupEvent {
   final String groupId;
   final String userId;
 
-  const AddMemberToGroup({
-    required this.groupId,
-    required this.userId,
-  });
+  const AddMemberToGroup({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -108,10 +102,7 @@ class RemoveMemberFromGroup extends GroupEvent {
   final String groupId;
   final String userId;
 
-  const RemoveMemberFromGroup({
-    required this.groupId,
-    required this.userId,
-  });
+  const RemoveMemberFromGroup({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -121,10 +112,7 @@ class PromoteToAdmin extends GroupEvent {
   final String groupId;
   final String userId;
 
-  const PromoteToAdmin({
-    required this.groupId,
-    required this.userId,
-  });
+  const PromoteToAdmin({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -134,10 +122,7 @@ class DemoteFromAdmin extends GroupEvent {
   final String groupId;
   final String userId;
 
-  const DemoteFromAdmin({
-    required this.groupId,
-    required this.userId,
-  });
+  const DemoteFromAdmin({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -147,10 +132,7 @@ class SearchPublicGroups extends GroupEvent {
   final String query;
   final int limit;
 
-  const SearchPublicGroups({
-    required this.query,
-    this.limit = 20,
-  });
+  const SearchPublicGroups({required this.query, this.limit = 20});
 
   @override
   List<Object?> get props => [query, limit];

@@ -14,8 +14,9 @@ class FirebaseAuthRepository implements AuthRepository {
   FirebaseAuthRepository({
     FirebaseAuth? firebaseAuth,
     FirebaseFunctions? functions,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _functions =
+           functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
 
   @override
   UserEntity? get currentUser {
@@ -50,7 +51,9 @@ class FirebaseAuthRepository implements AuthRepository {
       debugPrint('✅ Successfully signed in user: ${credential.user!.email}');
       return UserModel.fromFirebaseUser(credential.user!).toEntity();
     } on FirebaseAuthException catch (e) {
-      debugPrint('❌ Firebase Auth Error during sign in: ${e.code} - ${e.message}');
+      debugPrint(
+        '❌ Firebase Auth Error during sign in: ${e.code} - ${e.message}',
+      );
       throw _mapFirebaseAuthException(e);
     } catch (e) {
       debugPrint('❌ Unexpected error during sign in: $e');
@@ -80,7 +83,9 @@ class FirebaseAuthRepository implements AuthRepository {
       debugPrint('✅ Successfully created user: ${credential.user!.email}');
       return UserModel.fromFirebaseUser(credential.user!).toEntity();
     } on FirebaseAuthException catch (e) {
-      debugPrint('❌ Firebase Auth Error during registration: ${e.code} - ${e.message}');
+      debugPrint(
+        '❌ Firebase Auth Error during registration: ${e.code} - ${e.message}',
+      );
       throw _mapFirebaseAuthException(e);
     } catch (e) {
       debugPrint('❌ Unexpected error during registration: $e');
@@ -100,7 +105,9 @@ class FirebaseAuthRepository implements AuthRepository {
       debugPrint('✅ Successfully signed in anonymously');
       return UserModel.fromFirebaseUser(credential.user!).toEntity();
     } on FirebaseAuthException catch (e) {
-      debugPrint('❌ Firebase Auth Error during anonymous sign in: ${e.code} - ${e.message}');
+      debugPrint(
+        '❌ Firebase Auth Error during anonymous sign in: ${e.code} - ${e.message}',
+      );
       throw _mapFirebaseAuthException(e);
     } catch (e) {
       debugPrint('❌ Unexpected error during anonymous sign in: $e');
@@ -114,7 +121,9 @@ class FirebaseAuthRepository implements AuthRepository {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       debugPrint('✅ Password reset email sent to: $email');
     } on FirebaseAuthException catch (e) {
-      debugPrint('❌ Firebase Auth Error sending password reset: ${e.code} - ${e.message}');
+      debugPrint(
+        '❌ Firebase Auth Error sending password reset: ${e.code} - ${e.message}',
+      );
       throw _mapFirebaseAuthException(e);
     } catch (e) {
       debugPrint('❌ Unexpected error sending password reset: $e');
@@ -141,7 +150,9 @@ class FirebaseAuthRepository implements AuthRepository {
       await user.sendEmailVerification(actionCodeSettings);
       debugPrint('✅ Email verification sent to: ${user.email}');
     } on FirebaseAuthException catch (e) {
-      debugPrint('❌ Firebase Auth Error sending email verification: ${e.code} - ${e.message}');
+      debugPrint(
+        '❌ Firebase Auth Error sending email verification: ${e.code} - ${e.message}',
+      );
       throw _mapFirebaseAuthException(e);
     } catch (e) {
       debugPrint('❌ Unexpected error sending email verification: $e');
@@ -214,7 +225,9 @@ class FirebaseAuthRepository implements AuthRepository {
       });
       debugPrint('✅ User names updated in Firestore');
     } on FirebaseFunctionsException catch (e) {
-      debugPrint('❌ Cloud Function error updating user names: ${e.code} - ${e.message}');
+      debugPrint(
+        '❌ Cloud Function error updating user names: ${e.code} - ${e.message}',
+      );
       throw Exception('Failed to update user names: ${e.message}');
     } catch (e) {
       debugPrint('❌ Error updating user names: $e');
@@ -233,7 +246,9 @@ class FirebaseAuthRepository implements AuthRepository {
       // trigger onAuthStateChanged → AuthenticationUnauthenticated → LoginPage.
       await _firebaseAuth.signOut();
     } on FirebaseFunctionsException catch (e) {
-      debugPrint('❌ Cloud Function error deleting account: ${e.code} - ${e.message}');
+      debugPrint(
+        '❌ Cloud Function error deleting account: ${e.code} - ${e.message}',
+      );
       throw Exception('Failed to delete account: ${e.message}');
     } catch (e) {
       debugPrint('❌ Error deleting account: $e');

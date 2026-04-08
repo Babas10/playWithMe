@@ -39,11 +39,11 @@ class AddExercise extends ExerciseEvent {
 
   @override
   List<Object?> get props => [
-        trainingSessionId,
-        name,
-        description,
-        durationMinutes,
-      ];
+    trainingSessionId,
+    name,
+    description,
+    durationMinutes,
+  ];
 }
 
 /// Event to update an existing exercise
@@ -64,12 +64,12 @@ class UpdateExercise extends ExerciseEvent {
 
   @override
   List<Object?> get props => [
-        trainingSessionId,
-        exerciseId,
-        name,
-        description,
-        durationMinutes,
-      ];
+    trainingSessionId,
+    exerciseId,
+    name,
+    description,
+    durationMinutes,
+  ];
 }
 
 /// Event to delete an exercise

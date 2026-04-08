@@ -47,10 +47,7 @@ Future<bool> validateAndroidConfigs() async {
     'dev': 'org.gatherli.app.dev',
     'prod': 'org.gatherli.app',
   };
-  const expectedProjectIds = {
-    'dev': 'gatherli-dev',
-    'prod': 'gatherli-prod',
-  };
+  const expectedProjectIds = {'dev': 'gatherli-dev', 'prod': 'gatherli-prod'};
 
   for (final env in environments) {
     final configPath = 'android/app/src/$env/google-services.json';
@@ -71,7 +68,9 @@ Future<bool> validateAndroidConfigs() async {
       // Validate project ID
       final projectId = config['project_info']?['project_id'] as String?;
       if (projectId != expectedProjectIds[env]) {
-        print('    ❌ Project ID mismatch: expected "${expectedProjectIds[env]}", found "$projectId"');
+        print(
+          '    ❌ Project ID mismatch: expected "${expectedProjectIds[env]}", found "$projectId"',
+        );
         valid = false;
       } else {
         print('    ✅ Project ID correct: $projectId');
@@ -81,10 +80,14 @@ Future<bool> validateAndroidConfigs() async {
       final clients = config['client'] as List<dynamic>?;
       if (clients?.isNotEmpty == true) {
         final firstClient = clients!.first as Map<String, dynamic>;
-        final bundleId = firstClient['client_info']?['android_client_info']?['package_name'] as String?;
+        final bundleId =
+            firstClient['client_info']?['android_client_info']?['package_name']
+                as String?;
 
         if (bundleId != expectedBundleIds[env]) {
-          print('    ❌ Bundle ID mismatch: expected "${expectedBundleIds[env]}", found "$bundleId"');
+          print(
+            '    ❌ Bundle ID mismatch: expected "${expectedBundleIds[env]}", found "$bundleId"',
+          );
           valid = false;
         } else {
           print('    ✅ Bundle ID correct: $bundleId');
@@ -93,10 +96,16 @@ Future<bool> validateAndroidConfigs() async {
         // Check for placeholder API keys
         final apiKeys = firstClient['api_key'] as List<dynamic>?;
         if (apiKeys?.isNotEmpty == true) {
-          final apiKey = (apiKeys!.first as Map<String, dynamic>)['current_key'] as String?;
-          if (apiKey?.contains('placeholder') == true || apiKey?.contains('DEV') == true ||
-              apiKey?.contains('STG') == true || apiKey?.contains('PROD') == true) {
-            print('    ⚠️  Warning: API key appears to be a placeholder: ${apiKey?.substring(0, 20)}...');
+          final apiKey =
+              (apiKeys!.first as Map<String, dynamic>)['current_key']
+                  as String?;
+          if (apiKey?.contains('placeholder') == true ||
+              apiKey?.contains('DEV') == true ||
+              apiKey?.contains('STG') == true ||
+              apiKey?.contains('PROD') == true) {
+            print(
+              '    ⚠️  Warning: API key appears to be a placeholder: ${apiKey?.substring(0, 20)}...',
+            );
           } else {
             print('    ✅ API key appears to be real');
           }
@@ -105,7 +114,6 @@ Future<bool> validateAndroidConfigs() async {
         print('    ❌ No client configuration found');
         valid = false;
       }
-
     } catch (e) {
       print('    ❌ Error parsing config file: $e');
       valid = false;
@@ -122,10 +130,7 @@ Future<bool> validateiOSConfigs() async {
     'dev': 'org.gatherli.app.dev',
     'prod': 'org.gatherli.app',
   };
-  const expectedProjectIds = {
-    'dev': 'gatherli-dev',
-    'prod': 'gatherli-prod',
-  };
+  const expectedProjectIds = {'dev': 'gatherli-dev', 'prod': 'gatherli-prod'};
 
   for (final env in environments) {
     final configPath = 'ios/Runner/Firebase/$env/GoogleService-Info.plist';
@@ -143,14 +148,22 @@ Future<bool> validateiOSConfigs() async {
       final content = await file.readAsString();
 
       // Simple plist parsing (looking for key-value pairs)
-      final projectIdMatch = RegExp(r'<key>PROJECT_ID</key>\s*<string>([^<]+)</string>').firstMatch(content);
-      final bundleIdMatch = RegExp(r'<key>BUNDLE_ID</key>\s*<string>([^<]+)</string>').firstMatch(content);
-      final apiKeyMatch = RegExp(r'<key>API_KEY</key>\s*<string>([^<]+)</string>').firstMatch(content);
+      final projectIdMatch = RegExp(
+        r'<key>PROJECT_ID</key>\s*<string>([^<]+)</string>',
+      ).firstMatch(content);
+      final bundleIdMatch = RegExp(
+        r'<key>BUNDLE_ID</key>\s*<string>([^<]+)</string>',
+      ).firstMatch(content);
+      final apiKeyMatch = RegExp(
+        r'<key>API_KEY</key>\s*<string>([^<]+)</string>',
+      ).firstMatch(content);
 
       // Validate project ID
       final projectId = projectIdMatch?.group(1);
       if (projectId != expectedProjectIds[env]) {
-        print('    ❌ Project ID mismatch: expected "${expectedProjectIds[env]}", found "$projectId"');
+        print(
+          '    ❌ Project ID mismatch: expected "${expectedProjectIds[env]}", found "$projectId"',
+        );
         valid = false;
       } else {
         print('    ✅ Project ID correct: $projectId');
@@ -159,7 +172,9 @@ Future<bool> validateiOSConfigs() async {
       // Validate bundle ID
       final bundleId = bundleIdMatch?.group(1);
       if (bundleId != expectedBundleIds[env]) {
-        print('    ❌ Bundle ID mismatch: expected "${expectedBundleIds[env]}", found "$bundleId"');
+        print(
+          '    ❌ Bundle ID mismatch: expected "${expectedBundleIds[env]}", found "$bundleId"',
+        );
         valid = false;
       } else {
         print('    ✅ Bundle ID correct: $bundleId');
@@ -167,13 +182,16 @@ Future<bool> validateiOSConfigs() async {
 
       // Check for placeholder API keys
       final apiKey = apiKeyMatch?.group(1);
-      if (apiKey?.contains('placeholder') == true || apiKey?.contains('DEV') == true ||
-          apiKey?.contains('STG') == true || apiKey?.contains('PROD') == true) {
-        print('    ⚠️  Warning: API key appears to be a placeholder: ${apiKey?.substring(0, 20)}...');
+      if (apiKey?.contains('placeholder') == true ||
+          apiKey?.contains('DEV') == true ||
+          apiKey?.contains('STG') == true ||
+          apiKey?.contains('PROD') == true) {
+        print(
+          '    ⚠️  Warning: API key appears to be a placeholder: ${apiKey?.substring(0, 20)}...',
+        );
       } else {
         print('    ✅ API key appears to be real');
       }
-
     } catch (e) {
       print('    ❌ Error parsing config file: $e');
       valid = false;

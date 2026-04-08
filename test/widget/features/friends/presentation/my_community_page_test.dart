@@ -30,9 +30,7 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en'),
-      ],
+      supportedLocales: const [Locale('en')],
       home: Scaffold(
         body: BlocProvider<FriendBloc>.value(
           value: mockFriendBloc,
@@ -43,31 +41,36 @@ void main() {
   }
 
   group('MyCommunityPage Widget Tests', () {
-    testWidgets('BlocBuilder renders CircularProgressIndicator on loading state',
-        (WidgetTester tester) async {
-      when(() => mockFriendBloc.state)
-          .thenReturn(const FriendState.loading());
-      when(() => mockFriendBloc.stream)
-          .thenAnswer((_) => const Stream.empty());
+    testWidgets(
+      'BlocBuilder renders CircularProgressIndicator on loading state',
+      (WidgetTester tester) async {
+        when(
+          () => mockFriendBloc.state,
+        ).thenReturn(const FriendState.loading());
+        when(
+          () => mockFriendBloc.stream,
+        ).thenAnswer((_) => const Stream.empty());
 
-      await tester.pumpWidget(
-        createTestWidget(
-          BlocBuilder<FriendBloc, FriendState>(
-            builder: (context, state) {
-              if (state is FriendLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return const SizedBox();
-            },
+        await tester.pumpWidget(
+          createTestWidget(
+            BlocBuilder<FriendBloc, FriendState>(
+              builder: (context, state) {
+                if (state is FriendLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return const SizedBox();
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      },
+    );
 
-    testWidgets('BlocBuilder renders content on loaded state',
-        (WidgetTester tester) async {
+    testWidgets('BlocBuilder renders content on loaded state', (
+      WidgetTester tester,
+    ) async {
       when(() => mockFriendBloc.state).thenReturn(
         const FriendState.loaded(
           friends: [],
@@ -75,8 +78,7 @@ void main() {
           sentRequests: [],
         ),
       );
-      when(() => mockFriendBloc.stream)
-          .thenAnswer((_) => const Stream.empty());
+      when(() => mockFriendBloc.stream).thenAnswer((_) => const Stream.empty());
 
       await tester.pumpWidget(
         createTestWidget(
@@ -94,12 +96,17 @@ void main() {
       expect(find.text('Loaded'), findsOneWidget);
     });
 
-    testWidgets('BlocListener reacts to error state',
-        (WidgetTester tester) async {
+    testWidgets('BlocListener reacts to error state', (
+      WidgetTester tester,
+    ) async {
       bool listenerCalled = false;
 
       when(() => mockFriendBloc.state).thenReturn(
-        const FriendState.loaded(friends: [], receivedRequests: [], sentRequests: []),
+        const FriendState.loaded(
+          friends: [],
+          receivedRequests: [],
+          sentRequests: [],
+        ),
       );
       when(() => mockFriendBloc.stream).thenAnswer(
         (_) => Stream.fromIterable([
@@ -124,12 +131,17 @@ void main() {
       expect(listenerCalled, isTrue);
     });
 
-    testWidgets('BlocListener reacts to success state',
-        (WidgetTester tester) async {
+    testWidgets('BlocListener reacts to success state', (
+      WidgetTester tester,
+    ) async {
       bool listenerCalled = false;
 
       when(() => mockFriendBloc.state).thenReturn(
-        const FriendState.loaded(friends: [], receivedRequests: [], sentRequests: []),
+        const FriendState.loaded(
+          friends: [],
+          receivedRequests: [],
+          sentRequests: [],
+        ),
       );
       when(() => mockFriendBloc.stream).thenAnswer(
         (_) => Stream.fromIterable([

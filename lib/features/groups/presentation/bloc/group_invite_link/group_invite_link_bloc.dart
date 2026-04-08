@@ -11,8 +11,8 @@ class GroupInviteLinkBloc
   final GroupInviteLinkRepository _repository;
 
   GroupInviteLinkBloc({required GroupInviteLinkRepository repository})
-      : _repository = repository,
-        super(const GroupInviteLinkInitial()) {
+    : _repository = repository,
+      super(const GroupInviteLinkInitial()) {
     on<GenerateInvite>(_onGenerateInvite);
     on<RevokeInvite>(_onRevokeInvite);
   }
@@ -30,27 +30,33 @@ class GroupInviteLinkBloc
         usageLimit: event.usageLimit,
       );
 
-      emit(GroupInviteLinkGenerated(
-        deepLinkUrl: result.deepLinkUrl,
-        inviteId: result.inviteId,
-      ));
+      emit(
+        GroupInviteLinkGenerated(
+          deepLinkUrl: result.deepLinkUrl,
+          inviteId: result.inviteId,
+        ),
+      );
     } on GroupInviteLinkException catch (e) {
       final (message, isRetryable) =
           GroupInviteLinkErrorMessages.getErrorMessage(e);
-      emit(GroupInviteLinkError(
-        message: message,
-        errorCode: e.code ?? 'GENERATE_INVITE_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupInviteLinkError(
+          message: message,
+          errorCode: e.code ?? 'GENERATE_INVITE_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? ErrorMessages.getErrorMessage(e)
           : ('Failed to generate invite link', true);
-      emit(GroupInviteLinkError(
-        message: message,
-        errorCode: 'GENERATE_INVITE_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupInviteLinkError(
+          message: message,
+          errorCode: 'GENERATE_INVITE_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -70,20 +76,24 @@ class GroupInviteLinkBloc
     } on GroupInviteLinkException catch (e) {
       final (message, isRetryable) =
           GroupInviteLinkErrorMessages.getErrorMessage(e);
-      emit(GroupInviteLinkError(
-        message: message,
-        errorCode: e.code ?? 'REVOKE_INVITE_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupInviteLinkError(
+          message: message,
+          errorCode: e.code ?? 'REVOKE_INVITE_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? ErrorMessages.getErrorMessage(e)
           : ('Failed to revoke invite link', true);
-      emit(GroupInviteLinkError(
-        message: message,
-        errorCode: 'REVOKE_INVITE_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupInviteLinkError(
+          message: message,
+          errorCode: 'REVOKE_INVITE_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 }

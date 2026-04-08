@@ -104,11 +104,7 @@ class CompactStatsError extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
 
-  const CompactStatsError({
-    super.key,
-    this.message = 'Error',
-    this.onRetry,
-  });
+  const CompactStatsError({super.key, this.message = 'Error', this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +135,10 @@ class CompactStatsError extends StatelessWidget {
               TextButton(
                 onPressed: onRetry,
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   minimumSize: const Size(0, 0),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),

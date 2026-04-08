@@ -30,14 +30,14 @@ class InviteRegistrationSubmitted extends InviteRegistrationEvent {
 
   @override
   List<Object?> get props => [
-        firstName,
-        lastName,
-        displayName,
-        email,
-        password,
-        confirmPassword,
-        token,
-      ];
+    firstName,
+    lastName,
+    displayName,
+    email,
+    password,
+    confirmPassword,
+    token,
+  ];
 }
 
 /// Event to reset the invite registration form state.

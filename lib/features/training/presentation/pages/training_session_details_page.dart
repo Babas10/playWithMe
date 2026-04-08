@@ -57,8 +57,9 @@ class _TrainingSessionDetailsPageState
 
   Future<void> _updateSessionStatusIfNeeded() async {
     try {
-      await sl<TrainingSessionRepository>()
-          .updateSessionStatusIfNeeded(widget.trainingSessionId);
+      await sl<TrainingSessionRepository>().updateSessionStatusIfNeeded(
+        widget.trainingSessionId,
+      );
     } catch (e) {
       // Silently fail - status will be updated on next page load
       // This is a best-effort background update
@@ -76,8 +77,9 @@ class _TrainingSessionDetailsPageState
     return BlocProvider<TrainingSessionParticipationBloc>.value(
       value: _participationBloc,
       child: StreamBuilder<TrainingSessionModel?>(
-        stream: sl<TrainingSessionRepository>()
-            .getTrainingSessionStream(widget.trainingSessionId),
+        stream: sl<TrainingSessionRepository>().getTrainingSessionStream(
+          widget.trainingSessionId,
+        ),
         builder: (context, snapshot) {
           final l10n = AppLocalizations.of(context)!;
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -98,16 +100,15 @@ class _TrainingSessionDetailsPageState
                 title: l10n.training,
                 showUserActions: true,
               ),
-              body: Center(
-                child: Text(l10n.trainingNotFound),
-              ),
+              body: Center(child: Text(l10n.trainingNotFound)),
             );
           }
 
           final session = snapshot.data!;
           final isOrganizer = _currentUserId == session.createdBy;
           final isParticipant = session.isParticipant(_currentUserId ?? '');
-          final showFeedbackTab = session.status == TrainingStatus.completed && isParticipant;
+          final showFeedbackTab =
+              session.status == TrainingStatus.completed && isParticipant;
           final tabCount = showFeedbackTab ? 3 : 2;
           final canCancel = session.canUserCancel(_currentUserId ?? '');
 
@@ -118,8 +119,10 @@ class _TrainingSessionDetailsPageState
               extraActions: [
                 // Cancel button only visible to organizer for scheduled sessions
                 if (canCancel)
-                  BlocConsumer<TrainingSessionParticipationBloc,
-                      TrainingSessionParticipationState>(
+                  BlocConsumer<
+                    TrainingSessionParticipationBloc,
+                    TrainingSessionParticipationState
+                  >(
                     listener: (context, state) {
                       if (state is CancelledSession) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -140,7 +143,9 @@ class _TrainingSessionDetailsPageState
                             ? const SizedBox(
                                 width: 24,
                                 height: 24,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : const Icon(Icons.more_vert),
                         onSelected: (value) {
@@ -181,10 +186,22 @@ class _TrainingSessionDetailsPageState
                     unselectedLabelColor: AppColors.navLabelColor,
                     indicatorColor: AppColors.primary,
                     tabs: [
-                      _TrainingTab(tabIndex: 0, icon: Icons.people, label: l10n.participants),
-                      _TrainingTab(tabIndex: 1, icon: Icons.fitness_center, label: l10n.exercises),
+                      _TrainingTab(
+                        tabIndex: 0,
+                        icon: Icons.people,
+                        label: l10n.participants,
+                      ),
+                      _TrainingTab(
+                        tabIndex: 1,
+                        icon: Icons.fitness_center,
+                        label: l10n.exercises,
+                      ),
                       if (showFeedbackTab)
-                        _TrainingTab(tabIndex: 2, icon: Icons.feedback_outlined, label: l10n.feedback),
+                        _TrainingTab(
+                          tabIndex: 2,
+                          icon: Icons.feedback_outlined,
+                          label: l10n.feedback,
+                        ),
                     ],
                   ),
 
@@ -220,7 +237,11 @@ class _TrainingSessionDetailsPageState
               ),
             ),
             // Join/Leave floating action button
-            floatingActionButton: _buildActionButton(context, session, isParticipant),
+            floatingActionButton: _buildActionButton(
+              context,
+              session,
+              isParticipant,
+            ),
           );
         },
       ),
@@ -245,9 +266,9 @@ class _TrainingSessionDetailsPageState
                 child: Text(
                   session.title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
                 ),
               ),
               _buildStatusBadge(session.status),
@@ -282,9 +303,13 @@ class _TrainingSessionDetailsPageState
                   Text(
                     isOrganizer
                         ? l10n.youAreOrganizing
-                        : l10n.organizedBy(organizer?.displayName ?? l10n.loading),
+                        : l10n.organizedBy(
+                            organizer?.displayName ?? l10n.loading,
+                          ),
                     style: TextStyle(
-                      fontWeight: isOrganizer ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isOrganizer
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -330,12 +355,18 @@ class _TrainingSessionDetailsPageState
                   Icon(Icons.people, size: 16, color: AppColors.secondary),
                   const SizedBox(width: 4),
                   Text(
-                    l10n.participantsCount(session.participantIds.length, session.maxParticipants),
+                    l10n.participantsCount(
+                      session.participantIds.length,
+                      session.maxParticipants,
+                    ),
                   ),
                   if (session.isFull) ...[
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.red.withAlpha(26),
                         borderRadius: BorderRadius.circular(12),
@@ -596,10 +627,22 @@ class _TrainingSessionDetailsPageState
                   ),
                 ),
                 const Divider(),
-                _buildParticipationRow(l10n.current, '${session.participantIds.length}'),
-                _buildParticipationRow(l10n.minimum, '${session.minParticipants}'),
-                _buildParticipationRow(l10n.maximum, '${session.maxParticipants}'),
-                _buildParticipationRow(l10n.availableSpots, '${session.availableSpots}'),
+                _buildParticipationRow(
+                  l10n.current,
+                  '${session.participantIds.length}',
+                ),
+                _buildParticipationRow(
+                  l10n.minimum,
+                  '${session.minParticipants}',
+                ),
+                _buildParticipationRow(
+                  l10n.maximum,
+                  '${session.maxParticipants}',
+                ),
+                _buildParticipationRow(
+                  l10n.availableSpots,
+                  '${session.availableSpots}',
+                ),
               ],
             ),
           ),
@@ -614,14 +657,8 @@ class _TrainingSessionDetailsPageState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(color: Colors.grey),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
+          Text(label, style: const TextStyle(color: Colors.grey)),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -647,8 +684,10 @@ class _TrainingSessionDetailsPageState
       return null;
     }
 
-    return BlocConsumer<TrainingSessionParticipationBloc,
-        TrainingSessionParticipationState>(
+    return BlocConsumer<
+      TrainingSessionParticipationBloc,
+      TrainingSessionParticipationState
+    >(
       listener: (context, state) {
         final l10n = AppLocalizations.of(context)!;
         if (state is JoinedSession) {
@@ -667,24 +706,18 @@ class _TrainingSessionDetailsPageState
           );
         } else if (state is ParticipationError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
         }
       },
       builder: (context, state) {
         final l10n = AppLocalizations.of(context)!;
-        final isLoading =
-            state is JoiningSession || state is LeavingSession;
+        final isLoading = state is JoiningSession || state is LeavingSession;
 
         if (isParticipant) {
           // Show Leave button
           return FloatingActionButton.extended(
-            onPressed: isLoading
-                ? null
-                : () => _leaveSession(context, session),
+            onPressed: isLoading ? null : () => _leaveSession(context, session),
             icon: isLoading
                 ? const SizedBox(
                     width: 20,
@@ -723,10 +756,10 @@ class _TrainingSessionDetailsPageState
               isLoading
                   ? l10n.joining
                   : canJoin
-                      ? l10n.join
-                      : session.isFull
-                          ? l10n.full
-                          : l10n.cannotJoin,
+                  ? l10n.join
+                  : session.isFull
+                  ? l10n.full
+                  : l10n.cannotJoin,
               style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: canJoin ? AppColors.primary : Colors.grey,
@@ -738,8 +771,8 @@ class _TrainingSessionDetailsPageState
 
   void _joinSession(BuildContext context, TrainingSessionModel session) {
     context.read<TrainingSessionParticipationBloc>().add(
-          JoinTrainingSession(widget.trainingSessionId),
-        );
+      JoinTrainingSession(widget.trainingSessionId),
+    );
   }
 
   void _leaveSession(BuildContext context, TrainingSessionModel session) {
@@ -758,8 +791,8 @@ class _TrainingSessionDetailsPageState
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<TrainingSessionParticipationBloc>().add(
-                    LeaveTrainingSession(widget.trainingSessionId),
-                  );
+                LeaveTrainingSession(widget.trainingSessionId),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -774,7 +807,9 @@ class _TrainingSessionDetailsPageState
 
   /// Show confirmation dialog before cancelling a training session (Story 15.14)
   void _showCancelConfirmation(
-      BuildContext context, TrainingSessionModel session) {
+    BuildContext context,
+    TrainingSessionModel session,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
@@ -790,12 +825,10 @@ class _TrainingSessionDetailsPageState
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<TrainingSessionParticipationBloc>().add(
-                    CancelTrainingSession(widget.trainingSessionId),
-                  );
+                CancelTrainingSession(widget.trainingSessionId),
+              );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.cancelSession),
           ),
         ],

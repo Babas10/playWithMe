@@ -49,9 +49,7 @@ void main() {
         build: () => authenticationBloc,
         act: (bloc) => bloc.add(const AuthenticationStarted()),
         wait: const Duration(milliseconds: 50),
-        expect: () => [
-          const AuthenticationUnauthenticated(),
-        ],
+        expect: () => [const AuthenticationUnauthenticated()],
       );
 
       blocTest<AuthenticationBloc, AuthenticationState>(
@@ -95,7 +93,8 @@ void main() {
       blocTest<AuthenticationBloc, AuthenticationState>(
         'emits [AuthenticationAuthenticated] when user is non-null',
         build: () => authenticationBloc,
-        act: (bloc) => bloc.add(const AuthenticationUserChanged(TestUserData.testUser)),
+        act: (bloc) =>
+            bloc.add(const AuthenticationUserChanged(TestUserData.testUser)),
         expect: () => [
           const AuthenticationAuthenticated(TestUserData.testUser),
         ],
@@ -105,15 +104,15 @@ void main() {
         'emits [AuthenticationUnauthenticated] when user is null',
         build: () => authenticationBloc,
         act: (bloc) => bloc.add(const AuthenticationUserChanged(null)),
-        expect: () => [
-          const AuthenticationUnauthenticated(),
-        ],
+        expect: () => [const AuthenticationUnauthenticated()],
       );
 
       blocTest<AuthenticationBloc, AuthenticationState>(
         'emits [AuthenticationAuthenticated] with anonymous user',
         build: () => authenticationBloc,
-        act: (bloc) => bloc.add(const AuthenticationUserChanged(TestUserData.anonymousUser)),
+        act: (bloc) => bloc.add(
+          const AuthenticationUserChanged(TestUserData.anonymousUser),
+        ),
         expect: () => [
           const AuthenticationAuthenticated(TestUserData.anonymousUser),
         ],
@@ -122,7 +121,9 @@ void main() {
       blocTest<AuthenticationBloc, AuthenticationState>(
         'emits [AuthenticationAuthenticated] with unverified user',
         build: () => authenticationBloc,
-        act: (bloc) => bloc.add(const AuthenticationUserChanged(TestUserData.unverifiedUser)),
+        act: (bloc) => bloc.add(
+          const AuthenticationUserChanged(TestUserData.unverifiedUser),
+        ),
         expect: () => [
           const AuthenticationAuthenticated(TestUserData.unverifiedUser),
         ],
@@ -194,7 +195,9 @@ void main() {
           bloc.add(const AuthenticationUserChanged(TestUserData.testUser));
           bloc.add(const AuthenticationUserChanged(TestUserData.anonymousUser));
           bloc.add(const AuthenticationUserChanged(null));
-          bloc.add(const AuthenticationUserChanged(TestUserData.unverifiedUser));
+          bloc.add(
+            const AuthenticationUserChanged(TestUserData.unverifiedUser),
+          );
         },
         expect: () => [
           const AuthenticationAuthenticated(TestUserData.testUser),
@@ -264,22 +267,32 @@ void main() {
         expect(state1, equals(state2));
       });
 
-      test('AuthenticationAuthenticated instances with same user are equal', () {
-        const state1 = AuthenticationAuthenticated(TestUserData.testUser);
-        const state2 = AuthenticationAuthenticated(TestUserData.testUser);
-        expect(state1, equals(state2));
-      });
+      test(
+        'AuthenticationAuthenticated instances with same user are equal',
+        () {
+          const state1 = AuthenticationAuthenticated(TestUserData.testUser);
+          const state2 = AuthenticationAuthenticated(TestUserData.testUser);
+          expect(state1, equals(state2));
+        },
+      );
 
-      test('AuthenticationAuthenticated instances with different users are not equal', () {
-        const state1 = AuthenticationAuthenticated(TestUserData.testUser);
-        const state2 = AuthenticationAuthenticated(TestUserData.anonymousUser);
-        expect(state1, isNot(equals(state2)));
-      });
+      test(
+        'AuthenticationAuthenticated instances with different users are not equal',
+        () {
+          const state1 = AuthenticationAuthenticated(TestUserData.testUser);
+          const state2 = AuthenticationAuthenticated(
+            TestUserData.anonymousUser,
+          );
+          expect(state1, isNot(equals(state2)));
+        },
+      );
 
       test('Different state types are not equal', () {
         const unknown = AuthenticationUnknown();
         const unauthenticated = AuthenticationUnauthenticated();
-        const authenticated = AuthenticationAuthenticated(TestUserData.testUser);
+        const authenticated = AuthenticationAuthenticated(
+          TestUserData.testUser,
+        );
 
         expect(unknown, isNot(equals(unauthenticated)));
         expect(unknown, isNot(equals(authenticated)));
@@ -306,11 +319,14 @@ void main() {
         expect(event1, equals(event2));
       });
 
-      test('AuthenticationUserChanged instances with different users are not equal', () {
-        const event1 = AuthenticationUserChanged(TestUserData.testUser);
-        const event2 = AuthenticationUserChanged(TestUserData.anonymousUser);
-        expect(event1, isNot(equals(event2)));
-      });
+      test(
+        'AuthenticationUserChanged instances with different users are not equal',
+        () {
+          const event1 = AuthenticationUserChanged(TestUserData.testUser);
+          const event2 = AuthenticationUserChanged(TestUserData.anonymousUser);
+          expect(event1, isNot(equals(event2)));
+        },
+      );
 
       test('AuthenticationUserChanged instances with null are equal', () {
         const event1 = AuthenticationUserChanged(null);

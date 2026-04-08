@@ -9,14 +9,15 @@ void main() {
   group('GroupBottomNavBar', () {
     testWidgets('renders without error', (tester) async {
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: true,
               onInviteTap: () {},
@@ -33,19 +34,19 @@ void main() {
       expect(find.byType(GroupBottomNavBar), findsOneWidget);
     });
 
-    testWidgets('calls onInviteTap when admin taps first item',
-        (tester) async {
+    testWidgets('calls onInviteTap when admin taps first item', (tester) async {
       bool inviteTapped = false;
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: true,
               onInviteTap: () => inviteTapped = true,
@@ -66,19 +67,21 @@ void main() {
       expect(inviteTapped, isTrue);
     });
 
-    testWidgets('does not call onInviteTap when non-admin taps first item',
-        (tester) async {
+    testWidgets('does not call onInviteTap when non-admin taps first item', (
+      tester,
+    ) async {
       bool inviteTapped = false;
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: false,
               onInviteTap: () => inviteTapped = true,
@@ -99,53 +102,58 @@ void main() {
       expect(inviteTapped, isFalse);
     });
 
-    testWidgets('shows modal with game and training options when second item is tapped',
-        (tester) async {
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            bottomNavigationBar: GroupBottomNavBar(
-              isAdmin: true,
-              onInviteTap: () {},
-              onCreateGameTap: () {},
-              onCreateTrainingTap: () {},
-              onGamesListTap: () {},
+    testWidgets(
+      'shows modal with game and training options when second item is tapped',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
+              bottomNavigationBar: GroupBottomNavBar(
+                isAdmin: true,
+                onInviteTap: () {},
+                onCreateGameTap: () {},
+                onCreateTrainingTap: () {},
+                onGamesListTap: () {},
+              ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      final bottomNavBar = tester.widget<BottomNavigationBar>(
-        find.byType(BottomNavigationBar).first,
-      );
-      bottomNavBar.onTap!(1);
-      await tester.pumpAndSettle();
+        final bottomNavBar = tester.widget<BottomNavigationBar>(
+          find.byType(BottomNavigationBar).first,
+        );
+        bottomNavBar.onTap!(1);
+        await tester.pumpAndSettle();
 
-      // Verify modal sheet appears with both options
-      expect(find.text('Create Game'), findsOneWidget);
-      expect(find.text('Create Training Session'), findsOneWidget);
-    });
+        // Verify modal sheet appears with both options
+        expect(find.text('Create Game'), findsOneWidget);
+        expect(find.text('Create Training Session'), findsOneWidget);
+      },
+    );
 
-    testWidgets('calls onGamesListTap when third item is tapped',
-        (tester) async {
+    testWidgets('calls onGamesListTap when third item is tapped', (
+      tester,
+    ) async {
       bool gamesListTapped = false;
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: true,
               onInviteTap: () {},
@@ -168,14 +176,15 @@ void main() {
 
     testWidgets('renders correctly for non-admin', (tester) async {
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: false,
               onInviteTap: () {},
@@ -194,14 +203,15 @@ void main() {
 
     testWidgets('has three navigation items', (tester) async {
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: true,
               onInviteTap: () {},
@@ -221,17 +231,19 @@ void main() {
       expect(bottomNavBar.items.length, 3);
     });
 
-    testWidgets('first item has correct label and tooltip for admin',
-        (tester) async {
+    testWidgets('first item has correct label and tooltip for admin', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: true,
               onInviteTap: () {},
@@ -254,14 +266,15 @@ void main() {
 
     testWidgets('first item tooltip changes for non-admin', (tester) async {
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: false,
               onInviteTap: () {},
@@ -283,14 +296,15 @@ void main() {
 
     testWidgets('uses BottomNavigationBarType.fixed', (tester) async {
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             bottomNavigationBar: GroupBottomNavBar(
               isAdmin: true,
               onInviteTap: () {},
@@ -313,20 +327,21 @@ void main() {
     group('Badge Display', () {
       testWidgets('shows no badge when game count is 0', (tester) async {
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
               bottomNavigationBar: GroupBottomNavBar(
                 isAdmin: true,
                 upcomingGamesCount: 0,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
-              onCreateTrainingTap: () {},
+                onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -342,23 +357,25 @@ void main() {
         expect(badge.isLabelVisible, isFalse);
       });
 
-      testWidgets('shows badge with correct count when games exist',
-          (tester) async {
+      testWidgets('shows badge with correct count when games exist', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
               bottomNavigationBar: GroupBottomNavBar(
                 isAdmin: true,
                 upcomingGamesCount: 3,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
-              onCreateTrainingTap: () {},
+                onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -377,23 +394,23 @@ void main() {
         expect(find.text('3'), findsOneWidget);
       });
 
-      testWidgets('shows "9+" when game count is 10 or more',
-          (tester) async {
+      testWidgets('shows "9+" when game count is 10 or more', (tester) async {
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
               bottomNavigationBar: GroupBottomNavBar(
                 isAdmin: true,
                 upcomingGamesCount: 15,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
-              onCreateTrainingTap: () {},
+                onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -414,20 +431,21 @@ void main() {
 
       testWidgets('shows exact count for 9 games', (tester) async {
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
               bottomNavigationBar: GroupBottomNavBar(
                 isAdmin: true,
                 upcomingGamesCount: 9,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
-              onCreateTrainingTap: () {},
+                onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -448,20 +466,21 @@ void main() {
 
       testWidgets('badge appears on Games icon', (tester) async {
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
               bottomNavigationBar: GroupBottomNavBar(
                 isAdmin: true,
                 upcomingGamesCount: 5,
                 onInviteTap: () {},
                 onCreateGameTap: () {},
-              onCreateTrainingTap: () {},
+                onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),
@@ -480,20 +499,21 @@ void main() {
 
       testWidgets('defaults to 0 games when not specified', (tester) async {
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
               bottomNavigationBar: GroupBottomNavBar(
                 isAdmin: true,
                 // upcomingGamesCount not specified, should default to 0
                 onInviteTap: () {},
                 onCreateGameTap: () {},
-              onCreateTrainingTap: () {},
+                onCreateTrainingTap: () {},
                 onGamesListTap: () {},
               ),
             ),

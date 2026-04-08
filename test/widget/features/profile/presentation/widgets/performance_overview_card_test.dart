@@ -23,16 +23,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
@@ -67,16 +66,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
@@ -110,16 +108,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
@@ -131,7 +128,9 @@ void main() {
       expect(find.text('1'), findsOneWidget);
     });
 
-    testWidgets('shows best win with opponent names when available', (tester) async {
+    testWidgets('shows best win with opponent names when available', (
+      tester,
+    ) async {
       final user = UserModel(
         uid: 'test-uid',
         email: 'test@example.com',
@@ -154,79 +153,84 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
 
       // Should show best win data with structured layout
       expect(find.text('Best Win'), findsOneWidget);
-      expect(find.text('Team: Player A · Player B'), findsOneWidget); // Team composition with middle dot
+      expect(
+        find.text('Team: Player A · Player B'),
+        findsOneWidget,
+      ); // Team composition with middle dot
       expect(find.text('Team ELO: 1650'), findsOneWidget); // Team strength
       expect(find.text('+24 ELO gained'), findsOneWidget); // ELO gained
 
       // Should use trophy icon
       expect(
         find.byWidgetPredicate(
-          (widget) =>
-              widget is Icon &&
-              widget.icon == Icons.emoji_events,
+          (widget) => widget is Icon && widget.icon == Icons.emoji_events,
         ),
         findsAtLeastNWidgets(1),
       );
     });
 
-    testWidgets('shows best win with ELO only when opponent names are null (fallback)', (tester) async {
-      final user = UserModel(
-        uid: 'test-uid',
-        email: 'test@example.com',
-        isEmailVerified: true,
-        isAnonymous: false,
-        gamesPlayed: 5,
-        gamesWon: 3,
-        gamesLost: 2,
-        eloRating: 1550.0,
-        eloPeak: 1600.0,
-        bestWin: BestWinRecord(
-          gameId: 'game123',
-          opponentTeamElo: 1700.0,
-          opponentTeamAvgElo: 1650.0,
-          eloGained: 24.0,
-          date: DateTime(2024, 2, 10),
-          gameTitle: 'vs Opponents',
-          opponentNames: null, // Null for backward compatibility
-        ),
-      );
-
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
+    testWidgets(
+      'shows best win with ELO only when opponent names are null (fallback)',
+      (tester) async {
+        final user = UserModel(
+          uid: 'test-uid',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+          gamesPlayed: 5,
+          gamesWon: 3,
+          gamesLost: 2,
+          eloRating: 1550.0,
+          eloPeak: 1600.0,
+          bestWin: BestWinRecord(
+            gameId: 'game123',
+            opponentTeamElo: 1700.0,
+            opponentTeamAvgElo: 1650.0,
+            eloGained: 24.0,
+            date: DateTime(2024, 2, 10),
+            gameTitle: 'vs Opponents',
+            opponentNames: null, // Null for backward compatibility
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
 
-      // Should show best win data with ELO only (fallback behavior without team names)
-      expect(find.text('Best Win'), findsOneWidget);
-      expect(find.text('Team ELO: 1650'), findsOneWidget); // ELO shown without team names
-      expect(find.text('+24 ELO gained'), findsOneWidget);
-    });
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: PerformanceOverviewCard(user: user)),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Should show best win data with ELO only (fallback behavior without team names)
+        expect(find.text('Best Win'), findsOneWidget);
+        expect(
+          find.text('Team ELO: 1650'),
+          findsOneWidget,
+        ); // ELO shown without team names
+        expect(find.text('+24 ELO gained'), findsOneWidget);
+      },
+    );
 
     testWidgets('shows placeholder when user has no best win', (tester) async {
       final user = UserModel(
@@ -243,16 +247,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
@@ -269,59 +272,65 @@ void main() {
       expect(
         find.byWidgetPredicate(
           (widget) =>
-              widget is Icon &&
-              widget.icon == Icons.emoji_events_outlined,
+              widget is Icon && widget.icon == Icons.emoji_events_outlined,
         ),
         findsAtLeastNWidgets(1),
       );
     });
 
-    testWidgets('shows correct formatting for best win with opponent names and ELO values', (tester) async {
-      final user = UserModel(
-        uid: 'test-uid',
-        email: 'test@example.com',
-        isEmailVerified: true,
-        isAnonymous: false,
-        gamesPlayed: 10,
-        gamesWon: 6,
-        gamesLost: 4,
-        eloRating: 1600.0,
-        eloPeak: 1650.0,
-        bestWin: BestWinRecord(
-          gameId: 'game456',
-          opponentTeamElo: 1850.5, // Should be rounded
-          opponentTeamAvgElo: 1825.7, // Should be rounded
-          eloGained: 28.3, // Should be rounded with +
-          date: DateTime(2024, 3, 1),
-          gameTitle: 'vs Strong Team',
-          opponentNames: 'Alice & Bob',
-        ),
-      );
-
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
+    testWidgets(
+      'shows correct formatting for best win with opponent names and ELO values',
+      (tester) async {
+        final user = UserModel(
+          uid: 'test-uid',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+          gamesPlayed: 10,
+          gamesWon: 6,
+          gamesLost: 4,
+          eloRating: 1600.0,
+          eloPeak: 1650.0,
+          bestWin: BestWinRecord(
+            gameId: 'game456',
+            opponentTeamElo: 1850.5, // Should be rounded
+            opponentTeamAvgElo: 1825.7, // Should be rounded
+            eloGained: 28.3, // Should be rounded with +
+            date: DateTime(2024, 3, 1),
+            gameTitle: 'vs Strong Team',
+            opponentNames: 'Alice & Bob',
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
 
-      // Should show opponent names with rounded ELO values in structured layout
-      expect(find.text('Best Win'), findsOneWidget);
-      expect(find.text('Team: Alice · Bob'), findsOneWidget); // Team composition with middle dot
-      expect(find.text('Team ELO: 1826'), findsOneWidget); // Rounded ELO
-      expect(find.text('+28 ELO gained'), findsOneWidget); // Rounded ELO gain
-    });
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: PerformanceOverviewCard(user: user)),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Should show opponent names with rounded ELO values in structured layout
+        expect(find.text('Best Win'), findsOneWidget);
+        expect(
+          find.text('Team: Alice · Bob'),
+          findsOneWidget,
+        ); // Team composition with middle dot
+        expect(find.text('Team ELO: 1826'), findsOneWidget); // Rounded ELO
+        expect(find.text('+28 ELO gained'), findsOneWidget); // Rounded ELO gain
+      },
+    );
 
     // Story 301.7: Average Point Differential Tests (Wins vs Losses)
-    testWidgets('shows point differential for wins and losses separately', (tester) async {
+    testWidgets('shows point differential for wins and losses separately', (
+      tester,
+    ) async {
       final user = UserModel(
         uid: 'test-uid',
         email: 'test@example.com',
@@ -341,16 +350,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
@@ -372,7 +380,9 @@ void main() {
       expect(find.text('3 won, 2 lost'), findsOneWidget);
     });
 
-    testWidgets('shows point differential with only winning sets', (tester) async {
+    testWidgets('shows point differential with only winning sets', (
+      tester,
+    ) async {
       final user = UserModel(
         uid: 'test-uid',
         email: 'test@example.com',
@@ -392,16 +402,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
@@ -418,7 +427,9 @@ void main() {
       expect(find.text('4 won, 0 lost'), findsOneWidget);
     });
 
-    testWidgets('shows point differential with only losing sets', (tester) async {
+    testWidgets('shows point differential with only losing sets', (
+      tester,
+    ) async {
       final user = UserModel(
         uid: 'test-uid',
         email: 'test@example.com',
@@ -438,16 +449,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
@@ -479,16 +489,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();
@@ -496,20 +505,24 @@ void main() {
       // Should show placeholder (using _StatItem, not _PointDiffStatItem)
       expect(find.text('Avg Point Diff'), findsOneWidget);
       expect(find.text('Complete a game to unlock'), findsOneWidget);
-      expect(find.text('Win and lose sets to see your margins'), findsOneWidget);
+      expect(
+        find.text('Win and lose sets to see your margins'),
+        findsOneWidget,
+      );
 
       // Should have outlined icon
       expect(
         find.byWidgetPredicate(
           (widget) =>
-              widget is Icon &&
-              widget.icon == Icons.trending_up_outlined,
+              widget is Icon && widget.icon == Icons.trending_up_outlined,
         ),
         findsOneWidget,
       );
     });
 
-    testWidgets('shows correct decimal precision for point differential', (tester) async {
+    testWidgets('shows correct decimal precision for point differential', (
+      tester,
+    ) async {
       final user = UserModel(
         uid: 'test-uid',
         email: 'test@example.com',
@@ -529,16 +542,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PerformanceOverviewCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PerformanceOverviewCard(user: user)),
         ),
       );
       await tester.pumpAndSettle();

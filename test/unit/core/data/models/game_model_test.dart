@@ -68,14 +68,8 @@ void main() {
         final createdAtTimestamp = firestoreData['createdAt'] as Timestamp;
         final scheduledAtTimestamp = firestoreData['scheduledAt'] as Timestamp;
 
-        expect(
-          createdAtTimestamp.toDate(),
-          equals(now),
-        );
-        expect(
-          scheduledAtTimestamp.toDate(),
-          equals(futureDate),
-        );
+        expect(createdAtTimestamp.toDate(), equals(now));
+        expect(scheduledAtTimestamp.toDate(), equals(futureDate));
       });
 
       test('converts optional DateTime fields to Timestamp when present', () {
@@ -201,23 +195,17 @@ void main() {
           games: const [
             IndividualGame(
               gameNumber: 1,
-              sets: [
-                SetScore(teamAPoints: 21, teamBPoints: 15, setNumber: 1),
-              ],
+              sets: [SetScore(teamAPoints: 21, teamBPoints: 15, setNumber: 1)],
               winner: 'teamA',
             ),
             IndividualGame(
               gameNumber: 2,
-              sets: [
-                SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1),
-              ],
+              sets: [SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1)],
               winner: 'teamB',
             ),
             IndividualGame(
               gameNumber: 3,
-              sets: [
-                SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1),
-              ],
+              sets: [SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1)],
               winner: 'teamA',
             ),
           ],
@@ -311,7 +299,9 @@ void main() {
             games: [
               IndividualGame(
                 gameNumber: 1,
-                sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
+                sets: [
+                  SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1),
+                ],
                 winner: 'teamA',
               ),
             ],
@@ -361,9 +351,7 @@ void main() {
           'createdBy': 'user-123',
           'createdAt': Timestamp.fromDate(now),
           'scheduledAt': Timestamp.fromDate(futureDate),
-          'location': {
-            'name': 'Beach Court',
-          },
+          'location': {'name': 'Beach Court'},
           'status': 'scheduled',
           'maxPlayers': 4,
           'minPlayers': 2,
@@ -373,8 +361,9 @@ void main() {
 
         final game = GameModel.fromJson({
           ...firestoreDoc,
-          'createdAt':
-              (firestoreDoc['createdAt'] as Timestamp).toDate().toIso8601String(),
+          'createdAt': (firestoreDoc['createdAt'] as Timestamp)
+              .toDate()
+              .toIso8601String(),
           'scheduledAt': (firestoreDoc['scheduledAt'] as Timestamp)
               .toDate()
               .toIso8601String(),
@@ -388,18 +377,14 @@ void main() {
     group('Business Logic Methods', () {
       group('isPlayer', () {
         test('returns true when user is a player', () {
-          final game = createTestGame(
-            playerIds: ['user-123', 'user-456'],
-          );
+          final game = createTestGame(playerIds: ['user-123', 'user-456']);
 
           expect(game.isPlayer('user-123'), isTrue);
           expect(game.isPlayer('user-456'), isTrue);
         });
 
         test('returns false when user is not a player', () {
-          final game = createTestGame(
-            playerIds: ['user-123'],
-          );
+          final game = createTestGame(playerIds: ['user-123']);
 
           expect(game.isPlayer('user-789'), isFalse);
         });
@@ -407,17 +392,13 @@ void main() {
 
       group('isOnWaitlist', () {
         test('returns true when user is on waitlist', () {
-          final game = createTestGame(
-            waitlistIds: ['user-456', 'user-789'],
-          );
+          final game = createTestGame(waitlistIds: ['user-456', 'user-789']);
 
           expect(game.isOnWaitlist('user-456'), isTrue);
         });
 
         test('returns false when user is not on waitlist', () {
-          final game = createTestGame(
-            waitlistIds: ['user-456'],
-          );
+          final game = createTestGame(waitlistIds: ['user-456']);
 
           expect(game.isOnWaitlist('user-123'), isFalse);
         });
@@ -471,10 +452,7 @@ void main() {
         });
 
         test('returns false when player count is less than max', () {
-          final game = createTestGame(
-            maxPlayers: 4,
-            playerIds: ['p1', 'p2'],
-          );
+          final game = createTestGame(maxPlayers: 4, playerIds: ['p1', 'p2']);
 
           expect(game.isFull, isFalse);
         });
@@ -482,10 +460,7 @@ void main() {
 
       group('hasMinimumPlayers', () {
         test('returns true when player count meets minimum', () {
-          final game = createTestGame(
-            minPlayers: 2,
-            playerIds: ['p1', 'p2'],
-          );
+          final game = createTestGame(minPlayers: 2, playerIds: ['p1', 'p2']);
 
           expect(game.hasMinimumPlayers, isTrue);
         });
@@ -500,10 +475,7 @@ void main() {
         });
 
         test('returns false when player count is below minimum', () {
-          final game = createTestGame(
-            minPlayers: 4,
-            playerIds: ['p1', 'p2'],
-          );
+          final game = createTestGame(minPlayers: 4, playerIds: ['p1', 'p2']);
 
           expect(game.hasMinimumPlayers, isFalse);
         });
@@ -511,10 +483,7 @@ void main() {
 
       group('availableSpots', () {
         test('returns correct number of available spots', () {
-          final game = createTestGame(
-            maxPlayers: 6,
-            playerIds: ['p1', 'p2'],
-          );
+          final game = createTestGame(maxPlayers: 6, playerIds: ['p1', 'p2']);
 
           expect(game.availableSpots, 4);
         });
@@ -531,9 +500,7 @@ void main() {
 
       group('currentPlayerCount', () {
         test('returns correct player count', () {
-          final game = createTestGame(
-            playerIds: ['p1', 'p2', 'p3'],
-          );
+          final game = createTestGame(playerIds: ['p1', 'p2', 'p3']);
 
           expect(game.currentPlayerCount, 3);
         });
@@ -547,9 +514,7 @@ void main() {
 
       group('waitlistCount', () {
         test('returns correct waitlist count', () {
-          final game = createTestGame(
-            waitlistIds: ['w1', 'w2'],
-          );
+          final game = createTestGame(waitlistIds: ['w1', 'w2']);
 
           expect(game.waitlistCount, 2);
         });
@@ -581,9 +546,7 @@ void main() {
 
       group('isToday', () {
         test('returns true when game is scheduled for today', () {
-          final game = createTestGame(
-            scheduledAt: DateTime.now(),
-          );
+          final game = createTestGame(scheduledAt: DateTime.now());
 
           expect(game.isToday, isTrue);
         });
@@ -610,10 +573,7 @@ void main() {
           final startTime = DateTime.now();
           final endTime = startTime.add(const Duration(hours: 2));
 
-          final game = createTestGame(
-            startedAt: startTime,
-            endedAt: endTime,
-          );
+          final game = createTestGame(startedAt: startTime, endedAt: endTime);
 
           expect(game.gameDuration, const Duration(hours: 2));
         });
@@ -625,9 +585,7 @@ void main() {
         });
 
         test('returns null when game has not ended', () {
-          final game = createTestGame(
-            startedAt: DateTime.now(),
-          );
+          final game = createTestGame(startedAt: DateTime.now());
 
           expect(game.gameDuration, isNull);
         });
@@ -645,25 +603,19 @@ void main() {
         });
 
         test('returns false when user is already a player', () {
-          final game = createTestGame(
-            playerIds: ['user-123'],
-          );
+          final game = createTestGame(playerIds: ['user-123']);
 
           expect(game.canUserJoin('user-123'), isFalse);
         });
 
         test('returns false when user is on waitlist', () {
-          final game = createTestGame(
-            waitlistIds: ['user-123'],
-          );
+          final game = createTestGame(waitlistIds: ['user-123']);
 
           expect(game.canUserJoin('user-123'), isFalse);
         });
 
         test('returns false when game is not scheduled', () {
-          final game = createTestGame(
-            status: GameStatus.inProgress,
-          );
+          final game = createTestGame(status: GameStatus.inProgress);
 
           expect(game.canUserJoin('user-new'), isFalse);
         });
@@ -676,17 +628,19 @@ void main() {
           expect(game.canUserJoin('user-new'), isFalse);
         });
 
-        test('returns true for waitlist when game is full and waitlist allowed',
-            () {
-          final game = createTestGame(
-            maxPlayers: 2,
-            playerIds: ['p1', 'p2'],
-            allowWaitlist: true,
-            scheduledAt: DateTime.now().add(const Duration(hours: 1)),
-          );
+        test(
+          'returns true for waitlist when game is full and waitlist allowed',
+          () {
+            final game = createTestGame(
+              maxPlayers: 2,
+              playerIds: ['p1', 'p2'],
+              allowWaitlist: true,
+              scheduledAt: DateTime.now().add(const Duration(hours: 1)),
+            );
 
-          expect(game.canUserJoin('user-new'), isTrue);
-        });
+            expect(game.canUserJoin('user-new'), isTrue);
+          },
+        );
 
         test('returns false when game is full and waitlist not allowed', () {
           final game = createTestGame(
@@ -739,26 +693,32 @@ void main() {
       });
 
       group('canUserEnterResults', () {
-        test('returns true when participant and game is completed with enough players', () {
-          final game = createTestGame(
-            playerIds: ['user-123', 'user-456'],
-            minPlayers: 2,
-            status: GameStatus.completed,
-          );
+        test(
+          'returns true when participant and game is completed with enough players',
+          () {
+            final game = createTestGame(
+              playerIds: ['user-123', 'user-456'],
+              minPlayers: 2,
+              status: GameStatus.completed,
+            );
 
-          expect(game.canUserEnterResults('user-123'), isTrue);
-        });
+            expect(game.canUserEnterResults('user-123'), isTrue);
+          },
+        );
 
-        test('returns true when creator and game is past with enough players', () {
-          final game = createTestGame(
-            createdBy: 'user-123',
-            playerIds: ['user-123', 'user-456'],
-            minPlayers: 2,
-            scheduledAt: DateTime.now().subtract(const Duration(hours: 1)),
-          );
+        test(
+          'returns true when creator and game is past with enough players',
+          () {
+            final game = createTestGame(
+              createdBy: 'user-123',
+              playerIds: ['user-123', 'user-456'],
+              minPlayers: 2,
+              scheduledAt: DateTime.now().subtract(const Duration(hours: 1)),
+            );
 
-          expect(game.canUserEnterResults('user-123'), isTrue);
-        });
+            expect(game.canUserEnterResults('user-123'), isTrue);
+          },
+        );
 
         test('returns false when result already exists', () {
           final game = createTestGame(
@@ -769,7 +729,9 @@ void main() {
               games: [
                 IndividualGame(
                   gameNumber: 1,
-                  sets: [SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1)],
+                  sets: [
+                    SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1),
+                  ],
                   winner: 'teamA',
                 ),
               ],
@@ -800,17 +762,20 @@ void main() {
           expect(game.canUserEnterResults('user-123'), isFalse);
         });
 
-        test('returns false when creator and game is future (not past scheduled time)', () {
-          final game = createTestGame(
-            createdBy: 'user-123',
-            playerIds: ['user-123', 'user-456'],
-            minPlayers: 2,
-            scheduledAt: DateTime.now().add(const Duration(hours: 2)),
-            status: GameStatus.scheduled,
-          );
+        test(
+          'returns false when creator and game is future (not past scheduled time)',
+          () {
+            final game = createTestGame(
+              createdBy: 'user-123',
+              playerIds: ['user-123', 'user-456'],
+              minPlayers: 2,
+              scheduledAt: DateTime.now().add(const Duration(hours: 2)),
+              status: GameStatus.scheduled,
+            );
 
-          expect(game.canUserEnterResults('user-123'), isFalse);
-        });
+            expect(game.canUserEnterResults('user-123'), isFalse);
+          },
+        );
 
         test('returns false when game has fewer players than minPlayers', () {
           final game = createTestGame(
@@ -876,28 +841,19 @@ void main() {
 
       group('hasValidPlayerLimits', () {
         test('returns true when min <= max and min >= 2', () {
-          final game = createTestGame(
-            minPlayers: 2,
-            maxPlayers: 6,
-          );
+          final game = createTestGame(minPlayers: 2, maxPlayers: 6);
 
           expect(game.hasValidPlayerLimits, isTrue);
         });
 
         test('returns false when min > max', () {
-          final game = createTestGame(
-            minPlayers: 6,
-            maxPlayers: 4,
-          );
+          final game = createTestGame(minPlayers: 6, maxPlayers: 4);
 
           expect(game.hasValidPlayerLimits, isFalse);
         });
 
         test('returns false when min < 2', () {
-          final game = createTestGame(
-            minPlayers: 1,
-            maxPlayers: 4,
-          );
+          final game = createTestGame(minPlayers: 1, maxPlayers: 4);
 
           expect(game.hasValidPlayerLimits, isFalse);
         });
@@ -991,10 +947,7 @@ void main() {
 
       group('addPlayer', () {
         test('adds player to game when not full', () {
-          final game = createTestGame(
-            maxPlayers: 4,
-            playerIds: ['p1', 'p2'],
-          );
+          final game = createTestGame(maxPlayers: 4, playerIds: ['p1', 'p2']);
 
           final updated = game.addPlayer('p3');
 
@@ -1003,9 +956,7 @@ void main() {
         });
 
         test('does not add player if already playing', () {
-          final game = createTestGame(
-            playerIds: ['p1', 'p2'],
-          );
+          final game = createTestGame(playerIds: ['p1', 'p2']);
 
           final updated = game.addPlayer('p1');
 
@@ -1041,9 +992,7 @@ void main() {
 
       group('removePlayer', () {
         test('removes player from game', () {
-          final game = createTestGame(
-            playerIds: ['p1', 'p2', 'p3'],
-          );
+          final game = createTestGame(playerIds: ['p1', 'p2', 'p3']);
 
           final updated = game.removePlayer('p2');
 
@@ -1131,9 +1080,7 @@ void main() {
         });
 
         test('does not end if not in progress', () {
-          final game = createTestGame(
-            status: GameStatus.scheduled,
-          );
+          final game = createTestGame(status: GameStatus.scheduled);
 
           final updated = game.endGame(winnerId: 'team-a');
 
@@ -1144,9 +1091,7 @@ void main() {
 
       group('cancelGame', () {
         test('cancels scheduled game', () {
-          final game = createTestGame(
-            status: GameStatus.scheduled,
-          );
+          final game = createTestGame(status: GameStatus.scheduled);
 
           final updated = game.cancelGame();
 
@@ -1154,9 +1099,7 @@ void main() {
         });
 
         test('cancels in-progress game', () {
-          final game = createTestGame(
-            status: GameStatus.inProgress,
-          );
+          final game = createTestGame(status: GameStatus.inProgress);
 
           final updated = game.cancelGame();
 
@@ -1164,9 +1107,7 @@ void main() {
         });
 
         test('does not cancel completed game', () {
-          final game = createTestGame(
-            status: GameStatus.completed,
-          );
+          final game = createTestGame(status: GameStatus.completed);
 
           final updated = game.cancelGame();
 
@@ -1210,7 +1151,9 @@ void main() {
 
         test('returns hours format for games less than a day away', () {
           final game = createTestGame(
-            scheduledAt: DateTime.now().add(const Duration(hours: 5, minutes: 30)),
+            scheduledAt: DateTime.now().add(
+              const Duration(hours: 5, minutes: 30),
+            ),
           );
 
           final result = game.getTimeUntilGame();
@@ -1267,10 +1210,7 @@ void main() {
     });
 
     test('getUnassignedPlayers returns list of unassigned players', () {
-      const teams = GameTeams(
-        teamAPlayerIds: ['p1'],
-        teamBPlayerIds: ['p2'],
-      );
+      const teams = GameTeams(teamAPlayerIds: ['p1'], teamBPlayerIds: ['p2']);
 
       final unassigned = teams.getUnassignedPlayers(['p1', 'p2', 'p3', 'p4']);
 
@@ -1298,71 +1238,43 @@ void main() {
 
   group('SetScore', () {
     test('isValid returns true for valid score (21 win)', () {
-      const score = SetScore(
-        teamAPoints: 21,
-        teamBPoints: 18,
-        setNumber: 1,
-      );
+      const score = SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1);
 
       expect(score.isValid(), isTrue);
     });
 
     test('isValid returns true for extended set (22-20)', () {
-      const score = SetScore(
-        teamAPoints: 22,
-        teamBPoints: 20,
-        setNumber: 1,
-      );
+      const score = SetScore(teamAPoints: 22, teamBPoints: 20, setNumber: 1);
 
       expect(score.isValid(), isTrue);
     });
 
     test('isValid returns false when no winner (below 21)', () {
-      const score = SetScore(
-        teamAPoints: 20,
-        teamBPoints: 18,
-        setNumber: 1,
-      );
+      const score = SetScore(teamAPoints: 20, teamBPoints: 18, setNumber: 1);
 
       expect(score.isValid(), isFalse);
     });
 
     test('isValid returns false when not win by 2', () {
-      const score = SetScore(
-        teamAPoints: 21,
-        teamBPoints: 20,
-        setNumber: 1,
-      );
+      const score = SetScore(teamAPoints: 21, teamBPoints: 20, setNumber: 1);
 
       expect(score.isValid(), isFalse);
     });
 
     test('winner returns teamA when team A wins', () {
-      const score = SetScore(
-        teamAPoints: 21,
-        teamBPoints: 18,
-        setNumber: 1,
-      );
+      const score = SetScore(teamAPoints: 21, teamBPoints: 18, setNumber: 1);
 
       expect(score.winner, 'teamA');
     });
 
     test('winner returns teamB when team B wins', () {
-      const score = SetScore(
-        teamAPoints: 15,
-        teamBPoints: 21,
-        setNumber: 1,
-      );
+      const score = SetScore(teamAPoints: 15, teamBPoints: 21, setNumber: 1);
 
       expect(score.winner, 'teamB');
     });
 
     test('winner returns null for invalid score', () {
-      const score = SetScore(
-        teamAPoints: 10,
-        teamBPoints: 5,
-        setNumber: 1,
-      );
+      const score = SetScore(teamAPoints: 10, teamBPoints: 5, setNumber: 1);
 
       expect(score.winner, isNull);
     });
@@ -1380,11 +1292,7 @@ void main() {
     });
 
     test('isValid returns false for empty sets', () {
-      const game = IndividualGame(
-        gameNumber: 1,
-        sets: [],
-        winner: 'teamA',
-      );
+      const game = IndividualGame(gameNumber: 1, sets: [], winner: 'teamA');
 
       expect(game.isValid(), isFalse);
     });
@@ -1539,10 +1447,7 @@ void main() {
     });
 
     test('isValid returns false for empty games', () {
-      const result = GameResult(
-        games: [],
-        overallWinner: 'teamA',
-      );
+      const result = GameResult(games: [], overallWinner: 'teamA');
 
       expect(result.isValid(), isFalse);
     });
@@ -1800,5 +1705,4 @@ void main() {
       expect(updated.gameGenderType, GameGenderType.mix);
     });
   });
-
 }

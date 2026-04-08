@@ -93,10 +93,7 @@ class FeedbackError extends TrainingFeedbackState {
   final String message;
   final String? trainingSessionId;
 
-  const FeedbackError({
-    required this.message,
-    this.trainingSessionId,
-  });
+  const FeedbackError({required this.message, this.trainingSessionId});
 
   @override
   List<Object?> get props => [message, trainingSessionId];

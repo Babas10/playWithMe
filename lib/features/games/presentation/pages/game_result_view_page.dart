@@ -67,7 +67,10 @@ class GameResultViewPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   l10n.noResultsAvailable,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -90,10 +93,7 @@ class GameResultViewPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: PlayWithMeAppBar.build(
-        context: context,
-        title: l10n.gameResults,
-      ),
+      appBar: PlayWithMeAppBar.build(context: context, title: l10n.gameResults),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -112,9 +112,9 @@ class GameResultViewPage extends StatelessWidget {
             Text(
               l10n.individualGames,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.secondary,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: AppColors.secondary,
+              ),
             ),
             const SizedBox(height: 16),
             ...result.games.asMap().entries.map((entry) {
@@ -160,7 +160,9 @@ class _EloUpdatesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final playersWithElo = playerIds.where((id) => playerEloUpdates[id] != null).toList();
+    final playersWithElo = playerIds
+        .where((id) => playerEloUpdates[id] != null)
+        .toList();
 
     if (playersWithElo.isEmpty) return const SizedBox.shrink();
 
@@ -177,9 +179,9 @@ class _EloUpdatesCard extends StatelessWidget {
                 Text(
                   l10n.eloRatingChanges,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
                 ),
               ],
             ),
@@ -207,9 +209,8 @@ class _EloUpdatesCard extends StatelessWidget {
                           flex: 3,
                           child: Text(
                             playerName,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -219,9 +220,8 @@ class _EloUpdatesCard extends StatelessWidget {
                           flex: 2,
                           child: Text(
                             '$oldRating',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.grey[600],
-                                ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: Colors.grey[600]),
                             textAlign: TextAlign.right,
                           ),
                         ),
@@ -241,7 +241,8 @@ class _EloUpdatesCard extends StatelessWidget {
                           flex: 2,
                           child: Text(
                             '$newRating',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: isGain
                                       ? Colors.green
@@ -274,9 +275,8 @@ class _EloUpdatesCard extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 2.0),
                         child: Text(
                           l10n.winsLosses(record.wins, record.losses),
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
                         ),
                       ),
                   ],
@@ -355,9 +355,9 @@ class _IndividualGameCard extends StatelessWidget {
                 Text(
                   l10n.gameNumber(gameNumber),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
                 ),
               ],
             ),
@@ -378,9 +378,9 @@ class _IndividualGameCard extends StatelessWidget {
                 Text(
                   l10n.setsScore(setsWon['teamA'] ?? 0, setsWon['teamB'] ?? 0),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.secondary,
-                      ),
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.secondary,
+                  ),
                 ),
               ],
             ),
@@ -402,9 +402,9 @@ class _IndividualGameCard extends StatelessWidget {
                       child: Text(
                         l10n.setNumber(set.setNumber),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.secondary,
-                            ),
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.secondary,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -441,8 +441,7 @@ class _IndividualGameCard extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               '-',
                               style: TextStyle(
@@ -517,10 +516,9 @@ class _TeamMatchupRow extends StatelessWidget {
           child: Text(
             teamALabel,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight:
-                      teamAWon ? FontWeight.bold : FontWeight.normal,
-                  color: teamAWon ? AppColors.secondary : Colors.grey[600],
-                ),
+              fontWeight: teamAWon ? FontWeight.bold : FontWeight.normal,
+              color: teamAWon ? AppColors.secondary : Colors.grey[600],
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -528,9 +526,9 @@ class _TeamMatchupRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 6),
           child: Text(
             'vs',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[500],
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
           ),
         ),
         Expanded(
@@ -538,10 +536,9 @@ class _TeamMatchupRow extends StatelessWidget {
             teamBLabel,
             textAlign: TextAlign.right,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight:
-                      teamBWon ? FontWeight.bold : FontWeight.normal,
-                  color: teamBWon ? AppColors.secondary : Colors.grey[600],
-                ),
+              fontWeight: teamBWon ? FontWeight.bold : FontWeight.normal,
+              color: teamBWon ? AppColors.secondary : Colors.grey[600],
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),

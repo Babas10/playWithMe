@@ -52,8 +52,7 @@ class MockInvitationRepository implements InvitationRepository {
     required String invitedBy,
     required String inviterName,
   }) async {
-    final invitationId =
-        'invitation-${DateTime.now().millisecondsSinceEpoch}';
+    final invitationId = 'invitation-${DateTime.now().millisecondsSinceEpoch}';
     final invitation = InvitationModel(
       id: invitationId,
       groupId: groupId,
@@ -72,16 +71,18 @@ class MockInvitationRepository implements InvitationRepository {
   @override
   Stream<List<InvitationModel>> getPendingInvitations(String userId) async* {
     // Immediately yield the current value
-    yield _getUserInvitations(userId)
-        .where((inv) => inv.status == InvitationStatus.pending)
-        .toList();
+    yield _getUserInvitations(
+      userId,
+    ).where((inv) => inv.status == InvitationStatus.pending).toList();
 
     // Then continue listening for future updates
     yield* _invitationsController.stream.map(
       (invitations) => invitations
-          .where((inv) =>
-              inv.invitedUserId == userId &&
-              inv.status == InvitationStatus.pending)
+          .where(
+            (inv) =>
+                inv.invitedUserId == userId &&
+                inv.status == InvitationStatus.pending,
+          )
           .toList(),
     );
   }
@@ -144,8 +145,7 @@ class MockInvitationRepository implements InvitationRepository {
     required String groupId,
   }) async {
     return _getUserInvitations(userId).any(
-      (inv) =>
-          inv.groupId == groupId && inv.status == InvitationStatus.pending,
+      (inv) => inv.groupId == groupId && inv.status == InvitationStatus.pending,
     );
   }
 

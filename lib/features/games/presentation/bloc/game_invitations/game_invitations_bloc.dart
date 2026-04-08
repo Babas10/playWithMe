@@ -14,8 +14,8 @@ class GameInvitationsBloc
   final GameInvitationsRepository _repository;
 
   GameInvitationsBloc({required GameInvitationsRepository repository})
-      : _repository = repository,
-        super(const GameInvitationsInitial()) {
+    : _repository = repository,
+      super(const GameInvitationsInitial()) {
     on<LoadGameInvitations>(_onLoadGameInvitations);
     on<AcceptGameInvitation>(_onAcceptGameInvitation);
     on<DeclineGameInvitation>(_onDeclineGameInvitation);
@@ -50,15 +50,26 @@ class GameInvitationsBloc
         orElse: () => current.first,
       );
       await _repository.acceptGameInvitation(event.invitationId);
-      final updated =
-          current.where((i) => i.invitationId != event.invitationId).toList();
-      emit(GameInvitationActionSuccess(updated, event.invitationId,
-          accepted: true, gameId: accepted.gameId));
+      final updated = current
+          .where((i) => i.invitationId != event.invitationId)
+          .toList();
+      emit(
+        GameInvitationActionSuccess(
+          updated,
+          event.invitationId,
+          accepted: true,
+          gameId: accepted.gameId,
+        ),
+      );
     } on GameInvitationException catch (e) {
       emit(GameInvitationActionError(current, e.message, errorCode: e.code));
     } catch (e) {
-      emit(GameInvitationActionError(
-          current, 'Failed to accept invitation: ${e.toString()}'));
+      emit(
+        GameInvitationActionError(
+          current,
+          'Failed to accept invitation: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -72,15 +83,25 @@ class GameInvitationsBloc
     emit(GameInvitationActionInFlight(current, event.invitationId));
     try {
       await _repository.declineGameInvitation(event.invitationId);
-      final updated =
-          current.where((i) => i.invitationId != event.invitationId).toList();
-      emit(GameInvitationActionSuccess(updated, event.invitationId,
-          accepted: false));
+      final updated = current
+          .where((i) => i.invitationId != event.invitationId)
+          .toList();
+      emit(
+        GameInvitationActionSuccess(
+          updated,
+          event.invitationId,
+          accepted: false,
+        ),
+      );
     } on GameInvitationException catch (e) {
       emit(GameInvitationActionError(current, e.message, errorCode: e.code));
     } catch (e) {
-      emit(GameInvitationActionError(
-          current, 'Failed to decline invitation: ${e.toString()}'));
+      emit(
+        GameInvitationActionError(
+          current,
+          'Failed to decline invitation: ${e.toString()}',
+        ),
+      );
     }
   }
 

@@ -24,18 +24,32 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 
 // Mocktail mocks
 class MockAuthRepository extends Mock implements AuthRepository {}
+
 class MockUserRepository extends Mock implements UserRepository {}
+
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
-class MockImageStorageRepository extends Mock implements ImageStorageRepository {}
+
+class MockImageStorageRepository extends Mock
+    implements ImageStorageRepository {}
+
 class MockImagePickerService extends Mock implements ImagePickerService {}
-class MockLocalePreferencesRepository extends Mock implements LocalePreferencesRepository {}
+
+class MockLocalePreferencesRepository extends Mock
+    implements LocalePreferencesRepository {}
+
 class MockLocalePreferencesBloc extends Mock implements LocalePreferencesBloc {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 // Fakes for fallback values
-class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntity {}
-class FakeLocalePreferencesEvent extends Fake implements LocalePreferencesEvent {}
-class FakeLocalePreferencesState extends Fake implements LocalePreferencesState {}
+class FakeLocalePreferencesEntity extends Fake
+    implements LocalePreferencesEntity {}
+
+class FakeLocalePreferencesEvent extends Fake
+    implements LocalePreferencesEvent {}
+
+class FakeLocalePreferencesState extends Fake
+    implements LocalePreferencesState {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
@@ -57,40 +71,30 @@ void main() {
     final mockLocalePrefs = MockLocalePreferencesRepository();
 
     // Stub the locale preferences repository with default behavior
-    when(() => mockLocalePrefs.loadPreferences()).thenAnswer(
-      (_) async => LocalePreferencesEntity.defaultPreferences(),
-    );
-    when(() => mockLocalePrefs.savePreferences(any())).thenAnswer(
-      (_) async {},
-    );
-    when(() => mockLocalePrefs.syncToFirestore(any(), any())).thenAnswer(
-      (_) async {},
-    );
-    when(() => mockLocalePrefs.loadFromFirestore(any())).thenAnswer(
-      (_) async => null,
-    );
+    when(
+      () => mockLocalePrefs.loadPreferences(),
+    ).thenAnswer((_) async => LocalePreferencesEntity.defaultPreferences());
+    when(() => mockLocalePrefs.savePreferences(any())).thenAnswer((_) async {});
+    when(
+      () => mockLocalePrefs.syncToFirestore(any(), any()),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockLocalePrefs.loadFromFirestore(any()),
+    ).thenAnswer((_) async => null);
     when(() => mockLocalePrefs.getDeviceTimeZone()).thenReturn('UTC');
 
     // Register GetIt services for ProfileEditPage, AvatarUploadWidget and LocalePreferences
     if (!sl.isRegistered<AuthRepository>()) {
-      sl.registerLazySingleton<AuthRepository>(
-        () => mockAuthRepo,
-      );
+      sl.registerLazySingleton<AuthRepository>(() => mockAuthRepo);
     }
     if (!sl.isRegistered<UserRepository>()) {
-      sl.registerLazySingleton<UserRepository>(
-        () => mockUserRepo,
-      );
+      sl.registerLazySingleton<UserRepository>(() => mockUserRepo);
     }
     if (!sl.isRegistered<ImageStorageRepository>()) {
-      sl.registerLazySingleton<ImageStorageRepository>(
-        () => mockImageStorage,
-      );
+      sl.registerLazySingleton<ImageStorageRepository>(() => mockImageStorage);
     }
     if (!sl.isRegistered<ImagePickerService>()) {
-      sl.registerLazySingleton<ImagePickerService>(
-        () => mockImagePicker,
-      );
+      sl.registerLazySingleton<ImagePickerService>(() => mockImagePicker);
     }
     if (!sl.isRegistered<LocalePreferencesRepository>()) {
       sl.registerLazySingleton<LocalePreferencesRepository>(
@@ -105,7 +109,9 @@ void main() {
     mockLocalePrefsBloc = MockLocalePreferencesBloc();
     mockInvitationBloc = MockInvitationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
 
     // Stub the locale preferences bloc with default behavior
     when(() => mockLocalePrefsBloc.state).thenReturn(
@@ -142,7 +148,9 @@ void main() {
           providers: [
             BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
             BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
-            BlocProvider<LocalePreferencesBloc>.value(value: mockLocalePrefsBloc),
+            BlocProvider<LocalePreferencesBloc>.value(
+              value: mockLocalePrefsBloc,
+            ),
           ],
           child: ProfileEditPage(user: user),
         ),
@@ -180,7 +188,9 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
     });
 
-    testWidgets('displays user without displayName using email', (tester) async {
+    testWidgets('displays user without displayName using email', (
+      tester,
+    ) async {
       final userWithoutName = testUser.copyWith(displayName: null);
 
       await tester.pumpWidget(createWidgetUnderTest(userWithoutName));
@@ -190,7 +200,9 @@ void main() {
       expect(find.text('test@example.com'), findsOneWidget);
     });
 
-    testWidgets('Save button is initially disabled with no changes', (tester) async {
+    testWidgets('Save button is initially disabled with no changes', (
+      tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(testUser));
       await tester.pumpAndSettle();
 
@@ -205,7 +217,9 @@ void main() {
       expect(filledButton, findsOneWidget);
     });
 
-    testWidgets('displays validation error for short display name', (tester) async {
+    testWidgets('displays validation error for short display name', (
+      tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(testUser));
       await tester.pumpAndSettle();
 
@@ -220,10 +234,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify error message appears
-      expect(find.text('Display name must be at least 3 characters'), findsOneWidget);
+      expect(
+        find.text('Display name must be at least 3 characters'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('displays validation error for empty display name', (tester) async {
+    testWidgets('displays validation error for empty display name', (
+      tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(testUser));
       await tester.pumpAndSettle();
 
@@ -241,7 +260,9 @@ void main() {
       expect(find.text('Display name cannot be empty'), findsOneWidget);
     });
 
-    testWidgets('Save button becomes enabled after valid changes', (tester) async {
+    testWidgets('Save button becomes enabled after valid changes', (
+      tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(testUser));
       await tester.pumpAndSettle();
 
@@ -281,10 +302,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Now Save button should appear in AppBar
-      expect(find.descendant(
-        of: find.byType(AppBar),
-        matching: find.text('Save'),
-      ), findsOneWidget);
+      expect(
+        find.descendant(of: find.byType(AppBar), matching: find.text('Save')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays avatar upload widget', (tester) async {
@@ -300,7 +321,9 @@ void main() {
     });
 
     group('Avatar Upload Integration', () {
-      testWidgets('shows camera icon button when not uploading', (tester) async {
+      testWidgets('shows camera icon button when not uploading', (
+        tester,
+      ) async {
         await tester.pumpWidget(createWidgetUnderTest(testUser));
         await tester.pumpAndSettle();
 
@@ -309,7 +332,9 @@ void main() {
         expect(cameraIcon, findsOneWidget);
       });
 
-      testWidgets('camera button opens image source selection dialog', (tester) async {
+      testWidgets('camera button opens image source selection dialog', (
+        tester,
+      ) async {
         await tester.pumpWidget(createWidgetUnderTest(testUser));
         await tester.pumpAndSettle();
 
@@ -325,7 +350,9 @@ void main() {
         expect(find.text('Cancel'), findsWidgets);
       });
 
-      testWidgets('shows delete button when user has current photo', (tester) async {
+      testWidgets('shows delete button when user has current photo', (
+        tester,
+      ) async {
         await tester.pumpWidget(createWidgetUnderTest(testUser));
         await tester.pumpAndSettle();
 
@@ -333,7 +360,9 @@ void main() {
         expect(find.text('Remove Avatar'), findsOneWidget);
       });
 
-      testWidgets('does not show delete button when user has no photo', (tester) async {
+      testWidgets('does not show delete button when user has no photo', (
+        tester,
+      ) async {
         final userWithoutPhoto = testUser.copyWith(photoUrl: null);
         await tester.pumpWidget(createWidgetUnderTest(userWithoutPhoto));
         await tester.pumpAndSettle();
@@ -351,12 +380,17 @@ void main() {
         await tester.pumpAndSettle();
 
         // Verify confirmation dialog appears
-        expect(find.text('Are you sure you want to remove your avatar?'), findsOneWidget);
+        expect(
+          find.text('Are you sure you want to remove your avatar?'),
+          findsOneWidget,
+        );
         expect(find.widgetWithText(TextButton, 'Cancel'), findsOneWidget);
         expect(find.widgetWithText(FilledButton, 'Remove'), findsOneWidget);
       });
 
-      testWidgets('displays network image when user has photo URL', (tester) async {
+      testWidgets('displays network image when user has photo URL', (
+        tester,
+      ) async {
         await tester.pumpWidget(createWidgetUnderTest(testUser));
         await tester.pumpAndSettle();
 
@@ -371,7 +405,9 @@ void main() {
         expect(networkImage.url, testUser.photoUrl);
       });
 
-      testWidgets('displays default icon when user has no photo', (tester) async {
+      testWidgets('displays default icon when user has no photo', (
+        tester,
+      ) async {
         final userWithoutPhoto = testUser.copyWith(photoUrl: null);
         await tester.pumpWidget(createWidgetUnderTest(userWithoutPhoto));
         await tester.pumpAndSettle();
@@ -386,7 +422,9 @@ void main() {
         expect(circleAvatar.child, isA<Icon>());
       });
 
-      testWidgets('avatar upload widget is enabled when form is editable', (tester) async {
+      testWidgets('avatar upload widget is enabled when form is editable', (
+        tester,
+      ) async {
         await tester.pumpWidget(createWidgetUnderTest(testUser));
         await tester.pumpAndSettle();
 
@@ -404,7 +442,9 @@ void main() {
     });
 
     group('Form Integration with Avatar Upload', () {
-      testWidgets('changing display name and avatar both enable save button', (tester) async {
+      testWidgets('changing display name and avatar both enable save button', (
+        tester,
+      ) async {
         await tester.pumpWidget(createWidgetUnderTest(testUser));
         await tester.pumpAndSettle();
 
@@ -442,7 +482,9 @@ void main() {
     });
 
     group('Country Dropdown ISO Code Handling (Bug #449)', () {
-      testWidgets('renders without crash when country is an ISO code', (tester) async {
+      testWidgets('renders without crash when country is an ISO code', (
+        tester,
+      ) async {
         // Simulate the bug scenario: stored country preference is 'ES' (ISO code)
         final isoPreferences = const LocalePreferencesEntity(
           locale: Locale('es'),
@@ -474,7 +516,9 @@ void main() {
         expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
       });
 
-      testWidgets('falls back to default country when value is unrecognized', (tester) async {
+      testWidgets('falls back to default country when value is unrecognized', (
+        tester,
+      ) async {
         final unknownPreferences = const LocalePreferencesEntity(
           locale: Locale('en'),
           country: 'UNKNOWN',
@@ -504,7 +548,9 @@ void main() {
         expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
       });
 
-      testWidgets('displays correct country when value is a valid name', (tester) async {
+      testWidgets('displays correct country when value is a valid name', (
+        tester,
+      ) async {
         final validPreferences = const LocalePreferencesEntity(
           locale: Locale('es'),
           country: 'Spain',

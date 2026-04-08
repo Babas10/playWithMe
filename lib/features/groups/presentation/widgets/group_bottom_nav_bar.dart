@@ -34,7 +34,10 @@ class GroupBottomNavBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: Icon(Icons.sports_volleyball, color: AppColors.secondary),
+                  leading: Icon(
+                    Icons.sports_volleyball,
+                    color: AppColors.secondary,
+                  ),
                   title: Text(
                     l10n.createGame,
                     style: TextStyle(
@@ -44,7 +47,9 @@ class GroupBottomNavBar extends StatelessWidget {
                   ),
                   subtitle: Text(
                     l10n.competitiveGameWithElo,
-                    style: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+                    style: TextStyle(
+                      color: AppColors.secondary.withValues(alpha: 0.7),
+                    ),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -52,7 +57,10 @@ class GroupBottomNavBar extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.fitness_center, color: AppColors.secondary),
+                  leading: Icon(
+                    Icons.fitness_center,
+                    color: AppColors.secondary,
+                  ),
                   title: Text(
                     l10n.createTrainingSession,
                     style: TextStyle(
@@ -62,7 +70,9 @@ class GroupBottomNavBar extends StatelessWidget {
                   ),
                   subtitle: Text(
                     l10n.practiceSessionNoElo,
-                    style: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+                    style: TextStyle(
+                      color: AppColors.secondary.withValues(alpha: 0.7),
+                    ),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -110,10 +120,7 @@ class GroupBottomNavBar extends StatelessWidget {
           tooltip: isAdmin ? l10n.inviteMembers : l10n.adminOnly,
         ),
         BottomNavigationBarItem(
-          icon: Icon(
-            Icons.add_circle,
-            color: AppColors.primary,
-          ),
+          icon: Icon(Icons.add_circle, color: AppColors.primary),
           label: l10n.create,
           tooltip: l10n.createGameOrTraining,
         ),
@@ -121,10 +128,7 @@ class GroupBottomNavBar extends StatelessWidget {
           icon: Badge(
             label: Text(upcomingGamesCount > 9 ? '9+' : '$upcomingGamesCount'),
             isLabelVisible: upcomingGamesCount > 0,
-            child: Icon(
-              Icons.list,
-              color: AppColors.primary,
-            ),
+            child: Icon(Icons.list, color: AppColors.primary),
           ),
           label: l10n.activities,
           tooltip: l10n.viewAllActivities,

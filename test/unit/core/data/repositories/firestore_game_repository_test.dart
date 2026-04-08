@@ -171,8 +171,10 @@ void main() {
         final game = createTestGame(title: 'Existing Game');
         final existingId = await repository.createGame(game);
 
-        final games =
-            await repository.getGamesByIds([existingId, 'non-existent-id']);
+        final games = await repository.getGamesByIds([
+          existingId,
+          'non-existent-id',
+        ]);
 
         expect(games.length, 1);
         expect(games.first.title, 'Existing Game');
@@ -213,8 +215,10 @@ void main() {
     group('getGamesForGroup', () {
       test('returns stream of games for group', () async {
         final game1 = createTestGame(title: 'Group Game', groupId: 'group-123');
-        final game2 =
-            createTestGame(title: 'Other Group', groupId: 'group-456');
+        final game2 = createTestGame(
+          title: 'Other Group',
+          groupId: 'group-456',
+        );
         await repository.createGame(game1);
         await repository.createGame(game2);
 
@@ -257,11 +261,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.updateGameInfo('non-existent', title: 'New Title'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
@@ -304,11 +306,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.updateGameSettings('non-existent', maxPlayers: 10),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
@@ -344,11 +344,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.addPlayer('non-existent', 'user-123'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
@@ -374,7 +372,9 @@ void main() {
 
         final updatedGame = await repository.getGameById(gameId);
         expect(
-            updatedGame!.playerIds.where((id) => id == 'user-123').length, 1);
+          updatedGame!.playerIds.where((id) => id == 'user-123').length,
+          1,
+        );
       });
     });
 
@@ -395,11 +395,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.removePlayer('non-existent', 'user-123'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
@@ -438,11 +436,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.startGame('non-existent'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
@@ -480,11 +476,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.endGame('non-existent'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
@@ -530,11 +524,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.cancelGame('non-existent'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
@@ -566,11 +558,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.markGameAsCompleted('non-existent', 'user-123'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
@@ -580,11 +570,13 @@ void main() {
 
         await expectLater(
           repository.markGameAsCompleted(gameId, 'user-456'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'permission-denied',
-          )),
+          throwsA(
+            isA<GameException>().having(
+              (e) => e.code,
+              'code',
+              'permission-denied',
+            ),
+          ),
         );
       });
 
@@ -597,11 +589,13 @@ void main() {
 
         await expectLater(
           repository.markGameAsCompleted(gameId, 'user-123'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'already-completed',
-          )),
+          throwsA(
+            isA<GameException>().having(
+              (e) => e.code,
+              'code',
+              'already-completed',
+            ),
+          ),
         );
       });
 
@@ -614,11 +608,9 @@ void main() {
 
         await expectLater(
           repository.markGameAsCompleted(gameId, 'user-123'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'invalid-state',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'invalid-state'),
+          ),
         );
       });
     });
@@ -652,35 +644,37 @@ void main() {
 
         await expectLater(
           repository.updateGameTeams('non-existent', 'user-123', teams),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
-      test('throws GameException when user is not participant or creator',
-          () async {
-        final testGame = createTestGame(
-          createdBy: 'user-123',
-          playerIds: const ['user-1', 'user-2'],
-        );
-        final gameId = await repository.createGame(testGame);
-        const teams = GameTeams(
-          teamAPlayerIds: ['user-1'],
-          teamBPlayerIds: ['user-2'],
-        );
+      test(
+        'throws GameException when user is not participant or creator',
+        () async {
+          final testGame = createTestGame(
+            createdBy: 'user-123',
+            playerIds: const ['user-1', 'user-2'],
+          );
+          final gameId = await repository.createGame(testGame);
+          const teams = GameTeams(
+            teamAPlayerIds: ['user-1'],
+            teamBPlayerIds: ['user-2'],
+          );
 
-        await expectLater(
-          repository.updateGameTeams(gameId, 'user-999', teams),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'permission-denied',
-          )),
-        );
-      });
+          await expectLater(
+            repository.updateGameTeams(gameId, 'user-999', teams),
+            throwsA(
+              isA<GameException>().having(
+                (e) => e.code,
+                'code',
+                'permission-denied',
+              ),
+            ),
+          );
+        },
+      );
 
       test('throws GameException when player on both teams', () async {
         final testGame = createTestGame(
@@ -695,11 +689,13 @@ void main() {
 
         await expectLater(
           repository.updateGameTeams(gameId, 'user-123', teams),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'invalid-argument',
-          )),
+          throwsA(
+            isA<GameException>().having(
+              (e) => e.code,
+              'code',
+              'invalid-argument',
+            ),
+          ),
         );
       });
 
@@ -716,11 +712,13 @@ void main() {
 
         await expectLater(
           repository.updateGameTeams(gameId, 'user-123', teams),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'invalid-argument',
-          )),
+          throwsA(
+            isA<GameException>().having(
+              (e) => e.code,
+              'code',
+              'invalid-argument',
+            ),
+          ),
         );
       });
 
@@ -738,11 +736,9 @@ void main() {
 
         await expectLater(
           repository.updateGameTeams(gameId, 'user-123', teams),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'invalid-state',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'invalid-state'),
+          ),
         );
       });
     });
@@ -770,21 +766,23 @@ void main() {
 
         await expectLater(
           repository.updateScores('non-existent', scores),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
     });
 
     group('getGamesByStatus', () {
       test('returns games with matching status', () async {
-        final scheduledGame =
-            createTestGame(title: 'Scheduled', status: GameStatus.scheduled);
-        final completedGame =
-            createTestGame(title: 'Completed', status: GameStatus.completed);
+        final scheduledGame = createTestGame(
+          title: 'Scheduled',
+          status: GameStatus.scheduled,
+        );
+        final completedGame = createTestGame(
+          title: 'Completed',
+          status: GameStatus.completed,
+        );
         await repository.createGame(scheduledGame);
         await repository.createGame(completedGame);
 
@@ -812,8 +810,10 @@ void main() {
           await repository.createGame(game);
         }
 
-        final games =
-            await repository.getGamesByStatus(GameStatus.scheduled, limit: 3);
+        final games = await repository.getGamesByStatus(
+          GameStatus.scheduled,
+          limit: 3,
+        );
 
         expect(games.length, 3);
       });
@@ -864,8 +864,9 @@ void main() {
       });
 
       test('returns empty list when game does not exist', () async {
-        final participants =
-            await repository.getGameParticipants('non-existent');
+        final participants = await repository.getGameParticipants(
+          'non-existent',
+        );
         expect(participants, isEmpty);
       });
     });
@@ -904,8 +905,10 @@ void main() {
       });
 
       test('returns false when game does not exist', () async {
-        final canJoin =
-            await repository.canUserJoinGame('non-existent', 'user-1');
+        final canJoin = await repository.canUserJoinGame(
+          'non-existent',
+          'user-1',
+        );
         expect(canJoin, false);
       });
 
@@ -950,10 +953,7 @@ void main() {
       });
 
       test('does not throw when deleting non-existent game', () async {
-        await expectLater(
-          repository.deleteGame('non-existent'),
-          completes,
-        );
+        await expectLater(repository.deleteGame('non-existent'), completes);
       });
     });
 
@@ -997,11 +997,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.getGameStats('non-existent'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
     });
@@ -1031,13 +1029,21 @@ void main() {
         final now = DateTime.now();
         final todayGame = createTestGame(
           title: 'Today Game',
-          scheduledAt:
-              DateTime(now.year, now.month, now.day, 14, 0), // Today at 2pm
+          scheduledAt: DateTime(
+            now.year,
+            now.month,
+            now.day,
+            14,
+            0,
+          ), // Today at 2pm
         );
         final tomorrowGame = createTestGame(
           title: 'Tomorrow Game',
-          scheduledAt: DateTime(now.year, now.month, now.day)
-              .add(const Duration(days: 1, hours: 10)),
+          scheduledAt: DateTime(
+            now.year,
+            now.month,
+            now.day,
+          ).add(const Duration(days: 1, hours: 10)),
         );
         await repository.createGame(todayGame);
         await repository.createGame(tomorrowGame);
@@ -1173,14 +1179,15 @@ void main() {
           final game = createTestGame(
             title: 'Past Game $i',
             playerIds: const ['user-123'],
-            scheduledAt:
-                DateTime.now().subtract(Duration(days: i + 1)),
+            scheduledAt: DateTime.now().subtract(Duration(days: i + 1)),
           );
           await repository.createGame(game);
         }
 
-        final games =
-            await repository.getPastGamesForUser('user-123', limit: 3);
+        final games = await repository.getPastGamesForUser(
+          'user-123',
+          limit: 3,
+        );
 
         expect(games.length, 3);
       });
@@ -1188,42 +1195,38 @@ void main() {
 
     group('updateGameResult', () {
       test('throws GameException when game not found', () async {
-        const result = GameResult(
-          games: [],
-          overallWinner: 'teamA',
-        );
+        const result = GameResult(games: [], overallWinner: 'teamA');
 
         await expectLater(
           repository.updateGameResult('non-existent', 'user-123', result),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
-      test('throws GameException when user is not participant or creator',
-          () async {
-        final testGame = createTestGame(
-          createdBy: 'user-123',
-          playerIds: const ['user-1', 'user-2'],
-        );
-        final gameId = await repository.createGame(testGame);
-        const result = GameResult(
-          games: [],
-          overallWinner: 'teamA',
-        );
+      test(
+        'throws GameException when user is not participant or creator',
+        () async {
+          final testGame = createTestGame(
+            createdBy: 'user-123',
+            playerIds: const ['user-1', 'user-2'],
+          );
+          final gameId = await repository.createGame(testGame);
+          const result = GameResult(games: [], overallWinner: 'teamA');
 
-        await expectLater(
-          repository.updateGameResult(gameId, 'user-999', result),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'permission-denied',
-          )),
-        );
-      });
+          await expectLater(
+            repository.updateGameResult(gameId, 'user-999', result),
+            throwsA(
+              isA<GameException>().having(
+                (e) => e.code,
+                'code',
+                'permission-denied',
+              ),
+            ),
+          );
+        },
+      );
 
       test('throws GameException when game is cancelled', () async {
         final testGame = createTestGame(
@@ -1232,18 +1235,13 @@ void main() {
           status: GameStatus.cancelled,
         );
         final gameId = await repository.createGame(testGame);
-        const result = GameResult(
-          games: [],
-          overallWinner: 'teamA',
-        );
+        const result = GameResult(games: [], overallWinner: 'teamA');
 
         await expectLater(
           repository.updateGameResult(gameId, 'user-123', result),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'invalid-state',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'invalid-state'),
+          ),
         );
       });
 
@@ -1254,18 +1252,17 @@ void main() {
           status: GameStatus.inProgress,
         );
         final gameId = await repository.createGame(testGame);
-        const result = GameResult(
-          games: [],
-          overallWinner: 'teamA',
-        );
+        const result = GameResult(games: [], overallWinner: 'teamA');
 
         await expectLater(
           repository.updateGameResult(gameId, 'user-123', result),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'failed-precondition',
-          )),
+          throwsA(
+            isA<GameException>().having(
+              (e) => e.code,
+              'code',
+              'failed-precondition',
+            ),
+          ),
         );
       });
     });
@@ -1274,11 +1271,9 @@ void main() {
       test('throws GameException when game not found', () async {
         await expectLater(
           repository.confirmGameResult('non-existent', 'user-123'),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
     });
@@ -1289,10 +1284,7 @@ void main() {
           teamAPlayerIds: ['user-1'],
           teamBPlayerIds: ['user-2'],
         );
-        const result = GameResult(
-          games: [],
-          overallWinner: 'teamA',
-        );
+        const result = GameResult(games: [], overallWinner: 'teamA');
 
         await expectLater(
           repository.saveGameResult(
@@ -1301,11 +1293,9 @@ void main() {
             teams: teams,
             result: result,
           ),
-          throwsA(isA<GameException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<GameException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
     });

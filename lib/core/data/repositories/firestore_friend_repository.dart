@@ -16,10 +16,12 @@ class FirestoreFriendRepository implements FriendRepository {
   final FirebaseAuth _auth;
 
   /// Cache for batchCheckFriendship results: uid → (isFriend, fetchedAt). TTL: 5 minutes.
-  final Map<String, ({bool isFriend, DateTime fetchedAt})> _friendshipCache = {};
+  final Map<String, ({bool isFriend, DateTime fetchedAt})> _friendshipCache =
+      {};
 
   /// Cache for batchCheckFriendRequestStatus results: uid → (status, fetchedAt). TTL: 5 minutes.
-  final Map<String, ({FriendRequestStatus status, DateTime fetchedAt})> _requestStatusCache = {};
+  final Map<String, ({FriendRequestStatus status, DateTime fetchedAt})>
+  _requestStatusCache = {};
 
   static const Duration _friendshipCacheTtl = Duration(minutes: 5);
 
@@ -31,9 +33,9 @@ class FirestoreFriendRepository implements FriendRepository {
     required FirebaseFunctions functions,
     required FirebaseFirestore firestore,
     required FirebaseAuth auth,
-  })  : _functions = functions,
-        _firestore = firestore,
-        _auth = auth;
+  }) : _functions = functions,
+       _firestore = firestore,
+       _auth = auth;
 
   @override
   Future<String> sendFriendRequest(String targetUserId) async {
@@ -80,7 +82,9 @@ class FirestoreFriendRepository implements FriendRepository {
           code: 'not-found',
         );
       }
-      throw FriendshipException('Failed to accept friend request: ${e.message}');
+      throw FriendshipException(
+        'Failed to accept friend request: ${e.message}',
+      );
     } catch (e) {
       throw FriendshipException('Failed to accept friend request: $e');
     }
@@ -118,7 +122,9 @@ class FirestoreFriendRepository implements FriendRepository {
           code: 'not-found',
         );
       }
-      throw FriendshipException('Failed to decline friend request: ${e.message}');
+      throw FriendshipException(
+        'Failed to decline friend request: ${e.message}',
+      );
     } catch (e) {
       throw FriendshipException('Failed to decline friend request: $e');
     }
@@ -148,10 +154,7 @@ class FirestoreFriendRepository implements FriendRepository {
           code: 'permission-denied',
         );
       } else if (e.code == 'not-found') {
-        throw FriendshipException(
-          'Friendship not found',
-          code: 'not-found',
-        );
+        throw FriendshipException('Friendship not found', code: 'not-found');
       }
       throw FriendshipException('Failed to remove friend: ${e.message}');
     } catch (e) {
@@ -162,55 +165,55 @@ class FirestoreFriendRepository implements FriendRepository {
   @override
   Future<List<UserEntity>> getFriends(String userId) {
     return PerformanceTracer.trace('repo_get_friends', () async {
-    try {
-      // Story 11.13: Use Cloud Function to fetch friends
-      // Following Epic 11's Cloud Function-first architecture
-      final currentUserId = _auth.currentUser?.uid;
-      if (currentUserId == null) {
-        throw FriendshipException('User not authenticated');
+      try {
+        // Story 11.13: Use Cloud Function to fetch friends
+        // Following Epic 11's Cloud Function-first architecture
+        final currentUserId = _auth.currentUser?.uid;
+        if (currentUserId == null) {
+          throw FriendshipException('User not authenticated');
+        }
+
+        // Only the current user can fetch their own friends list
+        if (userId != currentUserId) {
+          throw FriendshipException(
+            'You can only view your own friends list',
+            code: 'permission-denied',
+          );
+        }
+
+        // Call Cloud Function to get friends (uses Admin SDK on backend)
+        final callable = _functions.httpsCallable('getFriends');
+        final result = await callable.call({'userId': userId});
+
+        final data = Map<String, dynamic>.from(result.data as Map);
+        final List<dynamic> friendsData = data['friends'] as List? ?? [];
+
+        // Parse friend profiles from Cloud Function response
+        return friendsData.map((json) {
+          final friendData = Map<String, dynamic>.from(json as Map);
+
+          return UserEntity(
+            uid: friendData['uid'] as String,
+            email: friendData['email'] as String,
+            displayName: friendData['displayName'] as String?,
+            photoUrl: friendData['photoUrl'] as String?,
+            isEmailVerified: friendData['isEmailVerified'] as bool? ?? false,
+            createdAt: friendData['createdAt'] != null
+                ? DateTime.parse(friendData['createdAt'] as String)
+                : null,
+            lastSignInAt: friendData['lastSignInAt'] != null
+                ? DateTime.parse(friendData['lastSignInAt'] as String)
+                : null,
+            isAnonymous: friendData['isAnonymous'] as bool? ?? false,
+          );
+        }).toList();
+      } on FirebaseFunctionsException catch (e) {
+        throw _handleError(e);
+      } on FriendshipException {
+        rethrow;
+      } catch (e) {
+        throw FriendshipException('Failed to get friends: $e');
       }
-
-      // Only the current user can fetch their own friends list
-      if (userId != currentUserId) {
-        throw FriendshipException(
-          'You can only view your own friends list',
-          code: 'permission-denied',
-        );
-      }
-
-      // Call Cloud Function to get friends (uses Admin SDK on backend)
-      final callable = _functions.httpsCallable('getFriends');
-      final result = await callable.call({'userId': userId});
-
-      final data = Map<String, dynamic>.from(result.data as Map);
-      final List<dynamic> friendsData = data['friends'] as List? ?? [];
-
-      // Parse friend profiles from Cloud Function response
-      return friendsData.map((json) {
-        final friendData = Map<String, dynamic>.from(json as Map);
-
-        return UserEntity(
-          uid: friendData['uid'] as String,
-          email: friendData['email'] as String,
-          displayName: friendData['displayName'] as String?,
-          photoUrl: friendData['photoUrl'] as String?,
-          isEmailVerified: friendData['isEmailVerified'] as bool? ?? false,
-          createdAt: friendData['createdAt'] != null
-              ? DateTime.parse(friendData['createdAt'] as String)
-              : null,
-          lastSignInAt: friendData['lastSignInAt'] != null
-              ? DateTime.parse(friendData['lastSignInAt'] as String)
-              : null,
-          isAnonymous: friendData['isAnonymous'] as bool? ?? false,
-        );
-      }).toList();
-    } on FirebaseFunctionsException catch (e) {
-      throw _handleError(e);
-    } on FriendshipException {
-      rethrow;
-    } catch (e) {
-      throw FriendshipException('Failed to get friends: $e');
-    }
     });
   }
 
@@ -261,8 +264,12 @@ class FirestoreFriendRepository implements FriendRepository {
           'recipientId': requestData['recipientId'],
           'recipientName': requestData['recipientName'],
           'status': requestData['status'],
-          'createdAt': parseTimestamp(requestData['createdAt']).toIso8601String(),
-          'updatedAt': parseTimestamp(requestData['updatedAt']).toIso8601String(),
+          'createdAt': parseTimestamp(
+            requestData['createdAt'],
+          ).toIso8601String(),
+          'updatedAt': parseTimestamp(
+            requestData['updatedAt'],
+          ).toIso8601String(),
         });
       }).toList();
     } on FirebaseFunctionsException catch (e) {
@@ -293,14 +300,13 @@ class FirestoreFriendRepository implements FriendRepository {
       }
 
       // Read current user's document to check cached friendIds
-      final userDoc =
-          await _firestore.collection('users').doc(currentUserId).get();
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(currentUserId)
+          .get();
 
       if (!userDoc.exists) {
-        throw FriendshipException(
-          'User not found',
-          code: 'not-found',
-        );
+        throw FriendshipException('User not found', code: 'not-found');
       }
 
       final userData = userDoc.data()!;
@@ -308,10 +314,7 @@ class FirestoreFriendRepository implements FriendRepository {
 
       // Check if already friends using cache
       if (friendIds.contains(userId)) {
-        return FriendshipStatusResult(
-          isFriend: true,
-          hasPendingRequest: false,
-        );
+        return FriendshipStatusResult(isFriend: true, hasPendingRequest: false);
       }
 
       // Not in cache, check for pending requests
@@ -332,17 +335,15 @@ class FirestoreFriendRepository implements FriendRepository {
           return FriendshipStatusResult(
             isFriend: false,
             hasPendingRequest: true,
-            requestDirection:
-                initiatorId == currentUserId ? 'sent' : 'received',
+            requestDirection: initiatorId == currentUserId
+                ? 'sent'
+                : 'received',
           );
         }
       }
 
       // No friendship or pending request
-      return FriendshipStatusResult(
-        isFriend: false,
-        hasPendingRequest: false,
-      );
+      return FriendshipStatusResult(isFriend: false, hasPendingRequest: false);
     } on FriendshipException {
       rethrow;
     } on FirebaseException catch (e) {
@@ -352,13 +353,11 @@ class FirestoreFriendRepository implements FriendRepository {
           code: 'permission-denied',
         );
       } else if (e.code == 'not-found') {
-        throw FriendshipException(
-          'User not found',
-          code: 'not-found',
-        );
+        throw FriendshipException('User not found', code: 'not-found');
       }
       throw FriendshipException(
-          'Failed to check friendship status: ${e.message}');
+        'Failed to check friendship status: ${e.message}',
+      );
     } catch (e) {
       throw FriendshipException('Failed to check friendship status: $e');
     }
@@ -367,47 +366,47 @@ class FirestoreFriendRepository implements FriendRepository {
   @override
   Future<UserSearchResult> searchUserByEmail(String email) {
     return PerformanceTracer.trace('repo_search_user_by_email', () async {
-    try {
-      final callable = _functions.httpsCallable('searchUserByEmail');
-      final result = await callable.call({'email': email});
+      try {
+        final callable = _functions.httpsCallable('searchUserByEmail');
+        final result = await callable.call({'email': email});
 
-      // Convert result.data to Map<String, dynamic> safely
-      final data = Map<String, dynamic>.from(result.data as Map);
+        // Convert result.data to Map<String, dynamic> safely
+        final data = Map<String, dynamic>.from(result.data as Map);
 
-      // Parse user data if present
-      UserEntity? user;
-      if (data['user'] != null) {
-        // Convert nested map safely
-        final userDataRaw = data['user'];
-        final userData = Map<String, dynamic>.from(userDataRaw as Map);
+        // Parse user data if present
+        UserEntity? user;
+        if (data['user'] != null) {
+          // Convert nested map safely
+          final userDataRaw = data['user'];
+          final userData = Map<String, dynamic>.from(userDataRaw as Map);
 
-        user = UserEntity(
-          uid: userData['uid'] as String,
-          email: userData['email'] as String,
-          displayName: userData['displayName'] as String?,
-          photoUrl: userData['photoUrl'] as String?,
-          isEmailVerified: userData['isEmailVerified'] as bool? ?? false,
-          createdAt: userData['createdAt'] != null
-              ? DateTime.parse(userData['createdAt'] as String)
-              : null,
-          lastSignInAt: userData['lastSignInAt'] != null
-              ? DateTime.parse(userData['lastSignInAt'] as String)
-              : null,
-          isAnonymous: userData['isAnonymous'] as bool? ?? false,
+          user = UserEntity(
+            uid: userData['uid'] as String,
+            email: userData['email'] as String,
+            displayName: userData['displayName'] as String?,
+            photoUrl: userData['photoUrl'] as String?,
+            isEmailVerified: userData['isEmailVerified'] as bool? ?? false,
+            createdAt: userData['createdAt'] != null
+                ? DateTime.parse(userData['createdAt'] as String)
+                : null,
+            lastSignInAt: userData['lastSignInAt'] != null
+                ? DateTime.parse(userData['lastSignInAt'] as String)
+                : null,
+            isAnonymous: userData['isAnonymous'] as bool? ?? false,
+          );
+        }
+
+        return UserSearchResult(
+          user: user,
+          isFriend: data['isFriend'] as bool? ?? false,
+          hasPendingRequest: data['hasPendingRequest'] as bool? ?? false,
+          requestDirection: data['requestDirection'] as String?,
         );
+      } on FirebaseFunctionsException catch (e) {
+        throw _handleError(e);
+      } catch (e) {
+        throw FriendshipException('Failed to search user by email: $e');
       }
-
-      return UserSearchResult(
-        user: user,
-        isFriend: data['isFriend'] as bool? ?? false,
-        hasPendingRequest: data['hasPendingRequest'] as bool? ?? false,
-        requestDirection: data['requestDirection'] as String?,
-      );
-    } on FirebaseFunctionsException catch (e) {
-      throw _handleError(e);
-    } catch (e) {
-      throw FriendshipException('Failed to search user by email: $e');
-    }
     });
   }
 
@@ -446,7 +445,8 @@ class FirestoreFriendRepository implements FriendRepository {
       // Separate cache hits from misses
       final missing = userIds.where((id) {
         final cached = _friendshipCache[id];
-        return cached == null || now.difference(cached.fetchedAt) > _friendshipCacheTtl;
+        return cached == null ||
+            now.difference(cached.fetchedAt) > _friendshipCacheTtl;
       }).toList();
 
       if (missing.isNotEmpty) {
@@ -455,7 +455,9 @@ class FirestoreFriendRepository implements FriendRepository {
         final result = await callable.call({'userIds': missing});
 
         final data = Map<String, dynamic>.from(result.data as Map);
-        final friendships = Map<String, dynamic>.from(data['friendships'] as Map);
+        final friendships = Map<String, dynamic>.from(
+          data['friendships'] as Map,
+        );
 
         for (final entry in friendships.entries) {
           _friendshipCache[entry.key] = (
@@ -468,7 +470,8 @@ class FirestoreFriendRepository implements FriendRepository {
       // Return results for all requested userIds from cache
       return {
         for (final id in userIds)
-          if (_friendshipCache.containsKey(id)) id: _friendshipCache[id]!.isFriend,
+          if (_friendshipCache.containsKey(id))
+            id: _friendshipCache[id]!.isFriend,
       };
     } on FirebaseFunctionsException catch (e) {
       throw _handleError(e);
@@ -545,7 +548,8 @@ class FirestoreFriendRepository implements FriendRepository {
         );
       }
       throw FriendshipException(
-          'Failed to check friend request status: ${e.message}');
+        'Failed to check friend request status: ${e.message}',
+      );
     } catch (e) {
       throw FriendshipException('Failed to check friend request status: $e');
     }
@@ -587,17 +591,21 @@ class FirestoreFriendRepository implements FriendRepository {
       // Separate cache hits from misses
       final missing = userIds.where((id) {
         final cached = _requestStatusCache[id];
-        return cached == null || now.difference(cached.fetchedAt) > _friendshipCacheTtl;
+        return cached == null ||
+            now.difference(cached.fetchedAt) > _friendshipCacheTtl;
       }).toList();
 
       if (missing.isNotEmpty) {
         // Call Cloud Function (Story 11.19) for cache misses only
-        final callable = _functions.httpsCallable('batchCheckFriendRequestStatus');
+        final callable = _functions.httpsCallable(
+          'batchCheckFriendRequestStatus',
+        );
         final result = await callable.call({'userIds': missing});
 
         final data = Map<String, dynamic>.from(result.data as Map);
-        final requestStatuses =
-            Map<String, dynamic>.from(data['requestStatuses'] as Map);
+        final requestStatuses = Map<String, dynamic>.from(
+          data['requestStatuses'] as Map,
+        );
 
         for (final entry in requestStatuses.entries) {
           final statusString = entry.value as String;
@@ -621,7 +629,8 @@ class FirestoreFriendRepository implements FriendRepository {
       // Return results for all requested userIds from cache
       return {
         for (final id in userIds)
-          if (_requestStatusCache.containsKey(id)) id: _requestStatusCache[id]!.status,
+          if (_requestStatusCache.containsKey(id))
+            id: _requestStatusCache[id]!.status,
       };
     } on FirebaseFunctionsException catch (e) {
       throw _handleError(e);
@@ -657,21 +666,23 @@ class FirestoreFriendRepository implements FriendRepository {
           .snapshots()
           .map((snapshot) => snapshot.docs.length)
           .handleError((error) {
-        if (error is FirebaseException) {
-          if (error.code == 'permission-denied') {
+            if (error is FirebaseException) {
+              if (error.code == 'permission-denied') {
+                throw FriendshipException(
+                  'You don\'t have permission to access friend requests',
+                  code: 'permission-denied',
+                );
+              }
+            }
             throw FriendshipException(
-              'You don\'t have permission to access friend requests',
-              code: 'permission-denied',
+              'Failed to get pending friend request count: $error',
             );
-          }
-        }
-        throw FriendshipException(
-          'Failed to get pending friend request count: $error',
-        );
-      });
+          });
     } catch (e) {
       // Return error stream for any immediate errors
-      throw FriendshipException('Failed to get pending friend request count: $e');
+      throw FriendshipException(
+        'Failed to get pending friend request count: $e',
+      );
     }
   }
 
@@ -694,10 +705,7 @@ class FirestoreFriendRepository implements FriendRepository {
           code: e.code,
         );
       case 'not-found':
-        return FriendshipException(
-          'User not found',
-          code: e.code,
-        );
+        return FriendshipException('User not found', code: e.code);
       case 'permission-denied':
         return FriendshipException(
           'You don\'t have permission to perform this action',

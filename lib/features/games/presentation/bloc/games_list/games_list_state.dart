@@ -56,13 +56,13 @@ class GamesListLoaded extends GamesListState {
 
   @override
   List<Object?> get props => [
-        upcomingActivities,
-        pastActivities,
-        olderPastActivities,
-        isLoadingOlderActivities,
-        olderActivitiesLoaded,
-        userId,
-      ];
+    upcomingActivities,
+    pastActivities,
+    olderPastActivities,
+    isLoadingOlderActivities,
+    olderActivitiesLoaded,
+    userId,
+  ];
 
   // Helper getters for backward compatibility and filtering
   List<GameModel> get upcomingGames => upcomingActivities
@@ -70,8 +70,10 @@ class GamesListLoaded extends GamesListState {
       .map((item) => item.game)
       .toList();
 
-  List<GameModel> get pastGames =>
-      pastActivities.whereType<GameActivityItem>().map((item) => item.game).toList();
+  List<GameModel> get pastGames => pastActivities
+      .whereType<GameActivityItem>()
+      .map((item) => item.game)
+      .toList();
 }
 
 class GamesListError extends GamesListState {

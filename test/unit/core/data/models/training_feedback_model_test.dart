@@ -153,8 +153,11 @@ void main() {
       test('returns true for valid ratings 1-5', () {
         for (int i = 1; i <= 5; i++) {
           final feedback = baseFeedback.copyWith(exercisesQuality: i);
-          expect(feedback.hasValidExercisesQuality, isTrue,
-              reason: 'Rating $i should be valid');
+          expect(
+            feedback.hasValidExercisesQuality,
+            isTrue,
+            reason: 'Rating $i should be valid',
+          );
         }
       });
 
@@ -178,8 +181,11 @@ void main() {
       test('returns true for valid ratings 1-5', () {
         for (int i = 1; i <= 5; i++) {
           final feedback = baseFeedback.copyWith(trainingIntensity: i);
-          expect(feedback.hasValidTrainingIntensity, isTrue,
-              reason: 'Rating $i should be valid');
+          expect(
+            feedback.hasValidTrainingIntensity,
+            isTrue,
+            reason: 'Rating $i should be valid',
+          );
         }
       });
 
@@ -198,8 +204,11 @@ void main() {
       test('returns true for valid ratings 1-5', () {
         for (int i = 1; i <= 5; i++) {
           final feedback = baseFeedback.copyWith(coachingClarity: i);
-          expect(feedback.hasValidCoachingClarity, isTrue,
-              reason: 'Rating $i should be valid');
+          expect(
+            feedback.hasValidCoachingClarity,
+            isTrue,
+            reason: 'Rating $i should be valid',
+          );
         }
       });
 

@@ -72,15 +72,22 @@ class GameTeamPickerWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          selectedTeams == null ? l10n.selectTeamsPrompt : l10n.teamsForThisGame,
+          selectedTeams == null
+              ? l10n.selectTeamsPrompt
+              : l10n.teamsForThisGame,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: selectedTeams == null ? Colors.grey.shade600 : AppColors.secondary,
-                fontWeight: selectedTeams != null ? FontWeight.w600 : FontWeight.normal,
-              ),
+            color: selectedTeams == null
+                ? Colors.grey.shade600
+                : AppColors.secondary,
+            fontWeight: selectedTeams != null
+                ? FontWeight.w600
+                : FontWeight.normal,
+          ),
         ),
         const SizedBox(height: 8),
         ...combinations.map((combo) {
-          final isSelected = selectedTeams != null && _teamsMatch(combo, selectedTeams!);
+          final isSelected =
+              selectedTeams != null && _teamsMatch(combo, selectedTeams!);
           final teamANames = combo.teamAPlayerIds
               .map((id) => playerDisplayName(id, players))
               .join(' & ');
@@ -95,14 +102,19 @@ class GameTeamPickerWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? AppColors.primary.withValues(alpha: 0.12)
                       : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : Colors.grey.shade300,
+                    color: isSelected
+                        ? AppColors.primary
+                        : Colors.grey.shade300,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),

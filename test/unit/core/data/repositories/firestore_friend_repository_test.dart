@@ -66,12 +66,15 @@ void main() {
     when(() => mockUser.uid).thenReturn('test-user-id');
 
     // Default httpsCallable setup for all Cloud Function calls
-    when(() => mockFunctions.httpsCallable('sendFriendRequest'))
-        .thenReturn(mockCallable);
-    when(() => mockFunctions.httpsCallable('getFriends'))
-        .thenReturn(mockCallable);
-    when(() => mockFunctions.httpsCallable('checkFriendshipStatus'))
-        .thenReturn(mockCallable);
+    when(
+      () => mockFunctions.httpsCallable('sendFriendRequest'),
+    ).thenReturn(mockCallable);
+    when(
+      () => mockFunctions.httpsCallable('getFriends'),
+    ).thenReturn(mockCallable);
+    when(
+      () => mockFunctions.httpsCallable('checkFriendshipStatus'),
+    ).thenReturn(mockCallable);
 
     repository = FirestoreFriendRepository(
       functions: mockFunctions,
@@ -84,52 +87,57 @@ void main() {
     test('should return friendshipId on successful friend request', () async {
       // Arrange
       final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
-      when(() => mockFunctions.httpsCallable('sendFriendRequest'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call(any())).thenAnswer(
-        (_) async => mockResult,
-      );
-      when(() => mockResult.data).thenReturn({
-        'friendshipId': 'friendship-123',
-      });
+      when(
+        () => mockFunctions.httpsCallable('sendFriendRequest'),
+      ).thenReturn(mockCallable);
+      when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+      when(
+        () => mockResult.data,
+      ).thenReturn({'friendshipId': 'friendship-123'});
 
       // Act
       final friendshipId = await repository.sendFriendRequest('target-user-id');
 
       // Assert
       expect(friendshipId, 'friendship-123');
-      verify(() => mockCallable.call({'targetUserId': 'target-user-id'}))
-          .called(1);
+      verify(
+        () => mockCallable.call({'targetUserId': 'target-user-id'}),
+      ).called(1);
     });
 
-    test('should throw FriendshipException for already-friends error', () async {
-      // Arrange
-      when(() => mockFunctions.httpsCallable('sendFriendRequest'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call(any())).thenThrow(
-        FirebaseFunctionsException(
-          code: 'already-friends',
-          message: 'Already friends',
-        ),
-      );
-
-      // Act & Assert
-      expect(
-        () => repository.sendFriendRequest('target-user-id'),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'You are already friends with this user',
+    test(
+      'should throw FriendshipException for already-friends error',
+      () async {
+        // Arrange
+        when(
+          () => mockFunctions.httpsCallable('sendFriendRequest'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'already-friends',
+            message: 'Already friends',
           ),
-        ),
-      );
-    });
+        );
+
+        // Act & Assert
+        expect(
+          () => repository.sendFriendRequest('target-user-id'),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'You are already friends with this user',
+            ),
+          ),
+        );
+      },
+    );
 
     test('should throw FriendshipException for request-exists error', () async {
       // Arrange
-      when(() => mockFunctions.httpsCallable('sendFriendRequest'))
-          .thenReturn(mockCallable);
+      when(
+        () => mockFunctions.httpsCallable('sendFriendRequest'),
+      ).thenReturn(mockCallable);
       when(() => mockCallable.call(any())).thenThrow(
         FirebaseFunctionsException(
           code: 'request-exists',
@@ -150,35 +158,39 @@ void main() {
       );
     });
 
-    test('should throw FriendshipException for cannot-friend-self error',
-        () async {
-      // Arrange
-      when(() => mockFunctions.httpsCallable('sendFriendRequest'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call(any())).thenThrow(
-        FirebaseFunctionsException(
-          code: 'cannot-friend-self',
-          message: 'Cannot friend self',
-        ),
-      );
-
-      // Act & Assert
-      expect(
-        () => repository.sendFriendRequest('same-user-id'),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'You cannot send a friend request to yourself',
+    test(
+      'should throw FriendshipException for cannot-friend-self error',
+      () async {
+        // Arrange
+        when(
+          () => mockFunctions.httpsCallable('sendFriendRequest'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'cannot-friend-self',
+            message: 'Cannot friend self',
           ),
-        ),
-      );
-    });
+        );
+
+        // Act & Assert
+        expect(
+          () => repository.sendFriendRequest('same-user-id'),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'You cannot send a friend request to yourself',
+            ),
+          ),
+        );
+      },
+    );
 
     test('should throw FriendshipException for not-found error', () async {
       // Arrange
-      when(() => mockFunctions.httpsCallable('sendFriendRequest'))
-          .thenReturn(mockCallable);
+      when(
+        () => mockFunctions.httpsCallable('sendFriendRequest'),
+      ).thenReturn(mockCallable);
       when(() => mockCallable.call(any())).thenThrow(
         FirebaseFunctionsException(
           code: 'not-found',
@@ -201,11 +213,12 @@ void main() {
 
     test('should throw FriendshipException for generic error', () async {
       // Arrange
-      when(() => mockFunctions.httpsCallable('sendFriendRequest'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call(any())).thenThrow(
-        Exception('Network error'),
-      );
+      when(
+        () => mockFunctions.httpsCallable('sendFriendRequest'),
+      ).thenReturn(mockCallable);
+      when(
+        () => mockCallable.call(any()),
+      ).thenThrow(Exception('Network error'));
 
       // Act & Assert
       expect(
@@ -221,8 +234,9 @@ void main() {
       final mockCollection = MockCollectionReference();
       final mockDoc = MockDocumentReference();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
       when(() => mockCollection.doc('friendship-123')).thenReturn(mockDoc);
       when(() => mockDoc.update(any())).thenAnswer((_) async {});
 
@@ -233,23 +247,25 @@ void main() {
       verify(() => mockDoc.update(any())).called(1);
     });
 
-    test('should throw FriendshipException when user not authenticated',
-        () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(null);
+    test(
+      'should throw FriendshipException when user not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
 
-      // Act & Assert
-      expect(
-        () => repository.acceptFriendRequest('friendship-123'),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'User not authenticated',
+        // Act & Assert
+        expect(
+          () => repository.acceptFriendRequest('friendship-123'),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'User not authenticated',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('should throw FriendshipException for permission-denied', () async {
       // Arrange
@@ -260,8 +276,9 @@ void main() {
       when(() => mockAuth.currentUser).thenReturn(mockUser);
       when(() => mockUser.uid).thenReturn('test-user-id');
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
       when(() => mockCollection.doc('friendship-123')).thenReturn(mockDoc);
       when(() => mockDoc.update(any())).thenThrow(
         FirebaseException(
@@ -293,8 +310,9 @@ void main() {
       when(() => mockAuth.currentUser).thenReturn(mockUser);
       when(() => mockUser.uid).thenReturn('test-user-id');
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
       when(() => mockCollection.doc('friendship-123')).thenReturn(mockDoc);
       when(() => mockDoc.update(any())).thenThrow(
         FirebaseException(
@@ -324,8 +342,9 @@ void main() {
       final mockCollection = MockCollectionReference();
       final mockDoc = MockDocumentReference();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
       when(() => mockCollection.doc('friendship-123')).thenReturn(mockDoc);
       when(() => mockDoc.update(any())).thenAnswer((_) async {});
 
@@ -336,23 +355,25 @@ void main() {
       verify(() => mockDoc.update(any())).called(1);
     });
 
-    test('should throw FriendshipException when user not authenticated',
-        () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(null);
+    test(
+      'should throw FriendshipException when user not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
 
-      // Act & Assert
-      expect(
-        () => repository.declineFriendRequest('friendship-123'),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'User not authenticated',
+        // Act & Assert
+        expect(
+          () => repository.declineFriendRequest('friendship-123'),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'User not authenticated',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   });
 
   group('removeFriend', () {
@@ -361,8 +382,9 @@ void main() {
       final mockCollection = MockCollectionReference();
       final mockDoc = MockDocumentReference();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
       when(() => mockCollection.doc('friendship-123')).thenReturn(mockDoc);
       when(() => mockDoc.delete()).thenAnswer((_) async {});
 
@@ -373,23 +395,25 @@ void main() {
       verify(() => mockDoc.delete()).called(1);
     });
 
-    test('should throw FriendshipException when user not authenticated',
-        () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(null);
+    test(
+      'should throw FriendshipException when user not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
 
-      // Act & Assert
-      expect(
-        () => repository.removeFriend('friendship-123'),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'User not authenticated',
+        // Act & Assert
+        expect(
+          () => repository.removeFriend('friendship-123'),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'User not authenticated',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('should throw FriendshipException for permission-denied', () async {
       // Arrange
@@ -400,8 +424,9 @@ void main() {
       when(() => mockAuth.currentUser).thenReturn(mockUser);
       when(() => mockUser.uid).thenReturn('test-user-id');
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
       when(() => mockCollection.doc('friendship-123')).thenReturn(mockDoc);
       when(() => mockDoc.delete()).thenThrow(
         FirebaseException(
@@ -428,10 +453,12 @@ void main() {
   group('getFriends', () {
     test('should return list of UserEntity from Cloud Function', () async {
       // Arrange - Story 11.13: Uses Cloud Function following Epic 11 architecture
-      when(() => mockFunctions.httpsCallable('getFriends'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call({'userId': 'test-user-id'}))
-          .thenAnswer((_) async {
+      when(
+        () => mockFunctions.httpsCallable('getFriends'),
+      ).thenReturn(mockCallable);
+      when(() => mockCallable.call({'userId': 'test-user-id'})).thenAnswer((
+        _,
+      ) async {
         final result = MockHttpsCallableResult();
         when(() => result.data).thenReturn({
           'friends': [
@@ -475,71 +502,82 @@ void main() {
       verify(() => mockCallable.call({'userId': 'test-user-id'})).called(1);
     });
 
-    test('should return empty list when no friends from Cloud Function', () async {
-      // Arrange
-      when(() => mockFunctions.httpsCallable('getFriends'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call({'userId': 'test-user-id'}))
-          .thenAnswer((_) async {
-        final result = MockHttpsCallableResult();
-        when(() => result.data).thenReturn({
-          'friends': [],
+    test(
+      'should return empty list when no friends from Cloud Function',
+      () async {
+        // Arrange
+        when(
+          () => mockFunctions.httpsCallable('getFriends'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call({'userId': 'test-user-id'})).thenAnswer((
+          _,
+        ) async {
+          final result = MockHttpsCallableResult();
+          when(() => result.data).thenReturn({'friends': []});
+          return result;
         });
-        return result;
-      });
 
-      // Act
-      final friends = await repository.getFriends('test-user-id');
+        // Act
+        final friends = await repository.getFriends('test-user-id');
 
-      // Assert
-      expect(friends, isEmpty);
-      verify(() => mockCallable.call({'userId': 'test-user-id'})).called(1);
-    });
+        // Assert
+        expect(friends, isEmpty);
+        verify(() => mockCallable.call({'userId': 'test-user-id'})).called(1);
+      },
+    );
 
-    test('should throw FriendshipException when user not authenticated', () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(null);
+    test(
+      'should throw FriendshipException when user not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
 
-      // Act & Assert
-      expect(
-        () => repository.getFriends('test-user-id'),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'User not authenticated',
+        // Act & Assert
+        expect(
+          () => repository.getFriends('test-user-id'),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'User not authenticated',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
-    test('should throw FriendshipException when trying to view another user\'s friends', () async {
-      // Arrange - current user is 'user-1' but trying to fetch friends of 'user-2'
-      when(() => mockAuth.currentUser).thenReturn(mockUser);
-      when(() => mockUser.uid).thenReturn('user-1');
+    test(
+      'should throw FriendshipException when trying to view another user\'s friends',
+      () async {
+        // Arrange - current user is 'user-1' but trying to fetch friends of 'user-2'
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
+        when(() => mockUser.uid).thenReturn('user-1');
 
-      // Act & Assert
-      expect(
-        () => repository.getFriends('user-2'),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'You can only view your own friends list',
+        // Act & Assert
+        expect(
+          () => repository.getFriends('user-2'),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'You can only view your own friends list',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('should handle Cloud Function errors gracefully', () async {
       // Arrange
-      when(() => mockFunctions.httpsCallable('getFriends'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call({'userId': 'test-user-id'}))
-          .thenThrow(FirebaseFunctionsException(
-        code: 'internal',
-        message: 'Failed to retrieve friends list',
-      ));
+      when(
+        () => mockFunctions.httpsCallable('getFriends'),
+      ).thenReturn(mockCallable);
+      when(() => mockCallable.call({'userId': 'test-user-id'})).thenThrow(
+        FirebaseFunctionsException(
+          code: 'internal',
+          message: 'Failed to retrieve friends list',
+        ),
+      );
 
       // Act & Assert
       expect(
@@ -555,8 +593,9 @@ void main() {
       final mockCallable = MockHttpsCallable();
       final mockResult = MockHttpsCallableResult();
 
-      when(() => mockFunctions.httpsCallable('getFriendshipRequests'))
-          .thenReturn(mockCallable);
+      when(
+        () => mockFunctions.httpsCallable('getFriendshipRequests'),
+      ).thenReturn(mockCallable);
       when(() => mockCallable.call()).thenAnswer((_) async => mockResult);
       when(() => mockResult.data).thenReturn({
         'sentRequests': [
@@ -567,8 +606,12 @@ void main() {
             'initiatorName': 'Test User',
             'recipientName': 'Recipient One',
             'status': 'pending',
-            'createdAt': {'_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000},
-            'updatedAt': {'_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000},
+            'createdAt': {
+              '_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+            },
+            'updatedAt': {
+              '_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+            },
           },
           {
             'id': 'friendship-2',
@@ -577,8 +620,12 @@ void main() {
             'initiatorName': 'Test User',
             'recipientName': 'Recipient Two',
             'status': 'pending',
-            'createdAt': {'_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000},
-            'updatedAt': {'_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000},
+            'createdAt': {
+              '_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+            },
+            'updatedAt': {
+              '_seconds': DateTime.now().millisecondsSinceEpoch ~/ 1000,
+            },
           },
         ],
         'receivedRequests': [],
@@ -601,13 +648,13 @@ void main() {
       final mockCallable = MockHttpsCallable();
       final mockResult = MockHttpsCallableResult();
 
-      when(() => mockFunctions.httpsCallable('getFriendshipRequests'))
-          .thenReturn(mockCallable);
+      when(
+        () => mockFunctions.httpsCallable('getFriendshipRequests'),
+      ).thenReturn(mockCallable);
       when(() => mockCallable.call()).thenAnswer((_) async => mockResult);
-      when(() => mockResult.data).thenReturn({
-        'sentRequests': [],
-        'receivedRequests': [],
-      });
+      when(
+        () => mockResult.data,
+      ).thenReturn({'sentRequests': [], 'receivedRequests': []});
 
       // Act
       final requests = await repository.getPendingRequests(
@@ -616,38 +663,40 @@ void main() {
 
       // Assert
       expect(requests, isEmpty);
-      verify(() => mockFunctions.httpsCallable('getFriendshipRequests')).called(1);
+      verify(
+        () => mockFunctions.httpsCallable('getFriendshipRequests'),
+      ).called(1);
     });
 
-    test('should throw FriendshipException when user not authenticated',
-        () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(null);
+    test(
+      'should throw FriendshipException when user not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
 
-      // Act & Assert
-      expect(
-        () => repository.getPendingRequests(type: FriendRequestType.sent),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'User not authenticated',
+        // Act & Assert
+        expect(
+          () => repository.getPendingRequests(type: FriendRequestType.sent),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'User not authenticated',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('should throw FriendshipException on Cloud Function error', () async {
       // Arrange
       final mockCallable = MockHttpsCallable();
 
-      when(() => mockFunctions.httpsCallable('getFriendshipRequests'))
-          .thenReturn(mockCallable);
+      when(
+        () => mockFunctions.httpsCallable('getFriendshipRequests'),
+      ).thenReturn(mockCallable);
       when(() => mockCallable.call()).thenThrow(
-        FirebaseFunctionsException(
-          code: 'internal',
-          message: 'Network error',
-        ),
+        FirebaseFunctionsException(code: 'internal', message: 'Network error'),
       );
 
       // Act & Assert
@@ -703,12 +752,15 @@ void main() {
       });
 
       // Mock pending requests query
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockFriendshipsQuery);
-      when(() => mockFriendshipsQuery.get())
-          .thenAnswer((_) async => mockFriendshipsSnapshot);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
+      when(
+        () => mockCollection.where('status', isEqualTo: 'pending'),
+      ).thenReturn(mockFriendshipsQuery);
+      when(
+        () => mockFriendshipsQuery.get(),
+      ).thenAnswer((_) async => mockFriendshipsSnapshot);
       when(() => mockFriendshipsSnapshot.docs).thenReturn([mockFriendshipDoc]);
 
       when(() => mockFriendshipDoc.data()).thenReturn({
@@ -730,9 +782,9 @@ void main() {
       // Arrange
       final mockCollection = MockCollectionReference();
       when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
-      when(() => mockCollection.doc(any())).thenThrow(
-        Exception('Firestore error'),
-      );
+      when(
+        () => mockCollection.doc(any()),
+      ).thenThrow(Exception('Firestore error'));
 
       // Act & Assert
       expect(
@@ -743,33 +795,44 @@ void main() {
   });
 
   group('batchCheckFriendship', () {
-    test('should return map of friendship statuses for multiple users', () async {
-      // Arrange - Story 11.17: Batch check friendships
-      final mockCallable = MockHttpsCallable();
-      final mockResult = MockHttpsCallableResult();
+    test(
+      'should return map of friendship statuses for multiple users',
+      () async {
+        // Arrange - Story 11.17: Batch check friendships
+        final mockCallable = MockHttpsCallable();
+        final mockResult = MockHttpsCallableResult();
 
-      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call({'userIds': ['user1', 'user2', 'user3']}))
-          .thenAnswer((_) async => mockResult);
-      when(() => mockResult.data).thenReturn({
-        'friendships': {
-          'user1': true,
-          'user2': false,
-          'user3': true,
-        },
-      });
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendship'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call({
+            'userIds': ['user1', 'user2', 'user3'],
+          }),
+        ).thenAnswer((_) async => mockResult);
+        when(() => mockResult.data).thenReturn({
+          'friendships': {'user1': true, 'user2': false, 'user3': true},
+        });
 
-      // Act
-      final result = await repository.batchCheckFriendship(['user1', 'user2', 'user3']);
+        // Act
+        final result = await repository.batchCheckFriendship([
+          'user1',
+          'user2',
+          'user3',
+        ]);
 
-      // Assert
-      expect(result, hasLength(3));
-      expect(result['user1'], true);
-      expect(result['user2'], false);
-      expect(result['user3'], true);
-      verify(() => mockCallable.call({'userIds': ['user1', 'user2', 'user3']})).called(1);
-    });
+        // Assert
+        expect(result, hasLength(3));
+        expect(result['user1'], true);
+        expect(result['user2'], false);
+        expect(result['user3'], true);
+        verify(
+          () => mockCallable.call({
+            'userIds': ['user1', 'user2', 'user3'],
+          }),
+        ).called(1);
+      },
+    );
 
     test('should return empty map when userIds list is empty', () async {
       // Arrange
@@ -786,14 +849,16 @@ void main() {
       final mockCallable = MockHttpsCallable();
       final mockResult = MockHttpsCallableResult();
 
-      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call({'userIds': ['user1']}))
-          .thenAnswer((_) async => mockResult);
+      when(
+        () => mockFunctions.httpsCallable('batchCheckFriendship'),
+      ).thenReturn(mockCallable);
+      when(
+        () => mockCallable.call({
+          'userIds': ['user1'],
+        }),
+      ).thenAnswer((_) async => mockResult);
       when(() => mockResult.data).thenReturn({
-        'friendships': {
-          'user1': true,
-        },
+        'friendships': {'user1': true},
       });
 
       // Act
@@ -809,15 +874,16 @@ void main() {
       final mockCallable = MockHttpsCallable();
       final mockResult = MockHttpsCallableResult();
 
-      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call({'userIds': ['user1', 'user2']}))
-          .thenAnswer((_) async => mockResult);
+      when(
+        () => mockFunctions.httpsCallable('batchCheckFriendship'),
+      ).thenReturn(mockCallable);
+      when(
+        () => mockCallable.call({
+          'userIds': ['user1', 'user2'],
+        }),
+      ).thenAnswer((_) async => mockResult);
       when(() => mockResult.data).thenReturn({
-        'friendships': {
-          'user1': false,
-          'user2': false,
-        },
+        'friendships': {'user1': false, 'user2': false},
       });
 
       // Act
@@ -829,39 +895,45 @@ void main() {
       expect(result['user2'], false);
     });
 
-    test('should throw FriendshipException when user not authenticated', () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(null);
+    test(
+      'should throw FriendshipException when user not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
 
-      // Act & Assert
-      expect(
-        () => repository.batchCheckFriendship(['user1', 'user2']),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'User not authenticated',
+        // Act & Assert
+        expect(
+          () => repository.batchCheckFriendship(['user1', 'user2']),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'User not authenticated',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
-    test('should throw FriendshipException when checking more than 100 users', () async {
-      // Arrange
-      final tooManyUsers = List.generate(101, (index) => 'user$index');
+    test(
+      'should throw FriendshipException when checking more than 100 users',
+      () async {
+        // Arrange
+        final tooManyUsers = List.generate(101, (index) => 'user$index');
 
-      // Act & Assert
-      expect(
-        () => repository.batchCheckFriendship(tooManyUsers),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'Maximum 100 users can be checked at once',
+        // Act & Assert
+        expect(
+          () => repository.batchCheckFriendship(tooManyUsers),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'Maximum 100 users can be checked at once',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('should handle exactly 100 users (edge case)', () async {
       // Arrange
@@ -869,17 +941,17 @@ void main() {
       final mockCallable = MockHttpsCallable();
       final mockResult = MockHttpsCallableResult();
 
-      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call({'userIds': exactly100Users}))
-          .thenAnswer((_) async => mockResult);
+      when(
+        () => mockFunctions.httpsCallable('batchCheckFriendship'),
+      ).thenReturn(mockCallable);
+      when(
+        () => mockCallable.call({'userIds': exactly100Users}),
+      ).thenAnswer((_) async => mockResult);
 
       // Generate response with all users as non-friends
       final friendships = {for (final user in exactly100Users) user: false};
 
-      when(() => mockResult.data).thenReturn({
-        'friendships': friendships,
-      });
+      when(() => mockResult.data).thenReturn({'friendships': friendships});
 
       // Act
       final result = await repository.batchCheckFriendship(exactly100Users);
@@ -893,8 +965,9 @@ void main() {
       // Arrange
       final mockCallable = MockHttpsCallable();
 
-      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-          .thenReturn(mockCallable);
+      when(
+        () => mockFunctions.httpsCallable('batchCheckFriendship'),
+      ).thenReturn(mockCallable);
       when(() => mockCallable.call(any())).thenThrow(
         FirebaseFunctionsException(
           code: 'internal',
@@ -909,67 +982,76 @@ void main() {
       );
     });
 
-    test('should throw FriendshipException on unauthenticated error from Cloud Function', () async {
-      // Arrange
-      final mockCallable = MockHttpsCallable();
+    test(
+      'should throw FriendshipException on unauthenticated error from Cloud Function',
+      () async {
+        // Arrange
+        final mockCallable = MockHttpsCallable();
 
-      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call(any())).thenThrow(
-        FirebaseFunctionsException(
-          code: 'unauthenticated',
-          message: 'User must be logged in',
-        ),
-      );
-
-      // Act & Assert
-      expect(
-        () => repository.batchCheckFriendship(['user1', 'user2']),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            contains('must be logged in'),
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendship'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'unauthenticated',
+            message: 'User must be logged in',
           ),
-        ),
-      );
-    });
+        );
 
-    test('should throw FriendshipException on not-found error from Cloud Function', () async {
-      // Arrange
-      final mockCallable = MockHttpsCallable();
-
-      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call(any())).thenThrow(
-        FirebaseFunctionsException(
-          code: 'not-found',
-          message: 'User not found',
-        ),
-      );
-
-      // Act & Assert
-      expect(
-        () => repository.batchCheckFriendship(['user1', 'user2']),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'User not found',
+        // Act & Assert
+        expect(
+          () => repository.batchCheckFriendship(['user1', 'user2']),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              contains('must be logged in'),
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
+
+    test(
+      'should throw FriendshipException on not-found error from Cloud Function',
+      () async {
+        // Arrange
+        final mockCallable = MockHttpsCallable();
+
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendship'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'not-found',
+            message: 'User not found',
+          ),
+        );
+
+        // Act & Assert
+        expect(
+          () => repository.batchCheckFriendship(['user1', 'user2']),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'User not found',
+            ),
+          ),
+        );
+      },
+    );
 
     test('should throw FriendshipException on generic error', () async {
       // Arrange
       final mockCallable = MockHttpsCallable();
 
-      when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-          .thenReturn(mockCallable);
-      when(() => mockCallable.call(any())).thenThrow(
-        Exception('Network error'),
-      );
+      when(
+        () => mockFunctions.httpsCallable('batchCheckFriendship'),
+      ).thenReturn(mockCallable);
+      when(
+        () => mockCallable.call(any()),
+      ).thenThrow(Exception('Network error'));
 
       // Act & Assert
       expect(
@@ -998,14 +1080,18 @@ void main() {
       final mockQuerySnapshot = MockQuerySnapshot();
       final mockDoc = MockQueryDocumentSnapshot();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('recipientId', isEqualTo: 'target-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
+      when(
+        () => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.where('recipientId', isEqualTo: 'target-user-id'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.where('status', isEqualTo: 'pending'),
+      ).thenReturn(mockQuery);
       when(() => mockQuery.limit(1)).thenReturn(mockQuery);
       when(() => mockQuery.get()).thenAnswer((_) async => mockQuerySnapshot);
       when(() => mockQuerySnapshot.docs).thenReturn([mockDoc]);
@@ -1020,51 +1106,64 @@ void main() {
       expect(status, FriendRequestStatus.sentByMe);
     });
 
-    test('should return receivedFromThem when target user sent request',
-        () async {
-      // Arrange
-      final mockCollection = MockCollectionReference();
-      final mockQuery1 = MockQuery();
-      final mockQuery2 = MockQuery();
-      final mockQuerySnapshot1 = MockQuerySnapshot();
-      final mockQuerySnapshot2 = MockQuerySnapshot();
-      final mockDoc = MockQueryDocumentSnapshot();
+    test(
+      'should return receivedFromThem when target user sent request',
+      () async {
+        // Arrange
+        final mockCollection = MockCollectionReference();
+        final mockQuery1 = MockQuery();
+        final mockQuery2 = MockQuery();
+        final mockQuerySnapshot1 = MockQuerySnapshot();
+        final mockQuerySnapshot2 = MockQuerySnapshot();
+        final mockDoc = MockQueryDocumentSnapshot();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
+        when(
+          () => mockFirestore.collection('friendships'),
+        ).thenReturn(mockCollection);
 
-      // First query (sent by me) - empty
-      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery1);
-      when(() => mockQuery1.where('recipientId', isEqualTo: 'target-user-id'))
-          .thenReturn(mockQuery1);
-      when(() => mockQuery1.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery1);
-      when(() => mockQuery1.limit(1)).thenReturn(mockQuery1);
-      when(() => mockQuery1.get()).thenAnswer((_) async => mockQuerySnapshot1);
-      when(() => mockQuerySnapshot1.docs).thenReturn([]);
+        // First query (sent by me) - empty
+        when(
+          () => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'),
+        ).thenReturn(mockQuery1);
+        when(
+          () => mockQuery1.where('recipientId', isEqualTo: 'target-user-id'),
+        ).thenReturn(mockQuery1);
+        when(
+          () => mockQuery1.where('status', isEqualTo: 'pending'),
+        ).thenReturn(mockQuery1);
+        when(() => mockQuery1.limit(1)).thenReturn(mockQuery1);
+        when(
+          () => mockQuery1.get(),
+        ).thenAnswer((_) async => mockQuerySnapshot1);
+        when(() => mockQuerySnapshot1.docs).thenReturn([]);
 
-      // Second query (received from them) - has doc
-      when(() =>
-              mockCollection.where('initiatorId', isEqualTo: 'target-user-id'))
-          .thenReturn(mockQuery2);
-      when(() => mockQuery2.where('recipientId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery2);
-      when(() => mockQuery2.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery2);
-      when(() => mockQuery2.limit(1)).thenReturn(mockQuery2);
-      when(() => mockQuery2.get()).thenAnswer((_) async => mockQuerySnapshot2);
-      when(() => mockQuerySnapshot2.docs).thenReturn([mockDoc]);
+        // Second query (received from them) - has doc
+        when(
+          () =>
+              mockCollection.where('initiatorId', isEqualTo: 'target-user-id'),
+        ).thenReturn(mockQuery2);
+        when(
+          () => mockQuery2.where('recipientId', isEqualTo: 'test-user-id'),
+        ).thenReturn(mockQuery2);
+        when(
+          () => mockQuery2.where('status', isEqualTo: 'pending'),
+        ).thenReturn(mockQuery2);
+        when(() => mockQuery2.limit(1)).thenReturn(mockQuery2);
+        when(
+          () => mockQuery2.get(),
+        ).thenAnswer((_) async => mockQuerySnapshot2);
+        when(() => mockQuerySnapshot2.docs).thenReturn([mockDoc]);
 
-      // Act
-      final status = await repository.getFriendRequestStatus(
-        'test-user-id',
-        'target-user-id',
-      );
+        // Act
+        final status = await repository.getFriendRequestStatus(
+          'test-user-id',
+          'target-user-id',
+        );
 
-      // Assert
-      expect(status, FriendRequestStatus.receivedFromThem);
-    });
+        // Assert
+        expect(status, FriendRequestStatus.receivedFromThem);
+      },
+    );
 
     test('should return none when no pending request exists', () async {
       // Arrange
@@ -1074,28 +1173,34 @@ void main() {
       final mockQuerySnapshot1 = MockQuerySnapshot();
       final mockQuerySnapshot2 = MockQuerySnapshot();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
 
       // First query (sent by me) - empty
-      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery1);
-      when(() => mockQuery1.where('recipientId', isEqualTo: 'target-user-id'))
-          .thenReturn(mockQuery1);
-      when(() => mockQuery1.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery1);
+      when(
+        () => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'),
+      ).thenReturn(mockQuery1);
+      when(
+        () => mockQuery1.where('recipientId', isEqualTo: 'target-user-id'),
+      ).thenReturn(mockQuery1);
+      when(
+        () => mockQuery1.where('status', isEqualTo: 'pending'),
+      ).thenReturn(mockQuery1);
       when(() => mockQuery1.limit(1)).thenReturn(mockQuery1);
       when(() => mockQuery1.get()).thenAnswer((_) async => mockQuerySnapshot1);
       when(() => mockQuerySnapshot1.docs).thenReturn([]);
 
       // Second query (received from them) - empty
-      when(() =>
-              mockCollection.where('initiatorId', isEqualTo: 'target-user-id'))
-          .thenReturn(mockQuery2);
-      when(() => mockQuery2.where('recipientId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery2);
-      when(() => mockQuery2.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery2);
+      when(
+        () => mockCollection.where('initiatorId', isEqualTo: 'target-user-id'),
+      ).thenReturn(mockQuery2);
+      when(
+        () => mockQuery2.where('recipientId', isEqualTo: 'test-user-id'),
+      ).thenReturn(mockQuery2);
+      when(
+        () => mockQuery2.where('status', isEqualTo: 'pending'),
+      ).thenReturn(mockQuery2);
       when(() => mockQuery2.limit(1)).thenReturn(mockQuery2);
       when(() => mockQuery2.get()).thenAnswer((_) async => mockQuerySnapshot2);
       when(() => mockQuerySnapshot2.docs).thenReturn([]);
@@ -1110,134 +1215,143 @@ void main() {
       expect(status, FriendRequestStatus.none);
     });
 
-    test('should throw FriendshipException when user is not authenticated',
-        () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(null);
+    test(
+      'should throw FriendshipException when user is not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
 
-      // Act & Assert
-      expect(
-        () => repository.getFriendRequestStatus(
-          'test-user-id',
-          'target-user-id',
-        ),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'User not authenticated',
+        // Act & Assert
+        expect(
+          () => repository.getFriendRequestStatus(
+            'test-user-id',
+            'target-user-id',
           ),
-        ),
-      );
-    });
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'User not authenticated',
+            ),
+          ),
+        );
+      },
+    );
 
     test(
-        'should throw FriendshipException when currentUserId does not match authenticated user',
-        () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(mockUser);
-      when(() => mockUser.uid).thenReturn('test-user-id');
+      'should throw FriendshipException when currentUserId does not match authenticated user',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
+        when(() => mockUser.uid).thenReturn('test-user-id');
 
-      // Act & Assert
-      expect(
-        () => repository.getFriendRequestStatus(
-          'different-user-id',
-          'target-user-id',
-        ),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'Can only check request status for authenticated user',
+        // Act & Assert
+        expect(
+          () => repository.getFriendRequestStatus(
+            'different-user-id',
+            'target-user-id',
           ),
-        ),
-      );
-    });
-
-    test('should throw FriendshipException when checking status with yourself',
-        () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(mockUser);
-      when(() => mockUser.uid).thenReturn('test-user-id');
-
-      // Act & Assert
-      expect(
-        () => repository.getFriendRequestStatus(
-          'test-user-id',
-          'test-user-id',
-        ),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            'Cannot check request status with yourself',
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'Can only check request status for authenticated user',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
-    test('should throw FriendshipException on Firestore permission denied error',
-        () async {
-      // Arrange
-      final mockCollection = MockCollectionReference();
-      final mockQuery = MockQuery();
+    test(
+      'should throw FriendshipException when checking status with yourself',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
+        when(() => mockUser.uid).thenReturn('test-user-id');
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('recipientId', isEqualTo: 'target-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.limit(1)).thenReturn(mockQuery);
-      when(() => mockQuery.get()).thenThrow(
-        FirebaseException(
-          plugin: 'cloud_firestore',
-          code: 'permission-denied',
-        ),
-      );
-
-      // Act & Assert
-      expect(
-        () => repository.getFriendRequestStatus(
-          'test-user-id',
-          'target-user-id',
-        ),
-        throwsA(
-          isA<FriendshipException>().having(
-            (e) => e.message,
-            'message',
-            contains('permission'),
+        // Act & Assert
+        expect(
+          () =>
+              repository.getFriendRequestStatus('test-user-id', 'test-user-id'),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              'Cannot check request status with yourself',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
+
+    test(
+      'should throw FriendshipException on Firestore permission denied error',
+      () async {
+        // Arrange
+        final mockCollection = MockCollectionReference();
+        final mockQuery = MockQuery();
+
+        when(
+          () => mockFirestore.collection('friendships'),
+        ).thenReturn(mockCollection);
+        when(
+          () => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'),
+        ).thenReturn(mockQuery);
+        when(
+          () => mockQuery.where('recipientId', isEqualTo: 'target-user-id'),
+        ).thenReturn(mockQuery);
+        when(
+          () => mockQuery.where('status', isEqualTo: 'pending'),
+        ).thenReturn(mockQuery);
+        when(() => mockQuery.limit(1)).thenReturn(mockQuery);
+        when(() => mockQuery.get()).thenThrow(
+          FirebaseException(
+            plugin: 'cloud_firestore',
+            code: 'permission-denied',
+          ),
+        );
+
+        // Act & Assert
+        expect(
+          () => repository.getFriendRequestStatus(
+            'test-user-id',
+            'target-user-id',
+          ),
+          throwsA(
+            isA<FriendshipException>().having(
+              (e) => e.message,
+              'message',
+              contains('permission'),
+            ),
+          ),
+        );
+      },
+    );
 
     test('should throw FriendshipException on generic error', () async {
       // Arrange
       final mockCollection = MockCollectionReference();
       final mockQuery = MockQuery();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('recipientId', isEqualTo: 'target-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
+      when(
+        () => mockCollection.where('initiatorId', isEqualTo: 'test-user-id'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.where('recipientId', isEqualTo: 'target-user-id'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.where('status', isEqualTo: 'pending'),
+      ).thenReturn(mockQuery);
       when(() => mockQuery.limit(1)).thenReturn(mockQuery);
-      when(() => mockQuery.get()).thenThrow(
-        Exception('Network error'),
-      );
+      when(() => mockQuery.get()).thenThrow(Exception('Network error'));
 
       // Act & Assert
       expect(
-        () => repository.getFriendRequestStatus(
-          'test-user-id',
-          'target-user-id',
-        ),
+        () =>
+            repository.getFriendRequestStatus('test-user-id', 'target-user-id'),
         throwsA(
           isA<FriendshipException>().having(
             (e) => e.message,
@@ -1250,34 +1364,37 @@ void main() {
   });
 
   group('getPendingFriendRequestCount', () {
-    test('should return stream with correct count of pending requests', () async {
-      // Arrange
-      final mockCollection = MockCollectionReference();
-      final mockQuery = MockQuery();
-      final mockQuerySnapshot = MockQuerySnapshot();
-      final mockDoc1 = MockQueryDocumentSnapshot();
-      final mockDoc2 = MockQueryDocumentSnapshot();
+    test(
+      'should return stream with correct count of pending requests',
+      () async {
+        // Arrange
+        final mockCollection = MockCollectionReference();
+        final mockQuery = MockQuery();
+        final mockQuerySnapshot = MockQuerySnapshot();
+        final mockDoc1 = MockQueryDocumentSnapshot();
+        final mockDoc2 = MockQueryDocumentSnapshot();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.snapshots()).thenAnswer(
-        (_) => Stream.value(mockQuerySnapshot),
-      );
-      when(() => mockQuerySnapshot.docs).thenReturn([mockDoc1, mockDoc2]);
+        when(
+          () => mockFirestore.collection('friendships'),
+        ).thenReturn(mockCollection);
+        when(
+          () => mockCollection.where('recipientId', isEqualTo: 'test-user-id'),
+        ).thenReturn(mockQuery);
+        when(
+          () => mockQuery.where('status', isEqualTo: 'pending'),
+        ).thenReturn(mockQuery);
+        when(
+          () => mockQuery.snapshots(),
+        ).thenAnswer((_) => Stream.value(mockQuerySnapshot));
+        when(() => mockQuerySnapshot.docs).thenReturn([mockDoc1, mockDoc2]);
 
-      // Act
-      final stream = repository.getPendingFriendRequestCount('test-user-id');
+        // Act
+        final stream = repository.getPendingFriendRequestCount('test-user-id');
 
-      // Assert
-      await expectLater(
-        stream,
-        emits(2),
-      );
-    });
+        // Assert
+        await expectLater(stream, emits(2));
+      },
+    );
 
     test('should return stream with zero when no pending requests', () async {
       // Arrange
@@ -1285,70 +1402,78 @@ void main() {
       final mockQuery = MockQuery();
       final mockQuerySnapshot = MockQuerySnapshot();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.snapshots()).thenAnswer(
-        (_) => Stream.value(mockQuerySnapshot),
-      );
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
+      when(
+        () => mockCollection.where('recipientId', isEqualTo: 'test-user-id'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.where('status', isEqualTo: 'pending'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.snapshots(),
+      ).thenAnswer((_) => Stream.value(mockQuerySnapshot));
       when(() => mockQuerySnapshot.docs).thenReturn([]);
 
       // Act
       final stream = repository.getPendingFriendRequestCount('test-user-id');
 
       // Assert
-      await expectLater(
-        stream,
-        emits(0),
-      );
+      await expectLater(stream, emits(0));
     });
 
-    test('should emit updated count when friendships collection changes', () async {
-      // Arrange
-      final mockCollection = MockCollectionReference();
-      final mockQuery = MockQuery();
-      final mockQuerySnapshot1 = MockQuerySnapshot();
-      final mockQuerySnapshot2 = MockQuerySnapshot();
-      final mockDoc1 = MockQueryDocumentSnapshot();
-      final mockDoc2 = MockQueryDocumentSnapshot();
-      final mockDoc3 = MockQueryDocumentSnapshot();
+    test(
+      'should emit updated count when friendships collection changes',
+      () async {
+        // Arrange
+        final mockCollection = MockCollectionReference();
+        final mockQuery = MockQuery();
+        final mockQuerySnapshot1 = MockQuerySnapshot();
+        final mockQuerySnapshot2 = MockQuerySnapshot();
+        final mockDoc1 = MockQueryDocumentSnapshot();
+        final mockDoc2 = MockQueryDocumentSnapshot();
+        final mockDoc3 = MockQueryDocumentSnapshot();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.snapshots()).thenAnswer(
-        (_) => Stream.fromIterable([mockQuerySnapshot1, mockQuerySnapshot2]),
-      );
-      when(() => mockQuerySnapshot1.docs).thenReturn([mockDoc1, mockDoc2]);
-      when(() => mockQuerySnapshot2.docs).thenReturn([mockDoc1, mockDoc2, mockDoc3]);
+        when(
+          () => mockFirestore.collection('friendships'),
+        ).thenReturn(mockCollection);
+        when(
+          () => mockCollection.where('recipientId', isEqualTo: 'test-user-id'),
+        ).thenReturn(mockQuery);
+        when(
+          () => mockQuery.where('status', isEqualTo: 'pending'),
+        ).thenReturn(mockQuery);
+        when(() => mockQuery.snapshots()).thenAnswer(
+          (_) => Stream.fromIterable([mockQuerySnapshot1, mockQuerySnapshot2]),
+        );
+        when(() => mockQuerySnapshot1.docs).thenReturn([mockDoc1, mockDoc2]);
+        when(
+          () => mockQuerySnapshot2.docs,
+        ).thenReturn([mockDoc1, mockDoc2, mockDoc3]);
 
-      // Act
-      final stream = repository.getPendingFriendRequestCount('test-user-id');
+        // Act
+        final stream = repository.getPendingFriendRequestCount('test-user-id');
 
-      // Assert
-      await expectLater(
-        stream,
-        emitsInOrder([2, 3]),
-      );
-    });
+        // Assert
+        await expectLater(stream, emitsInOrder([2, 3]));
+      },
+    );
 
     test('should handle permission denied error in stream', () async {
       // Arrange
       final mockCollection = MockCollectionReference();
       final mockQuery = MockQuery();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
+      when(
+        () => mockCollection.where('recipientId', isEqualTo: 'test-user-id'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.where('status', isEqualTo: 'pending'),
+      ).thenReturn(mockQuery);
       when(() => mockQuery.snapshots()).thenAnswer(
         (_) => Stream.error(
           FirebaseException(
@@ -1379,15 +1504,18 @@ void main() {
       final mockCollection = MockCollectionReference();
       final mockQuery = MockQuery();
 
-      when(() => mockFirestore.collection('friendships'))
-          .thenReturn(mockCollection);
-      when(() => mockCollection.where('recipientId', isEqualTo: 'test-user-id'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.where('status', isEqualTo: 'pending'))
-          .thenReturn(mockQuery);
-      when(() => mockQuery.snapshots()).thenAnswer(
-        (_) => Stream.error(Exception('Network error')),
-      );
+      when(
+        () => mockFirestore.collection('friendships'),
+      ).thenReturn(mockCollection);
+      when(
+        () => mockCollection.where('recipientId', isEqualTo: 'test-user-id'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.where('status', isEqualTo: 'pending'),
+      ).thenReturn(mockQuery);
+      when(
+        () => mockQuery.snapshots(),
+      ).thenAnswer((_) => Stream.error(Exception('Network error')));
 
       // Act
       final stream = repository.getPendingFriendRequestCount('test-user-id');
@@ -1408,81 +1536,119 @@ void main() {
 
   group('Friendship status caching', () {
     group('batchCheckFriendship cache', () {
-      test('returns cached result on second call without hitting Cloud Function', () async {
-        final mockCallable = MockHttpsCallable();
-        final mockResult = MockHttpsCallableResult();
+      test(
+        'returns cached result on second call without hitting Cloud Function',
+        () async {
+          final mockCallable = MockHttpsCallable();
+          final mockResult = MockHttpsCallableResult();
 
-        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
-        when(() => mockResult.data).thenReturn({
-          'friendships': {'user1': true},
-        });
+          when(
+            () => mockFunctions.httpsCallable('batchCheckFriendship'),
+          ).thenReturn(mockCallable);
+          when(
+            () => mockCallable.call(any()),
+          ).thenAnswer((_) async => mockResult);
+          when(() => mockResult.data).thenReturn({
+            'friendships': {'user1': true},
+          });
 
-        // First call — hits Cloud Function.
-        final first = await repository.batchCheckFriendship(['user1']);
-        expect(first['user1'], true);
+          // First call — hits Cloud Function.
+          final first = await repository.batchCheckFriendship(['user1']);
+          expect(first['user1'], true);
 
-        // Second call — should return from cache.
-        final second = await repository.batchCheckFriendship(['user1']);
-        expect(second['user1'], true);
+          // Second call — should return from cache.
+          final second = await repository.batchCheckFriendship(['user1']);
+          expect(second['user1'], true);
 
-        // Cloud Function called only once.
-        verify(() => mockFunctions.httpsCallable('batchCheckFriendship')).called(1);
-      });
+          // Cloud Function called only once.
+          verify(
+            () => mockFunctions.httpsCallable('batchCheckFriendship'),
+          ).called(1);
+        },
+      );
 
       test('only fetches cache-missing UIDs on partial cache hit', () async {
         final mockCallable = MockHttpsCallable();
         final mockResult1 = MockHttpsCallableResult();
         final mockResult2 = MockHttpsCallableResult();
 
-        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendship'),
+        ).thenReturn(mockCallable);
 
-        when(() => mockCallable.call({'userIds': ['user1']}))
-            .thenAnswer((_) async => mockResult1);
+        when(
+          () => mockCallable.call({
+            'userIds': ['user1'],
+          }),
+        ).thenAnswer((_) async => mockResult1);
         when(() => mockResult1.data).thenReturn({
           'friendships': {'user1': true},
         });
 
         await repository.batchCheckFriendship(['user1']);
 
-        when(() => mockCallable.call({'userIds': ['user2']}))
-            .thenAnswer((_) async => mockResult2);
+        when(
+          () => mockCallable.call({
+            'userIds': ['user2'],
+          }),
+        ).thenAnswer((_) async => mockResult2);
         when(() => mockResult2.data).thenReturn({
           'friendships': {'user2': false},
         });
 
-        final result = await repository.batchCheckFriendship(['user1', 'user2']);
+        final result = await repository.batchCheckFriendship([
+          'user1',
+          'user2',
+        ]);
 
         expect(result['user1'], true);
         expect(result['user2'], false);
         // user-1 from cache, user-2 from Cloud Function.
-        verify(() => mockCallable.call({'userIds': ['user1']})).called(1);
-        verify(() => mockCallable.call({'userIds': ['user2']})).called(1);
+        verify(
+          () => mockCallable.call({
+            'userIds': ['user1'],
+          }),
+        ).called(1);
+        verify(
+          () => mockCallable.call({
+            'userIds': ['user2'],
+          }),
+        ).called(1);
       });
     });
 
     group('batchCheckFriendRequestStatus cache', () {
-      test('returns cached result on second call without hitting Cloud Function', () async {
-        final mockCallable = MockHttpsCallable();
-        final mockResult = MockHttpsCallableResult();
+      test(
+        'returns cached result on second call without hitting Cloud Function',
+        () async {
+          final mockCallable = MockHttpsCallable();
+          final mockResult = MockHttpsCallableResult();
 
-        when(() => mockFunctions.httpsCallable('batchCheckFriendRequestStatus'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
-        when(() => mockResult.data).thenReturn({
-          'requestStatuses': {'user1': 'sentByMe'},
-        });
+          when(
+            () => mockFunctions.httpsCallable('batchCheckFriendRequestStatus'),
+          ).thenReturn(mockCallable);
+          when(
+            () => mockCallable.call(any()),
+          ).thenAnswer((_) async => mockResult);
+          when(() => mockResult.data).thenReturn({
+            'requestStatuses': {'user1': 'sentByMe'},
+          });
 
-        final first = await repository.batchCheckFriendRequestStatus(['user1']);
-        expect(first['user1'], FriendRequestStatus.sentByMe);
+          final first = await repository.batchCheckFriendRequestStatus([
+            'user1',
+          ]);
+          expect(first['user1'], FriendRequestStatus.sentByMe);
 
-        final second = await repository.batchCheckFriendRequestStatus(['user1']);
-        expect(second['user1'], FriendRequestStatus.sentByMe);
+          final second = await repository.batchCheckFriendRequestStatus([
+            'user1',
+          ]);
+          expect(second['user1'], FriendRequestStatus.sentByMe);
 
-        verify(() => mockFunctions.httpsCallable('batchCheckFriendRequestStatus')).called(1);
-      });
+          verify(
+            () => mockFunctions.httpsCallable('batchCheckFriendRequestStatus'),
+          ).called(1);
+        },
+      );
     });
 
     group('cache invalidation on mutating operations', () {
@@ -1491,10 +1657,12 @@ void main() {
         final mockFriendshipCallable = MockHttpsCallable();
         final mockFriendshipResult = MockHttpsCallableResult();
 
-        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-            .thenReturn(mockFriendshipCallable);
-        when(() => mockFriendshipCallable.call(any()))
-            .thenAnswer((_) async => mockFriendshipResult);
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendship'),
+        ).thenReturn(mockFriendshipCallable);
+        when(
+          () => mockFriendshipCallable.call(any()),
+        ).thenAnswer((_) async => mockFriendshipResult);
         when(() => mockFriendshipResult.data).thenReturn({
           'friendships': {'user1': true},
         });
@@ -1504,10 +1672,12 @@ void main() {
         final mockStatusCallable = MockHttpsCallable();
         final mockStatusResult = MockHttpsCallableResult();
 
-        when(() => mockFunctions.httpsCallable('batchCheckFriendRequestStatus'))
-            .thenReturn(mockStatusCallable);
-        when(() => mockStatusCallable.call(any()))
-            .thenAnswer((_) async => mockStatusResult);
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendRequestStatus'),
+        ).thenReturn(mockStatusCallable);
+        when(
+          () => mockStatusCallable.call(any()),
+        ).thenAnswer((_) async => mockStatusResult);
         when(() => mockStatusResult.data).thenReturn({
           'requestStatuses': {'user1': 'none'},
         });
@@ -1522,7 +1692,9 @@ void main() {
         final mockCollRef = MockCollectionReference();
         final mockDocRef = MockDocumentReference();
 
-        when(() => mockFirestore.collection('friendships')).thenReturn(mockCollRef);
+        when(
+          () => mockFirestore.collection('friendships'),
+        ).thenReturn(mockCollRef);
         when(() => mockCollRef.doc('friendship-123')).thenReturn(mockDocRef);
         when(() => mockDocRef.update(any())).thenAnswer((_) async {});
 
@@ -1531,9 +1703,12 @@ void main() {
         // After clearing the cache, a fresh Cloud Function call is required.
         final mockCallable2 = MockHttpsCallable();
         final mockResult2 = MockHttpsCallableResult();
-        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-            .thenReturn(mockCallable2);
-        when(() => mockCallable2.call(any())).thenAnswer((_) async => mockResult2);
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendship'),
+        ).thenReturn(mockCallable2);
+        when(
+          () => mockCallable2.call(any()),
+        ).thenAnswer((_) async => mockResult2);
         when(() => mockResult2.data).thenReturn({
           'friendships': {'user1': false},
         });
@@ -1548,7 +1723,9 @@ void main() {
         final mockCollRef = MockCollectionReference();
         final mockDocRef = MockDocumentReference();
 
-        when(() => mockFirestore.collection('friendships')).thenReturn(mockCollRef);
+        when(
+          () => mockFirestore.collection('friendships'),
+        ).thenReturn(mockCollRef);
         when(() => mockCollRef.doc('friendship-456')).thenReturn(mockDocRef);
         when(() => mockDocRef.update(any())).thenAnswer((_) async {});
 
@@ -1556,9 +1733,12 @@ void main() {
 
         final mockCallable2 = MockHttpsCallable();
         final mockResult2 = MockHttpsCallableResult();
-        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-            .thenReturn(mockCallable2);
-        when(() => mockCallable2.call(any())).thenAnswer((_) async => mockResult2);
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendship'),
+        ).thenReturn(mockCallable2);
+        when(
+          () => mockCallable2.call(any()),
+        ).thenAnswer((_) async => mockResult2);
         when(() => mockResult2.data).thenReturn({
           'friendships': {'user1': false},
         });
@@ -1573,7 +1753,9 @@ void main() {
         final mockCollRef = MockCollectionReference();
         final mockDocRef = MockDocumentReference();
 
-        when(() => mockFirestore.collection('friendships')).thenReturn(mockCollRef);
+        when(
+          () => mockFirestore.collection('friendships'),
+        ).thenReturn(mockCollRef);
         when(() => mockCollRef.doc('friendship-789')).thenReturn(mockDocRef);
         when(() => mockDocRef.delete()).thenAnswer((_) async {});
 
@@ -1581,9 +1763,12 @@ void main() {
 
         final mockCallable2 = MockHttpsCallable();
         final mockResult2 = MockHttpsCallableResult();
-        when(() => mockFunctions.httpsCallable('batchCheckFriendship'))
-            .thenReturn(mockCallable2);
-        when(() => mockCallable2.call(any())).thenAnswer((_) async => mockResult2);
+        when(
+          () => mockFunctions.httpsCallable('batchCheckFriendship'),
+        ).thenReturn(mockCallable2);
+        when(
+          () => mockCallable2.call(any()),
+        ).thenAnswer((_) async => mockResult2);
         when(() => mockResult2.data).thenReturn({
           'friendships': {'user1': false},
         });

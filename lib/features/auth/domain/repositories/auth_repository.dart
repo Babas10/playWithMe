@@ -35,10 +35,7 @@ abstract class AuthRepository {
   Future<void> signOut();
 
   /// Update user profile
-  Future<void> updateUserProfile({
-    String? displayName,
-    String? photoUrl,
-  });
+  Future<void> updateUserProfile({String? displayName, String? photoUrl});
 
   /// Update user's first and last name (and optionally gender) in Firestore via Cloud Function
   Future<void> updateUserNames({

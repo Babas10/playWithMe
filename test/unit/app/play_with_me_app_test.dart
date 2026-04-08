@@ -16,7 +16,8 @@ import '../helpers/test_helpers.dart';
 import '../features/auth/data/mock_auth_repository.dart';
 
 // Fake for mocktail matchers
-class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntity {}
+class FakeLocalePreferencesEntity extends Fake
+    implements LocalePreferencesEntity {}
 
 void main() {
   setUpAll(() {
@@ -34,56 +35,86 @@ void main() {
       cleanupTestDependencies();
     });
 
-    testWidgets('should render correctly in production environment', (WidgetTester tester) async {
+    testWidgets('should render correctly in production environment', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const PlayWithMeApp());
 
       // Wait for AuthenticationBloc to process initial auth state and stream subscription
       await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow bloc to start stream subscription
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow stream to emit initial value
       await tester.pump(); // Rebuild with new state
 
       // Should show login screen for unauthenticated users
       expect(find.text('Welcome Back!'), findsOneWidget);
-      expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
+      expect(
+        find.text('Sign in to continue organizing your volleyball games'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('should render correctly in development environment', (WidgetTester tester) async {
+    testWidgets('should render correctly in development environment', (
+      WidgetTester tester,
+    ) async {
       EnvironmentConfig.setEnvironment(Environment.dev);
       await tester.pumpWidget(const PlayWithMeApp());
 
       // Wait for AuthenticationBloc to process initial auth state and stream subscription
       await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow bloc to start stream subscription
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow stream to emit initial value
       await tester.pump(); // Rebuild with new state
 
       // App shows authentication screen regardless of environment
       expect(find.text('Welcome Back!'), findsOneWidget);
-      expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
+      expect(
+        find.text('Sign in to continue organizing your volleyball games'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('should have correct theme colors', (WidgetTester tester) async {
+    testWidgets('should have correct theme colors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const PlayWithMeApp());
 
       // Wait for AuthenticationBloc to process initial auth state and stream subscription
       await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow bloc to start stream subscription
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow stream to emit initial value
       await tester.pump(); // Rebuild with new state
 
       final MaterialApp materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.theme?.colorScheme.primary, isNotNull);
     });
 
-    testWidgets('should have correct app title for each environment', (WidgetTester tester) async {
+    testWidgets('should have correct app title for each environment', (
+      WidgetTester tester,
+    ) async {
       // Test production
       EnvironmentConfig.setEnvironment(Environment.prod);
       await tester.pumpWidget(const PlayWithMeApp());
       // Wait for AuthenticationBloc to process initial auth state and stream subscription
       await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow bloc to start stream subscription
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow stream to emit initial value
       await tester.pump(); // Rebuild with new state
       MaterialApp materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.title, 'Gatherli');
@@ -93,57 +124,77 @@ void main() {
       await tester.pumpWidget(const PlayWithMeApp());
       // Wait for AuthenticationBloc to process initial auth state and stream subscription
       await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial value
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow bloc to start stream subscription
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow stream to emit initial value
       await tester.pump(); // Rebuild with new state
       materialApp = tester.widget(find.byType(MaterialApp));
       expect(materialApp.title, 'Gatherli (Dev)');
     });
 
-    testWidgets('should properly handle authentication state transitions (Unknown → Unauthenticated → UI update)', (WidgetTester tester) async {
-      // Set up initial environment
-      EnvironmentConfig.setEnvironment(Environment.dev);
+    testWidgets(
+      'should properly handle authentication state transitions (Unknown → Unauthenticated → UI update)',
+      (WidgetTester tester) async {
+        // Set up initial environment
+        EnvironmentConfig.setEnvironment(Environment.dev);
 
-      // Build the app and capture the initial splash state
-      await tester.pumpWidget(const PlayWithMeApp());
+        // Build the app and capture the initial splash state
+        await tester.pumpWidget(const PlayWithMeApp());
 
-      // Initial state should show splash screen (Unknown state)
-      expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
-      expect(find.text('Loading...'), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        // Initial state should show splash screen (Unknown state)
+        expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
+        expect(find.text('Loading...'), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Allow authentication process to start and emit initial state
-      await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit initial null value
-      await tester.pump(); // Rebuild with new unauthenticated state
+        // Allow authentication process to start and emit initial state
+        await tester.pump(); // Initial build
+        await tester.pump(
+          const Duration(milliseconds: 10),
+        ); // Allow bloc to start stream subscription
+        await tester.pump(
+          const Duration(milliseconds: 10),
+        ); // Allow stream to emit initial null value
+        await tester.pump(); // Rebuild with new unauthenticated state
 
-      // Should transition to login screen (Unauthenticated state)
-      expect(find.text('Welcome Back!'), findsOneWidget);
-      expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
+        // Should transition to login screen (Unauthenticated state)
+        expect(find.text('Welcome Back!'), findsOneWidget);
+        expect(
+          find.text('Sign in to continue organizing your volleyball games'),
+          findsOneWidget,
+        );
 
-      // Should no longer show splash screen elements
-      expect(find.text('Loading...'), findsNothing);
-      expect(find.byType(CircularProgressIndicator), findsNothing);
+        // Should no longer show splash screen elements
+        expect(find.text('Loading...'), findsNothing);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
 
-      // Simulate user authentication by setting a user
-      final mockRepo = getTestAuthRepository()!;
-      const testUser = TestUserData.testUser;
-      mockRepo.setCurrentUser(testUser);
+        // Simulate user authentication by setting a user
+        final mockRepo = getTestAuthRepository()!;
+        const testUser = TestUserData.testUser;
+        mockRepo.setCurrentUser(testUser);
 
-      // Allow authentication bloc to process the state change
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream emission
-      await tester.pump(); // AuthenticationAuthenticated emitted → HomePage rendered
+        // Allow authentication bloc to process the state change
+        await tester.pump(
+          const Duration(milliseconds: 10),
+        ); // Allow stream emission
+        await tester
+            .pump(); // AuthenticationAuthenticated emitted → HomePage rendered
 
-      // Should transition to HomePage (Authenticated state)
-      // Bottom nav now has: Home, Stats, Groups, Community (Profile is in AppBar)
-      expect(find.byType(Scaffold), findsWidgets); // HomePage rendered
-      expect(find.byType(BottomNavigationBar), findsOneWidget);
+        // Should transition to HomePage (Authenticated state)
+        // Bottom nav now has: Home, Stats, Groups, Community (Profile is in AppBar)
+        expect(find.byType(Scaffold), findsWidgets); // HomePage rendered
+        expect(find.byType(BottomNavigationBar), findsOneWidget);
 
-      // Should no longer show login screen elements
-      expect(find.text('Welcome Back!'), findsNothing);
-      expect(find.text('Sign in to continue organizing your volleyball games'), findsNothing);
-    });
+        // Should no longer show login screen elements
+        expect(find.text('Welcome Back!'), findsNothing);
+        expect(
+          find.text('Sign in to continue organizing your volleyball games'),
+          findsNothing,
+        );
+      },
+    );
   });
 
   group('HomePage', () {
@@ -189,8 +240,12 @@ void main() {
       );
 
       await tester.pump(); // Initial build
-      await tester.pump(const Duration(milliseconds: 10)); // Allow bloc to start stream subscription
-      await tester.pump(const Duration(milliseconds: 10)); // Allow stream to emit user value
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow bloc to start stream subscription
+      await tester.pump(
+        const Duration(milliseconds: 10),
+      ); // Allow stream to emit user value
       await tester.pump(); // Rebuild with authenticated state
 
       expect(find.byType(AppBar), findsOneWidget);
@@ -201,7 +256,9 @@ void main() {
       expect(find.byType(Scaffold), findsOneWidget);
     });
 
-    testWidgets('should have correct layout structure', (WidgetTester tester) async {
+    testWidgets('should have correct layout structure', (
+      WidgetTester tester,
+    ) async {
       // Set up authenticated user for HomePage
       final mockRepo = getTestAuthRepository()!;
       const testUser = TestUserData.testUser;
@@ -241,7 +298,9 @@ void main() {
       // Note: Stats may be loading or empty in test environment
     });
 
-    testWidgets('should show correct environment indicator colors', (WidgetTester tester) async {
+    testWidgets('should show correct environment indicator colors', (
+      WidgetTester tester,
+    ) async {
       // SKIP: Environment indicators removed from home screen (Story #301)
     });
   });

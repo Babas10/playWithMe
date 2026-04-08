@@ -89,18 +89,12 @@ abstract class ExerciseRepository {
   /// - [Exception] if exercise does not exist
   /// - [Exception] if training session has already started
   /// - [Exception] if user does not have permission
-  Future<void> deleteExercise(
-    String trainingSessionId,
-    String exerciseId,
-  );
+  Future<void> deleteExercise(String trainingSessionId, String exerciseId);
 
   /// Check if exercise exists
   ///
   /// Returns true if the exercise exists in the specified training session
-  Future<bool> exerciseExists(
-    String trainingSessionId,
-    String exerciseId,
-  );
+  Future<bool> exerciseExists(String trainingSessionId, String exerciseId);
 
   /// Check if training session allows exercise modifications
   ///

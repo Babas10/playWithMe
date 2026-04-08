@@ -397,8 +397,18 @@ void main() {
         final after = DateTime.now();
 
         expect(acceptedInvitation.respondedAt, isNotNull);
-        expect(acceptedInvitation.respondedAt!.isAfter(before.subtract(const Duration(seconds: 1))), isTrue);
-        expect(acceptedInvitation.respondedAt!.isBefore(after.add(const Duration(seconds: 1))), isTrue);
+        expect(
+          acceptedInvitation.respondedAt!.isAfter(
+            before.subtract(const Duration(seconds: 1)),
+          ),
+          isTrue,
+        );
+        expect(
+          acceptedInvitation.respondedAt!.isBefore(
+            after.add(const Duration(seconds: 1)),
+          ),
+          isTrue,
+        );
       });
 
       test('preserves other fields unchanged', () {
@@ -479,8 +489,18 @@ void main() {
         final after = DateTime.now();
 
         expect(declinedInvitation.respondedAt, isNotNull);
-        expect(declinedInvitation.respondedAt!.isAfter(before.subtract(const Duration(seconds: 1))), isTrue);
-        expect(declinedInvitation.respondedAt!.isBefore(after.add(const Duration(seconds: 1))), isTrue);
+        expect(
+          declinedInvitation.respondedAt!.isAfter(
+            before.subtract(const Duration(seconds: 1)),
+          ),
+          isTrue,
+        );
+        expect(
+          declinedInvitation.respondedAt!.isBefore(
+            after.add(const Duration(seconds: 1)),
+          ),
+          isTrue,
+        );
       });
 
       test('preserves other fields unchanged', () {
@@ -715,33 +735,39 @@ void main() {
       test('throws exception for unknown type', () {
         expect(
           () => converter.fromJson(12.34),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Unknown type for timestamp'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Unknown type for timestamp'),
+            ),
+          ),
         );
       });
 
       test('throws exception for list type', () {
         expect(
           () => converter.fromJson([1, 2, 3]),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Unknown type for timestamp'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Unknown type for timestamp'),
+            ),
+          ),
         );
       });
 
       test('throws exception for map type', () {
         expect(
           () => converter.fromJson({'key': 'value'}),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Unknown type for timestamp'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Unknown type for timestamp'),
+            ),
+          ),
         );
       });
     });

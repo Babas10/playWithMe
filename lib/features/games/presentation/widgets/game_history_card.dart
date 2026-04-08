@@ -9,11 +9,7 @@ class GameHistoryCard extends StatelessWidget {
   final GameModel game;
   final VoidCallback onTap;
 
-  const GameHistoryCard({
-    super.key,
-    required this.game,
-    required this.onTap,
-  });
+  const GameHistoryCard({super.key, required this.game, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -204,10 +200,7 @@ class GameHistoryCard extends StatelessWidget {
               color: isWinner ? theme.colorScheme.primary : null,
             ),
           ),
-          Text(
-            'games won',
-            style: theme.textTheme.bodySmall,
-          ),
+          Text('games won', style: theme.textTheme.bodySmall),
         ],
       ),
     );

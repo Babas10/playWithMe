@@ -34,11 +34,7 @@ void main() {
       id: sessionId,
       groupId: 'group-1',
       title: 'Future Session',
-      location: const GameLocation(
-        name: 'Beach',
-        latitude: 0,
-        longitude: 0,
-      ),
+      location: const GameLocation(name: 'Beach', latitude: 0, longitude: 0),
       startTime: DateTime.now().add(const Duration(days: 1)),
       endTime: DateTime.now().add(const Duration(days: 1, hours: 2)),
       minParticipants: 2,
@@ -53,11 +49,7 @@ void main() {
       id: sessionId,
       groupId: 'group-1',
       title: 'Past Session',
-      location: const GameLocation(
-        name: 'Beach',
-        latitude: 0,
-        longitude: 0,
-      ),
+      location: const GameLocation(name: 'Beach', latitude: 0, longitude: 0),
       startTime: DateTime.now().subtract(const Duration(hours: 1)),
       endTime: DateTime.now().add(const Duration(hours: 1)),
       minParticipants: 2,
@@ -98,11 +90,11 @@ void main() {
         .collection('exercises')
         .doc(exerciseId)
         .set({
-      'name': name,
-      if (description != null) 'description': description,
-      if (durationMinutes != null) 'durationMinutes': durationMinutes,
-      'createdAt': Timestamp.now(),
-    });
+          'name': name,
+          if (description != null) 'description': description,
+          if (durationMinutes != null) 'durationMinutes': durationMinutes,
+          'createdAt': Timestamp.now(),
+        });
     return exerciseId;
   }
 
@@ -272,9 +264,9 @@ void main() {
         const sessionId = 'session-1';
         await createTrainingSessionInFirestore(sessionId);
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createFutureSession(sessionId));
 
         final exercise = ExerciseModel(
           id: '',
@@ -305,9 +297,9 @@ void main() {
       test('throws exception when session does not exist', () async {
         const sessionId = 'non-existent-session';
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => null);
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => null);
 
         final exercise = ExerciseModel(
           id: '',
@@ -325,9 +317,9 @@ void main() {
         const sessionId = 'session-1';
         await createTrainingSessionInFirestore(sessionId);
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createPastSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createPastSession(sessionId));
 
         final exercise = ExerciseModel(
           id: '',
@@ -345,9 +337,9 @@ void main() {
         const sessionId = 'session-1';
         await createTrainingSessionInFirestore(sessionId);
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createFutureSession(sessionId));
 
         final exercise = ExerciseModel(
           id: '',
@@ -365,9 +357,9 @@ void main() {
         const sessionId = 'session-1';
         await createTrainingSessionInFirestore(sessionId);
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createFutureSession(sessionId));
 
         final exercise = ExerciseModel(
           id: '',
@@ -394,9 +386,9 @@ void main() {
           durationMinutes: 15,
         );
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createFutureSession(sessionId));
 
         await exerciseRepository.updateExercise(
           sessionId,
@@ -422,9 +414,9 @@ void main() {
         const sessionId = 'session-1';
         await createTrainingSessionInFirestore(sessionId);
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createFutureSession(sessionId));
 
         await expectLater(
           exerciseRepository.updateExercise(
@@ -445,9 +437,9 @@ void main() {
           name: 'Original Name',
         );
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createPastSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createPastSession(sessionId));
 
         await expectLater(
           exerciseRepository.updateExercise(
@@ -468,44 +460,43 @@ void main() {
           name: 'Original Name',
         );
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createFutureSession(sessionId));
 
         await expectLater(
-          exerciseRepository.updateExercise(
-            sessionId,
-            'exercise-1',
-            name: '',
-          ),
+          exerciseRepository.updateExercise(sessionId, 'exercise-1', name: ''),
           throwsA(isA<ExerciseException>()),
         );
       });
 
-      test('throws exception when updating duration to invalid value',
-          () async {
-        const sessionId = 'session-1';
-        await createTrainingSessionInFirestore(sessionId);
-        await addExerciseToFirestore(
-          sessionId,
-          'exercise-1',
-          name: 'Original Name',
-          durationMinutes: 15,
-        );
-
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
-
-        await expectLater(
-          exerciseRepository.updateExercise(
+      test(
+        'throws exception when updating duration to invalid value',
+        () async {
+          const sessionId = 'session-1';
+          await createTrainingSessionInFirestore(sessionId);
+          await addExerciseToFirestore(
             sessionId,
             'exercise-1',
-            durationMinutes: 301,
-          ),
-          throwsA(isA<ExerciseException>()),
-        );
-      });
+            name: 'Original Name',
+            durationMinutes: 15,
+          );
+
+          when(
+            () =>
+                mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+          ).thenAnswer((_) async => createFutureSession(sessionId));
+
+          await expectLater(
+            exerciseRepository.updateExercise(
+              sessionId,
+              'exercise-1',
+              durationMinutes: 301,
+            ),
+            throwsA(isA<ExerciseException>()),
+          );
+        },
+      );
     });
 
     group('deleteExercise', () {
@@ -518,9 +509,9 @@ void main() {
           name: 'To Be Deleted',
         );
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createFutureSession(sessionId));
 
         await exerciseRepository.deleteExercise(sessionId, 'exercise-1');
 
@@ -538,9 +529,9 @@ void main() {
         const sessionId = 'session-1';
         await createTrainingSessionInFirestore(sessionId);
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createFutureSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createFutureSession(sessionId));
 
         await expectLater(
           exerciseRepository.deleteExercise(sessionId, 'non-existent-exercise'),
@@ -557,9 +548,9 @@ void main() {
           name: 'To Be Deleted',
         );
 
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              sessionId,
-            )).thenAnswer((_) async => createPastSession(sessionId));
+        when(
+          () => mockTrainingSessionRepository.getTrainingSessionById(sessionId),
+        ).thenAnswer((_) async => createPastSession(sessionId));
 
         await expectLater(
           exerciseRepository.deleteExercise(sessionId, 'exercise-1'),
@@ -601,42 +592,49 @@ void main() {
 
     group('canModifyExercises', () {
       test('returns true when session has not started', () async {
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              'session-1',
-            )).thenAnswer((_) async => createFutureSession('session-1'));
+        when(
+          () =>
+              mockTrainingSessionRepository.getTrainingSessionById('session-1'),
+        ).thenAnswer((_) async => createFutureSession('session-1'));
 
-        final canModify =
-            await exerciseRepository.canModifyExercises('session-1');
+        final canModify = await exerciseRepository.canModifyExercises(
+          'session-1',
+        );
 
         expect(canModify, isTrue);
       });
 
       test('returns false when session has started', () async {
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              'session-1',
-            )).thenAnswer((_) async => createPastSession('session-1'));
+        when(
+          () =>
+              mockTrainingSessionRepository.getTrainingSessionById('session-1'),
+        ).thenAnswer((_) async => createPastSession('session-1'));
 
-        final canModify =
-            await exerciseRepository.canModifyExercises('session-1');
+        final canModify = await exerciseRepository.canModifyExercises(
+          'session-1',
+        );
 
         expect(canModify, isFalse);
       });
 
       test('returns false when session does not exist', () async {
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              'session-1',
-            )).thenAnswer((_) async => null);
+        when(
+          () =>
+              mockTrainingSessionRepository.getTrainingSessionById('session-1'),
+        ).thenAnswer((_) async => null);
 
-        final canModify =
-            await exerciseRepository.canModifyExercises('session-1');
+        final canModify = await exerciseRepository.canModifyExercises(
+          'session-1',
+        );
 
         expect(canModify, isFalse);
       });
 
       test('throws exception when repository fails', () async {
-        when(() => mockTrainingSessionRepository.getTrainingSessionById(
-              'session-1',
-            )).thenThrow(Exception('Failed to get session'));
+        when(
+          () =>
+              mockTrainingSessionRepository.getTrainingSessionById('session-1'),
+        ).thenThrow(Exception('Failed to get session'));
 
         expect(
           () => exerciseRepository.canModifyExercises('session-1'),

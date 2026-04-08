@@ -17,10 +17,10 @@ import 'package:play_with_me/features/profile/presentation/bloc/email_verificati
 import 'package:play_with_me/features/profile/presentation/pages/email_verification_page.dart';
 
 // Mock classes
-class MockEmailVerificationBloc
-    extends Mock
-    implements EmailVerificationBloc {}
+class MockEmailVerificationBloc extends Mock implements EmailVerificationBloc {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
+
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 // Fake classes for mocktail
@@ -45,10 +45,17 @@ void main() {
     mockInvitationBloc = MockInvitationBloc();
     mockAuthBloc = MockAuthenticationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
-        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+        UserEntity(
+          uid: 'test-user',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+        ),
       ),
     );
     when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
@@ -56,7 +63,9 @@ void main() {
 
   Widget createWidgetUnderTest() {
     return MediaQuery(
-      data: const MediaQueryData(size: Size(800, 1200)), // Larger viewport for tests
+      data: const MediaQueryData(
+        size: Size(800, 1200),
+      ), // Larger viewport for tests
       child: MaterialApp(
         localizationsDelegates: const [
           AppLocalizations.delegate,
@@ -78,10 +87,10 @@ void main() {
   }
 
   group('EmailVerificationPage', () {
-    testWidgets('displays loading indicator for initial state',
-        (tester) async {
-      when(() => mockBloc.state)
-          .thenReturn(const EmailVerificationState.initial());
+    testWidgets('displays loading indicator for initial state', (tester) async {
+      when(
+        () => mockBloc.state,
+      ).thenReturn(const EmailVerificationState.initial());
       when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -90,10 +99,10 @@ void main() {
       expect(find.text('Email Verification'), findsOneWidget);
     });
 
-    testWidgets('displays loading indicator for loading state',
-        (tester) async {
-      when(() => mockBloc.state)
-          .thenReturn(const EmailVerificationState.loading());
+    testWidgets('displays loading indicator for loading state', (tester) async {
+      when(
+        () => mockBloc.state,
+      ).thenReturn(const EmailVerificationState.loading());
       when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -104,16 +113,18 @@ void main() {
     group('Verified State', () {
       testWidgets('displays verified UI with success icon', (tester) async {
         final verifiedAt = DateTime(2024, 10, 15);
-        when(() => mockBloc.state).thenReturn(
-          EmailVerificationState.verified(verifiedAt: verifiedAt),
-        );
+        when(
+          () => mockBloc.state,
+        ).thenReturn(EmailVerificationState.verified(verifiedAt: verifiedAt));
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
 
         await tester.pumpWidget(createWidgetUnderTest());
 
         expect(find.text('Email Verified!'), findsOneWidget);
-        expect(find.text('Your email has been successfully verified.'),
-            findsOneWidget);
+        expect(
+          find.text('Your email has been successfully verified.'),
+          findsOneWidget,
+        );
         expect(find.text('Verified on: Oct 15, 2024'), findsOneWidget);
         expect(find.byIcon(Icons.verified), findsOneWidget);
         expect(find.text('Back to Profile'), findsOneWidget);
@@ -135,8 +146,9 @@ void main() {
     });
 
     group('Pending State', () {
-      testWidgets('displays pending UI when email not yet sent',
-          (tester) async {
+      testWidgets('displays pending UI when email not yet sent', (
+        tester,
+      ) async {
         when(() => mockBloc.state).thenReturn(
           const EmailVerificationState.pending(
             email: 'test@example.com',
@@ -153,13 +165,14 @@ void main() {
         expect(find.text('test@example.com'), findsOneWidget);
         expect(find.text('Send Verification Email'), findsOneWidget);
         expect(
-            find.text(
-                'Click the button below to send a verification email.'),
-            findsOneWidget);
+          find.text('Click the button below to send a verification email.'),
+          findsOneWidget,
+        );
       });
 
-      testWidgets('displays pending UI when email has been sent',
-          (tester) async {
+      testWidgets('displays pending UI when email has been sent', (
+        tester,
+      ) async {
         when(() => mockBloc.state).thenReturn(
           EmailVerificationState.pending(
             email: 'test@example.com',
@@ -178,9 +191,9 @@ void main() {
         expect(find.text('Refresh Status'), findsAtLeastNWidgets(1));
         expect(find.text('Resend Email'), findsOneWidget);
         expect(
-            find.text(
-                'We\'ve sent a verification email to your address.'),
-            findsOneWidget);
+          find.text('We\'ve sent a verification email to your address.'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('displays instruction cards', (tester) async {
@@ -228,13 +241,19 @@ void main() {
 
         expect(find.text('Check your spam/junk folder'), findsOneWidget);
         expect(
-            find.text('Make sure the email address is correct'), findsOneWidget);
-        expect(find.text('Wait a few minutes for the email to arrive'),
-            findsOneWidget);
+          find.text('Make sure the email address is correct'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Wait a few minutes for the email to arrive'),
+          findsOneWidget,
+        );
         expect(find.text('Check your internet connection'), findsOneWidget);
         expect(find.text('Still having issues?'), findsOneWidget);
-        expect(find.text('Contact support at support@gatherli.org'),
-            findsOneWidget);
+        expect(
+          find.text('Contact support at support@gatherli.org'),
+          findsOneWidget,
+        );
       });
     });
 
@@ -263,8 +282,9 @@ void main() {
 
         // Snackbar message appears
         expect(
-            find.text('Verification email sent to test@example.com'),
-            findsOneWidget);
+          find.text('Verification email sent to test@example.com'),
+          findsOneWidget,
+        );
       });
     });
 
@@ -287,12 +307,11 @@ void main() {
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
       });
 
-      testWidgets('try again button triggers checkStatus event',
-          (tester) async {
+      testWidgets('try again button triggers checkStatus event', (
+        tester,
+      ) async {
         when(() => mockBloc.state).thenReturn(
-          const EmailVerificationState.error(
-            message: 'Failed to send email',
-          ),
+          const EmailVerificationState.error(message: 'Failed to send email'),
         );
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
         when(() => mockBloc.add(any())).thenReturn(null);
@@ -301,15 +320,14 @@ void main() {
         await tester.tap(find.text('Try Again'));
         await tester.pump();
 
-        verify(() => mockBloc.add(const EmailVerificationEvent.checkStatus()))
-            .called(1);
+        verify(
+          () => mockBloc.add(const EmailVerificationEvent.checkStatus()),
+        ).called(1);
       });
 
       testWidgets('back button pops navigation', (tester) async {
         when(() => mockBloc.state).thenReturn(
-          const EmailVerificationState.error(
-            message: 'Failed to send email',
-          ),
+          const EmailVerificationState.error(message: 'Failed to send email'),
         );
         when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
 
@@ -321,8 +339,9 @@ void main() {
         expect(find.byType(EmailVerificationPage), findsNothing);
       });
 
-      testWidgets('shows error snackbar when error state is emitted',
-          (tester) async {
+      testWidgets('shows error snackbar when error state is emitted', (
+        tester,
+      ) async {
         when(() => mockBloc.state).thenReturn(
           const EmailVerificationState.pending(
             email: 'test@example.com',
@@ -348,8 +367,9 @@ void main() {
     });
 
     testWidgets('AppBar displays correct title', (tester) async {
-      when(() => mockBloc.state)
-          .thenReturn(const EmailVerificationState.initial());
+      when(
+        () => mockBloc.state,
+      ).thenReturn(const EmailVerificationState.initial());
       when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
 
       await tester.pumpWidget(createWidgetUnderTest());

@@ -68,13 +68,17 @@ void main() {
     });
 
     group('LoadParticipants', () {
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [ParticipationLoading, ParticipationLoaded] when participants are loaded successfully',
         build: () {
-          when(() => mockRepository
-                  .getTrainingSessionParticipantsStream(testSessionId))
-              .thenAnswer((_) => Stream.value(testParticipants));
+          when(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).thenAnswer((_) => Stream.value(testParticipants));
           return bloc;
         },
         act: (bloc) => bloc.add(const LoadParticipants(testSessionId)),
@@ -86,38 +90,49 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockRepository
-              .getTrainingSessionParticipantsStream(testSessionId)).called(1);
+          verify(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).called(1);
         },
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [ParticipationLoading, ParticipationLoaded] with empty list when no participants',
         build: () {
-          when(() => mockRepository
-                  .getTrainingSessionParticipantsStream(testSessionId))
-              .thenAnswer((_) => Stream.value([]));
+          when(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).thenAnswer((_) => Stream.value([]));
           return bloc;
         },
         act: (bloc) => bloc.add(const LoadParticipants(testSessionId)),
         expect: () => [
           const ParticipationLoading(),
-          const ParticipationLoaded(
-            participants: [],
-            participantCount: 0,
-          ),
+          const ParticipationLoaded(participants: [], participantCount: 0),
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [ParticipationLoading, ParticipationError] when stream fails with FirebaseException',
         build: () {
-          when(() => mockRepository
-                  .getTrainingSessionParticipantsStream(testSessionId))
-              .thenAnswer((_) => Stream.error(
-                  FakeFirebaseException('permission-denied', 'Access denied')));
+          when(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).thenAnswer(
+            (_) => Stream.error(
+              FakeFirebaseException('permission-denied', 'Access denied'),
+            ),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const LoadParticipants(testSessionId)),
@@ -130,17 +145,21 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'updates loaded state when participants stream emits new data',
         build: () {
           final controller =
               Stream<List<TrainingSessionParticipantModel>>.value(
-            testParticipants,
-          );
-          when(() => mockRepository
-                  .getTrainingSessionParticipantsStream(testSessionId))
-              .thenAnswer((_) => controller);
+                testParticipants,
+              );
+          when(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).thenAnswer((_) => controller);
           return bloc;
         },
         act: (bloc) => bloc.add(const LoadParticipants(testSessionId)),
@@ -155,15 +174,20 @@ void main() {
     });
 
     group('JoinTrainingSession', () {
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [JoiningSession, JoinedSession, ParticipationLoading, ParticipationLoaded] when join succeeds',
         build: () {
-          when(() => mockRepository.joinTrainingSession(testSessionId))
-              .thenAnswer((_) async => {});
-          when(() => mockRepository
-                  .getTrainingSessionParticipantsStream(testSessionId))
-              .thenAnswer((_) => Stream.value(testParticipants));
+          when(
+            () => mockRepository.joinTrainingSession(testSessionId),
+          ).thenAnswer((_) async => {});
+          when(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).thenAnswer((_) => Stream.value(testParticipants));
           return bloc;
         },
         act: (bloc) => bloc.add(const JoinTrainingSession(testSessionId)),
@@ -177,22 +201,31 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockRepository.joinTrainingSession(testSessionId))
-              .called(1);
-          verify(() => mockRepository
-              .getTrainingSessionParticipantsStream(testSessionId)).called(1);
+          verify(
+            () => mockRepository.joinTrainingSession(testSessionId),
+          ).called(1);
+          verify(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).called(1);
         },
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [JoiningSession, ParticipationError] when join fails with unauthenticated error',
         build: () {
-          when(() => mockRepository.joinTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'unauthenticated',
-            'Not authenticated',
-          ));
+          when(
+            () => mockRepository.joinTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException(
+              'unauthenticated',
+              'Not authenticated',
+            ),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const JoinTrainingSession(testSessionId)),
@@ -205,15 +238,17 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [JoiningSession, ParticipationError] when join fails with already-exists error',
         build: () {
-          when(() => mockRepository.joinTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'already-exists',
-            'Already joined',
-          ));
+          when(
+            () => mockRepository.joinTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException('already-exists', 'Already joined'),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const JoinTrainingSession(testSessionId)),
@@ -226,15 +261,20 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [JoiningSession, ParticipationError] when join fails with failed-precondition error',
         build: () {
-          when(() => mockRepository.joinTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'failed-precondition',
-            'Session is full',
-          ));
+          when(
+            () => mockRepository.joinTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException(
+              'failed-precondition',
+              'Session is full',
+            ),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const JoinTrainingSession(testSessionId)),
@@ -247,12 +287,15 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [JoiningSession, ParticipationError] when join fails with generic error',
         build: () {
-          when(() => mockRepository.joinTrainingSession(testSessionId))
-              .thenThrow(Exception('Unknown error'));
+          when(
+            () => mockRepository.joinTrainingSession(testSessionId),
+          ).thenThrow(Exception('Unknown error'));
           return bloc;
         },
         act: (bloc) => bloc.add(const JoinTrainingSession(testSessionId)),
@@ -267,15 +310,20 @@ void main() {
     });
 
     group('LeaveTrainingSession', () {
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [LeavingSession, LeftSession, ParticipationLoading, ParticipationLoaded] when leave succeeds',
         build: () {
-          when(() => mockRepository.leaveTrainingSession(testSessionId))
-              .thenAnswer((_) async => {});
-          when(() => mockRepository
-                  .getTrainingSessionParticipantsStream(testSessionId))
-              .thenAnswer((_) => Stream.value([]));
+          when(
+            () => mockRepository.leaveTrainingSession(testSessionId),
+          ).thenAnswer((_) async => {});
+          when(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).thenAnswer((_) => Stream.value([]));
           return bloc;
         },
         act: (bloc) => bloc.add(const LeaveTrainingSession(testSessionId)),
@@ -283,28 +331,34 @@ void main() {
           const LeavingSession(testSessionId),
           const LeftSession(sessionId: testSessionId),
           const ParticipationLoading(),
-          const ParticipationLoaded(
-            participants: [],
-            participantCount: 0,
-          ),
+          const ParticipationLoaded(participants: [], participantCount: 0),
         ],
         verify: (_) {
-          verify(() => mockRepository.leaveTrainingSession(testSessionId))
-              .called(1);
-          verify(() => mockRepository
-              .getTrainingSessionParticipantsStream(testSessionId)).called(1);
+          verify(
+            () => mockRepository.leaveTrainingSession(testSessionId),
+          ).called(1);
+          verify(
+            () => mockRepository.getTrainingSessionParticipantsStream(
+              testSessionId,
+            ),
+          ).called(1);
         },
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [LeavingSession, ParticipationError] when leave fails with permission-denied error',
         build: () {
-          when(() => mockRepository.leaveTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'permission-denied',
-            'Permission denied',
-          ));
+          when(
+            () => mockRepository.leaveTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException(
+              'permission-denied',
+              'Permission denied',
+            ),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const LeaveTrainingSession(testSessionId)),
@@ -317,15 +371,17 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [LeavingSession, ParticipationError] when leave fails with not-found error',
         build: () {
-          when(() => mockRepository.leaveTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'not-found',
-            'Session not found',
-          ));
+          when(
+            () => mockRepository.leaveTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException('not-found', 'Session not found'),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const LeaveTrainingSession(testSessionId)),
@@ -338,12 +394,17 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [LeavingSession, ParticipationError] when leave fails with Firestore error',
         build: () {
-          when(() => mockRepository.leaveTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseException('unavailable', 'Service unavailable'));
+          when(
+            () => mockRepository.leaveTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseException('unavailable', 'Service unavailable'),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const LeaveTrainingSession(testSessionId)),
@@ -356,12 +417,15 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [LeavingSession, ParticipationError] when leave fails with generic error',
         build: () {
-          when(() => mockRepository.leaveTrainingSession(testSessionId))
-              .thenThrow(Exception('Unknown error'));
+          when(
+            () => mockRepository.leaveTrainingSession(testSessionId),
+          ).thenThrow(Exception('Unknown error'));
           return bloc;
         },
         act: (bloc) => bloc.add(const LeaveTrainingSession(testSessionId)),
@@ -377,12 +441,15 @@ void main() {
 
     // Story 15.14: Cancel Training Session tests
     group('CancelTrainingSession', () {
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, CancelledSession] when cancel succeeds',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenAnswer((_) async => {});
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenAnswer((_) async => {});
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
@@ -391,20 +458,26 @@ void main() {
           const CancelledSession(sessionId: testSessionId),
         ],
         verify: (_) {
-          verify(() => mockRepository.cancelTrainingSession(testSessionId))
-              .called(1);
+          verify(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).called(1);
         },
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, ParticipationError] when cancel fails with unauthenticated error',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'unauthenticated',
-            'Not authenticated',
-          ));
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException(
+              'unauthenticated',
+              'Not authenticated',
+            ),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
@@ -417,36 +490,44 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, ParticipationError] when cancel fails with permission-denied error',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'permission-denied',
-            'Only creator can cancel',
-          ));
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException(
+              'permission-denied',
+              'Only creator can cancel',
+            ),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
         expect: () => [
           const CancellingSession(testSessionId),
           const ParticipationError(
-            message: 'Only the session creator can cancel this training session',
+            message:
+                'Only the session creator can cancel this training session',
             errorCode: 'permission-denied',
           ),
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, ParticipationError] when cancel fails with not-found error',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'not-found',
-            'Session not found',
-          ));
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException('not-found', 'Session not found'),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
@@ -459,15 +540,20 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, ParticipationError] when cancel fails with failed-precondition (already cancelled)',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'failed-precondition',
-            'This training session is already cancelled',
-          ));
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException(
+              'failed-precondition',
+              'This training session is already cancelled',
+            ),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
@@ -480,15 +566,20 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, ParticipationError] when cancel fails with failed-precondition (completed)',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'failed-precondition',
-            'Cannot cancel a completed training session',
-          ));
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException(
+              'failed-precondition',
+              'Cannot cancel a completed training session',
+            ),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
@@ -501,15 +592,17 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, ParticipationError] when cancel fails with internal error',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenThrow(FakeFirebaseFunctionsException(
-            'internal',
-            'Server error',
-          ));
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseFunctionsException('internal', 'Server error'),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
@@ -522,13 +615,17 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, ParticipationError] when cancel fails with Firestore error',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenThrow(
-                  FakeFirebaseException('unavailable', 'Service unavailable'));
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenThrow(
+            FakeFirebaseException('unavailable', 'Service unavailable'),
+          );
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
@@ -541,12 +638,15 @@ void main() {
         ],
       );
 
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'emits [CancellingSession, ParticipationError] when cancel fails with generic error',
         build: () {
-          when(() => mockRepository.cancelTrainingSession(testSessionId))
-              .thenThrow(Exception('Unknown error'));
+          when(
+            () => mockRepository.cancelTrainingSession(testSessionId),
+          ).thenThrow(Exception('Unknown error'));
           return bloc;
         },
         act: (bloc) => bloc.add(const CancelTrainingSession(testSessionId)),
@@ -561,8 +661,10 @@ void main() {
     });
 
     group('Error handling', () {
-      blocTest<TrainingSessionParticipationBloc,
-          TrainingSessionParticipationState>(
+      blocTest<
+        TrainingSessionParticipationBloc,
+        TrainingSessionParticipationState
+      >(
         'provides friendly error message for all Firebase Functions error codes',
         build: () => bloc,
         act: (bloc) {},
@@ -586,9 +688,11 @@ void main() {
 
     group('Stream subscription cleanup', () {
       test('cancels participants subscription on close', () async {
-        when(() =>
-                mockRepository.getTrainingSessionParticipantsStream(testSessionId))
-            .thenAnswer((_) => Stream.value(testParticipants));
+        when(
+          () => mockRepository.getTrainingSessionParticipantsStream(
+            testSessionId,
+          ),
+        ).thenAnswer((_) => Stream.value(testParticipants));
 
         bloc.add(const LoadParticipants(testSessionId));
         await Future.delayed(const Duration(milliseconds: 100));

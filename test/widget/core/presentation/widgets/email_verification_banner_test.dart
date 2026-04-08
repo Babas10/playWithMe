@@ -30,37 +30,27 @@ void main() {
   }
 
   group('EmailVerificationBanner', () {
-    testWidgets('renders warning message with days remaining',
-        (tester) async {
+    testWidgets('renders warning message with days remaining', (tester) async {
       await tester.pumpWidget(buildTestWidget(daysRemaining: 5));
       await tester.pumpAndSettle();
 
-      expect(
-        find.textContaining('5 days left'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('5 days left'), findsOneWidget);
     });
 
-    testWidgets('renders warning message with 1 day remaining',
-        (tester) async {
+    testWidgets('renders warning message with 1 day remaining', (tester) async {
       await tester.pumpWidget(buildTestWidget(daysRemaining: 1));
       await tester.pumpAndSettle();
 
-      expect(
-        find.textContaining('1 days left'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('1 days left'), findsOneWidget);
     });
 
-    testWidgets('renders warning message with 7 days remaining',
-        (tester) async {
+    testWidgets('renders warning message with 7 days remaining', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestWidget(daysRemaining: 7));
       await tester.pumpAndSettle();
 
-      expect(
-        find.textContaining('7 days left'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('7 days left'), findsOneWidget);
     });
 
     testWidgets('renders Verify Now button', (tester) async {
@@ -84,14 +74,15 @@ void main() {
       expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
     });
 
-    testWidgets('calls onVerifyNow when Verify Now is tapped',
-        (tester) async {
+    testWidgets('calls onVerifyNow when Verify Now is tapped', (tester) async {
       bool verifyNowCalled = false;
 
-      await tester.pumpWidget(buildTestWidget(
-        daysRemaining: 5,
-        onVerifyNow: () => verifyNowCalled = true,
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(
+          daysRemaining: 5,
+          onVerifyNow: () => verifyNowCalled = true,
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Verify Now'));
@@ -103,10 +94,12 @@ void main() {
     testWidgets('calls onDismiss when Dismiss is tapped', (tester) async {
       bool dismissCalled = false;
 
-      await tester.pumpWidget(buildTestWidget(
-        daysRemaining: 5,
-        onDismiss: () => dismissCalled = true,
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(
+          daysRemaining: 5,
+          onDismiss: () => dismissCalled = true,
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Dismiss'));
@@ -119,19 +112,14 @@ void main() {
       await tester.pumpWidget(buildTestWidget(daysRemaining: 0));
       await tester.pumpAndSettle();
 
-      expect(
-        find.textContaining('0 days left'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('0 days left'), findsOneWidget);
     });
 
     testWidgets('banner takes full width', (tester) async {
       await tester.pumpWidget(buildTestWidget(daysRemaining: 5));
       await tester.pumpAndSettle();
 
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
       expect(container.constraints?.maxWidth, double.infinity);
     });
 
@@ -139,9 +127,7 @@ void main() {
       await tester.pumpWidget(buildTestWidget(daysRemaining: 5));
       await tester.pumpAndSettle();
 
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
       expect(
         (container.decoration as BoxDecoration?)?.color ?? container.color,
         Colors.amber.shade700,

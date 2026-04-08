@@ -16,19 +16,22 @@ import 'package:play_with_me/features/games/presentation/pages/game_result_view_
 import 'package:play_with_me/l10n/app_localizations.dart';
 
 class MockInvitationBloc extends Mock implements InvitationBloc {}
+
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
-RatingHistoryEntry _elo({required double oldRating, required double newRating}) =>
-    RatingHistoryEntry(
-      entryId: 'entry-test',
-      gameId: 'game1',
-      oldRating: oldRating,
-      newRating: newRating,
-      ratingChange: newRating - oldRating,
-      opponentTeam: '',
-      won: newRating >= oldRating,
-      timestamp: DateTime(2024),
-    );
+RatingHistoryEntry _elo({
+  required double oldRating,
+  required double newRating,
+}) => RatingHistoryEntry(
+  entryId: 'entry-test',
+  gameId: 'game1',
+  oldRating: oldRating,
+  newRating: newRating,
+  ratingChange: newRating - oldRating,
+  opponentTeam: '',
+  won: newRating >= oldRating,
+  timestamp: DateTime(2024),
+);
 
 Widget _buildApp({
   required GameModel game,
@@ -69,19 +72,50 @@ void main() {
     mockInvitationBloc = MockInvitationBloc();
     mockAuthBloc = MockAuthenticationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
     when(() => mockAuthBloc.state).thenReturn(
       const AuthenticationAuthenticated(
-        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+        UserEntity(
+          uid: 'test-user',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+        ),
       ),
     );
     when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
 
     players = {
-      'user1': const UserModel(uid: 'user1', email: 'alice@example.com', displayName: 'Alice', isEmailVerified: true, isAnonymous: false),
-      'user2': const UserModel(uid: 'user2', email: 'bob@example.com', displayName: 'Bob', isEmailVerified: true, isAnonymous: false),
-      'user3': const UserModel(uid: 'user3', email: 'charlie@example.com', displayName: null, isEmailVerified: true, isAnonymous: false),
-      'user4': const UserModel(uid: 'user4', email: 'diana@example.com', displayName: 'Diana', isEmailVerified: true, isAnonymous: false),
+      'user1': const UserModel(
+        uid: 'user1',
+        email: 'alice@example.com',
+        displayName: 'Alice',
+        isEmailVerified: true,
+        isAnonymous: false,
+      ),
+      'user2': const UserModel(
+        uid: 'user2',
+        email: 'bob@example.com',
+        displayName: 'Bob',
+        isEmailVerified: true,
+        isAnonymous: false,
+      ),
+      'user3': const UserModel(
+        uid: 'user3',
+        email: 'charlie@example.com',
+        displayName: null,
+        isEmailVerified: true,
+        isAnonymous: false,
+      ),
+      'user4': const UserModel(
+        uid: 'user4',
+        email: 'diana@example.com',
+        displayName: 'Diana',
+        isEmailVerified: true,
+        isAnonymous: false,
+      ),
     };
 
     gameWithResult = GameModel(
@@ -90,7 +124,11 @@ void main() {
       groupId: 'group1',
       scheduledAt: DateTime(2024, 1, 15, 10, 0),
       status: GameStatus.completed,
-      location: const GameLocation(name: 'Test Court', latitude: 40.7128, longitude: -74.0060),
+      location: const GameLocation(
+        name: 'Test Court',
+        latitude: 40.7128,
+        longitude: -74.0060,
+      ),
       createdBy: 'user1',
       createdAt: DateTime(2024, 1, 1),
       playerIds: const ['user1', 'user2', 'user3', 'user4'],
@@ -115,59 +153,75 @@ void main() {
   group('GameResultViewPage', () {
     testWidgets('shows empty state when no results', (tester) async {
       final gameWithoutResult = gameWithResult.copyWith(result: null);
-      await tester.pumpWidget(_buildApp(
-        game: gameWithoutResult,
-        players: players,
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
+      await tester.pumpWidget(
+        _buildApp(
+          game: gameWithoutResult,
+          players: players,
+          invitationBloc: mockInvitationBloc,
+          authBloc: mockAuthBloc,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('No results available yet'), findsOneWidget);
-      expect(find.text('Scores will appear here once they are entered'), findsOneWidget);
+      expect(
+        find.text('Scores will appear here once they are entered'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('Final Score card is removed (Story 14.13)', (tester) async {
-      await tester.pumpWidget(_buildApp(
-        game: gameWithResult,
-        players: players,
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
+      await tester.pumpWidget(
+        _buildApp(
+          game: gameWithResult,
+          players: players,
+          invitationBloc: mockInvitationBloc,
+          authBloc: mockAuthBloc,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Final Score'), findsNothing);
     });
 
     testWidgets('shows Individual Games section', (tester) async {
-      await tester.pumpWidget(_buildApp(
-        game: gameWithResult,
-        players: players,
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
+      await tester.pumpWidget(
+        _buildApp(
+          game: gameWithResult,
+          players: players,
+          invitationBloc: mockInvitationBloc,
+          authBloc: mockAuthBloc,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Individual Games'), findsOneWidget);
       expect(find.text('Game 1'), findsOneWidget);
     });
 
-    testWidgets('shows per-game team names using session-level fallback (backward compat)', (tester) async {
-      // Game has no per-game teams → must fall back to session-level teams
-      await tester.pumpWidget(_buildApp(
-        game: gameWithResult,
-        players: players,
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'shows per-game team names using session-level fallback (backward compat)',
+      (tester) async {
+        // Game has no per-game teams → must fall back to session-level teams
+        await tester.pumpWidget(
+          _buildApp(
+            game: gameWithResult,
+            players: players,
+            invitationBloc: mockInvitationBloc,
+            authBloc: mockAuthBloc,
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      // Session teams: user1+user2 = "Alice & Bob", user3+user4 = "charlie & Diana"
-      expect(find.text('Alice & Bob'), findsAtLeastNWidgets(1));
-      expect(find.text('charlie & Diana'), findsAtLeastNWidgets(1));
-    });
+        // Session teams: user1+user2 = "Alice & Bob", user3+user4 = "charlie & Diana"
+        expect(find.text('Alice & Bob'), findsAtLeastNWidgets(1));
+        expect(find.text('charlie & Diana'), findsAtLeastNWidgets(1));
+      },
+    );
 
-    testWidgets('shows per-game team names from IndividualGame.teams override', (tester) async {
+    testWidgets('shows per-game team names from IndividualGame.teams override', (
+      tester,
+    ) async {
       // Game 1 uses a different split from session-level
       final gameWithPerGameTeams = gameWithResult.copyWith(
         result: const GameResult(
@@ -186,12 +240,14 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(_buildApp(
-        game: gameWithPerGameTeams,
-        players: players,
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
+      await tester.pumpWidget(
+        _buildApp(
+          game: gameWithPerGameTeams,
+          players: players,
+          invitationBloc: mockInvitationBloc,
+          authBloc: mockAuthBloc,
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Per-game teams: user1+user3 = "Alice & charlie", user2+user4 = "Bob & Diana"
@@ -228,13 +284,15 @@ void main() {
         'user4': _elo(oldRating: 1200, newRating: 1184),
       };
 
-      await tester.pumpWidget(_buildApp(
-        game: gameWith2Games,
-        players: players,
-        playerEloUpdates: eloUpdates,
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
+      await tester.pumpWidget(
+        _buildApp(
+          game: gameWith2Games,
+          players: players,
+          playerEloUpdates: eloUpdates,
+          invitationBloc: mockInvitationBloc,
+          authBloc: mockAuthBloc,
+        ),
+      );
       await tester.pumpAndSettle();
 
       // user1+user2: 1 win (game 1 teamA won), 1 loss (game 2 teamB won)
@@ -242,7 +300,9 @@ void main() {
       expect(find.text('1W - 1L'), findsNWidgets(4)); // all 4 players are 1W-1L
     });
 
-    testWidgets('ELO card shows correct win/loss for rotating per-game teams', (tester) async {
+    testWidgets('ELO card shows correct win/loss for rotating per-game teams', (
+      tester,
+    ) async {
       // Game 1: user1+user2 vs user3+user4, teamA (user1+user2) wins
       // Game 2: user1+user3 vs user2+user4, teamA (user1+user3) wins
       // user1: 2W 0L, user2: 1W 1L, user3: 1W 1L, user4: 0W 2L
@@ -276,13 +336,15 @@ void main() {
         'user4': _elo(oldRating: 1200, newRating: 1168),
       };
 
-      await tester.pumpWidget(_buildApp(
-        game: gameWithRotating,
-        players: players,
-        playerEloUpdates: eloUpdates,
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
+      await tester.pumpWidget(
+        _buildApp(
+          game: gameWithRotating,
+          players: players,
+          playerEloUpdates: eloUpdates,
+          invitationBloc: mockInvitationBloc,
+          authBloc: mockAuthBloc,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('2W - 0L'), findsOneWidget); // user1
@@ -290,26 +352,34 @@ void main() {
       expect(find.text('0W - 2L'), findsOneWidget); // user4
     });
 
-    testWidgets('renders without crash when players map is null', (tester) async {
-      await tester.pumpWidget(_buildApp(
-        game: gameWithResult,
-        players: null,
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
+    testWidgets('renders without crash when players map is null', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildApp(
+          game: gameWithResult,
+          players: null,
+          invitationBloc: mockInvitationBloc,
+          authBloc: mockAuthBloc,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(GameResultViewPage), findsOneWidget);
     });
 
-    testWidgets('ELO card hidden when playerEloUpdates is empty', (tester) async {
-      await tester.pumpWidget(_buildApp(
-        game: gameWithResult,
-        players: players,
-        playerEloUpdates: const {},
-        invitationBloc: mockInvitationBloc,
-        authBloc: mockAuthBloc,
-      ));
+    testWidgets('ELO card hidden when playerEloUpdates is empty', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildApp(
+          game: gameWithResult,
+          players: players,
+          playerEloUpdates: const {},
+          invitationBloc: mockInvitationBloc,
+          authBloc: mockAuthBloc,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('ELO Rating Changes'), findsNothing);

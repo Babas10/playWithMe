@@ -18,10 +18,10 @@ class DeepLinkBloc extends Bloc<DeepLinkEvent, DeepLinkState> {
     required DeepLinkService deepLinkService,
     required PendingInviteStorage pendingInviteStorage,
     required FirebaseAnalytics analytics,
-  })  : _deepLinkService = deepLinkService,
-        _pendingInviteStorage = pendingInviteStorage,
-        _analytics = analytics,
-        super(const DeepLinkInitial()) {
+  }) : _deepLinkService = deepLinkService,
+       _pendingInviteStorage = pendingInviteStorage,
+       _analytics = analytics,
+       super(const DeepLinkInitial()) {
     on<InitializeDeepLinks>(_onInitialize);
     on<InviteTokenReceived>(_onInviteTokenReceived);
     on<ClearPendingInvite>(_onClearPendingInvite);
@@ -60,13 +60,11 @@ class DeepLinkBloc extends Bloc<DeepLinkEvent, DeepLinkState> {
 
   void _startLinkListener() {
     // Listen for foreground deep links
-    _tokenSubscription = _deepLinkService.inviteTokenStream.listen(
-      (token) {
-        if (token != null) {
-          add(InviteTokenReceived(token));
-        }
-      },
-    );
+    _tokenSubscription = _deepLinkService.inviteTokenStream.listen((token) {
+      if (token != null) {
+        add(InviteTokenReceived(token));
+      }
+    });
   }
 
   Future<void> _onInviteTokenReceived(

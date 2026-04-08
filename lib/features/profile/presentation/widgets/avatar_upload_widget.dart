@@ -41,13 +41,17 @@ class AvatarUploadWidget extends StatelessWidget {
             // Show success message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(AppLocalizations.of(context)!.avatarUploadedSuccess),
+                content: Text(
+                  AppLocalizations.of(context)!.avatarUploadedSuccess,
+                ),
                 backgroundColor: Colors.green,
               ),
             );
 
             // Reset the bloc
-            context.read<AvatarUploadBloc>().add(const AvatarUploadEvent.reset());
+            context.read<AvatarUploadBloc>().add(
+              const AvatarUploadEvent.reset(),
+            );
           } else if (state is AvatarUploadUploadError) {
             // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
@@ -71,13 +75,17 @@ class AvatarUploadWidget extends StatelessWidget {
             // Show success message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(AppLocalizations.of(context)!.avatarRemovedSuccess),
+                content: Text(
+                  AppLocalizations.of(context)!.avatarRemovedSuccess,
+                ),
                 backgroundColor: Colors.green,
               ),
             );
 
             // Reset the bloc
-            context.read<AvatarUploadBloc>().add(const AvatarUploadEvent.reset());
+            context.read<AvatarUploadBloc>().add(
+              const AvatarUploadEvent.reset(),
+            );
           } else if (state is AvatarUploadDeleteError) {
             // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
@@ -102,10 +110,7 @@ class _AvatarUploadContent extends StatelessWidget {
   final String? currentPhotoUrl;
   final bool enabled;
 
-  const _AvatarUploadContent({
-    this.currentPhotoUrl,
-    required this.enabled,
-  });
+  const _AvatarUploadContent({this.currentPhotoUrl, required this.enabled});
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +118,9 @@ class _AvatarUploadContent extends StatelessWidget {
       builder: (context, state) {
         final isUploading = state is AvatarUploadUploading;
         final isPicked = state is AvatarUploadPicked;
-        final uploadProgress = state is AvatarUploadUploading ? state.progress : 0.0;
+        final uploadProgress = state is AvatarUploadUploading
+            ? state.progress
+            : 0.0;
 
         // Determine which image to display
         File? pickedImage;
@@ -217,8 +224,8 @@ class _AvatarUploadContent extends StatelessWidget {
                   TextButton.icon(
                     onPressed: () {
                       context.read<AvatarUploadBloc>().add(
-                            const AvatarUploadEvent.uploadCancelled(),
-                          );
+                        const AvatarUploadEvent.uploadCancelled(),
+                      );
                     },
                     icon: const Icon(Icons.cancel),
                     label: Text(AppLocalizations.of(context)!.cancel),
@@ -227,8 +234,8 @@ class _AvatarUploadContent extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: () {
                       context.read<AvatarUploadBloc>().add(
-                            const AvatarUploadEvent.uploadRequested(),
-                          );
+                        const AvatarUploadEvent.uploadRequested(),
+                      );
                     },
                     icon: const Icon(Icons.upload),
                     label: Text(AppLocalizations.of(context)!.upload),
@@ -237,7 +244,11 @@ class _AvatarUploadContent extends StatelessWidget {
               ),
 
             // Delete button if current photo exists
-            if (!isPicked && !isUploading && currentPhotoUrl != null && currentPhotoUrl!.isNotEmpty && enabled)
+            if (!isPicked &&
+                !isUploading &&
+                currentPhotoUrl != null &&
+                currentPhotoUrl!.isNotEmpty &&
+                enabled)
               TextButton.icon(
                 onPressed: () => _showDeleteConfirmation(context),
                 icon: const Icon(Icons.delete_outline, color: Colors.red),
@@ -267,10 +278,10 @@ class _AvatarUploadContent extends StatelessWidget {
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 context.read<AvatarUploadBloc>().add(
-                      const AvatarUploadEvent.imageSourceSelected(
-                        source: ImageSource.camera,
-                      ),
-                    );
+                  const AvatarUploadEvent.imageSourceSelected(
+                    source: ImageSource.camera,
+                  ),
+                );
               },
             ),
             ListTile(
@@ -279,10 +290,10 @@ class _AvatarUploadContent extends StatelessWidget {
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 context.read<AvatarUploadBloc>().add(
-                      const AvatarUploadEvent.imageSourceSelected(
-                        source: ImageSource.gallery,
-                      ),
-                    );
+                  const AvatarUploadEvent.imageSourceSelected(
+                    source: ImageSource.gallery,
+                  ),
+                );
               },
             ),
             ListTile(
@@ -315,12 +326,10 @@ class _AvatarUploadContent extends StatelessWidget {
             onPressed: () {
               Navigator.of(dialogContext).pop();
               context.read<AvatarUploadBloc>().add(
-                    const AvatarUploadEvent.deleteRequested(),
-                  );
+                const AvatarUploadEvent.deleteRequested(),
+              );
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.remove),
           ),
         ],

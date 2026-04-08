@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:play_with_me/core/theme/app_colors.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
-enum MemberAction {
-  promote,
-  demote,
-  remove,
-}
+enum MemberAction { promote, demote, remove }
 
 class MemberActionMenu extends StatelessWidget {
   final bool isCurrentUserAdmin;
@@ -47,8 +43,11 @@ class MemberActionMenu extends StatelessWidget {
               value: MemberAction.promote,
               child: Row(
                 children: [
-                  const Icon(Icons.admin_panel_settings,
-                      size: 20, color: AppColors.secondary),
+                  const Icon(
+                    Icons.admin_panel_settings,
+                    size: 20,
+                    color: AppColors.secondary,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     l10n.promoteToAdmin,
@@ -67,8 +66,11 @@ class MemberActionMenu extends StatelessWidget {
               value: MemberAction.demote,
               child: Row(
                 children: [
-                  const Icon(Icons.person,
-                      size: 20, color: AppColors.secondary),
+                  const Icon(
+                    Icons.person,
+                    size: 20,
+                    color: AppColors.secondary,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     l10n.demoteToMember,

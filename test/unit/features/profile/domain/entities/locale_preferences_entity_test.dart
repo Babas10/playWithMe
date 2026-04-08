@@ -120,37 +120,51 @@ void main() {
 
     group('getLanguageName', () {
       test('returns English for en locale', () {
-        final name = LocalePreferencesEntity.getLanguageName(const Locale('en'));
+        final name = LocalePreferencesEntity.getLanguageName(
+          const Locale('en'),
+        );
         expect(name, equals('English'));
       });
 
       test('returns Spanish name for es locale', () {
-        final name = LocalePreferencesEntity.getLanguageName(const Locale('es'));
+        final name = LocalePreferencesEntity.getLanguageName(
+          const Locale('es'),
+        );
         expect(name, equals('Español (Spanish)'));
       });
 
       test('returns German name for de locale', () {
-        final name = LocalePreferencesEntity.getLanguageName(const Locale('de'));
+        final name = LocalePreferencesEntity.getLanguageName(
+          const Locale('de'),
+        );
         expect(name, equals('Deutsch (German)'));
       });
 
       test('returns Italian name for it locale', () {
-        final name = LocalePreferencesEntity.getLanguageName(const Locale('it'));
+        final name = LocalePreferencesEntity.getLanguageName(
+          const Locale('it'),
+        );
         expect(name, equals('Italiano (Italian)'));
       });
 
       test('returns French name for fr locale', () {
-        final name = LocalePreferencesEntity.getLanguageName(const Locale('fr'));
+        final name = LocalePreferencesEntity.getLanguageName(
+          const Locale('fr'),
+        );
         expect(name, equals('Français (French)'));
       });
 
       test('returns language code for unknown locale', () {
-        final name = LocalePreferencesEntity.getLanguageName(const Locale('zh'));
+        final name = LocalePreferencesEntity.getLanguageName(
+          const Locale('zh'),
+        );
         expect(name, equals('zh'));
       });
 
       test('returns language code for unsupported locale', () {
-        final name = LocalePreferencesEntity.getLanguageName(const Locale('ja'));
+        final name = LocalePreferencesEntity.getLanguageName(
+          const Locale('ja'),
+        );
         expect(name, equals('ja'));
       });
     });

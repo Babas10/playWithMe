@@ -22,6 +22,7 @@ class MockTrainingSessionCreationBloc
     implements TrainingSessionCreationBloc {}
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 class FakeTrainingSessionCreationEvent extends Fake
@@ -49,10 +50,13 @@ void main() {
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
 
-    when(() => mockCreationBloc.state)
-        .thenReturn(const TrainingSessionCreationInitial());
+    when(
+      () => mockCreationBloc.state,
+    ).thenReturn(const TrainingSessionCreationInitial());
 
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
@@ -86,7 +90,8 @@ void main() {
       home: MultiBlocProvider(
         providers: [
           BlocProvider<TrainingSessionCreationBloc>.value(
-              value: mockCreationBloc),
+            value: mockCreationBloc,
+          ),
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
           BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
         ],
@@ -100,8 +105,9 @@ void main() {
 
   group('TrainingSessionCreationPage Widget Tests', () {
     group('Initial UI Rendering', () {
-      testWidgets('renders app bar with Create Training Session title',
-          (tester) async {
+      testWidgets('renders app bar with Create Training Session title', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.byType(AppBar), findsOneWidget);
@@ -231,10 +237,14 @@ void main() {
       testWidgets('can enter description text', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        final descriptionField =
-            find.widgetWithText(TextFormField, 'Description (Optional)');
+        final descriptionField = find.widgetWithText(
+          TextFormField,
+          'Description (Optional)',
+        );
         await tester.enterText(
-            descriptionField, 'Practice serves and blocks today!');
+          descriptionField,
+          'Practice serves and blocks today!',
+        );
         await tester.pump();
 
         expect(find.text('Practice serves and blocks today!'), findsOneWidget);
@@ -289,15 +299,18 @@ void main() {
         expect(find.byType(DatePickerDialog), findsOneWidget);
       });
 
-      testWidgets('time picker opens as centered Dialog after date confirmed',
-          (tester) async {
+      testWidgets('time picker opens as centered Dialog after date confirmed', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Tap start time tile
-        await tester.tap(find.ancestor(
-          of: find.text('Start Time'),
-          matching: find.byType(ListTile),
-        ));
+        await tester.tap(
+          find.ancestor(
+            of: find.text('Start Time'),
+            matching: find.byType(ListTile),
+          ),
+        );
         await tester.pumpAndSettle();
 
         // Confirm the date in the date picker
@@ -309,14 +322,17 @@ void main() {
         expect(find.byType(BottomSheet), findsNothing);
       });
 
-      testWidgets('time picker dialog has Cancel and OK buttons',
-          (tester) async {
+      testWidgets('time picker dialog has Cancel and OK buttons', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
-        await tester.tap(find.ancestor(
-          of: find.text('Start Time'),
-          matching: find.byType(ListTile),
-        ));
+        await tester.tap(
+          find.ancestor(
+            of: find.text('Start Time'),
+            matching: find.byType(ListTile),
+          ),
+        );
         await tester.pumpAndSettle();
         await tester.tap(find.text('OK'));
         await tester.pumpAndSettle();
@@ -327,14 +343,17 @@ void main() {
         expect(find.text('OK'), findsOneWidget);
       });
 
-      testWidgets('canceling date picker does not open time picker',
-          (tester) async {
+      testWidgets('canceling date picker does not open time picker', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
-        await tester.tap(find.ancestor(
-          of: find.text('Start Time'),
-          matching: find.byType(ListTile),
-        ));
+        await tester.tap(
+          find.ancestor(
+            of: find.text('Start Time'),
+            matching: find.byType(ListTile),
+          ),
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Cancel'));
@@ -345,14 +364,17 @@ void main() {
         expect(find.byType(DatePickerDialog), findsNothing);
       });
 
-      testWidgets('canceling time picker does not update start time',
-          (tester) async {
+      testWidgets('canceling time picker does not update start time', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
-        await tester.tap(find.ancestor(
-          of: find.text('Start Time'),
-          matching: find.byType(ListTile),
-        ));
+        await tester.tap(
+          find.ancestor(
+            of: find.text('Start Time'),
+            matching: find.byType(ListTile),
+          ),
+        );
         await tester.pumpAndSettle();
 
         // Confirm date
@@ -367,14 +389,17 @@ void main() {
         expect(find.text('Not selected'), findsWidgets);
       });
 
-      testWidgets('tapping end time without start time shows snackbar',
-          (tester) async {
+      testWidgets('tapping end time without start time shows snackbar', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
-        await tester.tap(find.ancestor(
-          of: find.text('End Time'),
-          matching: find.byType(ListTile),
-        ));
+        await tester.tap(
+          find.ancestor(
+            of: find.text('End Time'),
+            matching: find.byType(ListTile),
+          ),
+        );
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
 
@@ -384,15 +409,18 @@ void main() {
         expect(find.byType(Dialog), findsNothing);
       });
 
-      testWidgets('end time picker opens as Dialog after start time set',
-          (tester) async {
+      testWidgets('end time picker opens as Dialog after start time set', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Set start time first
-        await tester.tap(find.ancestor(
-          of: find.text('Start Time'),
-          matching: find.byType(ListTile),
-        ));
+        await tester.tap(
+          find.ancestor(
+            of: find.text('Start Time'),
+            matching: find.byType(ListTile),
+          ),
+        );
         await tester.pumpAndSettle();
         await tester.tap(find.text('OK')); // Confirm date
         await tester.pumpAndSettle();
@@ -400,10 +428,12 @@ void main() {
         await tester.pumpAndSettle();
 
         // Now tap end time
-        await tester.tap(find.ancestor(
-          of: find.text('End Time'),
-          matching: find.byType(ListTile),
-        ));
+        await tester.tap(
+          find.ancestor(
+            of: find.text('End Time'),
+            matching: find.byType(ListTile),
+          ),
+        );
         await tester.pumpAndSettle();
 
         expect(find.byType(Dialog), findsOneWidget);
@@ -412,14 +442,18 @@ void main() {
     });
 
     group('Participant Sliders', () {
-      testWidgets('min participants slider shows initial value', (tester) async {
+      testWidgets('min participants slider shows initial value', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Initial min participants value is 2
         expect(find.text('2'), findsWidgets);
       });
 
-      testWidgets('max participants slider shows initial value', (tester) async {
+      testWidgets('max participants slider shows initial value', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Initial max participants value is 10
@@ -429,8 +463,9 @@ void main() {
 
     group('Loading State', () {
       testWidgets('shows loading indicator during submission', (tester) async {
-        when(() => mockCreationBloc.state)
-            .thenReturn(const TrainingSessionCreationSubmitting());
+        when(
+          () => mockCreationBloc.state,
+        ).thenReturn(const TrainingSessionCreationSubmitting());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -443,8 +478,9 @@ void main() {
       });
 
       testWidgets('button is disabled during loading', (tester) async {
-        when(() => mockCreationBloc.state)
-            .thenReturn(const TrainingSessionCreationSubmitting());
+        when(
+          () => mockCreationBloc.state,
+        ).thenReturn(const TrainingSessionCreationSubmitting());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -458,8 +494,9 @@ void main() {
       });
 
       testWidgets('form fields are disabled during loading', (tester) async {
-        when(() => mockCreationBloc.state)
-            .thenReturn(const TrainingSessionCreationSubmitting());
+        when(
+          () => mockCreationBloc.state,
+        ).thenReturn(const TrainingSessionCreationSubmitting());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -482,7 +519,8 @@ void main() {
             const TrainingSessionCreationInitial(),
             const TrainingSessionCreationSubmitting(),
             const TrainingSessionCreationError(
-                message: 'Failed to create training session'),
+              message: 'Failed to create training session',
+            ),
           ]),
           initialState: const TrainingSessionCreationInitial(),
         );
@@ -516,13 +554,16 @@ void main() {
 
     group('Unauthenticated State', () {
       testWidgets('shows login message when not authenticated', (tester) async {
-        when(() => mockAuthBloc.state)
-            .thenReturn(const AuthenticationUnauthenticated());
+        when(
+          () => mockAuthBloc.state,
+        ).thenReturn(const AuthenticationUnauthenticated());
 
         await tester.pumpWidget(createTestWidget());
 
-        expect(find.text('Please log in to create a training session'),
-            findsOneWidget);
+        expect(
+          find.text('Please log in to create a training session'),
+          findsOneWidget,
+        );
       });
     });
   });

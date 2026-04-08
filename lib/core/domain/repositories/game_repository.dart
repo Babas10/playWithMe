@@ -60,7 +60,8 @@ abstract class GameRepository {
   Future<String> createGame(GameModel game);
 
   /// Update game information
-  Future<void> updateGameInfo(String gameId, {
+  Future<void> updateGameInfo(
+    String gameId, {
     String? title,
     String? description,
     DateTime? scheduledAt,
@@ -71,7 +72,8 @@ abstract class GameRepository {
   });
 
   /// Update game settings
-  Future<void> updateGameSettings(String gameId, {
+  Future<void> updateGameSettings(
+    String gameId, {
     int? maxPlayers,
     int? minPlayers,
     bool? allowWaitlist,
@@ -93,7 +95,8 @@ abstract class GameRepository {
   Future<void> startGame(String gameId);
 
   /// End game
-  Future<void> endGame(String gameId, {
+  Future<void> endGame(
+    String gameId, {
     String? winnerId,
     List<GameScore>? finalScores,
   });
@@ -108,7 +111,11 @@ abstract class GameRepository {
   Future<void> updateGameTeams(String gameId, String userId, GameTeams teams);
 
   /// Update game result with final scores (for completed games)
-  Future<void> updateGameResult(String gameId, String userId, GameResult result);
+  Future<void> updateGameResult(
+    String gameId,
+    String userId,
+    GameResult result,
+  );
 
   /// Save complete game result (teams + scores) atomically with transaction
   /// Sets eloCalculated = false and completedAt timestamp
@@ -135,10 +142,7 @@ abstract class GameRepository {
   });
 
   /// Get games by status
-  Future<List<GameModel>> getGamesByStatus(
-    GameStatus status, {
-    int limit = 20,
-  });
+  Future<List<GameModel>> getGamesByStatus(GameStatus status, {int limit = 20});
 
   /// Get games scheduled for today
   Future<List<GameModel>> getGamesToday();

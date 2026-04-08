@@ -18,7 +18,9 @@ import 'package:play_with_me/features/notifications/presentation/pages/notificat
 // Mocks
 class MockNotificationRepository extends Mock
     implements NotificationRepository {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
+
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 // Fakes
@@ -39,10 +41,17 @@ void main() {
     mockInvitationBloc = MockInvitationBloc();
     mockAuthBloc = MockAuthenticationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
-        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+        UserEntity(
+          uid: 'test-user',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+        ),
       ),
     );
     when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
@@ -55,11 +64,12 @@ void main() {
     getIt.registerSingleton<NotificationRepository>(mockRepository);
 
     // Default stub
-    when(() => mockRepository.getPreferences())
-        .thenAnswer((_) async => const NotificationPreferencesEntity());
-    when(() => mockRepository.preferencesStream()).thenAnswer(
-      (_) => Stream.value(const NotificationPreferencesEntity()),
-    );
+    when(
+      () => mockRepository.getPreferences(),
+    ).thenAnswer((_) async => const NotificationPreferencesEntity());
+    when(
+      () => mockRepository.preferencesStream(),
+    ).thenAnswer((_) => Stream.value(const NotificationPreferencesEntity()));
   });
 
   tearDown(() {
@@ -96,8 +106,9 @@ void main() {
       expect(find.byType(AppBar), findsOneWidget);
     });
 
-    testWidgets('initially shows initializing state',
-        (WidgetTester tester) async {
+    testWidgets('initially shows initializing state', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(createWidgetUnderTest());
 
@@ -105,15 +116,17 @@ void main() {
       expect(find.text('Initializing...'), findsOneWidget);
     });
 
-    testWidgets('loads and displays preferences after initialization',
-        (WidgetTester tester) async {
+    testWidgets('loads and displays preferences after initialization', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const testPreferences = NotificationPreferencesEntity(
         groupInvitations: true,
         invitationAccepted: false,
       );
-      when(() => mockRepository.getPreferences())
-          .thenAnswer((_) async => testPreferences);
+      when(
+        () => mockRepository.getPreferences(),
+      ).thenAnswer((_) async => testPreferences);
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -128,8 +141,9 @@ void main() {
   });
 
   group('NotificationSettingsPage - Toggle Switches', () {
-    testWidgets('displays notification toggle switches',
-        (WidgetTester tester) async {
+    testWidgets('displays notification toggle switches', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -143,8 +157,9 @@ void main() {
       expect(find.text('Role Changes'), findsOneWidget);
     });
 
-    testWidgets('displays admin notification toggles',
-        (WidgetTester tester) async {
+    testWidgets('displays admin notification toggles', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -195,8 +210,9 @@ void main() {
       expect(find.text('Quiet Hours'), findsOneWidget);
     });
 
-    testWidgets('displays admin notification description',
-        (WidgetTester tester) async {
+    testWidgets('displays admin notification description', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -209,16 +225,20 @@ void main() {
 
       // Assert
       expect(
-          find.text('Only receive these if you are an admin'), findsOneWidget);
+        find.text('Only receive these if you are an admin'),
+        findsOneWidget,
+      );
     });
   });
 
   group('NotificationSettingsPage - Error Handling', () {
-    testWidgets('displays error message when loading fails',
-        (WidgetTester tester) async {
+    testWidgets('displays error message when loading fails', (
+      WidgetTester tester,
+    ) async {
       // Arrange
-      when(() => mockRepository.getPreferences())
-          .thenThrow(Exception('Failed to load preferences'));
+      when(
+        () => mockRepository.getPreferences(),
+      ).thenThrow(Exception('Failed to load preferences'));
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -231,11 +251,13 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
     });
 
-    testWidgets('retry button reloads preferences',
-        (WidgetTester tester) async {
+    testWidgets('retry button reloads preferences', (
+      WidgetTester tester,
+    ) async {
       // Arrange
-      when(() => mockRepository.getPreferences())
-          .thenThrow(Exception('Failed to load preferences'));
+      when(
+        () => mockRepository.getPreferences(),
+      ).thenThrow(Exception('Failed to load preferences'));
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -244,8 +266,9 @@ void main() {
       await tester.pump();
 
       // Tap retry button
-      when(() => mockRepository.getPreferences())
-          .thenAnswer((_) async => const NotificationPreferencesEntity());
+      when(
+        () => mockRepository.getPreferences(),
+      ).thenAnswer((_) async => const NotificationPreferencesEntity());
 
       await tester.tap(find.text('Retry'));
       await tester.pump();
@@ -258,14 +281,16 @@ void main() {
   });
 
   group('NotificationSettingsPage - Quiet Hours Display', () {
-    testWidgets('shows default quiet hours message when disabled',
-        (WidgetTester tester) async {
+    testWidgets('shows default quiet hours message when disabled', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const preferences = NotificationPreferencesEntity(
         quietHoursEnabled: false,
       );
-      when(() => mockRepository.getPreferences())
-          .thenAnswer((_) async => preferences);
+      when(
+        () => mockRepository.getPreferences(),
+      ).thenAnswer((_) async => preferences);
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -278,21 +303,25 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text('Pause notifications during specific times'),
-          findsOneWidget);
+      expect(
+        find.text('Pause notifications during specific times'),
+        findsOneWidget,
+      );
       expect(find.text('Adjust Quiet Hours'), findsNothing);
     });
 
-    testWidgets('shows time range when quiet hours enabled',
-        (WidgetTester tester) async {
+    testWidgets('shows time range when quiet hours enabled', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const preferences = NotificationPreferencesEntity(
         quietHoursEnabled: true,
         quietHoursStart: '22:00',
         quietHoursEnd: '08:00',
       );
-      when(() => mockRepository.getPreferences())
-          .thenAnswer((_) async => preferences);
+      when(
+        () => mockRepository.getPreferences(),
+      ).thenAnswer((_) async => preferences);
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -311,8 +340,9 @@ void main() {
   });
 
   group('NotificationSettingsPage - Switch Values', () {
-    testWidgets('switches reflect preference values',
-        (WidgetTester tester) async {
+    testWidgets('switches reflect preference values', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const preferences = NotificationPreferencesEntity(
         groupInvitations: true,
@@ -320,8 +350,9 @@ void main() {
         gameCreated: true,
         memberJoined: false,
       );
-      when(() => mockRepository.getPreferences())
-          .thenAnswer((_) async => preferences);
+      when(
+        () => mockRepository.getPreferences(),
+      ).thenAnswer((_) async => preferences);
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -357,16 +388,19 @@ void main() {
   });
 
   group('NotificationSettingsPage - Update Operations', () {
-    testWidgets('updates repository when switch is toggled',
-        (WidgetTester tester) async {
+    testWidgets('updates repository when switch is toggled', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const initialPreferences = NotificationPreferencesEntity(
         groupInvitations: false,
       );
-      when(() => mockRepository.getPreferences())
-          .thenAnswer((_) async => initialPreferences);
-      when(() => mockRepository.updatePreferences(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockRepository.getPreferences(),
+      ).thenAnswer((_) async => initialPreferences);
+      when(
+        () => mockRepository.updatePreferences(any()),
+      ).thenAnswer((_) async {});
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -375,10 +409,12 @@ void main() {
       await tester.pump();
 
       // Find and tap the group invitations switch
-      await tester.tap(find.ancestor(
-        of: find.text('Group Invitations'),
-        matching: find.byType(SwitchListTile),
-      ));
+      await tester.tap(
+        find.ancestor(
+          of: find.text('Group Invitations'),
+          matching: find.byType(SwitchListTile),
+        ),
+      );
       await tester.pump();
 
       // Assert - Verify update was called

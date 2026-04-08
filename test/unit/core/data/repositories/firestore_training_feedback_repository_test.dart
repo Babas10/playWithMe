@@ -18,7 +18,8 @@ class MockUser extends Mock implements User {}
 
 class MockHttpsCallable extends Mock implements HttpsCallable {}
 
-class MockHttpsCallableResult<T> extends Mock implements HttpsCallableResult<T> {}
+class MockHttpsCallableResult<T> extends Mock
+    implements HttpsCallableResult<T> {}
 
 void main() {
   group('FirestoreTrainingFeedbackRepository', () {
@@ -60,10 +61,12 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('submitTrainingFeedback'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any()))
-            .thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('submitTrainingFeedback'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({});
 
         await repository.submitFeedback(
@@ -74,8 +77,9 @@ void main() {
           comment: 'Great session!',
         );
 
-        verify(() => mockFunctions.httpsCallable('submitTrainingFeedback'))
-            .called(1);
+        verify(
+          () => mockFunctions.httpsCallable('submitTrainingFeedback'),
+        ).called(1);
       });
 
       test('throws exception for unauthenticated user', () async {
@@ -134,14 +138,15 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('hasSubmittedTrainingFeedback'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any()))
-            .thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('hasSubmittedTrainingFeedback'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({'hasSubmitted': true});
 
-        final result =
-            await repository.hasUserSubmittedFeedback('session-123');
+        final result = await repository.hasUserSubmittedFeedback('session-123');
 
         expect(result, isTrue);
       });
@@ -150,14 +155,15 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('hasSubmittedTrainingFeedback'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any()))
-            .thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('hasSubmittedTrainingFeedback'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({'hasSubmitted': false});
 
-        final result =
-            await repository.hasUserSubmittedFeedback('session-123');
+        final result = await repository.hasUserSubmittedFeedback('session-123');
 
         expect(result, isFalse);
       });
@@ -165,8 +171,7 @@ void main() {
       test('returns false for unauthenticated user', () async {
         when(() => mockAuth.currentUser).thenReturn(null);
 
-        final result =
-            await repository.hasUserSubmittedFeedback('session-123');
+        final result = await repository.hasUserSubmittedFeedback('session-123');
 
         expect(result, isFalse);
       });
@@ -174,13 +179,14 @@ void main() {
       test('returns false on error', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('hasSubmittedTrainingFeedback'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any()))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockFunctions.httpsCallable('hasSubmittedTrainingFeedback'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenThrow(Exception('Network error'));
 
-        final result =
-            await repository.hasUserSubmittedFeedback('session-123');
+        final result = await repository.hasUserSubmittedFeedback('session-123');
 
         expect(result, isFalse);
       });
@@ -188,8 +194,7 @@ void main() {
 
     group('getAggregatedFeedback', () {
       test('returns empty aggregation when no feedback exists', () async {
-        final result =
-            await repository.getAggregatedFeedback('session-123');
+        final result = await repository.getAggregatedFeedback('session-123');
 
         expect(result, isNotNull);
         expect(result!.trainingSessionId, equals('session-123'));
@@ -203,27 +208,26 @@ void main() {
             .doc('session-123')
             .collection('feedback')
             .add({
-          'exercisesQuality': 4,
-          'trainingIntensity': 5,
-          'coachingClarity': 3,
-          'participantHash': 'hash-1',
-          'submittedAt': Timestamp.now(),
-        });
+              'exercisesQuality': 4,
+              'trainingIntensity': 5,
+              'coachingClarity': 3,
+              'participantHash': 'hash-1',
+              'submittedAt': Timestamp.now(),
+            });
 
         await fakeFirestore
             .collection('trainingSessions')
             .doc('session-123')
             .collection('feedback')
             .add({
-          'exercisesQuality': 5,
-          'trainingIntensity': 4,
-          'coachingClarity': 5,
-          'participantHash': 'hash-2',
-          'submittedAt': Timestamp.now(),
-        });
+              'exercisesQuality': 5,
+              'trainingIntensity': 4,
+              'coachingClarity': 5,
+              'participantHash': 'hash-2',
+              'submittedAt': Timestamp.now(),
+            });
 
-        final result =
-            await repository.getAggregatedFeedback('session-123');
+        final result = await repository.getAggregatedFeedback('session-123');
 
         expect(result, isNotNull);
         expect(result!.totalCount, equals(2));
@@ -238,24 +242,24 @@ void main() {
             .doc('session-123')
             .collection('feedback')
             .add({
-          'exercisesQuality': 4,
-          'trainingIntensity': 5,
-          'coachingClarity': 3,
-          'participantHash': 'hash-1',
-          'submittedAt': Timestamp.now(),
-        });
+              'exercisesQuality': 4,
+              'trainingIntensity': 5,
+              'coachingClarity': 3,
+              'participantHash': 'hash-1',
+              'submittedAt': Timestamp.now(),
+            });
 
         await fakeFirestore
             .collection('trainingSessions')
             .doc('session-123')
             .collection('feedback')
             .add({
-          'exercisesQuality': 5,
-          'trainingIntensity': 4,
-          'coachingClarity': 5,
-          'participantHash': 'hash-2',
-          'submittedAt': Timestamp.now(),
-        });
+              'exercisesQuality': 5,
+              'trainingIntensity': 4,
+              'coachingClarity': 5,
+              'participantHash': 'hash-2',
+              'submittedAt': Timestamp.now(),
+            });
 
         // Verify feedback exists
         var feedbackSnapshot = await fakeFirestore
@@ -328,8 +332,10 @@ void main() {
           ),
         ];
 
-        final aggregation =
-            FeedbackAggregation.fromFeedbackList('session-123', feedbackList);
+        final aggregation = FeedbackAggregation.fromFeedbackList(
+          'session-123',
+          feedbackList,
+        );
 
         expect(aggregation.totalCount, equals(2));
         expect(aggregation.averageExercisesQuality, equals(4.5));
@@ -338,8 +344,10 @@ void main() {
       });
 
       test('returns empty aggregation for empty list', () {
-        final aggregation =
-            FeedbackAggregation.fromFeedbackList('session-123', []);
+        final aggregation = FeedbackAggregation.fromFeedbackList(
+          'session-123',
+          [],
+        );
 
         expect(aggregation.totalCount, equals(0));
         expect(aggregation.averageExercisesQuality, equals(0.0));
@@ -369,8 +377,10 @@ void main() {
           ),
         ];
 
-        final aggregation =
-            FeedbackAggregation.fromFeedbackList('session-123', feedbackList);
+        final aggregation = FeedbackAggregation.fromFeedbackList(
+          'session-123',
+          feedbackList,
+        );
 
         expect(aggregation.comments.length, equals(1));
         expect(aggregation.comments.first, equals('Great!'));
@@ -401,8 +411,10 @@ void main() {
           ),
         ];
 
-        final aggregation =
-            FeedbackAggregation.fromFeedbackList('session-123', feedbackList);
+        final aggregation = FeedbackAggregation.fromFeedbackList(
+          'session-123',
+          feedbackList,
+        );
 
         expect(aggregation.comments.isEmpty, isTrue);
       });
@@ -423,8 +435,10 @@ void main() {
           ),
         ];
 
-        final aggregation =
-            FeedbackAggregation.fromFeedbackList('session-123', feedbackList);
+        final aggregation = FeedbackAggregation.fromFeedbackList(
+          'session-123',
+          feedbackList,
+        );
 
         expect(aggregation.overallAverage, equals(3.0));
       });

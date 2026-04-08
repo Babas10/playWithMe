@@ -19,10 +19,9 @@ class GameHistoryBloc extends Bloc<GameHistoryEvent, GameHistoryState> {
   DateTime? _startDate;
   DateTime? _endDate;
 
-  GameHistoryBloc({
-    required GameRepository gameRepository,
-  })  : _gameRepository = gameRepository,
-        super(const GameHistoryState.initial()) {
+  GameHistoryBloc({required GameRepository gameRepository})
+    : _gameRepository = gameRepository,
+      super(const GameHistoryState.initial()) {
     on<GameHistoryLoadEvent>(_onLoad);
     on<GameHistoryLoadMoreEvent>(_onLoadMore);
     on<GameHistoryRefreshEvent>(_onRefresh);
@@ -57,18 +56,22 @@ class GameHistoryBloc extends Bloc<GameHistoryEvent, GameHistoryState> {
           .first;
 
       _lastDocument = page.lastDocument;
-      emit(GameHistoryState.loaded(
-        games: page.games,
-        hasMore: page.hasMore,
-        currentFilter: _currentFilter,
-        startDate: _startDate,
-        endDate: _endDate,
-      ));
+      emit(
+        GameHistoryState.loaded(
+          games: page.games,
+          hasMore: page.hasMore,
+          currentFilter: _currentFilter,
+          startDate: _startDate,
+          endDate: _endDate,
+        ),
+      );
     } catch (e) {
-      emit(GameHistoryState.error(
-        message: 'Failed to load games: $e',
-        lastFilter: _currentFilter,
-      ));
+      emit(
+        GameHistoryState.error(
+          message: 'Failed to load games: $e',
+          lastFilter: _currentFilter,
+        ),
+      );
     }
   }
 
@@ -98,14 +101,16 @@ class GameHistoryBloc extends Bloc<GameHistoryEvent, GameHistoryState> {
 
       _lastDocument = page.lastDocument;
 
-      emit(GameHistoryState.loaded(
-        games: [...currentState.games, ...page.games],
-        hasMore: page.hasMore,
-        currentFilter: _currentFilter,
-        startDate: _startDate,
-        endDate: _endDate,
-        isLoadingMore: false,
-      ));
+      emit(
+        GameHistoryState.loaded(
+          games: [...currentState.games, ...page.games],
+          hasMore: page.hasMore,
+          currentFilter: _currentFilter,
+          startDate: _startDate,
+          endDate: _endDate,
+          isLoadingMore: false,
+        ),
+      );
     } catch (e) {
       emit(currentState.copyWith(isLoadingMore: false));
       // Don't emit error, just stop loading more
@@ -119,13 +124,15 @@ class GameHistoryBloc extends Bloc<GameHistoryEvent, GameHistoryState> {
     if (_currentUserId == null) return;
 
     // Reload with current filters
-    add(GameHistoryEvent.load(
-      groupId: _currentGroupId,
-      userId: _currentUserId!,
-      filter: _currentFilter,
-      startDate: _startDate,
-      endDate: _endDate,
-    ));
+    add(
+      GameHistoryEvent.load(
+        groupId: _currentGroupId,
+        userId: _currentUserId!,
+        filter: _currentFilter,
+        startDate: _startDate,
+        endDate: _endDate,
+      ),
+    );
   }
 
   Future<void> _onFilterChanged(
@@ -137,13 +144,15 @@ class GameHistoryBloc extends Bloc<GameHistoryEvent, GameHistoryState> {
     _currentFilter = event.filter;
 
     // Reload with new filter
-    add(GameHistoryEvent.load(
-      groupId: _currentGroupId,
-      userId: _currentUserId!,
-      filter: event.filter,
-      startDate: _startDate,
-      endDate: _endDate,
-    ));
+    add(
+      GameHistoryEvent.load(
+        groupId: _currentGroupId,
+        userId: _currentUserId!,
+        filter: event.filter,
+        startDate: _startDate,
+        endDate: _endDate,
+      ),
+    );
   }
 
   Future<void> _onDateRangeChanged(
@@ -156,12 +165,14 @@ class GameHistoryBloc extends Bloc<GameHistoryEvent, GameHistoryState> {
     _endDate = event.endDate;
 
     // Reload with new date range
-    add(GameHistoryEvent.load(
-      groupId: _currentGroupId,
-      userId: _currentUserId!,
-      filter: _currentFilter,
-      startDate: event.startDate,
-      endDate: event.endDate,
-    ));
+    add(
+      GameHistoryEvent.load(
+        groupId: _currentGroupId,
+        userId: _currentUserId!,
+        filter: _currentFilter,
+        startDate: event.startDate,
+        endDate: event.endDate,
+      ),
+    );
   }
 }

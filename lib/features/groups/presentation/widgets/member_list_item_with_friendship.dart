@@ -41,8 +41,9 @@ class MemberListItemWithFriendship extends StatelessWidget {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
-        backgroundImage:
-            user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
+        backgroundImage: user.photoUrl != null
+            ? NetworkImage(user.photoUrl!)
+            : null,
         child: user.photoUrl == null
             ? Text(
                 _getInitials(user.fullDisplayName),
@@ -78,10 +79,7 @@ class MemberListItemWithFriendship extends StatelessWidget {
           if (isAdmin) ...[
             const SizedBox(width: 8),
             Chip(
-              label: const Text(
-                'Admin',
-                style: TextStyle(fontSize: 12),
-              ),
+              label: const Text('Admin', style: TextStyle(fontSize: 12)),
               backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
               labelStyle: TextStyle(
                 color: Color(0xFF004E64),
@@ -92,11 +90,7 @@ class MemberListItemWithFriendship extends StatelessWidget {
           ],
           if (isCreator) ...[
             const SizedBox(width: 8),
-            Icon(
-              Icons.star,
-              size: 16,
-              color: Colors.amber[700],
-            ),
+            Icon(Icons.star, size: 16, color: Colors.amber[700]),
           ],
         ],
       ),
@@ -125,18 +119,11 @@ class MemberListItemWithFriendship extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.check_circle,
-            size: 16,
-            color: Colors.green[700],
-          ),
+          Icon(Icons.check_circle, size: 16, color: Colors.green[700]),
           const SizedBox(width: 4),
           Text(
             'Friend',
-            style: TextStyle(
-              color: Colors.green[700],
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.green[700], fontSize: 12),
           ),
         ],
       );
@@ -146,18 +133,11 @@ class MemberListItemWithFriendship extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.schedule,
-            size: 16,
-            color: Colors.orange[700],
-          ),
+          Icon(Icons.schedule, size: 16, color: Colors.orange[700]),
           const SizedBox(width: 4),
           Text(
             'Request Sent',
-            style: TextStyle(
-              color: Colors.orange[700],
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.orange[700], fontSize: 12),
           ),
         ],
       );
@@ -167,18 +147,11 @@ class MemberListItemWithFriendship extends StatelessWidget {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.person_add,
-            size: 16,
-            color: Colors.blue[700],
-          ),
+          Icon(Icons.person_add, size: 16, color: Colors.blue[700]),
           const SizedBox(width: 4),
           Text(
             'Wants to be friends',
-            style: TextStyle(
-              color: Colors.blue[700],
-              fontSize: 12,
-            ),
+            style: TextStyle(color: Colors.blue[700], fontSize: 12),
           ),
         ],
       );
@@ -213,10 +186,7 @@ class MemberListItemWithFriendship extends StatelessWidget {
       return Chip(
         label: const Text('Pending'),
         backgroundColor: Colors.orange.shade100,
-        labelStyle: TextStyle(
-          color: Colors.orange[900],
-          fontSize: 11,
-        ),
+        labelStyle: TextStyle(color: Colors.orange[900], fontSize: 11),
       );
     }
 

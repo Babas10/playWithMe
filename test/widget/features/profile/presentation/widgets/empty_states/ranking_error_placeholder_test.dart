@@ -51,7 +51,9 @@ void main() {
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
 
-    testWidgets('triggers callback when retry button is tapped', (tester) async {
+    testWidgets('triggers callback when retry button is tapped', (
+      tester,
+    ) async {
       var retryCallbackCalled = false;
 
       await tester.pumpWidget(

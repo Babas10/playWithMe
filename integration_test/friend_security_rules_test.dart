@@ -25,266 +25,269 @@ void main() {
   });
 
   group('Friend Security Rules', () {
-    test(
-      'Unauthenticated users cannot send friend requests',
-      () async {
-        // Create target user but don't sign in
-        final targetUser = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'target@test.com',
-          password: 'password123',
-          displayName: 'Target User',
-        );
+    test('Unauthenticated users cannot send friend requests', () async {
+      // Create target user but don't sign in
+      final targetUser = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'target@test.com',
+        password: 'password123',
+        displayName: 'Target User',
+      );
 
-        // Sign out to become unauthenticated
-        await FirebaseEmulatorHelper.signOut();
+      // Sign out to become unauthenticated
+      await FirebaseEmulatorHelper.signOut();
 
-        // Try to send friend request while unauthenticated
-        final sendRequestCallable = FirebaseFunctions.instance.httpsCallable('sendFriendRequest');
+      // Try to send friend request while unauthenticated
+      final sendRequestCallable = FirebaseFunctions.instance.httpsCallable(
+        'sendFriendRequest',
+      );
 
-        expect(
-          () async => await sendRequestCallable.call({'targetUserId': targetUser.uid}),
-          throwsA(
-            predicate((e) =>
-                e is FirebaseFunctionsException &&
-                e.code == 'unauthenticated'),
+      expect(
+        () async =>
+            await sendRequestCallable.call({'targetUserId': targetUser.uid}),
+        throwsA(
+          predicate(
+            (e) =>
+                e is FirebaseFunctionsException && e.code == 'unauthenticated',
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
 
-    test(
-      'Unauthenticated users cannot search for users',
-      () async {
-        // Create user but don't sign in
-        await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'user@test.com',
-          password: 'password123',
-          displayName: 'Test User',
-        );
+    test('Unauthenticated users cannot search for users', () async {
+      // Create user but don't sign in
+      await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'user@test.com',
+        password: 'password123',
+        displayName: 'Test User',
+      );
 
-        // Sign out to become unauthenticated
-        await FirebaseEmulatorHelper.signOut();
+      // Sign out to become unauthenticated
+      await FirebaseEmulatorHelper.signOut();
 
-        // Try to search while unauthenticated
-        final searchCallable = FirebaseFunctions.instance.httpsCallable('searchUserByEmail');
+      // Try to search while unauthenticated
+      final searchCallable = FirebaseFunctions.instance.httpsCallable(
+        'searchUserByEmail',
+      );
 
-        expect(
-          () async => await searchCallable.call({'email': 'user@test.com'}),
-          throwsA(
-            predicate((e) =>
-                e is FirebaseFunctionsException &&
-                e.code == 'unauthenticated'),
+      expect(
+        () async => await searchCallable.call({'email': 'user@test.com'}),
+        throwsA(
+          predicate(
+            (e) =>
+                e is FirebaseFunctionsException && e.code == 'unauthenticated',
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
 
-    test(
-      'Unauthenticated users cannot get friends list',
-      () async {
-        // Create user
-        final user = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'user@test.com',
-          password: 'password123',
-          displayName: 'Test User',
-        );
+    test('Unauthenticated users cannot get friends list', () async {
+      // Create user
+      final user = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'user@test.com',
+        password: 'password123',
+        displayName: 'Test User',
+      );
 
-        // Sign out to become unauthenticated
-        await FirebaseEmulatorHelper.signOut();
+      // Sign out to become unauthenticated
+      await FirebaseEmulatorHelper.signOut();
 
-        // Try to get friends while unauthenticated
-        final getFriendsCallable = FirebaseFunctions.instance.httpsCallable('getFriends');
+      // Try to get friends while unauthenticated
+      final getFriendsCallable = FirebaseFunctions.instance.httpsCallable(
+        'getFriends',
+      );
 
-        expect(
-          () async => await getFriendsCallable.call({'userId': user.uid}),
-          throwsA(
-            predicate((e) =>
-                e is FirebaseFunctionsException &&
-                e.code == 'unauthenticated'),
+      expect(
+        () async => await getFriendsCallable.call({'userId': user.uid}),
+        throwsA(
+          predicate(
+            (e) =>
+                e is FirebaseFunctionsException && e.code == 'unauthenticated',
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
 
-    test(
-      'Unauthenticated users cannot get friendship requests',
-      () async {
-        // Create user
-        await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'user@test.com',
-          password: 'password123',
-          displayName: 'Test User',
-        );
+    test('Unauthenticated users cannot get friendship requests', () async {
+      // Create user
+      await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'user@test.com',
+        password: 'password123',
+        displayName: 'Test User',
+      );
 
-        // Sign out to become unauthenticated
-        await FirebaseEmulatorHelper.signOut();
+      // Sign out to become unauthenticated
+      await FirebaseEmulatorHelper.signOut();
 
-        // Try to get requests while unauthenticated
-        final getRequestsCallable = FirebaseFunctions.instance.httpsCallable('getFriendshipRequests');
+      // Try to get requests while unauthenticated
+      final getRequestsCallable = FirebaseFunctions.instance.httpsCallable(
+        'getFriendshipRequests',
+      );
 
-        expect(
-          () async => await getRequestsCallable.call(),
-          throwsA(
-            predicate((e) =>
-                e is FirebaseFunctionsException &&
-                e.code == 'unauthenticated'),
+      expect(
+        () async => await getRequestsCallable.call(),
+        throwsA(
+          predicate(
+            (e) =>
+                e is FirebaseFunctionsException && e.code == 'unauthenticated',
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
 
-    test(
-      'Unauthenticated users cannot check friendship status',
-      () async {
-        // Create user
-        final user = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'user@test.com',
-          password: 'password123',
-          displayName: 'Test User',
-        );
+    test('Unauthenticated users cannot check friendship status', () async {
+      // Create user
+      final user = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'user@test.com',
+        password: 'password123',
+        displayName: 'Test User',
+      );
 
-        // Sign out to become unauthenticated
-        await FirebaseEmulatorHelper.signOut();
+      // Sign out to become unauthenticated
+      await FirebaseEmulatorHelper.signOut();
 
-        // Try to check status while unauthenticated
-        final checkStatusCallable = FirebaseFunctions.instance.httpsCallable('checkFriendshipStatus');
+      // Try to check status while unauthenticated
+      final checkStatusCallable = FirebaseFunctions.instance.httpsCallable(
+        'checkFriendshipStatus',
+      );
 
-        expect(
-          () async => await checkStatusCallable.call({'userId': user.uid}),
-          throwsA(
-            predicate((e) =>
-                e is FirebaseFunctionsException &&
-                e.code == 'unauthenticated'),
+      expect(
+        () async => await checkStatusCallable.call({'userId': user.uid}),
+        throwsA(
+          predicate(
+            (e) =>
+                e is FirebaseFunctionsException && e.code == 'unauthenticated',
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
 
-    test(
-      'Cloud Functions validate required parameters',
-      () async {
-        // Sign in as user
-        await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'user@test.com',
-          password: 'password123',
-          displayName: 'Test User',
-        );
+    test('Cloud Functions validate required parameters', () async {
+      // Sign in as user
+      await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'user@test.com',
+        password: 'password123',
+        displayName: 'Test User',
+      );
 
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'user@test.com',
-          password: 'password123',
-        );
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'user@test.com',
+        password: 'password123',
+      );
 
-        // Try to send friend request without required parameter
-        final sendRequestCallable = FirebaseFunctions.instance.httpsCallable('sendFriendRequest');
+      // Try to send friend request without required parameter
+      final sendRequestCallable = FirebaseFunctions.instance.httpsCallable(
+        'sendFriendRequest',
+      );
 
-        expect(
-          () async => await sendRequestCallable.call({}),
-          throwsA(isA<FirebaseFunctionsException>()),
-        );
+      expect(
+        () async => await sendRequestCallable.call({}),
+        throwsA(isA<FirebaseFunctionsException>()),
+      );
 
-        // Try to search without email parameter
-        final searchCallable = FirebaseFunctions.instance.httpsCallable('searchUserByEmail');
+      // Try to search without email parameter
+      final searchCallable = FirebaseFunctions.instance.httpsCallable(
+        'searchUserByEmail',
+      );
 
-        expect(
-          () async => await searchCallable.call({}),
-          throwsA(isA<FirebaseFunctionsException>()),
-        );
-      },
-    );
+      expect(
+        () async => await searchCallable.call({}),
+        throwsA(isA<FirebaseFunctionsException>()),
+      );
+    });
 
-    test(
-      'Users can only access their own friendship requests',
-      () async {
-        // Create two users
-        final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'user1@test.com',
-          password: 'password123',
-          displayName: 'User One',
-        );
+    test('Users can only access their own friendship requests', () async {
+      // Create two users
+      final user1 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'user1@test.com',
+        password: 'password123',
+        displayName: 'User One',
+      );
 
-        final user2 = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'user2@test.com',
-          password: 'password123',
-          displayName: 'User Two',
-        );
+      final user2 = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'user2@test.com',
+        password: 'password123',
+        displayName: 'User Two',
+      );
 
-        // User1 sends request to user2
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'user1@test.com',
-          password: 'password123',
-        );
+      // User1 sends request to user2
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'user1@test.com',
+        password: 'password123',
+      );
 
-        final sendRequestCallable = FirebaseFunctions.instance.httpsCallable('sendFriendRequest');
-        await sendRequestCallable.call({'targetUserId': user2.uid});
+      final sendRequestCallable = FirebaseFunctions.instance.httpsCallable(
+        'sendFriendRequest',
+      );
+      await sendRequestCallable.call({'targetUserId': user2.uid});
 
-        await FirebaseEmulatorHelper.waitForFirestore();
+      await FirebaseEmulatorHelper.waitForFirestore();
 
-        // User1 gets their own requests - should see sent request
-        final getRequestsCallable = FirebaseFunctions.instance.httpsCallable('getFriendshipRequests');
-        final user1Requests = await getRequestsCallable.call();
+      // User1 gets their own requests - should see sent request
+      final getRequestsCallable = FirebaseFunctions.instance.httpsCallable(
+        'getFriendshipRequests',
+      );
+      final user1Requests = await getRequestsCallable.call();
 
-        expect(user1Requests.data['sentRequests'], isNotEmpty);
-        expect(user1Requests.data['receivedRequests'], isEmpty);
+      expect(user1Requests.data['sentRequests'], isNotEmpty);
+      expect(user1Requests.data['receivedRequests'], isEmpty);
 
-        // User2 gets their own requests - should see received request
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'user2@test.com',
-          password: 'password123',
-        );
+      // User2 gets their own requests - should see received request
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'user2@test.com',
+        password: 'password123',
+      );
 
-        final user2Requests = await getRequestsCallable.call();
+      final user2Requests = await getRequestsCallable.call();
 
-        expect(user2Requests.data['receivedRequests'], isNotEmpty);
-        expect(user2Requests.data['sentRequests'], isEmpty);
+      expect(user2Requests.data['receivedRequests'], isNotEmpty);
+      expect(user2Requests.data['sentRequests'], isEmpty);
 
-        // Verify each user only sees their own requests, not the other's
-        expect(
-          user1Requests.data['sentRequests'][0]['initiatorId'],
-          equals(user1.uid),
-        );
-        expect(
-          user2Requests.data['receivedRequests'][0]['recipientId'],
-          equals(user2.uid),
-        );
-      },
-    );
+      // Verify each user only sees their own requests, not the other's
+      expect(
+        user1Requests.data['sentRequests'][0]['initiatorId'],
+        equals(user1.uid),
+      );
+      expect(
+        user2Requests.data['receivedRequests'][0]['recipientId'],
+        equals(user2.uid),
+      );
+    });
 
-    test(
-      'Cloud Functions handle invalid user IDs gracefully',
-      () async {
-        // Sign in as user
-        await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'user@test.com',
-          password: 'password123',
-          displayName: 'Test User',
-        );
+    test('Cloud Functions handle invalid user IDs gracefully', () async {
+      // Sign in as user
+      await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'user@test.com',
+        password: 'password123',
+        displayName: 'Test User',
+      );
 
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'user@test.com',
-          password: 'password123',
-        );
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'user@test.com',
+        password: 'password123',
+      );
 
-        // Try operations with invalid user IDs
-        final sendRequestCallable = FirebaseFunctions.instance.httpsCallable('sendFriendRequest');
+      // Try operations with invalid user IDs
+      final sendRequestCallable = FirebaseFunctions.instance.httpsCallable(
+        'sendFriendRequest',
+      );
 
-        // Empty user ID
-        expect(
-          () async => await sendRequestCallable.call({'targetUserId': ''}),
-          throwsA(isA<FirebaseFunctionsException>()),
-        );
+      // Empty user ID
+      expect(
+        () async => await sendRequestCallable.call({'targetUserId': ''}),
+        throwsA(isA<FirebaseFunctionsException>()),
+      );
 
-        // Non-existent user ID
-        expect(
-          () async => await sendRequestCallable.call({'targetUserId': 'non-existent-id'}),
-          throwsA(isA<FirebaseFunctionsException>()),
-        );
-      },
-    );
+      // Non-existent user ID
+      expect(
+        () async =>
+            await sendRequestCallable.call({'targetUserId': 'non-existent-id'}),
+        throwsA(isA<FirebaseFunctionsException>()),
+      );
+    });
 
     test(
       'Search function returns appropriate data without exposing sensitive info',
@@ -309,7 +312,9 @@ void main() {
           password: 'password123',
         );
 
-        final searchCallable = FirebaseFunctions.instance.httpsCallable('searchUserByEmail');
+        final searchCallable = FirebaseFunctions.instance.httpsCallable(
+          'searchUserByEmail',
+        );
         final result = await searchCallable.call({'email': 'user2@test.com'});
 
         // Verify returned data includes public info
@@ -351,8 +356,12 @@ void main() {
           password: 'password123',
         );
 
-        final sendRequestCallable = FirebaseFunctions.instance.httpsCallable('sendFriendRequest');
-        final requestResult = await sendRequestCallable.call({'targetUserId': user2.uid});
+        final sendRequestCallable = FirebaseFunctions.instance.httpsCallable(
+          'sendFriendRequest',
+        );
+        final requestResult = await sendRequestCallable.call({
+          'targetUserId': user2.uid,
+        });
 
         await FirebaseEmulatorHelper.signOut();
         await FirebaseEmulatorHelper.signIn(
@@ -364,14 +373,16 @@ void main() {
             .collection('friendships')
             .doc(requestResult.data['friendshipId'])
             .update({
-          'status': 'accepted',
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
+              'status': 'accepted',
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
 
         await FirebaseEmulatorHelper.waitForFirestore();
 
         // Get friends list
-        final getFriendsCallable = FirebaseFunctions.instance.httpsCallable('getFriends');
+        final getFriendsCallable = FirebaseFunctions.instance.httpsCallable(
+          'getFriends',
+        );
         final result = await getFriendsCallable.call({'userId': user2.uid});
 
         expect(result.data['friends'], isNotEmpty);

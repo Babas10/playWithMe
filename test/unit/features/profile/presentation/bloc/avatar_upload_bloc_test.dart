@@ -14,9 +14,13 @@ import 'package:play_with_me/features/profile/presentation/bloc/avatar_upload/av
 import 'package:play_with_me/features/profile/presentation/bloc/avatar_upload/avatar_upload_state.dart';
 
 // Mocktail mocks
-class MockImageStorageRepository extends Mock implements ImageStorageRepository {}
+class MockImageStorageRepository extends Mock
+    implements ImageStorageRepository {}
+
 class MockImagePickerService extends Mock implements ImagePickerService {}
+
 class MockAuthRepository extends Mock implements AuthRepository {}
+
 class MockFile extends Mock implements File {}
 
 void main() {
@@ -65,9 +69,7 @@ void main() {
         'emits initial state when started',
         build: createBloc,
         act: (bloc) => bloc.add(const AvatarUploadEvent.started()),
-        expect: () => [
-          const AvatarUploadState.initial(),
-        ],
+        expect: () => [const AvatarUploadState.initial()],
       );
     });
 
@@ -76,16 +78,19 @@ void main() {
         'emits [picking, validating, picked] when image is selected and validated successfully',
         setUp: () {
           final testFile = File('test_avatar.jpg');
-          when(() => mockImagePickerService.pickImage(
-                source: any(named: 'source'),
-                cropSquare: true,
-              )).thenAnswer((_) async => testFile);
-          when(() => mockImagePickerService.validateFileSize(
-                any(),
-                maxSizeInMB: 5,
-              )).thenReturn(true);
-          when(() => mockImagePickerService.validateFileExtension(any()))
-              .thenReturn(true);
+          when(
+            () => mockImagePickerService.pickImage(
+              source: any(named: 'source'),
+              cropSquare: true,
+            ),
+          ).thenAnswer((_) async => testFile);
+          when(
+            () =>
+                mockImagePickerService.validateFileSize(any(), maxSizeInMB: 5),
+          ).thenReturn(true);
+          when(
+            () => mockImagePickerService.validateFileExtension(any()),
+          ).thenReturn(true);
         },
         build: createBloc,
         act: (bloc) => bloc.add(
@@ -103,10 +108,12 @@ void main() {
       blocTest<AvatarUploadBloc, AvatarUploadState>(
         'emits [picking, initial] when user cancels image selection',
         setUp: () {
-          when(() => mockImagePickerService.pickImage(
-                source: any(named: 'source'),
-                cropSquare: true,
-              )).thenAnswer((_) async => null);
+          when(
+            () => mockImagePickerService.pickImage(
+              source: any(named: 'source'),
+              cropSquare: true,
+            ),
+          ).thenAnswer((_) async => null);
         },
         build: createBloc,
         act: (bloc) => bloc.add(
@@ -123,10 +130,12 @@ void main() {
       blocTest<AvatarUploadBloc, AvatarUploadState>(
         'emits [picking, validationError] when image picker fails',
         setUp: () {
-          when(() => mockImagePickerService.pickImage(
-                source: any(named: 'source'),
-                cropSquare: true,
-              )).thenThrow(Exception('Picker failed'));
+          when(
+            () => mockImagePickerService.pickImage(
+              source: any(named: 'source'),
+              cropSquare: true,
+            ),
+          ).thenThrow(Exception('Picker failed'));
         },
         build: createBloc,
         act: (bloc) => bloc.add(
@@ -147,10 +156,10 @@ void main() {
       blocTest<AvatarUploadBloc, AvatarUploadState>(
         'emits [validating, validationError] when file size is too large',
         setUp: () {
-          when(() => mockImagePickerService.validateFileSize(
-                any(),
-                maxSizeInMB: 5,
-              )).thenReturn(false);
+          when(
+            () =>
+                mockImagePickerService.validateFileSize(any(), maxSizeInMB: 5),
+          ).thenReturn(false);
         },
         build: createBloc,
         act: (bloc) => bloc.add(
@@ -168,12 +177,13 @@ void main() {
       blocTest<AvatarUploadBloc, AvatarUploadState>(
         'emits [validating, validationError] when file extension is invalid',
         setUp: () {
-          when(() => mockImagePickerService.validateFileSize(
-                any(),
-                maxSizeInMB: 5,
-              )).thenReturn(true);
-          when(() => mockImagePickerService.validateFileExtension(any()))
-              .thenReturn(false);
+          when(
+            () =>
+                mockImagePickerService.validateFileSize(any(), maxSizeInMB: 5),
+          ).thenReturn(true);
+          when(
+            () => mockImagePickerService.validateFileExtension(any()),
+          ).thenReturn(false);
         },
         build: createBloc,
         act: (bloc) => bloc.add(
@@ -191,12 +201,13 @@ void main() {
       blocTest<AvatarUploadBloc, AvatarUploadState>(
         'emits [validating, picked] when file is valid',
         setUp: () {
-          when(() => mockImagePickerService.validateFileSize(
-                any(),
-                maxSizeInMB: 5,
-              )).thenReturn(true);
-          when(() => mockImagePickerService.validateFileExtension(any()))
-              .thenReturn(true);
+          when(
+            () =>
+                mockImagePickerService.validateFileSize(any(), maxSizeInMB: 5),
+          ).thenReturn(true);
+          when(
+            () => mockImagePickerService.validateFileExtension(any()),
+          ).thenReturn(true);
         },
         build: createBloc,
         act: (bloc) => bloc.add(
@@ -214,17 +225,22 @@ void main() {
         'emits [uploading, uploadSuccess] when upload is successful',
         setUp: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockImageStorageRepository.uploadAvatar(
-                userId: any(named: 'userId'),
-                imageFile: any(named: 'imageFile'),
-                onProgress: any(named: 'onProgress'),
-              )).thenAnswer((_) async => 'https://example.com/avatar.jpg');
-          when(() => mockAuthRepository.updateUserProfile(
-                photoUrl: any(named: 'photoUrl'),
-              )).thenAnswer((_) async {});
+          when(
+            () => mockImageStorageRepository.uploadAvatar(
+              userId: any(named: 'userId'),
+              imageFile: any(named: 'imageFile'),
+              onProgress: any(named: 'onProgress'),
+            ),
+          ).thenAnswer((_) async => 'https://example.com/avatar.jpg');
+          when(
+            () => mockAuthRepository.updateUserProfile(
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
         },
-        seed: () => AvatarUploadState.picked(imageFile: File('test_avatar.jpg')),
+        seed: () =>
+            AvatarUploadState.picked(imageFile: File('test_avatar.jpg')),
         build: createBloc,
         act: (bloc) => bloc.add(const AvatarUploadEvent.uploadRequested()),
         expect: () => [
@@ -234,14 +250,18 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockImageStorageRepository.uploadAvatar(
-                userId: testUser.uid,
-                imageFile: any(named: 'imageFile'),
-                onProgress: any(named: 'onProgress'),
-              )).called(1);
-          verify(() => mockAuthRepository.updateUserProfile(
-                photoUrl: 'https://example.com/avatar.jpg',
-              )).called(1);
+          verify(
+            () => mockImageStorageRepository.uploadAvatar(
+              userId: testUser.uid,
+              imageFile: any(named: 'imageFile'),
+              onProgress: any(named: 'onProgress'),
+            ),
+          ).called(1);
+          verify(
+            () => mockAuthRepository.updateUserProfile(
+              photoUrl: 'https://example.com/avatar.jpg',
+            ),
+          ).called(1);
           verify(() => mockAuthRepository.reloadUser()).called(1);
         },
       );
@@ -251,7 +271,8 @@ void main() {
         setUp: () {
           when(() => mockAuthRepository.currentUser).thenReturn(null);
         },
-        seed: () => AvatarUploadState.picked(imageFile: File('test_avatar.jpg')),
+        seed: () =>
+            AvatarUploadState.picked(imageFile: File('test_avatar.jpg')),
         build: createBloc,
         act: (bloc) => bloc.add(const AvatarUploadEvent.uploadRequested()),
         expect: () => [
@@ -267,13 +288,16 @@ void main() {
         'emits [uploading, uploadError] when upload fails',
         setUp: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockImageStorageRepository.uploadAvatar(
-                userId: any(named: 'userId'),
-                imageFile: any(named: 'imageFile'),
-                onProgress: any(named: 'onProgress'),
-              )).thenThrow(Exception('Upload failed'));
+          when(
+            () => mockImageStorageRepository.uploadAvatar(
+              userId: any(named: 'userId'),
+              imageFile: any(named: 'imageFile'),
+              onProgress: any(named: 'onProgress'),
+            ),
+          ).thenThrow(Exception('Upload failed'));
         },
-        seed: () => AvatarUploadState.picked(imageFile: File('test_avatar.jpg')),
+        seed: () =>
+            AvatarUploadState.picked(imageFile: File('test_avatar.jpg')),
         build: createBloc,
         act: (bloc) => bloc.add(const AvatarUploadEvent.uploadRequested()),
         expect: () => [
@@ -297,12 +321,11 @@ void main() {
     group('AvatarUploadUploadCancelled', () {
       blocTest<AvatarUploadBloc, AvatarUploadState>(
         'emits initial state when upload is cancelled',
-        seed: () => AvatarUploadState.picked(imageFile: File('test_avatar.jpg')),
+        seed: () =>
+            AvatarUploadState.picked(imageFile: File('test_avatar.jpg')),
         build: createBloc,
         act: (bloc) => bloc.add(const AvatarUploadEvent.uploadCancelled()),
-        expect: () => [
-          const AvatarUploadState.initial(),
-        ],
+        expect: () => [const AvatarUploadState.initial()],
       );
     });
 
@@ -311,12 +334,14 @@ void main() {
         'emits [deleting, deleteSuccess] when deletion is successful',
         setUp: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockImageStorageRepository.deleteAvatar(
-                userId: any(named: 'userId'),
-              )).thenAnswer((_) async {});
-          when(() => mockAuthRepository.updateUserProfile(
-                photoUrl: null,
-              )).thenAnswer((_) async {});
+          when(
+            () => mockImageStorageRepository.deleteAvatar(
+              userId: any(named: 'userId'),
+            ),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockAuthRepository.updateUserProfile(photoUrl: null),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
         },
         build: createBloc,
@@ -326,11 +351,12 @@ void main() {
           const AvatarUploadState.deleteSuccess(),
         ],
         verify: (_) {
-          verify(() => mockImageStorageRepository.deleteAvatar(
-                userId: testUser.uid,
-              )).called(1);
-          verify(() => mockAuthRepository.updateUserProfile(photoUrl: null))
-              .called(1);
+          verify(
+            () => mockImageStorageRepository.deleteAvatar(userId: testUser.uid),
+          ).called(1);
+          verify(
+            () => mockAuthRepository.updateUserProfile(photoUrl: null),
+          ).called(1);
           verify(() => mockAuthRepository.reloadUser()).called(1);
         },
       );
@@ -353,17 +379,17 @@ void main() {
         'emits [deleting, deleteError] when deletion fails',
         setUp: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          when(() => mockImageStorageRepository.deleteAvatar(
-                userId: any(named: 'userId'),
-              )).thenThrow(Exception('Delete failed'));
+          when(
+            () => mockImageStorageRepository.deleteAvatar(
+              userId: any(named: 'userId'),
+            ),
+          ).thenThrow(Exception('Delete failed'));
         },
         build: createBloc,
         act: (bloc) => bloc.add(const AvatarUploadEvent.deleteRequested()),
         expect: () => [
           const AvatarUploadState.deleting(),
-          const AvatarUploadState.deleteError(
-            message: 'Delete failed',
-          ),
+          const AvatarUploadState.deleteError(message: 'Delete failed'),
         ],
       );
     });
@@ -376,9 +402,7 @@ void main() {
         ),
         build: createBloc,
         act: (bloc) => bloc.add(const AvatarUploadEvent.reset()),
-        expect: () => [
-          const AvatarUploadState.initial(),
-        ],
+        expect: () => [const AvatarUploadState.initial()],
       );
     });
   });

@@ -33,32 +33,35 @@ void main() {
         'emits [LoginLoading, LoginSuccess] when login succeeds',
         setUp: () {
           mockAuthRepository.setSignInWithEmailAndPasswordBehavior(
-            ({required String email, required String password}) async => TestUserData.testUser,
+            ({required String email, required String password}) async =>
+                TestUserData.testUser,
           );
         },
         build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginWithEmailAndPasswordSubmitted(
-          email: testEmail,
-          password: testPassword,
-        )),
-        expect: () => [
-          const LoginLoading(),
-          const LoginSuccess(),
-        ],
+        act: (bloc) => bloc.add(
+          const LoginWithEmailAndPasswordSubmitted(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ),
+        expect: () => [const LoginLoading(), const LoginSuccess()],
       );
 
       blocTest<LoginBloc, LoginState>(
         'emits [LoginLoading, LoginFailure] when login fails',
         setUp: () {
           mockAuthRepository.setSignInWithEmailAndPasswordBehavior(
-            ({required String email, required String password}) async => throw Exception('Invalid credentials'),
+            ({required String email, required String password}) async =>
+                throw Exception('Invalid credentials'),
           );
         },
         build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginWithEmailAndPasswordSubmitted(
-          email: testEmail,
-          password: testPassword,
-        )),
+        act: (bloc) => bloc.add(
+          const LoginWithEmailAndPasswordSubmitted(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ),
         expect: () => [
           const LoginLoading(),
           const LoginFailure('Invalid credentials'),
@@ -68,10 +71,12 @@ void main() {
       blocTest<LoginBloc, LoginState>(
         'emits [LoginFailure] when email is empty',
         build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginWithEmailAndPasswordSubmitted(
-          email: '',
-          password: testPassword,
-        )),
+        act: (bloc) => bloc.add(
+          const LoginWithEmailAndPasswordSubmitted(
+            email: '',
+            password: testPassword,
+          ),
+        ),
         expect: () => [
           const LoginLoading(),
           const LoginFailure('Email cannot be empty'),
@@ -81,10 +86,12 @@ void main() {
       blocTest<LoginBloc, LoginState>(
         'emits [LoginFailure] when email is only whitespace',
         build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginWithEmailAndPasswordSubmitted(
-          email: '   ',
-          password: testPassword,
-        )),
+        act: (bloc) => bloc.add(
+          const LoginWithEmailAndPasswordSubmitted(
+            email: '   ',
+            password: testPassword,
+          ),
+        ),
         expect: () => [
           const LoginLoading(),
           const LoginFailure('Email cannot be empty'),
@@ -94,10 +101,12 @@ void main() {
       blocTest<LoginBloc, LoginState>(
         'emits [LoginFailure] when password is empty',
         build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginWithEmailAndPasswordSubmitted(
-          email: testEmail,
-          password: '',
-        )),
+        act: (bloc) => bloc.add(
+          const LoginWithEmailAndPasswordSubmitted(
+            email: testEmail,
+            password: '',
+          ),
+        ),
         expect: () => [
           const LoginLoading(),
           const LoginFailure('Password cannot be empty'),
@@ -107,10 +116,12 @@ void main() {
       blocTest<LoginBloc, LoginState>(
         'emits [LoginFailure] when password is only whitespace',
         build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginWithEmailAndPasswordSubmitted(
-          email: testEmail,
-          password: '   ',
-        )),
+        act: (bloc) => bloc.add(
+          const LoginWithEmailAndPasswordSubmitted(
+            email: testEmail,
+            password: '   ',
+          ),
+        ),
         expect: () => [
           const LoginLoading(),
           const LoginFailure('Password cannot be empty'),
@@ -120,10 +131,12 @@ void main() {
       blocTest<LoginBloc, LoginState>(
         'emits [LoginFailure] when email format is invalid',
         build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginWithEmailAndPasswordSubmitted(
-          email: 'invalid-email',
-          password: testPassword,
-        )),
+        act: (bloc) => bloc.add(
+          const LoginWithEmailAndPasswordSubmitted(
+            email: 'invalid-email',
+            password: testPassword,
+          ),
+        ),
         expect: () => [
           const LoginLoading(),
           const LoginFailure('Please enter a valid email address'),
@@ -161,18 +174,18 @@ void main() {
             'accepts valid email: $email',
             setUp: () {
               mockAuthRepository.setSignInWithEmailAndPasswordBehavior(
-                ({required String email, required String password}) async => TestUserData.testUser,
+                ({required String email, required String password}) async =>
+                    TestUserData.testUser,
               );
             },
             build: () => loginBloc,
-            act: (bloc) => bloc.add(LoginWithEmailAndPasswordSubmitted(
-              email: email,
-              password: testPassword,
-            )),
-            expect: () => [
-              const LoginLoading(),
-              const LoginSuccess(),
-            ],
+            act: (bloc) => bloc.add(
+              LoginWithEmailAndPasswordSubmitted(
+                email: email,
+                password: testPassword,
+              ),
+            ),
+            expect: () => [const LoginLoading(), const LoginSuccess()],
           );
         }
 
@@ -180,10 +193,12 @@ void main() {
           blocTest<LoginBloc, LoginState>(
             'rejects invalid email: $email',
             build: () => loginBloc,
-            act: (bloc) => bloc.add(LoginWithEmailAndPasswordSubmitted(
-              email: email,
-              password: testPassword,
-            )),
+            act: (bloc) => bloc.add(
+              LoginWithEmailAndPasswordSubmitted(
+                email: email,
+                password: testPassword,
+              ),
+            ),
             expect: () => [
               const LoginLoading(),
               const LoginFailure('Please enter a valid email address'),
@@ -195,7 +210,10 @@ void main() {
       group('Repository error handling', () {
         final testCases = [
           {'error': 'Network error', 'expected': 'Network error'},
-          {'error': 'Exception: Invalid credentials', 'expected': 'Invalid credentials'},
+          {
+            'error': 'Exception: Invalid credentials',
+            'expected': 'Invalid credentials',
+          },
           {'error': 'Exception: User not found', 'expected': 'User not found'},
           {'error': 'Timeout occurred', 'expected': 'Timeout occurred'},
         ];
@@ -205,14 +223,17 @@ void main() {
             'handles repository error: ${testCase['error']}',
             setUp: () {
               mockAuthRepository.setSignInWithEmailAndPasswordBehavior(
-                ({required String email, required String password}) async => throw Exception(testCase['error']),
+                ({required String email, required String password}) async =>
+                    throw Exception(testCase['error']),
               );
             },
             build: () => loginBloc,
-            act: (bloc) => bloc.add(const LoginWithEmailAndPasswordSubmitted(
-              email: testEmail,
-              password: testPassword,
-            )),
+            act: (bloc) => bloc.add(
+              const LoginWithEmailAndPasswordSubmitted(
+                email: testEmail,
+                password: testPassword,
+              ),
+            ),
             expect: () => [
               const LoginLoading(),
               LoginFailure(testCase['expected']!),
@@ -232,10 +253,7 @@ void main() {
         },
         build: () => loginBloc,
         act: (bloc) => bloc.add(const LoginAnonymouslySubmitted()),
-        expect: () => [
-          const LoginLoading(),
-          const LoginSuccess(),
-        ],
+        expect: () => [const LoginLoading(), const LoginSuccess()],
       );
 
       blocTest<LoginBloc, LoginState>(
@@ -284,7 +302,9 @@ void main() {
         seed: () => const LoginFailure('Some error'),
         act: (bloc) {
           bloc.add(const LoginFormReset()); // From failure to initial
-          bloc.add(const LoginFormReset()); // From initial to initial (no change)
+          bloc.add(
+            const LoginFormReset(),
+          ); // From initial to initial (no change)
         },
         expect: () => [
           const LoginInitial(), // Only one emission since initial->initial is deduplicated
@@ -297,19 +317,24 @@ void main() {
         'handles rapid consecutive login attempts',
         setUp: () {
           mockAuthRepository.setSignInWithEmailAndPasswordBehavior(
-            ({required String email, required String password}) async => TestUserData.testUser,
+            ({required String email, required String password}) async =>
+                TestUserData.testUser,
           );
         },
         build: () => loginBloc,
         act: (bloc) {
-          bloc.add(const LoginWithEmailAndPasswordSubmitted(
-            email: 'test1@example.com',
-            password: 'password1',
-          ));
-          bloc.add(const LoginWithEmailAndPasswordSubmitted(
-            email: 'test2@example.com',
-            password: 'password2',
-          ));
+          bloc.add(
+            const LoginWithEmailAndPasswordSubmitted(
+              email: 'test1@example.com',
+              password: 'password1',
+            ),
+          );
+          bloc.add(
+            const LoginWithEmailAndPasswordSubmitted(
+              email: 'test2@example.com',
+              password: 'password2',
+            ),
+          );
           bloc.add(const LoginFormReset());
         },
         expect: () => [
@@ -325,28 +350,34 @@ void main() {
         'handles login failure followed by successful login',
         setUp: () {
           // Set up different responses for different credentials
-          mockAuthRepository.setSignInWithEmailAndPasswordBehavior(
-            ({required String email, required String password}) async {
-              if (email == 'fail@example.com' && password == 'wrongpassword') {
-                throw Exception('Invalid credentials');
-              } else if (email == 'success@example.com' && password == 'correctpassword') {
-                return TestUserData.testUser;
-              } else {
-                throw Exception('Unexpected credentials');
-              }
-            },
-          );
+          mockAuthRepository.setSignInWithEmailAndPasswordBehavior(({
+            required String email,
+            required String password,
+          }) async {
+            if (email == 'fail@example.com' && password == 'wrongpassword') {
+              throw Exception('Invalid credentials');
+            } else if (email == 'success@example.com' &&
+                password == 'correctpassword') {
+              return TestUserData.testUser;
+            } else {
+              throw Exception('Unexpected credentials');
+            }
+          });
         },
         build: () => loginBloc,
         act: (bloc) {
-          bloc.add(const LoginWithEmailAndPasswordSubmitted(
-            email: 'fail@example.com',
-            password: 'wrongpassword',
-          ));
-          bloc.add(const LoginWithEmailAndPasswordSubmitted(
-            email: 'success@example.com',
-            password: 'correctpassword',
-          ));
+          bloc.add(
+            const LoginWithEmailAndPasswordSubmitted(
+              email: 'fail@example.com',
+              password: 'wrongpassword',
+            ),
+          );
+          bloc.add(
+            const LoginWithEmailAndPasswordSubmitted(
+              email: 'success@example.com',
+              password: 'correctpassword',
+            ),
+          );
         },
         expect: () => [
           const LoginLoading(),
@@ -360,7 +391,8 @@ void main() {
         'handles mixed login types (email/password and anonymous)',
         setUp: () {
           mockAuthRepository.setSignInWithEmailAndPasswordBehavior(
-            ({required String email, required String password}) async => TestUserData.testUser,
+            ({required String email, required String password}) async =>
+                TestUserData.testUser,
           );
           mockAuthRepository.setSignInAnonymouslyBehavior(
             () async => TestUserData.anonymousUser,
@@ -368,10 +400,12 @@ void main() {
         },
         build: () => loginBloc,
         act: (bloc) {
-          bloc.add(const LoginWithEmailAndPasswordSubmitted(
-            email: 'test@example.com',
-            password: 'password',
-          ));
+          bloc.add(
+            const LoginWithEmailAndPasswordSubmitted(
+              email: 'test@example.com',
+              password: 'password',
+            ),
+          );
           bloc.add(const LoginAnonymouslySubmitted());
           bloc.add(const LoginFormReset());
         },

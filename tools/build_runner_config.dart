@@ -7,8 +7,9 @@ import 'dart:io';
 /// This is called by the build system to ensure config files are available
 void main(List<String> arguments) {
   // Get the flavor from environment or arguments
-  String? flavor = Platform.environment['FLUTTER_BUILD_MODE'] ??
-                   Platform.environment['CONFIGURATION'];
+  String? flavor =
+      Platform.environment['FLUTTER_BUILD_MODE'] ??
+      Platform.environment['CONFIGURATION'];
 
   if (arguments.isNotEmpty) {
     flavor = arguments[0];
@@ -33,11 +34,10 @@ void main(List<String> arguments) {
   print('🔧 Pre-build: Generating Firebase config for $environment...');
 
   // Run the config generation
-  final result = Process.runSync(
-    'dart',
-    ['tools/generate_firebase_config.dart', environment],
-    runInShell: true,
-  );
+  final result = Process.runSync('dart', [
+    'tools/generate_firebase_config.dart',
+    environment,
+  ], runInShell: true);
 
   if (result.exitCode == 0) {
     print('✅ Firebase config generation completed');

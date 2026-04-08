@@ -16,9 +16,9 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   FriendBloc({
     required FriendRepository friendRepository,
     required AuthRepository authRepository,
-  })  : _friendRepository = friendRepository,
-        _authRepository = authRepository,
-        super(const FriendState.initial()) {
+  }) : _friendRepository = friendRepository,
+       _authRepository = authRepository,
+       super(const FriendState.initial()) {
     on<FriendLoadRequested>(_onLoadRequested);
     on<FriendRequestSent>(_onRequestSent);
     on<FriendRequestAccepted>(_onRequestAccepted);
@@ -46,17 +46,35 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     // error handling. This prevents Android's ExecutionException from
     // causing all data to be lost when one Cloud Function call fails
     // (see GitHub issue #454).
-    final results = await PerformanceTracer.trace('page_my_community_load', () => Future.wait([
-      _safeCall(() => _friendRepository.getFriends(currentUser.uid), <UserEntity>[]),
-      _safeCall(() => _friendRepository.getPendingRequests(type: FriendRequestType.received), <FriendshipEntity>[]),
-      _safeCall(() => _friendRepository.getPendingRequests(type: FriendRequestType.sent), <FriendshipEntity>[]),
-    ]));
+    final results = await PerformanceTracer.trace(
+      'page_my_community_load',
+      () => Future.wait([
+        _safeCall(
+          () => _friendRepository.getFriends(currentUser.uid),
+          <UserEntity>[],
+        ),
+        _safeCall(
+          () => _friendRepository.getPendingRequests(
+            type: FriendRequestType.received,
+          ),
+          <FriendshipEntity>[],
+        ),
+        _safeCall(
+          () => _friendRepository.getPendingRequests(
+            type: FriendRequestType.sent,
+          ),
+          <FriendshipEntity>[],
+        ),
+      ]),
+    );
 
-    emit(FriendState.loaded(
-      friends: results[0] as List<UserEntity>,
-      receivedRequests: results[1] as List<FriendshipEntity>,
-      sentRequests: results[2] as List<FriendshipEntity>,
-    ));
+    emit(
+      FriendState.loaded(
+        friends: results[0] as List<UserEntity>,
+        receivedRequests: results[1] as List<FriendshipEntity>,
+        sentRequests: results[2] as List<FriendshipEntity>,
+      ),
+    );
   }
 
   /// Executes [fn] and returns its result, or [fallback] on any error.
@@ -74,18 +92,24 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   ) async {
     try {
       await _friendRepository.sendFriendRequest(event.targetUserId);
-      emit(const FriendState.actionSuccess(
-        message: 'Friend request sent successfully',
-      ));
+      emit(
+        const FriendState.actionSuccess(
+          message: 'Friend request sent successfully',
+        ),
+      );
 
       // Reload the data to show updated state
       add(const FriendEvent.loadRequested());
     } on FriendshipException catch (e) {
       // Story 21.5: show green tick instead of red error when request already exists
-      if (e.code == 'already-exists' || e.code == 'already-friends' || e.code == 'request-exists') {
-        emit(const FriendState.actionSuccess(
-          message: 'Friend request already pending',
-        ));
+      if (e.code == 'already-exists' ||
+          e.code == 'already-friends' ||
+          e.code == 'request-exists') {
+        emit(
+          const FriendState.actionSuccess(
+            message: 'Friend request already pending',
+          ),
+        );
         return;
       }
       emit(FriendState.error(message: e.message));
@@ -103,9 +127,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   ) async {
     try {
       await _friendRepository.acceptFriendRequest(event.friendshipId);
-      emit(const FriendState.actionSuccess(
-        message: 'Friend request accepted',
-      ));
+      emit(const FriendState.actionSuccess(message: 'Friend request accepted'));
 
       // Reload the data to show updated state
       add(const FriendEvent.loadRequested());
@@ -125,9 +147,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   ) async {
     try {
       await _friendRepository.declineFriendRequest(event.friendshipId);
-      emit(const FriendState.actionSuccess(
-        message: 'Friend request declined',
-      ));
+      emit(const FriendState.actionSuccess(message: 'Friend request declined'));
 
       // Reload the data to show updated state
       add(const FriendEvent.loadRequested());
@@ -148,9 +168,9 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
     try {
       // Cancelling is the same as declining from the initiator's side
       await _friendRepository.declineFriendRequest(event.friendshipId);
-      emit(const FriendState.actionSuccess(
-        message: 'Friend request cancelled',
-      ));
+      emit(
+        const FriendState.actionSuccess(message: 'Friend request cancelled'),
+      );
 
       // Reload the data to show updated state
       add(const FriendEvent.loadRequested());
@@ -170,9 +190,7 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
   ) async {
     try {
       await _friendRepository.removeFriend(event.friendshipId);
-      emit(const FriendState.actionSuccess(
-        message: 'Friend removed',
-      ));
+      emit(const FriendState.actionSuccess(message: 'Friend removed'));
 
       // Reload the data to show updated state
       add(const FriendEvent.loadRequested());
@@ -201,27 +219,31 @@ class FriendBloc extends Bloc<FriendEvent, FriendState> {
 
       // Check if searching for own email
       if (event.email.toLowerCase() == currentUser.email.toLowerCase()) {
-        emit(FriendState.searchResult(
-          user: null,
-          isFriend: false,
-          hasPendingRequest: false,
-          requestDirection: null,
-          searchedEmail: event.email,
-          isSelfSearch: true,
-        ));
+        emit(
+          FriendState.searchResult(
+            user: null,
+            isFriend: false,
+            hasPendingRequest: false,
+            requestDirection: null,
+            searchedEmail: event.email,
+            isSelfSearch: true,
+          ),
+        );
         return;
       }
 
       // Call repository to search by email
       final result = await _friendRepository.searchUserByEmail(event.email);
 
-      emit(FriendState.searchResult(
-        user: result.user,
-        isFriend: result.isFriend,
-        hasPendingRequest: result.hasPendingRequest,
-        requestDirection: result.requestDirection,
-        searchedEmail: event.email,
-      ));
+      emit(
+        FriendState.searchResult(
+          user: result.user,
+          isFriend: result.isFriend,
+          hasPendingRequest: result.hasPendingRequest,
+          requestDirection: result.requestDirection,
+          searchedEmail: event.email,
+        ),
+      );
     } on FriendshipException catch (e) {
       emit(FriendState.error(message: e.message));
     } catch (e) {

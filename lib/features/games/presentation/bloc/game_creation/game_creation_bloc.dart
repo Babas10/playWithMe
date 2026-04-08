@@ -16,9 +16,9 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
   GameCreationBloc({
     required GameRepository gameRepository,
     required FirebaseAnalytics analytics,
-  })  : _gameRepository = gameRepository,
-        _analytics = analytics,
-        super(const GameCreationInitial()) {
+  }) : _gameRepository = gameRepository,
+       _analytics = analytics,
+       super(const GameCreationInitial()) {
     on<SelectGroup>(_onSelectGroup);
     on<SetDateTime>(_onSetDateTime);
     on<SetLocation>(_onSetLocation);
@@ -42,7 +42,9 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
   }
 
   Future<void> _onSelectGroup(
-      SelectGroup event, Emitter<GameCreationState> emit) async {
+    SelectGroup event,
+    Emitter<GameCreationState> emit,
+  ) async {
     // Log intent when the creation screen opens (SelectGroup is dispatched on initState).
     if (state is GameCreationInitial) {
       await _analytics.logEvent(name: 'create_game_started');
@@ -81,7 +83,9 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
   }
 
   void _onSetDescription(
-      SetDescription event, Emitter<GameCreationState> emit) {
+    SetDescription event,
+    Emitter<GameCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       description: event.description,
     );
@@ -105,17 +109,12 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
   }
 
   void _onSetGameType(SetGameType event, Emitter<GameCreationState> emit) {
-    final formState = _currentFormState.copyWith(
-      gameType: event.gameType,
-    );
+    final formState = _currentFormState.copyWith(gameType: event.gameType);
     emit(formState);
   }
 
-  void _onSetSkillLevel(
-      SetSkillLevel event, Emitter<GameCreationState> emit) {
-    final formState = _currentFormState.copyWith(
-      skillLevel: event.skillLevel,
-    );
+  void _onSetSkillLevel(SetSkillLevel event, Emitter<GameCreationState> emit) {
+    final formState = _currentFormState.copyWith(skillLevel: event.skillLevel);
     emit(formState);
   }
 
@@ -124,7 +123,9 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
   }
 
   Future<void> _onSubmitGame(
-      SubmitGame event, Emitter<GameCreationState> emit) async {
+    SubmitGame event,
+    Emitter<GameCreationState> emit,
+  ) async {
     final formState = _currentFormState;
 
     // Validate form
@@ -161,20 +162,21 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
       final gameId = await _gameRepository.createGame(game);
       final createdGame = game.copyWith(id: gameId);
 
-      emit(GameCreationSuccess(
-        gameId: gameId,
-        game: createdGame,
-      ));
+      emit(GameCreationSuccess(gameId: gameId, game: createdGame));
     } on GameException catch (e) {
-      emit(GameCreationError(
-        message: e.message,
-        errorCode: e.code ?? 'CREATE_GAME_ERROR',
-      ));
+      emit(
+        GameCreationError(
+          message: e.message,
+          errorCode: e.code ?? 'CREATE_GAME_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(GameCreationError(
-        message: 'Failed to create game: ${e.toString()}',
-        errorCode: 'CREATE_GAME_ERROR',
-      ));
+      emit(
+        GameCreationError(
+          message: 'Failed to create game: ${e.toString()}',
+          errorCode: 'CREATE_GAME_ERROR',
+        ),
+      );
     }
   }
 
@@ -203,7 +205,8 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
     }
 
     // Validate location
-    if (formState.locationName == null || formState.locationName!.trim().isEmpty) {
+    if (formState.locationName == null ||
+        formState.locationName!.trim().isEmpty) {
       locationError = 'Please enter a location';
     }
 
@@ -220,12 +223,14 @@ class GameCreationBloc extends Bloc<GameCreationEvent, GameCreationState> {
     if (formState.minPlayers < 2) {
       playersError = 'Minimum players must be at least 2';
     } else if (formState.maxPlayers < formState.minPlayers) {
-      playersError = 'Maximum players must be greater than or equal to minimum players';
+      playersError =
+          'Maximum players must be greater than or equal to minimum players';
     } else if (formState.maxPlayers > 20) {
       playersError = 'Maximum players cannot exceed 20';
     }
 
-    final isValid = groupError == null &&
+    final isValid =
+        groupError == null &&
         dateTimeError == null &&
         locationError == null &&
         titleError == null &&

@@ -9,10 +9,12 @@ import 'package:play_with_me/features/notifications/presentation/bloc/notificati
 import 'package:play_with_me/features/notifications/presentation/bloc/notification_event.dart';
 import 'package:play_with_me/features/notifications/presentation/bloc/notification_state.dart';
 
-class MockNotificationRepository extends Mock implements NotificationRepository {}
+class MockNotificationRepository extends Mock
+    implements NotificationRepository {}
 
 // Create a fake class for registration with Mocktail
-class FakeNotificationPreferencesEntity extends Fake implements NotificationPreferencesEntity {}
+class FakeNotificationPreferencesEntity extends Fake
+    implements NotificationPreferencesEntity {}
 
 void main() {
   setUpAll(() {
@@ -32,9 +34,9 @@ void main() {
         'emits [loading, loaded] when loading preferences succeeds',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.getPreferences()).thenAnswer(
-            (_) async => const NotificationPreferencesEntity(),
-          );
+          when(
+            () => mockRepository.getPreferences(),
+          ).thenAnswer((_) async => const NotificationPreferencesEntity());
           return NotificationBloc(repository: mockRepository);
         },
         act: (bloc) => bloc.add(const NotificationEvent.loadPreferences()),
@@ -48,9 +50,9 @@ void main() {
         'emits [loading, error] when loading preferences fails',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.getPreferences()).thenThrow(
-            Exception('Failed to load'),
-          );
+          when(
+            () => mockRepository.getPreferences(),
+          ).thenThrow(Exception('Failed to load'));
           return NotificationBloc(repository: mockRepository);
         },
         act: (bloc) => bloc.add(const NotificationEvent.loadPreferences()),
@@ -76,9 +78,9 @@ void main() {
         'emits [updating, loaded] when update succeeds',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenAnswer(
-            (_) async => {},
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenAnswer((_) async => {});
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),
@@ -95,9 +97,9 @@ void main() {
         'emits [updating, error, loaded] when update fails',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenThrow(
-            Exception('Update failed'),
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenThrow(Exception('Update failed'));
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),
@@ -124,15 +126,14 @@ void main() {
         'toggleGroupInvitations updates preferences correctly',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenAnswer(
-            (_) async => {},
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenAnswer((_) async => {});
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),
-        act: (bloc) => bloc.add(
-          const NotificationEvent.toggleGroupInvitations(false),
-        ),
+        act: (bloc) =>
+            bloc.add(const NotificationEvent.toggleGroupInvitations(false)),
         expect: () => [
           const NotificationState.updating(
             NotificationPreferencesEntity(groupInvitations: false),
@@ -147,9 +148,9 @@ void main() {
         'toggleQuietHours updates preferences correctly',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenAnswer(
-            (_) async => {},
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenAnswer((_) async => {});
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),
@@ -182,9 +183,9 @@ void main() {
         'toggleGroupSpecific updates preferences correctly',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenAnswer(
-            (_) async => {},
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenAnswer((_) async => {});
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),
@@ -196,14 +197,10 @@ void main() {
         ),
         expect: () => [
           const NotificationState.updating(
-            NotificationPreferencesEntity(
-              groupSpecific: {'group1': false},
-            ),
+            NotificationPreferencesEntity(groupSpecific: {'group1': false}),
           ),
           const NotificationState.loaded(
-            NotificationPreferencesEntity(
-              groupSpecific: {'group1': false},
-            ),
+            NotificationPreferencesEntity(groupSpecific: {'group1': false}),
           ),
         ],
       );
@@ -217,9 +214,9 @@ void main() {
         'toggleTrainingSessionCreated updates preferences correctly',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenAnswer(
-            (_) async => {},
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenAnswer((_) async => {});
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),
@@ -240,9 +237,9 @@ void main() {
         'toggleTrainingMinParticipantsReached updates preferences correctly',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenAnswer(
-            (_) async => {},
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenAnswer((_) async => {});
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),
@@ -251,10 +248,14 @@ void main() {
         ),
         expect: () => [
           const NotificationState.updating(
-            NotificationPreferencesEntity(trainingMinParticipantsReached: false),
+            NotificationPreferencesEntity(
+              trainingMinParticipantsReached: false,
+            ),
           ),
           const NotificationState.loaded(
-            NotificationPreferencesEntity(trainingMinParticipantsReached: false),
+            NotificationPreferencesEntity(
+              trainingMinParticipantsReached: false,
+            ),
           ),
         ],
       );
@@ -263,9 +264,9 @@ void main() {
         'toggleTrainingFeedbackReceived updates preferences correctly',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenAnswer(
-            (_) async => {},
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenAnswer((_) async => {});
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),
@@ -286,9 +287,9 @@ void main() {
         'toggleTrainingSessionCancelled updates preferences correctly',
         build: () {
           final mockRepository = MockNotificationRepository();
-          when(() => mockRepository.updatePreferences(any())).thenAnswer(
-            (_) async => {},
-          );
+          when(
+            () => mockRepository.updatePreferences(any()),
+          ).thenAnswer((_) async => {});
           return NotificationBloc(repository: mockRepository);
         },
         seed: () => const NotificationState.loaded(initialPreferences),

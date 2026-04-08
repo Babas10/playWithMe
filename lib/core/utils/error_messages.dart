@@ -62,55 +62,25 @@ class ErrorMessages {
   ) {
     switch (e.code) {
       case 'permission-denied':
-        return (
-          'You don\'t have permission to perform this action',
-          false,
-        );
+        return ('You don\'t have permission to perform this action', false);
       case 'unavailable':
-        return (
-          'Service temporarily unavailable. Please try again.',
-          true,
-        );
+        return ('Service temporarily unavailable. Please try again.', true);
       case 'already-exists':
-        return (
-          'This action has already been performed',
-          false,
-        );
+        return ('This action has already been performed', false);
       case 'not-found':
-        return (
-          'The requested resource was not found',
-          false,
-        );
+        return ('The requested resource was not found', false);
       case 'deadline-exceeded':
-        return (
-          'Request timed out. Check your connection.',
-          true,
-        );
+        return ('Request timed out. Check your connection.', true);
       case 'cancelled':
-        return (
-          'Operation was cancelled',
-          true,
-        );
+        return ('Operation was cancelled', true);
       case 'aborted':
-        return (
-          'Operation was interrupted. Please try again.',
-          true,
-        );
+        return ('Operation was interrupted. Please try again.', true);
       case 'resource-exhausted':
-        return (
-          'Too many requests. Please wait a moment.',
-          true,
-        );
+        return ('Too many requests. Please wait a moment.', true);
       case 'unauthenticated':
-        return (
-          'You must be logged in to perform this action',
-          false,
-        );
+        return ('You must be logged in to perform this action', false);
       case 'failed-precondition':
-        return (
-          'Cannot complete this action right now',
-          false,
-        );
+        return ('Cannot complete this action right now', false);
       default:
         return (
           e.message ?? 'An unexpected error occurred. Please try again.',
@@ -129,15 +99,9 @@ class ErrorMessages {
   ) {
     switch (e.code) {
       case 'unauthenticated':
-        return (
-          'You must be logged in to perform this action',
-          false,
-        );
+        return ('You must be logged in to perform this action', false);
       case 'permission-denied':
-        return (
-          'You don\'t have permission to perform this action',
-          false,
-        );
+        return ('You don\'t have permission to perform this action', false);
       case 'invalid-argument':
       case 'not-found':
       case 'already-exists':
@@ -148,15 +112,9 @@ class ErrorMessages {
           e.code == 'internal',
         );
       case 'unavailable':
-        return (
-          'Service temporarily unavailable. Please try again.',
-          true,
-        );
+        return ('Service temporarily unavailable. Please try again.', true);
       case 'deadline-exceeded':
-        return (
-          'Request timed out. Check your connection.',
-          true,
-        );
+        return ('Request timed out. Check your connection.', true);
       default:
         return (
           e.message ?? 'An unexpected error occurred. Please try again.',
@@ -190,11 +148,7 @@ class ErrorMessages {
 
   /// Check if a Cloud Function error is retryable.
   static bool _isRetryableCloudFunctionError(FirebaseFunctionsException e) {
-    const retryableCodes = {
-      'unavailable',
-      'deadline-exceeded',
-      'internal',
-    };
+    const retryableCodes = {'unavailable', 'deadline-exceeded', 'internal'};
     return retryableCodes.contains(e.code);
   }
 }
@@ -212,27 +166,15 @@ class GroupErrorMessages {
 
     // Check for specific group-related errors
     if (errorMessage.contains('already a member')) {
-      return (
-        'You\'re already a member of this group',
-        false,
-      );
+      return ('You\'re already a member of this group', false);
     } else if (errorMessage.contains('group deleted') ||
         errorMessage.contains('group not found')) {
-      return (
-        'Group deleted or unavailable',
-        false,
-      );
+      return ('Group deleted or unavailable', false);
     } else if (errorMessage.contains('group is full') ||
         errorMessage.contains('at capacity')) {
-      return (
-        'This group is full',
-        false,
-      );
+      return ('This group is full', false);
     } else if (errorMessage.contains('not an admin')) {
-      return (
-        'Only group admins can perform this action',
-        false,
-      );
+      return ('Only group admins can perform this action', false);
     }
 
     // Fall back to generic error message handling
@@ -254,31 +196,16 @@ class InvitationErrorMessages {
     // Check for specific invitation-related errors
     if (errorMessage.contains('user not found') ||
         errorMessage.contains('invitee not found')) {
-      return (
-        'User not found. Please check the email address.',
-        false,
-      );
+      return ('User not found. Please check the email address.', false);
     } else if (errorMessage.contains('already invited') ||
         errorMessage.contains('invitation exists')) {
-      return (
-        'This user has already been invited',
-        false,
-      );
+      return ('This user has already been invited', false);
     } else if (errorMessage.contains('already a member')) {
-      return (
-        'This user is already a member of the group',
-        false,
-      );
+      return ('This user is already a member of the group', false);
     } else if (errorMessage.contains('invitation not found')) {
-      return (
-        'Invitation not found or has expired',
-        false,
-      );
+      return ('Invitation not found or has expired', false);
     } else if (errorMessage.contains('cannot invite yourself')) {
-      return (
-        'You cannot invite yourself to a group',
-        false,
-      );
+      return ('You cannot invite yourself to a group', false);
     }
 
     // Fall back to generic error message handling

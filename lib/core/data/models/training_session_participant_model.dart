@@ -34,8 +34,9 @@ class TrainingSessionParticipantModel with _$TrainingSessionParticipantModel {
     final jsonData = Map<String, dynamic>.from(data);
 
     if (data['joinedAt'] is Timestamp) {
-      jsonData['joinedAt'] =
-          (data['joinedAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['joinedAt'] = (data['joinedAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
 
     return TrainingSessionParticipantModel.fromJson({

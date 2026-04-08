@@ -106,16 +106,10 @@ void main() {
         final firestoreData = testExercise.toFirestore();
 
         final createdAtTimestamp = firestoreData['createdAt'] as Timestamp;
-        expect(
-          createdAtTimestamp.toDate(),
-          testExercise.createdAt,
-        );
+        expect(createdAtTimestamp.toDate(), testExercise.createdAt);
 
         final updatedAtTimestamp = firestoreData['updatedAt'] as Timestamp;
-        expect(
-          updatedAtTimestamp.toDate(),
-          testExercise.updatedAt,
-        );
+        expect(updatedAtTimestamp.toDate(), testExercise.updatedAt);
       });
 
       test('toFirestore handles null updatedAt', () {
@@ -179,8 +173,9 @@ void main() {
         });
 
         test('updates description', () {
-          final updated =
-              testExercise.updateInfo(description: 'New Description');
+          final updated = testExercise.updateInfo(
+            description: 'New Description',
+          );
           expect(updated.description, 'New Description');
           expect(updated.name, testExercise.name);
           expect(updated.durationMinutes, testExercise.durationMinutes);
@@ -211,8 +206,16 @@ void main() {
           final after = DateTime.now();
 
           expect(updated.updatedAt, isNotNull);
-          expect(updated.updatedAt!.isAfter(before) || updated.updatedAt!.isAtSameMomentAs(before), isTrue);
-          expect(updated.updatedAt!.isBefore(after) || updated.updatedAt!.isAtSameMomentAs(after), isTrue);
+          expect(
+            updated.updatedAt!.isAfter(before) ||
+                updated.updatedAt!.isAtSameMomentAs(before),
+            isTrue,
+          );
+          expect(
+            updated.updatedAt!.isBefore(after) ||
+                updated.updatedAt!.isAtSameMomentAs(after),
+            isTrue,
+          );
         });
 
         test('does not modify original object', () {

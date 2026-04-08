@@ -51,13 +51,14 @@ class TrainingSessionListItem extends StatelessWidget {
                     child: Text(
                       session.title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: isCancelled
-                                ? Theme.of(context).colorScheme.onSurfaceVariant
-                                : AppColors.secondary,
-                            decoration:
-                                isCancelled ? TextDecoration.lineThrough : null,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: isCancelled
+                            ? Theme.of(context).colorScheme.onSurfaceVariant
+                            : AppColors.secondary,
+                        decoration: isCancelled
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
                     ),
                   ),
                   _buildTypeBadge(context),
@@ -107,10 +108,9 @@ class TrainingSessionListItem extends StatelessWidget {
 
   Color? _getCardBackgroundColor(BuildContext context) {
     if (session.status == TrainingStatus.cancelled) {
-      return Theme.of(context)
-          .colorScheme
-          .surfaceContainerHighest
-          .withValues(alpha: 0.5);
+      return Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
     }
 
     if (session.status == TrainingStatus.completed) {
@@ -162,23 +162,23 @@ class TrainingSessionListItem extends StatelessWidget {
   }
 
   Widget _buildInfoRow(
-      BuildContext context, IconData icon, String text, Color iconColor) {
+    BuildContext context,
+    IconData icon,
+    String text,
+    Color iconColor,
+  ) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: iconColor,
-        ),
+        Icon(icon, size: 16, color: iconColor),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isPast
-                      ? Theme.of(context).colorScheme.onSurfaceVariant
-                      : null,
-                ),
+              color: isPast
+                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                  : null,
+            ),
           ),
         ),
       ],
@@ -198,13 +198,16 @@ class TrainingSessionListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                l10n.participantsCount(session.currentParticipantCount, session.maxParticipants),
+                l10n.participantsCount(
+                  session.currentParticipantCount,
+                  session.maxParticipants,
+                ),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: isPast
-                          ? Theme.of(context).colorScheme.onSurfaceVariant
-                          : Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  color: isPast
+                      ? Theme.of(context).colorScheme.onSurfaceVariant
+                      : Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const SizedBox(height: 4),
               ClipRRect(
@@ -225,10 +228,7 @@ class TrainingSessionListItem extends StatelessWidget {
             ],
           ),
         ),
-        if (isParticipant) ...[
-          const SizedBox(width: 12),
-          const JoinedBadge(),
-        ],
+        if (isParticipant) ...[const SizedBox(width: 12), const JoinedBadge()],
       ],
     );
   }
@@ -238,8 +238,7 @@ class TrainingSessionListItem extends StatelessWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
-    final sessionDate =
-        DateTime(dateTime.year, dateTime.month, dateTime.day);
+    final sessionDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
     String dayString;
     if (sessionDate == today) {

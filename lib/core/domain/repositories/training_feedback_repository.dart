@@ -45,7 +45,8 @@ abstract class TrainingFeedbackRepository {
   /// Real-time updates of aggregated statistics as feedback is submitted
   /// Only accessible by the session creator
   Stream<FeedbackAggregation?> getAggregatedFeedbackStream(
-      String trainingSessionId);
+    String trainingSessionId,
+  );
 
   /// Check if user has already submitted feedback for a session
   ///
@@ -57,7 +58,8 @@ abstract class TrainingFeedbackRepository {
   /// Returns all feedback entries sorted by submission time (most recent first)
   /// Note: All feedback is anonymous - no user information is exposed
   Stream<List<TrainingFeedbackModel>> getFeedbackListStream(
-      String trainingSessionId);
+    String trainingSessionId,
+  );
 
   /// Delete all feedback for a training session
   ///
@@ -92,16 +94,16 @@ class FeedbackAggregation extends Equatable {
 
   @override
   List<Object?> get props => [
-        trainingSessionId,
-        averageExercisesQuality,
-        averageTrainingIntensity,
-        averageCoachingClarity,
-        totalCount,
-        exercisesDistribution,
-        intensityDistribution,
-        coachingDistribution,
-        comments,
-      ];
+    trainingSessionId,
+    averageExercisesQuality,
+    averageTrainingIntensity,
+    averageCoachingClarity,
+    totalCount,
+    exercisesDistribution,
+    intensityDistribution,
+    coachingDistribution,
+    comments,
+  ];
 
   factory FeedbackAggregation.empty(String trainingSessionId) {
     return FeedbackAggregation(
@@ -201,5 +203,9 @@ class FeedbackAggregation extends Equatable {
   }
 
   /// Get overall average (average of all three ratings)
-  double get overallAverage => (averageExercisesQuality + averageTrainingIntensity + averageCoachingClarity) / 3;
+  double get overallAverage =>
+      (averageExercisesQuality +
+          averageTrainingIntensity +
+          averageCoachingClarity) /
+      3;
 }

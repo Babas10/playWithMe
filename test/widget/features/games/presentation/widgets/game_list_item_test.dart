@@ -47,19 +47,16 @@ void main() {
     testWidgets('displays game title and location', (tester) async {
       final game = _createGame();
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: GameListItem(
-              game: game,
-              userId: 'user-1',
-              onTap: () {},
-            ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
           ),
         ),
       );
@@ -71,19 +68,16 @@ void main() {
     testWidgets('displays scheduled status color', (tester) async {
       final game = _createGame(status: GameStatus.scheduled);
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: GameListItem(
-              game: game,
-              userId: 'user-1',
-              onTap: () {},
-            ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
           ),
         ),
       );
@@ -95,19 +89,16 @@ void main() {
     testWidgets('displays in progress status color', (tester) async {
       final game = _createGame(status: GameStatus.inProgress);
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: GameListItem(
-              game: game,
-              userId: 'user-1',
-              onTap: () {},
-            ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
           ),
         ),
       );
@@ -116,22 +107,21 @@ void main() {
       expect(icon.color, AppColors.secondary);
     });
 
-    testWidgets('displays cancelled status styling (grey + strikethrough)', (tester) async {
+    testWidgets('displays cancelled status styling (grey + strikethrough)', (
+      tester,
+    ) async {
       final game = _createGame(status: GameStatus.cancelled);
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: GameListItem(
-              game: game,
-              userId: 'user-1',
-              onTap: () {},
-            ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
           ),
         ),
       );
@@ -143,36 +133,32 @@ void main() {
       expect(title.style?.decoration, TextDecoration.lineThrough);
     });
 
-    testWidgets('displays result badge and scores when completed with result', (tester) async {
+    testWidgets('displays result badge and scores when completed with result', (
+      tester,
+    ) async {
       final result = const GameResult(
         games: [
           IndividualGame(
             gameNumber: 1,
             winner: 'teamA',
             sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
-          )
+          ),
         ],
         overallWinner: 'teamA',
       );
-      final game = _createGame(
-        status: GameStatus.completed,
-        result: result,
-      );
+      final game = _createGame(status: GameStatus.completed, result: result);
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: GameListItem(
-              game: game,
-              userId: 'user-1',
-              onTap: () {},
-            ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
           ),
         ),
       );
@@ -182,22 +168,21 @@ void main() {
       expect(find.text('21-19'), findsOneWidget);
     });
 
-    testWidgets('displays verification status with theme badge', (tester) async {
+    testWidgets('displays verification status with theme badge', (
+      tester,
+    ) async {
       final game = _createGame(status: GameStatus.verification);
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: GameListItem(
-              game: game,
-              userId: 'user-1',
-              onTap: () {},
-            ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
           ),
         ),
       );
@@ -207,22 +192,21 @@ void main() {
       expect(icon.color, AppColors.secondary);
     });
 
-    testWidgets('applies background tint for verification status', (tester) async {
+    testWidgets('applies background tint for verification status', (
+      tester,
+    ) async {
       final game = _createGame(status: GameStatus.verification);
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: GameListItem(
-              game: game,
-              userId: 'user-1',
-              onTap: () {},
-            ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
           ),
         ),
       );
@@ -231,22 +215,21 @@ void main() {
       expect(card.color, AppColors.primary.withValues(alpha: 0.1));
     });
 
-    testWidgets('displays RSVP badge when not completed/cancelled', (tester) async {
+    testWidgets('displays RSVP badge when not completed/cancelled', (
+      tester,
+    ) async {
       final game = _createGame(status: GameStatus.scheduled, userId: 'user-1');
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: GameListItem(
-              game: game,
-              userId: 'user-1',
-              onTap: () {},
-            ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
           ),
         ),
       );
@@ -259,14 +242,15 @@ void main() {
       bool tapped = false;
       final game = _createGame();
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: GameListItem(
               game: game,
               userId: 'user-1',
@@ -284,38 +268,46 @@ void main() {
   // Story 26.5: MixGameBadge visibility
   group('MixGameBadge in GameListItem', () {
     Widget buildItem(GameModel game) => MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
-          ),
-        );
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
+      home: Scaffold(
+        body: GameListItem(game: game, userId: 'user-1', onTap: () {}),
+      ),
+    );
 
-    testWidgets('shows MixGameBadge when gameGenderType is mix', (tester) async {
+    testWidgets('shows MixGameBadge when gameGenderType is mix', (
+      tester,
+    ) async {
       final game = _createGame(gameGenderType: GameGenderType.mix);
       await tester.pumpWidget(buildItem(game));
       expect(find.byType(MixGameBadge), findsOneWidget);
       expect(find.text('MIX'), findsOneWidget);
     });
 
-    testWidgets('hides MixGameBadge when gameGenderType is male', (tester) async {
+    testWidgets('hides MixGameBadge when gameGenderType is male', (
+      tester,
+    ) async {
       final game = _createGame(gameGenderType: GameGenderType.male);
       await tester.pumpWidget(buildItem(game));
       expect(find.byType(MixGameBadge), findsNothing);
     });
 
-    testWidgets('hides MixGameBadge when gameGenderType is female', (tester) async {
+    testWidgets('hides MixGameBadge when gameGenderType is female', (
+      tester,
+    ) async {
       final game = _createGame(gameGenderType: GameGenderType.female);
       await tester.pumpWidget(buildItem(game));
       expect(find.byType(MixGameBadge), findsNothing);
     });
 
-    testWidgets('hides MixGameBadge when gameGenderType is null', (tester) async {
+    testWidgets('hides MixGameBadge when gameGenderType is null', (
+      tester,
+    ) async {
       final game = _createGame();
       await tester.pumpWidget(buildItem(game));
       expect(find.byType(MixGameBadge), findsNothing);

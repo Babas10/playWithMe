@@ -25,9 +25,10 @@ class FirestoreTrainingFeedbackRepository
     FirebaseFirestore? firestore,
     FirebaseFunctions? functions,
     FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6'),
-        _auth = auth ?? FirebaseAuth.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _functions =
+           functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6'),
+       _auth = auth ?? FirebaseAuth.instance;
 
   /// Get feedback collection reference for a training session
   CollectionReference _getFeedbackCollection(String trainingSessionId) {
@@ -98,23 +99,28 @@ class FirestoreTrainingFeedbackRepository
 
   @override
   Future<FeedbackAggregation?> getAggregatedFeedback(
-      String trainingSessionId) async {
+    String trainingSessionId,
+  ) async {
     try {
-      final feedbackSnapshot = await _getFeedbackCollection(trainingSessionId)
-          .orderBy('submittedAt', descending: true)
-          .get();
+      final feedbackSnapshot = await _getFeedbackCollection(
+        trainingSessionId,
+      ).orderBy('submittedAt', descending: true).get();
 
       if (feedbackSnapshot.docs.isEmpty) {
         return FeedbackAggregation.empty(trainingSessionId);
       }
 
       final feedbackList = feedbackSnapshot.docs
-          .map((doc) =>
-              TrainingFeedbackModel.fromFirestore(doc, trainingSessionId))
+          .map(
+            (doc) =>
+                TrainingFeedbackModel.fromFirestore(doc, trainingSessionId),
+          )
           .toList();
 
       return FeedbackAggregation.fromFeedbackList(
-          trainingSessionId, feedbackList);
+        trainingSessionId,
+        feedbackList,
+      );
     } catch (e) {
       developer.log(
         '[FirestoreTrainingFeedbackRepository] Error getting aggregated feedback: $e',
@@ -127,24 +133,29 @@ class FirestoreTrainingFeedbackRepository
 
   @override
   Stream<FeedbackAggregation?> getAggregatedFeedbackStream(
-      String trainingSessionId) {
+    String trainingSessionId,
+  ) {
     // Calculate aggregation from individual feedback list (which uses Cloud Function)
     // This avoids direct Firestore access and reuses the same data source
-    return getFeedbackListStream(trainingSessionId).map((feedbackList) {
-      if (feedbackList.isEmpty) {
-        return FeedbackAggregation.empty(trainingSessionId);
-      }
+    return getFeedbackListStream(trainingSessionId)
+        .map((feedbackList) {
+          if (feedbackList.isEmpty) {
+            return FeedbackAggregation.empty(trainingSessionId);
+          }
 
-      return FeedbackAggregation.fromFeedbackList(
-          trainingSessionId, feedbackList);
-    }).handleError((error) {
-      developer.log(
-        '[FirestoreTrainingFeedbackRepository] Error streaming aggregated feedback: $error',
-        name: 'training.feedback',
-        error: error,
-      );
-      return FeedbackAggregation.empty(trainingSessionId);
-    });
+          return FeedbackAggregation.fromFeedbackList(
+            trainingSessionId,
+            feedbackList,
+          );
+        })
+        .handleError((error) {
+          developer.log(
+            '[FirestoreTrainingFeedbackRepository] Error streaming aggregated feedback: $error',
+            name: 'training.feedback',
+            error: error,
+          );
+          return FeedbackAggregation.empty(trainingSessionId);
+        });
   }
 
   @override
@@ -175,46 +186,49 @@ class FirestoreTrainingFeedbackRepository
 
   @override
   Stream<List<TrainingFeedbackModel>> getFeedbackListStream(
-      String trainingSessionId) {
+    String trainingSessionId,
+  ) {
     // Use Cloud Function to fetch feedback (validates group membership server-side)
     // Returns a stream that fetches immediately then polls periodically
     return Stream.periodic(const Duration(seconds: 5))
         .startWith(0) // Emit immediately on subscription
         .asyncMap((_) async {
-      try {
-        final callable = _functions.httpsCallable('getTrainingFeedback');
-        final result = await callable.call({
-          'trainingSessionId': trainingSessionId,
+          try {
+            final callable = _functions.httpsCallable('getTrainingFeedback');
+            final result = await callable.call({
+              'trainingSessionId': trainingSessionId,
+            });
+
+            final feedbackData = result.data['feedback'] as List<dynamic>;
+
+            return feedbackData.map((item) {
+              // iOS returns Map<Object?, Object?> so we need to explicitly cast
+              final feedbackMap = Map<String, dynamic>.from(item as Map);
+              // Cloud Function returns ISO string for submittedAt, ready for model
+              return TrainingFeedbackModel.fromJson({
+                ...feedbackMap,
+                'trainingSessionId': trainingSessionId,
+                'participantHash':
+                    'anonymous', // Hash not returned by Cloud Function
+              });
+            }).toList();
+          } catch (e) {
+            developer.log(
+              '[FirestoreTrainingFeedbackRepository] Error fetching feedback: $e',
+              name: 'training.feedback',
+              error: e,
+            );
+            return <TrainingFeedbackModel>[];
+          }
+        })
+        .handleError((error) {
+          developer.log(
+            '[FirestoreTrainingFeedbackRepository] Error in feedback stream: $error',
+            name: 'training.feedback',
+            error: error,
+          );
+          return <TrainingFeedbackModel>[];
         });
-
-        final feedbackData = result.data['feedback'] as List<dynamic>;
-
-        return feedbackData.map((item) {
-          // iOS returns Map<Object?, Object?> so we need to explicitly cast
-          final feedbackMap = Map<String, dynamic>.from(item as Map);
-          // Cloud Function returns ISO string for submittedAt, ready for model
-          return TrainingFeedbackModel.fromJson({
-            ...feedbackMap,
-            'trainingSessionId': trainingSessionId,
-            'participantHash': 'anonymous', // Hash not returned by Cloud Function
-          });
-        }).toList();
-      } catch (e) {
-        developer.log(
-          '[FirestoreTrainingFeedbackRepository] Error fetching feedback: $e',
-          name: 'training.feedback',
-          error: e,
-        );
-        return <TrainingFeedbackModel>[];
-      }
-    }).handleError((error) {
-      developer.log(
-        '[FirestoreTrainingFeedbackRepository] Error in feedback stream: $error',
-        name: 'training.feedback',
-        error: error,
-      );
-      return <TrainingFeedbackModel>[];
-    });
   }
 
   @override
@@ -226,8 +240,9 @@ class FirestoreTrainingFeedbackRepository
       );
 
       // Get all feedback documents
-      final feedbackSnapshot =
-          await _getFeedbackCollection(trainingSessionId).get();
+      final feedbackSnapshot = await _getFeedbackCollection(
+        trainingSessionId,
+      ).get();
 
       // Delete in batches (Firestore limit is 500 operations per batch)
       final batch = _firestore.batch();

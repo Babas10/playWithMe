@@ -31,10 +31,10 @@ class DeferredDeepLinkOrchestrator {
     required PendingInviteStorage storage,
     required SharedPreferences prefs,
     Duration? timeoutDuration,
-  })  : _service = service,
-        _storage = storage,
-        _prefs = prefs,
-        _timeoutDuration = timeoutDuration ?? defaultTimeout;
+  }) : _service = service,
+       _storage = storage,
+       _prefs = prefs,
+       _timeoutDuration = timeoutDuration ?? defaultTimeout;
 
   /// Runs the deferred token check once on first launch.
   ///
@@ -55,9 +55,10 @@ class DeferredDeepLinkOrchestrator {
     await _prefs.setBool(checkedKey, true);
 
     try {
-      final token = await service
-          .retrieveDeferredToken()
-          .timeout(_timeoutDuration, onTimeout: () => null);
+      final token = await service.retrieveDeferredToken().timeout(
+        _timeoutDuration,
+        onTimeout: () => null,
+      );
       if (token != null) {
         await _storage.store(token);
       }

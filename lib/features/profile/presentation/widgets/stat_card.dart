@@ -35,9 +35,9 @@ class StatCard extends StatelessWidget {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 if (icon != null)
                   Icon(
@@ -51,9 +51,9 @@ class StatCard extends StatelessWidget {
             Text(
               value,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
             ),
             if (subLabel != null)
               Padding(
@@ -61,9 +61,9 @@ class StatCard extends StatelessWidget {
                 child: Text(
                   subLabel!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: subLabelColor ?? Colors.grey[600],
-                        fontSize: 11,
-                      ),
+                    color: subLabelColor ?? Colors.grey[600],
+                    fontSize: 11,
+                  ),
                 ),
               ),
           ],

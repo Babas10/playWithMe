@@ -30,7 +30,8 @@ import '../features/auth/data/mock_auth_repository.dart';
 import '../core/data/repositories/mock_group_repository.dart';
 
 // Mock for LocalePreferencesRepository
-class MockLocalePreferencesRepository extends Mock implements LocalePreferencesRepository {}
+class MockLocalePreferencesRepository extends Mock
+    implements LocalePreferencesRepository {}
 
 // Mock for UserRepository
 class MockUserRepository extends Mock implements UserRepository {}
@@ -93,30 +94,38 @@ Future<void> initializeTestDependencies({
   }
 
   // Register mock repository
-  sl.registerLazySingleton<AuthRepository>(
-    () => _globalMockRepo!,
-  );
+  sl.registerLazySingleton<AuthRepository>(() => _globalMockRepo!);
 
   // Register mock UserRepository
   _globalMockUserRepo = MockUserRepository();
-  when(() => _globalMockUserRepo!.createOrUpdateUser(any())).thenAnswer((_) async {});
+  when(
+    () => _globalMockUserRepo!.createOrUpdateUser(any()),
+  ).thenAnswer((_) async {});
   // Stub getUserStream to return an empty stream (for PlayerStatsBloc)
-  when(() => _globalMockUserRepo!.getUserStream(any())).thenAnswer((_) => Stream.value(null));
+  when(
+    () => _globalMockUserRepo!.getUserStream(any()),
+  ).thenAnswer((_) => Stream.value(null));
   // Stub getUserById to return null — gender check falls through to NotRequired (Story 26.2)
-  when(() => _globalMockUserRepo!.getUserById(any())).thenAnswer((_) async => null);
+  when(
+    () => _globalMockUserRepo!.getUserById(any()),
+  ).thenAnswer((_) async => null);
   // Stub getRatingHistory to return an empty stream (for PlayerStatsBloc)
-  when(() => _globalMockUserRepo!.getRatingHistory(any(), limit: any(named: 'limit')))
-      .thenAnswer((_) => Stream.value([]));
-  sl.registerLazySingleton<UserRepository>(
-    () => _globalMockUserRepo!,
-  );
+  when(
+    () => _globalMockUserRepo!.getRatingHistory(
+      any(),
+      limit: any(named: 'limit'),
+    ),
+  ).thenAnswer((_) => Stream.value([]));
+  sl.registerLazySingleton<UserRepository>(() => _globalMockUserRepo!);
 
   // Register mock FirebaseAnalytics
   final mockAnalytics = MockFirebaseAnalytics();
-  when(() => mockAnalytics.logEvent(
-        name: any(named: 'name'),
-        parameters: any(named: 'parameters'),
-      )).thenAnswer((_) async {});
+  when(
+    () => mockAnalytics.logEvent(
+      name: any(named: 'name'),
+      parameters: any(named: 'parameters'),
+    ),
+  ).thenAnswer((_) async {});
   sl.registerLazySingleton<FirebaseAnalytics>(() => mockAnalytics);
 
   // Register BLoCs with mock repository
@@ -141,18 +150,18 @@ Future<void> initializeTestDependencies({
 
   // Register mock LocalePreferencesRepository
   final mockLocalePrefsRepo = MockLocalePreferencesRepository();
-  when(() => mockLocalePrefsRepo.loadPreferences()).thenAnswer(
-    (_) async => LocalePreferencesEntity.defaultPreferences(),
-  );
-  when(() => mockLocalePrefsRepo.savePreferences(any())).thenAnswer(
-    (_) async {},
-  );
-  when(() => mockLocalePrefsRepo.syncToFirestore(any(), any())).thenAnswer(
-    (_) async {},
-  );
-  when(() => mockLocalePrefsRepo.loadFromFirestore(any())).thenAnswer(
-    (_) async => null,
-  );
+  when(
+    () => mockLocalePrefsRepo.loadPreferences(),
+  ).thenAnswer((_) async => LocalePreferencesEntity.defaultPreferences());
+  when(
+    () => mockLocalePrefsRepo.savePreferences(any()),
+  ).thenAnswer((_) async {});
+  when(
+    () => mockLocalePrefsRepo.syncToFirestore(any(), any()),
+  ).thenAnswer((_) async {});
+  when(
+    () => mockLocalePrefsRepo.loadFromFirestore(any()),
+  ).thenAnswer((_) async => null);
   when(() => mockLocalePrefsRepo.getDeviceTimeZone()).thenReturn('UTC');
 
   sl.registerLazySingleton<LocalePreferencesRepository>(
@@ -174,7 +183,9 @@ Future<void> initializeTestDependencies({
 
   // Register MockInvitationRepository for invitation-related tests
   _globalMockInvitationRepo = MockInvitationRepository();
-  sl.registerLazySingleton<InvitationRepository>(() => _globalMockInvitationRepo!);
+  sl.registerLazySingleton<InvitationRepository>(
+    () => _globalMockInvitationRepo!,
+  );
 
   // Register InvitationBloc factory that uses the mock repository
   sl.registerFactory<InvitationBloc>(
@@ -184,8 +195,9 @@ Future<void> initializeTestDependencies({
   // Register MockFriendRepository for friend-related tests
   _globalMockFriendRepo = MockFriendRepository();
   // Mock the getPendingFriendRequestCount stream to return 0 by default
-  when(() => _globalMockFriendRepo!.getPendingFriendRequestCount(any()))
-      .thenAnswer((_) => Stream.value(0));
+  when(
+    () => _globalMockFriendRepo!.getPendingFriendRequestCount(any()),
+  ).thenAnswer((_) => Stream.value(0));
   sl.registerLazySingleton<FriendRepository>(() => _globalMockFriendRepo!);
 
   // Register FriendBloc factory that uses the mock repository
@@ -198,28 +210,26 @@ Future<void> initializeTestDependencies({
 
   // Register FriendRequestCountBloc factory that uses the mock repository
   sl.registerFactory<FriendRequestCountBloc>(
-    () => FriendRequestCountBloc(
-      friendRepository: sl<FriendRepository>(),
-    ),
+    () => FriendRequestCountBloc(friendRepository: sl<FriendRepository>()),
   );
 
   // Register deep link services and bloc
   final mockDeepLinkService = MockDeepLinkService();
   final mockPendingInviteStorage = MockPendingInviteStorage();
-  when(() => mockDeepLinkService.inviteTokenStream)
-      .thenAnswer((_) => const Stream.empty());
-  when(() => mockDeepLinkService.getInitialInviteToken())
-      .thenAnswer((_) async => null);
-  when(() => mockPendingInviteStorage.retrieve())
-      .thenAnswer((_) async => null);
-  when(() => mockPendingInviteStorage.store(any()))
-      .thenAnswer((_) async {});
-  when(() => mockPendingInviteStorage.clear())
-      .thenAnswer((_) async {});
+  when(
+    () => mockDeepLinkService.inviteTokenStream,
+  ).thenAnswer((_) => const Stream.empty());
+  when(
+    () => mockDeepLinkService.getInitialInviteToken(),
+  ).thenAnswer((_) async => null);
+  when(() => mockPendingInviteStorage.retrieve()).thenAnswer((_) async => null);
+  when(() => mockPendingInviteStorage.store(any())).thenAnswer((_) async {});
+  when(() => mockPendingInviteStorage.clear()).thenAnswer((_) async {});
 
   sl.registerLazySingleton<DeepLinkService>(() => mockDeepLinkService);
   sl.registerLazySingleton<PendingInviteStorage>(
-      () => mockPendingInviteStorage);
+    () => mockPendingInviteStorage,
+  );
   sl.registerFactory<DeepLinkBloc>(
     () => DeepLinkBloc(
       deepLinkService: sl<DeepLinkService>(),
@@ -231,7 +241,8 @@ Future<void> initializeTestDependencies({
   // Register InviteJoinBloc with mock repository
   final mockGroupInviteLinkRepo = MockGroupInviteLinkRepository();
   sl.registerLazySingleton<GroupInviteLinkRepository>(
-      () => mockGroupInviteLinkRepo);
+    () => mockGroupInviteLinkRepo,
+  );
   sl.registerFactory<InviteJoinBloc>(
     () => InviteJoinBloc(
       repository: sl<GroupInviteLinkRepository>(),
@@ -246,15 +257,15 @@ Future<void> initializeTestDependencies({
 
   // Register GameInvitationsBloc with a mock repository (Story 28.10)
   final mockGameInvitationsRepo = MockGameInvitationsRepository();
-  when(() => mockGameInvitationsRepo.getGameInvitations())
-      .thenAnswer((_) async => []);
+  when(
+    () => mockGameInvitationsRepo.getGameInvitations(),
+  ).thenAnswer((_) async => []);
   sl.registerLazySingleton<GameInvitationsRepository>(
     () => mockGameInvitationsRepo,
   );
   sl.registerFactory<GameInvitationsBloc>(
     () => GameInvitationsBloc(repository: sl<GameInvitationsRepository>()),
   );
-
 }
 
 /// Get the mock repository for test control
@@ -267,7 +278,8 @@ MockGroupRepository? getTestGroupRepository() => _globalMockGroupRepo;
 MockUserRepository? getTestUserRepository() => _globalMockUserRepo;
 
 /// Get the mock invitation repository for test control
-MockInvitationRepository? getTestInvitationRepository() => _globalMockInvitationRepo;
+MockInvitationRepository? getTestInvitationRepository() =>
+    _globalMockInvitationRepo;
 
 /// Get the mock friend repository for test control
 MockFriendRepository? getTestFriendRepository() => _globalMockFriendRepo;

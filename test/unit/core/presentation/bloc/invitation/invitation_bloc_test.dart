@@ -16,8 +16,9 @@ void main() {
 
     setUp(() {
       mockInvitationRepository = MockInvitationRepository();
-      invitationBloc =
-          InvitationBloc(invitationRepository: mockInvitationRepository);
+      invitationBloc = InvitationBloc(
+        invitationRepository: mockInvitationRepository,
+      );
     });
 
     tearDown(() {
@@ -36,17 +37,16 @@ void main() {
           mockInvitationRepository.clearInvitations();
           return invitationBloc;
         },
-        act: (bloc) => bloc.add(const SendInvitation(
-          groupId: 'group-123',
-          groupName: 'Test Group',
-          invitedUserId: 'user-456',
-          invitedBy: 'user-123',
-          inviterName: 'John Doe',
-        )),
-        expect: () => [
-          const InvitationLoading(),
-          isA<InvitationSent>(),
-        ],
+        act: (bloc) => bloc.add(
+          const SendInvitation(
+            groupId: 'group-123',
+            groupName: 'Test Group',
+            invitedUserId: 'user-456',
+            invitedBy: 'user-123',
+            inviterName: 'John Doe',
+          ),
+        ),
+        expect: () => [const InvitationLoading(), isA<InvitationSent>()],
       );
 
       // Note: Error handling tests would require a mock that can throw exceptions
@@ -160,10 +160,12 @@ void main() {
           mockInvitationRepository.addInvitation(testInvitation);
           return invitationBloc;
         },
-        act: (bloc) => bloc.add(const AcceptInvitation(
-          userId: 'user-456',
-          invitationId: 'invitation-1',
-        )),
+        act: (bloc) => bloc.add(
+          const AcceptInvitation(
+            userId: 'user-456',
+            invitationId: 'invitation-1',
+          ),
+        ),
         expect: () => [
           const InvitationLoading(),
           const InvitationAccepted(invitationId: 'invitation-1'),
@@ -176,14 +178,13 @@ void main() {
           mockInvitationRepository.clearInvitations();
           return invitationBloc;
         },
-        act: (bloc) => bloc.add(const AcceptInvitation(
-          userId: 'user-456',
-          invitationId: 'non-existent',
-        )),
-        expect: () => [
-          const InvitationLoading(),
-          isA<InvitationError>(),
-        ],
+        act: (bloc) => bloc.add(
+          const AcceptInvitation(
+            userId: 'user-456',
+            invitationId: 'non-existent',
+          ),
+        ),
+        expect: () => [const InvitationLoading(), isA<InvitationError>()],
       );
     });
 
@@ -205,10 +206,12 @@ void main() {
           mockInvitationRepository.addInvitation(testInvitation);
           return invitationBloc;
         },
-        act: (bloc) => bloc.add(const DeclineInvitation(
-          userId: 'user-456',
-          invitationId: 'invitation-1',
-        )),
+        act: (bloc) => bloc.add(
+          const DeclineInvitation(
+            userId: 'user-456',
+            invitationId: 'invitation-1',
+          ),
+        ),
         expect: () => [
           const InvitationLoading(),
           const InvitationDeclined(invitationId: 'invitation-1'),
@@ -221,14 +224,13 @@ void main() {
           mockInvitationRepository.clearInvitations();
           return invitationBloc;
         },
-        act: (bloc) => bloc.add(const DeclineInvitation(
-          userId: 'user-456',
-          invitationId: 'non-existent',
-        )),
-        expect: () => [
-          const InvitationLoading(),
-          isA<InvitationError>(),
-        ],
+        act: (bloc) => bloc.add(
+          const DeclineInvitation(
+            userId: 'user-456',
+            invitationId: 'non-existent',
+          ),
+        ),
+        expect: () => [const InvitationLoading(), isA<InvitationError>()],
       );
     });
 
@@ -250,10 +252,12 @@ void main() {
           mockInvitationRepository.addInvitation(testInvitation);
           return invitationBloc;
         },
-        act: (bloc) => bloc.add(const DeleteInvitation(
-          userId: 'user-456',
-          invitationId: 'invitation-1',
-        )),
+        act: (bloc) => bloc.add(
+          const DeleteInvitation(
+            userId: 'user-456',
+            invitationId: 'invitation-1',
+          ),
+        ),
         expect: () => [
           const InvitationLoading(),
           const InvitationDeleted(invitationId: 'invitation-1'),

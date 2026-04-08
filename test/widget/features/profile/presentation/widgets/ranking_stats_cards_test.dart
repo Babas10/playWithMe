@@ -11,18 +11,14 @@ void main() {
     testWidgets('shows empty state when ranking is null', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: RankingStatsCards(
-              ranking: null,
-            ),
-          ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: RankingStatsCards(ranking: null)),
         ),
       );
 
@@ -39,18 +35,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-            ),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: RankingStatsCards(ranking: ranking)),
         ),
       );
 
@@ -68,18 +61,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-            ),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: RankingStatsCards(ranking: ranking)),
         ),
       );
 
@@ -99,18 +89,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-            ),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: RankingStatsCards(ranking: ranking)),
         ),
       );
 
@@ -136,11 +123,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-            ),
-          ),
+          home: Scaffold(body: RankingStatsCards(ranking: ranking)),
         ),
       );
 
@@ -149,7 +132,9 @@ void main() {
       expect(find.byIcon(Icons.people), findsOneWidget);
     });
 
-    testWidgets('responsive layout: horizontal on wide screens', (tester) async {
+    testWidgets('responsive layout: horizontal on wide screens', (
+      tester,
+    ) async {
       final ranking = UserRanking(
         globalRank: 42,
         totalUsers: 1500,
@@ -160,20 +145,19 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: Center(
               child: SizedBox(
                 width: 600, // Wide screen
-                child: RankingStatsCards(
-                  ranking: ranking,
-                ),
+                child: RankingStatsCards(ranking: ranking),
               ),
             ),
           ),
@@ -184,7 +168,9 @@ void main() {
       expect(find.byType(Row), findsWidgets);
     });
 
-    testWidgets('responsive layout: vertical on very narrow screens', (tester) async {
+    testWidgets('responsive layout: vertical on very narrow screens', (
+      tester,
+    ) async {
       final ranking = UserRanking(
         globalRank: 42,
         totalUsers: 1500,
@@ -195,20 +181,19 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: Center(
               child: SizedBox(
                 width: 250, // Very narrow screen (< 280px threshold)
-                child: RankingStatsCards(
-                  ranking: ranking,
-                ),
+                child: RankingStatsCards(ranking: ranking),
               ),
             ),
           ),
@@ -230,24 +215,24 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-            ),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: RankingStatsCards(ranking: ranking)),
         ),
       );
 
       // Find all icon widgets (trending_up now appears twice: percentile→ssid_chart, streak→trending_up)
       expect(find.byIcon(Icons.public), findsOneWidget);
-      expect(find.byType(CustomPaint), findsAtLeastNWidgets(1)); // gaussian curve for percentile
+      expect(
+        find.byType(CustomPaint),
+        findsAtLeastNWidgets(1),
+      ); // gaussian curve for percentile
       expect(find.byIcon(Icons.people), findsOneWidget);
       expect(find.byIcon(Icons.trending_up), findsOneWidget);
     });
@@ -270,10 +255,7 @@ void main() {
           ],
           supportedLocales: const [Locale('en')],
           home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-              currentStreak: 5,
-            ),
+            body: RankingStatsCards(ranking: ranking, currentStreak: 5),
           ),
         ),
       );
@@ -301,10 +283,7 @@ void main() {
           ],
           supportedLocales: const [Locale('en')],
           home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-              currentStreak: -3,
-            ),
+            body: RankingStatsCards(ranking: ranking, currentStreak: -3),
           ),
         ),
       );
@@ -331,10 +310,7 @@ void main() {
           ],
           supportedLocales: const [Locale('en')],
           home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-              currentStreak: 0,
-            ),
+            body: RankingStatsCards(ranking: ranking, currentStreak: 0),
           ),
         ),
       );
@@ -344,7 +320,9 @@ void main() {
       expect(find.text('-'), findsNWidgets(2));
     });
 
-    testWidgets('all three cards rendered when ranking has all data', (tester) async {
+    testWidgets('all three cards rendered when ranking has all data', (
+      tester,
+    ) async {
       final ranking = UserRanking(
         globalRank: 1,
         totalUsers: 10000,
@@ -355,18 +333,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-            ),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: RankingStatsCards(ranking: ranking)),
         ),
       );
 

@@ -7,14 +7,14 @@ import 'friend_request_count_state.dart';
 /// BLoC for managing friend request count badge
 /// This is a dedicated BLoC that only handles the real-time count of pending friend requests
 /// Separated from FriendBloc to avoid state conflicts and enable independent updates
-class FriendRequestCountBloc extends Bloc<FriendRequestCountEvent, FriendRequestCountState> {
+class FriendRequestCountBloc
+    extends Bloc<FriendRequestCountEvent, FriendRequestCountState> {
   final FriendRepository _friendRepository;
   StreamSubscription<int>? _countSubscription;
 
-  FriendRequestCountBloc({
-    required FriendRepository friendRepository,
-  })  : _friendRepository = friendRepository,
-        super(const FriendRequestCountState.initial()) {
+  FriendRequestCountBloc({required FriendRepository friendRepository})
+    : _friendRepository = friendRepository,
+      super(const FriendRequestCountState.initial()) {
     on<FriendRequestCountStartListening>(_onStartListening);
     on<FriendRequestCountStopListening>(_onStopListening);
   }
@@ -41,9 +41,11 @@ class FriendRequestCountBloc extends Bloc<FriendRequestCountEvent, FriendRequest
         },
       );
     } catch (e) {
-      emit(FriendRequestCountState.error(
-        message: 'Failed to start listening to friend request count: $e',
-      ));
+      emit(
+        FriendRequestCountState.error(
+          message: 'Failed to start listening to friend request count: $e',
+        ),
+      );
     }
   }
 

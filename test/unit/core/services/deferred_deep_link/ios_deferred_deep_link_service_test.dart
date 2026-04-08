@@ -16,29 +16,38 @@ void main() {
   });
 
   group('IosDeferredDeepLinkService.retrieveDeferredToken', () {
-    test('returns token from valid gatherli://invite/ clipboard content', () async {
-      when(() => mockClipboard.read())
-          .thenAnswer((_) async => 'gatherli://invite/abc123');
-      when(() => mockClipboard.clear()).thenAnswer((_) async {});
+    test(
+      'returns token from valid gatherli://invite/ clipboard content',
+      () async {
+        when(
+          () => mockClipboard.read(),
+        ).thenAnswer((_) async => 'gatherli://invite/abc123');
+        when(() => mockClipboard.clear()).thenAnswer((_) async {});
 
-      final token = await service.retrieveDeferredToken();
+        final token = await service.retrieveDeferredToken();
 
-      expect(token, 'abc123');
-    });
+        expect(token, 'abc123');
+      },
+    );
 
-    test('clears clipboard after successfully extracting a valid token', () async {
-      when(() => mockClipboard.read())
-          .thenAnswer((_) async => 'gatherli://invite/abc123');
-      when(() => mockClipboard.clear()).thenAnswer((_) async {});
+    test(
+      'clears clipboard after successfully extracting a valid token',
+      () async {
+        when(
+          () => mockClipboard.read(),
+        ).thenAnswer((_) async => 'gatherli://invite/abc123');
+        when(() => mockClipboard.clear()).thenAnswer((_) async {});
 
-      await service.retrieveDeferredToken();
+        await service.retrieveDeferredToken();
 
-      verify(() => mockClipboard.clear()).called(1);
-    });
+        verify(() => mockClipboard.clear()).called(1);
+      },
+    );
 
     test('returns null for wrong scheme (https URL)', () async {
-      when(() => mockClipboard.read())
-          .thenAnswer((_) async => 'https://gatherli.org/invite/abc123');
+      when(
+        () => mockClipboard.read(),
+      ).thenAnswer((_) async => 'https://gatherli.org/invite/abc123');
 
       final token = await service.retrieveDeferredToken();
 
@@ -46,8 +55,9 @@ void main() {
     });
 
     test('returns null for unrelated clipboard content', () async {
-      when(() => mockClipboard.read())
-          .thenAnswer((_) async => 'some random text copied by user');
+      when(
+        () => mockClipboard.read(),
+      ).thenAnswer((_) async => 'some random text copied by user');
 
       final token = await service.retrieveDeferredToken();
 
@@ -70,27 +80,36 @@ void main() {
       expect(token, isNull);
     });
 
-    test('returns null for gatherli://invite/ with empty token segment', () async {
-      when(() => mockClipboard.read())
-          .thenAnswer((_) async => 'gatherli://invite/');
+    test(
+      'returns null for gatherli://invite/ with empty token segment',
+      () async {
+        when(
+          () => mockClipboard.read(),
+        ).thenAnswer((_) async => 'gatherli://invite/');
 
-      final token = await service.retrieveDeferredToken();
+        final token = await service.retrieveDeferredToken();
 
-      expect(token, isNull);
-    });
+        expect(token, isNull);
+      },
+    );
 
-    test('returns null when clipboard read throws (iOS consent denied)', () async {
-      when(() => mockClipboard.read())
-          .thenThrow(Exception('Clipboard access denied'));
+    test(
+      'returns null when clipboard read throws (iOS consent denied)',
+      () async {
+        when(
+          () => mockClipboard.read(),
+        ).thenThrow(Exception('Clipboard access denied'));
 
-      final token = await service.retrieveDeferredToken();
+        final token = await service.retrieveDeferredToken();
 
-      expect(token, isNull);
-    });
+        expect(token, isNull);
+      },
+    );
 
     test('does not clear clipboard when no valid token found', () async {
-      when(() => mockClipboard.read())
-          .thenAnswer((_) async => 'https://other.com/link');
+      when(
+        () => mockClipboard.read(),
+      ).thenAnswer((_) async => 'https://other.com/link');
 
       await service.retrieveDeferredToken();
 
@@ -98,8 +117,9 @@ void main() {
     });
 
     test('trims whitespace from extracted token', () async {
-      when(() => mockClipboard.read())
-          .thenAnswer((_) async => 'gatherli://invite/  token123  ');
+      when(
+        () => mockClipboard.read(),
+      ).thenAnswer((_) async => 'gatherli://invite/  token123  ');
       when(() => mockClipboard.clear()).thenAnswer((_) async {});
 
       final token = await service.retrieveDeferredToken();
