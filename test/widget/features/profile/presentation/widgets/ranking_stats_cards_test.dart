@@ -119,7 +119,7 @@ void main() {
       expect(find.byIcon(Icons.people), findsOneWidget);
     });
 
-    testWidgets('shows "Add friends" when no friends', (tester) async {
+    testWidgets('shows dash when no friends rank available', (tester) async {
       final ranking = UserRanking(
         globalRank: 42,
         totalUsers: 1500,
@@ -128,14 +128,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: RankingStatsCards(
               ranking: ranking,
             ),
@@ -144,44 +145,8 @@ void main() {
       );
 
       expect(find.text('Friends Rank'), findsOneWidget);
-      expect(find.text('Add friends'), findsOneWidget);
+      expect(find.text('Add friends'), findsNothing);
       expect(find.byIcon(Icons.people), findsOneWidget);
-    });
-
-    testWidgets('tap on "Add friends" triggers callback', (tester) async {
-      final ranking = UserRanking(
-        globalRank: 42,
-        totalUsers: 1500,
-        percentile: 97.2,
-        calculatedAt: DateTime(2024, 1, 1),
-      );
-
-      bool callbackTriggered = false;
-
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: RankingStatsCards(
-              ranking: ranking,
-              onAddFriendsTap: () {
-                callbackTriggered = true;
-              },
-            ),
-          ),
-        ),
-      );
-
-      // Find and tap the "Add friends" text
-      await tester.tap(find.text('Add friends'));
-      await tester.pumpAndSettle();
-
-      expect(callbackTriggered, isTrue);
     });
 
     testWidgets('responsive layout: horizontal on wide screens', (tester) async {
@@ -375,7 +340,8 @@ void main() {
       );
 
       expect(find.text('Streak'), findsOneWidget);
-      expect(find.text('-'), findsOneWidget);
+      // Both streak card and friends rank card show '-' when values are absent
+      expect(find.text('-'), findsNWidgets(2));
     });
 
     testWidgets('all three cards rendered when ranking has all data', (tester) async {

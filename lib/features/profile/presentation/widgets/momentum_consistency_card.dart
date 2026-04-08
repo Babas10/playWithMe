@@ -101,9 +101,6 @@ class MomentumConsistencyCard extends StatelessWidget {
                         RankingStatsCards(
                           ranking: statsState.ranking,
                           currentStreak: user.currentStreak,
-                          onAddFriendsTap: () {
-                            Navigator.pushNamed(context, '/friends');
-                          },
                         ),
                         const SizedBox(height: 12),
                       ],

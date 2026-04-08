@@ -12,13 +12,11 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 class RankingStatsCards extends StatelessWidget {
   final UserRanking? ranking;
   final int currentStreak;
-  final VoidCallback? onAddFriendsTap;
 
   const RankingStatsCards({
     super.key,
     required this.ranking,
     this.currentStreak = 0,
-    this.onAddFriendsTap,
   });
 
   @override
@@ -36,10 +34,7 @@ class RankingStatsCards extends StatelessWidget {
               const SizedBox(height: 8),
               _PercentileCard(ranking: ranking!),
               const SizedBox(height: 8),
-              _FriendsRankCard(
-                ranking: ranking!,
-                onAddFriendsTap: onAddFriendsTap,
-              ),
+              _FriendsRankCard(ranking: ranking!),
               const SizedBox(height: 8),
               _StreakCard(currentStreak: currentStreak),
             ],
@@ -53,10 +48,7 @@ class RankingStatsCards extends StatelessWidget {
             Expanded(child: _PercentileCard(ranking: ranking!)),
             const SizedBox(width: 6),
             Expanded(
-              child: _FriendsRankCard(
-                ranking: ranking!,
-                onAddFriendsTap: onAddFriendsTap,
-              ),
+              child: _FriendsRankCard(ranking: ranking!),
             ),
             const SizedBox(width: 6),
             Expanded(child: _StreakCard(currentStreak: currentStreak)),
@@ -135,31 +127,18 @@ class _PercentileCard extends StatelessWidget {
 /// Friends ranking card
 class _FriendsRankCard extends StatelessWidget {
   final UserRanking ranking;
-  final VoidCallback? onAddFriendsTap;
 
-  const _FriendsRankCard({
-    required this.ranking,
-    this.onAddFriendsTap,
-  });
+  const _FriendsRankCard({required this.ranking});
 
   @override
   Widget build(BuildContext context) {
-    if (ranking.friendsRank == null || ranking.totalFriends == null) {
-      return _RankingStatCard(
-        icon: Icons.people,
-        iconColor: AppColors.secondary,
-        label: AppLocalizations.of(context)!.friendsRank,
-        value: AppLocalizations.of(context)!.addFriendsAction,
-        isActionable: true,
-        onTap: onAddFriendsTap,
-      );
-    }
-
     return _RankingStatCard(
       icon: Icons.people,
       iconColor: AppColors.secondary,
       label: AppLocalizations.of(context)!.friendsRank,
-      value: ranking.friendsRankDisplay!,
+      value: ranking.friendsRank != null && ranking.totalFriends != null
+          ? ranking.friendsRankDisplay!
+          : '-',
     );
   }
 }
@@ -205,8 +184,6 @@ class _RankingStatCard extends StatelessWidget {
   final String label;
   final String value;
   final Color? valueColor;
-  final bool isActionable;
-  final VoidCallback? onTap;
 
   const _RankingStatCard({
     this.icon,
@@ -215,8 +192,6 @@ class _RankingStatCard extends StatelessWidget {
     required this.label,
     required this.value,
     this.valueColor,
-    this.isActionable = false,
-    this.onTap,
   }) : assert(icon != null || customIcon != null, 'Provide icon or customIcon');
 
   @override
@@ -264,10 +239,7 @@ class _RankingStatCard extends StatelessWidget {
                 value,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: valueColor ??
-                      (isActionable
-                          ? theme.colorScheme.primary
-                          : AppColors.secondary),
+                  color: valueColor ?? AppColors.secondary,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
@@ -277,14 +249,6 @@ class _RankingStatCard extends StatelessWidget {
         ],
       ),
     );
-
-    if (isActionable && onTap != null) {
-      return InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: card,
-      );
-    }
 
     return card;
   }
