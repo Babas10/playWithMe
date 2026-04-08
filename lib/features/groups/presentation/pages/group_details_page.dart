@@ -389,7 +389,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
             return Scaffold(
               appBar: PlayWithMeAppBar.build(
                 context: context,
-                title: 'Group Details',
+                title: 'Group',
                 showUserActions: true,
               ),
               body: const Center(
@@ -401,7 +401,7 @@ class _GroupDetailsPageContentState extends State<_GroupDetailsPageContent>
           return Scaffold(
             appBar: PlayWithMeAppBar.build(
               context: context,
-              title: 'Group Details',
+              title: 'Group',
               extraActions: [
                 if (_group != null)
                   PopupMenuButton<String>(

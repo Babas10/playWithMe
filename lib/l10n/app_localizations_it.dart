@@ -368,7 +368,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tapToSelect => 'Tocca per selezionare';
 
   @override
-  String get gameDetails => 'Dettagli Partita';
+  String get gameDetails => 'Partita';
 
   @override
   String get goBack => 'Indietro';

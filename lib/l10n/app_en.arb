@@ -566,7 +566,7 @@
     "description": "Tap to select hint text"
   },
 
-  "gameDetails": "Game Details",
+  "gameDetails": "Game",
   "@gameDetails": {
     "description": "Game details page title"
   },

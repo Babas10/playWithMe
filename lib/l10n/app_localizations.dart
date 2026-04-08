@@ -767,7 +767,7 @@ abstract class AppLocalizations {
   /// Game details page title
   ///
   /// In en, this message translates to:
-  /// **'Game Details'**
+  /// **'Game'**
   String get gameDetails;
 
   /// Go back button text
