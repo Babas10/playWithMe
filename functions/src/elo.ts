@@ -133,11 +133,17 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
           continue;
         }
 
+        // Per-game teams with session-level fallback (Story 14.12)
+        // New games carry per-game teams; old games fall back to session-level assignment.
+        const gameTeams = individualGame.teams ?? gameData.teams;
+        const gameTeamAIds: string[] = gameTeams.teamAPlayerIds;
+        const gameTeamBIds: string[] = gameTeams.teamBPlayerIds;
+
         // Get current ratings for this iteration
         const getRatings = (ids: string[]) => ids.map(id => currentRatings.get(id) || DEFAULT_ELO);
 
-        const teamARatings = getRatings(teamAPlayerIds);
-        const teamBRatings = getRatings(teamBPlayerIds);
+        const teamARatings = getRatings(gameTeamAIds);
+        const teamBRatings = getRatings(gameTeamBIds);
 
         // Calculate Team Ratings (Weak-Link formula: 0.7 * min + 0.3 * max)
         const teamARating = calculateTeamRating(teamARatings);
@@ -156,13 +162,13 @@ export async function processGameEloUpdates(gameId: string, gameData: any): Prom
         const teamBChange = calculateRatingChange(teamBActualScore, teamBExpected);
 
         // Update current ratings and track cumulative changes
-        teamAPlayerIds.forEach((id: string) => {
+        gameTeamAIds.forEach((id: string) => {
           const newRating = (currentRatings.get(id) || DEFAULT_ELO) + teamAChange;
           currentRatings.set(id, newRating);
           cumulativeChanges.set(id, (cumulativeChanges.get(id) || 0) + teamAChange);
         });
 
-        teamBPlayerIds.forEach((id: string) => {
+        gameTeamBIds.forEach((id: string) => {
           const newRating = (currentRatings.get(id) || DEFAULT_ELO) + teamBChange;
           currentRatings.set(id, newRating);
           cumulativeChanges.set(id, (cumulativeChanges.get(id) || 0) + teamBChange);
