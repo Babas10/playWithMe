@@ -25,7 +25,7 @@ import '../bloc/game_details/game_details_event.dart';
 import '../bloc/game_details/game_details_state.dart';
 import '../bloc/game_guest_invitation/game_guest_invitation_bloc.dart';
 import '../widgets/invite_guest_players_sheet.dart';
-import 'record_results_page.dart';
+import 'score_entry_page.dart';
 import 'game_result_view_page.dart';
 
 class GameDetailsPage extends StatelessWidget {
@@ -727,10 +727,10 @@ class _RsvpButtons extends StatelessWidget {
     return BlocListener<GameDetailsBloc, GameDetailsState>(
       listener: (context, state) {
         if (state is GameCompletedSuccessfully) {
-          // Navigate to Record Results screen
+          // Navigate to Score Entry
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => RecordResultsPage(gameId: state.game.id),
+              builder: (context) => ScoreEntryPage(gameId: state.game.id),
             ),
           );
         }
@@ -771,7 +771,7 @@ class _RsvpButtons extends StatelessWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) =>
-                                  RecordResultsPage(gameId: game.id),
+                                  ScoreEntryPage(gameId: game.id),
                             ),
                           );
                         },
@@ -1178,11 +1178,11 @@ class _VerificationSection extends StatelessWidget {
                       onPressed: isOperationInProgress
                           ? null
                           : () {
-                              // Navigate to RecordResultsPage to edit
+                              // Navigate to ScoreEntryPage to edit
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      RecordResultsPage(gameId: game.id),
+                                      ScoreEntryPage(gameId: game.id),
                                 ),
                               );
                             },

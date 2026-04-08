@@ -18,7 +18,7 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_event.dart';
 import 'package:play_with_me/features/auth/presentation/bloc/authentication/authentication_state.dart';
 import 'package:play_with_me/features/games/presentation/pages/game_details_page.dart';
-import 'package:play_with_me/features/games/presentation/pages/record_results_page.dart';
+import 'package:play_with_me/features/games/presentation/pages/score_entry_page.dart';
 
 import '../../../../../unit/core/data/repositories/mock_game_repository.dart';
 import '../../../../../unit/core/data/repositories/mock_user_repository.dart';
@@ -188,7 +188,7 @@ void main() {
     expect(find.text('Enter Results'), findsNothing);
   });
 
-  testWidgets('"Enter Results" button navigates to RecordResultsPage', (tester) async {
+  testWidgets('"Enter Results" button navigates to ScoreEntryPage', (tester) async {
     final pastGame = baseGame.copyWith(
       scheduledAt: DateTime.now().subtract(const Duration(hours: 2)),
     );
@@ -204,7 +204,7 @@ void main() {
     await tester.tap(find.text('Enter Results'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(RecordResultsPage), findsOneWidget);
+    expect(find.byType(ScoreEntryPage), findsOneWidget);
   });
 
   testWidgets('Participant does NOT see "Enter Results" when game has insufficient players', (tester) async {
