@@ -41,7 +41,7 @@ class MyGameTile extends StatelessWidget {
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: _statusColor(item.status),
+                  color: _statusColor(_effectiveStatus(item.status, item.scheduledAt)),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -86,13 +86,22 @@ class MyGameTile extends StatelessWidget {
               const SizedBox(width: 8),
               item.isGroupGame
                   ? _OpenBadge(l10n: l10n)
-                  : _StatusBadge(status: item.status, l10n: l10n),
+                  : _StatusBadge(status: _effectiveStatus(item.status, item.scheduledAt), l10n: l10n),
               const Icon(Icons.chevron_right, size: 18, color: _kTextMuted),
             ],
           ),
         ),
       ),
     );
+  }
+
+  /// Treats past-scheduled games as verification to prompt result entry.
+  GameStatus _effectiveStatus(GameStatus status, DateTime scheduledAt) {
+    if (status == GameStatus.scheduled &&
+        scheduledAt.isBefore(DateTime.now())) {
+      return GameStatus.verification;
+    }
+    return status;
   }
 
   Color _statusColor(GameStatus status) {

@@ -436,7 +436,7 @@ class _PlayersCard extends StatelessWidget {
                               color: AppColors.secondary,
                             ),
                           ),
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.25),
                         ),
                       ],
                     ),
@@ -477,7 +477,11 @@ class _PlayersCard extends StatelessWidget {
                         dense: true,
                         contentPadding: EdgeInsets.zero,
                         leading: CircleAvatar(
-                          child: Text('${index + 1}'),
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.25),
+                          child: Text(
+                            '${index + 1}',
+                            style: const TextStyle(color: AppColors.secondary),
+                          ),
                         ),
                         title: Text(
                           displayName,

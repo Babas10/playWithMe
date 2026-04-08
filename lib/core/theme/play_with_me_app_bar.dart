@@ -45,9 +45,9 @@ class PlayWithMeAppBar {
           Icon(
             Icons.sports_volleyball,
             color: AppColors.secondary,
-            size: 24,
+            size: 22,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           Flexible(
             child: Text(
               title,
@@ -97,6 +97,7 @@ class PlayWithMeAppBar {
             children: [
               IconButton(
                 icon: const Icon(Icons.mail_outline, size: 22),
+                visualDensity: VisualDensity.compact,
                 tooltip: l10n.invitations,
                 onPressed: () {
                   Navigator.push(
@@ -164,6 +165,7 @@ class PlayWithMeAppBar {
                   IconButton(
                     icon:
                         const Icon(Icons.sports_volleyball_outlined, size: 22),
+                    visualDensity: VisualDensity.compact,
                     tooltip: l10n.gameInvitations,
                     onPressed: () async {
                       final bloc = gameInvBloc!;
@@ -216,12 +218,14 @@ class PlayWithMeAppBar {
       if (showProfileAction)
         IconButton(
           icon: const Icon(Icons.person_outline, size: 22),
+          visualDensity: VisualDensity.compact,
           tooltip: l10n.profile,
           onPressed: () => _navigateToProfile(context),
         ),
       // Logout icon
       IconButton(
         icon: const Icon(Icons.logout, size: 22),
+        visualDensity: VisualDensity.compact,
         tooltip: l10n.signOut,
         onPressed: () => _showSignOutDialog(context),
       ),

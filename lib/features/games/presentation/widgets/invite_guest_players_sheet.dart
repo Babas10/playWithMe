@@ -22,6 +22,7 @@ void showInviteGuestPlayersSheet(BuildContext context, String gameId) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    backgroundColor: AppColors.scaffoldBackground,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
     ),
@@ -225,8 +226,19 @@ class _GroupCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
-              // Stacked avatars
-              _AvatarStack(members: members),
+              // Single group avatar
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.primary.withValues(alpha: 0.25),
+                child: Text(
+                  groupName.isNotEmpty ? groupName[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.secondary,
+                  ),
+                ),
+              ),
               const SizedBox(width: 14),
               // Group name + count
               Expanded(
@@ -238,7 +250,7 @@ class _GroupCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1A2C32),
+                        color: AppColors.secondary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -284,75 +296,6 @@ class _GroupCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-// ── Avatar stack ─────────────────────────────────────────────────────────────
-
-class _AvatarStack extends StatelessWidget {
-  static const _size = 32.0;
-  static const _overlap = 10.0;
-  static const _maxVisible = 3;
-
-  final List<InvitablePlayerModel> members;
-
-  const _AvatarStack({required this.members});
-
-  @override
-  Widget build(BuildContext context) {
-    final visible = members.take(_maxVisible).toList();
-    final extra = members.length - _maxVisible;
-    final totalWidth = _size + (_size - _overlap) * (visible.length - 1).clamp(0, _maxVisible - 1).toDouble();
-
-    return SizedBox(
-      width: totalWidth,
-      height: _size,
-      child: Stack(
-        children: [
-          for (int i = 0; i < visible.length; i++)
-            Positioned(
-              left: i * (_size - _overlap),
-              child: _buildAvatar(visible[i], extra > 0 && i == visible.length - 1 ? extra : 0),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAvatar(InvitablePlayerModel player, int overflowCount) {
-    if (overflowCount > 0) {
-      return CircleAvatar(
-        radius: _size / 2,
-        backgroundColor: Colors.grey.shade300,
-        child: Text(
-          '+$overflowCount',
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF64748B),
-          ),
-        ),
-      );
-    }
-
-    return CircleAvatar(
-      radius: _size / 2,
-      backgroundImage:
-          player.photoUrl != null ? NetworkImage(player.photoUrl!) : null,
-      backgroundColor: Colors.grey.shade200,
-      child: player.photoUrl == null
-          ? Text(
-              player.displayName.isNotEmpty
-                  ? player.displayName[0].toUpperCase()
-                  : '?',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A2C32),
-              ),
-            )
-          : null,
     );
   }
 }

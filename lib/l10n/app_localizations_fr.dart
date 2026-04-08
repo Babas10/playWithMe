@@ -369,7 +369,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tapToSelect => 'Appuyez pour sélectionner';
 
   @override
-  String get gameDetails => 'Détails du Match';
+  String get gameDetails => 'Partie';
 
   @override
   String get goBack => 'Retour';
