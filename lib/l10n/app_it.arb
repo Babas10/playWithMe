@@ -693,5 +693,18 @@
   },
   "@pastGames": {
     "description": "Section header for past games in MyGamesPage"
+  },
+
+  "teamsForThisGame": "Squadre",
+  "@teamsForThisGame": {
+    "description": "Section label for per-game team picker"
+  },
+  "selectTeamsPrompt": "Chi ha giocato questa partita?",
+  "@selectTeamsPrompt": {
+    "description": "Prompt shown in per-game team picker when no team is selected"
+  },
+  "vsLabel": "vs",
+  "@vsLabel": {
+    "description": "Label between two teams in a matchup, e.g. Alice & Bob vs Carol & Dave"
   }
 }

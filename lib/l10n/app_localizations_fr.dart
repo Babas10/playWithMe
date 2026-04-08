@@ -2046,4 +2046,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get open => 'Ouvert';
+
+  @override
+  String get teamsForThisGame => 'Équipes';
+
+  @override
+  String get selectTeamsPrompt => 'Qui a joué ce match ?';
+
+  @override
+  String get vsLabel => 'vs';
 }

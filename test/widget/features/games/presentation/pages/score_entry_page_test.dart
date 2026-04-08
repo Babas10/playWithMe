@@ -15,11 +15,14 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/games/presentation/bloc/score_entry/score_entry_event.dart';
 import 'package:play_with_me/features/games/presentation/bloc/score_entry/score_entry_state.dart';
 import 'package:play_with_me/features/games/presentation/pages/score_entry_page.dart';
+import 'package:play_with_me/features/games/presentation/widgets/game_team_picker_widget.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/core/services/service_locator.dart';
 
 // Mock classes
 class MockGameRepository extends Mock implements GameRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 class MockInvitationBloc extends Mock implements InvitationBloc {}
@@ -38,6 +41,7 @@ class FakeRoute extends Fake implements Route<dynamic> {}
 
 void main() {
   late MockGameRepository mockGameRepository;
+  late MockUserRepository mockUserRepository;
   late MockAuthenticationBloc mockAuthBloc;
   late MockInvitationBloc mockInvitationBloc;
 
@@ -77,12 +81,16 @@ void main() {
 
   setUp(() {
     mockGameRepository = MockGameRepository();
+    mockUserRepository = MockUserRepository();
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
     when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
     sl.registerSingleton<AuthenticationBloc>(mockAuthBloc);
     sl.registerSingleton<GameRepository>(mockGameRepository);
+    sl.registerSingleton<UserRepository>(mockUserRepository);
+    when(() => mockUserRepository.getUsersByIds(any()))
+        .thenAnswer((_) async => []);
 
     when(() => mockGameRepository.getGameById(any()))
         .thenAnswer((_) async => testGame);
@@ -148,6 +156,23 @@ void main() {
 
       // Select 2 games
       await tester.tap(find.text('2'));
+      await tester.pumpAndSettle();
+
+      // Find all team combo InkWells (scoped to GameTeamPickerWidget to exclude
+      // SegmentedButton InkWells from the format selector)
+      final teamPickerInkWells = find.descendant(
+        of: find.byType(GameTeamPickerWidget),
+        matching: find.byType(InkWell),
+      );
+
+      // Select teams for Game 1 (tap first combination chip)
+      await tester.tap(teamPickerInkWells.at(0));
+      await tester.pumpAndSettle();
+
+      // Scroll to game 2's team picker and select first combination chip
+      await tester.ensureVisible(teamPickerInkWells.at(3));
+      await tester.pumpAndSettle();
+      await tester.tap(teamPickerInkWells.at(3));
       await tester.pumpAndSettle();
 
       // Enter scores - Game 1: Team A wins
@@ -222,6 +247,15 @@ void main() {
 
       // Select 1 game
       await tester.tap(find.text('1'));
+      await tester.pumpAndSettle();
+
+      // Select teams for Game 1 (scoped to picker to exclude SegmentedButton InkWells)
+      await tester.tap(
+        find.descendant(
+          of: find.byType(GameTeamPickerWidget),
+          matching: find.byType(InkWell),
+        ).first,
+      );
       await tester.pumpAndSettle();
 
       // Enter scores

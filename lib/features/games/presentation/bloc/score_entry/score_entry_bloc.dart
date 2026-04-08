@@ -1,20 +1,26 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/data/models/game_model.dart';
+import '../../../../../core/data/models/user_model.dart';
 import '../../../../../core/domain/repositories/game_repository.dart';
+import '../../../../../core/domain/repositories/user_repository.dart';
 import 'score_entry_event.dart';
 import 'score_entry_state.dart';
 
 class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
   final GameRepository gameRepository;
+  final UserRepository userRepository;
 
   ScoreEntryBloc({
     required this.gameRepository,
+    required this.userRepository,
   }) : super(const ScoreEntryInitial()) {
     on<LoadGameForScoreEntry>(_onLoadGameForScoreEntry);
     on<SetGameCount>(_onSetGameCount);
     on<SetGameFormat>(_onSetGameFormat);
     on<UpdateSetScore>(_onUpdateSetScore);
+    on<SelectGameTeams>(_onSelectGameTeams);
     on<SaveScores>(_onSaveScores);
   }
 
@@ -38,12 +44,20 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
         return;
       }
 
-      if (game.teams == null) {
-        emit(const ScoreEntryError(message: 'Teams must be assigned before entering scores'));
-        return;
+      // Load player display names
+      Map<String, UserModel> players = {};
+      if (game.playerIds.isNotEmpty) {
+        try {
+          final userList = await userRepository.getUsersByIds(game.playerIds);
+          for (final user in userList) {
+            players[user.uid] = user;
+          }
+        } catch (e) {
+          debugPrint('Failed to load player data for score entry: $e');
+        }
       }
 
-      // If result already exists, load it
+      // If result already exists, restore it
       if (game.result != null) {
         final result = game.result!;
         final loadedGames = <GameData>[];
@@ -56,9 +70,13 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
             );
           }).toList();
 
+          // Restore per-game teams; fall back to session-level teams for old docs
+          final gameTeams = individualGame.teams ?? game.teams;
+
           loadedGames.add(GameData(
             numberOfSets: individualGame.sets.length,
             sets: sets,
+            teams: gameTeams,
           ));
         }
 
@@ -66,9 +84,10 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
           game: game,
           gameCount: result.games.length,
           games: loadedGames,
+          players: players,
         ));
       } else {
-        emit(ScoreEntryLoaded(game: game));
+        emit(ScoreEntryLoaded(game: game, players: players));
       }
     } catch (e) {
       emit(ScoreEntryError(message: 'Failed to load game: $e'));
@@ -83,12 +102,13 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
 
     final currentState = state as ScoreEntryLoaded;
 
-    // Initialize games list with default single-set games
+    // Initialize games list with default single-set games (no teams selected)
     final games = List.generate(
       event.count,
       (index) => GameData(
         numberOfSets: 1,
         sets: [const SetScoreData()],
+        // no teams selected yet
       ),
     );
 
@@ -126,7 +146,7 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
       },
     );
 
-    updatedGames[event.gameIndex] = GameData(
+    updatedGames[event.gameIndex] = currentGame.copyWith(
       numberOfSets: event.numberOfSets,
       sets: newSets,
     );
@@ -165,6 +185,26 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
     emit(currentState.copyWith(games: updatedGames));
   }
 
+  Future<void> _onSelectGameTeams(
+    SelectGameTeams event,
+    Emitter<ScoreEntryState> emit,
+  ) async {
+    if (state is! ScoreEntryLoaded) return;
+
+    final currentState = state as ScoreEntryLoaded;
+
+    if (event.gameIndex < 0 || event.gameIndex >= currentState.games.length) {
+      return;
+    }
+
+    final updatedGames = List<GameData>.from(currentState.games);
+    updatedGames[event.gameIndex] = updatedGames[event.gameIndex].copyWith(
+      teams: event.teams,
+    );
+
+    emit(currentState.copyWith(games: updatedGames));
+  }
+
   Future<void> _onSaveScores(
     SaveScores event,
     Emitter<ScoreEntryState> emit,
@@ -175,7 +215,7 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
 
     // Validate that we can save
     if (!currentState.canSave) {
-      emit(const ScoreEntryError(message: 'Please enter valid scores for all games'));
+      emit(const ScoreEntryError(message: 'Please select teams and enter valid scores for all games'));
       emit(currentState); // Return to loaded state
       return;
     }
@@ -201,6 +241,7 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
         gameNumber: gameIndex + 1,
         sets: sets,
         winner: gameData.winner!,
+        teams: gameData.teams,
       ));
     }
 
@@ -220,10 +261,13 @@ class ScoreEntryBloc extends Bloc<ScoreEntryEvent, ScoreEntryState> {
     emit(ScoreEntrySaving(game: currentState.game, result: result));
 
     try {
+      // Use game 1's teams as the session-level teams for backward compat
+      final sessionTeams = individualGames.first.teams ?? const GameTeams();
+
       await gameRepository.saveGameResult(
         gameId: currentState.game.id,
         userId: event.userId,
-        teams: currentState.game.teams!,
+        teams: sessionTeams,
         result: result,
       );
 

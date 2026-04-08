@@ -5,13 +5,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
+import '../../../../core/data/models/user_model.dart';
 import '../../../../core/domain/repositories/game_repository.dart';
+import '../../../../core/domain/repositories/user_repository.dart';
 import '../../../../core/services/service_locator.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_bloc.dart';
 import '../../../auth/presentation/bloc/authentication/authentication_state.dart';
 import '../bloc/score_entry/score_entry_bloc.dart';
 import '../bloc/score_entry/score_entry_event.dart';
 import '../bloc/score_entry/score_entry_state.dart';
+import '../widgets/game_team_picker_widget.dart';
 
 class ScoreEntryPage extends StatelessWidget {
   final String gameId;
@@ -30,6 +33,7 @@ class ScoreEntryPage extends StatelessWidget {
           scoreEntryBloc ??
           ScoreEntryBloc(
             gameRepository: sl<GameRepository>(),
+            userRepository: sl<UserRepository>(),
           )..add(LoadGameForScoreEntry(gameId: gameId)),
       child: const _ScoreEntryView(),
     );
@@ -185,6 +189,8 @@ class _ScoreEntryForm extends StatelessWidget {
                 gameIndex: index,
                 gameData: state.games[index],
                 totalGames: state.games.length,
+                players: state.players,
+                allPlayerIds: state.game.playerIds,
               );
             },
           ),
@@ -213,11 +219,15 @@ class _GameCard extends StatelessWidget {
   final int gameIndex;
   final GameData gameData;
   final int totalGames;
+  final Map<String, UserModel> players;
+  final List<String> allPlayerIds;
 
   const _GameCard({
     required this.gameIndex,
     required this.gameData,
     required this.totalGames,
+    required this.players,
+    required this.allPlayerIds,
   });
 
   @override
@@ -255,6 +265,22 @@ class _GameCard extends StatelessWidget {
                   ),
               ],
             ),
+            const SizedBox(height: 12),
+            // Team picker (shown only for 4-player games)
+            if (allPlayerIds.length == 4)
+              GameTeamPickerWidget(
+                playerIds: allPlayerIds,
+                players: players,
+                selectedTeams: gameData.teams,
+                onTeamsSelected: (teams) {
+                  context.read<ScoreEntryBloc>().add(
+                        SelectGameTeams(
+                          gameIndex: gameIndex,
+                          teams: teams,
+                        ),
+                      );
+                },
+              ),
             const SizedBox(height: 12),
             _GameFormatSelector(
               gameIndex: gameIndex,

@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../../../core/data/models/game_model.dart';
+
 abstract class ScoreEntryEvent extends Equatable {
   const ScoreEntryEvent();
 
@@ -57,6 +59,20 @@ class UpdateSetScore extends ScoreEntryEvent {
 
   @override
   List<Object?> get props => [gameIndex, setIndex, teamAPoints, teamBPoints];
+}
+
+/// Select which teams played a specific game
+class SelectGameTeams extends ScoreEntryEvent {
+  final int gameIndex;
+  final GameTeams teams;
+
+  const SelectGameTeams({
+    required this.gameIndex,
+    required this.teams,
+  });
+
+  @override
+  List<Object?> get props => [gameIndex, teams];
 }
 
 /// Save all the entered scores
