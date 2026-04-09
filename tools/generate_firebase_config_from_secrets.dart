@@ -105,22 +105,30 @@ Map<String, String> _getProjectDataFromEnv(String environment) {
 
   // Validate that all required environment variables are present
   final missingVars = <String>[];
-  if (projectId == null || projectId.isEmpty)
+  if (projectId == null || projectId.isEmpty) {
     missingVars.add('FIREBASE_${envPrefix}_PROJECT_ID');
-  if (storageBucket == null || storageBucket.isEmpty)
+  }
+  if (storageBucket == null || storageBucket.isEmpty) {
     missingVars.add('FIREBASE_${envPrefix}_STORAGE_BUCKET');
-  if (androidAppId == null || androidAppId.isEmpty)
+  }
+  if (androidAppId == null || androidAppId.isEmpty) {
     missingVars.add('FIREBASE_${envPrefix}_ANDROID_APP_ID');
-  if (iosAppId == null || iosAppId.isEmpty)
+  }
+  if (iosAppId == null || iosAppId.isEmpty) {
     missingVars.add('FIREBASE_${envPrefix}_IOS_APP_ID');
-  if (apiKey == null || apiKey.isEmpty)
+  }
+  if (apiKey == null || apiKey.isEmpty) {
     missingVars.add('FIREBASE_${envPrefix}_API_KEY');
-  if (messagingSenderId == null || messagingSenderId.isEmpty)
+  }
+  if (messagingSenderId == null || messagingSenderId.isEmpty) {
     missingVars.add('FIREBASE_${envPrefix}_MESSAGING_SENDER_ID');
-  if (androidPackageName == null || androidPackageName.isEmpty)
+  }
+  if (androidPackageName == null || androidPackageName.isEmpty) {
     missingVars.add('FIREBASE_${envPrefix}_ANDROID_PACKAGE_NAME');
-  if (iosBundleId == null || iosBundleId.isEmpty)
+  }
+  if (iosBundleId == null || iosBundleId.isEmpty) {
     missingVars.add('FIREBASE_${envPrefix}_IOS_BUNDLE_ID');
+  }
 
   if (missingVars.isNotEmpty) {
     throw Exception(

@@ -177,8 +177,9 @@ class GroupModel with _$GroupModel {
 
   /// Demote an admin to regular member
   GroupModel demoteFromAdmin(String userId) {
-    if (!adminIds.contains(userId) || userId == createdBy)
+    if (!adminIds.contains(userId) || userId == createdBy) {
       return this; // Can't demote creator
+    }
     return copyWith(
       adminIds: adminIds.where((id) => id != userId).toList(),
       updatedAt: DateTime.now(),
