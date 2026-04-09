@@ -10,6 +10,8 @@ import 'package:play_with_me/features/auth/presentation/bloc/authentication/auth
 import 'package:play_with_me/features/profile/presentation/bloc/account_deletion/account_deletion_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/account_deletion/account_deletion_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/account_deletion/account_deletion_state.dart';
+import 'package:play_with_me/core/presentation/bloc/account_status/account_status_bloc.dart';
+import 'package:play_with_me/core/presentation/bloc/account_status/account_status_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
 import 'package:play_with_me/features/profile/presentation/pages/email_verification_page.dart';
@@ -147,6 +149,10 @@ class _ProfileContent extends StatelessWidget {
 
   void _navigateToEmailVerification(BuildContext context) {
     final authRepository = sl<AuthRepository>();
+    // Capture the AccountStatusBloc before navigating so the pushed route
+    // (which is outside AccountStatusBloc's provider scope) can still dismiss
+    // the banner when the email is confirmed verified.
+    final accountStatusBloc = context.read<AccountStatusBloc>();
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -154,7 +160,10 @@ class _ProfileContent extends StatelessWidget {
           create: (context) =>
               EmailVerificationBloc(authRepository: authRepository)
                 ..add(const EmailVerificationEvent.checkStatus()),
-          child: const EmailVerificationPage(),
+          child: EmailVerificationPage(
+            onVerified: () =>
+                accountStatusBloc.add(const AccountEmailVerified()),
+          ),
         ),
       ),
     );

@@ -366,6 +366,125 @@ void main() {
       });
     });
 
+    group('Refresh Status card', () {
+      testWidgets(
+        'card #3 is tappable and dispatches refreshStatus when email has been sent',
+        (tester) async {
+          when(() => mockBloc.state).thenReturn(
+            const EmailVerificationState.pending(
+              email: 'test@example.com',
+              emailSent: true,
+              lastSentAt: null,
+              resendCooldownSeconds: 0,
+            ),
+          );
+          when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
+          when(() => mockBloc.add(any())).thenReturn(null);
+
+          await tester.pumpWidget(createWidgetUnderTest());
+
+          // Card #3 shows the tappable description
+          expect(
+            find.text('Tap here to check if your email has been verified.'),
+            findsOneWidget,
+          );
+          // Chevron indicator is visible
+          expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+
+          // Tap the InkWell that wraps card #3
+          final card3InkWell = find.ancestor(
+            of: find.text(
+              'Tap here to check if your email has been verified.',
+            ),
+            matching: find.byType(InkWell),
+          ).first;
+          await tester.ensureVisible(card3InkWell);
+          await tester.tap(card3InkWell);
+          await tester.pump();
+
+          verify(
+            () => mockBloc.add(const EmailVerificationEvent.refreshStatus()),
+          ).called(1);
+        },
+      );
+
+      testWidgets(
+        'card #3 is not tappable before the verification email is sent',
+        (tester) async {
+          when(() => mockBloc.state).thenReturn(
+            const EmailVerificationState.pending(
+              email: 'test@example.com',
+              emailSent: false,
+              lastSentAt: null,
+              resendCooldownSeconds: 0,
+            ),
+          );
+          when(() => mockBloc.stream).thenAnswer((_) => const Stream.empty());
+
+          await tester.pumpWidget(createWidgetUnderTest());
+
+          // Non-tappable description shown
+          expect(
+            find.text('Return here and refresh to confirm verification.'),
+            findsOneWidget,
+          );
+          // No chevron
+          expect(find.byIcon(Icons.chevron_right), findsNothing);
+        },
+      );
+    });
+
+    group('onVerified callback', () {
+      testWidgets('calls onVerified when state transitions to verified',
+          (tester) async {
+        var callbackCalled = false;
+
+        when(() => mockBloc.state).thenReturn(
+          const EmailVerificationState.pending(
+            email: 'test@example.com',
+            emailSent: true,
+            lastSentAt: null,
+            resendCooldownSeconds: 0,
+          ),
+        );
+        when(() => mockBloc.stream).thenAnswer(
+          (_) => Stream.value(
+            EmailVerificationState.verified(verifiedAt: DateTime.now()),
+          ),
+        );
+
+        await tester.pumpWidget(
+          MediaQuery(
+            data: const MediaQueryData(size: Size(800, 1200)),
+            child: MaterialApp(
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [Locale('en')],
+              home: MultiBlocProvider(
+                providers: [
+                  BlocProvider<EmailVerificationBloc>.value(value: mockBloc),
+                  BlocProvider<InvitationBloc>.value(
+                    value: mockInvitationBloc,
+                  ),
+                  BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+                ],
+                child: EmailVerificationPage(
+                  onVerified: () => callbackCalled = true,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(callbackCalled, isTrue);
+      });
+    });
+
     testWidgets('AppBar displays correct title', (tester) async {
       when(
         () => mockBloc.state,

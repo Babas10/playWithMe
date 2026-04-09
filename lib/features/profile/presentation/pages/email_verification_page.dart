@@ -7,7 +7,11 @@ import 'package:play_with_me/features/profile/presentation/bloc/email_verificati
 
 /// Page for email verification flow with status display and resend functionality
 class EmailVerificationPage extends StatelessWidget {
-  const EmailVerificationPage({super.key});
+  /// Called when the page confirms the user's email is now verified.
+  /// Use this to notify blocs above the navigator (e.g. AccountStatusBloc).
+  final VoidCallback? onVerified;
+
+  const EmailVerificationPage({super.key, this.onVerified});
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,12 @@ class EmailVerificationPage extends StatelessWidget {
                 duration: const Duration(seconds: 4),
               ),
             );
+          }
+
+          // When the email is confirmed verified, notify the caller so blocs
+          // above the navigator (AccountStatusBloc) can dismiss the banner.
+          if (state is EmailVerificationVerified) {
+            onVerified?.call();
           }
         },
         builder: (context, state) {
@@ -216,7 +226,14 @@ class EmailVerificationPage extends StatelessWidget {
             context,
             icon: Icons.looks_3,
             title: 'Refresh Status',
-            description: 'Return here and refresh to confirm verification.',
+            description: emailSent
+                ? 'Tap here to check if your email has been verified.'
+                : 'Return here and refresh to confirm verification.',
+            onTap: emailSent
+                ? () => context.read<EmailVerificationBloc>().add(
+                      const EmailVerificationEvent.refreshStatus(),
+                    )
+                : null,
           ),
           const SizedBox(height: 32),
 
@@ -326,15 +343,21 @@ class EmailVerificationPage extends StatelessWidget {
     required IconData icon,
     required String title,
     required String description,
+    VoidCallback? onTap,
   }) {
     final theme = Theme.of(context);
 
-    return Container(
+    final content = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
+        border: Border.all(
+          color: onTap != null
+              ? theme.colorScheme.primary.withValues(alpha: 0.4)
+              : theme.colorScheme.outlineVariant,
+          width: onTap != null ? 1.5 : 1,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,8 +391,24 @@ class EmailVerificationPage extends StatelessWidget {
               ],
             ),
           ),
+          if (onTap != null) ...[
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right,
+              size: 20,
+              color: theme.colorScheme.primary,
+            ),
+          ],
         ],
       ),
+    );
+
+    if (onTap == null) return content;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: content,
     );
   }
 
