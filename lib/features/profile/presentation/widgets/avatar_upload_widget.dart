@@ -206,7 +206,12 @@ class _AvatarUploadContent extends StatelessWidget {
                           size: 18,
                           color: Colors.white,
                         ),
-                        onPressed: () => _showImageSourceDialog(context),
+                        onPressed: () =>
+                            context.read<AvatarUploadBloc>().add(
+                              const AvatarUploadEvent.imageSourceSelected(
+                                source: ImageSource.camera,
+                              ),
+                            ),
                         padding: EdgeInsets.zero,
                       ),
                     ),
@@ -260,52 +265,6 @@ class _AvatarUploadContent extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  /// Show dialog to select image source (camera or gallery)
-  void _showImageSourceDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: Text(l10n.takePhoto),
-              onTap: () {
-                Navigator.of(sheetContext).pop();
-                context.read<AvatarUploadBloc>().add(
-                  const AvatarUploadEvent.imageSourceSelected(
-                    source: ImageSource.camera,
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: Text(l10n.chooseFromGallery),
-              onTap: () {
-                Navigator.of(sheetContext).pop();
-                context.read<AvatarUploadBloc>().add(
-                  const AvatarUploadEvent.imageSourceSelected(
-                    source: ImageSource.gallery,
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.cancel),
-              title: Text(l10n.cancel),
-              onTap: () {
-                Navigator.of(sheetContext).pop();
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 
