@@ -12,8 +12,7 @@ import 'package:play_with_me/features/invitations/presentation/bloc/invite_join/
 import 'package:play_with_me/features/invitations/presentation/pages/join_group_confirmation_page.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
-class MockInviteJoinBloc
-    extends MockBloc<InviteJoinEvent, InviteJoinState>
+class MockInviteJoinBloc extends MockBloc<InviteJoinEvent, InviteJoinState>
     implements InviteJoinBloc {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
@@ -102,8 +101,7 @@ void main() {
         expect(find.text('12 members'), findsOneWidget);
       });
 
-      testWidgets('shows group without description when null',
-          (tester) async {
+      testWidgets('shows group without description when null', (tester) async {
         const stateNoDesc = InviteJoinValidated(
           groupId: 'group-123',
           groupName: 'Volleyball Club',
@@ -129,8 +127,9 @@ void main() {
         expect(find.text('Cancel'), findsOneWidget);
       });
 
-      testWidgets('join button dispatches JoinGroupViaInvite event',
-          (tester) async {
+      testWidgets('join button dispatches JoinGroupViaInvite event', (
+        tester,
+      ) async {
         when(() => mockBloc.state).thenReturn(validatedState);
 
         await tester.pumpWidget(createTestWidget());
@@ -203,9 +202,9 @@ void main() {
       });
 
       testWidgets('shows generic error', (tester) async {
-        when(() => mockBloc.state).thenReturn(
-          const InviteJoinError(message: 'Something went wrong'),
-        );
+        when(
+          () => mockBloc.state,
+        ).thenReturn(const InviteJoinError(message: 'Something went wrong'));
 
         await tester.pumpWidget(createTestWidget());
 

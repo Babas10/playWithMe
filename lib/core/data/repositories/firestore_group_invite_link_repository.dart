@@ -7,22 +7,19 @@ import 'package:play_with_me/core/domain/repositories/group_invite_link_reposito
 class FirestoreGroupInviteLinkRepository implements GroupInviteLinkRepository {
   final FirebaseFunctions _functions;
 
-  FirestoreGroupInviteLinkRepository({
-    required FirebaseFunctions functions,
-  }) : _functions = functions;
+  FirestoreGroupInviteLinkRepository({required FirebaseFunctions functions})
+    : _functions = functions;
 
   @override
   Future<({String inviteId, String token, String deepLinkUrl})>
-      createGroupInvite({
+  createGroupInvite({
     required String groupId,
     int? expiresInHours,
     int? usageLimit,
   }) async {
     try {
       final callable = _functions.httpsCallable('createGroupInvite');
-      final params = <String, dynamic>{
-        'groupId': groupId,
-      };
+      final params = <String, dynamic>{'groupId': groupId};
       if (expiresInHours != null) {
         params['expiresInHours'] = expiresInHours;
       }
@@ -41,8 +38,7 @@ class FirestoreGroupInviteLinkRepository implements GroupInviteLinkRepository {
     } on FirebaseFunctionsException catch (e) {
       throw _handleError(e);
     } catch (e) {
-      throw GroupInviteLinkException(
-          'Failed to create invite link: $e');
+      throw GroupInviteLinkException('Failed to create invite link: $e');
     }
   }
 
@@ -53,28 +49,27 @@ class FirestoreGroupInviteLinkRepository implements GroupInviteLinkRepository {
   }) async {
     try {
       final callable = _functions.httpsCallable('revokeGroupInvite');
-      await callable.call({
-        'groupId': groupId,
-        'inviteId': inviteId,
-      });
+      await callable.call({'groupId': groupId, 'inviteId': inviteId});
     } on FirebaseFunctionsException catch (e) {
       throw _handleError(e);
     } catch (e) {
-      throw GroupInviteLinkException(
-          'Failed to revoke invite link: $e');
+      throw GroupInviteLinkException('Failed to revoke invite link: $e');
     }
   }
 
   @override
-  Future<({
-    String groupId,
-    String groupName,
-    String? groupDescription,
-    String? groupPhotoUrl,
-    int groupMemberCount,
-    String inviterName,
-    String? inviterPhotoUrl,
-  })> validateInviteToken({required String token}) async {
+  Future<
+    ({
+      String groupId,
+      String groupName,
+      String? groupDescription,
+      String? groupPhotoUrl,
+      int groupMemberCount,
+      String inviterName,
+      String? inviterPhotoUrl,
+    })
+  >
+  validateInviteToken({required String token}) async {
     try {
       final callable = _functions.httpsCallable('validateInviteToken');
       final result = await callable.call({'token': token});
@@ -92,17 +87,13 @@ class FirestoreGroupInviteLinkRepository implements GroupInviteLinkRepository {
     } on FirebaseFunctionsException catch (e) {
       throw _handleError(e);
     } catch (e) {
-      throw GroupInviteLinkException(
-          'Failed to validate invite token: $e');
+      throw GroupInviteLinkException('Failed to validate invite token: $e');
     }
   }
 
   @override
-  Future<({
-    String groupId,
-    String groupName,
-    bool alreadyMember,
-  })> joinGroupViaInvite({required String token}) async {
+  Future<({String groupId, String groupName, bool alreadyMember})>
+  joinGroupViaInvite({required String token}) async {
     try {
       final callable = _functions.httpsCallable('joinGroupViaInvite');
       final result = await callable.call({'token': token});
@@ -116,8 +107,7 @@ class FirestoreGroupInviteLinkRepository implements GroupInviteLinkRepository {
     } on FirebaseFunctionsException catch (e) {
       throw _handleError(e);
     } catch (e) {
-      throw GroupInviteLinkException(
-          'Failed to join group via invite: $e');
+      throw GroupInviteLinkException('Failed to join group via invite: $e');
     }
   }
 

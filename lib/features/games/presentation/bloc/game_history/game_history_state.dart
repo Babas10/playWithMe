@@ -7,7 +7,7 @@ import '../../../../../core/data/models/game_model.dart';
 part 'game_history_state.freezed.dart';
 
 enum GameHistoryFilter {
-  all,     // All group games
+  all, // All group games
   myGames, // Only games user played in
 }
 

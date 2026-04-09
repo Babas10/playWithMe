@@ -21,9 +21,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
@@ -46,9 +44,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
@@ -70,9 +66,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
@@ -94,9 +88,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
@@ -128,14 +120,14 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
-      expect(find.text('Great training session! Really enjoyed it.'),
-          findsOneWidget);
+      expect(
+        find.text('Great training session! Really enjoyed it.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('hides comment section when comment is null', (tester) async {
@@ -152,9 +144,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
@@ -175,9 +165,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
@@ -201,9 +189,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
@@ -225,16 +211,17 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
       expect(find.byType(Card), findsOneWidget);
 
       final card = tester.widget<Card>(find.byType(Card));
-      expect(card.margin, const EdgeInsets.symmetric(horizontal: 16, vertical: 6));
+      expect(
+        card.margin,
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      );
     });
 
     testWidgets('displays all rating chip components', (tester) async {
@@ -251,9 +238,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackListItem(feedback: feedback),
-          ),
+          home: Scaffold(body: FeedbackListItem(feedback: feedback)),
         ),
       );
 
@@ -288,8 +273,9 @@ void main() {
 
       // Verify the long comment is displayed
       expect(
-          find.textContaining('This was an excellent training session'),
-          findsOneWidget);
+        find.textContaining('This was an excellent training session'),
+        findsOneWidget,
+      );
     });
   });
 }

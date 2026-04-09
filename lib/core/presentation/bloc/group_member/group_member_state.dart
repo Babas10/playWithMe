@@ -23,10 +23,7 @@ class MemberPromotedSuccess extends GroupMemberState {
   final String groupId;
   final String userId;
 
-  const MemberPromotedSuccess({
-    required this.groupId,
-    required this.userId,
-  });
+  const MemberPromotedSuccess({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -37,10 +34,7 @@ class MemberDemotedSuccess extends GroupMemberState {
   final String groupId;
   final String userId;
 
-  const MemberDemotedSuccess({
-    required this.groupId,
-    required this.userId,
-  });
+  const MemberDemotedSuccess({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -51,10 +45,7 @@ class MemberRemovedSuccess extends GroupMemberState {
   final String groupId;
   final String userId;
 
-  const MemberRemovedSuccess({
-    required this.groupId,
-    required this.userId,
-  });
+  const MemberRemovedSuccess({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -74,9 +65,7 @@ class GroupMemberError extends GroupMemberState {
 class UserLeftGroupSuccess extends GroupMemberState {
   final String groupId;
 
-  const UserLeftGroupSuccess({
-    required this.groupId,
-  });
+  const UserLeftGroupSuccess({required this.groupId});
 
   @override
   List<Object?> get props => [groupId];

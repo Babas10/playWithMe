@@ -41,36 +41,48 @@ void main() {
           recentMatchups: [],
         );
 
-        when(() => mockUserRepository.getHeadToHeadStats('user-123', 'opponent-123'))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats('user-123', 'opponent-123'),
+        ).thenAnswer((_) async => testStats);
 
         return HeadToHeadBloc(userRepository: mockUserRepository);
       },
-      act: (bloc) => bloc.add(const HeadToHeadEvent.loadHeadToHead(
-        userId: 'user-123',
-        opponentId: 'opponent-123',
-      )),
+      act: (bloc) => bloc.add(
+        const HeadToHeadEvent.loadHeadToHead(
+          userId: 'user-123',
+          opponentId: 'opponent-123',
+        ),
+      ),
       expect: () => [
         const HeadToHeadState.loading(),
         isA<HeadToHeadLoaded>()
             .having((s) => s.stats.opponentId, 'opponent id', 'opponent-123')
             .having((s) => s.stats.gamesPlayed, 'games played', 8)
-            .having((s) => s.stats.opponentDisplayName, 'opponent name', 'Opponent User'),
+            .having(
+              (s) => s.stats.opponentDisplayName,
+              'opponent name',
+              'Opponent User',
+            ),
       ],
     );
 
     blocTest<HeadToHeadBloc, HeadToHeadState>(
       'emits [loading, error] when stats are not found',
       build: () {
-        when(() => mockUserRepository.getHeadToHeadStats('user-123', 'opponent-123'))
-            .thenAnswer((_) async => null);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats('user-123', 'opponent-123'),
+        ).thenAnswer((_) async => null);
 
         return HeadToHeadBloc(userRepository: mockUserRepository);
       },
-      act: (bloc) => bloc.add(const HeadToHeadEvent.loadHeadToHead(
-        userId: 'user-123',
-        opponentId: 'opponent-123',
-      )),
+      act: (bloc) => bloc.add(
+        const HeadToHeadEvent.loadHeadToHead(
+          userId: 'user-123',
+          opponentId: 'opponent-123',
+        ),
+      ),
       expect: () => [
         const HeadToHeadState.loading(),
         const HeadToHeadState.error(

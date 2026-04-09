@@ -123,7 +123,9 @@ void main() {
       expect(find.byIcon(Icons.emoji_events), findsOneWidget);
     });
 
-    testWidgets('renders volleyball icon for games played card', (tester) async {
+    testWidgets('renders volleyball icon for games played card', (
+      tester,
+    ) async {
       await pumpHomeStatsSection(tester);
 
       expect(find.byIcon(Icons.sports_volleyball), findsOneWidget);
@@ -134,7 +136,10 @@ void main() {
 
       final expectedWinRate = (testUser.winRate * 100).toStringAsFixed(1);
       expect(find.text('$expectedWinRate%'), findsOneWidget);
-      expect(find.text('${testUser.gamesWon}W - ${testUser.gamesLost}L'), findsOneWidget);
+      expect(
+        find.text('${testUser.gamesWon}W - ${testUser.gamesLost}L'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays correct games played value', (tester) async {
@@ -143,7 +148,9 @@ void main() {
       expect(find.text(testUser.gamesPlayed.toString()), findsOneWidget);
     });
 
-    testWidgets('shows winning streak with weather emoji when streak >= 2', (tester) async {
+    testWidgets('shows winning streak with weather emoji when streak >= 2', (
+      tester,
+    ) async {
       await pumpHomeStatsSection(tester);
 
       // User has currentStreak = 3, should show "3 wins ☀️" weather metaphor
@@ -158,14 +165,17 @@ void main() {
       expect(find.textContaining('1 wins'), findsOneWidget);
     });
 
-    testWidgets('shows losing streak with weather emoji for negative streak <= -2', (tester) async {
-      final userWithLossStreak = testUser.copyWith(currentStreak: -3);
+    testWidgets(
+      'shows losing streak with weather emoji for negative streak <= -2',
+      (tester) async {
+        final userWithLossStreak = testUser.copyWith(currentStreak: -3);
 
-      await pumpHomeStatsSection(tester, user: userWithLossStreak);
+        await pumpHomeStatsSection(tester, user: userWithLossStreak);
 
-      // Should show "3 losses 🌧️" weather metaphor in red
-      expect(find.textContaining('3 losses'), findsOneWidget);
-    });
+        // Should show "3 losses 🌧️" weather metaphor in red
+        expect(find.textContaining('3 losses'), findsOneWidget);
+      },
+    );
 
     testWidgets('shows ELO trend delta for positive history', (tester) async {
       await pumpHomeStatsSection(tester);

@@ -5,7 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart' show debugPrint, kIsWeb, visibleForTesting;
+import 'package:flutter/foundation.dart'
+    show debugPrint, kIsWeb, visibleForTesting;
 
 /// Background message handler (must be top-level function)
 @pragma('vm:entry-point')
@@ -35,10 +36,10 @@ class NotificationService {
     required FlutterLocalNotificationsPlugin localNotifications,
     required FirebaseFirestore firestore,
     required FirebaseAuth auth,
-  })  : _fcm = fcm,
-        _localNotifications = localNotifications,
-        _firestore = firestore,
-        _auth = auth;
+  }) : _fcm = fcm,
+       _localNotifications = localNotifications,
+       _firestore = firestore,
+       _auth = auth;
 
   /// Initialize the notification service
   Future<void> initialize({
@@ -61,7 +62,9 @@ class NotificationService {
     }
 
     // Initialize local notifications
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -69,10 +72,7 @@ class NotificationService {
     );
 
     await _localNotifications.initialize(
-      const InitializationSettings(
-        android: androidSettings,
-        iOS: iosSettings,
-      ),
+      const InitializationSettings(android: androidSettings, iOS: iosSettings),
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         if (response.payload != null) {
           final data = jsonDecode(response.payload!);
@@ -84,7 +84,8 @@ class NotificationService {
     // Create Android notification channel
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_channel);
 
     // Register token-refresh listener BEFORE fetching the initial token to
@@ -113,7 +114,9 @@ class NotificationService {
 
       if (isIOS) {
         // On iOS the FCM token depends on APNS; request it first.
-        debugPrint('[NotificationService] iOS detected: waiting for APNS token...');
+        debugPrint(
+          '[NotificationService] iOS detected: waiting for APNS token...',
+        );
 
         // Retry up to 5 times with 1-second delays.  The OS can take a
         // moment to deliver the APNS token on the first launch or after a

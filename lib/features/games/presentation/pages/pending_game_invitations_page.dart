@@ -71,8 +71,9 @@ class _PendingGameInvitationsViewState
                 ? l10n.gameInvitationAccepted
                 : l10n.gameInvitationDeclined,
           ),
-          backgroundColor:
-              state.accepted ? Colors.green.shade600 : AppColors.textMuted,
+          backgroundColor: state.accepted
+              ? Colors.green.shade600
+              : AppColors.textMuted,
         ),
       );
       // Navigate to game details after accept
@@ -112,15 +113,18 @@ class _PendingGameInvitationsViewState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline,
-                  size: 64, color: Theme.of(context).colorScheme.error),
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Theme.of(context).colorScheme.error,
+              ),
               const SizedBox(height: 16),
               Text(state.message, textAlign: TextAlign.center),
               const SizedBox(height: 16),
               FilledButton(
-                onPressed: () => context
-                    .read<GameInvitationsBloc>()
-                    .add(const LoadGameInvitations()),
+                onPressed: () => context.read<GameInvitationsBloc>().add(
+                  const LoadGameInvitations(),
+                ),
                 child: Text(l10n.retry),
               ),
             ],
@@ -150,10 +154,9 @@ class _PendingGameInvitationsViewState
             const SizedBox(height: 16),
             Text(
               l10n.noPendingGameInvitations,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: AppColors.textMuted),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: AppColors.textMuted),
               textAlign: TextAlign.center,
             ),
           ],
@@ -162,9 +165,8 @@ class _PendingGameInvitationsViewState
     }
 
     return RefreshIndicator(
-      onRefresh: () async => context
-          .read<GameInvitationsBloc>()
-          .add(const LoadGameInvitations()),
+      onRefresh: () async =>
+          context.read<GameInvitationsBloc>().add(const LoadGameInvitations()),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 12),
         itemCount: invitations.length,
@@ -173,12 +175,12 @@ class _PendingGameInvitationsViewState
           return GameInvitationCard(
             invitation: inv,
             isProcessing: processingId == inv.invitationId,
-            onAccept: () => context
-                .read<GameInvitationsBloc>()
-                .add(AcceptGameInvitation(inv.invitationId)),
-            onDecline: () => context
-                .read<GameInvitationsBloc>()
-                .add(DeclineGameInvitation(inv.invitationId)),
+            onAccept: () => context.read<GameInvitationsBloc>().add(
+              AcceptGameInvitation(inv.invitationId),
+            ),
+            onDecline: () => context.read<GameInvitationsBloc>().add(
+              DeclineGameInvitation(inv.invitationId),
+            ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -191,4 +193,3 @@ class _PendingGameInvitationsViewState
     );
   }
 }
-

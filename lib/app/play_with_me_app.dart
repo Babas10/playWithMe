@@ -72,14 +72,11 @@ class PlayWithMeApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthenticationBloc>(
-          create: (context) => sl<AuthenticationBloc>()..add(const AuthenticationStarted()),
+          create: (context) =>
+              sl<AuthenticationBloc>()..add(const AuthenticationStarted()),
         ),
-        BlocProvider<InvitationBloc>(
-          create: (context) => sl<InvitationBloc>(),
-        ),
-        BlocProvider<LoginBloc>(
-          create: (context) => sl<LoginBloc>(),
-        ),
+        BlocProvider<InvitationBloc>(create: (context) => sl<InvitationBloc>()),
+        BlocProvider<LoginBloc>(create: (context) => sl<LoginBloc>()),
         BlocProvider<RegistrationBloc>(
           create: (context) => sl<RegistrationBloc>(),
         ),
@@ -87,11 +84,10 @@ class PlayWithMeApp extends StatelessWidget {
           create: (context) => sl<PasswordResetBloc>(),
         ),
         BlocProvider<DeepLinkBloc>(
-          create: (context) => sl<DeepLinkBloc>()..add(const InitializeDeepLinks()),
+          create: (context) =>
+              sl<DeepLinkBloc>()..add(const InitializeDeepLinks()),
         ),
-        BlocProvider<InviteJoinBloc>(
-          create: (context) => sl<InviteJoinBloc>(),
-        ),
+        BlocProvider<InviteJoinBloc>(create: (context) => sl<InviteJoinBloc>()),
         BlocProvider<GameInvitationsBloc>(
           create: (context) => sl<GameInvitationsBloc>(),
         ),
@@ -109,18 +105,18 @@ class PlayWithMeApp extends StatelessWidget {
                 context.read<InvitationBloc>().add(
                   LoadPendingInvitations(userId: state.user.uid),
                 );
-                context
-                    .read<GameInvitationsBloc>()
-                    .add(const LoadGameInvitations());
+                context.read<GameInvitationsBloc>().add(
+                  const LoadGameInvitations(),
+                );
                 // Check for pending invite token (from "I Have an Account" flow).
                 // If found, navigate to join confirmation and clear the stack.
                 final deepLinkState = context.read<DeepLinkBloc>().state;
                 if (deepLinkState is DeepLinkPendingInvite) {
                   context.read<DeepLinkBloc>().add(const ClearPendingInvite());
                   final token = deepLinkState.token;
-                  context
-                      .read<InviteJoinBloc>()
-                      .add(ValidateInviteToken(token));
+                  context.read<InviteJoinBloc>().add(
+                    ValidateInviteToken(token),
+                  );
                   final navigator = PlayWithMeApp.navigatorKey.currentState;
                   if (navigator != null) {
                     navigator.pushAndRemoveUntil(
@@ -131,9 +127,7 @@ class PlayWithMeApp extends StatelessWidget {
                               value: context.read<InviteJoinBloc>(),
                             ),
                           ],
-                          child: JoinGroupConfirmationPage(
-                            token: token,
-                          ),
+                          child: JoinGroupConfirmationPage(token: token),
                         ),
                       ),
                       (route) => route.isFirst,
@@ -141,9 +135,9 @@ class PlayWithMeApp extends StatelessWidget {
                   }
                 } else {
                   // No pending invite — normal login
-                  context
-                      .read<InviteJoinBloc>()
-                      .add(const ProcessPendingInvite());
+                  context.read<InviteJoinBloc>().add(
+                    const ProcessPendingInvite(),
+                  );
                 }
               } else if (state is AuthenticationUnauthenticated) {
                 // Clear all pushed routes so LoginPage (MaterialApp.home) is visible
@@ -181,17 +175,16 @@ class PlayWithMeApp extends StatelessWidget {
           BlocListener<DeepLinkBloc, DeepLinkState>(
             listener: (context, deepLinkState) {
               if (deepLinkState is DeepLinkPendingInvite) {
-                final authState =
-                    context.read<AuthenticationBloc>().state;
+                final authState = context.read<AuthenticationBloc>().state;
                 final navigator = PlayWithMeApp.navigatorKey.currentState;
                 if (navigator == null) return;
 
                 if (authState is AuthenticationAuthenticated) {
                   // Authenticated: clear state and show join confirmation
                   context.read<DeepLinkBloc>().add(const ClearPendingInvite());
-                  context
-                      .read<InviteJoinBloc>()
-                      .add(ValidateInviteToken(deepLinkState.token));
+                  context.read<InviteJoinBloc>().add(
+                    ValidateInviteToken(deepLinkState.token),
+                  );
                   navigator.push(
                     MaterialPageRoute(
                       builder: (_) => MultiBlocProvider(
@@ -219,9 +212,7 @@ class PlayWithMeApp extends StatelessWidget {
                             value: context.read<DeepLinkBloc>(),
                           ),
                         ],
-                        child: InviteOnboardingPage(
-                          token: deepLinkState.token,
-                        ),
+                        child: InviteOnboardingPage(token: deepLinkState.token),
                       ),
                     ),
                   );
@@ -231,61 +222,60 @@ class PlayWithMeApp extends StatelessWidget {
           ),
         ],
         child: BlocBuilder<LocalePreferencesBloc, LocalePreferencesState>(
-        builder: (context, localeState) {
-          // Get the current locale from preferences or use default
-          Locale currentLocale = const Locale('en');
-          if (localeState is LocalePreferencesLoaded) {
-            currentLocale = localeState.preferences.locale;
-          }
+          builder: (context, localeState) {
+            // Get the current locale from preferences or use default
+            Locale currentLocale = const Locale('en');
+            if (localeState is LocalePreferencesLoaded) {
+              currentLocale = localeState.preferences.locale;
+            }
 
-          return MaterialApp(
-            navigatorKey: PlayWithMeApp.navigatorKey,
-            debugShowCheckedModeBanner: false,
-            title: 'Gatherli${EnvironmentConfig.appSuffix}',
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: AppColors.primary,
-              ).copyWith(
-                primary: AppColors.primary,
-                secondary: AppColors.secondary,
-                error: AppColors.danger,
-                onSurface: AppColors.onSurface,
-                onSurfaceVariant: AppColors.textMuted,
-              ),
-              scaffoldBackgroundColor: AppColors.scaffoldBackground,
-              cardTheme: CardThemeData(
-                elevation: 0,
-                color: Colors.white,
-                shadowColor: AppColors.shadow,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+            return MaterialApp(
+              navigatorKey: PlayWithMeApp.navigatorKey,
+              debugShowCheckedModeBanner: false,
+              title: 'Gatherli${EnvironmentConfig.appSuffix}',
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary)
+                    .copyWith(
+                      primary: AppColors.primary,
+                      secondary: AppColors.secondary,
+                      error: AppColors.danger,
+                      onSurface: AppColors.onSurface,
+                      onSurfaceVariant: AppColors.textMuted,
+                    ),
+                scaffoldBackgroundColor: AppColors.scaffoldBackground,
+                cardTheme: CardThemeData(
+                  elevation: 0,
+                  color: Colors.white,
+                  shadowColor: AppColors.shadow,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
+                useMaterial3: true,
               ),
-              useMaterial3: true,
-            ),
-            locale: currentLocale,
-            supportedLocales: LocalePreferencesEntity.supportedLocales,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-              builder: (context, authState) {
-                if (authState is AuthenticationAuthenticated) {
-                  return const HomePage();
-                } else if (authState is AuthenticationUnauthenticated) {
-                  return const LoginPage();
-                } else {
-                  return const _SplashScreen();
-                }
-              },
-            ),
-            onGenerateRoute: RouteGenerator.generateRoute,
-          );
-        },
-      ),
+              locale: currentLocale,
+              supportedLocales: LocalePreferencesEntity.supportedLocales,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                builder: (context, authState) {
+                  if (authState is AuthenticationAuthenticated) {
+                    return const HomePage();
+                  } else if (authState is AuthenticationUnauthenticated) {
+                    return const LoginPage();
+                  } else {
+                    return const _SplashScreen();
+                  }
+                },
+              ),
+              onGenerateRoute: RouteGenerator.generateRoute,
+            );
+          },
+        ),
       ),
     );
   }
@@ -321,13 +311,9 @@ class _HomePageState extends State<HomePage> {
     final authState = context.read<AuthenticationBloc>().state;
     _groupBloc = sl<GroupBloc>();
     _friendRequestCountBloc = sl<FriendRequestCountBloc>();
-    _playerStatsBloc = PlayerStatsBloc(
-      userRepository: sl<UserRepository>(),
-    );
+    _playerStatsBloc = PlayerStatsBloc(userRepository: sl<UserRepository>());
     _accountStatusBloc = sl<AccountStatusBloc>();
-    _emailVerificationBloc = EmailVerificationBloc(
-      authRepository: sl(),
-    );
+    _emailVerificationBloc = EmailVerificationBloc(authRepository: sl());
 
     // Expose tab switching so pushed routes (e.g. GroupDetailsPage) can
     // navigate back to a specific tab without prop-drilling.
@@ -380,9 +366,7 @@ class _HomePageState extends State<HomePage> {
       case 'invitation':
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => const PendingInvitationsPage(),
-          ),
+          MaterialPageRoute(builder: (_) => const PendingInvitationsPage()),
         );
         break;
       case 'game_invitation':
@@ -454,10 +438,14 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<FriendRequestCountBloc>.value(value: _friendRequestCountBloc),
+        BlocProvider<FriendRequestCountBloc>.value(
+          value: _friendRequestCountBloc,
+        ),
         BlocProvider<PlayerStatsBloc>.value(value: _playerStatsBloc),
         BlocProvider<AccountStatusBloc>.value(value: _accountStatusBloc),
-        BlocProvider<EmailVerificationBloc>.value(value: _emailVerificationBloc),
+        BlocProvider<EmailVerificationBloc>.value(
+          value: _emailVerificationBloc,
+        ),
       ],
       child: Scaffold(
         appBar: PlayWithMeAppBar.build(
@@ -498,23 +486,23 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             Expanded(
-              child: IndexedStack(
-                index: _selectedIndex,
-                children: _pages,
-              ),
+              child: IndexedStack(index: _selectedIndex, children: _pages),
             ),
           ],
         ),
-        bottomNavigationBar: BlocBuilder<FriendRequestCountBloc, FriendRequestCountState>(
-          builder: (context, state) {
-            final count = state is FriendRequestCountLoaded ? state.count : 0;
-            return GlobalBottomNavBar(
-              selectedIndex: _selectedIndex,
-              onTabSelected: _onItemTapped,
-              friendRequestCount: count,
-            );
-          },
-        ),
+        bottomNavigationBar:
+            BlocBuilder<FriendRequestCountBloc, FriendRequestCountState>(
+              builder: (context, state) {
+                final count = state is FriendRequestCountLoaded
+                    ? state.count
+                    : 0;
+                return GlobalBottomNavBar(
+                  selectedIndex: _selectedIndex,
+                  onTabSelected: _onItemTapped,
+                  friendRequestCount: count,
+                );
+              },
+            ),
       ),
     );
   }
@@ -548,7 +536,11 @@ class _HomeTab extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'Error loading stats: ${statsState.message}',
@@ -590,14 +582,20 @@ class _HomeTab extends StatelessWidget {
 
                     // Next Game Card
                     StreamBuilder(
-                      stream: sl<GameRepository>().getNextGameForUser(authState.user.uid),
+                      stream: sl<GameRepository>().getNextGameForUser(
+                        authState.user.uid,
+                      ),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+                        if (snapshot.connectionState ==
+                                ConnectionState.waiting &&
+                            !snapshot.hasData) {
                           return const SizedBox.shrink();
                         }
 
                         if (snapshot.hasError) {
-                          debugPrint('NextGame stream error: ${snapshot.error}');
+                          debugPrint(
+                            'NextGame stream error: ${snapshot.error}',
+                          );
                         }
 
                         final nextGame = snapshot.data;
@@ -610,12 +608,13 @@ class _HomeTab extends StatelessWidget {
                                   final gameRepository = sl<GameRepository>();
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (newContext) => RepositoryProvider.value(
-                                        value: gameRepository,
-                                        child: GameDetailsPage(
-                                          gameId: nextGame.id,
-                                        ),
-                                      ),
+                                      builder: (newContext) =>
+                                          RepositoryProvider.value(
+                                            value: gameRepository,
+                                            child: GameDetailsPage(
+                                              gameId: nextGame.id,
+                                            ),
+                                          ),
                                     ),
                                   );
                                 }
@@ -624,14 +623,15 @@ class _HomeTab extends StatelessWidget {
                       },
                     ),
 
-
                     const SizedBox(height: 25),
 
                     // Next Training Session section title
                     Padding(
                       padding: const EdgeInsets.only(left: 20.0, bottom: 15.0),
                       child: Text(
-                        AppLocalizations.of(context)!.nextTrainingSession.toUpperCase(),
+                        AppLocalizations.of(
+                          context,
+                        )!.nextTrainingSession.toUpperCase(),
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -646,14 +646,16 @@ class _HomeTab extends StatelessWidget {
                       stream: sl<TrainingSessionRepository>()
                           .getNextTrainingSessionForUser(authState.user.uid),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting &&
+                        if (snapshot.connectionState ==
+                                ConnectionState.waiting &&
                             !snapshot.hasData) {
                           return const SizedBox.shrink();
                         }
 
                         if (snapshot.hasError) {
                           debugPrint(
-                              'NextTrainingSession stream error: ${snapshot.error}');
+                            'NextTrainingSession stream error: ${snapshot.error}',
+                          );
                         }
 
                         final nextSession = snapshot.data;
@@ -669,11 +671,11 @@ class _HomeTab extends StatelessWidget {
                                     MaterialPageRoute(
                                       builder: (newContext) =>
                                           RepositoryProvider.value(
-                                        value: trainingSessionRepository,
-                                        child: TrainingSessionDetailsPage(
-                                          trainingSessionId: nextSession.id,
-                                        ),
-                                      ),
+                                            value: trainingSessionRepository,
+                                            child: TrainingSessionDetailsPage(
+                                              trainingSessionId: nextSession.id,
+                                            ),
+                                          ),
                                     ),
                                   );
                                 }
@@ -690,7 +692,10 @@ class _HomeTab extends StatelessWidget {
             return Center(
               child: Text(
                 AppLocalizations.of(context)!.welcomeMessage,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             );
           },

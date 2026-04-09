@@ -13,15 +13,19 @@ import '../../../../../core/domain/repositories/training_session_repository.dart
 import 'training_session_participation_event.dart';
 import 'training_session_participation_state.dart';
 
-class TrainingSessionParticipationBloc extends Bloc<
-    TrainingSessionParticipationEvent, TrainingSessionParticipationState> {
+class TrainingSessionParticipationBloc
+    extends
+        Bloc<
+          TrainingSessionParticipationEvent,
+          TrainingSessionParticipationState
+        > {
   final TrainingSessionRepository _trainingSessionRepository;
   StreamSubscription? _participantsSubscription;
 
   TrainingSessionParticipationBloc({
     required TrainingSessionRepository trainingSessionRepository,
-  })  : _trainingSessionRepository = trainingSessionRepository,
-        super(const ParticipationInitial()) {
+  }) : _trainingSessionRepository = trainingSessionRepository,
+       super(const ParticipationInitial()) {
     on<LoadParticipants>(_onLoadParticipants);
     on<JoinTrainingSession>(_onJoinTrainingSession);
     on<LeaveTrainingSession>(_onLeaveTrainingSession);
@@ -37,38 +41,49 @@ class TrainingSessionParticipationBloc extends Bloc<
     emit(const ParticipationLoading());
 
     try {
-      await PerformanceTracer.trace('page_training_session_details_setup', () async {
-      // Cancel any existing subscription
-      await _participantsSubscription?.cancel();
+      await PerformanceTracer.trace(
+        'page_training_session_details_setup',
+        () async {
+          // Cancel any existing subscription
+          await _participantsSubscription?.cancel();
 
-      // Subscribe to participants stream
-      _participantsSubscription = _trainingSessionRepository
-          .getTrainingSessionParticipantsStream(event.sessionId)
-          .listen(
-        (participants) {
-          // Only emit if we're still in a loading or loaded state
-          if (state is ParticipationLoading || state is ParticipationLoaded) {
-            add(_ParticipantsUpdated(
-              participants: participants,
-              participantCount: participants.length,
-            ));
-          }
-        },
-        onError: (error) {
-          if (state is ParticipationLoading || state is ParticipationLoaded) {
-            add(_ParticipantsError(
-              message: _getErrorMessage(error),
-              errorCode: _getErrorCode(error),
-            ));
-          }
+          // Subscribe to participants stream
+          _participantsSubscription = _trainingSessionRepository
+              .getTrainingSessionParticipantsStream(event.sessionId)
+              .listen(
+                (participants) {
+                  // Only emit if we're still in a loading or loaded state
+                  if (state is ParticipationLoading ||
+                      state is ParticipationLoaded) {
+                    add(
+                      _ParticipantsUpdated(
+                        participants: participants,
+                        participantCount: participants.length,
+                      ),
+                    );
+                  }
+                },
+                onError: (error) {
+                  if (state is ParticipationLoading ||
+                      state is ParticipationLoaded) {
+                    add(
+                      _ParticipantsError(
+                        message: _getErrorMessage(error),
+                        errorCode: _getErrorCode(error),
+                      ),
+                    );
+                  }
+                },
+              );
         },
       );
-      });
     } catch (e) {
-      emit(ParticipationError(
-        message: _getErrorMessage(e),
-        errorCode: _getErrorCode(e),
-      ));
+      emit(
+        ParticipationError(
+          message: _getErrorMessage(e),
+          errorCode: _getErrorCode(e),
+        ),
+      );
     }
   }
 
@@ -86,24 +101,27 @@ class TrainingSessionParticipationBloc extends Bloc<
       // Reload participants to reflect the change
       add(LoadParticipants(event.sessionId));
     } on TrainingSessionException catch (e) {
-      emit(ParticipationError(
-        message: e.message,
-        errorCode: e.code,
-      ));
+      emit(ParticipationError(message: e.message, errorCode: e.code));
     } on FirebaseFunctionsException catch (e) {
-      emit(ParticipationError(
-        message: _getFriendlyErrorMessage(e),
-        errorCode: e.code,
-      ));
+      emit(
+        ParticipationError(
+          message: _getFriendlyErrorMessage(e),
+          errorCode: e.code,
+        ),
+      );
     } on FirebaseException catch (e) {
-      emit(ParticipationError(
-        message: _getFirestoreErrorMessage(e),
-        errorCode: e.code,
-      ));
+      emit(
+        ParticipationError(
+          message: _getFirestoreErrorMessage(e),
+          errorCode: e.code,
+        ),
+      );
     } catch (e) {
-      emit(ParticipationError(
-        message: 'Failed to join training session. Please try again.',
-      ));
+      emit(
+        ParticipationError(
+          message: 'Failed to join training session. Please try again.',
+        ),
+      );
     }
   }
 
@@ -121,24 +139,27 @@ class TrainingSessionParticipationBloc extends Bloc<
       // Reload participants to reflect the change
       add(LoadParticipants(event.sessionId));
     } on TrainingSessionException catch (e) {
-      emit(ParticipationError(
-        message: e.message,
-        errorCode: e.code,
-      ));
+      emit(ParticipationError(message: e.message, errorCode: e.code));
     } on FirebaseFunctionsException catch (e) {
-      emit(ParticipationError(
-        message: _getFriendlyErrorMessage(e),
-        errorCode: e.code,
-      ));
+      emit(
+        ParticipationError(
+          message: _getFriendlyErrorMessage(e),
+          errorCode: e.code,
+        ),
+      );
     } on FirebaseException catch (e) {
-      emit(ParticipationError(
-        message: _getFirestoreErrorMessage(e),
-        errorCode: e.code,
-      ));
+      emit(
+        ParticipationError(
+          message: _getFirestoreErrorMessage(e),
+          errorCode: e.code,
+        ),
+      );
     } catch (e) {
-      emit(ParticipationError(
-        message: 'Failed to leave training session. Please try again.',
-      ));
+      emit(
+        ParticipationError(
+          message: 'Failed to leave training session. Please try again.',
+        ),
+      );
     }
   }
 
@@ -155,24 +176,27 @@ class TrainingSessionParticipationBloc extends Bloc<
 
       emit(CancelledSession(sessionId: event.sessionId));
     } on TrainingSessionException catch (e) {
-      emit(ParticipationError(
-        message: e.message,
-        errorCode: e.code,
-      ));
+      emit(ParticipationError(message: e.message, errorCode: e.code));
     } on FirebaseFunctionsException catch (e) {
-      emit(ParticipationError(
-        message: _getCancelErrorMessage(e),
-        errorCode: e.code,
-      ));
+      emit(
+        ParticipationError(
+          message: _getCancelErrorMessage(e),
+          errorCode: e.code,
+        ),
+      );
     } on FirebaseException catch (e) {
-      emit(ParticipationError(
-        message: _getFirestoreErrorMessage(e),
-        errorCode: e.code,
-      ));
+      emit(
+        ParticipationError(
+          message: _getFirestoreErrorMessage(e),
+          errorCode: e.code,
+        ),
+      );
     } catch (e) {
-      emit(ParticipationError(
-        message: 'Failed to cancel training session. Please try again.',
-      ));
+      emit(
+        ParticipationError(
+          message: 'Failed to cancel training session. Please try again.',
+        ),
+      );
     }
   }
 
@@ -181,10 +205,12 @@ class TrainingSessionParticipationBloc extends Bloc<
     _ParticipantsUpdated event,
     Emitter<TrainingSessionParticipationState> emit,
   ) {
-    emit(ParticipationLoaded(
-      participants: event.participants,
-      participantCount: event.participantCount,
-    ));
+    emit(
+      ParticipationLoaded(
+        participants: event.participants,
+        participantCount: event.participantCount,
+      ),
+    );
   }
 
   /// Internal event to handle participants stream errors
@@ -192,10 +218,9 @@ class TrainingSessionParticipationBloc extends Bloc<
     _ParticipantsError event,
     Emitter<TrainingSessionParticipationState> emit,
   ) {
-    emit(ParticipationError(
-      message: event.message,
-      errorCode: event.errorCode,
-    ));
+    emit(
+      ParticipationError(message: event.message, errorCode: event.errorCode),
+    );
   }
 
   /// Get friendly error message from Firebase Functions exception
@@ -299,10 +324,7 @@ class _ParticipantsError extends TrainingSessionParticipationEvent {
   final String message;
   final String? errorCode;
 
-  const _ParticipantsError({
-    required this.message,
-    this.errorCode,
-  });
+  const _ParticipantsError({required this.message, this.errorCode});
 
   @override
   List<Object?> get props => [message, errorCode];

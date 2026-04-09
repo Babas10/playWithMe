@@ -19,7 +19,8 @@ class MockFirebaseFunctions extends Mock implements FirebaseFunctions {}
 
 class MockHttpsCallable extends Mock implements HttpsCallable {}
 
-class MockHttpsCallableResult<T> extends Mock implements HttpsCallableResult<T> {}
+class MockHttpsCallableResult<T> extends Mock
+    implements HttpsCallableResult<T> {}
 
 void main() {
   late FakeFirebaseFirestore fakeFirestore;
@@ -40,7 +41,9 @@ void main() {
     // Setup default auth state
     when(() => mockUser.uid).thenReturn(testUserId);
     when(() => mockAuth.currentUser).thenReturn(mockUser);
-    when(() => mockAuth.authStateChanges()).thenAnswer((_) => Stream.value(mockUser));
+    when(
+      () => mockAuth.authStateChanges(),
+    ).thenAnswer((_) => Stream.value(mockUser));
 
     repository = FirestoreUserRepository(
       firestore: fakeFirestore,
@@ -96,9 +99,12 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('getPublicUserProfile'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('getPublicUserProfile'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({
           'user': {
             'uid': otherUserId,
@@ -116,7 +122,9 @@ void main() {
         expect(result!.uid, otherUserId);
         expect(result.email, 'other@example.com');
         expect(result.displayName, 'Other User');
-        verify(() => mockFunctions.httpsCallable('getPublicUserProfile')).called(1);
+        verify(
+          () => mockFunctions.httpsCallable('getPublicUserProfile'),
+        ).called(1);
       });
 
       test('returns null when Cloud Function returns null user', () async {
@@ -124,9 +132,12 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('getPublicUserProfile'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('getPublicUserProfile'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({'user': null});
 
         final result = await repository.getUserById(otherUserId);
@@ -138,19 +149,25 @@ void main() {
         const otherUserId = 'other-user-456';
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getPublicUserProfile'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('getPublicUserProfile'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(code: 'not-found', message: 'User not found'),
+          FirebaseFunctionsException(
+            code: 'not-found',
+            message: 'User not found',
+          ),
         );
 
         expect(
           () => repository.getUserById(otherUserId),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('Failed to get user'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('Failed to get user'),
+            ),
+          ),
         );
       });
     });
@@ -167,7 +184,10 @@ void main() {
 
         await repository.createOrUpdateUser(user);
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.exists, true);
         expect(doc.data()!['email'], testEmail);
         expect(doc.data()!['displayName'], 'New User');
@@ -192,7 +212,10 @@ void main() {
 
         await repository.createOrUpdateUser(updatedUser);
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.data()!['displayName'], 'New Name');
         expect(doc.data()!['email'], testEmail);
       });
@@ -215,7 +238,10 @@ void main() {
           location: 'New York',
         );
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.data()!['displayName'], 'New Name');
         expect(doc.data()!['bio'], 'New bio text');
         expect(doc.data()!['location'], 'New York');
@@ -226,15 +252,15 @@ void main() {
         // But don't create the document, so user is not found
         // The new targeted update() call surfaces Firestore's own not-found error.
         expect(
-          () => repository.updateUserProfile(
-            testUserId,
-            displayName: 'New Name',
+          () =>
+              repository.updateUserProfile(testUserId, displayName: 'New Name'),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('Failed to update user profile'),
+            ),
           ),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('Failed to update user profile'),
-          )),
         );
       });
     });
@@ -256,7 +282,10 @@ void main() {
           emailNotifications: false,
         );
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.data()!['notificationsEnabled'], false);
         expect(doc.data()!['emailNotifications'], false);
         expect(doc.data()!['pushNotifications'], true);
@@ -270,11 +299,13 @@ void main() {
             testUserId,
             notificationsEnabled: false,
           ),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('User not found'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('User not found'),
+            ),
+          ),
         );
       });
     });
@@ -296,7 +327,10 @@ void main() {
           showEmail: false,
         );
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.data()!['privacyLevel'], 'friends');
         expect(doc.data()!['showEmail'], false);
         expect(doc.data()!['showPhoneNumber'], true);
@@ -310,11 +344,13 @@ void main() {
             testUserId,
             privacyLevel: UserPrivacyLevel.private,
           ),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('User not found'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('User not found'),
+            ),
+          ),
         );
       });
     });
@@ -330,7 +366,10 @@ void main() {
 
         await repository.joinGroup(testUserId, 'group-123');
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.data()!['groupIds'], contains('group-123'));
       });
 
@@ -339,11 +378,13 @@ void main() {
         // But don't create the document, so user is not found
         expect(
           () => repository.joinGroup(testUserId, 'group-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('User not found'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('User not found'),
+            ),
+          ),
         );
       });
     });
@@ -359,7 +400,10 @@ void main() {
 
         await repository.leaveGroup(testUserId, 'group-123');
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.data()!['groupIds'], isNot(contains('group-123')));
         expect(doc.data()!['groupIds'], contains('group-456'));
       });
@@ -369,11 +413,13 @@ void main() {
         // But don't create the document, so user is not found
         expect(
           () => repository.leaveGroup(testUserId, 'group-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('User not found'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('User not found'),
+            ),
+          ),
         );
       });
     });
@@ -397,7 +443,10 @@ void main() {
           score: 21,
         );
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.data()!['gameIds'], contains('game-123'));
         expect(doc.data()!['gamesPlayed'], 1);
         expect(doc.data()!['gamesWon'], 1);
@@ -409,11 +458,13 @@ void main() {
         // But don't create the document, so user is not found
         expect(
           () => repository.addGameParticipation(testUserId, 'game-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('User not found'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('User not found'),
+            ),
+          ),
         );
       });
     });
@@ -435,9 +486,12 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('searchUsers'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('searchUsers'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({
           'users': [
             {
@@ -462,9 +516,12 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('searchUsers'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('searchUsers'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({
           'users': [
             {
@@ -492,14 +549,32 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('searchUsers'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('searchUsers'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({
           'users': [
-            {'uid': 'user-1', 'email': 'a@example.com', 'displayName': 'A', 'photoUrl': null},
-            {'uid': 'user-2', 'email': 'b@example.com', 'displayName': 'B', 'photoUrl': null},
-            {'uid': 'user-3', 'email': 'c@example.com', 'displayName': 'C', 'photoUrl': null},
+            {
+              'uid': 'user-1',
+              'email': 'a@example.com',
+              'displayName': 'A',
+              'photoUrl': null,
+            },
+            {
+              'uid': 'user-2',
+              'email': 'b@example.com',
+              'displayName': 'B',
+              'photoUrl': null,
+            },
+            {
+              'uid': 'user-3',
+              'email': 'c@example.com',
+              'displayName': 'C',
+              'photoUrl': null,
+            },
           ],
         });
 
@@ -508,42 +583,53 @@ void main() {
         expect(result.length, 2);
       });
 
-      test('returns empty list when Cloud Function returns empty users', () async {
-        final mockCallable = MockHttpsCallable();
-        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+      test(
+        'returns empty list when Cloud Function returns empty users',
+        () async {
+          final mockCallable = MockHttpsCallable();
+          final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('searchUsers'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
-        when(() => mockResult.data).thenReturn({'users': []});
+          when(
+            () => mockFunctions.httpsCallable('searchUsers'),
+          ).thenReturn(mockCallable);
+          when(
+            () => mockCallable.call(any()),
+          ).thenAnswer((_) async => mockResult);
+          when(() => mockResult.data).thenReturn({'users': []});
 
-        final result = await repository.searchUsers('nonexistent');
+          final result = await repository.searchUsers('nonexistent');
 
-        expect(result, isEmpty);
-      });
+          expect(result, isEmpty);
+        },
+      );
 
-      test('returns empty list for invalid-argument error (query too short)', () async {
-        final mockCallable = MockHttpsCallable();
+      test(
+        'returns empty list for invalid-argument error (query too short)',
+        () async {
+          final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('searchUsers'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'invalid-argument',
-            message: 'Query must be at least 3 characters long',
-          ),
-        );
+          when(
+            () => mockFunctions.httpsCallable('searchUsers'),
+          ).thenReturn(mockCallable);
+          when(() => mockCallable.call(any())).thenThrow(
+            FirebaseFunctionsException(
+              code: 'invalid-argument',
+              message: 'Query must be at least 3 characters long',
+            ),
+          );
 
-        final result = await repository.searchUsers('ab');
+          final result = await repository.searchUsers('ab');
 
-        expect(result, isEmpty);
-      });
+          expect(result, isEmpty);
+        },
+      );
 
       test('throws UserException with unauthenticated code', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('searchUsers'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('searchUsers'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
           FirebaseFunctionsException(
             code: 'unauthenticated',
@@ -553,19 +639,22 @@ void main() {
 
         expect(
           () => repository.searchUsers('john'),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'unauthenticated',
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.code,
+              'code',
+              'unauthenticated',
+            ),
+          ),
         );
       });
 
       test('throws UserException with permission-denied code', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('searchUsers'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('searchUsers'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
           FirebaseFunctionsException(
             code: 'permission-denied',
@@ -575,33 +664,35 @@ void main() {
 
         expect(
           () => repository.searchUsers('john'),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'permission-denied',
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.code,
+              'code',
+              'permission-denied',
+            ),
+          ),
         );
       });
 
       test('throws UserException on generic Cloud Function error', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('searchUsers'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('searchUsers'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'internal',
-            message: 'Server error',
-          ),
+          FirebaseFunctionsException(code: 'internal', message: 'Server error'),
         );
 
         expect(
           () => repository.searchUsers('john'),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('Failed to search users'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('Failed to search users'),
+            ),
+          ),
         );
       });
     });
@@ -618,9 +709,12 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('getUsersByIds'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({
           'users': [
             {
@@ -645,7 +739,10 @@ void main() {
         final result = await repository.getUsersInGroup('group-123');
 
         expect(result.length, 2);
-        expect(result.map((u) => u.displayName), containsAll(['User 1', 'User 2']));
+        expect(
+          result.map((u) => u.displayName),
+          containsAll(['User 1', 'User 2']),
+        );
         expect(result[0].firstName, 'User');
         expect(result[0].lastName, 'One');
         verify(() => mockFunctions.httpsCallable('getUsersByIds')).called(1);
@@ -680,89 +777,107 @@ void main() {
         expect(result, isEmpty);
       });
 
-      test('throws UserException on unauthenticated Cloud Function error', () async {
-        // Create group document with memberIds
-        await fakeFirestore.collection('groups').doc('group-123').set({
-          'name': 'Test Group',
-          'memberIds': ['user-1'],
-        });
+      test(
+        'throws UserException on unauthenticated Cloud Function error',
+        () async {
+          // Create group document with memberIds
+          await fakeFirestore.collection('groups').doc('group-123').set({
+            'name': 'Test Group',
+            'memberIds': ['user-1'],
+          });
 
-        final mockCallable = MockHttpsCallable();
+          final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'unauthenticated',
-            message: 'User must be authenticated',
-          ),
-        );
+          when(
+            () => mockFunctions.httpsCallable('getUsersByIds'),
+          ).thenReturn(mockCallable);
+          when(() => mockCallable.call(any())).thenThrow(
+            FirebaseFunctionsException(
+              code: 'unauthenticated',
+              message: 'User must be authenticated',
+            ),
+          );
 
-        expect(
-          () => repository.getUsersInGroup('group-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'unauthenticated',
-          )),
-        );
-      });
+          expect(
+            () => repository.getUsersInGroup('group-123'),
+            throwsA(
+              isA<UserException>().having(
+                (e) => e.code,
+                'code',
+                'unauthenticated',
+              ),
+            ),
+          );
+        },
+      );
 
-      test('throws UserException on permission-denied Cloud Function error', () async {
-        // Create group document with memberIds
-        await fakeFirestore.collection('groups').doc('group-123').set({
-          'name': 'Test Group',
-          'memberIds': ['user-1'],
-        });
+      test(
+        'throws UserException on permission-denied Cloud Function error',
+        () async {
+          // Create group document with memberIds
+          await fakeFirestore.collection('groups').doc('group-123').set({
+            'name': 'Test Group',
+            'memberIds': ['user-1'],
+          });
 
-        final mockCallable = MockHttpsCallable();
+          final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'permission-denied',
-            message: 'Access denied',
-          ),
-        );
+          when(
+            () => mockFunctions.httpsCallable('getUsersByIds'),
+          ).thenReturn(mockCallable);
+          when(() => mockCallable.call(any())).thenThrow(
+            FirebaseFunctionsException(
+              code: 'permission-denied',
+              message: 'Access denied',
+            ),
+          );
 
-        expect(
-          () => repository.getUsersInGroup('group-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'permission-denied',
-          )),
-        );
-      });
+          expect(
+            () => repository.getUsersInGroup('group-123'),
+            throwsA(
+              isA<UserException>().having(
+                (e) => e.code,
+                'code',
+                'permission-denied',
+              ),
+            ),
+          );
+        },
+      );
 
-      test('throws UserException on invalid-argument Cloud Function error', () async {
-        // Create group document with memberIds
-        await fakeFirestore.collection('groups').doc('group-123').set({
-          'name': 'Test Group',
-          'memberIds': ['user-1'],
-        });
+      test(
+        'throws UserException on invalid-argument Cloud Function error',
+        () async {
+          // Create group document with memberIds
+          await fakeFirestore.collection('groups').doc('group-123').set({
+            'name': 'Test Group',
+            'memberIds': ['user-1'],
+          });
 
-        final mockCallable = MockHttpsCallable();
+          final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'invalid-argument',
-            message: 'Invalid user IDs',
-          ),
-        );
+          when(
+            () => mockFunctions.httpsCallable('getUsersByIds'),
+          ).thenReturn(mockCallable);
+          when(() => mockCallable.call(any())).thenThrow(
+            FirebaseFunctionsException(
+              code: 'invalid-argument',
+              message: 'Invalid user IDs',
+            ),
+          );
 
-        expect(
-          () => repository.getUsersInGroup('group-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'invalid-argument',
-          )),
-        );
-      });
+          expect(
+            () => repository.getUsersInGroup('group-123'),
+            throwsA(
+              isA<UserException>().having(
+                (e) => e.code,
+                'code',
+                'invalid-argument',
+              ),
+            ),
+          );
+        },
+      );
 
       test('throws UserException on generic Cloud Function error', () async {
         // Create group document with memberIds
@@ -773,22 +888,22 @@ void main() {
 
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('getUsersByIds'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'internal',
-            message: 'Server error',
-          ),
+          FirebaseFunctionsException(code: 'internal', message: 'Server error'),
         );
 
         expect(
           () => repository.getUsersInGroup('group-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('Failed to get users in group'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('Failed to get users in group'),
+            ),
+          ),
         );
       });
     });
@@ -803,7 +918,10 @@ void main() {
 
         await repository.deleteUser(testUserId);
 
-        final doc = await fakeFirestore.collection('users').doc(testUserId).get();
+        final doc = await fakeFirestore
+            .collection('users')
+            .doc(testUserId)
+            .get();
         expect(doc.exists, false);
       });
     });
@@ -839,9 +957,12 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('getUsersByIds'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({
           'users': [
             {
@@ -873,98 +994,117 @@ void main() {
         expect(result[1].lastName, 'Two');
       });
 
-      test('returns users with firstName/lastName even when displayName is null', () async {
-        final mockCallable = MockHttpsCallable();
-        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+      test(
+        'returns users with firstName/lastName even when displayName is null',
+        () async {
+          final mockCallable = MockHttpsCallable();
+          final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
-        when(() => mockResult.data).thenReturn({
-          'users': [
-            {
-              'uid': 'user-1',
-              'email': 'user1@example.com',
-              'displayName': null,
-              'photoUrl': null,
-              'firstName': 'Etienne',
-              'lastName': 'Dubois',
-            },
-          ],
-        });
+          when(
+            () => mockFunctions.httpsCallable('getUsersByIds'),
+          ).thenReturn(mockCallable);
+          when(
+            () => mockCallable.call(any()),
+          ).thenAnswer((_) async => mockResult);
+          when(() => mockResult.data).thenReturn({
+            'users': [
+              {
+                'uid': 'user-1',
+                'email': 'user1@example.com',
+                'displayName': null,
+                'photoUrl': null,
+                'firstName': 'Etienne',
+                'lastName': 'Dubois',
+              },
+            ],
+          });
 
-        final result = await repository.getUsersByIds(['user-1']);
+          final result = await repository.getUsersByIds(['user-1']);
 
-        expect(result.length, 1);
-        expect(result.first.displayName, isNull);
-        expect(result.first.firstName, 'Etienne');
-        expect(result.first.lastName, 'Dubois');
-        expect(result.first.fullDisplayName, 'Etienne Dubois');
-      });
+          expect(result.length, 1);
+          expect(result.first.displayName, isNull);
+          expect(result.first.firstName, 'Etienne');
+          expect(result.first.lastName, 'Dubois');
+          expect(result.first.fullDisplayName, 'Etienne Dubois');
+        },
+      );
 
       test('throws UserException on Cloud Function error', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('getUsersByIds'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
           FirebaseFunctionsException(code: 'internal', message: 'Server error'),
         );
 
         expect(
           () => repository.getUsersByIds(['user-1']),
-          throwsA(isA<UserException>().having(
-            (e) => e.message,
-            'message',
-            contains('Failed to get users'),
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.message,
+              'message',
+              contains('Failed to get users'),
+            ),
+          ),
         );
       });
 
-      test('returns cached result on second call without hitting Cloud Function', () async {
-        final mockCallable = MockHttpsCallable();
-        final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
+      test(
+        'returns cached result on second call without hitting Cloud Function',
+        () async {
+          final mockCallable = MockHttpsCallable();
+          final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
-        when(() => mockResult.data).thenReturn({
-          'users': [
-            {
-              'uid': 'user-1',
-              'email': 'user1@example.com',
-              'displayName': 'User 1',
-              'photoUrl': null,
-              'firstName': 'User',
-              'lastName': 'One',
-            },
-          ],
-        });
+          when(
+            () => mockFunctions.httpsCallable('getUsersByIds'),
+          ).thenReturn(mockCallable);
+          when(
+            () => mockCallable.call(any()),
+          ).thenAnswer((_) async => mockResult);
+          when(() => mockResult.data).thenReturn({
+            'users': [
+              {
+                'uid': 'user-1',
+                'email': 'user1@example.com',
+                'displayName': 'User 1',
+                'photoUrl': null,
+                'firstName': 'User',
+                'lastName': 'One',
+              },
+            ],
+          });
 
-        // First call — hits Cloud Function.
-        final first = await repository.getUsersByIds(['user-1']);
-        expect(first.length, 1);
+          // First call — hits Cloud Function.
+          final first = await repository.getUsersByIds(['user-1']);
+          expect(first.length, 1);
 
-        // Second call — should return from cache without calling Cloud Function again.
-        final second = await repository.getUsersByIds(['user-1']);
-        expect(second.length, 1);
-        expect(second.first.uid, 'user-1');
+          // Second call — should return from cache without calling Cloud Function again.
+          final second = await repository.getUsersByIds(['user-1']);
+          expect(second.length, 1);
+          expect(second.first.uid, 'user-1');
 
-        // Cloud Function should have been called exactly once.
-        verify(() => mockFunctions.httpsCallable('getUsersByIds')).called(1);
-      });
+          // Cloud Function should have been called exactly once.
+          verify(() => mockFunctions.httpsCallable('getUsersByIds')).called(1);
+        },
+      );
 
       test('only fetches cache-missing UIDs on partial cache hit', () async {
         final mockCallable = MockHttpsCallable();
         final mockResult1 = MockHttpsCallableResult<Map<String, dynamic>>();
         final mockResult2 = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('getUsersByIds'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('getUsersByIds'),
+        ).thenReturn(mockCallable);
 
         // First call: fetch user-1 only.
-        when(() => mockCallable.call({'userIds': ['user-1']}))
-            .thenAnswer((_) async => mockResult1);
+        when(
+          () => mockCallable.call({
+            'userIds': ['user-1'],
+          }),
+        ).thenAnswer((_) async => mockResult1);
         when(() => mockResult1.data).thenReturn({
           'users': [
             {
@@ -981,8 +1121,11 @@ void main() {
         await repository.getUsersByIds(['user-1']);
 
         // Second call: user-1 is cached; only user-2 should be fetched.
-        when(() => mockCallable.call({'userIds': ['user-2']}))
-            .thenAnswer((_) async => mockResult2);
+        when(
+          () => mockCallable.call({
+            'userIds': ['user-2'],
+          }),
+        ).thenAnswer((_) async => mockResult2);
         when(() => mockResult2.data).thenReturn({
           'users': [
             {
@@ -1002,8 +1145,16 @@ void main() {
         expect(result.map((u) => u.uid), containsAll(['user-1', 'user-2']));
 
         // user-1 was served from cache; user-2 required a new Cloud Function call.
-        verify(() => mockCallable.call({'userIds': ['user-1']})).called(1);
-        verify(() => mockCallable.call({'userIds': ['user-2']})).called(1);
+        verify(
+          () => mockCallable.call({
+            'userIds': ['user-1'],
+          }),
+        ).called(1);
+        verify(
+          () => mockCallable.call({
+            'userIds': ['user-2'],
+          }),
+        ).called(1);
       });
     });
 
@@ -1012,12 +1163,18 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>?>();
 
-        when(() => mockFunctions.httpsCallable('getHeadToHeadStats'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('getHeadToHeadStats'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn(null);
 
-        final result = await repository.getHeadToHeadStats(testUserId, 'opponent-123');
+        final result = await repository.getHeadToHeadStats(
+          testUserId,
+          'opponent-123',
+        );
 
         expect(result, isNull);
       });
@@ -1025,51 +1182,70 @@ void main() {
       test('throws UserException with unauthenticated code', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getHeadToHeadStats'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('getHeadToHeadStats'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(code: 'unauthenticated', message: 'Not logged in'),
+          FirebaseFunctionsException(
+            code: 'unauthenticated',
+            message: 'Not logged in',
+          ),
         );
 
         expect(
           () => repository.getHeadToHeadStats(testUserId, 'opponent-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'unauthenticated',
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.code,
+              'code',
+              'unauthenticated',
+            ),
+          ),
         );
       });
 
       test('throws UserException with permission-denied code', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getHeadToHeadStats'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('getHeadToHeadStats'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(code: 'permission-denied', message: 'Access denied'),
+          FirebaseFunctionsException(
+            code: 'permission-denied',
+            message: 'Access denied',
+          ),
         );
 
         expect(
           () => repository.getHeadToHeadStats(testUserId, 'opponent-123'),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'permission-denied',
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.code,
+              'code',
+              'permission-denied',
+            ),
+          ),
         );
       });
 
       test('returns null for not-found error', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('getHeadToHeadStats'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('getHeadToHeadStats'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(code: 'not-found', message: 'Stats not found'),
+          FirebaseFunctionsException(
+            code: 'not-found',
+            message: 'Stats not found',
+          ),
         );
 
-        final result = await repository.getHeadToHeadStats(testUserId, 'opponent-123');
+        final result = await repository.getHeadToHeadStats(
+          testUserId,
+          'opponent-123',
+        );
 
         expect(result, isNull);
       });
@@ -1079,57 +1255,64 @@ void main() {
       test('throws UserException with unauthenticated code', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('calculateUserRanking'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('calculateUserRanking'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call<Map<String, dynamic>>()).thenThrow(
-          FirebaseFunctionsException(code: 'unauthenticated', message: 'Not logged in'),
+          FirebaseFunctionsException(
+            code: 'unauthenticated',
+            message: 'Not logged in',
+          ),
         );
 
         expect(
           () => repository.getUserRanking(testUserId),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'unauthenticated',
-          )),
+          throwsA(
+            isA<UserException>().having(
+              (e) => e.code,
+              'code',
+              'unauthenticated',
+            ),
+          ),
         );
       });
 
       test('throws UserException with not-found code', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('calculateUserRanking'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('calculateUserRanking'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call<Map<String, dynamic>>()).thenThrow(
-          FirebaseFunctionsException(code: 'not-found', message: 'User not found'),
+          FirebaseFunctionsException(
+            code: 'not-found',
+            message: 'User not found',
+          ),
         );
 
         expect(
           () => repository.getUserRanking(testUserId),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'not-found',
-          )),
+          throwsA(
+            isA<UserException>().having((e) => e.code, 'code', 'not-found'),
+          ),
         );
       });
 
       test('throws UserException with internal code', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('calculateUserRanking'))
-            .thenReturn(mockCallable);
+        when(
+          () => mockFunctions.httpsCallable('calculateUserRanking'),
+        ).thenReturn(mockCallable);
         when(() => mockCallable.call<Map<String, dynamic>>()).thenThrow(
           FirebaseFunctionsException(code: 'internal', message: 'Server error'),
         );
 
         expect(
           () => repository.getUserRanking(testUserId),
-          throwsA(isA<UserException>().having(
-            (e) => e.code,
-            'code',
-            'internal',
-          )),
+          throwsA(
+            isA<UserException>().having((e) => e.code, 'code', 'internal'),
+          ),
         );
       });
     });
@@ -1151,7 +1334,10 @@ void main() {
           'isAnonymous': false,
         });
 
-        final result = await repository.getTeammateStats(testUserId, 'teammate-123');
+        final result = await repository.getTeammateStats(
+          testUserId,
+          'teammate-123',
+        );
 
         expect(result, isNull);
       });
@@ -1162,14 +1348,14 @@ void main() {
           'isEmailVerified': true,
           'isAnonymous': false,
           'teammateStats': {
-            'other-teammate': {
-              'gamesPlayed': 5,
-              'gamesWon': 3,
-            },
+            'other-teammate': {'gamesPlayed': 5, 'gamesWon': 3},
           },
         });
 
-        final result = await repository.getTeammateStats(testUserId, 'teammate-123');
+        final result = await repository.getTeammateStats(
+          testUserId,
+          'teammate-123',
+        );
 
         expect(result, isNull);
       });
@@ -1191,7 +1377,10 @@ void main() {
           },
         });
 
-        final result = await repository.getTeammateStats(testUserId, 'teammate-123');
+        final result = await repository.getTeammateStats(
+          testUserId,
+          'teammate-123',
+        );
 
         expect(result, isNotNull);
         expect(result!.gamesPlayed, 10);

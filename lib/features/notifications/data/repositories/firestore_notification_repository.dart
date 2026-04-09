@@ -12,8 +12,8 @@ class FirestoreNotificationRepository implements NotificationRepository {
   FirestoreNotificationRepository({
     required FirebaseFirestore firestore,
     required FirebaseAuth auth,
-  })  : _firestore = firestore,
-        _auth = auth;
+  }) : _firestore = firestore,
+       _auth = auth;
 
   String? get _userId => _auth.currentUser?.uid;
 
@@ -26,7 +26,8 @@ class FirestoreNotificationRepository implements NotificationRepository {
 
     final doc = await _firestore.collection('users').doc(userId).get();
 
-    final prefsData = doc.data()?['notificationPreferences'] as Map<String, dynamic>?;
+    final prefsData =
+        doc.data()?['notificationPreferences'] as Map<String, dynamic>?;
 
     if (prefsData == null) {
       // Return default preferences if none exist
@@ -37,7 +38,9 @@ class FirestoreNotificationRepository implements NotificationRepository {
   }
 
   @override
-  Future<void> updatePreferences(NotificationPreferencesEntity preferences) async {
+  Future<void> updatePreferences(
+    NotificationPreferencesEntity preferences,
+  ) async {
     final userId = _userId;
     if (userId == null) {
       throw Exception('User not authenticated');
@@ -55,12 +58,11 @@ class FirestoreNotificationRepository implements NotificationRepository {
       throw Exception('User not authenticated');
     }
 
-    return _firestore
-        .collection('users')
-        .doc(userId)
-        .snapshots()
-        .map((snapshot) {
-      final prefsData = snapshot.data()?['notificationPreferences'] as Map<String, dynamic>?;
+    return _firestore.collection('users').doc(userId).snapshots().map((
+      snapshot,
+    ) {
+      final prefsData =
+          snapshot.data()?['notificationPreferences'] as Map<String, dynamic>?;
 
       if (prefsData == null) {
         return const NotificationPreferencesEntity();

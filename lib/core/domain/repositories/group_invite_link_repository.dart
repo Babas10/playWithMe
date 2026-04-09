@@ -8,7 +8,7 @@ abstract class GroupInviteLinkRepository {
   /// Returns a record with the invite ID, token, and deep link URL.
   /// Throws [GroupInviteLinkException] on failure.
   Future<({String inviteId, String token, String deepLinkUrl})>
-      createGroupInvite({
+  createGroupInvite({
     required String groupId,
     int? expiresInHours,
     int? usageLimit,
@@ -25,22 +25,22 @@ abstract class GroupInviteLinkRepository {
   /// Validates an invite token and returns group info for the pre-join screen.
   ///
   /// Throws [GroupInviteLinkException] on failure (expired, revoked, limit reached).
-  Future<({
-    String groupId,
-    String groupName,
-    String? groupDescription,
-    String? groupPhotoUrl,
-    int groupMemberCount,
-    String inviterName,
-    String? inviterPhotoUrl,
-  })> validateInviteToken({required String token});
+  Future<
+    ({
+      String groupId,
+      String groupName,
+      String? groupDescription,
+      String? groupPhotoUrl,
+      int groupMemberCount,
+      String inviterName,
+      String? inviterPhotoUrl,
+    })
+  >
+  validateInviteToken({required String token});
 
   /// Joins the authenticated user to the group via invite token.
   ///
   /// Throws [GroupInviteLinkException] on failure.
-  Future<({
-    String groupId,
-    String groupName,
-    bool alreadyMember,
-  })> joinGroupViaInvite({required String token});
+  Future<({String groupId, String groupName, bool alreadyMember})>
+  joinGroupViaInvite({required String token});
 }

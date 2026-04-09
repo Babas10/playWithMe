@@ -36,8 +36,11 @@ void main() {
       blocTest<FriendRequestCountBloc, FriendRequestCountState>(
         'emits [loaded] states when count stream updates',
         build: () {
-          when(() => mockFriendRepository.getPendingFriendRequestCount('test-user-id'))
-              .thenAnswer((_) => Stream.fromIterable([0, 1, 2, 3]));
+          when(
+            () => mockFriendRepository.getPendingFriendRequestCount(
+              'test-user-id',
+            ),
+          ).thenAnswer((_) => Stream.fromIterable([0, 1, 2, 3]));
           return friendRequestCountBloc;
         },
         act: (bloc) => bloc.add(
@@ -50,34 +53,43 @@ void main() {
           const FriendRequestCountState.loaded(count: 3),
         ],
         verify: (_) {
-          verify(() =>
-                  mockFriendRepository.getPendingFriendRequestCount('test-user-id'))
-              .called(1);
+          verify(
+            () => mockFriendRepository.getPendingFriendRequestCount(
+              'test-user-id',
+            ),
+          ).called(1);
         },
       );
 
       blocTest<FriendRequestCountBloc, FriendRequestCountState>(
         'emits [loaded] with zero when no pending requests',
         build: () {
-          when(() => mockFriendRepository.getPendingFriendRequestCount('test-user-id'))
-              .thenAnswer((_) => Stream.value(0));
+          when(
+            () => mockFriendRepository.getPendingFriendRequestCount(
+              'test-user-id',
+            ),
+          ).thenAnswer((_) => Stream.value(0));
           return friendRequestCountBloc;
         },
         act: (bloc) => bloc.add(
           const FriendRequestCountEvent.startListening(userId: 'test-user-id'),
         ),
-        expect: () => [
-          const FriendRequestCountState.loaded(count: 0),
-        ],
+        expect: () => [const FriendRequestCountState.loaded(count: 0)],
       );
 
       blocTest<FriendRequestCountBloc, FriendRequestCountState>(
         'emits [error] when repository throws FriendshipException',
         build: () {
-          when(() => mockFriendRepository.getPendingFriendRequestCount('test-user-id'))
-              .thenAnswer(
+          when(
+            () => mockFriendRepository.getPendingFriendRequestCount(
+              'test-user-id',
+            ),
+          ).thenAnswer(
             (_) => Stream.error(
-              FriendshipException('Permission denied', code: 'permission-denied'),
+              FriendshipException(
+                'Permission denied',
+                code: 'permission-denied',
+              ),
             ),
           );
           return friendRequestCountBloc;
@@ -93,10 +105,11 @@ void main() {
       blocTest<FriendRequestCountBloc, FriendRequestCountState>(
         'emits [error] when repository throws generic exception',
         build: () {
-          when(() => mockFriendRepository.getPendingFriendRequestCount('test-user-id'))
-              .thenAnswer(
-            (_) => Stream.error(Exception('Network error')),
-          );
+          when(
+            () => mockFriendRepository.getPendingFriendRequestCount(
+              'test-user-id',
+            ),
+          ).thenAnswer((_) => Stream.error(Exception('Network error')));
           return friendRequestCountBloc;
         },
         act: (bloc) => bloc.add(
@@ -113,8 +126,11 @@ void main() {
         'handles stream that emits count then error',
         build: () {
           // Create a stream controller to emit values then error
-          when(() => mockFriendRepository.getPendingFriendRequestCount('test-user-id'))
-              .thenAnswer((_) async* {
+          when(
+            () => mockFriendRepository.getPendingFriendRequestCount(
+              'test-user-id',
+            ),
+          ).thenAnswer((_) async* {
             yield 1;
             yield 2;
             throw FriendshipException('Connection lost');
@@ -136,12 +152,8 @@ void main() {
       blocTest<FriendRequestCountBloc, FriendRequestCountState>(
         'emits [initial] when stop listening event is triggered',
         build: () => friendRequestCountBloc,
-        act: (bloc) => bloc.add(
-          const FriendRequestCountEvent.stopListening(),
-        ),
-        expect: () => [
-          const FriendRequestCountState.initial(),
-        ],
+        act: (bloc) => bloc.add(const FriendRequestCountEvent.stopListening()),
+        expect: () => [const FriendRequestCountState.initial()],
       );
     });
   });

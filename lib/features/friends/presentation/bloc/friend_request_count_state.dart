@@ -10,12 +10,10 @@ class FriendRequestCountState with _$FriendRequestCountState {
   const factory FriendRequestCountState.initial() = FriendRequestCountInitial;
 
   /// Count loaded - shows the current number of pending friend requests
-  const factory FriendRequestCountState.loaded({
-    required int count,
-  }) = FriendRequestCountLoaded;
+  const factory FriendRequestCountState.loaded({required int count}) =
+      FriendRequestCountLoaded;
 
   /// Error state - failed to load count
-  const factory FriendRequestCountState.error({
-    required String message,
-  }) = FriendRequestCountError;
+  const factory FriendRequestCountState.error({required String message}) =
+      FriendRequestCountError;
 }

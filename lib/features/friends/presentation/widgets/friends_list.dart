@@ -42,8 +42,8 @@ class FriendsList extends StatelessWidget {
               Text(
                 l10n.searchForFriends,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -59,10 +59,7 @@ class FriendsList extends StatelessWidget {
         final friend = friends[index];
         return FriendTile(
           friend: friend,
-          onRemove: () => _showRemoveConfirmation(
-            context,
-            friend,
-          ),
+          onRemove: () => _showRemoveConfirmation(context, friend),
           onTap: onFriendTap != null ? () => onFriendTap!(friend) : null,
         );
       },
@@ -92,9 +89,7 @@ class FriendsList extends StatelessWidget {
               // For now, we'll use the uid as a placeholder
               onRemoveFriend(friend.uid);
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.remove),
           ),
         ],

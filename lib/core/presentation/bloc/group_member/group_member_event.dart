@@ -13,10 +13,7 @@ class PromoteMemberToAdmin extends GroupMemberEvent {
   final String groupId;
   final String userId;
 
-  const PromoteMemberToAdmin({
-    required this.groupId,
-    required this.userId,
-  });
+  const PromoteMemberToAdmin({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -27,10 +24,7 @@ class DemoteMemberFromAdmin extends GroupMemberEvent {
   final String groupId;
   final String userId;
 
-  const DemoteMemberFromAdmin({
-    required this.groupId,
-    required this.userId,
-  });
+  const DemoteMemberFromAdmin({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -41,10 +35,7 @@ class RemoveMemberFromGroup extends GroupMemberEvent {
   final String groupId;
   final String userId;
 
-  const RemoveMemberFromGroup({
-    required this.groupId,
-    required this.userId,
-  });
+  const RemoveMemberFromGroup({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];
@@ -55,10 +46,7 @@ class LeaveGroup extends GroupMemberEvent {
   final String groupId;
   final String userId; // Current user's ID
 
-  const LeaveGroup({
-    required this.groupId,
-    required this.userId,
-  });
+  const LeaveGroup({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];

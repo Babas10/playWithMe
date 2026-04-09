@@ -20,7 +20,6 @@ class EloHistoryState with _$EloHistoryState {
     BestEloRecord? bestEloInPeriod,
   }) = EloHistoryLoaded;
 
-  const factory EloHistoryState.error({
-    required String message,
-  }) = EloHistoryError;
+  const factory EloHistoryState.error({required String message}) =
+      EloHistoryError;
 }

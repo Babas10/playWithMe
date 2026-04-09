@@ -12,16 +12,14 @@ void main() {
             gameNumber: 1,
             winner: 'teamA',
             sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
-          )
+          ),
         ],
         overallWinner: 'teamA',
       );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: SetScoresDisplay(result: validResult),
-          ),
+          home: Scaffold(body: SetScoresDisplay(result: validResult)),
         ),
       );
 
@@ -39,16 +37,14 @@ void main() {
               SetScore(teamAPoints: 15, teamBPoints: 21, setNumber: 2),
               SetScore(teamAPoints: 15, teamBPoints: 10, setNumber: 3),
             ],
-          )
+          ),
         ],
         overallWinner: 'teamA',
       );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: SetScoresDisplay(result: validResult),
-          ),
+          home: Scaffold(body: SetScoresDisplay(result: validResult)),
         ),
       );
 
@@ -74,9 +70,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: SetScoresDisplay(result: validResult),
-          ),
+          home: Scaffold(body: SetScoresDisplay(result: validResult)),
         ),
       );
 
@@ -85,16 +79,11 @@ void main() {
     });
 
     testWidgets('renders nothing when there are no games', (tester) async {
-      final emptyResult = const GameResult(
-        games: [],
-        overallWinner: 'teamA',
-      );
+      final emptyResult = const GameResult(games: [], overallWinner: 'teamA');
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: SetScoresDisplay(result: emptyResult),
-          ),
+          home: Scaffold(body: SetScoresDisplay(result: emptyResult)),
         ),
       );
 

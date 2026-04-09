@@ -42,10 +42,7 @@ class GamesListPage extends StatelessWidget {
         return sl<GamesListBloc>()
           ..add(LoadGamesForGroup(groupId: groupId, userId: userId));
       },
-      child: _GamesListPageContent(
-        groupId: groupId,
-        groupName: groupName,
-      ),
+      child: _GamesListPageContent(groupId: groupId, groupName: groupName),
     );
   }
 }
@@ -54,24 +51,16 @@ class _GamesListPageContent extends StatelessWidget {
   final String groupId;
   final String groupName;
 
-  const _GamesListPageContent({
-    required this.groupId,
-    required this.groupName,
-  });
+  const _GamesListPageContent({required this.groupId, required this.groupName});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PlayWithMeAppBar.build(
-        context: context,
-        title: 'Activities',
-      ),
+      appBar: PlayWithMeAppBar.build(context: context, title: 'Activities'),
       body: BlocBuilder<GamesListBloc, GamesListState>(
         builder: (context, state) {
           if (state is GamesListLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (state is GamesListError) {
@@ -106,13 +95,17 @@ class _GamesListPageContent extends StatelessWidget {
           children: [
             if (state.upcomingActivities.isNotEmpty) ...[
               _buildSectionHeader(context, 'Upcoming Activities'),
-              ...state.upcomingActivities.map((activity) =>
-                  _buildActivityItem(context, activity, state.userId, false)),
+              ...state.upcomingActivities.map(
+                (activity) =>
+                    _buildActivityItem(context, activity, state.userId, false),
+              ),
             ],
             if (state.pastActivities.isNotEmpty) ...[
               _buildSectionHeader(context, 'Past Activities'),
-              ...state.pastActivities.map((activity) =>
-                  _buildActivityItem(context, activity, state.userId, true)),
+              ...state.pastActivities.map(
+                (activity) =>
+                    _buildActivityItem(context, activity, state.userId, true),
+              ),
             ],
             const SizedBox(height: 80), // Space for FAB
           ],
@@ -149,9 +142,9 @@ class _GamesListPageContent extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.secondary,
-            ),
+          fontWeight: FontWeight.bold,
+          color: AppColors.secondary,
+        ),
       ),
     );
   }
@@ -167,10 +160,7 @@ class _GamesListPageContent extends StatelessWidget {
             color: Theme.of(context).colorScheme.error,
           ),
           const SizedBox(height: 16),
-          Text(
-            'Error',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('Error', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -213,8 +203,8 @@ class _GamesListPageContent extends StatelessWidget {
           Text(
             l10n.createFirstActivity,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
@@ -273,18 +263,11 @@ class _GamesListPageContent extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: AppColors.primary,
-              size: 24,
-            ),
+            Icon(icon, color: AppColors.primary, size: 24),
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(
-                color: AppColors.navLabelColor,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: AppColors.navLabelColor, fontSize: 12),
             ),
           ],
         ),
@@ -305,7 +288,10 @@ class _GamesListPageContent extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: Icon(Icons.sports_volleyball, color: AppColors.secondary),
+                  leading: Icon(
+                    Icons.sports_volleyball,
+                    color: AppColors.secondary,
+                  ),
                   title: Text(
                     l10n.createGame,
                     style: TextStyle(
@@ -315,7 +301,9 @@ class _GamesListPageContent extends StatelessWidget {
                   ),
                   subtitle: Text(
                     l10n.competitiveGameWithElo,
-                    style: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+                    style: TextStyle(
+                      color: AppColors.secondary.withValues(alpha: 0.7),
+                    ),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -323,7 +311,10 @@ class _GamesListPageContent extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.fitness_center, color: AppColors.secondary),
+                  leading: Icon(
+                    Icons.fitness_center,
+                    color: AppColors.secondary,
+                  ),
                   title: Text(
                     l10n.createTrainingSession,
                     style: TextStyle(
@@ -333,7 +324,9 @@ class _GamesListPageContent extends StatelessWidget {
                   ),
                   subtitle: Text(
                     l10n.practiceSessionNoElo,
-                    style: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+                    style: TextStyle(
+                      color: AppColors.secondary.withValues(alpha: 0.7),
+                    ),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -354,10 +347,7 @@ class _GamesListPageContent extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => BlocProvider(
           create: (context) => sl<GameCreationBloc>(),
-          child: GameCreationPage(
-            groupId: groupId,
-            groupName: groupName,
-          ),
+          child: GameCreationPage(groupId: groupId, groupName: groupName),
         ),
       ),
     );
@@ -381,9 +371,7 @@ class _GamesListPageContent extends StatelessWidget {
   void _navigateToGameDetails(BuildContext context, String gameId) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => GameDetailsPage(gameId: gameId),
-      ),
+      MaterialPageRoute(builder: (context) => GameDetailsPage(gameId: gameId)),
     );
   }
 
@@ -391,9 +379,8 @@ class _GamesListPageContent extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TrainingSessionDetailsPage(
-          trainingSessionId: sessionId,
-        ),
+        builder: (context) =>
+            TrainingSessionDetailsPage(trainingSessionId: sessionId),
       ),
     );
   }

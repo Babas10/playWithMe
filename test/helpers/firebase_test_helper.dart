@@ -34,7 +34,9 @@ class FirebaseTestHelper {
       await FirebaseService.initialize();
       return FirebaseService.isInitialized;
     } catch (e) {
-      debugPrint('🧪 Firebase initialization failed (expected in test environment): $e');
+      debugPrint(
+        '🧪 Firebase initialization failed (expected in test environment): $e',
+      );
       return false;
     }
   }
@@ -48,8 +50,8 @@ class FirebaseTestHelper {
 
       // Basic validation of configuration structure
       return connectionInfo['environment'] != null &&
-             connectionInfo['projectId'] != null &&
-             connectionInfo['projectId'].toString().isNotEmpty;
+          connectionInfo['projectId'] != null &&
+          connectionInfo['projectId'].toString().isNotEmpty;
     } catch (e) {
       debugPrint('🧪 Firebase config test failed: $e');
       return false;
@@ -82,7 +84,8 @@ class FirebaseTestHelper {
   /// Detect if running in Flutter test environment
   static bool isFlutterTestEnvironment() {
     // Check if we're running in Flutter test environment
-    return identical(0, 0.0) == false; // This is always false in test environment
+    return identical(0, 0.0) ==
+        false; // This is always false in test environment
   }
 
   /// Setup test environment with appropriate configuration

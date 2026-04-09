@@ -16,9 +16,8 @@ class FirestoreGroupRepository implements GroupRepository {
   static const int _maxRetries = 3;
   static const Duration _retryDelay = Duration(seconds: 2);
 
-  FirestoreGroupRepository({
-    FirebaseFirestore? firestore,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance;
+  FirestoreGroupRepository({FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   /// Retry operation with exponential backoff for retryable errors.
   Future<T> _retryOperation<T>(
@@ -100,7 +99,9 @@ class FirestoreGroupRepository implements GroupRepository {
   @override
   Stream<List<GroupModel>> getGroupsForUser(String userId) {
     try {
-      debugPrint('🔍 [GroupRepository] getGroupsForUser called for userId: $userId');
+      debugPrint(
+        '🔍 [GroupRepository] getGroupsForUser called for userId: $userId',
+      );
       return _firestore
           .collection(_collection)
           .where('memberIds', arrayContains: userId)
@@ -119,30 +120,34 @@ class FirestoreGroupRepository implements GroupRepository {
                 error.message?.contains('index') == true) {
               throw GroupException(
                 'Firestore index required. Please run: firebase deploy --only firestore:indexes',
-                code: 'failed-precondition');
+                code: 'failed-precondition',
+              );
             }
             throw GroupException('Failed to get groups for user: $error');
           })
           .map((snapshot) {
-            debugPrint('📊 [GroupRepository] Snapshot received with ${snapshot.docs.length} documents');
+            debugPrint(
+              '📊 [GroupRepository] Snapshot received with ${snapshot.docs.length} documents',
+            );
             try {
-              final groups = snapshot.docs
-                  .where((doc) => doc.exists)
-                  .map((doc) {
-                    debugPrint('   Processing doc: ${doc.id}');
-                    try {
-                      final group = GroupModel.fromFirestore(doc);
-                      debugPrint('   ✅ Successfully parsed: ${group.name}');
-                      return group;
-                    } catch (e, stackTrace) {
-                      debugPrint('   ❌ Failed to parse doc ${doc.id}: $e');
-                      debugPrint('   Stack trace: $stackTrace');
-                      debugPrint('   Doc data: ${doc.data()}');
-                      rethrow;
-                    }
-                  })
-                  .toList();
-              debugPrint('✅ [GroupRepository] Returning ${groups.length} groups');
+              final groups = snapshot.docs.where((doc) => doc.exists).map((
+                doc,
+              ) {
+                debugPrint('   Processing doc: ${doc.id}');
+                try {
+                  final group = GroupModel.fromFirestore(doc);
+                  debugPrint('   ✅ Successfully parsed: ${group.name}');
+                  return group;
+                } catch (e, stackTrace) {
+                  debugPrint('   ❌ Failed to parse doc ${doc.id}: $e');
+                  debugPrint('   Stack trace: $stackTrace');
+                  debugPrint('   Doc data: ${doc.data()}');
+                  rethrow;
+                }
+              }).toList();
+              debugPrint(
+                '✅ [GroupRepository] Returning ${groups.length} groups',
+              );
               return groups;
             } catch (e, stackTrace) {
               debugPrint('❌ [GroupRepository] Error in map: $e');
@@ -163,9 +168,7 @@ class FirestoreGroupRepository implements GroupRepository {
       try {
         final data = group.toFirestore();
 
-        final docRef = await _firestore
-            .collection(_collection)
-            .add(data);
+        final docRef = await _firestore.collection(_collection).add(data);
         return docRef.id;
       } catch (e) {
         throw GroupException('Failed to create group: $e');
@@ -174,7 +177,8 @@ class FirestoreGroupRepository implements GroupRepository {
   }
 
   @override
-  Future<void> updateGroupInfo(String groupId, {
+  Future<void> updateGroupInfo(
+    String groupId, {
     String? name,
     String? description,
     String? photoUrl,
@@ -205,7 +209,8 @@ class FirestoreGroupRepository implements GroupRepository {
   }
 
   @override
-  Future<void> updateGroupSettings(String groupId, {
+  Future<void> updateGroupSettings(
+    String groupId, {
     GroupPrivacy? privacy,
     bool? requiresApproval,
     int? maxMembers,
@@ -280,13 +285,18 @@ class FirestoreGroupRepository implements GroupRepository {
   @override
   Future<void> leaveGroup(String groupId) async {
     try {
-      final callable = FirebaseFunctions.instanceFor(region: 'europe-west6').httpsCallable('leaveGroup');
+      final callable = FirebaseFunctions.instanceFor(
+        region: 'europe-west6',
+      ).httpsCallable('leaveGroup');
       final result = await callable.call<Map<String, dynamic>>({
         'groupId': groupId,
       });
 
       if (result.data['success'] != true) {
-        throw GroupException(result.data['message'] ?? 'Failed to leave group', code: 'unknown');
+        throw GroupException(
+          result.data['message'] ?? 'Failed to leave group',
+          code: 'unknown',
+        );
       }
     } on FirebaseFunctionsException catch (e) {
       throw GroupException(e.message ?? 'Failed to leave group', code: e.code);
@@ -391,7 +401,10 @@ class FirestoreGroupRepository implements GroupRepository {
   }
 
   @override
-  Future<List<GroupModel>> searchPublicGroups(String query, {int limit = 20}) async {
+  Future<List<GroupModel>> searchPublicGroups(
+    String query, {
+    int limit = 20,
+  }) async {
     if (query.trim().isEmpty) return [];
 
     try {

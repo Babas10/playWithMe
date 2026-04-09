@@ -84,7 +84,8 @@ class GameDetailsNotFound extends GameDetailsState implements ErrorState {
   List<Object?> get props => [message, errorCode, isRetryable];
 }
 
-class GameCompletedSuccessfully extends GameDetailsState implements SuccessState {
+class GameCompletedSuccessfully extends GameDetailsState
+    implements SuccessState {
   final GameModel game;
   final String message;
 

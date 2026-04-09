@@ -14,7 +14,8 @@ class MockFirebaseFunctions extends Mock implements FirebaseFunctions {}
 
 class MockHttpsCallable extends Mock implements HttpsCallable {}
 
-class MockHttpsCallableResult<T> extends Mock implements HttpsCallableResult<T> {}
+class MockHttpsCallableResult<T> extends Mock
+    implements HttpsCallableResult<T> {}
 
 class MockGroupRepository extends Mock implements GroupRepository {}
 
@@ -25,7 +26,10 @@ void main() {
     late MockGroupRepository mockGroupRepository;
     late FirestoreTrainingSessionRepository repository;
 
-    const testLocation = GameLocation(name: 'Beach Court', address: '123 Beach Rd');
+    const testLocation = GameLocation(
+      name: 'Beach Court',
+      address: '123 Beach Rd',
+    );
 
     TrainingSessionModel createTestSession({
       String id = '',
@@ -57,10 +61,12 @@ void main() {
       );
     }
 
-    Future<String> addTestSessionToFirestore(TrainingSessionModel session) async {
-      final docRef = await fakeFirestore.collection('trainingSessions').add(
-        session.toFirestore(),
-      );
+    Future<String> addTestSessionToFirestore(
+      TrainingSessionModel session,
+    ) async {
+      final docRef = await fakeFirestore
+          .collection('trainingSessions')
+          .add(session.toFirestore());
       return docRef.id;
     }
 
@@ -100,7 +106,9 @@ void main() {
       });
 
       test('returns null when session does not exist', () async {
-        final result = await repository.getTrainingSessionById('non-existent-id');
+        final result = await repository.getTrainingSessionById(
+          'non-existent-id',
+        );
 
         expect(result, isNull);
       });
@@ -141,7 +149,9 @@ void main() {
       });
 
       test('returns false when session does not exist', () async {
-        final exists = await repository.trainingSessionExists('non-existent-id');
+        final exists = await repository.trainingSessionExists(
+          'non-existent-id',
+        );
 
         expect(exists, isFalse);
       });
@@ -154,8 +164,9 @@ void main() {
         );
         final sessionId = await addTestSessionToFirestore(testSession);
 
-        final participants =
-            await repository.getTrainingSessionParticipants(sessionId);
+        final participants = await repository.getTrainingSessionParticipants(
+          sessionId,
+        );
 
         expect(participants, hasLength(3));
         expect(participants, contains('user-1'));
@@ -164,8 +175,9 @@ void main() {
       });
 
       test('returns empty list for non-existent session', () async {
-        final participants =
-            await repository.getTrainingSessionParticipants('non-existent');
+        final participants = await repository.getTrainingSessionParticipants(
+          'non-existent',
+        );
 
         expect(participants, isEmpty);
       });
@@ -179,11 +191,14 @@ void main() {
         );
         final sessionId = await addTestSessionToFirestore(testSession);
 
-        when(() => mockGroupRepository.getGroupMembers('group-123'))
-            .thenAnswer((_) async => ['user-1', 'user-2', 'user-3']);
+        when(
+          () => mockGroupRepository.getGroupMembers('group-123'),
+        ).thenAnswer((_) async => ['user-1', 'user-2', 'user-3']);
 
-        final canJoin =
-            await repository.canUserJoinTrainingSession(sessionId, 'user-2');
+        final canJoin = await repository.canUserJoinTrainingSession(
+          sessionId,
+          'user-2',
+        );
 
         expect(canJoin, isTrue);
       });
@@ -195,18 +210,23 @@ void main() {
         );
         final sessionId = await addTestSessionToFirestore(testSession);
 
-        when(() => mockGroupRepository.getGroupMembers('group-123'))
-            .thenAnswer((_) async => ['user-1', 'user-2']);
+        when(
+          () => mockGroupRepository.getGroupMembers('group-123'),
+        ).thenAnswer((_) async => ['user-1', 'user-2']);
 
-        final canJoin =
-            await repository.canUserJoinTrainingSession(sessionId, 'user-999');
+        final canJoin = await repository.canUserJoinTrainingSession(
+          sessionId,
+          'user-999',
+        );
 
         expect(canJoin, isFalse);
       });
 
       test('returns false for non-existent session', () async {
-        final canJoin =
-            await repository.canUserJoinTrainingSession('non-existent', 'user-1');
+        final canJoin = await repository.canUserJoinTrainingSession(
+          'non-existent',
+          'user-1',
+        );
 
         expect(canJoin, isFalse);
       });
@@ -220,12 +240,15 @@ void main() {
         );
         final sessionId = await addTestSessionToFirestore(testSession);
 
-        when(() => mockGroupRepository.getGroupMembers('group-123'))
-            .thenAnswer((_) async => ['user-1', 'user-2', 'user-3']);
+        when(
+          () => mockGroupRepository.getGroupMembers('group-123'),
+        ).thenAnswer((_) async => ['user-1', 'user-2', 'user-3']);
 
         await repository.addParticipant(sessionId, 'user-2');
 
-        final updatedSession = await repository.getTrainingSessionById(sessionId);
+        final updatedSession = await repository.getTrainingSessionById(
+          sessionId,
+        );
         expect(updatedSession!.participantIds, contains('user-2'));
       });
 
@@ -237,13 +260,12 @@ void main() {
       });
 
       test('throws exception when user not in group', () async {
-        final testSession = createTestSession(
-          participantIds: ['user-1'],
-        );
+        final testSession = createTestSession(participantIds: ['user-1']);
         final sessionId = await addTestSessionToFirestore(testSession);
 
-        when(() => mockGroupRepository.getGroupMembers('group-123'))
-            .thenAnswer((_) async => ['user-1']);
+        when(
+          () => mockGroupRepository.getGroupMembers('group-123'),
+        ).thenAnswer((_) async => ['user-1']);
 
         expect(
           () => repository.addParticipant(sessionId, 'user-999'),
@@ -258,8 +280,9 @@ void main() {
         );
         final sessionId = await addTestSessionToFirestore(testSession);
 
-        when(() => mockGroupRepository.getGroupMembers('group-123'))
-            .thenAnswer((_) async => ['user-1', 'user-2', 'user-3']);
+        when(
+          () => mockGroupRepository.getGroupMembers('group-123'),
+        ).thenAnswer((_) async => ['user-1', 'user-2', 'user-3']);
 
         expect(
           () => repository.addParticipant(sessionId, 'user-3'),
@@ -277,7 +300,9 @@ void main() {
 
         await repository.removeParticipant(sessionId, 'user-2');
 
-        final updatedSession = await repository.getTrainingSessionById(sessionId);
+        final updatedSession = await repository.getTrainingSessionById(
+          sessionId,
+        );
         expect(updatedSession!.participantIds, isNot(contains('user-2')));
         expect(updatedSession.participantIds, contains('user-1'));
       });
@@ -297,7 +322,9 @@ void main() {
 
         await repository.completeTrainingSession(sessionId);
 
-        final updatedSession = await repository.getTrainingSessionById(sessionId);
+        final updatedSession = await repository.getTrainingSessionById(
+          sessionId,
+        );
         expect(updatedSession!.status, equals(TrainingStatus.completed));
       });
 
@@ -319,7 +346,9 @@ void main() {
           title: 'Updated Title',
         );
 
-        final updatedSession = await repository.getTrainingSessionById(sessionId);
+        final updatedSession = await repository.getTrainingSessionById(
+          sessionId,
+        );
         expect(updatedSession!.title, equals('Updated Title'));
       });
 
@@ -332,7 +361,9 @@ void main() {
           description: 'New description',
         );
 
-        final updatedSession = await repository.getTrainingSessionById(sessionId);
+        final updatedSession = await repository.getTrainingSessionById(
+          sessionId,
+        );
         expect(updatedSession!.description, equals('New description'));
       });
 
@@ -357,7 +388,9 @@ void main() {
           maxParticipants: 12,
         );
 
-        final updatedSession = await repository.getTrainingSessionById(sessionId);
+        final updatedSession = await repository.getTrainingSessionById(
+          sessionId,
+        );
         expect(updatedSession!.maxParticipants, equals(12));
       });
 
@@ -370,7 +403,9 @@ void main() {
           minParticipants: 4,
         );
 
-        final updatedSession = await repository.getTrainingSessionById(sessionId);
+        final updatedSession = await repository.getTrainingSessionById(
+          sessionId,
+        );
         expect(updatedSession!.minParticipants, equals(4));
       });
 
@@ -390,27 +425,37 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('createTrainingSession'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call<Map<String, dynamic>>(any()))
-            .thenAnswer((_) async => mockResult);
-        when(() => mockResult.data).thenReturn({'sessionId': 'new-session-123'});
+        when(
+          () => mockFunctions.httpsCallable('createTrainingSession'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call<Map<String, dynamic>>(any()),
+        ).thenAnswer((_) async => mockResult);
+        when(
+          () => mockResult.data,
+        ).thenReturn({'sessionId': 'new-session-123'});
 
         final testSession = createTestSession();
         final sessionId = await repository.createTrainingSession(testSession);
 
         expect(sessionId, equals('new-session-123'));
-        verify(() => mockFunctions.httpsCallable('createTrainingSession'))
-            .called(1);
+        verify(
+          () => mockFunctions.httpsCallable('createTrainingSession'),
+        ).called(1);
       });
 
       test('throws exception on unauthenticated error', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('createTrainingSession'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call<Map<String, dynamic>>(any()))
-            .thenThrow(FirebaseFunctionsException(code: 'unauthenticated', message: 'message'));
+        when(
+          () => mockFunctions.httpsCallable('createTrainingSession'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call<Map<String, dynamic>>(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'unauthenticated',
+            message: 'message',
+          ),
+        );
 
         final testSession = createTestSession();
 
@@ -432,25 +477,33 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('joinTrainingSession'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call<Map<String, dynamic>>(any()))
-            .thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('joinTrainingSession'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call<Map<String, dynamic>>(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({});
 
         await repository.joinTrainingSession('session-123');
 
-        verify(() => mockFunctions.httpsCallable('joinTrainingSession'))
-            .called(1);
+        verify(
+          () => mockFunctions.httpsCallable('joinTrainingSession'),
+        ).called(1);
       });
 
       test('throws exception on already joined error', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('joinTrainingSession'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call<Map<String, dynamic>>(any()))
-            .thenThrow(FirebaseFunctionsException(code: 'already-exists', message: 'message'));
+        when(
+          () => mockFunctions.httpsCallable('joinTrainingSession'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call<Map<String, dynamic>>(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'already-exists',
+            message: 'message',
+          ),
+        );
 
         expect(
           () => repository.joinTrainingSession('session-123'),
@@ -470,16 +523,19 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('leaveTrainingSession'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call<Map<String, dynamic>>(any()))
-            .thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('leaveTrainingSession'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call<Map<String, dynamic>>(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({});
 
         await repository.leaveTrainingSession('session-123');
 
-        verify(() => mockFunctions.httpsCallable('leaveTrainingSession'))
-            .called(1);
+        verify(
+          () => mockFunctions.httpsCallable('leaveTrainingSession'),
+        ).called(1);
       });
     });
 
@@ -488,25 +544,33 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('cancelTrainingSession'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call<Map<String, dynamic>>(any()))
-            .thenAnswer((_) async => mockResult);
+        when(
+          () => mockFunctions.httpsCallable('cancelTrainingSession'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call<Map<String, dynamic>>(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({});
 
         await repository.cancelTrainingSession('session-123');
 
-        verify(() => mockFunctions.httpsCallable('cancelTrainingSession'))
-            .called(1);
+        verify(
+          () => mockFunctions.httpsCallable('cancelTrainingSession'),
+        ).called(1);
       });
 
       test('throws exception on permission denied', () async {
         final mockCallable = MockHttpsCallable();
 
-        when(() => mockFunctions.httpsCallable('cancelTrainingSession'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call<Map<String, dynamic>>(any()))
-            .thenThrow(FirebaseFunctionsException(code: 'permission-denied', message: 'message'));
+        when(
+          () => mockFunctions.httpsCallable('cancelTrainingSession'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call<Map<String, dynamic>>(any())).thenThrow(
+          FirebaseFunctionsException(
+            code: 'permission-denied',
+            message: 'message',
+          ),
+        );
 
         expect(
           () => repository.cancelTrainingSession('session-123'),
@@ -526,16 +590,20 @@ void main() {
         final mockCallable = MockHttpsCallable();
         final mockResult = MockHttpsCallableResult<Map<String, dynamic>>();
 
-        when(() => mockFunctions.httpsCallable('generateRecurringTrainingSessions'))
-            .thenReturn(mockCallable);
-        when(() => mockCallable.call<Map<String, dynamic>>(any()))
-            .thenAnswer((_) async => mockResult);
+        when(
+          () =>
+              mockFunctions.httpsCallable('generateRecurringTrainingSessions'),
+        ).thenReturn(mockCallable);
+        when(
+          () => mockCallable.call<Map<String, dynamic>>(any()),
+        ).thenAnswer((_) async => mockResult);
         when(() => mockResult.data).thenReturn({
-          'sessionIds': ['session-1', 'session-2', 'session-3']
+          'sessionIds': ['session-1', 'session-2', 'session-3'],
         });
 
-        final sessionIds =
-            await repository.generateRecurringInstances('parent-session');
+        final sessionIds = await repository.generateRecurringInstances(
+          'parent-session',
+        );
 
         expect(sessionIds, hasLength(3));
         expect(sessionIds, contains('session-1'));

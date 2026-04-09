@@ -24,12 +24,13 @@ class PartnerDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => PartnerDetailBloc(
-        userRepository: sl<UserRepository>(),
-      )..add(PartnerDetailEvent.loadPartnerDetails(
-          userId: userId,
-          partnerId: partnerId,
-        )),
+      create: (context) =>
+          PartnerDetailBloc(userRepository: sl<UserRepository>())..add(
+            PartnerDetailEvent.loadPartnerDetails(
+              userId: userId,
+              partnerId: partnerId,
+            ),
+          ),
       child: Scaffold(
         appBar: PlayWithMeAppBar.build(
           context: context,
@@ -40,12 +41,17 @@ class PartnerDetailPage extends StatelessWidget {
             return state.when(
               initial: () => const SizedBox.shrink(),
               loading: () => const Center(child: CircularProgressIndicator()),
-              loaded: (stats, partner) => _buildLoadedView(context, stats, partner),
+              loaded: (stats, partner) =>
+                  _buildLoadedView(context, stats, partner),
               error: (message) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     Text(message, textAlign: TextAlign.center),
                   ],
@@ -102,10 +108,15 @@ class PartnerDetailPage extends StatelessWidget {
             CircleAvatar(
               radius: 40,
               backgroundColor: theme.colorScheme.primaryContainer,
-              backgroundImage:
-                  partner.photoUrl != null ? NetworkImage(partner.photoUrl!) : null,
+              backgroundImage: partner.photoUrl != null
+                  ? NetworkImage(partner.photoUrl!)
+                  : null,
               child: partner.photoUrl == null
-                  ? Icon(Icons.person, size: 40, color: theme.colorScheme.onPrimaryContainer)
+                  ? Icon(
+                      Icons.person,
+                      size: 40,
+                      color: theme.colorScheme.onPrimaryContainer,
+                    )
                   : null,
             ),
             const SizedBox(width: 16),
@@ -123,7 +134,9 @@ class PartnerDetailPage extends StatelessWidget {
                     Text(
                       partner.email,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                 ],
@@ -181,7 +194,10 @@ class PartnerDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPointDifferentialCard(BuildContext context, TeammateStats stats) {
+  Widget _buildPointDifferentialCard(
+    BuildContext context,
+    TeammateStats stats,
+  ) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final avgDiff = stats.avgPointDifferential;
@@ -293,7 +309,10 @@ class PartnerDetailPage extends StatelessWidget {
                 ),
                 if (stats.currentStreak.abs() > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: stats.isOnWinningStreak
                           ? Colors.green.withValues(alpha: 0.1)
@@ -305,7 +324,9 @@ class PartnerDetailPage extends StatelessWidget {
                           ? l10n.streakWins(stats.currentStreak.abs())
                           : l10n.streakLosses(stats.currentStreak.abs()),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: stats.isOnWinningStreak ? Colors.green : Colors.red,
+                        color: stats.isOnWinningStreak
+                            ? Colors.green
+                            : Colors.red,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -340,10 +361,7 @@ class PartnerDetailPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: resultColor.withValues(alpha: 0.3),
-          width: 2,
-        ),
+        border: Border.all(color: resultColor.withValues(alpha: 0.3), width: 2),
       ),
       child: Row(
         children: [
@@ -381,14 +399,18 @@ class PartnerDetailPage extends StatelessWidget {
                     Text(
                       '(${game.formattedPointDifferential})',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  AppLocalizations.of(context)!.eloLabel(game.formattedEloChange),
+                  AppLocalizations.of(
+                    context,
+                  )!.eloLabel(game.formattedEloChange),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: game.eloChange >= 0 ? Colors.green : Colors.red,
                   ),

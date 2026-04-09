@@ -56,26 +56,18 @@ class HomeStatsSection extends StatelessWidget {
           // Row 1: ELO + Win Rate side-by-side
           Row(
             children: [
-              Expanded(
-                child: _buildEloCard(context, l10n, trendData),
-              ),
+              Expanded(child: _buildEloCard(context, l10n, trendData)),
               const SizedBox(width: 15),
-              Expanded(
-                child: _buildWinRateCard(context, l10n),
-              ),
+              Expanded(child: _buildWinRateCard(context, l10n)),
             ],
           ),
           const SizedBox(height: 15),
           // Row 2: Streak + Games Played side-by-side
           Row(
             children: [
-              Expanded(
-                child: _buildStreakCard(context, l10n, hasStreak),
-              ),
+              Expanded(child: _buildStreakCard(context, l10n, hasStreak)),
               const SizedBox(width: 15),
-              Expanded(
-                child: _buildGamesPlayedCard(context, l10n),
-              ),
+              Expanded(child: _buildGamesPlayedCard(context, l10n)),
             ],
           ),
         ],
@@ -95,10 +87,7 @@ class HomeStatsSection extends StatelessWidget {
         children: [
           Text(
             l10n.eloRatingLabel,
-            style: const TextStyle(
-              fontSize: 12,
-              color: _kTextMuted,
-            ),
+            style: const TextStyle(fontSize: 12, color: _kTextMuted),
           ),
           const SizedBox(height: 8),
           Text(
@@ -137,10 +126,7 @@ class HomeStatsSection extends StatelessWidget {
               padding: const EdgeInsets.only(top: 5),
               child: Text(
                 l10n.noGamesPlayedYet,
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: _kTextMuted,
-                ),
+                style: const TextStyle(fontSize: 10, color: _kTextMuted),
               ),
             ),
         ],
@@ -148,10 +134,7 @@ class HomeStatsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildWinRateCard(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildWinRateCard(BuildContext context, AppLocalizations l10n) {
     return _StatsCard(
       child: Row(
         children: [
@@ -171,18 +154,12 @@ class HomeStatsSection extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   l10n.winRate,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: _kTextMuted,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: _kTextMuted),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   l10n.winsLosses(user.gamesWon, user.gamesLost),
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: _kTextMuted,
-                  ),
+                  style: const TextStyle(fontSize: 10, color: _kTextMuted),
                 ),
               ],
             ),
@@ -201,15 +178,10 @@ class HomeStatsSection extends StatelessWidget {
                     value: user.winRate,
                     strokeWidth: 6,
                     backgroundColor: const Color(0xFFEEEEEE),
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(_kPrimary),
+                    valueColor: const AlwaysStoppedAnimation<Color>(_kPrimary),
                   ),
                 ),
-                const Icon(
-                  Icons.emoji_events,
-                  size: 16,
-                  color: _kPrimary,
-                ),
+                const Icon(Icons.emoji_events, size: 16, color: _kPrimary),
               ],
             ),
           ),
@@ -233,10 +205,7 @@ class HomeStatsSection extends StatelessWidget {
         children: [
           Text(
             l10n.streakLabel,
-            style: const TextStyle(
-              fontSize: 12,
-              color: _kTextMuted,
-            ),
+            style: const TextStyle(fontSize: 12, color: _kTextMuted),
           ),
           const SizedBox(height: 8),
           if (hasStreak)
@@ -264,10 +233,7 @@ class HomeStatsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildGamesPlayedCard(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
+  Widget _buildGamesPlayedCard(BuildContext context, AppLocalizations l10n) {
     return _StatsCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,10 +241,7 @@ class HomeStatsSection extends StatelessWidget {
         children: [
           Text(
             l10n.gamesPlayed,
-            style: const TextStyle(
-              fontSize: 12,
-              color: _kTextMuted,
-            ),
+            style: const TextStyle(fontSize: 12, color: _kTextMuted),
           ),
           const SizedBox(height: 8),
           Row(
@@ -338,11 +301,7 @@ class _StatsCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(
-              color: _kShadow,
-              blurRadius: 20,
-              offset: Offset(0, 8),
-            ),
+            BoxShadow(color: _kShadow, blurRadius: 20, offset: Offset(0, 8)),
           ],
         ),
         padding: const EdgeInsets.all(16),

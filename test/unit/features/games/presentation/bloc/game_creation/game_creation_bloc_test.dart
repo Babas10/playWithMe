@@ -29,10 +29,12 @@ void main() {
   setUp(() {
     mockGameRepository = MockGameRepository();
     mockAnalytics = MockFirebaseAnalytics();
-    when(() => mockAnalytics.logEvent(
-          name: any(named: 'name'),
-          parameters: any(named: 'parameters'),
-        )).thenAnswer((_) async {});
+    when(
+      () => mockAnalytics.logEvent(
+        name: any(named: 'name'),
+        parameters: any(named: 'parameters'),
+      ),
+    ).thenAnswer((_) async {});
     gameCreationBloc = GameCreationBloc(
       gameRepository: mockGameRepository,
       analytics: mockAnalytics,
@@ -52,10 +54,9 @@ void main() {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationFormState with selected group and validation errors for other fields',
         build: () => gameCreationBloc,
-        act: (bloc) => bloc.add(const SelectGroup(
-          groupId: 'group1',
-          groupName: 'Test Group',
-        )),
+        act: (bloc) => bloc.add(
+          const SelectGroup(groupId: 'group1', groupName: 'Test Group'),
+        ),
         expect: () => [
           const GameCreationFormState(
             groupId: 'group1',
@@ -68,35 +69,35 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockAnalytics.logEvent(name: 'create_game_started')).called(1);
+          verify(
+            () => mockAnalytics.logEvent(name: 'create_game_started'),
+          ).called(1);
         },
       );
 
       blocTest<GameCreationBloc, GameCreationState>(
         'does not log create_game_started when state is not initial (re-selection)',
         build: () => gameCreationBloc,
-        seed: () => const GameCreationFormState(
-          groupError: 'Please select a group',
+        seed: () =>
+            const GameCreationFormState(groupError: 'Please select a group'),
+        act: (bloc) => bloc.add(
+          const SelectGroup(groupId: 'group1', groupName: 'Test Group'),
         ),
-        act: (bloc) => bloc.add(const SelectGroup(
-          groupId: 'group1',
-          groupName: 'Test Group',
-        )),
         verify: (_) {
-          verifyNever(() => mockAnalytics.logEvent(name: 'create_game_started'));
+          verifyNever(
+            () => mockAnalytics.logEvent(name: 'create_game_started'),
+          );
         },
       );
 
       blocTest<GameCreationBloc, GameCreationState>(
         'clears groupError when group is selected',
         build: () => gameCreationBloc,
-        seed: () => const GameCreationFormState(
-          groupError: 'Please select a group',
+        seed: () =>
+            const GameCreationFormState(groupError: 'Please select a group'),
+        act: (bloc) => bloc.add(
+          const SelectGroup(groupId: 'group1', groupName: 'Test Group'),
         ),
-        act: (bloc) => bloc.add(const SelectGroup(
-          groupId: 'group1',
-          groupName: 'Test Group',
-        )),
         expect: () => [
           const GameCreationFormState(
             groupId: 'group1',
@@ -154,10 +155,12 @@ void main() {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationFormState with location and validation errors for other fields',
         build: () => gameCreationBloc,
-        act: (bloc) => bloc.add(const SetLocation(
-          locationName: 'Venice Beach',
-          address: '123 Beach Blvd',
-        )),
+        act: (bloc) => bloc.add(
+          const SetLocation(
+            locationName: 'Venice Beach',
+            address: '123 Beach Blvd',
+          ),
+        ),
         expect: () => [
           const GameCreationFormState(
             locationName: 'Venice Beach',
@@ -174,9 +177,8 @@ void main() {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationFormState with location without address',
         build: () => gameCreationBloc,
-        act: (bloc) => bloc.add(const SetLocation(
-          locationName: 'Venice Beach',
-        )),
+        act: (bloc) =>
+            bloc.add(const SetLocation(locationName: 'Venice Beach')),
         expect: () => [
           const GameCreationFormState(
             locationName: 'Venice Beach',
@@ -212,9 +214,9 @@ void main() {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationFormState with description (no validation)',
         build: () => gameCreationBloc,
-        act: (bloc) => bloc.add(const SetDescription(
-          description: 'Casual beach volleyball game',
-        )),
+        act: (bloc) => bloc.add(
+          const SetDescription(description: 'Casual beach volleyball game'),
+        ),
         expect: () => [
           const GameCreationFormState(
             description: 'Casual beach volleyball game',
@@ -271,9 +273,8 @@ void main() {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationFormState with gameType',
         build: () => gameCreationBloc,
-        act: (bloc) => bloc.add(const SetGameType(
-          gameType: GameType.beachVolleyball,
-        )),
+        act: (bloc) =>
+            bloc.add(const SetGameType(gameType: GameType.beachVolleyball)),
         expect: () => [
           const GameCreationFormState(
             gameType: GameType.beachVolleyball,
@@ -287,9 +288,9 @@ void main() {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationFormState with skillLevel',
         build: () => gameCreationBloc,
-        act: (bloc) => bloc.add(const SetSkillLevel(
-          skillLevel: GameSkillLevel.intermediate,
-        )),
+        act: (bloc) => bloc.add(
+          const SetSkillLevel(skillLevel: GameSkillLevel.intermediate),
+        ),
         expect: () => [
           const GameCreationFormState(
             skillLevel: GameSkillLevel.intermediate,
@@ -407,7 +408,11 @@ void main() {
           isA<GameCreationFormState>()
               .having((s) => s.groupId, 'groupId', 'group1')
               .having((s) => s.groupName, 'groupName', 'Test Group')
-              .having((s) => s.dateTimeError, 'dateTimeError', 'Game date must be in the future')
+              .having(
+                (s) => s.dateTimeError,
+                'dateTimeError',
+                'Game date must be in the future',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -460,7 +465,8 @@ void main() {
             title: 'Beach Volleyball',
             minPlayers: 4,
             maxPlayers: 2,
-            playersError: 'Maximum players must be greater than or equal to minimum players',
+            playersError:
+                'Maximum players must be greater than or equal to minimum players',
             isValid: false,
           ),
         ],
@@ -499,9 +505,9 @@ void main() {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationSubmitting and GameCreationSuccess when form is valid',
         build: () {
-          when(() => mockGameRepository.createGame(any())).thenAnswer(
-            (_) async => 'game123',
-          );
+          when(
+            () => mockGameRepository.createGame(any()),
+          ).thenAnswer((_) async => 'game123');
           return gameCreationBloc;
         },
         seed: () => GameCreationFormState(
@@ -523,10 +529,22 @@ void main() {
           const GameCreationSubmitting(),
           isA<GameCreationSuccess>()
               .having((s) => s.gameId, 'gameId', equals('game123'))
-              .having((s) => s.game.title, 'game.title', equals('Beach Volleyball'))
+              .having(
+                (s) => s.game.title,
+                'game.title',
+                equals('Beach Volleyball'),
+              )
               .having((s) => s.game.groupId, 'game.groupId', equals('group1'))
-              .having((s) => s.game.createdBy, 'game.createdBy', equals('user123'))
-              .having((s) => s.game.playerIds, 'game.playerIds', contains('user123')),
+              .having(
+                (s) => s.game.createdBy,
+                'game.createdBy',
+                equals('user123'),
+              )
+              .having(
+                (s) => s.game.playerIds,
+                'game.playerIds',
+                contains('user123'),
+              ),
         ],
         verify: (_) {
           verify(() => mockGameRepository.createGame(any())).called(1);
@@ -555,9 +573,9 @@ void main() {
       blocTest<GameCreationBloc, GameCreationState>(
         'emits GameCreationError when repository throws exception',
         build: () {
-          when(() => mockGameRepository.createGame(any())).thenThrow(
-            Exception('Failed to create game'),
-          );
+          when(
+            () => mockGameRepository.createGame(any()),
+          ).thenThrow(Exception('Failed to create game'));
           return gameCreationBloc;
         },
         seed: () => GameCreationFormState(
@@ -572,8 +590,16 @@ void main() {
         expect: () => [
           const GameCreationSubmitting(),
           isA<GameCreationError>()
-              .having((s) => s.message, 'message', contains('Failed to create game'))
-              .having((s) => s.errorCode, 'errorCode', equals('CREATE_GAME_ERROR')),
+              .having(
+                (s) => s.message,
+                'message',
+                contains('Failed to create game'),
+              )
+              .having(
+                (s) => s.errorCode,
+                'errorCode',
+                equals('CREATE_GAME_ERROR'),
+              ),
         ],
       );
     });
@@ -590,9 +616,7 @@ void main() {
           title: 'Beach Volleyball',
         ),
         act: (bloc) => bloc.add(const ResetForm()),
-        expect: () => [
-          const GameCreationFormState(),
-        ],
+        expect: () => [const GameCreationFormState()],
       );
     });
   });

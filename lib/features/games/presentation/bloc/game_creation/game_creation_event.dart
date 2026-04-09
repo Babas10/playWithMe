@@ -12,10 +12,7 @@ class SelectGroup extends GameCreationEvent {
   final String groupId;
   final String groupName;
 
-  const SelectGroup({
-    required this.groupId,
-    required this.groupName,
-  });
+  const SelectGroup({required this.groupId, required this.groupName});
 
   @override
   List<Object?> get props => [groupId, groupName];
@@ -36,10 +33,7 @@ class SetLocation extends GameCreationEvent {
   final String locationName;
   final String? address;
 
-  const SetLocation({
-    required this.locationName,
-    this.address,
-  });
+  const SetLocation({required this.locationName, this.address});
 
   @override
   List<Object?> get props => [locationName, address];

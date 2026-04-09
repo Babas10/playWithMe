@@ -47,27 +47,20 @@ class EmailVerificationPage extends StatelessWidget {
               child: state.when(
                 initial: () => const Center(child: CircularProgressIndicator()),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                verified: (verifiedAt) => _buildVerifiedState(context, verifiedAt),
-                pending: (email, emailSent, lastSentAt, cooldown) => _buildPendingState(
-                  context,
-                  email,
-                  emailSent,
-                  lastSentAt,
-                  cooldown,
-                ),
-                error: (message, email, wasVerified) => _buildErrorState(
-                  context,
-                  message,
-                  email,
-                  wasVerified,
-                ),
-                emailSent: (email, sentAt, cooldown) => _buildPendingState(
-                  context,
-                  email,
-                  true,
-                  sentAt,
-                  cooldown,
-                ),
+                verified: (verifiedAt) =>
+                    _buildVerifiedState(context, verifiedAt),
+                pending: (email, emailSent, lastSentAt, cooldown) =>
+                    _buildPendingState(
+                      context,
+                      email,
+                      emailSent,
+                      lastSentAt,
+                      cooldown,
+                    ),
+                error: (message, email, wasVerified) =>
+                    _buildErrorState(context, message, email, wasVerified),
+                emailSent: (email, sentAt, cooldown) =>
+                    _buildPendingState(context, email, true, sentAt, cooldown),
               ),
             ),
           );
@@ -232,8 +225,8 @@ class EmailVerificationPage extends StatelessWidget {
             FilledButton.icon(
               onPressed: () {
                 context.read<EmailVerificationBloc>().add(
-                      const EmailVerificationEvent.sendVerificationEmail(),
-                    );
+                  const EmailVerificationEvent.sendVerificationEmail(),
+                );
               },
               icon: const Icon(Icons.send),
               label: const Text('Send Verification Email'),
@@ -242,8 +235,8 @@ class EmailVerificationPage extends StatelessWidget {
             FilledButton.icon(
               onPressed: () {
                 context.read<EmailVerificationBloc>().add(
-                      const EmailVerificationEvent.refreshStatus(),
-                    );
+                  const EmailVerificationEvent.refreshStatus(),
+                );
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Refresh Status'),
@@ -254,8 +247,8 @@ class EmailVerificationPage extends StatelessWidget {
                   ? null
                   : () {
                       context.read<EmailVerificationBloc>().add(
-                            const EmailVerificationEvent.sendVerificationEmail(),
-                          );
+                        const EmailVerificationEvent.sendVerificationEmail(),
+                      );
                     },
               icon: const Icon(Icons.forward_to_inbox),
               label: Text(
@@ -284,11 +277,7 @@ class EmailVerificationPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 80,
-            color: theme.colorScheme.error,
-          ),
+          Icon(Icons.error_outline, size: 80, color: theme.colorScheme.error),
           const SizedBox(height: 24),
           Text(
             'Something Went Wrong',
@@ -316,8 +305,8 @@ class EmailVerificationPage extends StatelessWidget {
           FilledButton.icon(
             onPressed: () {
               context.read<EmailVerificationBloc>().add(
-                    const EmailVerificationEvent.checkStatus(),
-                  );
+                const EmailVerificationEvent.checkStatus(),
+              );
             },
             icon: const Icon(Icons.refresh),
             label: const Text('Try Again'),
@@ -345,10 +334,7 @@ class EmailVerificationPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant,
-          width: 1,
-        ),
+        border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,11 +345,7 @@ class EmailVerificationPage extends StatelessWidget {
               color: theme.colorScheme.primaryContainer,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              size: 24,
-              color: theme.colorScheme.primary,
-            ),
+            child: Icon(icon, size: 24, color: theme.colorScheme.primary),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -401,20 +383,14 @@ class EmailVerificationPage extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      leading: Icon(
-        Icons.help_outline,
-        color: theme.colorScheme.primary,
-      ),
+      leading: Icon(Icons.help_outline, color: theme.colorScheme.primary),
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTroubleshootingTip(
-                context,
-                'Check your spam/junk folder',
-              ),
+              _buildTroubleshootingTip(context, 'Check your spam/junk folder'),
               _buildTroubleshootingTip(
                 context,
                 'Make sure the email address is correct',
@@ -462,12 +438,7 @@ class EmailVerificationPage extends StatelessWidget {
             color: theme.colorScheme.primary,
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              tip,
-              style: theme.textTheme.bodySmall,
-            ),
-          ),
+          Expanded(child: Text(tip, style: theme.textTheme.bodySmall)),
         ],
       ),
     );
@@ -486,7 +457,7 @@ class EmailVerificationPage extends StatelessWidget {
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }

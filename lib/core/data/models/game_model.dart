@@ -74,28 +74,37 @@ class GameModel with _$GameModel {
     final jsonData = Map<String, dynamic>.from(data);
 
     if (data['createdAt'] is Timestamp) {
-      jsonData['createdAt'] = (data['createdAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['createdAt'] = (data['createdAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['scheduledAt'] is Timestamp) {
-      jsonData['scheduledAt'] = (data['scheduledAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['scheduledAt'] = (data['scheduledAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['updatedAt'] is Timestamp) {
-      jsonData['updatedAt'] = (data['updatedAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['updatedAt'] = (data['updatedAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['startedAt'] is Timestamp) {
-      jsonData['startedAt'] = (data['startedAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['startedAt'] = (data['startedAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['endedAt'] is Timestamp) {
-      jsonData['endedAt'] = (data['endedAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['endedAt'] = (data['endedAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['completedAt'] is Timestamp) {
-      jsonData['completedAt'] = (data['completedAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['completedAt'] = (data['completedAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
 
-    return GameModel.fromJson({
-      ...jsonData,
-      'id': doc.id,
-    });
+    return GameModel.fromJson({...jsonData, 'id': doc.id});
   }
 
   /// Convert to Firestore-compatible map (excludes id since it's the document ID)
@@ -201,8 +210,8 @@ class GameModel with _$GameModel {
     final now = DateTime.now();
     final gameDate = scheduledAt;
     return now.year == gameDate.year &&
-           now.month == gameDate.month &&
-           now.day == gameDate.day;
+        now.month == gameDate.month &&
+        now.day == gameDate.day;
   }
 
   /// Check if game is this week
@@ -232,7 +241,7 @@ class GameModel with _$GameModel {
   /// Check if user can leave the game
   bool canUserLeave(String userId) {
     return (isPlayer(userId) || isOnWaitlist(userId)) &&
-           status == GameStatus.scheduled;
+        status == GameStatus.scheduled;
   }
 
   /// Check if user can enter/record results for the game
@@ -244,16 +253,17 @@ class GameModel with _$GameModel {
     final isCancelled = status == GameStatus.cancelled;
     final isVerification = status == GameStatus.verification;
 
-    final isReady = status == GameStatus.completed ||
-                    status == GameStatus.inProgress ||
-                    isPast;
+    final isReady =
+        status == GameStatus.completed ||
+        status == GameStatus.inProgress ||
+        isPast;
 
     return isParticipant &&
-           !isCancelled &&
-           !isVerification &&
-           !hasExistingResult &&
-           isReady &&
-           hasMinimumPlayers;
+        !isCancelled &&
+        !isVerification &&
+        !hasExistingResult &&
+        isReady &&
+        hasMinimumPlayers;
   }
 
   /// Validation methods
@@ -383,18 +393,12 @@ class GameModel with _$GameModel {
   /// Cancel the game
   GameModel cancelGame() {
     if (status == GameStatus.completed) return this;
-    return copyWith(
-      status: GameStatus.cancelled,
-      updatedAt: DateTime.now(),
-    );
+    return copyWith(status: GameStatus.cancelled, updatedAt: DateTime.now());
   }
 
   /// Update scores
   GameModel updateScores(List<GameScore> newScores) {
-    return copyWith(
-      scores: newScores,
-      updatedAt: DateTime.now(),
-    );
+    return copyWith(scores: newScores, updatedAt: DateTime.now());
   }
 
   /// Get formatted time until game
@@ -441,7 +445,9 @@ class GameTeams with _$GameTeams {
   /// Get list of unassigned players
   List<String> getUnassignedPlayers(List<String> allPlayerIds) {
     final assignedPlayers = {...teamAPlayerIds, ...teamBPlayerIds};
-    return allPlayerIds.where((playerId) => !assignedPlayers.contains(playerId)).toList();
+    return allPlayerIds
+        .where((playerId) => !assignedPlayers.contains(playerId))
+        .toList();
   }
 
   /// Check if teams are valid (no duplicates, all players assigned)
@@ -527,7 +533,9 @@ class IndividualGame with _$IndividualGame {
     required int gameNumber, // 1, 2, 3, etc. within the session
     @SetScoreListConverter() required List<SetScore> sets,
     required String winner, // 'teamA' or 'teamB'
-    @GameTeamsConverter() GameTeams? teams, // per-game teams override; null means use session-level GameModel.teams
+    @GameTeamsConverter()
+    GameTeams?
+    teams, // per-game teams override; null means use session-level GameModel.teams
   }) = _IndividualGame;
 
   const IndividualGame._();
@@ -738,12 +746,15 @@ class TimestampConverter implements JsonConverter<DateTime?, Object?> {
 }
 
 /// Custom converter for List&lt;SetScore&gt; to handle proper JSON serialization
-class SetScoreListConverter implements JsonConverter<List<SetScore>, List<dynamic>> {
+class SetScoreListConverter
+    implements JsonConverter<List<SetScore>, List<dynamic>> {
   const SetScoreListConverter();
 
   @override
   List<SetScore> fromJson(List<dynamic> json) {
-    return json.map((e) => SetScore.fromJson(e as Map<String, dynamic>)).toList();
+    return json
+        .map((e) => SetScore.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
@@ -753,7 +764,8 @@ class SetScoreListConverter implements JsonConverter<List<SetScore>, List<dynami
 }
 
 /// Custom converter for nullable GameTeams to ensure proper JSON serialization
-class GameTeamsConverter implements JsonConverter<GameTeams?, Map<String, dynamic>?> {
+class GameTeamsConverter
+    implements JsonConverter<GameTeams?, Map<String, dynamic>?> {
   const GameTeamsConverter();
 
   @override
@@ -767,12 +779,15 @@ class GameTeamsConverter implements JsonConverter<GameTeams?, Map<String, dynami
 }
 
 /// Custom converter for List&lt;IndividualGame&gt; to handle proper JSON serialization
-class IndividualGameListConverter implements JsonConverter<List<IndividualGame>, List<dynamic>> {
+class IndividualGameListConverter
+    implements JsonConverter<List<IndividualGame>, List<dynamic>> {
   const IndividualGameListConverter();
 
   @override
   List<IndividualGame> fromJson(List<dynamic> json) {
-    return json.map((e) => IndividualGame.fromJson(e as Map<String, dynamic>)).toList();
+    return json
+        .map((e) => IndividualGame.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override

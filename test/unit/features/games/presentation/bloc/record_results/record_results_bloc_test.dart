@@ -47,12 +47,17 @@ void main() {
             userRepository: mockUserRepository,
           );
         },
-        act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
+        act: (bloc) =>
+            bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
         expect: () => [
           const RecordResultsLoading(),
           isA<RecordResultsLoaded>()
               .having((state) => state.game.id, 'game id', 'test-game-123')
-              .having((state) => state.unassignedPlayerIds.length, 'unassigned count', 2),
+              .having(
+                (state) => state.unassignedPlayerIds.length,
+                'unassigned count',
+                2,
+              ),
         ],
       );
 
@@ -62,7 +67,8 @@ void main() {
           gameRepository: mockGameRepository,
           userRepository: mockUserRepository,
         ),
-        act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'non-existent')),
+        act: (bloc) =>
+            bloc.add(const LoadGameForResults(gameId: 'non-existent')),
         expect: () => [
           const RecordResultsLoading(),
           const RecordResultsError(message: 'Game not found'),
@@ -78,7 +84,8 @@ void main() {
             userRepository: mockUserRepository,
           );
         },
-        act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
+        act: (bloc) =>
+            bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
         expect: () => [
           const RecordResultsLoading(),
           isA<RecordResultsLoaded>(),
@@ -102,13 +109,22 @@ void main() {
             userRepository: mockUserRepository,
           );
         },
-        act: (bloc) => bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
+        act: (bloc) =>
+            bloc.add(const LoadGameForResults(gameId: 'test-game-123')),
         expect: () => [
           const RecordResultsLoading(),
           isA<RecordResultsLoaded>()
-              .having((state) => state.teamAPlayerIds, 'team A', ['test-uid-123'])
-              .having((state) => state.teamBPlayerIds, 'team B', ['user-uid-789'])
-              .having((state) => state.unassignedPlayerIds, 'unassigned', isEmpty),
+              .having((state) => state.teamAPlayerIds, 'team A', [
+                'test-uid-123',
+              ])
+              .having((state) => state.teamBPlayerIds, 'team B', [
+                'user-uid-789',
+              ])
+              .having(
+                (state) => state.unassignedPlayerIds,
+                'unassigned',
+                isEmpty,
+              ),
         ],
       );
     });
@@ -130,7 +146,9 @@ void main() {
         expect: () => [
           isA<RecordResultsLoaded>()
               .having((state) => state.teamAPlayerIds, 'team A', ['player1'])
-              .having((state) => state.unassignedPlayerIds, 'unassigned', ['player2']),
+              .having((state) => state.unassignedPlayerIds, 'unassigned', [
+                'player2',
+              ]),
         ],
       );
 
@@ -172,7 +190,9 @@ void main() {
         expect: () => [
           isA<RecordResultsLoaded>()
               .having((state) => state.teamBPlayerIds, 'team B', ['player1'])
-              .having((state) => state.unassignedPlayerIds, 'unassigned', ['player2']),
+              .having((state) => state.unassignedPlayerIds, 'unassigned', [
+                'player2',
+              ]),
         ],
       );
 
@@ -210,11 +230,14 @@ void main() {
           teamBPlayerIds: const [],
           unassignedPlayerIds: const [],
         ),
-        act: (bloc) => bloc.add(const RemovePlayerFromTeam(playerId: 'player1')),
+        act: (bloc) =>
+            bloc.add(const RemovePlayerFromTeam(playerId: 'player1')),
         expect: () => [
           isA<RecordResultsLoaded>()
               .having((state) => state.teamAPlayerIds, 'team A', ['player2'])
-              .having((state) => state.unassignedPlayerIds, 'unassigned', ['player1']),
+              .having((state) => state.unassignedPlayerIds, 'unassigned', [
+                'player1',
+              ]),
         ],
       );
 
@@ -230,11 +253,14 @@ void main() {
           teamBPlayerIds: const ['player1', 'player2'],
           unassignedPlayerIds: const [],
         ),
-        act: (bloc) => bloc.add(const RemovePlayerFromTeam(playerId: 'player1')),
+        act: (bloc) =>
+            bloc.add(const RemovePlayerFromTeam(playerId: 'player1')),
         expect: () => [
           isA<RecordResultsLoaded>()
               .having((state) => state.teamBPlayerIds, 'team B', ['player2'])
-              .having((state) => state.unassignedPlayerIds, 'unassigned', ['player1']),
+              .having((state) => state.unassignedPlayerIds, 'unassigned', [
+                'player1',
+              ]),
         ],
       );
     });
@@ -263,10 +289,7 @@ void main() {
           unassignedPlayerIds: const [],
         ),
         act: (bloc) => bloc.add(const SaveTeams(userId: 'test-uid-123')),
-        expect: () => [
-          isA<RecordResultsSaving>(),
-          isA<RecordResultsSaved>(),
-        ],
+        expect: () => [isA<RecordResultsSaving>(), isA<RecordResultsSaved>()],
       );
 
       blocTest<RecordResultsBloc, RecordResultsState>(
@@ -283,7 +306,9 @@ void main() {
         ),
         act: (bloc) => bloc.add(const SaveTeams(userId: 'test-uid-123')),
         expect: () => [
-          const RecordResultsError(message: 'All players must be assigned to a team'),
+          const RecordResultsError(
+            message: 'All players must be assigned to a team',
+          ),
           isA<RecordResultsLoaded>(),
         ],
       );

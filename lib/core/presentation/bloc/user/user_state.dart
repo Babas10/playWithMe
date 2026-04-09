@@ -35,10 +35,7 @@ class UserUpdated extends UserState implements SuccessState {
   final UserModel user;
   final String message;
 
-  const UserUpdated({
-    required this.user,
-    required this.message,
-  });
+  const UserUpdated({required this.user, required this.message});
 
   @override
   List<Object?> get props => [user, message];

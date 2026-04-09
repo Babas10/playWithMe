@@ -12,7 +12,9 @@ class RouteGenerator {
     final routeName = settings.name;
 
     // Handle deep link routes: /invite/{token}
-    if (uri != null && uri.pathSegments.length == 2 && uri.pathSegments[0] == 'invite') {
+    if (uri != null &&
+        uri.pathSegments.length == 2 &&
+        uri.pathSegments[0] == 'invite') {
       // Deep link invite route — no dedicated page yet.
       // The DeepLinkBloc handles token extraction and storage.
       // For now, redirect to login page so auth flow can proceed.
@@ -38,10 +40,7 @@ class RouteGenerator {
     Widget page,
     RouteSettings settings,
   ) {
-    return MaterialPageRoute(
-      builder: (_) => page,
-      settings: settings,
-    );
+    return MaterialPageRoute(builder: (_) => page, settings: settings);
   }
 }
 
@@ -53,9 +52,7 @@ class _UnknownRoutePage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.pageNotFound)),
-      body: Center(
-        child: Text(l10n.pageNotFoundMessage),
-      ),
+      body: Center(child: Text(l10n.pageNotFoundMessage)),
     );
   }
 }

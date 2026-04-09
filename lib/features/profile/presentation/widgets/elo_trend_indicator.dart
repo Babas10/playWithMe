@@ -66,9 +66,7 @@ class ELOTrendIndicator extends StatelessWidget {
                         ? Icons.arrow_upward
                         : Icons.arrow_downward,
                     size: 16,
-                    color: trendData['isPositive']
-                        ? Colors.green
-                        : Colors.red,
+                    color: trendData['isPositive'] ? Colors.green : Colors.red,
                   ),
                   const SizedBox(width: 4),
                   // Delta

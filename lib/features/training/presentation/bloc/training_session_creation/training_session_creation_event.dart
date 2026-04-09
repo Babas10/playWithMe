@@ -12,10 +12,7 @@ class SelectTrainingGroup extends TrainingSessionCreationEvent {
   final String groupId;
   final String groupName;
 
-  const SelectTrainingGroup({
-    required this.groupId,
-    required this.groupName,
-  });
+  const SelectTrainingGroup({required this.groupId, required this.groupName});
 
   @override
   List<Object?> get props => [groupId, groupName];
@@ -46,10 +43,7 @@ class SetTrainingLocation extends TrainingSessionCreationEvent {
   final String locationName;
   final String? address;
 
-  const SetTrainingLocation({
-    required this.locationName,
-    this.address,
-  });
+  const SetTrainingLocation({required this.locationName, this.address});
 
   @override
   List<Object?> get props => [locationName, address];

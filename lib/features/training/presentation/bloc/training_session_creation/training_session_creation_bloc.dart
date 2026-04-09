@@ -15,8 +15,8 @@ class TrainingSessionCreationBloc
 
   TrainingSessionCreationBloc({
     required TrainingSessionRepository trainingSessionRepository,
-  })  : _trainingSessionRepository = trainingSessionRepository,
-        super(const TrainingSessionCreationInitial()) {
+  }) : _trainingSessionRepository = trainingSessionRepository,
+       super(const TrainingSessionCreationInitial()) {
     on<SelectTrainingGroup>(_onSelectTrainingGroup);
     on<SetStartTime>(_onSetStartTime);
     on<SetEndTime>(_onSetEndTime);
@@ -42,7 +42,9 @@ class TrainingSessionCreationBloc
   }
 
   void _onSelectTrainingGroup(
-      SelectTrainingGroup event, Emitter<TrainingSessionCreationState> emit) {
+    SelectTrainingGroup event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       groupId: event.groupId,
       groupName: event.groupName,
@@ -52,7 +54,9 @@ class TrainingSessionCreationBloc
   }
 
   void _onSetStartTime(
-      SetStartTime event, Emitter<TrainingSessionCreationState> emit) {
+    SetStartTime event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       startTime: event.startTime,
       startTimeError: null,
@@ -63,7 +67,9 @@ class TrainingSessionCreationBloc
   }
 
   void _onSetEndTime(
-      SetEndTime event, Emitter<TrainingSessionCreationState> emit) {
+    SetEndTime event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       endTime: event.endTime,
       endTimeError: null,
@@ -72,7 +78,9 @@ class TrainingSessionCreationBloc
   }
 
   void _onSetTrainingLocation(
-      SetTrainingLocation event, Emitter<TrainingSessionCreationState> emit) {
+    SetTrainingLocation event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       locationName: event.locationName,
       address: event.address,
@@ -82,7 +90,9 @@ class TrainingSessionCreationBloc
   }
 
   void _onSetTrainingTitle(
-      SetTrainingTitle event, Emitter<TrainingSessionCreationState> emit) {
+    SetTrainingTitle event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       title: event.title,
       titleError: null,
@@ -90,8 +100,10 @@ class TrainingSessionCreationBloc
     emit(_validateAndEmit(formState));
   }
 
-  void _onSetTrainingDescription(SetTrainingDescription event,
-      Emitter<TrainingSessionCreationState> emit) {
+  void _onSetTrainingDescription(
+    SetTrainingDescription event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       description: event.description,
     );
@@ -99,7 +111,9 @@ class TrainingSessionCreationBloc
   }
 
   void _onSetMaxParticipants(
-      SetMaxParticipants event, Emitter<TrainingSessionCreationState> emit) {
+    SetMaxParticipants event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       maxParticipants: event.maxParticipants,
       participantsError: null,
@@ -108,7 +122,9 @@ class TrainingSessionCreationBloc
   }
 
   void _onSetMinParticipants(
-      SetMinParticipants event, Emitter<TrainingSessionCreationState> emit) {
+    SetMinParticipants event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       minParticipants: event.minParticipants,
       participantsError: null,
@@ -117,16 +133,18 @@ class TrainingSessionCreationBloc
   }
 
   void _onSetSessionNotes(
-      SetSessionNotes event, Emitter<TrainingSessionCreationState> emit) {
-    final formState = _currentFormState.copyWith(
-      notes: event.notes,
-    );
+    SetSessionNotes event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
+    final formState = _currentFormState.copyWith(notes: event.notes);
     emit(formState);
   }
 
   // Story 15.2: Handle recurrence rule changes
   void _onSetRecurrenceRule(
-      SetRecurrenceRule event, Emitter<TrainingSessionCreationState> emit) {
+    SetRecurrenceRule event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     final formState = _currentFormState.copyWith(
       recurrenceRule: event.recurrenceRule,
       recurrenceError: null,
@@ -136,8 +154,10 @@ class TrainingSessionCreationBloc
   }
 
   // Story 15.2: Generate recurring training session instances
-  Future<void> _onGenerateRecurringInstances(GenerateRecurringInstances event,
-      Emitter<TrainingSessionCreationState> emit) async {
+  Future<void> _onGenerateRecurringInstances(
+    GenerateRecurringInstances event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) async {
     try {
       // Generate instances via repository (calls Cloud Function)
       await _trainingSessionRepository.generateRecurringInstances(
@@ -147,28 +167,37 @@ class TrainingSessionCreationBloc
       // Success is handled by the existing success state
       // The UI will navigate away automatically
     } on TrainingSessionException catch (e) {
-      emit(TrainingSessionCreationError(
-        message: 'Training session created, but failed to generate recurring instances: ${e.message}',
-        errorCode: e.code ?? 'GENERATE_INSTANCES_ERROR',
-      ));
+      emit(
+        TrainingSessionCreationError(
+          message:
+              'Training session created, but failed to generate recurring instances: ${e.message}',
+          errorCode: e.code ?? 'GENERATE_INSTANCES_ERROR',
+        ),
+      );
     } catch (e) {
       // If generation fails, we still created the parent session
       // Just log the error and allow the user to try again later
-      emit(TrainingSessionCreationError(
-        message:
-            'Training session created, but failed to generate recurring instances: ${e.toString()}',
-        errorCode: 'GENERATE_INSTANCES_ERROR',
-      ));
+      emit(
+        TrainingSessionCreationError(
+          message:
+              'Training session created, but failed to generate recurring instances: ${e.toString()}',
+          errorCode: 'GENERATE_INSTANCES_ERROR',
+        ),
+      );
     }
   }
 
-  void _onValidateTrainingForm(ValidateTrainingForm event,
-      Emitter<TrainingSessionCreationState> emit) {
+  void _onValidateTrainingForm(
+    ValidateTrainingForm event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     emit(_validateAndEmit(_currentFormState));
   }
 
-  Future<void> _onSubmitTrainingSession(SubmitTrainingSession event,
-      Emitter<TrainingSessionCreationState> emit) async {
+  Future<void> _onSubmitTrainingSession(
+    SubmitTrainingSession event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) async {
     final formState = _currentFormState;
 
     // Validate form
@@ -202,52 +231,66 @@ class TrainingSessionCreationBloc
       );
 
       // Create training session in repository
-      final sessionId =
-          await _trainingSessionRepository.createTrainingSession(session);
+      final sessionId = await _trainingSessionRepository.createTrainingSession(
+        session,
+      );
       final createdSession = session.copyWith(id: sessionId);
 
       // Story 15.2: If this is a recurring session, generate instances
       if (formState.recurrenceRule != null &&
           formState.recurrenceRule!.isRecurring) {
         try {
-          await _trainingSessionRepository.generateRecurringInstances(sessionId);
+          await _trainingSessionRepository.generateRecurringInstances(
+            sessionId,
+          );
         } catch (e) {
           // Instance generation failed, but parent session was created
           // Log error but don't fail the creation
-          emit(TrainingSessionCreationError(
-            message:
-                'Training session created, but failed to generate recurring instances. You can try again later.',
-            errorCode: 'GENERATE_INSTANCES_ERROR',
-          ));
+          emit(
+            TrainingSessionCreationError(
+              message:
+                  'Training session created, but failed to generate recurring instances. You can try again later.',
+              errorCode: 'GENERATE_INSTANCES_ERROR',
+            ),
+          );
           return;
         }
       }
 
-      emit(TrainingSessionCreationSuccess(
-        sessionId: sessionId,
-        session: createdSession,
-      ));
+      emit(
+        TrainingSessionCreationSuccess(
+          sessionId: sessionId,
+          session: createdSession,
+        ),
+      );
     } on TrainingSessionException catch (e) {
-      emit(TrainingSessionCreationError(
-        message: e.message,
-        errorCode: e.code ?? 'CREATE_SESSION_ERROR',
-      ));
+      emit(
+        TrainingSessionCreationError(
+          message: e.message,
+          errorCode: e.code ?? 'CREATE_SESSION_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(TrainingSessionCreationError(
-        message: 'Failed to create training session: ${e.toString()}',
-        errorCode: 'CREATE_SESSION_ERROR',
-      ));
+      emit(
+        TrainingSessionCreationError(
+          message: 'Failed to create training session: ${e.toString()}',
+          errorCode: 'CREATE_SESSION_ERROR',
+        ),
+      );
     }
   }
 
   void _onResetTrainingForm(
-      ResetTrainingForm event, Emitter<TrainingSessionCreationState> emit) {
+    ResetTrainingForm event,
+    Emitter<TrainingSessionCreationState> emit,
+  ) {
     emit(const TrainingSessionCreationFormState());
   }
 
   /// Validates the form and returns a new state with validation errors
   TrainingSessionCreationFormState _validateForm(
-      TrainingSessionCreationFormState formState) {
+    TrainingSessionCreationFormState formState,
+  ) {
     String? groupError;
     String? startTimeError;
     String? endTimeError;
@@ -312,7 +355,8 @@ class TrainingSessionCreationBloc
       }
     }
 
-    final isValid = groupError == null &&
+    final isValid =
+        groupError == null &&
         startTimeError == null &&
         endTimeError == null &&
         locationError == null &&
@@ -334,7 +378,8 @@ class TrainingSessionCreationBloc
 
   /// Helper method to validate and emit state
   TrainingSessionCreationFormState _validateAndEmit(
-      TrainingSessionCreationFormState formState) {
+    TrainingSessionCreationFormState formState,
+  ) {
     return _validateForm(formState);
   }
 }

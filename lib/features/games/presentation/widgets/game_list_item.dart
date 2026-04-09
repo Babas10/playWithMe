@@ -24,7 +24,8 @@ class GameListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCompletedWithResult = game.status == GameStatus.completed && game.result != null;
+    final isCompletedWithResult =
+        game.status == GameStatus.completed && game.result != null;
     final isCancelled = game.status == GameStatus.cancelled;
     final isVerification = game.status == GameStatus.verification;
 
@@ -54,14 +55,14 @@ class GameListItem extends StatelessWidget {
                     child: Text(
                       game.title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: isCancelled
-                                ? Theme.of(context).colorScheme.onSurfaceVariant
-                                : AppColors.secondary,
-                            decoration: isCancelled
-                                ? TextDecoration.lineThrough
-                                : null,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: isCancelled
+                            ? Theme.of(context).colorScheme.onSurfaceVariant
+                            : AppColors.secondary,
+                        decoration: isCancelled
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
                     ),
                   ),
                   if (game.gameGenderType == GameGenderType.mix) ...[
@@ -69,10 +70,7 @@ class GameListItem extends StatelessWidget {
                     const SizedBox(width: 6),
                   ],
                   if (isCompletedWithResult)
-                    GameResultBadge(
-                      result: game.result!,
-                      teams: game.teams,
-                    )
+                    GameResultBadge(result: game.result!, teams: game.teams)
                   else if (isVerification)
                     _buildVerificationBadge(context)
                   else if (isCancelled)
@@ -112,9 +110,11 @@ class GameListItem extends StatelessWidget {
 
   Color? _getCardBackgroundColor(BuildContext context) {
     if (game.status == GameStatus.cancelled) {
-      return Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
+      return Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
     }
-    
+
     switch (game.status) {
       case GameStatus.verification:
         return AppColors.primary.withValues(alpha: 0.1);
@@ -127,23 +127,24 @@ class GameListItem extends StatelessWidget {
     }
   }
 
-  Widget _buildInfoRow(BuildContext context, IconData icon, String text, Color iconColor) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    IconData icon,
+    String text,
+    Color iconColor,
+  ) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: iconColor,
-        ),
+        Icon(icon, size: 16, color: iconColor),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isPast
-                      ? Theme.of(context).colorScheme.onSurfaceVariant
-                      : null,
-                ),
+              color: isPast
+                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                  : null,
+            ),
           ),
         ),
       ],
@@ -283,18 +284,18 @@ class GameListItem extends StatelessWidget {
                   Text(
                     '${game.currentPlayerCount}/${game.maxPlayers} players',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isPast
-                              ? Theme.of(context).colorScheme.onSurfaceVariant
-                              : Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      color: isPast
+                          ? Theme.of(context).colorScheme.onSurfaceVariant
+                          : Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   if (game.waitlistCount > 0)
                     Text(
                       '${game.waitlistCount} waitlisted',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                 ],
               ),
@@ -317,10 +318,7 @@ class GameListItem extends StatelessWidget {
             ],
           ),
         ),
-        if (statusBadge != null) ...[
-          const SizedBox(width: 12),
-          statusBadge,
-        ],
+        if (statusBadge != null) ...[const SizedBox(width: 12), statusBadge],
       ],
     );
   }

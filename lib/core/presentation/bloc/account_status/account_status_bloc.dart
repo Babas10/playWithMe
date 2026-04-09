@@ -11,10 +11,9 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
   final AuthRepository _authRepository;
   StreamSubscription<dynamic>? _authStateSubscription;
 
-  AccountStatusBloc({
-    required AuthRepository authRepository,
-  })  : _authRepository = authRepository,
-        super(const AccountStatusLoading()) {
+  AccountStatusBloc({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(const AccountStatusLoading()) {
     on<CheckAccountStatus>(_onCheckStatus);
     on<AccountEmailVerified>(_onEmailVerified);
     on<DismissAccountWarning>(_onDismissWarning);
@@ -51,18 +50,18 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
       case AccountStatus.active:
         emit(const AccountStatusActive());
       case AccountStatus.pendingVerification:
-        final daysLeft = computeDaysRemaining(
-          accountCreatedAt: user.createdAt,
-        );
+        final daysLeft = computeDaysRemaining(accountCreatedAt: user.createdAt);
         emit(AccountStatusPending(daysRemaining: daysLeft));
       case AccountStatus.restricted:
         final daysSinceCreation = user.createdAt != null
             ? DateTime.now().difference(user.createdAt!).inDays
             : deletionPeriodDays;
         final daysUntilDeletion = deletionPeriodDays - daysSinceCreation;
-        emit(AccountStatusRestricted(
-          daysUntilDeletion: daysUntilDeletion > 0 ? daysUntilDeletion : 0,
-        ));
+        emit(
+          AccountStatusRestricted(
+            daysUntilDeletion: daysUntilDeletion > 0 ? daysUntilDeletion : 0,
+          ),
+        );
       case AccountStatus.scheduledForDeletion:
         emit(const AccountStatusRestricted(daysUntilDeletion: 0));
     }

@@ -18,7 +18,9 @@ import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/pages/partner_detail_page.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
+
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 void main() {
@@ -102,10 +104,17 @@ void main() {
     mockInvitationBloc = MockInvitationBloc();
     mockAuthBloc = MockAuthenticationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
-        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+        UserEntity(
+          uid: 'test-user',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+        ),
       ),
     );
     when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
@@ -139,10 +148,7 @@ void main() {
           BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
           BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
         ],
-        child: PartnerDetailPage(
-          userId: testUserId,
-          partnerId: testPartnerId,
-        ),
+        child: PartnerDetailPage(userId: testUserId, partnerId: testPartnerId),
       ),
     );
   }
@@ -150,10 +156,12 @@ void main() {
   group('PartnerDetailPage Widget Tests', () {
     group('Initial UI Rendering', () {
       testWidgets('renders app bar with Partner Details title', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -165,24 +173,32 @@ void main() {
 
     group('Error State', () {
       testWidgets('shows error message when stats is null', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => null);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => null);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
-        expect(find.text('No statistics found for this partner'), findsOneWidget);
+        expect(
+          find.text('No statistics found for this partner'),
+          findsOneWidget,
+        );
       });
 
-      testWidgets('shows error message when partner profile is null',
-          (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => null);
+      testWidgets('shows error message when partner profile is null', (
+        tester,
+      ) async {
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => null);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -191,26 +207,33 @@ void main() {
         expect(find.text('Partner profile not found'), findsOneWidget);
       });
 
-      testWidgets('shows error message when exception is thrown',
-          (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenThrow(Exception('Network error'));
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+      testWidgets('shows error message when exception is thrown', (
+        tester,
+      ) async {
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenThrow(Exception('Network error'));
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
-        expect(find.textContaining('Failed to load partner details'),
-            findsOneWidget);
+        expect(
+          find.textContaining('Failed to load partner details'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('error icon has red color', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => null);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => null);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -222,10 +245,12 @@ void main() {
 
     group('Loaded State - Partner Header', () {
       testWidgets('shows partner display name', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -233,12 +258,15 @@ void main() {
         expect(find.text('John Partner'), findsOneWidget);
       });
 
-      testWidgets('shows partner email when display name is set',
-          (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+      testWidgets('shows partner email when display name is set', (
+        tester,
+      ) async {
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -246,12 +274,15 @@ void main() {
         expect(find.text('partner@example.com'), findsOneWidget);
       });
 
-      testWidgets('shows email as display name when no display name',
-          (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartnerWithoutDisplayName);
+      testWidgets('shows email as display name when no display name', (
+        tester,
+      ) async {
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartnerWithoutDisplayName);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -261,10 +292,12 @@ void main() {
       });
 
       testWidgets('shows person icon when no photo url', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -275,10 +308,12 @@ void main() {
 
     group('Loaded State - Record Card', () {
       testWidgets('shows Overall Record title', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -287,10 +322,12 @@ void main() {
       });
 
       testWidgets('shows games played count', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -300,10 +337,12 @@ void main() {
       });
 
       testWidgets('shows win rate percentage', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -314,10 +353,12 @@ void main() {
       });
 
       testWidgets('shows win-loss record string', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -329,10 +370,12 @@ void main() {
 
     group('Loaded State - Point Differential Card', () {
       testWidgets('shows Point Differential title', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -341,10 +384,12 @@ void main() {
       });
 
       testWidgets('shows average point differential', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -357,10 +402,12 @@ void main() {
       });
 
       testWidgets('shows points scored average', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -371,10 +418,12 @@ void main() {
       });
 
       testWidgets('shows points allowed average', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -387,10 +436,12 @@ void main() {
 
     group('Loaded State - ELO Card', () {
       testWidgets('shows ELO Performance title', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -399,10 +450,12 @@ void main() {
       });
 
       testWidgets('shows total ELO change', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -412,10 +465,12 @@ void main() {
       });
 
       testWidgets('shows average ELO change per game', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -429,10 +484,12 @@ void main() {
 
     group('Loaded State - Recent Form', () {
       testWidgets('shows Recent Form title', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -440,12 +497,15 @@ void main() {
         expect(find.text('Recent Form'), findsOneWidget);
       });
 
-      testWidgets('shows current streak badge when on winning streak',
-          (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+      testWidgets('shows current streak badge when on winning streak', (
+        tester,
+      ) async {
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -455,10 +515,12 @@ void main() {
       });
 
       testWidgets('shows game score displays', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -470,10 +532,12 @@ void main() {
       });
 
       testWidgets('shows W and L result letters', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -484,10 +548,12 @@ void main() {
       });
 
       testWidgets('shows ELO change for each game', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -498,10 +564,12 @@ void main() {
       });
 
       testWidgets('shows empty state when no recent games', (tester) async {
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => testStatsNoGames);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => testStatsNoGames);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -511,8 +579,9 @@ void main() {
     });
 
     group('Loaded State - Losing Streak', () {
-      testWidgets('shows losing streak badge when on losing streak',
-          (tester) async {
+      testWidgets('shows losing streak badge when on losing streak', (
+        tester,
+      ) async {
         final losingStats = TeammateStats(
           userId: testPartnerId,
           gamesPlayed: 10,
@@ -549,10 +618,12 @@ void main() {
           ],
         );
 
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => losingStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => losingStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -574,10 +645,12 @@ void main() {
           recentGames: [],
         );
 
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => negativeStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => negativeStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -585,8 +658,9 @@ void main() {
         expect(find.text('-30.0'), findsOneWidget);
       });
 
-      testWidgets('shows negative point differential correctly',
-          (tester) async {
+      testWidgets('shows negative point differential correctly', (
+        tester,
+      ) async {
         final negativeStats = TeammateStats(
           userId: testPartnerId,
           gamesPlayed: 10,
@@ -598,10 +672,12 @@ void main() {
           recentGames: [],
         );
 
-        when(() => mockUserRepository.getTeammateStats(testUserId, testPartnerId))
-            .thenAnswer((_) async => negativeStats);
-        when(() => mockUserRepository.getUserById(testPartnerId))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats(testUserId, testPartnerId),
+        ).thenAnswer((_) async => negativeStats);
+        when(
+          () => mockUserRepository.getUserById(testPartnerId),
+        ).thenAnswer((_) async => testPartner);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();

@@ -29,18 +29,15 @@ void main() {
         expect(FirebaseService.app, isNull);
       });
 
-      test('throws StateError when accessing firestore before initialization', () {
-        expect(
-          () => FirebaseService.firestore,
-          throwsA(isA<StateError>()),
-        );
-      });
+      test(
+        'throws StateError when accessing firestore before initialization',
+        () {
+          expect(() => FirebaseService.firestore, throwsA(isA<StateError>()));
+        },
+      );
 
       test('throws StateError when accessing auth before initialization', () {
-        expect(
-          () => FirebaseService.auth,
-          throwsA(isA<StateError>()),
-        );
+        expect(() => FirebaseService.auth, throwsA(isA<StateError>()));
       });
 
       // Note: We can't actually test Firebase initialization in unit tests

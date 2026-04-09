@@ -10,7 +10,10 @@ abstract class LocalePreferencesRepository {
   Future<void> savePreferences(LocalePreferencesEntity preferences);
 
   /// Sync preferences to Firestore
-  Future<void> syncToFirestore(String userId, LocalePreferencesEntity preferences);
+  Future<void> syncToFirestore(
+    String userId,
+    LocalePreferencesEntity preferences,
+  );
 
   /// Load preferences from Firestore
   /// Returns null if no preferences are found in Firestore

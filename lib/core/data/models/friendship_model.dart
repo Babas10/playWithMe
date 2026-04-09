@@ -32,10 +32,7 @@ class FriendshipModel with _$FriendshipModel {
   /// Factory constructor for creating from Firestore DocumentSnapshot
   factory FriendshipModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return FriendshipModel.fromJson({
-      ...data,
-      'id': doc.id,
-    });
+    return FriendshipModel.fromJson({...data, 'id': doc.id});
   }
 
   /// Convert to Firestore-compatible map (excludes id since it's the document ID)
@@ -91,7 +88,8 @@ class FriendshipModel with _$FriendshipModel {
   bool isRecipient(String userId) => recipientId == userId;
 
   /// Check if user is involved in this friendship
-  bool involves(String userId) => initiatorId == userId || recipientId == userId;
+  bool involves(String userId) =>
+      initiatorId == userId || recipientId == userId;
 
   /// Get the other user's ID given one user's ID
   String? getOtherUserId(String userId) {
@@ -130,15 +128,9 @@ class FriendshipModel with _$FriendshipModel {
   /// Update denormalized user names (used when a user changes their display name)
   FriendshipModel updateUserName(String userId, String newName) {
     if (initiatorId == userId) {
-      return copyWith(
-        initiatorName: newName,
-        updatedAt: DateTime.now(),
-      );
+      return copyWith(initiatorName: newName, updatedAt: DateTime.now());
     } else if (recipientId == userId) {
-      return copyWith(
-        recipientName: newName,
-        updatedAt: DateTime.now(),
-      );
+      return copyWith(recipientName: newName, updatedAt: DateTime.now());
     }
     return this;
   }

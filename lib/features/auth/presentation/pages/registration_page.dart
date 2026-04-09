@@ -165,7 +165,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     if (value == null || value.trim().isEmpty) {
                       return l10n.emailRequired;
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return l10n.validEmailRequired;
                     }
                     return null;
@@ -178,8 +180,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     Text(
                       l10n.genderSelectionTitle,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(width: 4),
                     Tooltip(
@@ -202,7 +204,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         label: l10n.genderMale,
                         value: _kGenderMale,
                         selected: _selectedGender == _kGenderMale,
-                        onTap: () => setState(() => _selectedGender = _kGenderMale),
+                        onTap: () =>
+                            setState(() => _selectedGender = _kGenderMale),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -211,7 +214,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         label: l10n.genderFemale,
                         value: _kGenderFemale,
                         selected: _selectedGender == _kGenderFemale,
-                        onTap: () => setState(() => _selectedGender = _kGenderFemale),
+                        onTap: () =>
+                            setState(() => _selectedGender = _kGenderFemale),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -220,7 +224,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         label: l10n.genderPreferNotToSay,
                         value: _kGenderNone,
                         selected: _selectedGender == _kGenderNone,
-                        onTap: () => setState(() => _selectedGender = _kGenderNone),
+                        onTap: () =>
+                            setState(() => _selectedGender = _kGenderNone),
                       ),
                     ),
                   ],
@@ -231,8 +236,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     child: Text(
                       l10n.registrationGenderRequired,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.error,
-                          ),
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ),
                 const SizedBox(height: 20),
@@ -245,7 +250,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   prefixIcon: Icons.lock,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() {
@@ -274,9 +281,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   padding: const EdgeInsets.only(left: 12),
                   child: Text(
                     l10n.passwordRequirementsHint,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -288,7 +295,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   prefixIcon: Icons.lock,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                      _obscureConfirmPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() {
@@ -336,8 +345,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   child: Text(
                     l10n.termsAgreement,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
+                      color: Colors.grey.shade600,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -356,16 +365,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
     if (_formKey.currentState!.validate() && _selectedGender != null) {
       context.read<RegistrationBloc>().add(
-            RegistrationSubmitted(
-              firstName: _firstNameController.text.trim(),
-              lastName: _lastNameController.text.trim(),
-              displayName: _displayNameController.text.trim(),
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-              confirmPassword: _confirmPasswordController.text,
-              gender: _selectedGender!,
-            ),
-          );
+        RegistrationSubmitted(
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          displayName: _displayNameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          confirmPassword: _confirmPasswordController.text,
+          gender: _selectedGender!,
+        ),
+      );
     }
   }
 }

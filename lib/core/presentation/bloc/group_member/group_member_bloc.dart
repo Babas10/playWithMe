@@ -7,10 +7,9 @@ import 'group_member_state.dart';
 class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
   final GroupRepository _groupRepository;
 
-  GroupMemberBloc({
-    required GroupRepository groupRepository,
-  })  : _groupRepository = groupRepository,
-        super(const GroupMemberInitial()) {
+  GroupMemberBloc({required GroupRepository groupRepository})
+    : _groupRepository = groupRepository,
+      super(const GroupMemberInitial()) {
     on<PromoteMemberToAdmin>(_onPromoteMemberToAdmin);
     on<DemoteMemberFromAdmin>(_onDemoteMemberFromAdmin);
     on<RemoveMemberFromGroup>(_onRemoveMemberFromGroup);
@@ -46,10 +45,7 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
 
       await _groupRepository.promoteToAdmin(event.groupId, event.userId);
 
-      emit(MemberPromotedSuccess(
-        groupId: event.groupId,
-        userId: event.userId,
-      ));
+      emit(MemberPromotedSuccess(groupId: event.groupId, userId: event.userId));
     } catch (e) {
       emit(GroupMemberError('Failed to promote member: ${e.toString()}'));
     }
@@ -78,7 +74,11 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
 
       // Prevent demoting the last admin
       if (group.adminCount <= 1) {
-        emit(const GroupMemberError('Cannot demote the last admin. Promote another member first.'));
+        emit(
+          const GroupMemberError(
+            'Cannot demote the last admin. Promote another member first.',
+          ),
+        );
         return;
       }
 
@@ -90,10 +90,7 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
 
       await _groupRepository.demoteFromAdmin(event.groupId, event.userId);
 
-      emit(MemberDemotedSuccess(
-        groupId: event.groupId,
-        userId: event.userId,
-      ));
+      emit(MemberDemotedSuccess(groupId: event.groupId, userId: event.userId));
     } catch (e) {
       emit(GroupMemberError('Failed to demote member: ${e.toString()}'));
     }
@@ -122,16 +119,17 @@ class GroupMemberBloc extends Bloc<GroupMemberEvent, GroupMemberState> {
 
       // If user is an admin, check if they're the last admin
       if (group.isAdmin(event.userId) && group.adminCount <= 1) {
-        emit(const GroupMemberError('Cannot remove the last admin. Promote another member first.'));
+        emit(
+          const GroupMemberError(
+            'Cannot remove the last admin. Promote another member first.',
+          ),
+        );
         return;
       }
 
       await _groupRepository.removeMember(event.groupId, event.userId);
 
-      emit(MemberRemovedSuccess(
-        groupId: event.groupId,
-        userId: event.userId,
-      ));
+      emit(MemberRemovedSuccess(groupId: event.groupId, userId: event.userId));
     } catch (e) {
       emit(GroupMemberError('Failed to remove member: ${e.toString()}'));
     }

@@ -7,10 +7,7 @@ import 'package:play_with_me/core/services/firebase_service.dart';
 class EnvironmentIndicator extends StatelessWidget {
   final bool showDetails;
 
-  const EnvironmentIndicator({
-    super.key,
-    this.showDetails = false,
-  });
+  const EnvironmentIndicator({super.key, this.showDetails = false});
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +39,7 @@ class EnvironmentIndicator extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
-          _getEnvironmentIcon(),
-          size: 16,
-          color: Colors.white,
-        ),
+        Icon(_getEnvironmentIcon(), size: 16, color: Colors.white),
         const SizedBox(width: 4),
         Text(
           '${EnvironmentConfig.environmentName} Environment',
@@ -74,11 +67,7 @@ class EnvironmentIndicator extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
-              _getEnvironmentIcon(),
-              size: 16,
-              color: Colors.white,
-            ),
+            Icon(_getEnvironmentIcon(), size: 16, color: Colors.white),
             const SizedBox(width: 4),
             Text(
               '${EnvironmentConfig.environmentName} Environment',
@@ -90,27 +79,23 @@ class EnvironmentIndicator extends StatelessWidget {
             ),
             const Spacer(),
             Icon(
-              FirebaseService.isInitialized ? Icons.cloud_done : Icons.cloud_off,
+              FirebaseService.isInitialized
+                  ? Icons.cloud_done
+                  : Icons.cloud_off,
               size: 16,
               color: Colors.white,
             ),
             const SizedBox(width: 4),
             Text(
               FirebaseService.isInitialized ? 'Connected' : 'Disconnected',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 10),
             ),
           ],
         ),
         const SizedBox(height: 2),
         Text(
           'Project: ${connectionInfo['projectId']}',
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 10,
-          ),
+          style: const TextStyle(color: Colors.white70, fontSize: 10),
         ),
       ],
     );
@@ -179,16 +164,9 @@ class _FirebaseDebugPanelState extends State<FirebaseDebugPanel> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.bug_report,
-              color: Colors.white,
-              size: 20,
-            ),
+            Icon(Icons.bug_report, color: Colors.white, size: 20),
             const SizedBox(width: 8),
-            Text(
-              'Debug',
-              style: TextStyle(color: Colors.white, fontSize: 12),
-            ),
+            Text('Debug', style: TextStyle(color: Colors.white, fontSize: 12)),
           ],
         ),
       ),
@@ -230,7 +208,10 @@ class _FirebaseDebugPanelState extends State<FirebaseDebugPanel> {
           const SizedBox(height: 12),
           _buildInfoRow('Environment:', EnvironmentConfig.environmentName),
           _buildInfoRow('Project ID:', connectionInfo['projectId']),
-          _buildInfoRow('Initialized:', connectionInfo['isInitialized'].toString()),
+          _buildInfoRow(
+            'Initialized:',
+            connectionInfo['isInitialized'].toString(),
+          ),
           _buildInfoRow('App Name:', connectionInfo['appName'] ?? 'N/A'),
           const SizedBox(height: 12),
           SizedBox(
@@ -241,10 +222,7 @@ class _FirebaseDebugPanelState extends State<FirebaseDebugPanel> {
                 backgroundColor: Colors.blue,
                 padding: const EdgeInsets.symmetric(vertical: 8),
               ),
-              child: Text(
-                'Test Connection',
-                style: TextStyle(fontSize: 12),
-              ),
+              child: Text('Test Connection', style: TextStyle(fontSize: 12)),
             ),
           ),
         ],

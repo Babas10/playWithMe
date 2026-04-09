@@ -20,10 +20,10 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     required GroupRepository groupRepository,
     InvitationRepository? invitationRepository,
     required FirebaseAnalytics analytics,
-  })  : _groupRepository = groupRepository,
-        _invitationRepository = invitationRepository,
-        _analytics = analytics,
-        super(const GroupInitial()) {
+  }) : _groupRepository = groupRepository,
+       _invitationRepository = invitationRepository,
+       _analytics = analytics,
+       super(const GroupInitial()) {
     on<GroupCreationStarted>(_onGroupCreationStarted);
     on<LoadGroupById>(_onLoadGroupById);
     on<LoadGroupsForUser>(_onLoadGroupsForUser);
@@ -66,11 +66,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to load group', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'LOAD_GROUP_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'LOAD_GROUP_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -78,7 +80,9 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
     LoadGroupsForUser event,
     Emitter<GroupState> emit,
   ) async {
-    debugPrint('🎯 [GroupBloc] LoadGroupsForUser event received for userId: ${event.userId}');
+    debugPrint(
+      '🎯 [GroupBloc] LoadGroupsForUser event received for userId: ${event.userId}',
+    );
 
     // Cancel existing subscription
     await _groupsSubscription?.cancel();
@@ -91,9 +95,10 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       await emit.forEach<List<GroupModel>>(
         stream,
         onData: (groups) {
-          debugPrint('✅ [GroupBloc] onData received with ${groups.length} groups');
-          for (var i = 0; i < groups.length; i++) {
-          }
+          debugPrint(
+            '✅ [GroupBloc] onData received with ${groups.length} groups',
+          );
+          for (var i = 0; i < groups.length; i++) {}
           debugPrint('✅ [GroupBloc] Emitting GroupsLoaded state');
           return GroupsLoaded(groups: groups);
         },
@@ -103,7 +108,9 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
           final (message, isRetryable) = error is Exception
               ? GroupErrorMessages.getErrorMessage(error)
               : ('Failed to load user groups', true);
-          debugPrint('❌ [GroupBloc] Emitting GroupError with message: $message');
+          debugPrint(
+            '❌ [GroupBloc] Emitting GroupError with message: $message',
+          );
           return GroupError(
             message: message,
             errorCode: 'LOAD_USER_GROUPS_ERROR',
@@ -117,11 +124,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to load user groups', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'LOAD_USER_GROUPS_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'LOAD_USER_GROUPS_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -154,23 +163,24 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
           // Group was created successfully, invitation failures are non-critical
           // Using print for now - consider using a proper logger in production
           // ignore: avoid_print
-          debugPrint('⚠️ Warning: Failed to send invitations during group creation: $inviteError');
+          debugPrint(
+            '⚠️ Warning: Failed to send invitations during group creation: $inviteError',
+          );
         }
       }
 
-      emit(GroupCreated(
-        groupId: groupId,
-        group: createdGroup,
-      ));
+      emit(GroupCreated(groupId: groupId, group: createdGroup));
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to create group', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'CREATE_GROUP_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'CREATE_GROUP_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -191,24 +201,30 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       final updatedGroup = await _groupRepository.getGroupById(event.groupId);
       if (updatedGroup != null) {
-        emit(GroupUpdated(
-          group: updatedGroup,
-          message: 'Group information updated successfully',
-        ));
+        emit(
+          GroupUpdated(
+            group: updatedGroup,
+            message: 'Group information updated successfully',
+          ),
+        );
       } else {
-        emit(const GroupOperationSuccess(
-          message: 'Group information updated successfully',
-        ));
+        emit(
+          const GroupOperationSuccess(
+            message: 'Group information updated successfully',
+          ),
+        );
       }
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to update group info', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'UPDATE_GROUP_INFO_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'UPDATE_GROUP_INFO_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -231,24 +247,30 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       final updatedGroup = await _groupRepository.getGroupById(event.groupId);
       if (updatedGroup != null) {
-        emit(GroupUpdated(
-          group: updatedGroup,
-          message: 'Group settings updated successfully',
-        ));
+        emit(
+          GroupUpdated(
+            group: updatedGroup,
+            message: 'Group settings updated successfully',
+          ),
+        );
       } else {
-        emit(const GroupOperationSuccess(
-          message: 'Group settings updated successfully',
-        ));
+        emit(
+          const GroupOperationSuccess(
+            message: 'Group settings updated successfully',
+          ),
+        );
       }
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to update group settings', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'UPDATE_GROUP_SETTINGS_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'UPDATE_GROUP_SETTINGS_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -263,24 +285,26 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       final updatedGroup = await _groupRepository.getGroupById(event.groupId);
       if (updatedGroup != null) {
-        emit(GroupUpdated(
-          group: updatedGroup,
-          message: 'Member added successfully',
-        ));
+        emit(
+          GroupUpdated(
+            group: updatedGroup,
+            message: 'Member added successfully',
+          ),
+        );
       } else {
-        emit(const GroupOperationSuccess(
-          message: 'Member added successfully',
-        ));
+        emit(const GroupOperationSuccess(message: 'Member added successfully'));
       }
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to add member', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'ADD_MEMBER_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'ADD_MEMBER_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -295,24 +319,28 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       final updatedGroup = await _groupRepository.getGroupById(event.groupId);
       if (updatedGroup != null) {
-        emit(GroupUpdated(
-          group: updatedGroup,
-          message: 'Member removed successfully',
-        ));
+        emit(
+          GroupUpdated(
+            group: updatedGroup,
+            message: 'Member removed successfully',
+          ),
+        );
       } else {
-        emit(const GroupOperationSuccess(
-          message: 'Member removed successfully',
-        ));
+        emit(
+          const GroupOperationSuccess(message: 'Member removed successfully'),
+        );
       }
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to remove member', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'REMOVE_MEMBER_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'REMOVE_MEMBER_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -327,24 +355,30 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       final updatedGroup = await _groupRepository.getGroupById(event.groupId);
       if (updatedGroup != null) {
-        emit(GroupUpdated(
-          group: updatedGroup,
-          message: 'Member promoted to admin successfully',
-        ));
+        emit(
+          GroupUpdated(
+            group: updatedGroup,
+            message: 'Member promoted to admin successfully',
+          ),
+        );
       } else {
-        emit(const GroupOperationSuccess(
-          message: 'Member promoted to admin successfully',
-        ));
+        emit(
+          const GroupOperationSuccess(
+            message: 'Member promoted to admin successfully',
+          ),
+        );
       }
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to promote member', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'PROMOTE_MEMBER_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'PROMOTE_MEMBER_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -359,24 +393,28 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       final updatedGroup = await _groupRepository.getGroupById(event.groupId);
       if (updatedGroup != null) {
-        emit(GroupUpdated(
-          group: updatedGroup,
-          message: 'Admin demoted successfully',
-        ));
+        emit(
+          GroupUpdated(
+            group: updatedGroup,
+            message: 'Admin demoted successfully',
+          ),
+        );
       } else {
-        emit(const GroupOperationSuccess(
-          message: 'Admin demoted successfully',
-        ));
+        emit(
+          const GroupOperationSuccess(message: 'Admin demoted successfully'),
+        );
       }
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to demote admin', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'DEMOTE_ADMIN_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'DEMOTE_ADMIN_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -397,11 +435,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to search groups', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'SEARCH_GROUPS_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'SEARCH_GROUPS_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -418,11 +458,13 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to load group stats', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'LOAD_GROUP_STATS_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'LOAD_GROUP_STATS_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 
@@ -435,18 +477,18 @@ class GroupBloc extends Bloc<GroupEvent, GroupState> {
 
       await _groupRepository.deleteGroup(event.groupId);
 
-      emit(const GroupOperationSuccess(
-        message: 'Group deleted successfully',
-      ));
+      emit(const GroupOperationSuccess(message: 'Group deleted successfully'));
     } catch (e) {
       final (message, isRetryable) = e is Exception
           ? GroupErrorMessages.getErrorMessage(e)
           : ('Failed to delete group', true);
-      emit(GroupError(
-        message: message,
-        errorCode: 'DELETE_GROUP_ERROR',
-        isRetryable: isRetryable,
-      ));
+      emit(
+        GroupError(
+          message: message,
+          errorCode: 'DELETE_GROUP_ERROR',
+          isRetryable: isRetryable,
+        ),
+      );
     }
   }
 

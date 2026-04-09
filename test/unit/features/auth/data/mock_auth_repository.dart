@@ -5,7 +5,8 @@ import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 
 class MockAuthRepository implements AuthRepository {
-  final StreamController<UserEntity?> _authStateController = StreamController<UserEntity?>.broadcast();
+  final StreamController<UserEntity?> _authStateController =
+      StreamController<UserEntity?>.broadcast();
   UserEntity? _currentUser;
   Stream<UserEntity?>? _authStateStream;
 
@@ -32,7 +33,9 @@ class MockAuthRepository implements AuthRepository {
     _authStateStream ??= _authStateController.stream.asBroadcastStream(
       onListen: (subscription) {
         // Immediately emit the current user when someone subscribes
-        debugPrint('🧪 MockAuthRepository: New subscriber, emitting current user: ${_currentUser?.email ?? 'null'}');
+        debugPrint(
+          '🧪 MockAuthRepository: New subscriber, emitting current user: ${_currentUser?.email ?? 'null'}',
+        );
         Future.microtask(() {
           if (!_authStateController.isClosed) {
             _authStateController.add(_currentUser);
@@ -45,7 +48,9 @@ class MockAuthRepository implements AuthRepository {
 
   // Helper methods for testing
   void setCurrentUser(UserEntity? user) {
-    debugPrint('🧪 MockAuthRepository: Setting current user to ${user?.email ?? 'null'}');
+    debugPrint(
+      '🧪 MockAuthRepository: Setting current user to ${user?.email ?? 'null'}',
+    );
     _currentUser = user;
     // Only add to stream if controller is not closed
     if (!_authStateController.isClosed) {
@@ -68,42 +73,64 @@ class MockAuthRepository implements AuthRepository {
   }
 
   // Configurable behaviors for tests with default implementations
-  Future<UserEntity> Function({required String email, required String password}) _signInWithEmailAndPasswordBehavior =
-    ({required String email, required String password}) async => TestUserData.testUser;
+  Future<UserEntity> Function({required String email, required String password})
+  _signInWithEmailAndPasswordBehavior =
+      ({required String email, required String password}) async =>
+          TestUserData.testUser;
 
-  Future<UserEntity> Function({required String email, required String password}) _createUserWithEmailAndPasswordBehavior =
-    ({required String email, required String password}) async => TestUserData.testUser;
+  Future<UserEntity> Function({required String email, required String password})
+  _createUserWithEmailAndPasswordBehavior =
+      ({required String email, required String password}) async =>
+          TestUserData.testUser;
 
-  Future<UserEntity> Function() _signInAnonymouslyBehavior =
-    () async => TestUserData.anonymousUser;
+  Future<UserEntity> Function() _signInAnonymouslyBehavior = () async =>
+      TestUserData.anonymousUser;
 
-  Future<void> Function({required String email}) _sendPasswordResetEmailBehavior =
-    ({required String email}) async {};
+  Future<void> Function({required String email})
+  _sendPasswordResetEmailBehavior = ({required String email}) async {};
 
-  Future<void> Function() _sendEmailVerificationBehavior =
-    () async {};
+  Future<void> Function() _sendEmailVerificationBehavior = () async {};
 
-  Future<void> Function() _reloadUserBehavior =
-    () async {};
+  Future<void> Function() _reloadUserBehavior = () async {};
 
-  Future<void> Function() _signOutBehavior =
-    () async {};
+  Future<void> Function() _signOutBehavior = () async {};
 
-  Future<void> Function({String? displayName, String? photoUrl}) _updateUserProfileBehavior =
-    ({String? displayName, String? photoUrl}) async {};
+  Future<void> Function({String? displayName, String? photoUrl})
+  _updateUserProfileBehavior =
+      ({String? displayName, String? photoUrl}) async {};
 
-  Future<void> Function({required String firstName, required String lastName, String? gender}) _updateUserNamesBehavior =
-    ({required String firstName, required String lastName, String? gender}) async {};
+  Future<void> Function({
+    required String firstName,
+    required String lastName,
+    String? gender,
+  })
+  _updateUserNamesBehavior =
+      ({
+        required String firstName,
+        required String lastName,
+        String? gender,
+      }) async {};
 
-  Future<void> Function() _deleteAccountBehavior =
-    () async {};
+  Future<void> Function() _deleteAccountBehavior = () async {};
 
   // Configure behaviors for testing
-  void setSignInWithEmailAndPasswordBehavior(Future<UserEntity> Function({required String email, required String password}) behavior) {
+  void setSignInWithEmailAndPasswordBehavior(
+    Future<UserEntity> Function({
+      required String email,
+      required String password,
+    })
+    behavior,
+  ) {
     _signInWithEmailAndPasswordBehavior = behavior;
   }
 
-  void setCreateUserWithEmailAndPasswordBehavior(Future<UserEntity> Function({required String email, required String password}) behavior) {
+  void setCreateUserWithEmailAndPasswordBehavior(
+    Future<UserEntity> Function({
+      required String email,
+      required String password,
+    })
+    behavior,
+  ) {
     _createUserWithEmailAndPasswordBehavior = behavior;
   }
 
@@ -111,7 +138,9 @@ class MockAuthRepository implements AuthRepository {
     _signInAnonymouslyBehavior = behavior;
   }
 
-  void setSendPasswordResetEmailBehavior(Future<void> Function({required String email}) behavior) {
+  void setSendPasswordResetEmailBehavior(
+    Future<void> Function({required String email}) behavior,
+  ) {
     _sendPasswordResetEmailBehavior = behavior;
   }
 
@@ -127,11 +156,20 @@ class MockAuthRepository implements AuthRepository {
     _signOutBehavior = behavior;
   }
 
-  void setUpdateUserProfileBehavior(Future<void> Function({String? displayName, String? photoUrl}) behavior) {
+  void setUpdateUserProfileBehavior(
+    Future<void> Function({String? displayName, String? photoUrl}) behavior,
+  ) {
     _updateUserProfileBehavior = behavior;
   }
 
-  void setUpdateUserNamesBehavior(Future<void> Function({required String firstName, required String lastName, String? gender}) behavior) {
+  void setUpdateUserNamesBehavior(
+    Future<void> Function({
+      required String firstName,
+      required String lastName,
+      String? gender,
+    })
+    behavior,
+  ) {
     _updateUserNamesBehavior = behavior;
   }
 
@@ -140,13 +178,25 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> signInWithEmailAndPassword({required String email, required String password}) {
-    return _signInWithEmailAndPasswordBehavior(email: email, password: password);
+  Future<UserEntity> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) {
+    return _signInWithEmailAndPasswordBehavior(
+      email: email,
+      password: password,
+    );
   }
 
   @override
-  Future<UserEntity> createUserWithEmailAndPassword({required String email, required String password}) {
-    return _createUserWithEmailAndPasswordBehavior(email: email, password: password);
+  Future<UserEntity> createUserWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) {
+    return _createUserWithEmailAndPasswordBehavior(
+      email: email,
+      password: password,
+    );
   }
 
   @override
@@ -177,12 +227,23 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<void> updateUserProfile({String? displayName, String? photoUrl}) {
-    return _updateUserProfileBehavior(displayName: displayName, photoUrl: photoUrl);
+    return _updateUserProfileBehavior(
+      displayName: displayName,
+      photoUrl: photoUrl,
+    );
   }
 
   @override
-  Future<void> updateUserNames({required String firstName, required String lastName, String? gender}) {
-    return _updateUserNamesBehavior(firstName: firstName, lastName: lastName, gender: gender);
+  Future<void> updateUserNames({
+    required String firstName,
+    required String lastName,
+    String? gender,
+  }) {
+    return _updateUserNamesBehavior(
+      firstName: firstName,
+      lastName: lastName,
+      gender: gender,
+    );
   }
 
   @override

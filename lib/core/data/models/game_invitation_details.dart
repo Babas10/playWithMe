@@ -38,12 +38,16 @@ class GameInvitationDetails {
       groupId: map['groupId'] as String? ?? '',
       inviterId: map['inviterId'] as String? ?? '',
       status: map['status'] as String? ?? '',
-      createdAt: DateTime.parse(map['createdAt'] as String? ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        map['createdAt'] as String? ?? DateTime.now().toIso8601String(),
+      ),
       expiresAt: map['expiresAt'] != null
           ? DateTime.parse(map['expiresAt'] as String)
           : null,
       gameTitle: map['gameTitle'] as String? ?? '',
-      gameScheduledAt: DateTime.parse(map['gameScheduledAt'] as String? ?? DateTime.now().toIso8601String()),
+      gameScheduledAt: DateTime.parse(
+        map['gameScheduledAt'] as String? ?? DateTime.now().toIso8601String(),
+      ),
       gameLocationName: map['gameLocationName'] as String? ?? '',
       groupName: map['groupName'] as String? ?? '',
       inviterDisplayName: map['inviterDisplayName'] as String? ?? '',

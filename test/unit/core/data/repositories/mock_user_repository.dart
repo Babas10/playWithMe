@@ -13,10 +13,12 @@ import 'package:play_with_me/core/domain/entities/time_period.dart';
 import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 
 class MockUserRepository implements UserRepository {
-  final StreamController<UserModel?> _currentUserController = StreamController<UserModel?>.broadcast();
+  final StreamController<UserModel?> _currentUserController =
+      StreamController<UserModel?>.broadcast();
   final Map<String, UserModel> _users = {};
 
-  StreamController<UserModel?> get currentUserController => _currentUserController;
+  StreamController<UserModel?> get currentUserController =>
+      _currentUserController;
 
   @override
   Stream<UserModel?> get currentUser => _currentUserController.stream;
@@ -28,14 +30,18 @@ class MockUserRepository implements UserRepository {
 
   // Helper methods for testing
   void setCurrentUser(UserModel? user) {
-    print('🧪 MockUserRepository: Setting current user to ${user?.email ?? 'null'}');
+    print(
+      '🧪 MockUserRepository: Setting current user to ${user?.email ?? 'null'}',
+    );
     if (!_currentUserController.isClosed) {
       _currentUserController.add(user);
     }
   }
 
   void setCurrentUserValue(UserModel? user) {
-    print('🧪 MockUserRepository: Setting current user value to ${user?.email ?? 'null'}');
+    print(
+      '🧪 MockUserRepository: Setting current user value to ${user?.email ?? 'null'}',
+    );
     // Emit immediately in the next microtask to ensure listeners are set up
     scheduleMicrotask(() {
       if (!_currentUserController.isClosed) {
@@ -92,7 +98,8 @@ class MockUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> updateUserProfile(String uid, {
+  Future<void> updateUserProfile(
+    String uid, {
     String? displayName,
     String? photoUrl,
     String? firstName,
@@ -122,7 +129,8 @@ class MockUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> updateUserPreferences(String uid, {
+  Future<void> updateUserPreferences(
+    String uid, {
     bool? notificationsEnabled,
     bool? emailNotifications,
     bool? pushNotifications,
@@ -140,7 +148,8 @@ class MockUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> updateUserPrivacy(String uid, {
+  Future<void> updateUserPrivacy(
+    String uid, {
     UserPrivacyLevel? privacyLevel,
     bool? showEmail,
     bool? showPhoneNumber,
@@ -176,7 +185,9 @@ class MockUserRepository implements UserRepository {
   }
 
   @override
-  Future<void> addGameParticipation(String uid, String gameId, {
+  Future<void> addGameParticipation(
+    String uid,
+    String gameId, {
     bool won = false,
     int score = 0,
   }) async {
@@ -191,9 +202,11 @@ class MockUserRepository implements UserRepository {
   Future<List<UserModel>> searchUsers(String query, {int limit = 20}) async {
     final queryLower = query.toLowerCase();
     return _users.values
-        .where((user) =>
-            user.displayName?.toLowerCase().contains(queryLower) == true ||
-            user.email.toLowerCase().contains(queryLower))
+        .where(
+          (user) =>
+              user.displayName?.toLowerCase().contains(queryLower) == true ||
+              user.email.toLowerCase().contains(queryLower),
+        )
         .take(limit)
         .toList();
   }

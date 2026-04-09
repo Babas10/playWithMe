@@ -10,10 +10,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 class WinStreakBadge extends StatelessWidget {
   final int currentStreak;
 
-  const WinStreakBadge({
-    super.key,
-    required this.currentStreak,
-  });
+  const WinStreakBadge({super.key, required this.currentStreak});
 
   bool get shouldDisplay => currentStreak.abs() >= 1;
 
@@ -48,10 +45,7 @@ class WinStreakBadge extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Emoji
-            Text(
-              streakEmoji,
-              style: const TextStyle(fontSize: 24),
-            ),
+            Text(streakEmoji, style: const TextStyle(fontSize: 24)),
             const SizedBox(width: 8),
             // Streak text
             Text(

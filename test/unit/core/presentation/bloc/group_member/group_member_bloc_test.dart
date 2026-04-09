@@ -36,38 +36,40 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, success] when member is successfully promoted',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
-        when(() => mockGroupRepository.promoteToAdmin('group1', 'user1'))
-            .thenAnswer((_) async {});
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.promoteToAdmin('group1', 'user1'),
+        ).thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const PromoteMemberToAdmin(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const PromoteMemberToAdmin(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const MemberPromotedSuccess(groupId: 'group1', userId: 'user1'),
       ],
       verify: (_) {
         verify(() => mockGroupRepository.getGroupById('group1')).called(1);
-        verify(() => mockGroupRepository.promoteToAdmin('group1', 'user1'))
-            .called(1);
+        verify(
+          () => mockGroupRepository.promoteToAdmin('group1', 'user1'),
+        ).called(1);
       },
     );
 
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when group is not found',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => null);
         return bloc;
       },
-      act: (bloc) => bloc.add(const PromoteMemberToAdmin(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const PromoteMemberToAdmin(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('Group not found'),
@@ -81,14 +83,14 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when user is not a member',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
         return bloc;
       },
-      act: (bloc) => bloc.add(const PromoteMemberToAdmin(
-        groupId: 'group1',
-        userId: 'nonMember123',
-      )),
+      act: (bloc) => bloc.add(
+        const PromoteMemberToAdmin(groupId: 'group1', userId: 'nonMember123'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('User is not a member of this group'),
@@ -102,14 +104,14 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when user is already an admin',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
         return bloc;
       },
-      act: (bloc) => bloc.add(const PromoteMemberToAdmin(
-        groupId: 'group1',
-        userId: 'admin1',
-      )),
+      act: (bloc) => bloc.add(
+        const PromoteMemberToAdmin(groupId: 'group1', userId: 'admin1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('User is already an admin'),
@@ -123,19 +125,22 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when repository throws exception',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
-        when(() => mockGroupRepository.promoteToAdmin('group1', 'user1'))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.promoteToAdmin('group1', 'user1'),
+        ).thenThrow(Exception('Network error'));
         return bloc;
       },
-      act: (bloc) => bloc.add(const PromoteMemberToAdmin(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const PromoteMemberToAdmin(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
-        const GroupMemberError('Failed to promote member: Exception: Network error'),
+        const GroupMemberError(
+          'Failed to promote member: Exception: Network error',
+        ),
       ],
     );
   });
@@ -144,38 +149,40 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, success] when admin is successfully demoted',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
-        when(() => mockGroupRepository.demoteFromAdmin('group1', 'admin1'))
-            .thenAnswer((_) async {});
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.demoteFromAdmin('group1', 'admin1'),
+        ).thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const DemoteMemberFromAdmin(
-        groupId: 'group1',
-        userId: 'admin1',
-      )),
+      act: (bloc) => bloc.add(
+        const DemoteMemberFromAdmin(groupId: 'group1', userId: 'admin1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const MemberDemotedSuccess(groupId: 'group1', userId: 'admin1'),
       ],
       verify: (_) {
         verify(() => mockGroupRepository.getGroupById('group1')).called(1);
-        verify(() => mockGroupRepository.demoteFromAdmin('group1', 'admin1'))
-            .called(1);
+        verify(
+          () => mockGroupRepository.demoteFromAdmin('group1', 'admin1'),
+        ).called(1);
       },
     );
 
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when group is not found',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => null);
         return bloc;
       },
-      act: (bloc) => bloc.add(const DemoteMemberFromAdmin(
-        groupId: 'group1',
-        userId: 'admin1',
-      )),
+      act: (bloc) => bloc.add(
+        const DemoteMemberFromAdmin(groupId: 'group1', userId: 'admin1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('Group not found'),
@@ -189,14 +196,14 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when user is not an admin',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
         return bloc;
       },
-      act: (bloc) => bloc.add(const DemoteMemberFromAdmin(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const DemoteMemberFromAdmin(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('User is not an admin'),
@@ -211,18 +218,19 @@ void main() {
       'emits [loading, error] when trying to demote last admin',
       build: () {
         final singleAdminGroup = testGroup.copyWith(adminIds: ['creator123']);
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => singleAdminGroup);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => singleAdminGroup);
         return bloc;
       },
-      act: (bloc) => bloc.add(const DemoteMemberFromAdmin(
-        groupId: 'group1',
-        userId: 'creator123',
-      )),
+      act: (bloc) => bloc.add(
+        const DemoteMemberFromAdmin(groupId: 'group1', userId: 'creator123'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError(
-            'Cannot demote the last admin. Promote another member first.'),
+          'Cannot demote the last admin. Promote another member first.',
+        ),
       ],
       verify: (_) {
         verify(() => mockGroupRepository.getGroupById('group1')).called(1);
@@ -233,14 +241,14 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when trying to demote group creator',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
         return bloc;
       },
-      act: (bloc) => bloc.add(const DemoteMemberFromAdmin(
-        groupId: 'group1',
-        userId: 'creator123',
-      )),
+      act: (bloc) => bloc.add(
+        const DemoteMemberFromAdmin(groupId: 'group1', userId: 'creator123'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('Cannot demote the group creator'),
@@ -254,19 +262,22 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when repository throws exception',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
-        when(() => mockGroupRepository.demoteFromAdmin('group1', 'admin1'))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.demoteFromAdmin('group1', 'admin1'),
+        ).thenThrow(Exception('Network error'));
         return bloc;
       },
-      act: (bloc) => bloc.add(const DemoteMemberFromAdmin(
-        groupId: 'group1',
-        userId: 'admin1',
-      )),
+      act: (bloc) => bloc.add(
+        const DemoteMemberFromAdmin(groupId: 'group1', userId: 'admin1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
-        const GroupMemberError('Failed to demote member: Exception: Network error'),
+        const GroupMemberError(
+          'Failed to demote member: Exception: Network error',
+        ),
       ],
     );
   });
@@ -275,38 +286,40 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, success] when member is successfully removed',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
-        when(() => mockGroupRepository.removeMember('group1', 'user1'))
-            .thenAnswer((_) async {});
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.removeMember('group1', 'user1'),
+        ).thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const RemoveMemberFromGroup(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const RemoveMemberFromGroup(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const MemberRemovedSuccess(groupId: 'group1', userId: 'user1'),
       ],
       verify: (_) {
         verify(() => mockGroupRepository.getGroupById('group1')).called(1);
-        verify(() => mockGroupRepository.removeMember('group1', 'user1'))
-            .called(1);
+        verify(
+          () => mockGroupRepository.removeMember('group1', 'user1'),
+        ).called(1);
       },
     );
 
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when group is not found',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => null);
         return bloc;
       },
-      act: (bloc) => bloc.add(const RemoveMemberFromGroup(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const RemoveMemberFromGroup(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('Group not found'),
@@ -320,14 +333,14 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when user is not a member',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
         return bloc;
       },
-      act: (bloc) => bloc.add(const RemoveMemberFromGroup(
-        groupId: 'group1',
-        userId: 'nonMember123',
-      )),
+      act: (bloc) => bloc.add(
+        const RemoveMemberFromGroup(groupId: 'group1', userId: 'nonMember123'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('User is not a member of this group'),
@@ -342,18 +355,19 @@ void main() {
       'emits [loading, error] when trying to remove last admin',
       build: () {
         final singleAdminGroup = testGroup.copyWith(adminIds: ['admin1']);
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => singleAdminGroup);
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => singleAdminGroup);
         return bloc;
       },
-      act: (bloc) => bloc.add(const RemoveMemberFromGroup(
-        groupId: 'group1',
-        userId: 'admin1',
-      )),
+      act: (bloc) => bloc.add(
+        const RemoveMemberFromGroup(groupId: 'group1', userId: 'admin1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError(
-            'Cannot remove the last admin. Promote another member first.'),
+          'Cannot remove the last admin. Promote another member first.',
+        ),
       ],
       verify: (_) {
         verify(() => mockGroupRepository.getGroupById('group1')).called(1);
@@ -364,43 +378,48 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, success] when removing admin with other admins present',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
-        when(() => mockGroupRepository.removeMember('group1', 'admin1'))
-            .thenAnswer((_) async {});
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.removeMember('group1', 'admin1'),
+        ).thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const RemoveMemberFromGroup(
-        groupId: 'group1',
-        userId: 'admin1',
-      )),
+      act: (bloc) => bloc.add(
+        const RemoveMemberFromGroup(groupId: 'group1', userId: 'admin1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
         const MemberRemovedSuccess(groupId: 'group1', userId: 'admin1'),
       ],
       verify: (_) {
         verify(() => mockGroupRepository.getGroupById('group1')).called(1);
-        verify(() => mockGroupRepository.removeMember('group1', 'admin1'))
-            .called(1);
+        verify(
+          () => mockGroupRepository.removeMember('group1', 'admin1'),
+        ).called(1);
       },
     );
 
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when repository throws exception',
       build: () {
-        when(() => mockGroupRepository.getGroupById('group1'))
-            .thenAnswer((_) async => testGroup);
-        when(() => mockGroupRepository.removeMember('group1', 'user1'))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockGroupRepository.getGroupById('group1'),
+        ).thenAnswer((_) async => testGroup);
+        when(
+          () => mockGroupRepository.removeMember('group1', 'user1'),
+        ).thenThrow(Exception('Network error'));
         return bloc;
       },
-      act: (bloc) => bloc.add(const RemoveMemberFromGroup(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const RemoveMemberFromGroup(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GroupMemberLoading(),
-        const GroupMemberError('Failed to remove member: Exception: Network error'),
+        const GroupMemberError(
+          'Failed to remove member: Exception: Network error',
+        ),
       ],
     );
   });
@@ -409,14 +428,13 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, success] when user successfully leaves group',
       build: () {
-        when(() => mockGroupRepository.leaveGroup('group1'))
-            .thenAnswer((_) async {});
+        when(
+          () => mockGroupRepository.leaveGroup('group1'),
+        ).thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const LeaveGroup(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) =>
+          bloc.add(const LeaveGroup(groupId: 'group1', userId: 'user1')),
       expect: () => [
         const GroupMemberLoading(),
         const UserLeftGroupSuccess(groupId: 'group1'),
@@ -429,14 +447,13 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when group not found',
       build: () {
-        when(() => mockGroupRepository.leaveGroup('group1'))
-            .thenThrow(Exception('Group not found'));
+        when(
+          () => mockGroupRepository.leaveGroup('group1'),
+        ).thenThrow(Exception('Group not found'));
         return bloc;
       },
-      act: (bloc) => bloc.add(const LeaveGroup(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) =>
+          bloc.add(const LeaveGroup(groupId: 'group1', userId: 'user1')),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('Group not found'),
@@ -449,14 +466,13 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when user is not a member',
       build: () {
-        when(() => mockGroupRepository.leaveGroup('group1'))
-            .thenThrow(Exception('You are not a member of this group'));
+        when(
+          () => mockGroupRepository.leaveGroup('group1'),
+        ).thenThrow(Exception('You are not a member of this group'));
         return bloc;
       },
-      act: (bloc) => bloc.add(const LeaveGroup(
-        groupId: 'group1',
-        userId: 'nonMember123',
-      )),
+      act: (bloc) =>
+          bloc.add(const LeaveGroup(groupId: 'group1', userId: 'nonMember123')),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('You are not a member of this group'),
@@ -469,19 +485,20 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when user is last admin trying to leave',
       build: () {
-        when(() => mockGroupRepository.leaveGroup('group1'))
-            .thenThrow(Exception(
-                'Cannot leave group as the last admin. Promote another member to admin first.'));
+        when(() => mockGroupRepository.leaveGroup('group1')).thenThrow(
+          Exception(
+            'Cannot leave group as the last admin. Promote another member to admin first.',
+          ),
+        );
         return bloc;
       },
-      act: (bloc) => bloc.add(const LeaveGroup(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) =>
+          bloc.add(const LeaveGroup(groupId: 'group1', userId: 'user1')),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError(
-            'Cannot leave group as the last admin. Promote another member to admin first.'),
+          'Cannot leave group as the last admin. Promote another member to admin first.',
+        ),
       ],
       verify: (_) {
         verify(() => mockGroupRepository.leaveGroup('group1')).called(1);
@@ -491,19 +508,20 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when creator is last admin trying to leave',
       build: () {
-        when(() => mockGroupRepository.leaveGroup('group1'))
-            .thenThrow(Exception(
-                'Cannot leave group as the last admin. Promote another member to admin first.'));
+        when(() => mockGroupRepository.leaveGroup('group1')).thenThrow(
+          Exception(
+            'Cannot leave group as the last admin. Promote another member to admin first.',
+          ),
+        );
         return bloc;
       },
-      act: (bloc) => bloc.add(const LeaveGroup(
-        groupId: 'group1',
-        userId: 'creator123',
-      )),
+      act: (bloc) =>
+          bloc.add(const LeaveGroup(groupId: 'group1', userId: 'creator123')),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError(
-            'Cannot leave group as the last admin. Promote another member to admin first.'),
+          'Cannot leave group as the last admin. Promote another member to admin first.',
+        ),
       ],
       verify: (_) {
         verify(() => mockGroupRepository.leaveGroup('group1')).called(1);
@@ -513,14 +531,13 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, success] when admin leaves but other admins present',
       build: () {
-        when(() => mockGroupRepository.leaveGroup('group1'))
-            .thenAnswer((_) async {});
+        when(
+          () => mockGroupRepository.leaveGroup('group1'),
+        ).thenAnswer((_) async {});
         return bloc;
       },
-      act: (bloc) => bloc.add(const LeaveGroup(
-        groupId: 'group1',
-        userId: 'admin1',
-      )),
+      act: (bloc) =>
+          bloc.add(const LeaveGroup(groupId: 'group1', userId: 'admin1')),
       expect: () => [
         const GroupMemberLoading(),
         const UserLeftGroupSuccess(groupId: 'group1'),
@@ -533,14 +550,13 @@ void main() {
     blocTest<GroupMemberBloc, GroupMemberState>(
       'emits [loading, error] when repository throws exception',
       build: () {
-        when(() => mockGroupRepository.leaveGroup('group1'))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockGroupRepository.leaveGroup('group1'),
+        ).thenThrow(Exception('Network error'));
         return bloc;
       },
-      act: (bloc) => bloc.add(const LeaveGroup(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) =>
+          bloc.add(const LeaveGroup(groupId: 'group1', userId: 'user1')),
       expect: () => [
         const GroupMemberLoading(),
         const GroupMemberError('Network error'),

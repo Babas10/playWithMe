@@ -62,28 +62,34 @@ void main() {
 
   group('ExerciseListWidget', () {
     group('organiser view', () {
-      testWidgets('shows Add Exercise button when organiser and canModify true',
-          (tester) async {
-        when(() => mockBloc.state).thenReturn(ExercisesLoaded(
-          exercises: testExercises,
-          canModify: true,
-          isOrganiser: true,
-        ));
-
-        await tester.pumpWidget(buildWidget(isOrganiser: true));
-        await tester.pump();
-
-        expect(find.text('Add Exercise'), findsOneWidget);
-      });
-
       testWidgets(
-          'shows lock message for organiser when session has started',
-          (tester) async {
-        when(() => mockBloc.state).thenReturn(ExercisesLoaded(
-          exercises: testExercises,
-          canModify: false,
-          isOrganiser: true,
-        ));
+        'shows Add Exercise button when organiser and canModify true',
+        (tester) async {
+          when(() => mockBloc.state).thenReturn(
+            ExercisesLoaded(
+              exercises: testExercises,
+              canModify: true,
+              isOrganiser: true,
+            ),
+          );
+
+          await tester.pumpWidget(buildWidget(isOrganiser: true));
+          await tester.pump();
+
+          expect(find.text('Add Exercise'), findsOneWidget);
+        },
+      );
+
+      testWidgets('shows lock message for organiser when session has started', (
+        tester,
+      ) async {
+        when(() => mockBloc.state).thenReturn(
+          ExercisesLoaded(
+            exercises: testExercises,
+            canModify: false,
+            isOrganiser: true,
+          ),
+        );
 
         await tester.pumpWidget(buildWidget(isOrganiser: true));
         await tester.pump();
@@ -97,13 +103,16 @@ void main() {
     });
 
     group('non-organiser view', () {
-      testWidgets('does not show Add Exercise button for non-organiser',
-          (tester) async {
-        when(() => mockBloc.state).thenReturn(ExercisesLoaded(
-          exercises: testExercises,
-          canModify: false,
-          isOrganiser: false,
-        ));
+      testWidgets('does not show Add Exercise button for non-organiser', (
+        tester,
+      ) async {
+        when(() => mockBloc.state).thenReturn(
+          ExercisesLoaded(
+            exercises: testExercises,
+            canModify: false,
+            isOrganiser: false,
+          ),
+        );
 
         await tester.pumpWidget(buildWidget(isOrganiser: false));
         await tester.pump();
@@ -112,30 +121,36 @@ void main() {
       });
 
       testWidgets(
-          'does not show lock message for non-organiser (session timing irrelevant)',
-          (tester) async {
-        when(() => mockBloc.state).thenReturn(ExercisesLoaded(
-          exercises: testExercises,
-          canModify: false,
-          isOrganiser: false,
-        ));
+        'does not show lock message for non-organiser (session timing irrelevant)',
+        (tester) async {
+          when(() => mockBloc.state).thenReturn(
+            ExercisesLoaded(
+              exercises: testExercises,
+              canModify: false,
+              isOrganiser: false,
+            ),
+          );
 
-        await tester.pumpWidget(buildWidget(isOrganiser: false));
-        await tester.pump();
+          await tester.pumpWidget(buildWidget(isOrganiser: false));
+          await tester.pump();
 
-        expect(
-          find.text('Exercises cannot be modified after session starts'),
-          findsNothing,
+          expect(
+            find.text('Exercises cannot be modified after session starts'),
+            findsNothing,
+          );
+        },
+      );
+
+      testWidgets('shows correct empty-state text for non-organiser', (
+        tester,
+      ) async {
+        when(() => mockBloc.state).thenReturn(
+          const ExercisesLoaded(
+            exercises: [],
+            canModify: false,
+            isOrganiser: false,
+          ),
         );
-      });
-
-      testWidgets('shows correct empty-state text for non-organiser',
-          (tester) async {
-        when(() => mockBloc.state).thenReturn(const ExercisesLoaded(
-          exercises: [],
-          canModify: false,
-          isOrganiser: false,
-        ));
 
         await tester.pumpWidget(buildWidget(isOrganiser: false));
         await tester.pump();
@@ -146,13 +161,16 @@ void main() {
         );
       });
 
-      testWidgets('shows exercise list but no edit/delete controls',
-          (tester) async {
-        when(() => mockBloc.state).thenReturn(ExercisesLoaded(
-          exercises: testExercises,
-          canModify: false,
-          isOrganiser: false,
-        ));
+      testWidgets('shows exercise list but no edit/delete controls', (
+        tester,
+      ) async {
+        when(() => mockBloc.state).thenReturn(
+          ExercisesLoaded(
+            exercises: testExercises,
+            canModify: false,
+            isOrganiser: false,
+          ),
+        );
 
         await tester.pumpWidget(buildWidget(isOrganiser: false));
         await tester.pump();
@@ -165,8 +183,9 @@ void main() {
     });
 
     group('loading state', () {
-      testWidgets('shows CircularProgressIndicator while loading',
-          (tester) async {
+      testWidgets('shows CircularProgressIndicator while loading', (
+        tester,
+      ) async {
         when(() => mockBloc.state).thenReturn(const ExercisesLoading());
 
         await tester.pumpWidget(buildWidget(isOrganiser: true));

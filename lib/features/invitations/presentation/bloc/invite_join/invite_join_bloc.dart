@@ -13,9 +13,9 @@ class InviteJoinBloc extends Bloc<InviteJoinEvent, InviteJoinState> {
   InviteJoinBloc({
     required GroupInviteLinkRepository repository,
     required PendingInviteStorage pendingInviteStorage,
-  })  : _repository = repository,
-        _pendingInviteStorage = pendingInviteStorage,
-        super(const InviteJoinInitial()) {
+  }) : _repository = repository,
+       _pendingInviteStorage = pendingInviteStorage,
+       super(const InviteJoinInitial()) {
     on<ValidateInviteToken>(_onValidateToken);
     on<JoinGroupViaInvite>(_onJoinGroup);
     on<ProcessPendingInvite>(_onProcessPendingInvite);
@@ -27,18 +27,19 @@ class InviteJoinBloc extends Bloc<InviteJoinEvent, InviteJoinState> {
   ) async {
     emit(const InviteJoinValidating());
     try {
-      final result =
-          await _repository.validateInviteToken(token: event.token);
-      emit(InviteJoinValidated(
-        groupId: result.groupId,
-        groupName: result.groupName,
-        groupDescription: result.groupDescription,
-        groupPhotoUrl: result.groupPhotoUrl,
-        memberCount: result.groupMemberCount,
-        inviterName: result.inviterName,
-        inviterPhotoUrl: result.inviterPhotoUrl,
-        token: event.token,
-      ));
+      final result = await _repository.validateInviteToken(token: event.token);
+      emit(
+        InviteJoinValidated(
+          groupId: result.groupId,
+          groupName: result.groupName,
+          groupDescription: result.groupDescription,
+          groupPhotoUrl: result.groupPhotoUrl,
+          memberCount: result.groupMemberCount,
+          inviterName: result.inviterName,
+          inviterPhotoUrl: result.inviterPhotoUrl,
+          token: event.token,
+        ),
+      );
     } on GroupInviteLinkException catch (e) {
       if (e.code == 'failed-precondition') {
         emit(InviteJoinInvalidToken(reason: e.message));
@@ -56,14 +57,15 @@ class InviteJoinBloc extends Bloc<InviteJoinEvent, InviteJoinState> {
   ) async {
     emit(const InviteJoinJoining());
     try {
-      final result =
-          await _repository.joinGroupViaInvite(token: event.token);
+      final result = await _repository.joinGroupViaInvite(token: event.token);
       await _pendingInviteStorage.clear();
-      emit(InviteJoinJoined(
-        groupId: result.groupId,
-        groupName: result.groupName,
-        alreadyMember: result.alreadyMember,
-      ));
+      emit(
+        InviteJoinJoined(
+          groupId: result.groupId,
+          groupName: result.groupName,
+          alreadyMember: result.alreadyMember,
+        ),
+      );
     } on GroupInviteLinkException catch (e) {
       if (e.code == 'failed-precondition') {
         emit(InviteJoinInvalidToken(reason: e.message));
@@ -85,20 +87,21 @@ class InviteJoinBloc extends Bloc<InviteJoinEvent, InviteJoinState> {
     }
     emit(const InviteJoinValidating());
     try {
-      final result =
-          await _repository.validateInviteToken(token: token);
+      final result = await _repository.validateInviteToken(token: token);
       // Clear storage — token is now held in BLoC state
       await _pendingInviteStorage.clear();
-      emit(InviteJoinValidated(
-        groupId: result.groupId,
-        groupName: result.groupName,
-        groupDescription: result.groupDescription,
-        groupPhotoUrl: result.groupPhotoUrl,
-        memberCount: result.groupMemberCount,
-        inviterName: result.inviterName,
-        inviterPhotoUrl: result.inviterPhotoUrl,
-        token: token,
-      ));
+      emit(
+        InviteJoinValidated(
+          groupId: result.groupId,
+          groupName: result.groupName,
+          groupDescription: result.groupDescription,
+          groupPhotoUrl: result.groupPhotoUrl,
+          memberCount: result.groupMemberCount,
+          inviterName: result.inviterName,
+          inviterPhotoUrl: result.inviterPhotoUrl,
+          token: token,
+        ),
+      );
     } on GroupInviteLinkException catch (e) {
       await _pendingInviteStorage.clear();
       if (e.code == 'failed-precondition') {

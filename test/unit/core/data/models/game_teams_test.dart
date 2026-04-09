@@ -12,7 +12,12 @@ void main() {
       );
 
       expect(
-        teams.areAllPlayersAssigned(['player1', 'player2', 'player3', 'player4']),
+        teams.areAllPlayersAssigned([
+          'player1',
+          'player2',
+          'player3',
+          'player4',
+        ]),
         true,
       );
     });
@@ -24,7 +29,12 @@ void main() {
       );
 
       expect(
-        teams.areAllPlayersAssigned(['player1', 'player2', 'player3', 'player4']),
+        teams.areAllPlayersAssigned([
+          'player1',
+          'player2',
+          'player3',
+          'player4',
+        ]),
         false,
       );
     });
@@ -53,9 +63,12 @@ void main() {
         teamBPlayerIds: ['player2'],
       );
 
-      final unassigned = teams.getUnassignedPlayers(
-        ['player1', 'player2', 'player3', 'player4'],
-      );
+      final unassigned = teams.getUnassignedPlayers([
+        'player1',
+        'player2',
+        'player3',
+        'player4',
+      ]);
 
       expect(unassigned, ['player3', 'player4']);
     });
@@ -66,9 +79,12 @@ void main() {
         teamBPlayerIds: ['player3', 'player4'],
       );
 
-      final unassigned = teams.getUnassignedPlayers(
-        ['player1', 'player2', 'player3', 'player4'],
-      );
+      final unassigned = teams.getUnassignedPlayers([
+        'player1',
+        'player2',
+        'player3',
+        'player4',
+      ]);
 
       expect(unassigned, isEmpty);
     });
@@ -79,10 +95,7 @@ void main() {
         teamBPlayerIds: ['player3', 'player4'],
       );
 
-      expect(
-        teams.isValid(['player1', 'player2', 'player3', 'player4']),
-        true,
-      );
+      expect(teams.isValid(['player1', 'player2', 'player3', 'player4']), true);
     });
 
     test('isValid returns false when player is on both teams', () {
@@ -91,10 +104,7 @@ void main() {
         teamBPlayerIds: ['player2', 'player3'],
       );
 
-      expect(
-        teams.isValid(['player1', 'player2', 'player3']),
-        false,
-      );
+      expect(teams.isValid(['player1', 'player2', 'player3']), false);
     });
 
     test('isValid returns false when not all players assigned', () {

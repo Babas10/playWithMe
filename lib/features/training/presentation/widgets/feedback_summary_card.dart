@@ -8,10 +8,7 @@ import '../../../../core/domain/repositories/training_feedback_repository.dart';
 class FeedbackSummaryCard extends StatelessWidget {
   final FeedbackAggregation aggregation;
 
-  const FeedbackSummaryCard({
-    super.key,
-    required this.aggregation,
-  });
+  const FeedbackSummaryCard({super.key, required this.aggregation});
 
   @override
   Widget build(BuildContext context) {
@@ -50,17 +47,17 @@ class FeedbackSummaryCard extends StatelessWidget {
                     Text(
                       overallAverage.toStringAsFixed(1),
                       style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.secondary,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
+                      ),
                     ),
                     _buildStarRating(overallAverage),
                     const SizedBox(height: 8),
                     Text(
                       'Based on ${aggregation.totalCount} ${aggregation.totalCount == 1 ? 'rating' : 'ratings'}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textMuted,
-                          ),
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -121,11 +118,7 @@ class FeedbackSummaryCard extends StatelessWidget {
           icon = Icons.star_border;
         }
 
-        return Icon(
-          icon,
-          color: AppColors.primary,
-          size: 32,
-        );
+        return Icon(icon, color: AppColors.primary, size: 32);
       }),
     );
   }
@@ -146,9 +139,9 @@ class FeedbackSummaryCard extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 4),
               Row(
@@ -169,8 +162,8 @@ class FeedbackSummaryCard extends StatelessWidget {
                     child: Text(
                       rating.toStringAsFixed(1),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                       textAlign: TextAlign.right,
                     ),
                   ),

@@ -20,16 +20,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -39,7 +38,8 @@ void main() {
         expect(find.text('No Nemesis Yet'), findsOneWidget);
         expect(
           find.text(
-              'Play at least 3 games against the same opponent to track your toughest matchup.'),
+            'Play at least 3 games against the same opponent to track your toughest matchup.',
+          ),
           findsOneWidget,
         );
         expect(find.text('Face the same opponent 3+ times'), findsOneWidget);
@@ -58,16 +58,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -96,16 +95,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -143,16 +141,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -181,16 +178,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -218,24 +214,21 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
 
         // Find the Text widget with win rate
-        final winRateText = tester.widget<Text>(
-          find.text('Win Rate: 25.0%'),
-        );
+        final winRateText = tester.widget<Text>(find.text('Win Rate: 25.0%'));
 
         // Check if text style indicates error color (red)
         // Note: We can't directly check the color since it's theme-dependent,
@@ -262,16 +255,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -301,16 +293,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -322,8 +313,7 @@ void main() {
         expect(find.byIcon(Icons.arrow_forward_ios), findsOneWidget);
       });
 
-      testWidgets('card is not tappable when nemesis is null',
-          (tester) async {
+      testWidgets('card is not tappable when nemesis is null', (tester) async {
         final user = UserModel(
           uid: 'test-uid',
           email: 'test@example.com',
@@ -333,16 +323,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -365,16 +354,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();
@@ -401,16 +389,15 @@ void main() {
         );
 
         await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],            home: Scaffold(
-              body: RivalsCard(user: user),
-            ),
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(body: RivalsCard(user: user)),
           ),
         );
         await tester.pumpAndSettle();

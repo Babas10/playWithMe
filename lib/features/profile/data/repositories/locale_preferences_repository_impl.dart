@@ -19,8 +19,8 @@ class LocalePreferencesRepositoryImpl implements LocalePreferencesRepository {
   LocalePreferencesRepositoryImpl({
     required SharedPreferences sharedPreferences,
     required FirebaseFirestore firestore,
-  })  : _sharedPreferences = sharedPreferences,
-        _firestore = firestore;
+  }) : _sharedPreferences = sharedPreferences,
+       _firestore = firestore;
 
   @override
   Future<LocalePreferencesEntity> loadPreferences() async {

@@ -17,7 +17,9 @@ import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/pages/head_to_head_page.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
+
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 void main() {
@@ -95,10 +97,17 @@ void main() {
     mockInvitationBloc = MockInvitationBloc();
     mockAuthBloc = MockAuthenticationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
-        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+        UserEntity(
+          uid: 'test-user',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+        ),
       ),
     );
     when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
@@ -143,8 +152,10 @@ void main() {
   group('HeadToHeadPage Widget Tests', () {
     group('Initial UI Rendering', () {
       testWidgets('renders app bar with Head-to-Head title', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -156,32 +167,44 @@ void main() {
 
     group('Error State', () {
       testWidgets('shows error message when stats is null', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => null);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => null);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
-        expect(find.text('No head-to-head statistics found for this opponent'),
-            findsOneWidget);
+        expect(
+          find.text('No head-to-head statistics found for this opponent'),
+          findsOneWidget,
+        );
       });
 
-      testWidgets('shows error message when exception is thrown', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenThrow(Exception('Network error'));
+      testWidgets('shows error message when exception is thrown', (
+        tester,
+      ) async {
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenThrow(Exception('Network error'));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
-        expect(find.textContaining('Failed to load head-to-head details'),
-            findsOneWidget);
+        expect(
+          find.textContaining('Failed to load head-to-head details'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('error icon has red color', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => null);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => null);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -193,8 +216,10 @@ void main() {
 
     group('Loaded State - Opponent Header', () {
       testWidgets('shows opponent display name', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -203,8 +228,10 @@ void main() {
       });
 
       testWidgets('shows opponent email when available', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -213,8 +240,10 @@ void main() {
       });
 
       testWidgets('shows person icon when no photo url', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -223,8 +252,10 @@ void main() {
       });
 
       testWidgets('shows rivalry indicator badge', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -235,8 +266,10 @@ void main() {
 
     group('Loaded State - Rivalry Card', () {
       testWidgets('shows rivalry intensity', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -246,8 +279,10 @@ void main() {
       });
 
       testWidgets('shows matchup advantage', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -259,8 +294,10 @@ void main() {
 
     group('Loaded State - Record Card', () {
       testWidgets('shows Head-to-Head Record title', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -269,8 +306,10 @@ void main() {
       });
 
       testWidgets('shows games played count', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -280,8 +319,10 @@ void main() {
       });
 
       testWidgets('shows win rate percentage', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -292,8 +333,10 @@ void main() {
       });
 
       testWidgets('shows win-loss record string', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -305,8 +348,10 @@ void main() {
 
     group('Loaded State - Point Differential Card', () {
       testWidgets('shows Point Differential title', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -315,8 +360,10 @@ void main() {
       });
 
       testWidgets('shows average point differential', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -328,8 +375,10 @@ void main() {
       });
 
       testWidgets('shows points scored average', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -340,8 +389,10 @@ void main() {
       });
 
       testWidgets('shows points allowed average', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -354,8 +405,10 @@ void main() {
 
     group('Loaded State - Margins Card', () {
       testWidgets('shows Matchup Margins title', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -364,8 +417,10 @@ void main() {
       });
 
       testWidgets('shows biggest victory margin', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -375,8 +430,10 @@ void main() {
       });
 
       testWidgets('shows worst defeat margin', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -386,8 +443,10 @@ void main() {
       });
 
       testWidgets('shows total ELO change against opponent', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -399,8 +458,10 @@ void main() {
 
     group('Loaded State - Recent Matchups', () {
       testWidgets('shows Recent Matchups title', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -409,8 +470,10 @@ void main() {
       });
 
       testWidgets('shows current streak badge when on streak', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -420,8 +483,10 @@ void main() {
       });
 
       testWidgets('shows matchup score displays', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -433,8 +498,10 @@ void main() {
       });
 
       testWidgets('shows W and L result letters', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -445,8 +512,10 @@ void main() {
       });
 
       testWidgets('shows ELO change for each matchup', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -457,8 +526,10 @@ void main() {
       });
 
       testWidgets('shows empty state when no recent matchups', (tester) async {
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => testStatsNoMatchups);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => testStatsNoMatchups);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -468,8 +539,9 @@ void main() {
     });
 
     group('Loaded State - Losing Streak', () {
-      testWidgets('shows losing streak badge when on losing streak',
-          (tester) async {
+      testWidgets('shows losing streak badge when on losing streak', (
+        tester,
+      ) async {
         final losingStats = HeadToHeadStats(
           userId: testUserId,
           opponentId: testOpponentId,
@@ -503,8 +575,10 @@ void main() {
           ],
         );
 
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => losingStats);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => losingStats);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -531,8 +605,10 @@ void main() {
           recentMatchups: [],
         );
 
-        when(() => mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId))
-            .thenAnswer((_) async => statsWithoutName);
+        when(
+          () =>
+              mockUserRepository.getHeadToHeadStats(testUserId, testOpponentId),
+        ).thenAnswer((_) async => statsWithoutName);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();

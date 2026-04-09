@@ -34,10 +34,7 @@ class SetGameFormat extends ScoreEntryEvent {
   final int gameIndex; // 0-based index
   final int numberOfSets; // 1, 2, or 3
 
-  const SetGameFormat({
-    required this.gameIndex,
-    required this.numberOfSets,
-  });
+  const SetGameFormat({required this.gameIndex, required this.numberOfSets});
 
   @override
   List<Object?> get props => [gameIndex, numberOfSets];
@@ -66,10 +63,7 @@ class SelectGameTeams extends ScoreEntryEvent {
   final int gameIndex;
   final GameTeams teams;
 
-  const SelectGameTeams({
-    required this.gameIndex,
-    required this.teams,
-  });
+  const SelectGameTeams({required this.gameIndex, required this.teams});
 
   @override
   List<Object?> get props => [gameIndex, teams];

@@ -21,8 +21,9 @@ void main() {
 
     group('store', () {
       test('stores token in SharedPreferences', () async {
-        when(() => mockPrefs.setString(key, testToken))
-            .thenAnswer((_) async => true);
+        when(
+          () => mockPrefs.setString(key, testToken),
+        ).thenAnswer((_) async => true);
 
         await storage.store(testToken);
 

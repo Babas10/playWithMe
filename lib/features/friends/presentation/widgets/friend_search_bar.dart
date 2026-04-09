@@ -39,9 +39,7 @@ class _FriendSearchBarState extends State<FriendSearchBar> {
       return;
     }
     _focusNode.unfocus();
-    context.read<FriendBloc>().add(
-          FriendEvent.searchRequested(email: email),
-        );
+    context.read<FriendBloc>().add(FriendEvent.searchRequested(email: email));
   }
 
   void _clearSearch() {

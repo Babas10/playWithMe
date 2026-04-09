@@ -82,7 +82,9 @@ void main() {
   }
 
   group('ProfilePage', () {
-    testWidgets('displays profile content when user is authenticated', (tester) async {
+    testWidgets('displays profile content when user is authenticated', (
+      tester,
+    ) async {
       final testUser = UserEntity(
         uid: 'test-uid-123',
         email: 'test@example.com',
@@ -112,7 +114,9 @@ void main() {
       expect(find.byType(ExpandedStatsSection), findsNothing);
     });
 
-    testWidgets('displays loading indicator when authentication is unknown', (tester) async {
+    testWidgets('displays loading indicator when authentication is unknown', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         createWidgetUnderTest(state: const AuthenticationUnknown()),
       );

@@ -24,10 +24,12 @@ void main() {
     mockDeepLinkService = MockDeepLinkService();
     mockStorage = MockPendingInviteStorage();
     mockAnalytics = MockFirebaseAnalytics();
-    when(() => mockAnalytics.logEvent(
-          name: any(named: 'name'),
-          parameters: any(named: 'parameters'),
-        )).thenAnswer((_) async {});
+    when(
+      () => mockAnalytics.logEvent(
+        name: any(named: 'name'),
+        parameters: any(named: 'parameters'),
+      ),
+    ).thenAnswer((_) async {});
   });
 
   DeepLinkBloc buildBloc() {
@@ -40,8 +42,9 @@ void main() {
 
   group('DeepLinkBloc', () {
     test('initial state is DeepLinkInitial', () {
-      when(() => mockDeepLinkService.inviteTokenStream)
-          .thenAnswer((_) => const Stream.empty());
+      when(
+        () => mockDeepLinkService.inviteTokenStream,
+      ).thenAnswer((_) => const Stream.empty());
       final bloc = buildBloc();
       expect(bloc.state, const DeepLinkInitial());
       bloc.close();
@@ -51,21 +54,23 @@ void main() {
       blocTest<DeepLinkBloc, DeepLinkState>(
         'emits [DeepLinkPendingInvite] when stored token exists',
         setUp: () {
-          when(() => mockStorage.retrieve())
-              .thenAnswer((_) async => 'stored-token');
+          when(
+            () => mockStorage.retrieve(),
+          ).thenAnswer((_) async => 'stored-token');
           when(() => mockStorage.clear()).thenAnswer((_) async {});
-          when(() => mockDeepLinkService.inviteTokenStream)
-              .thenAnswer((_) => const Stream.empty());
+          when(
+            () => mockDeepLinkService.inviteTokenStream,
+          ).thenAnswer((_) => const Stream.empty());
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const InitializeDeepLinks()),
-        expect: () => [
-          const DeepLinkPendingInvite(token: 'stored-token'),
-        ],
+        expect: () => [const DeepLinkPendingInvite(token: 'stored-token')],
         verify: (_) {
           verify(() => mockStorage.retrieve()).called(1);
           verifyNever(() => mockDeepLinkService.getInitialInviteToken());
-          verify(() => mockAnalytics.logEvent(name: 'invite_link_tapped')).called(1);
+          verify(
+            () => mockAnalytics.logEvent(name: 'invite_link_tapped'),
+          ).called(1);
         },
       );
 
@@ -73,46 +78,48 @@ void main() {
         'emits [DeepLinkPendingInvite] when initial deep link token exists',
         setUp: () {
           when(() => mockStorage.retrieve()).thenAnswer((_) async => null);
-          when(() => mockDeepLinkService.getInitialInviteToken())
-              .thenAnswer((_) async => 'initial-token');
-          when(() => mockStorage.isConsumed('initial-token'))
-              .thenReturn(false);
-          when(() => mockDeepLinkService.inviteTokenStream)
-              .thenAnswer((_) => const Stream.empty());
+          when(
+            () => mockDeepLinkService.getInitialInviteToken(),
+          ).thenAnswer((_) async => 'initial-token');
+          when(() => mockStorage.isConsumed('initial-token')).thenReturn(false);
+          when(
+            () => mockDeepLinkService.inviteTokenStream,
+          ).thenAnswer((_) => const Stream.empty());
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const InitializeDeepLinks()),
-        expect: () => [
-          const DeepLinkPendingInvite(token: 'initial-token'),
-        ],
+        expect: () => [const DeepLinkPendingInvite(token: 'initial-token')],
       );
 
       blocTest<DeepLinkBloc, DeepLinkState>(
         'emits [DeepLinkNoInvite] when no stored or initial token exists',
         setUp: () {
           when(() => mockStorage.retrieve()).thenAnswer((_) async => null);
-          when(() => mockDeepLinkService.getInitialInviteToken())
-              .thenAnswer((_) async => null);
-          when(() => mockDeepLinkService.inviteTokenStream)
-              .thenAnswer((_) => const Stream.empty());
+          when(
+            () => mockDeepLinkService.getInitialInviteToken(),
+          ).thenAnswer((_) async => null);
+          when(
+            () => mockDeepLinkService.inviteTokenStream,
+          ).thenAnswer((_) => const Stream.empty());
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const InitializeDeepLinks()),
-        expect: () => [
-          const DeepLinkNoInvite(),
-        ],
+        expect: () => [const DeepLinkNoInvite()],
       );
 
       blocTest<DeepLinkBloc, DeepLinkState>(
         'listens to foreground token stream after initialization',
         setUp: () {
           when(() => mockStorage.retrieve()).thenAnswer((_) async => null);
-          when(() => mockDeepLinkService.getInitialInviteToken())
-              .thenAnswer((_) async => null);
-          when(() => mockDeepLinkService.inviteTokenStream)
-              .thenAnswer((_) => Stream.value('stream-token'));
-          when(() => mockStorage.store('stream-token'))
-              .thenAnswer((_) async {});
+          when(
+            () => mockDeepLinkService.getInitialInviteToken(),
+          ).thenAnswer((_) async => null);
+          when(
+            () => mockDeepLinkService.inviteTokenStream,
+          ).thenAnswer((_) => Stream.value('stream-token'));
+          when(
+            () => mockStorage.store('stream-token'),
+          ).thenAnswer((_) async {});
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const InitializeDeepLinks()),
@@ -128,19 +135,19 @@ void main() {
       blocTest<DeepLinkBloc, DeepLinkState>(
         'emits [DeepLinkPendingInvite] and stores token',
         setUp: () {
-          when(() => mockStorage.store('new-token'))
-              .thenAnswer((_) async {});
-          when(() => mockDeepLinkService.inviteTokenStream)
-              .thenAnswer((_) => const Stream.empty());
+          when(() => mockStorage.store('new-token')).thenAnswer((_) async {});
+          when(
+            () => mockDeepLinkService.inviteTokenStream,
+          ).thenAnswer((_) => const Stream.empty());
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const InviteTokenReceived('new-token')),
-        expect: () => [
-          const DeepLinkPendingInvite(token: 'new-token'),
-        ],
+        expect: () => [const DeepLinkPendingInvite(token: 'new-token')],
         verify: (_) {
           verify(() => mockStorage.store('new-token')).called(1);
-          verify(() => mockAnalytics.logEvent(name: 'invite_link_tapped')).called(1);
+          verify(
+            () => mockAnalytics.logEvent(name: 'invite_link_tapped'),
+          ).called(1);
         },
       );
     });
@@ -150,14 +157,13 @@ void main() {
         'emits [DeepLinkNoInvite] and clears storage',
         setUp: () {
           when(() => mockStorage.clear()).thenAnswer((_) async {});
-          when(() => mockDeepLinkService.inviteTokenStream)
-              .thenAnswer((_) => const Stream.empty());
+          when(
+            () => mockDeepLinkService.inviteTokenStream,
+          ).thenAnswer((_) => const Stream.empty());
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const ClearPendingInvite()),
-        expect: () => [
-          const DeepLinkNoInvite(),
-        ],
+        expect: () => [const DeepLinkNoInvite()],
         verify: (_) {
           verify(() => mockStorage.clear()).called(1);
         },

@@ -22,14 +22,12 @@ class ExerciseListItem extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
-        leading: const CircleAvatar(
-          child: Icon(Icons.fitness_center),
-        ),
+        leading: const CircleAvatar(child: Icon(Icons.fitness_center)),
         title: Text(
           exercise.name,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -55,9 +55,11 @@ class EloResult with _$EloResult {
 
   /// Get the rating change for a specific player (positive or negative)
   double getRatingChange(String playerId) {
-    if (playerId == teamAPlayer1.playerId || playerId == teamAPlayer2.playerId) {
+    if (playerId == teamAPlayer1.playerId ||
+        playerId == teamAPlayer2.playerId) {
       return teamAWon ? ratingDelta : -ratingDelta;
-    } else if (playerId == teamBPlayer1.playerId || playerId == teamBPlayer2.playerId) {
+    } else if (playerId == teamBPlayer1.playerId ||
+        playerId == teamBPlayer2.playerId) {
       return teamAWon ? -ratingDelta : ratingDelta;
     }
     throw ArgumentError('Player ID $playerId not found in ELO result');

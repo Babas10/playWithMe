@@ -15,9 +15,9 @@ class NotificationSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => NotificationBloc(
-        repository: GetIt.instance<NotificationRepository>(),
-      )..add(const NotificationEvent.loadPreferences()),
+      create: (context) =>
+          NotificationBloc(repository: GetIt.instance<NotificationRepository>())
+            ..add(const NotificationEvent.loadPreferences()),
       child: const _NotificationSettingsView(),
     );
   }
@@ -48,8 +48,8 @@ class _NotificationSettingsView extends StatelessWidget {
                   value: preferences.groupInvitations,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleGroupInvitations(value),
-                        );
+                      NotificationEvent.toggleGroupInvitations(value),
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -58,18 +58,20 @@ class _NotificationSettingsView extends StatelessWidget {
                   value: preferences.invitationAccepted,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleInvitationAccepted(value),
-                        );
+                      NotificationEvent.toggleInvitationAccepted(value),
+                    );
                   },
                 ),
                 SwitchListTile(
                   title: const Text('New Games'),
-                  subtitle: const Text('When a new game is created in your groups'),
+                  subtitle: const Text(
+                    'When a new game is created in your groups',
+                  ),
                   value: preferences.gameCreated,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleGameCreated(value),
-                        );
+                      NotificationEvent.toggleGameCreated(value),
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -78,8 +80,8 @@ class _NotificationSettingsView extends StatelessWidget {
                   value: preferences.roleChanged,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleRoleChanged(value),
-                        );
+                      NotificationEvent.toggleRoleChanged(value),
+                    );
                   },
                 ),
 
@@ -89,42 +91,52 @@ class _NotificationSettingsView extends StatelessWidget {
                 _SectionHeader(title: 'Training Sessions'),
                 SwitchListTile(
                   title: const Text('New Training Sessions'),
-                  subtitle: const Text('When a training session is created in your groups'),
+                  subtitle: const Text(
+                    'When a training session is created in your groups',
+                  ),
                   value: preferences.trainingSessionCreated,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleTrainingSessionCreated(value),
-                        );
+                      NotificationEvent.toggleTrainingSessionCreated(value),
+                    );
                   },
                 ),
                 SwitchListTile(
                   title: const Text('Minimum Participants Reached'),
-                  subtitle: const Text('When a training session has enough participants'),
+                  subtitle: const Text(
+                    'When a training session has enough participants',
+                  ),
                   value: preferences.trainingMinParticipantsReached,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleTrainingMinParticipantsReached(value),
-                        );
+                      NotificationEvent.toggleTrainingMinParticipantsReached(
+                        value,
+                      ),
+                    );
                   },
                 ),
                 SwitchListTile(
                   title: const Text('Feedback Received'),
-                  subtitle: const Text('When someone leaves feedback on a training session'),
+                  subtitle: const Text(
+                    'When someone leaves feedback on a training session',
+                  ),
                   value: preferences.trainingFeedbackReceived,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleTrainingFeedbackReceived(value),
-                        );
+                      NotificationEvent.toggleTrainingFeedbackReceived(value),
+                    );
                   },
                 ),
                 SwitchListTile(
                   title: const Text('Session Cancelled'),
-                  subtitle: const Text('When a training session you joined is cancelled'),
+                  subtitle: const Text(
+                    'When a training session you joined is cancelled',
+                  ),
                   value: preferences.trainingSessionCancelled,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleTrainingSessionCancelled(value),
-                        );
+                      NotificationEvent.toggleTrainingSessionCancelled(value),
+                    );
                   },
                 ),
 
@@ -136,10 +148,7 @@ class _NotificationSettingsView extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     'Only receive these if you are an admin',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ),
                 SwitchListTile(
@@ -148,8 +157,8 @@ class _NotificationSettingsView extends StatelessWidget {
                   value: preferences.memberJoined,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleMemberJoined(value),
-                        );
+                      NotificationEvent.toggleMemberJoined(value),
+                    );
                   },
                 ),
                 SwitchListTile(
@@ -158,8 +167,8 @@ class _NotificationSettingsView extends StatelessWidget {
                   value: preferences.memberLeft,
                   onChanged: (value) {
                     context.read<NotificationBloc>().add(
-                          NotificationEvent.toggleMemberLeft(value),
-                        );
+                      NotificationEvent.toggleMemberLeft(value),
+                    );
                   },
                 ),
 
@@ -186,12 +195,12 @@ class _NotificationSettingsView extends StatelessWidget {
                     } else {
                       // If disabling, just toggle off
                       context.read<NotificationBloc>().add(
-                            NotificationEvent.toggleQuietHours(
-                              enabled: false,
-                              start: preferences.quietHoursStart,
-                              end: preferences.quietHoursEnd,
-                            ),
-                          );
+                        NotificationEvent.toggleQuietHours(
+                          enabled: false,
+                          start: preferences.quietHoursStart,
+                          end: preferences.quietHoursEnd,
+                        ),
+                      );
                     }
                   },
                 ),
@@ -245,8 +254,8 @@ class _NotificationSettingsView extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       context.read<NotificationBloc>().add(
-                            const NotificationEvent.loadPreferences(),
-                          );
+                        const NotificationEvent.loadPreferences(),
+                      );
                     },
                     child: const Text('Retry'),
                   ),
@@ -314,12 +323,12 @@ class _NotificationSettingsView extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               context.read<NotificationBloc>().add(
-                    NotificationEvent.toggleQuietHours(
-                      enabled: true,
-                      start: _formatTime(startTime),
-                      end: _formatTime(endTime),
-                    ),
-                  );
+                NotificationEvent.toggleQuietHours(
+                  enabled: true,
+                  start: _formatTime(startTime),
+                  end: _formatTime(endTime),
+                ),
+              );
               Navigator.pop(dialogContext);
             },
             child: const Text('Save'),
@@ -331,10 +340,7 @@ class _NotificationSettingsView extends StatelessWidget {
 
   TimeOfDay _parseTime(String time) {
     final parts = time.split(':');
-    return TimeOfDay(
-      hour: int.parse(parts[0]),
-      minute: int.parse(parts[1]),
-    );
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
   String _formatTime(TimeOfDay time) {

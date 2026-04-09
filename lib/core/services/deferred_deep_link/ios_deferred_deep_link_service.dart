@@ -43,7 +43,7 @@ class IosDeferredDeepLinkService implements DeferredDeepLinkService {
   final ClipboardReader _clipboard;
 
   IosDeferredDeepLinkService({ClipboardReader? clipboard})
-      : _clipboard = clipboard ?? FlutterClipboardReader();
+    : _clipboard = clipboard ?? FlutterClipboardReader();
 
   @override
   Future<String?> retrieveDeferredToken() async {

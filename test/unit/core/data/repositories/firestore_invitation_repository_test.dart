@@ -9,8 +9,11 @@ import 'package:play_with_me/core/data/repositories/firestore_invitation_reposit
 import 'package:play_with_me/core/domain/repositories/group_repository.dart';
 
 class MockGroupRepository extends Mock implements GroupRepository {}
+
 class MockFirebaseFunctions extends Mock implements FirebaseFunctions {}
+
 class MockHttpsCallable extends Mock implements HttpsCallable {}
+
 class MockHttpsCallableResult extends Mock implements HttpsCallableResult {}
 
 void main() {
@@ -29,7 +32,9 @@ void main() {
 
       // Setup default mock behavior for Cloud Functions
       when(() => mockFunctions.httpsCallable(any())).thenReturn(mockCallable);
-      when(() => mockCallable.call(any())).thenAnswer((_) async => MockHttpsCallableResult());
+      when(
+        () => mockCallable.call(any()),
+      ).thenAnswer((_) async => MockHttpsCallableResult());
 
       repository = FirestoreInvitationRepository(
         firestore: fakeFirestore,
@@ -39,112 +44,135 @@ void main() {
     });
 
     group('sendInvitation', () {
-      test('calls inviteToGroup Cloud Function with correct parameters', () async {
-        // Arrange
-        final mockResult = MockHttpsCallableResult();
-        when(() => mockResult.data).thenReturn({
-          'success': true,
-          'invitationId': 'invitation-789',
-        });
-        when(() => mockCallable.call(any())).thenAnswer((_) async => mockResult);
+      test(
+        'calls inviteToGroup Cloud Function with correct parameters',
+        () async {
+          // Arrange
+          final mockResult = MockHttpsCallableResult();
+          when(
+            () => mockResult.data,
+          ).thenReturn({'success': true, 'invitationId': 'invitation-789'});
+          when(
+            () => mockCallable.call(any()),
+          ).thenAnswer((_) async => mockResult);
 
-        // Act
-        final invitationId = await repository.sendInvitation(
-          groupId: 'group-123',
-          groupName: 'Test Group',
-          invitedUserId: 'user-456',
-          invitedBy: 'user-123',
-          inviterName: 'John Doe',
-        );
-
-        // Assert
-        expect(invitationId, 'invitation-789');
-
-        // Verify Cloud Function was called with correct parameters
-        verify(() => mockFunctions.httpsCallable('inviteToGroup')).called(1);
-        verify(() => mockCallable.call({
-          'groupId': 'group-123',
-          'invitedUserId': 'user-456',
-        })).called(1);
-      });
-
-      test('throws exception with user-friendly message for permission-denied error', () async {
-        // Arrange
-        when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'permission-denied',
-            message: 'You can only invite friends to groups',
-          ),
-        );
-
-        // Act & Assert
-        expect(
-          () => repository.sendInvitation(
+          // Act
+          final invitationId = await repository.sendInvitation(
             groupId: 'group-123',
             groupName: 'Test Group',
             invitedUserId: 'user-456',
             invitedBy: 'user-123',
             inviterName: 'John Doe',
-          ),
-          throwsA(
-            predicate((e) =>
-                e is Exception &&
-                e.toString().contains('You can only invite friends to groups')),
-          ),
-        );
-      });
+          );
 
-      test('throws exception with user-friendly message for not-found error', () async {
-        // Arrange
-        when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'not-found',
-            message: 'User or group not found',
-          ),
-        );
+          // Assert
+          expect(invitationId, 'invitation-789');
 
-        // Act & Assert
-        expect(
-          () => repository.sendInvitation(
-            groupId: 'group-123',
-            groupName: 'Test Group',
-            invitedUserId: 'user-456',
-            invitedBy: 'user-123',
-            inviterName: 'John Doe',
-          ),
-          throwsA(
-            predicate((e) =>
-                e is Exception &&
-                e.toString().contains('User or group not found')),
-          ),
-        );
-      });
+          // Verify Cloud Function was called with correct parameters
+          verify(() => mockFunctions.httpsCallable('inviteToGroup')).called(1);
+          verify(
+            () => mockCallable.call({
+              'groupId': 'group-123',
+              'invitedUserId': 'user-456',
+            }),
+          ).called(1);
+        },
+      );
 
-      test('throws exception with user-friendly message for already-exists error', () async {
-        // Arrange
-        when(() => mockCallable.call(any())).thenThrow(
-          FirebaseFunctionsException(
-            code: 'already-exists',
-            message: 'User already has a pending invitation',
-          ),
-        );
+      test(
+        'throws exception with user-friendly message for permission-denied error',
+        () async {
+          // Arrange
+          when(() => mockCallable.call(any())).thenThrow(
+            FirebaseFunctionsException(
+              code: 'permission-denied',
+              message: 'You can only invite friends to groups',
+            ),
+          );
 
-        // Act & Assert
-        expect(
-          () => repository.sendInvitation(
-            groupId: 'group-123',
-            groupName: 'Test Group',
-            invitedUserId: 'user-456',
-            invitedBy: 'user-123',
-            inviterName: 'John Doe',
-          ),
-          throwsA(
-            predicate((e) =>
-                e is Exception &&
-                e.toString().contains('already has a pending invitation')),
-          ),
-        );
-      });
+          // Act & Assert
+          expect(
+            () => repository.sendInvitation(
+              groupId: 'group-123',
+              groupName: 'Test Group',
+              invitedUserId: 'user-456',
+              invitedBy: 'user-123',
+              inviterName: 'John Doe',
+            ),
+            throwsA(
+              predicate(
+                (e) =>
+                    e is Exception &&
+                    e.toString().contains(
+                      'You can only invite friends to groups',
+                    ),
+              ),
+            ),
+          );
+        },
+      );
+
+      test(
+        'throws exception with user-friendly message for not-found error',
+        () async {
+          // Arrange
+          when(() => mockCallable.call(any())).thenThrow(
+            FirebaseFunctionsException(
+              code: 'not-found',
+              message: 'User or group not found',
+            ),
+          );
+
+          // Act & Assert
+          expect(
+            () => repository.sendInvitation(
+              groupId: 'group-123',
+              groupName: 'Test Group',
+              invitedUserId: 'user-456',
+              invitedBy: 'user-123',
+              inviterName: 'John Doe',
+            ),
+            throwsA(
+              predicate(
+                (e) =>
+                    e is Exception &&
+                    e.toString().contains('User or group not found'),
+              ),
+            ),
+          );
+        },
+      );
+
+      test(
+        'throws exception with user-friendly message for already-exists error',
+        () async {
+          // Arrange
+          when(() => mockCallable.call(any())).thenThrow(
+            FirebaseFunctionsException(
+              code: 'already-exists',
+              message: 'User already has a pending invitation',
+            ),
+          );
+
+          // Act & Assert
+          expect(
+            () => repository.sendInvitation(
+              groupId: 'group-123',
+              groupName: 'Test Group',
+              invitedUserId: 'user-456',
+              invitedBy: 'user-123',
+              inviterName: 'John Doe',
+            ),
+            throwsA(
+              predicate(
+                (e) =>
+                    e is Exception &&
+                    e.toString().contains('already has a pending invitation'),
+              ),
+            ),
+          );
+        },
+      );
 
       test('throws exception for general Firebase Functions errors', () async {
         // Arrange
@@ -165,9 +193,11 @@ void main() {
             inviterName: 'John Doe',
           ),
           throwsA(
-            predicate((e) =>
-                e is Exception &&
-                e.toString().contains('Internal server error')),
+            predicate(
+              (e) =>
+                  e is Exception &&
+                  e.toString().contains('Internal server error'),
+            ),
           ),
         );
       });
@@ -181,28 +211,28 @@ void main() {
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group 1',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-123',
+              'groupName': 'Test Group 1',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-123',
+              'inviterName': 'John Doe',
+              'status': 'pending',
+              'createdAt': Timestamp.now(),
+            });
 
         await fakeFirestore
             .collection('users')
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-789',
-          'groupName': 'Test Group 2',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-111',
-          'inviterName': 'Jane Smith',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-789',
+              'groupName': 'Test Group 2',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-111',
+              'inviterName': 'Jane Smith',
+              'status': 'pending',
+              'createdAt': Timestamp.now(),
+            });
 
         // Add a non-pending invitation (should not be included)
         await fakeFirestore
@@ -210,14 +240,14 @@ void main() {
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-999',
-          'groupName': 'Test Group 3',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-222',
-          'inviterName': 'Bob Johnson',
-          'status': 'accepted',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-999',
+              'groupName': 'Test Group 3',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-222',
+              'inviterName': 'Bob Johnson',
+              'status': 'accepted',
+              'createdAt': Timestamp.now(),
+            });
 
         // Act
         final stream = repository.getPendingInvitations('user-456');
@@ -225,25 +255,34 @@ void main() {
         // Assert
         await expectLater(
           stream,
-          emits(predicate<List<InvitationModel>>((invitations) {
-            return invitations.length == 2 &&
-                invitations.every((inv) => inv.status == InvitationStatus.pending);
-          })),
+          emits(
+            predicate<List<InvitationModel>>((invitations) {
+              return invitations.length == 2 &&
+                  invitations.every(
+                    (inv) => inv.status == InvitationStatus.pending,
+                  );
+            }),
+          ),
         );
       });
 
-      test('returns empty stream when user has no pending invitations', () async {
-        // Act
-        final stream = repository.getPendingInvitations('user-456');
+      test(
+        'returns empty stream when user has no pending invitations',
+        () async {
+          // Act
+          final stream = repository.getPendingInvitations('user-456');
 
-        // Assert
-        await expectLater(
-          stream,
-          emits(predicate<List<InvitationModel>>(
-            (invitations) => invitations.isEmpty,
-          )),
-        );
-      });
+          // Assert
+          await expectLater(
+            stream,
+            emits(
+              predicate<List<InvitationModel>>(
+                (invitations) => invitations.isEmpty,
+              ),
+            ),
+          );
+        },
+      );
     });
 
     group('getInvitations', () {
@@ -254,42 +293,42 @@ void main() {
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group 1',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-123',
+              'groupName': 'Test Group 1',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-123',
+              'inviterName': 'John Doe',
+              'status': 'pending',
+              'createdAt': Timestamp.now(),
+            });
 
         await fakeFirestore
             .collection('users')
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-789',
-          'groupName': 'Test Group 2',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-111',
-          'inviterName': 'Jane Smith',
-          'status': 'accepted',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-789',
+              'groupName': 'Test Group 2',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-111',
+              'inviterName': 'Jane Smith',
+              'status': 'accepted',
+              'createdAt': Timestamp.now(),
+            });
 
         await fakeFirestore
             .collection('users')
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-999',
-          'groupName': 'Test Group 3',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-222',
-          'inviterName': 'Bob Johnson',
-          'status': 'declined',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-999',
+              'groupName': 'Test Group 3',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-222',
+              'inviterName': 'Bob Johnson',
+              'status': 'declined',
+              'createdAt': Timestamp.now(),
+            });
 
         // Act
         final invitations = await repository.getInvitations('user-456');
@@ -327,14 +366,14 @@ void main() {
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-123',
+              'groupName': 'Test Group',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-123',
+              'inviterName': 'John Doe',
+              'status': 'pending',
+              'createdAt': Timestamp.now(),
+            });
 
         // Act
         final invitation = await repository.getInvitationById(
@@ -377,9 +416,9 @@ void main() {
 
         // Assert - Verify Cloud Function was called with correct parameters
         verify(() => mockFunctions.httpsCallable('acceptInvitation')).called(1);
-        verify(() => mockCallable.call({
-          'invitationId': 'invitation-123',
-        })).called(1);
+        verify(
+          () => mockCallable.call({'invitationId': 'invitation-123'}),
+        ).called(1);
       });
 
       test('throws exception when Cloud Function fails', () async {
@@ -415,10 +454,12 @@ void main() {
         );
 
         // Assert - Verify Cloud Function was called with correct parameters
-        verify(() => mockFunctions.httpsCallable('declineInvitation')).called(1);
-        verify(() => mockCallable.call({
-          'invitationId': 'invitation-123',
-        })).called(1);
+        verify(
+          () => mockFunctions.httpsCallable('declineInvitation'),
+        ).called(1);
+        verify(
+          () => mockCallable.call({'invitationId': 'invitation-123'}),
+        ).called(1);
       });
 
       test('throws exception when Cloud Function fails', () async {
@@ -449,14 +490,14 @@ void main() {
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-123',
+              'groupName': 'Test Group',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-123',
+              'inviterName': 'John Doe',
+              'status': 'pending',
+              'createdAt': Timestamp.now(),
+            });
 
         // Act
         await repository.deleteInvitation(
@@ -487,14 +528,14 @@ void main() {
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-123',
+              'groupName': 'Test Group',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-123',
+              'inviterName': 'John Doe',
+              'status': 'pending',
+              'createdAt': Timestamp.now(),
+            });
 
         // Act
         final hasPending = await repository.hasPendingInvitation(
@@ -506,16 +547,19 @@ void main() {
         expect(hasPending, true);
       });
 
-      test('returns false when user has no pending invitation for group', () async {
-        // Act
-        final hasPending = await repository.hasPendingInvitation(
-          userId: 'user-456',
-          groupId: 'group-123',
-        );
+      test(
+        'returns false when user has no pending invitation for group',
+        () async {
+          // Act
+          final hasPending = await repository.hasPendingInvitation(
+            userId: 'user-456',
+            groupId: 'group-123',
+          );
 
-        // Assert
-        expect(hasPending, false);
-      });
+          // Assert
+          expect(hasPending, false);
+        },
+      );
 
       test('returns false when invitation exists but is not pending', () async {
         // Arrange
@@ -524,14 +568,14 @@ void main() {
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'accepted',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-123',
+              'groupName': 'Test Group',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-123',
+              'inviterName': 'John Doe',
+              'status': 'accepted',
+              'createdAt': Timestamp.now(),
+            });
 
         // Act
         final hasPending = await repository.hasPendingInvitation(
@@ -552,14 +596,14 @@ void main() {
             .doc('user-456')
             .collection('invitations')
             .add({
-          'groupId': 'group-123',
-          'groupName': 'Test Group',
-          'invitedUserId': 'user-456',
-          'invitedBy': 'user-123',
-          'inviterName': 'John Doe',
-          'status': 'pending',
-          'createdAt': Timestamp.now(),
-        });
+              'groupId': 'group-123',
+              'groupName': 'Test Group',
+              'invitedUserId': 'user-456',
+              'invitedBy': 'user-123',
+              'inviterName': 'John Doe',
+              'status': 'pending',
+              'createdAt': Timestamp.now(),
+            });
 
         // Act
         await repository.cancelInvitation(

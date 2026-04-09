@@ -10,8 +10,8 @@ class AccountDeletionBloc
   final AuthRepository _authRepository;
 
   AccountDeletionBloc({required AuthRepository authRepository})
-      : _authRepository = authRepository,
-        super(const AccountDeletionState.initial()) {
+    : _authRepository = authRepository,
+      super(const AccountDeletionState.initial()) {
     on<AccountDeletionRequested>(_onDeleteRequested);
   }
 
@@ -24,9 +24,11 @@ class AccountDeletionBloc
       await _authRepository.deleteAccount();
       emit(const AccountDeletionState.success());
     } catch (e) {
-      emit(AccountDeletionState.failure(
-        message: e.toString().replaceFirst('Exception: ', ''),
-      ));
+      emit(
+        AccountDeletionState.failure(
+          message: e.toString().replaceFirst('Exception: ', ''),
+        ),
+      );
     }
   }
 }

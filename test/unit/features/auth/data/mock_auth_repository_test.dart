@@ -22,28 +22,32 @@ void main() {
         expect(mockAuthRepository.currentUser, isNull);
       });
 
-      test('should emit immediate initial state when stream is subscribed', () async {
-        // Arrange
-        final completer = Completer<UserEntity?>();
+      test(
+        'should emit immediate initial state when stream is subscribed',
+        () async {
+          // Arrange
+          final completer = Completer<UserEntity?>();
 
-        // Act - Subscribe to the stream
-        final subscription = mockAuthRepository.authStateChanges.listen(
-          (user) {
+          // Act - Subscribe to the stream
+          final subscription = mockAuthRepository.authStateChanges.listen((
+            user,
+          ) {
             if (!completer.isCompleted) {
               completer.complete(user);
             }
-          },
-        );
+          });
 
-        // Assert - Should receive initial null state immediately
-        final initialUser = await completer.future.timeout(
-          const Duration(milliseconds: 100),
-          onTimeout: () => throw TimeoutException('Initial state not emitted'),
-        );
+          // Assert - Should receive initial null state immediately
+          final initialUser = await completer.future.timeout(
+            const Duration(milliseconds: 100),
+            onTimeout: () =>
+                throw TimeoutException('Initial state not emitted'),
+          );
 
-        expect(initialUser, isNull);
-        await subscription.cancel();
-      });
+          expect(initialUser, isNull);
+          await subscription.cancel();
+        },
+      );
 
       test('should emit initial state to multiple subscribers', () async {
         // Arrange
@@ -51,21 +55,21 @@ void main() {
         final completer2 = Completer<UserEntity?>();
 
         // Act - Subscribe to the stream with two listeners
-        final subscription1 = mockAuthRepository.authStateChanges.listen(
-          (user) {
-            if (!completer1.isCompleted) {
-              completer1.complete(user);
-            }
-          },
-        );
+        final subscription1 = mockAuthRepository.authStateChanges.listen((
+          user,
+        ) {
+          if (!completer1.isCompleted) {
+            completer1.complete(user);
+          }
+        });
 
-        final subscription2 = mockAuthRepository.authStateChanges.listen(
-          (user) {
-            if (!completer2.isCompleted) {
-              completer2.complete(user);
-            }
-          },
-        );
+        final subscription2 = mockAuthRepository.authStateChanges.listen((
+          user,
+        ) {
+          if (!completer2.isCompleted) {
+            completer2.complete(user);
+          }
+        });
 
         // Assert - Both should receive initial null state
         final results = await Future.wait([
@@ -119,31 +123,35 @@ void main() {
         await subscription.cancel();
       });
 
-      test('should emit new state to new subscribers after setCurrentUser', () async {
-        // Arrange
-        const testUser = TestUserData.testUser;
-        mockAuthRepository.setCurrentUser(testUser);
+      test(
+        'should emit new state to new subscribers after setCurrentUser',
+        () async {
+          // Arrange
+          const testUser = TestUserData.testUser;
+          mockAuthRepository.setCurrentUser(testUser);
 
-        final completer = Completer<UserEntity?>();
+          final completer = Completer<UserEntity?>();
 
-        // Act - Subscribe after setting user
-        final subscription = mockAuthRepository.authStateChanges.listen(
-          (user) {
+          // Act - Subscribe after setting user
+          final subscription = mockAuthRepository.authStateChanges.listen((
+            user,
+          ) {
             if (!completer.isCompleted) {
               completer.complete(user);
             }
-          },
-        );
+          });
 
-        // Assert - Should receive current user state immediately
-        final receivedUser = await completer.future.timeout(
-          const Duration(milliseconds: 100),
-          onTimeout: () => throw TimeoutException('Current state not emitted'),
-        );
+          // Assert - Should receive current user state immediately
+          final receivedUser = await completer.future.timeout(
+            const Duration(milliseconds: 100),
+            onTimeout: () =>
+                throw TimeoutException('Current state not emitted'),
+          );
 
-        expect(receivedUser, equals(testUser));
-        await subscription.cancel();
-      });
+          expect(receivedUser, equals(testUser));
+          await subscription.cancel();
+        },
+      );
 
       test('should handle setting user to null', () async {
         // Arrange
@@ -256,13 +264,11 @@ void main() {
         mockAuthRepository = MockAuthRepository();
 
         final completer = Completer<UserEntity?>();
-        final subscription = mockAuthRepository.authStateChanges.listen(
-          (user) {
-            if (!completer.isCompleted) {
-              completer.complete(user);
-            }
-          },
-        );
+        final subscription = mockAuthRepository.authStateChanges.listen((user) {
+          if (!completer.isCompleted) {
+            completer.complete(user);
+          }
+        });
 
         // Assert - New instance should start with null state
         final receivedUser = await completer.future.timeout(
@@ -349,13 +355,16 @@ void main() {
     });
 
     group('Integration with AuthenticationBloc simulation', () {
-      test('should work correctly in typical bloc subscription scenario', () async {
-        // Arrange - Simulate how AuthenticationBloc would use the repository
-        final receivedStates = <String>[];
+      test(
+        'should work correctly in typical bloc subscription scenario',
+        () async {
+          // Arrange - Simulate how AuthenticationBloc would use the repository
+          final receivedStates = <String>[];
 
-        // Simulate bloc subscription
-        final subscription = mockAuthRepository.authStateChanges.listen(
-          (user) {
+          // Simulate bloc subscription
+          final subscription = mockAuthRepository.authStateChanges.listen((
+            user,
+          ) {
             if (user == null) {
               receivedStates.add('Unauthenticated');
             } else if (user.isAnonymous) {
@@ -363,32 +372,35 @@ void main() {
             } else {
               receivedStates.add('AuthenticatedUser');
             }
-          },
-        );
+          });
 
-        // Wait for initial state
-        await Future.delayed(const Duration(milliseconds: 10));
+          // Wait for initial state
+          await Future.delayed(const Duration(milliseconds: 10));
 
-        // Act - Simulate authentication flow
-        mockAuthRepository.setCurrentUser(TestUserData.anonymousUser);
-        await Future.delayed(const Duration(milliseconds: 10));
+          // Act - Simulate authentication flow
+          mockAuthRepository.setCurrentUser(TestUserData.anonymousUser);
+          await Future.delayed(const Duration(milliseconds: 10));
 
-        mockAuthRepository.setCurrentUser(TestUserData.testUser);
-        await Future.delayed(const Duration(milliseconds: 10));
+          mockAuthRepository.setCurrentUser(TestUserData.testUser);
+          await Future.delayed(const Duration(milliseconds: 10));
 
-        mockAuthRepository.setCurrentUser(null);
-        await Future.delayed(const Duration(milliseconds: 10));
+          mockAuthRepository.setCurrentUser(null);
+          await Future.delayed(const Duration(milliseconds: 10));
 
-        // Assert - Should have received all state transitions
-        expect(receivedStates, equals([
-          'Unauthenticated',
-          'AuthenticatedAnonymous',
-          'AuthenticatedUser',
-          'Unauthenticated',
-        ]));
+          // Assert - Should have received all state transitions
+          expect(
+            receivedStates,
+            equals([
+              'Unauthenticated',
+              'AuthenticatedAnonymous',
+              'AuthenticatedUser',
+              'Unauthenticated',
+            ]),
+          );
 
-        await subscription.cancel();
-      });
+          await subscription.cancel();
+        },
+      );
     });
   });
 }

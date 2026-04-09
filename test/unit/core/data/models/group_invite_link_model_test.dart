@@ -385,17 +385,19 @@ void main() {
     });
 
     group('isActive', () {
-      test('returns true when not expired, not revoked, and limit not reached',
-          () {
-        final invite = createTestInvite(
-          expiresAt: DateTime.now().add(const Duration(days: 7)),
-          revoked: false,
-          usageLimit: 10,
-          usageCount: 3,
-        );
+      test(
+        'returns true when not expired, not revoked, and limit not reached',
+        () {
+          final invite = createTestInvite(
+            expiresAt: DateTime.now().add(const Duration(days: 7)),
+            revoked: false,
+            usageLimit: 10,
+            usageCount: 3,
+          );
 
-        expect(invite.isActive, isTrue);
-      });
+          expect(invite.isActive, isTrue);
+        },
+      );
 
       test('returns true when no expiration and no usage limit', () {
         final invite = createTestInvite(
@@ -584,10 +586,7 @@ void main() {
       });
 
       test('toJson then fromJson preserves null optional fields', () {
-        final original = createTestInvite(
-          expiresAt: null,
-          usageLimit: null,
-        );
+        final original = createTestInvite(expiresAt: null, usageLimit: null);
 
         final json = original.toJson();
         final restored = GroupInviteLinkModel.fromJson(json);

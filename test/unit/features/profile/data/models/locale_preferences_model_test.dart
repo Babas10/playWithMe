@@ -30,10 +30,7 @@ void main() {
       });
 
       test('creates instance with null optional fields', () {
-        const model = LocalePreferencesModel(
-          language: 'fr',
-          country: 'France',
-        );
+        const model = LocalePreferencesModel(language: 'fr', country: 'France');
 
         expect(model.language, equals('fr'));
         expect(model.country, equals('France'));
@@ -119,9 +116,7 @@ void main() {
       });
 
       test('uses default language when not provided', () {
-        final map = <String, dynamic>{
-          'country': 'Canada',
-        };
+        final map = <String, dynamic>{'country': 'Canada'};
 
         final model = LocalePreferencesModel.fromMap(map);
 
@@ -129,9 +124,7 @@ void main() {
       });
 
       test('uses default country when not provided', () {
-        final map = <String, dynamic>{
-          'language': 'es',
-        };
+        final map = <String, dynamic>{'language': 'es'};
 
         final model = LocalePreferencesModel.fromMap(map);
 
@@ -150,10 +143,7 @@ void main() {
       });
 
       test('converts model with null fields', () {
-        const model = LocalePreferencesModel(
-          language: 'fr',
-          country: 'France',
-        );
+        const model = LocalePreferencesModel(language: 'fr', country: 'France');
 
         final entity = model.toEntity();
 
@@ -195,10 +185,7 @@ void main() {
       });
 
       test('uses server timestamp when lastSyncedAt is null', () {
-        const model = LocalePreferencesModel(
-          language: 'fr',
-          country: 'France',
-        );
+        const model = LocalePreferencesModel(language: 'fr', country: 'France');
 
         final firestoreMap = model.toFirestore();
 
@@ -206,10 +193,7 @@ void main() {
       });
 
       test('includes null timeZone', () {
-        const model = LocalePreferencesModel(
-          language: 'es',
-          country: 'Spain',
-        );
+        const model = LocalePreferencesModel(language: 'es', country: 'Spain');
 
         final firestoreMap = model.toFirestore();
 
@@ -229,14 +213,14 @@ void main() {
       test('converts lastSyncedAt to milliseconds', () {
         final map = baseModel.toMap();
 
-        expect(map['lastSyncedAt'], equals(testSyncedAt.millisecondsSinceEpoch));
+        expect(
+          map['lastSyncedAt'],
+          equals(testSyncedAt.millisecondsSinceEpoch),
+        );
       });
 
       test('includes null values for optional fields', () {
-        const model = LocalePreferencesModel(
-          language: 'fr',
-          country: 'France',
-        );
+        const model = LocalePreferencesModel(language: 'fr', country: 'France');
 
         final map = model.toMap();
 

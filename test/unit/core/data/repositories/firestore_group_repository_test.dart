@@ -114,10 +114,7 @@ void main() {
           createdAt: DateTime(2024, 1, 1),
         );
 
-        await expectLater(
-          repository.createGroup(testGroup),
-          completes,
-        );
+        await expectLater(repository.createGroup(testGroup), completes);
       });
     });
 
@@ -136,7 +133,9 @@ void main() {
 
         await expectLater(
           stream,
-          emits(isA<GroupModel>().having((g) => g.name, 'name', 'Watched Group')),
+          emits(
+            isA<GroupModel>().having((g) => g.name, 'name', 'Watched Group'),
+          ),
         );
       });
 
@@ -243,8 +242,10 @@ void main() {
         );
         final id1 = await repository.createGroup(group1);
 
-        final groups =
-            await repository.getGroupsByIds([id1, 'non-existent-id']);
+        final groups = await repository.getGroupsByIds([
+          id1,
+          'non-existent-id',
+        ]);
 
         expect(groups.length, 1);
         expect(groups.first.name, 'Group 1');
@@ -865,8 +866,10 @@ void main() {
       });
 
       test('returns false when group does not exist', () async {
-        final canJoin =
-            await repository.canUserJoinGroup('non-existent-id', 'user-456');
+        final canJoin = await repository.canUserJoinGroup(
+          'non-existent-id',
+          'user-456',
+        );
 
         expect(canJoin, false);
       });
@@ -889,10 +892,7 @@ void main() {
       });
 
       test('does not throw when deleting non-existent group', () async {
-        await expectLater(
-          repository.deleteGroup('non-existent-id'),
-          completes,
-        );
+        await expectLater(repository.deleteGroup('non-existent-id'), completes);
       });
     });
 
@@ -977,6 +977,5 @@ void main() {
         expect(stats['lastActivity'], isNotNull);
       });
     });
-
   });
 }

@@ -68,14 +68,14 @@ class CITestHelper {
   static bool _detectCIEnvironment() {
     // Check common CI environment variables
     final ciIndicators = [
-      'CI',                    // Generic CI indicator
-      'GITHUB_ACTIONS',        // GitHub Actions
-      'GITLAB_CI',             // GitLab CI
-      'TRAVIS',                // Travis CI
-      'CIRCLECI',              // CircleCI
-      'JENKINS_URL',           // Jenkins
-      'BUILDKITE',             // Buildkite
-      'TF_BUILD',              // Azure DevOps
+      'CI', // Generic CI indicator
+      'GITHUB_ACTIONS', // GitHub Actions
+      'GITLAB_CI', // GitLab CI
+      'TRAVIS', // Travis CI
+      'CIRCLECI', // CircleCI
+      'JENKINS_URL', // Jenkins
+      'BUILDKITE', // Buildkite
+      'TF_BUILD', // Azure DevOps
     ];
 
     // Check if any CI indicator is present

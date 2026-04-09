@@ -24,71 +24,72 @@ void main() {
   });
 
   group('Invitation Creation Flow', () {
-    test(
-      'Admin can create invitation and it appears in Firestore',
-      () async {
-        // 1. Create admin user (User A)
-        final admin = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'admin@test.com',
-          password: 'password123',
-          displayName: 'Admin User',
-        );
+    test('Admin can create invitation and it appears in Firestore', () async {
+      // 1. Create admin user (User A)
+      final admin = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'admin@test.com',
+        password: 'password123',
+        displayName: 'Admin User',
+      );
 
-        // 2. Create regular user (User B) who will be invited
-        final invitee = await FirebaseEmulatorHelper.createCompleteTestUser(
-          email: 'invitee@test.com',
-          password: 'password123',
-          displayName: 'Invitee User',
-        );
+      // 2. Create regular user (User B) who will be invited
+      final invitee = await FirebaseEmulatorHelper.createCompleteTestUser(
+        email: 'invitee@test.com',
+        password: 'password123',
+        displayName: 'Invitee User',
+      );
 
-        // 3. Sign in as admin
-        await FirebaseEmulatorHelper.signOut();
-        await FirebaseEmulatorHelper.signIn(
-          email: 'admin@test.com',
-          password: 'password123',
-        );
+      // 3. Sign in as admin
+      await FirebaseEmulatorHelper.signOut();
+      await FirebaseEmulatorHelper.signIn(
+        email: 'admin@test.com',
+        password: 'password123',
+      );
 
-        // 4. Create a group with admin as owner
-        final groupId = await FirebaseEmulatorHelper.createTestGroup(
-          createdBy: admin.uid,
-          name: 'Test Volleyball Group',
-          description: 'A group for testing invitations',
-        );
+      // 4. Create a group with admin as owner
+      final groupId = await FirebaseEmulatorHelper.createTestGroup(
+        createdBy: admin.uid,
+        name: 'Test Volleyball Group',
+        description: 'A group for testing invitations',
+      );
 
-        // 5. Create invitation document (simulating InvitationRepository.sendInvitation)
-        final invitationRef = FirebaseEmulatorHelper.firestore
-            .collection('users')
-            .doc(invitee.uid)
-            .collection('invitations')
-            .doc();
+      // 5. Create invitation document (simulating InvitationRepository.sendInvitation)
+      final invitationRef = FirebaseEmulatorHelper.firestore
+          .collection('users')
+          .doc(invitee.uid)
+          .collection('invitations')
+          .doc();
 
-        await invitationRef.set({
-          'groupId': groupId,
-          'groupName': 'Test Volleyball Group',
-          'invitedBy': admin.uid,
-          'inviterName': 'Admin User',
-          'invitedUserId': invitee.uid,
-          'status': 'pending',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+      await invitationRef.set({
+        'groupId': groupId,
+        'groupName': 'Test Volleyball Group',
+        'invitedBy': admin.uid,
+        'inviterName': 'Admin User',
+        'invitedUserId': invitee.uid,
+        'status': 'pending',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-        await FirebaseEmulatorHelper.waitForFirestore();
+      await FirebaseEmulatorHelper.waitForFirestore();
 
-        // 6. Verify invitation document exists at correct path
-        final invitationDoc = await invitationRef.get();
-        expect(invitationDoc.exists, true, reason: 'Invitation document should exist');
+      // 6. Verify invitation document exists at correct path
+      final invitationDoc = await invitationRef.get();
+      expect(
+        invitationDoc.exists,
+        true,
+        reason: 'Invitation document should exist',
+      );
 
-        // 7. Verify invitation contains correct fields
-        final invitationData = invitationDoc.data()!;
-        expect(invitationData['groupId'], groupId);
-        expect(invitationData['groupName'], 'Test Volleyball Group');
-        expect(invitationData['invitedBy'], admin.uid);
-        expect(invitationData['inviterName'], 'Admin User');
-        expect(invitationData['invitedUserId'], invitee.uid);
-        expect(invitationData['status'], 'pending');
-        expect(invitationData['createdAt'], isNotNull);
-      },
-    );
+      // 7. Verify invitation contains correct fields
+      final invitationData = invitationDoc.data()!;
+      expect(invitationData['groupId'], groupId);
+      expect(invitationData['groupName'], 'Test Volleyball Group');
+      expect(invitationData['invitedBy'], admin.uid);
+      expect(invitationData['inviterName'], 'Admin User');
+      expect(invitationData['invitedUserId'], invitee.uid);
+      expect(invitationData['status'], 'pending');
+      expect(invitationData['createdAt'], isNotNull);
+    });
 
     test(
       'Non-admin cannot create invitation (security rule enforcement)',

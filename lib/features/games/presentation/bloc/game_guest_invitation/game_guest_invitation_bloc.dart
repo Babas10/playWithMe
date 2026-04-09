@@ -12,8 +12,8 @@ class GameGuestInvitationBloc
   final GameGuestInvitationRepository _repository;
 
   GameGuestInvitationBloc({required GameGuestInvitationRepository repository})
-      : _repository = repository,
-        super(const GameGuestInvitationInitial()) {
+    : _repository = repository,
+      super(const GameGuestInvitationInitial()) {
     on<LoadInvitablePlayers>(_onLoadInvitablePlayers);
     on<InviteGuestPlayer>(_onInviteGuestPlayer);
     on<InviteGroupPlayers>(_onInviteGroupPlayers);
@@ -28,15 +28,19 @@ class GameGuestInvitationBloc
       final players = await _repository.getInvitablePlayers(event.gameId);
       emit(InvitablePlayersLoaded(players: players));
     } on GameInvitationException catch (e) {
-      emit(InvitablePlayersError(
-        message: e.message,
-        errorCode: e.code ?? 'LOAD_INVITABLE_PLAYERS_ERROR',
-      ));
+      emit(
+        InvitablePlayersError(
+          message: e.message,
+          errorCode: e.code ?? 'LOAD_INVITABLE_PLAYERS_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(InvitablePlayersError(
-        message: 'Failed to load players: ${e.toString()}',
-        errorCode: 'LOAD_INVITABLE_PLAYERS_ERROR',
-      ));
+      emit(
+        InvitablePlayersError(
+          message: 'Failed to load players: ${e.toString()}',
+          errorCode: 'LOAD_INVITABLE_PLAYERS_ERROR',
+        ),
+      );
     }
   }
 
@@ -57,10 +61,16 @@ class GameGuestInvitationBloc
     Emitter<GameGuestInvitationState> emit,
   ) async {
     final players = _getPlayers();
-    final groupPlayers =
-        players.where((p) => p.sourceGroupId == event.groupId).toList();
+    final groupPlayers = players
+        .where((p) => p.sourceGroupId == event.groupId)
+        .toList();
 
-    emit(InviteGroupSending(players: List.unmodifiable(players), groupId: event.groupId));
+    emit(
+      InviteGroupSending(
+        players: List.unmodifiable(players),
+        groupId: event.groupId,
+      ),
+    );
 
     for (final player in groupPlayers) {
       try {
@@ -76,7 +86,12 @@ class GameGuestInvitationBloc
       }
     }
 
-    emit(InviteGroupSuccess(players: List.unmodifiable(players), groupId: event.groupId));
+    emit(
+      InviteGroupSuccess(
+        players: List.unmodifiable(players),
+        groupId: event.groupId,
+      ),
+    );
   }
 
   Future<void> _onInviteGuestPlayer(
@@ -86,30 +101,38 @@ class GameGuestInvitationBloc
     final loadedPlayers = _getPlayers();
 
     try {
-      emit(InvitePlayerSending(
-        players: List.unmodifiable(loadedPlayers),
-        inviteeId: event.inviteeId,
-      ));
+      emit(
+        InvitePlayerSending(
+          players: List.unmodifiable(loadedPlayers),
+          inviteeId: event.inviteeId,
+        ),
+      );
       await _repository.inviteGuestPlayer(
         gameId: event.gameId,
         inviteeId: event.inviteeId,
       );
-      emit(InvitePlayerSuccess(
-        players: List.unmodifiable(loadedPlayers),
-        inviteeId: event.inviteeId,
-      ));
+      emit(
+        InvitePlayerSuccess(
+          players: List.unmodifiable(loadedPlayers),
+          inviteeId: event.inviteeId,
+        ),
+      );
     } on GameInvitationException catch (e) {
-      emit(InvitePlayerError(
-        players: List.unmodifiable(loadedPlayers),
-        message: e.message,
-        errorCode: e.code ?? 'INVITE_GUEST_PLAYER_ERROR',
-      ));
+      emit(
+        InvitePlayerError(
+          players: List.unmodifiable(loadedPlayers),
+          message: e.message,
+          errorCode: e.code ?? 'INVITE_GUEST_PLAYER_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(InvitePlayerError(
-        players: List.unmodifiable(loadedPlayers),
-        message: 'Failed to send invitation: ${e.toString()}',
-        errorCode: 'INVITE_GUEST_PLAYER_ERROR',
-      ));
+      emit(
+        InvitePlayerError(
+          players: List.unmodifiable(loadedPlayers),
+          message: 'Failed to send invitation: ${e.toString()}',
+          errorCode: 'INVITE_GUEST_PLAYER_ERROR',
+        ),
+      );
     }
   }
 }

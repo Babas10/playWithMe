@@ -43,10 +43,7 @@ void main() {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
-            .update({
-          'eloRating': eloRating,
-          'eloGamesPlayed': 10,
-        });
+            .update({'eloRating': eloRating, 'eloGamesPlayed': 10});
       }
 
       // 2. Sign in as user with ELO 1800 (rank should be #4 of 10)
@@ -88,10 +85,7 @@ void main() {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
-            .update({
-          'eloRating': eloRating,
-          'eloGamesPlayed': 5,
-        });
+            .update({'eloRating': eloRating, 'eloGamesPlayed': 5});
       }
 
       // 2. Sign in as user with highest ELO (1900)
@@ -124,10 +118,10 @@ void main() {
       );
 
       // Set main user's ELO to 1700
-      await FirebaseFirestore.instance.collection('users').doc(mainUser.uid).update({
-        'eloRating': 1700.0,
-        'eloGamesPlayed': 10,
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(mainUser.uid)
+          .update({'eloRating': 1700.0, 'eloGamesPlayed': 10});
 
       // 2. Create 5 friends with varying ELO
       final friendIds = <String>[];
@@ -144,16 +138,14 @@ void main() {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(friend.uid)
-            .update({
-          'eloRating': friendElos[i],
-          'eloGamesPlayed': 5,
-        });
+            .update({'eloRating': friendElos[i], 'eloGamesPlayed': 5});
       }
 
       // 3. Set main user's friends list
-      await FirebaseFirestore.instance.collection('users').doc(mainUser.uid).update({
-        'friendIds': friendIds,
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(mainUser.uid)
+          .update({'friendIds': friendIds});
 
       // 4. Sign in as main user
       await FirebaseEmulatorHelper.signOut();
@@ -185,11 +177,13 @@ void main() {
         displayName: 'Solo User',
       );
 
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-        'eloRating': 1600.0,
-        'eloGamesPlayed': 5,
-        'friendIds': [], // No friends
-      });
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update(
+        {
+          'eloRating': 1600.0,
+          'eloGamesPlayed': 5,
+          'friendIds': [], // No friends
+        },
+      );
 
       // 2. Create some other users for global ranking
       for (int i = 0; i < 3; i++) {
@@ -202,10 +196,7 @@ void main() {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(otherUser.uid)
-            .update({
-          'eloRating': 1500.0 + (i * 100),
-          'eloGamesPlayed': 5,
-        });
+            .update({'eloRating': 1500.0 + (i * 100), 'eloGamesPlayed': 5});
       }
 
       // 3. Sign in and get ranking
@@ -233,33 +224,32 @@ void main() {
 
     test('excludes users with no games played from ranking', () async {
       // 1. Create users: some with games, some without
-      final userWithGames1 = await FirebaseEmulatorHelper.createCompleteTestUser(
-        email: 'player1@test.com',
-        password: 'password123',
-        displayName: 'Player 1',
-      );
+      final userWithGames1 =
+          await FirebaseEmulatorHelper.createCompleteTestUser(
+            email: 'player1@test.com',
+            password: 'password123',
+            displayName: 'Player 1',
+          );
 
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userWithGames1.uid)
           .update({
-        'eloRating': 1700.0,
-        'eloGamesPlayed': 10, // Has played games
-      });
+            'eloRating': 1700.0,
+            'eloGamesPlayed': 10, // Has played games
+          });
 
-      final userWithGames2 = await FirebaseEmulatorHelper.createCompleteTestUser(
-        email: 'player2@test.com',
-        password: 'password123',
-        displayName: 'Player 2',
-      );
+      final userWithGames2 =
+          await FirebaseEmulatorHelper.createCompleteTestUser(
+            email: 'player2@test.com',
+            password: 'password123',
+            displayName: 'Player 2',
+          );
 
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userWithGames2.uid)
-          .update({
-        'eloRating': 1600.0,
-        'eloGamesPlayed': 5,
-      });
+          .update({'eloRating': 1600.0, 'eloGamesPlayed': 5});
 
       // Create user with no games (should be excluded)
       final userNoGames = await FirebaseEmulatorHelper.createCompleteTestUser(
@@ -272,9 +262,9 @@ void main() {
           .collection('users')
           .doc(userNoGames.uid)
           .update({
-        'eloRating': 2000.0, // High ELO but no games
-        'eloGamesPlayed': 0, // ZERO games
-      });
+            'eloRating': 2000.0, // High ELO but no games
+            'eloGamesPlayed': 0, // ZERO games
+          });
 
       // 2. Sign in as player2
       await FirebaseEmulatorHelper.signOut();
@@ -304,10 +294,10 @@ void main() {
         displayName: 'Main User',
       );
 
-      await FirebaseFirestore.instance.collection('users').doc(mainUser.uid).update({
-        'eloRating': 1700.0,
-        'eloGamesPlayed': 10,
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(mainUser.uid)
+          .update({'eloRating': 1700.0, 'eloGamesPlayed': 10});
 
       // 2. Create friends: some with games, some without
       final friend1 = await FirebaseEmulatorHelper.createCompleteTestUser(
@@ -315,35 +305,47 @@ void main() {
         password: 'password123',
         displayName: 'Friend 1',
       );
-      await FirebaseFirestore.instance.collection('users').doc(friend1.uid).update({
-        'eloRating': 1800.0,
-        'eloGamesPlayed': 5, // Has games
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(friend1.uid)
+          .update({
+            'eloRating': 1800.0,
+            'eloGamesPlayed': 5, // Has games
+          });
 
       final friend2 = await FirebaseEmulatorHelper.createCompleteTestUser(
         email: 'friend2@test.com',
         password: 'password123',
         displayName: 'Friend 2',
       );
-      await FirebaseFirestore.instance.collection('users').doc(friend2.uid).update({
-        'eloRating': 2000.0,
-        'eloGamesPlayed': 0, // NO games - should be excluded
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(friend2.uid)
+          .update({
+            'eloRating': 2000.0,
+            'eloGamesPlayed': 0, // NO games - should be excluded
+          });
 
       final friend3 = await FirebaseEmulatorHelper.createCompleteTestUser(
         email: 'friend3@test.com',
         password: 'password123',
         displayName: 'Friend 3',
       );
-      await FirebaseFirestore.instance.collection('users').doc(friend3.uid).update({
-        'eloRating': 1600.0,
-        'eloGamesPlayed': 3, // Has games
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(friend3.uid)
+          .update({
+            'eloRating': 1600.0,
+            'eloGamesPlayed': 3, // Has games
+          });
 
       // 3. Set friends list
-      await FirebaseFirestore.instance.collection('users').doc(mainUser.uid).update({
-        'friendIds': [friend1.uid, friend2.uid, friend3.uid],
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(mainUser.uid)
+          .update({
+            'friendIds': [friend1.uid, friend2.uid, friend3.uid],
+          });
 
       // 4. Sign in and get ranking
       await FirebaseEmulatorHelper.signOut();
@@ -361,7 +363,10 @@ void main() {
 
       // 5. Verify only friends with games are counted
       expect(ranking.totalFriends, equals(2)); // friend1 and friend3 only
-      expect(ranking.friendsRank, equals(2)); // friend1 (1800) > main (1700) > friend3 (1600)
+      expect(
+        ranking.friendsRank,
+        equals(2),
+      ); // friend1 (1800) > main (1700) > friend3 (1600)
     });
 
     test('throws error when user is not authenticated', () async {
@@ -374,10 +379,7 @@ void main() {
       );
 
       // Should throw unauthenticated error
-      expect(
-        () => repository.getUserRanking('some-user-id'),
-        throwsException,
-      );
+      expect(() => repository.getUserRanking('some-user-id'), throwsException);
     });
 
     test('handles single user correctly', () async {
@@ -388,10 +390,9 @@ void main() {
         displayName: 'Only One',
       );
 
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-        'eloRating': 1600.0,
-        'eloGamesPlayed': 1,
-      });
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update(
+        {'eloRating': 1600.0, 'eloGamesPlayed': 1},
+      );
 
       // 2. Sign in and get ranking
       await FirebaseEmulatorHelper.signOut();
@@ -429,10 +430,7 @@ void main() {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
-            .update({
-          'eloRating': eloRating,
-          'eloGamesPlayed': 10,
-        });
+            .update({'eloRating': eloRating, 'eloGamesPlayed': 10});
       }
 
       // 2. Sign in as user at 50th position (ELO 1490)

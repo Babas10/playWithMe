@@ -8,7 +8,9 @@ import 'package:play_with_me/features/profile/presentation/widgets/partners_card
 
 void main() {
   group('PartnersCard Widget Tests', () {
-    testWidgets('displays teammate display name instead of user ID', (tester) async {
+    testWidgets('displays teammate display name instead of user ID', (
+      tester,
+    ) async {
       // Create a user with teammate stats including display name
       final user = UserModel(
         uid: 'user-123',
@@ -30,16 +32,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PartnersCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PartnersCard(user: user)),
         ),
       );
 
@@ -55,7 +56,9 @@ void main() {
       expect(find.text('8W - 2L • 10 games'), findsOneWidget);
     });
 
-    testWidgets('displays "Unknown Player" when teammateName is missing', (tester) async {
+    testWidgets('displays "Unknown Player" when teammateName is missing', (
+      tester,
+    ) async {
       // Create a user with teammate stats WITHOUT display name (legacy data)
       final user = UserModel(
         uid: 'user-123',
@@ -77,16 +80,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PartnersCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PartnersCard(user: user)),
         ),
       );
 
@@ -97,7 +99,9 @@ void main() {
       expect(find.text('71.4% Win Rate'), findsOneWidget);
     });
 
-    testWidgets('shows empty state when no teammates have 5+ games', (tester) async {
+    testWidgets('shows empty state when no teammates have 5+ games', (
+      tester,
+    ) async {
       final user = UserModel(
         uid: 'user-123',
         email: 'test@example.com',
@@ -118,16 +122,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PartnersCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PartnersCard(user: user)),
         ),
       );
 
@@ -169,16 +172,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: PartnersCard(user: user),
-          ),
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(body: PartnersCard(user: user)),
         ),
       );
 
@@ -212,14 +214,15 @@ void main() {
       );
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: SizedBox(
               width: 400, // Constrained width to test ellipsis
               child: PartnersCard(user: user),

@@ -8,11 +8,7 @@ class GroupListItem extends StatelessWidget {
   final GroupModel group;
   final VoidCallback onTap;
 
-  const GroupListItem({
-    super.key,
-    required this.group,
-    required this.onTap,
-  });
+  const GroupListItem({super.key, required this.group, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +35,8 @@ class GroupListItem extends StatelessWidget {
                     Text(
                       group.name,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -49,8 +45,8 @@ class GroupListItem extends StatelessWidget {
                       Text(
                         group.description!,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -66,8 +62,11 @@ class GroupListItem extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           l10n.memberCount(group.memberCount),
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                               ),
                         ),
                         const SizedBox(width: 16),
@@ -82,8 +81,11 @@ class GroupListItem extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             _getPrivacyLabel(context, group.privacy),
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.secondary,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
                                 ),
                           ),
                         ],
@@ -133,7 +135,9 @@ class GroupListItem extends StatelessWidget {
     if (words.length >= 2) {
       return '${words[0][0]}${words[1][0]}'.toUpperCase();
     }
-    return group.name.substring(0, group.name.length >= 2 ? 2 : 1).toUpperCase();
+    return group.name
+        .substring(0, group.name.length >= 2 ? 2 : 1)
+        .toUpperCase();
   }
 
   Color _getGroupColor() {

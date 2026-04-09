@@ -36,8 +36,9 @@ void main() {
   setUp(() {
     mockRegistrationBloc = MockRegistrationBloc();
     mockNavigatorObserver = MockNavigatorObserver();
-    when(() => mockRegistrationBloc.state)
-        .thenReturn(const RegistrationInitial());
+    when(
+      () => mockRegistrationBloc.state,
+    ).thenReturn(const RegistrationInitial());
   });
 
   tearDown(() {
@@ -57,8 +58,7 @@ void main() {
         value: mockRegistrationBloc,
         child: const RegistrationPage(),
       ),
-      navigatorObservers:
-          withNavigatorObserver ? [mockNavigatorObserver] : [],
+      navigatorObservers: withNavigatorObserver ? [mockNavigatorObserver] : [],
     );
   }
 
@@ -146,12 +146,16 @@ void main() {
     });
 
     group('Form Validation', () {
-      testWidgets('shows validation error for empty first name', (tester) async {
+      testWidgets('shows validation error for empty first name', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Tap create account button without filling fields
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Account');
+        final createButton = find.widgetWithText(
+          ElevatedButton,
+          'Create Account',
+        );
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
@@ -165,15 +169,23 @@ void main() {
 
         // Fill name fields but leave email empty
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JohnD');
+          find.widgetWithText(TextFormField, 'Display Name'),
+          'JohnD',
+        );
         await tester.pump();
 
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Account');
+        final createButton = find.widgetWithText(
+          ElevatedButton,
+          'Create Account',
+        );
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
@@ -186,23 +198,36 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JohnD');
+          find.widgetWithText(TextFormField, 'Display Name'),
+          'JohnD',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Email'), 'test@example.com');
+          find.widgetWithText(TextFormField, 'Email'),
+          'test@example.com',
+        );
         await tester.pump();
 
         await tester.ensureVisible(
-            find.widgetWithText(TextFormField, 'Password'));
+          find.widgetWithText(TextFormField, 'Password'),
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Password'), 'Pass1');
+          find.widgetWithText(TextFormField, 'Password'),
+          'Pass1',
+        );
         await tester.pump();
 
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Account');
+        final createButton = find.widgetWithText(
+          ElevatedButton,
+          'Create Account',
+        );
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
@@ -216,82 +241,102 @@ void main() {
     });
 
     group('Registration Button', () {
-      testWidgets('triggers RegistrationSubmitted event on tap with all fields',
-          (tester) async {
-        await tester.pumpWidget(createTestWidget());
+      testWidgets(
+        'triggers RegistrationSubmitted event on tap with all fields',
+        (tester) async {
+          await tester.pumpWidget(createTestWidget());
 
-        // Fill all fields
-        await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
-        await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
-        await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JohnD');
-        await tester.enterText(
-            find.widgetWithText(TextFormField, 'Email'), 'test@example.com');
-        await tester.pump();
+          // Fill all fields
+          await tester.enterText(
+            find.widgetWithText(TextFormField, 'First Name'),
+            'John',
+          );
+          await tester.enterText(
+            find.widgetWithText(TextFormField, 'Last Name'),
+            'Doe',
+          );
+          await tester.enterText(
+            find.widgetWithText(TextFormField, 'Display Name'),
+            'JohnD',
+          );
+          await tester.enterText(
+            find.widgetWithText(TextFormField, 'Email'),
+            'test@example.com',
+          );
+          await tester.pump();
 
-        await tester.ensureVisible(
-            find.widgetWithText(TextFormField, 'Password'));
-        await tester.enterText(
-            find.widgetWithText(TextFormField, 'Password'), 'Password1');
-        await tester.pump();
+          await tester.ensureVisible(
+            find.widgetWithText(TextFormField, 'Password'),
+          );
+          await tester.enterText(
+            find.widgetWithText(TextFormField, 'Password'),
+            'Password1',
+          );
+          await tester.pump();
 
-        await tester.ensureVisible(
-            find.widgetWithText(TextFormField, 'Confirm Password'));
-        await tester.enterText(
-            find.widgetWithText(TextFormField, 'Confirm Password'), 'Password1');
-        await tester.pump();
+          await tester.ensureVisible(
+            find.widgetWithText(TextFormField, 'Confirm Password'),
+          );
+          await tester.enterText(
+            find.widgetWithText(TextFormField, 'Confirm Password'),
+            'Password1',
+          );
+          await tester.pump();
 
-        // Select gender
-        await tester.ensureVisible(find.text('Male'));
-        await tester.tap(find.text('Male'));
-        await tester.pump();
+          // Select gender
+          await tester.ensureVisible(find.text('Male'));
+          await tester.tap(find.text('Male'));
+          await tester.pump();
 
-        // Tap create account button
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Account');
-        await tester.ensureVisible(createButton);
-        await tester.pumpAndSettle();
-        await tester.tap(createButton);
-        await tester.pump();
+          // Tap create account button
+          final createButton = find.widgetWithText(
+            ElevatedButton,
+            'Create Account',
+          );
+          await tester.ensureVisible(createButton);
+          await tester.pumpAndSettle();
+          await tester.tap(createButton);
+          await tester.pump();
 
-        verify(
-          () => mockRegistrationBloc.add(
-            const RegistrationSubmitted(
-              firstName: 'John',
-              lastName: 'Doe',
-              displayName: 'JohnD',
-              email: 'test@example.com',
-              password: 'Password1',
-              confirmPassword: 'Password1',
-              gender: 'male',
+          verify(
+            () => mockRegistrationBloc.add(
+              const RegistrationSubmitted(
+                firstName: 'John',
+                lastName: 'Doe',
+                displayName: 'JohnD',
+                email: 'test@example.com',
+                password: 'Password1',
+                confirmPassword: 'Password1',
+                gender: 'male',
+              ),
             ),
-          ),
-        ).called(1);
-      });
+          ).called(1);
+        },
+      );
 
       testWidgets('does not trigger event with invalid form', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        final createButton =
-            find.widgetWithText(ElevatedButton, 'Create Account');
+        final createButton = find.widgetWithText(
+          ElevatedButton,
+          'Create Account',
+        );
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
         await tester.pump();
 
-        verifyNever(
-          () => mockRegistrationBloc.add(any()),
-        );
+        verifyNever(() => mockRegistrationBloc.add(any()));
       });
     });
 
     group('Loading State', () {
-      testWidgets('shows loading indicator during registration',
-          (tester) async {
-        when(() => mockRegistrationBloc.state)
-            .thenReturn(const RegistrationLoading());
+      testWidgets('shows loading indicator during registration', (
+        tester,
+      ) async {
+        when(
+          () => mockRegistrationBloc.state,
+        ).thenReturn(const RegistrationLoading());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -299,8 +344,9 @@ void main() {
       });
 
       testWidgets('button is disabled during loading', (tester) async {
-        when(() => mockRegistrationBloc.state)
-            .thenReturn(const RegistrationLoading());
+        when(
+          () => mockRegistrationBloc.state,
+        ).thenReturn(const RegistrationLoading());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -331,8 +377,9 @@ void main() {
         expect(find.byType(SnackBar), findsOneWidget);
       });
 
-      testWidgets('snackbar has red background color on failure',
-          (tester) async {
+      testWidgets('snackbar has red background color on failure', (
+        tester,
+      ) async {
         whenListen(
           mockRegistrationBloc,
           Stream.fromIterable([
@@ -352,8 +399,9 @@ void main() {
     });
 
     group('Success Handling', () {
-      testWidgets('shows success snackbar and navigates back on success',
-          (tester) async {
+      testWidgets('shows success snackbar and navigates back on success', (
+        tester,
+      ) async {
         whenListen(
           mockRegistrationBloc,
           Stream.fromIterable([

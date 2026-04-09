@@ -57,7 +57,10 @@ void main() {
         title: title,
         startTime: start,
         endTime: end,
-        location: const GameLocation(name: 'Training Court', address: '123 Main St'),
+        location: const GameLocation(
+          name: 'Training Court',
+          address: '123 Main St',
+        ),
         status: status,
         participantIds: participantIds ?? [testUserId],
         maxParticipants: 12,
@@ -65,7 +68,9 @@ void main() {
       );
     }
 
-    testWidgets('displays empty state when no session provided', (tester) async {
+    testWidgets('displays empty state when no session provided', (
+      tester,
+    ) async {
       // Arrange & Act
       await pumpNextTrainingSessionCard(tester, session: null);
 
@@ -74,7 +79,9 @@ void main() {
       expect(find.byIcon(Icons.fitness_center), findsOneWidget);
     });
 
-    testWidgets('displays training session card when session provided', (tester) async {
+    testWidgets('displays training session card when session provided', (
+      tester,
+    ) async {
       // Arrange
       final session = createTestSession(title: 'Evening Practice');
 
@@ -88,7 +95,9 @@ void main() {
       expect(find.text('No training sessions scheduled'), findsNothing);
     });
 
-    testWidgets('shows joined badge when user is a participant', (tester) async {
+    testWidgets('shows joined badge when user is a participant', (
+      tester,
+    ) async {
       // Arrange
       final session = createTestSession(
         participantIds: [testUserId, 'other-user'],
@@ -102,7 +111,9 @@ void main() {
       expect(find.text('JOINED'), findsOneWidget);
     });
 
-    testWidgets('calls onTap callback when session card is tapped', (tester) async {
+    testWidgets('calls onTap callback when session card is tapped', (
+      tester,
+    ) async {
       // Arrange
       bool tapped = false;
       final session = createTestSession();
@@ -174,7 +185,9 @@ void main() {
       expect(find.textContaining('Today'), findsOneWidget);
     });
 
-    testWidgets('displays correct date formatting for tomorrow', (tester) async {
+    testWidgets('displays correct date formatting for tomorrow', (
+      tester,
+    ) async {
       // Arrange
       final tomorrow = DateTime.now().add(const Duration(days: 1));
       final tomorrowSession = createTestSession(
@@ -206,11 +219,19 @@ void main() {
       await pumpNextTrainingSessionCard(tester, session: session);
 
       // Assert - TrainingSessionListItem should be used
-      expect(find.byType(InkWell), findsWidgets); // TrainingSessionListItem uses InkWell
-      expect(find.byType(Card), findsWidgets); // TrainingSessionListItem uses Card
+      expect(
+        find.byType(InkWell),
+        findsWidgets,
+      ); // TrainingSessionListItem uses InkWell
+      expect(
+        find.byType(Card),
+        findsWidgets,
+      ); // TrainingSessionListItem uses Card
     });
 
-    testWidgets('displays calendar and location icons for sessions', (tester) async {
+    testWidgets('displays calendar and location icons for sessions', (
+      tester,
+    ) async {
       // Arrange
       final session = createTestSession();
 

@@ -18,10 +18,10 @@ class InviteRegistrationBloc
     required AuthRepository authRepository,
     required GroupInviteLinkRepository groupInviteLinkRepository,
     required PendingInviteStorage pendingInviteStorage,
-  })  : _authRepository = authRepository,
-        _groupInviteLinkRepository = groupInviteLinkRepository,
-        _pendingInviteStorage = pendingInviteStorage,
-        super(const InviteRegistrationInitial()) {
+  }) : _authRepository = authRepository,
+       _groupInviteLinkRepository = groupInviteLinkRepository,
+       _pendingInviteStorage = pendingInviteStorage,
+       super(const InviteRegistrationInitial()) {
     on<InviteRegistrationSubmitted>(_onSubmitted);
     on<InviteRegistrationFormReset>(_onFormReset);
   }
@@ -42,7 +42,8 @@ class InviteRegistrationBloc
 
       // Step 1: Create Firebase Auth account
       debugPrint(
-          '🔐 InviteRegistrationBloc: Creating account for ${event.email}');
+        '🔐 InviteRegistrationBloc: Creating account for ${event.email}',
+      );
       await _authRepository.createUserWithEmailAndPassword(
         email: event.email.trim(),
         password: event.password,
@@ -57,7 +58,8 @@ class InviteRegistrationBloc
         debugPrint('✅ InviteRegistrationBloc: Display name updated');
       } catch (e) {
         debugPrint(
-            '⚠️ InviteRegistrationBloc: Failed to update display name: $e');
+          '⚠️ InviteRegistrationBloc: Failed to update display name: $e',
+        );
       }
 
       // Step 3: Persist firstName and lastName to Firestore
@@ -68,8 +70,7 @@ class InviteRegistrationBloc
         );
         debugPrint('✅ InviteRegistrationBloc: First/last name persisted');
       } catch (e) {
-        debugPrint(
-            '⚠️ InviteRegistrationBloc: Failed to persist names: $e');
+        debugPrint('⚠️ InviteRegistrationBloc: Failed to persist names: $e');
       }
 
       // Step 4: Send email verification (non-blocking)
@@ -78,13 +79,15 @@ class InviteRegistrationBloc
         debugPrint('✅ InviteRegistrationBloc: Verification email sent');
       } catch (e) {
         debugPrint(
-            '⚠️ InviteRegistrationBloc: Failed to send verification: $e');
+          '⚠️ InviteRegistrationBloc: Failed to send verification: $e',
+        );
       }
 
       // Step 5: Join group via invite token
       emit(const InviteRegistrationJoiningGroup());
       debugPrint(
-          '🔐 InviteRegistrationBloc: Joining group with token: ${event.token}');
+        '🔐 InviteRegistrationBloc: Joining group with token: ${event.token}',
+      );
 
       try {
         final joinResult = await _groupInviteLinkRepository.joinGroupViaInvite(
@@ -94,35 +97,38 @@ class InviteRegistrationBloc
         // Step 6: Clear pending invite
         await _pendingInviteStorage.clear();
         debugPrint(
-            '✅ InviteRegistrationBloc: Joined group ${joinResult.groupName}');
+          '✅ InviteRegistrationBloc: Joined group ${joinResult.groupName}',
+        );
 
-        emit(InviteRegistrationSuccess(
-          groupId: joinResult.groupId,
-          groupName: joinResult.groupName,
-        ));
+        emit(
+          InviteRegistrationSuccess(
+            groupId: joinResult.groupId,
+            groupName: joinResult.groupName,
+          ),
+        );
       } on GroupInviteLinkException catch (e) {
         // Token expired or invalid — account was still created successfully
         await _pendingInviteStorage.clear();
         if (e.code == 'failed-precondition') {
           debugPrint(
-              '⚠️ InviteRegistrationBloc: Token expired during registration');
+            '⚠️ InviteRegistrationBloc: Token expired during registration',
+          );
           emit(const InviteRegistrationTokenExpired());
         } else {
-          emit(InviteRegistrationFailure(
-            message: e.message,
-            errorCode: e.code,
-          ));
+          emit(
+            InviteRegistrationFailure(message: e.message, errorCode: e.code),
+          );
         }
       }
     } catch (error) {
       final errorMessage = _mapFirebaseError(error.toString());
       final errorCode = _extractErrorCode(error.toString());
       debugPrint(
-          '❌ InviteRegistrationBloc: Registration failed: $errorMessage');
-      emit(InviteRegistrationFailure(
-        message: errorMessage,
-        errorCode: errorCode,
-      ));
+        '❌ InviteRegistrationBloc: Registration failed: $errorMessage',
+      );
+      emit(
+        InviteRegistrationFailure(message: errorMessage, errorCode: errorCode),
+      );
     }
   }
 
@@ -193,8 +199,7 @@ class InviteRegistrationBloc
     if (error.contains('invalid-email')) {
       return 'Please enter a valid email address.';
     }
-    if (error.contains('network-request-failed') ||
-        error.contains('network')) {
+    if (error.contains('network-request-failed') || error.contains('network')) {
       return 'Unable to connect. Please check your connection and try again.';
     }
     // Clean up error prefix

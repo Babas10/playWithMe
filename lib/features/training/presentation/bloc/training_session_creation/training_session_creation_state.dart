@@ -99,7 +99,9 @@ class TrainingSessionCreationFormState extends TrainingSessionCreationState {
       maxParticipants: maxParticipants ?? this.maxParticipants,
       minParticipants: minParticipants ?? this.minParticipants,
       notes: notes ?? this.notes,
-      recurrenceRule: clearRecurrenceRule ? null : (recurrenceRule ?? this.recurrenceRule),
+      recurrenceRule: clearRecurrenceRule
+          ? null
+          : (recurrenceRule ?? this.recurrenceRule),
       groupError: groupError,
       startTimeError: startTimeError,
       endTimeError: endTimeError,
@@ -113,27 +115,27 @@ class TrainingSessionCreationFormState extends TrainingSessionCreationState {
 
   @override
   List<Object?> get props => [
-        groupId,
-        groupName,
-        startTime,
-        endTime,
-        locationName,
-        address,
-        title,
-        description,
-        maxParticipants,
-        minParticipants,
-        notes,
-        recurrenceRule, // Story 15.2
-        groupError,
-        startTimeError,
-        endTimeError,
-        locationError,
-        titleError,
-        participantsError,
-        recurrenceError, // Story 15.2
-        isValid,
-      ];
+    groupId,
+    groupName,
+    startTime,
+    endTime,
+    locationName,
+    address,
+    title,
+    description,
+    maxParticipants,
+    minParticipants,
+    notes,
+    recurrenceRule, // Story 15.2
+    groupError,
+    startTimeError,
+    endTimeError,
+    locationError,
+    titleError,
+    participantsError,
+    recurrenceError, // Story 15.2
+    isValid,
+  ];
 }
 
 /// State when submitting the training session

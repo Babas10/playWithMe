@@ -12,7 +12,7 @@ class AppLinksDeepLinkService implements DeepLinkService {
   StreamSubscription<Uri>? _linkSubscription;
 
   AppLinksDeepLinkService({AppLinks? appLinks})
-      : _appLinks = appLinks ?? AppLinks() {
+    : _appLinks = appLinks ?? AppLinks() {
     debugPrint('[DeepLinkService] Service created, starting listener...');
     _listenForLinks();
   }

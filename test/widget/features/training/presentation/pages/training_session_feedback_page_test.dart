@@ -23,8 +23,7 @@ class MockTrainingFeedbackBloc
     extends MockBloc<TrainingFeedbackEvent, TrainingFeedbackState>
     implements TrainingFeedbackBloc {}
 
-class MockInvitationBloc
-    extends MockBloc<InvitationEvent, InvitationState>
+class MockInvitationBloc extends MockBloc<InvitationEvent, InvitationState>
     implements InvitationBloc {}
 
 class MockAuthenticationBloc
@@ -55,7 +54,12 @@ void main() {
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
-        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+        UserEntity(
+          uid: 'test-user',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+        ),
       ),
     );
 
@@ -91,8 +95,9 @@ void main() {
 
   group('TrainingSessionFeedbackPage Widget Tests', () {
     group('Initial UI Rendering', () {
-      testWidgets('renders app bar with Session Feedback title',
-          (tester) async {
+      testWidgets('renders app bar with Session Feedback title', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.byType(AppBar), findsOneWidget);
@@ -122,7 +127,8 @@ void main() {
 
         expect(
           find.text(
-              'Your feedback is anonymous and helps improve future training sessions.'),
+            'Your feedback is anonymous and helps improve future training sessions.',
+          ),
           findsOneWidget,
         );
       });
@@ -170,7 +176,8 @@ void main() {
         expect(find.text('Additional Comments (Optional)'), findsOneWidget);
         expect(
           find.text(
-              'Share your thoughts about the session, exercises, or suggestions for improvement...'),
+            'Share your thoughts about the session, exercises, or suggestions for improvement...',
+          ),
           findsOneWidget,
         );
       });
@@ -190,24 +197,30 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         // Scroll down to see privacy card
-        await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -300));
+        await tester.drag(
+          find.byType(SingleChildScrollView),
+          const Offset(0, -300),
+        );
         await tester.pumpAndSettle();
 
         expect(
           find.text(
-              'Your feedback is completely anonymous and cannot be traced back to you.'),
+            'Your feedback is completely anonymous and cannot be traced back to you.',
+          ),
           findsOneWidget,
         );
         expect(find.byIcon(Icons.privacy_tip_outlined), findsOneWidget);
       });
 
-      testWidgets('sends CheckFeedbackSubmission event on init',
-          (tester) async {
+      testWidgets('sends CheckFeedbackSubmission event on init', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         verify(
-          () => mockFeedbackBloc
-              .add(const CheckFeedbackSubmission(testSessionId)),
+          () => mockFeedbackBloc.add(
+            const CheckFeedbackSubmission(testSessionId),
+          ),
         ).called(1);
       });
     });
@@ -268,7 +281,9 @@ void main() {
         await tester.ensureVisible(submitButton);
         await tester.pump();
 
-        await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Feedback'));
+        await tester.tap(
+          find.widgetWithText(ElevatedButton, 'Submit Feedback'),
+        );
         await tester.pump();
 
         // Should show validation snackbar
@@ -281,10 +296,12 @@ void main() {
     });
 
     group('Checking Submission State', () {
-      testWidgets('shows loading indicator when checking submission',
-          (tester) async {
-        when(() => mockFeedbackBloc.state)
-            .thenReturn(const CheckingFeedbackSubmission(testSessionId));
+      testWidgets('shows loading indicator when checking submission', (
+        tester,
+      ) async {
+        when(
+          () => mockFeedbackBloc.state,
+        ).thenReturn(const CheckingFeedbackSubmission(testSessionId));
 
         await tester.pumpWidget(createTestWidget());
 
@@ -307,8 +324,9 @@ void main() {
         expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
       });
 
-      testWidgets('shows session title in already submitted view',
-          (tester) async {
+      testWidgets('shows session title in already submitted view', (
+        tester,
+      ) async {
         when(() => mockFeedbackBloc.state).thenReturn(
           const FeedbackSubmissionChecked(
             trainingSessionId: testSessionId,
@@ -319,13 +337,16 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         expect(
-          find.text('You have already provided feedback for "$testSessionTitle".'),
+          find.text(
+            'You have already provided feedback for "$testSessionTitle".',
+          ),
           findsOneWidget,
         );
       });
 
-      testWidgets('shows back button in already submitted view',
-          (tester) async {
+      testWidgets('shows back button in already submitted view', (
+        tester,
+      ) async {
         when(() => mockFeedbackBloc.state).thenReturn(
           const FeedbackSubmissionChecked(
             trainingSessionId: testSessionId,
@@ -341,8 +362,9 @@ void main() {
 
     group('Submitting State', () {
       testWidgets('shows loading indicator during submission', (tester) async {
-        when(() => mockFeedbackBloc.state)
-            .thenReturn(const SubmittingFeedback(testSessionId));
+        when(
+          () => mockFeedbackBloc.state,
+        ).thenReturn(const SubmittingFeedback(testSessionId));
 
         await tester.pumpWidget(createTestWidget());
 
@@ -354,9 +376,12 @@ void main() {
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
 
-      testWidgets('submit button is disabled during submission', (tester) async {
-        when(() => mockFeedbackBloc.state)
-            .thenReturn(const SubmittingFeedback(testSessionId));
+      testWidgets('submit button is disabled during submission', (
+        tester,
+      ) async {
+        when(
+          () => mockFeedbackBloc.state,
+        ).thenReturn(const SubmittingFeedback(testSessionId));
 
         await tester.pumpWidget(createTestWidget());
 

@@ -19,7 +19,9 @@ import 'package:play_with_me/features/profile/presentation/widgets/best_elo_high
 import 'package:play_with_me/features/profile/presentation/widgets/time_period_selector.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
+
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
 
 void main() {
@@ -70,10 +72,17 @@ void main() {
     mockInvitationBloc = MockInvitationBloc();
     mockAuthBloc = MockAuthenticationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
-        UserEntity(uid: 'test-user', email: 'test@example.com', isEmailVerified: true, isAnonymous: false),
+        UserEntity(
+          uid: 'test-user',
+          email: 'test@example.com',
+          isEmailVerified: true,
+          isAnonymous: false,
+        ),
       ),
     );
     when(() => mockAuthBloc.stream).thenAnswer((_) => const Stream.empty());
@@ -115,8 +124,9 @@ void main() {
   group('FullEloHistoryPage Widget Tests', () {
     group('Initial UI Rendering', () {
       testWidgets('renders app bar with ELO History title', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -126,8 +136,9 @@ void main() {
       });
 
       testWidgets('renders filter icon in app bar when loaded', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -138,19 +149,24 @@ void main() {
 
     group('Error State', () {
       testWidgets('shows error message when error state', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.error('Failed to load ELO history'));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.error('Failed to load ELO history'));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
-        expect(find.textContaining('Failed to load ELO history'), findsOneWidget);
+        expect(
+          find.textContaining('Failed to load ELO history'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('error icon has red color', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.error('Network error'));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.error('Network error'));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -162,23 +178,27 @@ void main() {
 
     group('Empty State', () {
       testWidgets('shows empty state when no history', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value([]));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value([]));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.timeline), findsOneWidget);
         expect(find.text('No ELO history yet'), findsOneWidget);
-        expect(find.text('Play some games to see your rating history'),
-            findsOneWidget);
+        expect(
+          find.text('Play some games to see your rating history'),
+          findsOneWidget,
+        );
       });
     });
 
     group('Loaded State - Stats Summary', () {
       testWidgets('shows games count in stats summary', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -189,8 +209,9 @@ void main() {
       });
 
       testWidgets('shows win-loss record', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -201,8 +222,9 @@ void main() {
       });
 
       testWidgets('shows total rating change', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -213,8 +235,9 @@ void main() {
       });
 
       testWidgets('shows average rating change', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -227,8 +250,9 @@ void main() {
 
     group('Loaded State - Time Period Selector', () {
       testWidgets('renders time period selector', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -239,8 +263,9 @@ void main() {
 
     group('Loaded State - Best ELO Card', () {
       testWidgets('renders best ELO highlight card', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -251,8 +276,9 @@ void main() {
 
     group('Loaded State - History List', () {
       testWidgets('renders history entries', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -264,8 +290,9 @@ void main() {
       });
 
       testWidgets('shows W for wins and L for losses', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -276,8 +303,9 @@ void main() {
       });
 
       testWidgets('shows rating change for each entry', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -288,8 +316,9 @@ void main() {
       });
 
       testWidgets('shows trending up icon for gains', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -298,8 +327,9 @@ void main() {
       });
 
       testWidgets('shows trending down icon for losses', (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -309,10 +339,12 @@ void main() {
     });
 
     group('Time Period Filter', () {
-      testWidgets('time period selector displays all period options',
-          (tester) async {
-        when(() => mockUserRepository.getRatingHistory(testUserId, limit: 100))
-            .thenAnswer((_) => Stream.value(testHistory));
+      testWidgets('time period selector displays all period options', (
+        tester,
+      ) async {
+        when(
+          () => mockUserRepository.getRatingHistory(testUserId, limit: 100),
+        ).thenAnswer((_) => Stream.value(testHistory));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();

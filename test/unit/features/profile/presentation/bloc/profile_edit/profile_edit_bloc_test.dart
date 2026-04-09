@@ -12,6 +12,7 @@ import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/pro
 
 // Mocktail mock for AuthRepository
 class MockAuthRepository extends Mock implements AuthRepository {}
+
 class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
@@ -29,7 +30,7 @@ void main() {
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     mockUserRepository = MockUserRepository();
-    
+
     // Default stubs
     when(() => mockAuthRepository.currentUser).thenReturn(testUser);
   });
@@ -97,10 +98,12 @@ void main() {
         build: buildBloc,
         act: (bloc) {
           // Initialize with original values
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           // Change display name
           bloc.add(const ProfileEditEvent.displayNameChanged('Jane Smith'));
         },
@@ -123,10 +126,12 @@ void main() {
         'emits loaded with error when displayName is too short',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jo'));
         },
         expect: () => [
@@ -149,10 +154,12 @@ void main() {
         'emits loaded with error when displayName is empty',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged(''));
         },
         expect: () => [
@@ -175,10 +182,12 @@ void main() {
         'emits loaded with error when displayName is too long',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(ProfileEditEvent.displayNameChanged('A' * 51));
         },
         expect: () => [
@@ -201,10 +210,12 @@ void main() {
         'emits loaded with error when displayName contains invalid characters',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('John@Doe!'));
         },
         expect: () => [
@@ -229,13 +240,17 @@ void main() {
         'emits loaded with valid photoUrl and hasUnsavedChanges=true',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
-          bloc.add(const ProfileEditEvent.photoUrlChanged(
-            'https://example.com/photo.jpg',
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
+          bloc.add(
+            const ProfileEditEvent.photoUrlChanged(
+              'https://example.com/photo.jpg',
+            ),
+          );
         },
         expect: () => [
           const ProfileEditState.loading(),
@@ -256,10 +271,12 @@ void main() {
         'emits loaded with null when photoUrl is empty string',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: 'https://example.com/old.jpg',
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: 'https://example.com/old.jpg',
+            ),
+          );
           bloc.add(const ProfileEditEvent.photoUrlChanged(''));
         },
         expect: () => [
@@ -281,10 +298,12 @@ void main() {
         'emits loaded with error when photoUrl is invalid',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.photoUrlChanged('not-a-url'));
         },
         expect: () => [
@@ -307,13 +326,15 @@ void main() {
         'emits loaded without error for valid https URL',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
-          bloc.add(const ProfileEditEvent.photoUrlChanged(
-            'https://example.com/photo',
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
+          bloc.add(
+            const ProfileEditEvent.photoUrlChanged('https://example.com/photo'),
+          );
         },
         expect: () => [
           const ProfileEditState.loading(),
@@ -336,22 +357,28 @@ void main() {
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits [saving, success] when save is successful',
         setUp: () {
-          when(() => mockAuthRepository.updateUserProfile(
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              )).thenAnswer((_) async {});
-          when(() => mockUserRepository.updateUserProfile(
-                any(), // uid
-                displayName: any(named: 'displayName'),
-              )).thenAnswer((_) async {});
+          when(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockUserRepository.updateUserProfile(
+              any(), // uid
+              displayName: any(named: 'displayName'),
+            ),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
         },
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jane Smith'));
           bloc.add(const ProfileEditEvent.saveRequested());
         },
@@ -374,14 +401,18 @@ void main() {
           const ProfileEditState.success(),
         ],
         verify: (_) {
-          verify(() => mockUserRepository.updateUserProfile(
-                'test-uid-123',
-                displayName: 'Jane Smith',
-              )).called(1);
-          verify(() => mockAuthRepository.updateUserProfile(
-                displayName: 'Jane Smith',
-                photoUrl: null,
-              )).called(1);
+          verify(
+            () => mockUserRepository.updateUserProfile(
+              'test-uid-123',
+              displayName: 'Jane Smith',
+            ),
+          ).called(1);
+          verify(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: 'Jane Smith',
+              photoUrl: null,
+            ),
+          ).called(1);
           verify(() => mockAuthRepository.reloadUser()).called(1);
         },
       );
@@ -390,10 +421,12 @@ void main() {
         'emits success immediately when no changes to save',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.saveRequested());
         },
         expect: () => [
@@ -406,14 +439,18 @@ void main() {
           const ProfileEditState.success(),
         ],
         verify: (_) {
-          verifyNever(() => mockAuthRepository.updateUserProfile(
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              ));
-          verifyNever(() => mockUserRepository.updateUserProfile(
-                any(),
-                displayName: any(named: 'displayName'),
-              ));
+          verifyNever(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          );
+          verifyNever(
+            () => mockUserRepository.updateUserProfile(
+              any(),
+              displayName: any(named: 'displayName'),
+            ),
+          );
         },
       );
 
@@ -421,10 +458,12 @@ void main() {
         'does not save when validation errors exist',
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jo'));
           bloc.add(const ProfileEditEvent.saveRequested());
         },
@@ -446,31 +485,39 @@ void main() {
           // (BLoC deduplicates). The important thing is that updateUserProfile is never called.
         ],
         verify: (_) {
-          verifyNever(() => mockAuthRepository.updateUserProfile(
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              ));
-          verifyNever(() => mockUserRepository.updateUserProfile(
-                any(),
-                displayName: any(named: 'displayName'),
-              ));
+          verifyNever(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          );
+          verifyNever(
+            () => mockUserRepository.updateUserProfile(
+              any(),
+              displayName: any(named: 'displayName'),
+            ),
+          );
         },
       );
 
       blocTest<ProfileEditBloc, ProfileEditState>(
         'emits [saving, error] when repository throws exception',
         setUp: () {
-          when(() => mockUserRepository.updateUserProfile(
-                any(),
-                displayName: any(named: 'displayName'),
-              )).thenThrow(Exception('Network error'));
+          when(
+            () => mockUserRepository.updateUserProfile(
+              any(),
+              displayName: any(named: 'displayName'),
+            ),
+          ).thenThrow(Exception('Network error'));
         },
         build: buildBloc,
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jane Smith'));
           bloc.add(const ProfileEditEvent.saveRequested());
         },
@@ -497,10 +544,12 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockUserRepository.updateUserProfile(
-                'test-uid-123',
-                displayName: 'Jane Smith',
-              )).called(1);
+          verify(
+            () => mockUserRepository.updateUserProfile(
+              'test-uid-123',
+              displayName: 'Jane Smith',
+            ),
+          ).called(1);
         },
       );
     });
@@ -515,9 +564,7 @@ void main() {
           hasUnsavedChanges: true,
         ),
         act: (bloc) => bloc.add(const ProfileEditEvent.cancelled()),
-        expect: () => [
-          const ProfileEditState.success(),
-        ],
+        expect: () => [const ProfileEditState.success()],
       );
     });
   });

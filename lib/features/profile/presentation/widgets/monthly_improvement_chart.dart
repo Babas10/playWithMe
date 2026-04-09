@@ -104,7 +104,9 @@ class MonthlyImprovementChart extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.noGamesPlayedInLast(_getPeriodDisplayName(context, timePeriod)),
+            l10n.noGamesPlayedInLast(
+              _getPeriodDisplayName(context, timePeriod),
+            ),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -193,8 +195,11 @@ class MonthlyImprovementChart extends StatelessWidget {
   /// Get the start of the week (Monday) for a given date
   DateTime _getWeekStart(DateTime date) {
     final daysFromMonday = date.weekday - 1;
-    return DateTime(date.year, date.month, date.day)
-        .subtract(Duration(days: daysFromMonday));
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+    ).subtract(Duration(days: daysFromMonday));
   }
 
   /// Aggregate by month (for long periods ≥ 1 year)
@@ -232,11 +237,9 @@ class MonthlyImprovementChart extends StatelessWidget {
       // - Bottom tier: Year (shown only at first occurrence of each year)
       final label = labelFormat.format(date);
 
-      dataPoints.add(ChartDataPoint(
-        date: date,
-        eloRating: snapshotRating,
-        label: label,
-      ));
+      dataPoints.add(
+        ChartDataPoint(date: date, eloRating: snapshotRating, label: label),
+      );
     }
 
     return dataPoints;
@@ -307,7 +310,8 @@ class MonthlyImprovementChart extends StatelessWidget {
                 sideTitles: SideTitles(
                   showTitles: true,
                   reservedSize: 42, // Increased for two-tier labels
-                  interval: 1, // Show all positions to ensure year labels appear
+                  interval:
+                      1, // Show all positions to ensure year labels appear
                   getTitlesWidget: (value, meta) {
                     final index = value.toInt();
                     if (index < 0 || index >= data.length) {
@@ -322,7 +326,11 @@ class MonthlyImprovementChart extends StatelessWidget {
                     final showMonth = index % calculatedInterval.toInt() == 0;
 
                     // Determine if this is the position to show the year label
-                    final showYear = _shouldShowYearAtIndex(data, index, currentYear);
+                    final showYear = _shouldShowYearAtIndex(
+                      data,
+                      index,
+                      currentYear,
+                    );
 
                     // If neither month nor year should show, return empty space
                     if (!showMonth && !showYear) {
@@ -350,12 +358,15 @@ class MonthlyImprovementChart extends StatelessWidget {
                                 currentYear.toString(),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 10,
-                                  color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                                  color: theme.textTheme.bodySmall?.color
+                                      ?.withValues(alpha: 0.6),
                                 ),
                               ),
                             )
                           else
-                            const SizedBox(height: 14), // Placeholder for alignment
+                            const SizedBox(
+                              height: 14,
+                            ), // Placeholder for alignment
                         ],
                       ),
                     );
@@ -387,10 +398,7 @@ class MonthlyImprovementChart extends StatelessWidget {
             lineBarsData: [
               LineChartBarData(
                 spots: data.asMap().entries.map((entry) {
-                  return FlSpot(
-                    entry.key.toDouble(),
-                    entry.value.eloRating,
-                  );
+                  return FlSpot(entry.key.toDouble(), entry.value.eloRating);
                 }).toList(),
                 isCurved: true,
                 curveSmoothness: 0.4,

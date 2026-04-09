@@ -29,7 +29,9 @@ void main() {
 
   setUp(() {
     mockRepository = MockLocalePreferencesRepository();
-    when(() => mockRepository.getDeviceTimeZone()).thenReturn('America/New_York');
+    when(
+      () => mockRepository.getDeviceTimeZone(),
+    ).thenReturn('America/New_York');
   });
 
   tearDown(() {
@@ -46,12 +48,12 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'emits [loading, loaded] when preferences are loaded successfully',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
-        act: (bloc) =>
-            bloc.add(const LocalePreferencesEvent.loadPreferences()),
+        act: (bloc) => bloc.add(const LocalePreferencesEvent.loadPreferences()),
         expect: () => [
           const LocalePreferencesState.loading(),
           LocalePreferencesState.loaded(
@@ -68,12 +70,12 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'emits [loading, error] when loading fails',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenThrow(Exception('Failed to load'));
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenThrow(Exception('Failed to load'));
           return LocalePreferencesBloc(repository: mockRepository);
         },
-        act: (bloc) =>
-            bloc.add(const LocalePreferencesEvent.loadPreferences()),
+        act: (bloc) => bloc.add(const LocalePreferencesEvent.loadPreferences()),
         expect: () => [
           const LocalePreferencesState.loading(),
           const LocalePreferencesState.error(
@@ -87,13 +89,16 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'updates locale and sets hasUnsavedChanges=true',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) {
           bloc.add(const LocalePreferencesEvent.loadPreferences());
-          return bloc.stream.firstWhere((state) => state is LocalePreferencesLoaded).then(
+          return bloc.stream
+              .firstWhere((state) => state is LocalePreferencesLoaded)
+              .then(
                 (_) => bloc.add(
                   const LocalePreferencesEvent.updateLanguage(Locale('es')),
                 ),
@@ -116,13 +121,16 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'updates country and sets hasUnsavedChanges=true',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) {
           bloc.add(const LocalePreferencesEvent.loadPreferences());
-          return bloc.stream.firstWhere((state) => state is LocalePreferencesLoaded).then(
+          return bloc.stream
+              .firstWhere((state) => state is LocalePreferencesLoaded)
+              .then(
                 (_) => bloc.add(
                   const LocalePreferencesEvent.updateCountry('Canada'),
                 ),
@@ -145,29 +153,37 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'emits [saving, saved, loaded] when preferences are saved successfully',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
-          when(() => mockRepository.savePreferences(any()))
-              .thenAnswer((_) async {});
-          when(() => mockRepository.syncToFirestore(any(), any()))
-              .thenAnswer((_) async {});
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.savePreferences(any()),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockRepository.syncToFirestore(any(), any()),
+          ).thenAnswer((_) async {});
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) {
           bloc.add(const LocalePreferencesEvent.loadPreferences());
-          return bloc.stream.firstWhere((state) => state is LocalePreferencesLoaded).then(
-                (_) {
-                  bloc.add(const LocalePreferencesEvent.updateLanguage(Locale('es')));
-                  return bloc.stream
-                      .firstWhere((state) =>
-                          state is LocalePreferencesLoaded && state.hasUnsavedChanges)
-                      .then(
-                        (_) => bloc.add(
-                          const LocalePreferencesEvent.savePreferences('user123'),
-                        ),
-                      );
-                },
-              );
+          return bloc.stream
+              .firstWhere((state) => state is LocalePreferencesLoaded)
+              .then((_) {
+                bloc.add(
+                  const LocalePreferencesEvent.updateLanguage(Locale('es')),
+                );
+                return bloc.stream
+                    .firstWhere(
+                      (state) =>
+                          state is LocalePreferencesLoaded &&
+                          state.hasUnsavedChanges,
+                    )
+                    .then(
+                      (_) => bloc.add(
+                        const LocalePreferencesEvent.savePreferences('user123'),
+                      ),
+                    );
+              });
         },
         skip: 3, // Skip initial loading states and first update
         expect: () => [
@@ -177,29 +193,32 @@ void main() {
         ],
         verify: (_) {
           verify(() => mockRepository.savePreferences(any())).called(1);
-          verify(() => mockRepository.syncToFirestore('user123', any())).called(1);
+          verify(
+            () => mockRepository.syncToFirestore('user123', any()),
+          ).called(1);
         },
       );
 
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'emits saved immediately when there are no changes',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) {
           bloc.add(const LocalePreferencesEvent.loadPreferences());
-          return bloc.stream.firstWhere((state) => state is LocalePreferencesLoaded).then(
+          return bloc.stream
+              .firstWhere((state) => state is LocalePreferencesLoaded)
+              .then(
                 (_) => bloc.add(
                   const LocalePreferencesEvent.savePreferences('user123'),
                 ),
               );
         },
         skip: 2, // Skip loading states
-        expect: () => [
-          const LocalePreferencesState.saved(),
-        ],
+        expect: () => [const LocalePreferencesState.saved()],
         verify: (_) {
           verifyNever(() => mockRepository.savePreferences(any()));
           verifyNever(() => mockRepository.syncToFirestore(any(), any()));
@@ -209,27 +228,34 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'emits [saving, error] when savePreferences fails',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
-          when(() => mockRepository.savePreferences(any()))
-              .thenThrow(Exception('Failed to save'));
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.savePreferences(any()),
+          ).thenThrow(Exception('Failed to save'));
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) {
           bloc.add(const LocalePreferencesEvent.loadPreferences());
-          return bloc.stream.firstWhere((state) => state is LocalePreferencesLoaded).then(
-                (_) {
-                  bloc.add(const LocalePreferencesEvent.updateLanguage(Locale('es')));
-                  return bloc.stream
-                      .firstWhere((state) =>
-                          state is LocalePreferencesLoaded && state.hasUnsavedChanges)
-                      .then(
-                        (_) => bloc.add(
-                          const LocalePreferencesEvent.savePreferences('user123'),
-                        ),
-                      );
-                },
-              );
+          return bloc.stream
+              .firstWhere((state) => state is LocalePreferencesLoaded)
+              .then((_) {
+                bloc.add(
+                  const LocalePreferencesEvent.updateLanguage(Locale('es')),
+                );
+                return bloc.stream
+                    .firstWhere(
+                      (state) =>
+                          state is LocalePreferencesLoaded &&
+                          state.hasUnsavedChanges,
+                    )
+                    .then(
+                      (_) => bloc.add(
+                        const LocalePreferencesEvent.savePreferences('user123'),
+                      ),
+                    );
+              });
         },
         skip: 3,
         expect: () => [
@@ -241,29 +267,35 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'emits [saving, error] when syncToFirestore fails',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
-          when(() => mockRepository.savePreferences(any()))
-              .thenAnswer((_) async {});
-          when(() => mockRepository.syncToFirestore(any(), any()))
-              .thenThrow(Exception('Firestore sync failed'));
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.savePreferences(any()),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockRepository.syncToFirestore(any(), any()),
+          ).thenThrow(Exception('Firestore sync failed'));
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) {
           bloc.add(const LocalePreferencesEvent.loadPreferences());
-          return bloc.stream.firstWhere((state) => state is LocalePreferencesLoaded).then(
-                (_) {
-                  bloc.add(const LocalePreferencesEvent.updateCountry('Germany'));
-                  return bloc.stream
-                      .firstWhere((state) =>
-                          state is LocalePreferencesLoaded && state.hasUnsavedChanges)
-                      .then(
-                        (_) => bloc.add(
-                          const LocalePreferencesEvent.savePreferences('user123'),
-                        ),
-                      );
-                },
-              );
+          return bloc.stream
+              .firstWhere((state) => state is LocalePreferencesLoaded)
+              .then((_) {
+                bloc.add(const LocalePreferencesEvent.updateCountry('Germany'));
+                return bloc.stream
+                    .firstWhere(
+                      (state) =>
+                          state is LocalePreferencesLoaded &&
+                          state.hasUnsavedChanges,
+                    )
+                    .then(
+                      (_) => bloc.add(
+                        const LocalePreferencesEvent.savePreferences('user123'),
+                      ),
+                    );
+              });
         },
         skip: 3,
         expect: () => [
@@ -281,8 +313,9 @@ void main() {
             locale: const Locale('fr'),
             country: 'France',
           );
-          when(() => mockRepository.loadFromFirestore('user123'))
-              .thenAnswer((_) async => firestorePrefs);
+          when(
+            () => mockRepository.loadFromFirestore('user123'),
+          ).thenAnswer((_) async => firestorePrefs);
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) =>
@@ -307,10 +340,12 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'falls back to loadPreferences when Firestore returns null',
         build: () {
-          when(() => mockRepository.loadFromFirestore('user123'))
-              .thenAnswer((_) async => null);
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.loadFromFirestore('user123'),
+          ).thenAnswer((_) async => null);
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) =>
@@ -331,8 +366,9 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'emits [loading, error] when Firestore load fails',
         build: () {
-          when(() => mockRepository.loadFromFirestore('user123'))
-              .thenThrow(Exception('Firestore error'));
+          when(
+            () => mockRepository.loadFromFirestore('user123'),
+          ).thenThrow(Exception('Firestore error'));
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) =>
@@ -340,7 +376,8 @@ void main() {
         expect: () => [
           const LocalePreferencesState.loading(),
           const LocalePreferencesState.error(
-            message: 'Failed to load preferences from Firestore: Exception: Firestore error',
+            message:
+                'Failed to load preferences from Firestore: Exception: Firestore error',
           ),
         ],
       );
@@ -350,31 +387,38 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'does not update when UpdateLanguage is called before loading',
         build: () => LocalePreferencesBloc(repository: mockRepository),
-        act: (bloc) => bloc.add(const LocalePreferencesEvent.updateLanguage(Locale('es'))),
+        act: (bloc) =>
+            bloc.add(const LocalePreferencesEvent.updateLanguage(Locale('es'))),
         expect: () => [],
       );
 
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'does not update when UpdateCountry is called before loading',
         build: () => LocalePreferencesBloc(repository: mockRepository),
-        act: (bloc) => bloc.add(const LocalePreferencesEvent.updateCountry('Spain')),
+        act: (bloc) =>
+            bloc.add(const LocalePreferencesEvent.updateCountry('Spain')),
         expect: () => [],
       );
 
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'tracks hasUnsavedChanges correctly across multiple updates',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) async {
           bloc.add(const LocalePreferencesEvent.loadPreferences());
-          await bloc.stream.firstWhere((state) => state is LocalePreferencesLoaded);
+          await bloc.stream.firstWhere(
+            (state) => state is LocalePreferencesLoaded,
+          );
 
           bloc.add(const LocalePreferencesEvent.updateLanguage(Locale('es')));
-          await bloc.stream.firstWhere((state) =>
-              state is LocalePreferencesLoaded && state.hasUnsavedChanges);
+          await bloc.stream.firstWhere(
+            (state) =>
+                state is LocalePreferencesLoaded && state.hasUnsavedChanges,
+          );
 
           bloc.add(const LocalePreferencesEvent.updateCountry('Spain'));
         },
@@ -407,12 +451,12 @@ void main() {
             timeZone: null,
             lastSyncedAt: null,
           );
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => isoPreferences);
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => isoPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
-        act: (bloc) =>
-            bloc.add(const LocalePreferencesEvent.loadPreferences()),
+        act: (bloc) => bloc.add(const LocalePreferencesEvent.loadPreferences()),
         expect: () => [
           const LocalePreferencesState.loading(),
           isA<LocalePreferencesLoaded>().having(
@@ -436,8 +480,9 @@ void main() {
             timeZone: null,
             lastSyncedAt: null,
           );
-          when(() => mockRepository.loadFromFirestore('user123'))
-              .thenAnswer((_) async => isoPreferences);
+          when(
+            () => mockRepository.loadFromFirestore('user123'),
+          ).thenAnswer((_) async => isoPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) =>
@@ -458,17 +503,22 @@ void main() {
       blocTest<LocalePreferencesBloc, LocalePreferencesState>(
         'resets hasUnsavedChanges to false when changing back to original values',
         build: () {
-          when(() => mockRepository.loadPreferences())
-              .thenAnswer((_) async => testPreferences);
+          when(
+            () => mockRepository.loadPreferences(),
+          ).thenAnswer((_) async => testPreferences);
           return LocalePreferencesBloc(repository: mockRepository);
         },
         act: (bloc) async {
           bloc.add(const LocalePreferencesEvent.loadPreferences());
-          await bloc.stream.firstWhere((state) => state is LocalePreferencesLoaded);
+          await bloc.stream.firstWhere(
+            (state) => state is LocalePreferencesLoaded,
+          );
 
           bloc.add(const LocalePreferencesEvent.updateLanguage(Locale('es')));
-          await bloc.stream.firstWhere((state) =>
-              state is LocalePreferencesLoaded && state.hasUnsavedChanges);
+          await bloc.stream.firstWhere(
+            (state) =>
+                state is LocalePreferencesLoaded && state.hasUnsavedChanges,
+          );
 
           // Change back to original
           bloc.add(const LocalePreferencesEvent.updateLanguage(Locale('en')));

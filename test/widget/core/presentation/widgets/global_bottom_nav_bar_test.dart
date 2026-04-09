@@ -51,7 +51,9 @@ void main() {
       expect(nav.currentIndex, 0);
     });
 
-    testWidgets('highlights Groups tab when selectedIndex is 2', (tester) async {
+    testWidgets('highlights Groups tab when selectedIndex is 2', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildWidget(selectedIndex: 2));
       final nav = tester.widget<BottomNavigationBar>(
         find.byType(BottomNavigationBar),
@@ -75,8 +77,9 @@ void main() {
       expect(find.text('0'), findsNothing);
     });
 
-    testWidgets('shows badge with count when friendRequestCount > 0',
-        (tester) async {
+    testWidgets('shows badge with count when friendRequestCount > 0', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildWidget(friendRequestCount: 3));
       expect(find.text('3'), findsOneWidget);
     });

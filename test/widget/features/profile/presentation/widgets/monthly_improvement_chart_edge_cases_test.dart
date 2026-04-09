@@ -12,18 +12,15 @@ void main() {
     testWidgets('shows placeholder when user has 0 games', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
           home: Scaffold(
-            body: MonthlyImprovementChart(
-              ratingHistory: [],
-              currentElo: 1500,
-            ),
+            body: MonthlyImprovementChart(ratingHistory: [], currentElo: 1500),
           ),
         ),
       );
@@ -31,7 +28,10 @@ void main() {
       expect(find.text('Monthly Progress Chart'), findsOneWidget);
       expect(find.text('Play at least 3 games'), findsOneWidget);
       expect(find.text('0/3 games'), findsOneWidget);
-      expect(find.text('Start playing to track your progress!'), findsOneWidget);
+      expect(
+        find.text('Start playing to track your progress!'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows placeholder when user has 1 game', (tester) async {
@@ -49,14 +49,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1525,
@@ -97,14 +98,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1550,
@@ -153,14 +155,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1575,
@@ -210,14 +213,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1575,
@@ -231,7 +235,9 @@ void main() {
       expect(find.text('Play at least 3 games'), findsNothing);
     });
 
-    testWidgets('shows empty period message when no games in selected period', (tester) async {
+    testWidgets('shows empty period message when no games in selected period', (
+      tester,
+    ) async {
       final now = DateTime.now();
       final history = [
         RatingHistoryEntry(
@@ -242,7 +248,9 @@ void main() {
           ratingChange: 25,
           opponentTeam: 'Team A',
           won: true,
-          timestamp: now.subtract(const Duration(days: 200)), // Outside 30-day period
+          timestamp: now.subtract(
+            const Duration(days: 200),
+          ), // Outside 30-day period
         ),
         RatingHistoryEntry(
           entryId: 'entry-2',
@@ -267,14 +275,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
             body: MonthlyImprovementChart(
               ratingHistory: history,
               currentElo: 1575,
@@ -289,61 +298,65 @@ void main() {
       expect(find.text('Try selecting a longer time period'), findsOneWidget);
     });
 
-    testWidgets('shows chart when aggregated data >= 2 points for long periods', (tester) async {
-      final now = DateTime.now();
-      final history = [
-        RatingHistoryEntry(
-          entryId: 'entry-1',
-          gameId: 'game-1',
-          oldRating: 1500,
-          newRating: 1525,
-          ratingChange: 25,
-          opponentTeam: 'Team A',
-          won: true,
-          timestamp: now.subtract(const Duration(days: 60)),
-        ),
-        RatingHistoryEntry(
-          entryId: 'entry-2',
-          gameId: 'game-2',
-          oldRating: 1525,
-          newRating: 1550,
-          ratingChange: 25,
-          opponentTeam: 'Team B',
-          won: true,
-          timestamp: now.subtract(const Duration(days: 30)),
-        ),
-        RatingHistoryEntry(
-          entryId: 'entry-3',
-          gameId: 'game-3',
-          oldRating: 1550,
-          newRating: 1575,
-          ratingChange: 25,
-          opponentTeam: 'Team C',
-          won: true,
-          timestamp: now,
-        ),
-      ];
+    testWidgets(
+      'shows chart when aggregated data >= 2 points for long periods',
+      (tester) async {
+        final now = DateTime.now();
+        final history = [
+          RatingHistoryEntry(
+            entryId: 'entry-1',
+            gameId: 'game-1',
+            oldRating: 1500,
+            newRating: 1525,
+            ratingChange: 25,
+            opponentTeam: 'Team A',
+            won: true,
+            timestamp: now.subtract(const Duration(days: 60)),
+          ),
+          RatingHistoryEntry(
+            entryId: 'entry-2',
+            gameId: 'game-2',
+            oldRating: 1525,
+            newRating: 1550,
+            ratingChange: 25,
+            opponentTeam: 'Team B',
+            won: true,
+            timestamp: now.subtract(const Duration(days: 30)),
+          ),
+          RatingHistoryEntry(
+            entryId: 'entry-3',
+            gameId: 'game-3',
+            oldRating: 1550,
+            newRating: 1575,
+            ratingChange: 25,
+            opponentTeam: 'Team C',
+            won: true,
+            timestamp: now,
+          ),
+        ];
 
-      await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],          home: Scaffold(
-            body: MonthlyImprovementChart(
-              ratingHistory: history,
-              currentElo: 1575,
-              timePeriod: TimePeriod.ninetyDays,
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
+              body: MonthlyImprovementChart(
+                ratingHistory: history,
+                currentElo: 1575,
+                timePeriod: TimePeriod.ninetyDays,
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Should show chart
-      expect(find.text('Play games over a longer period'), findsNothing);
-    });
+        // Should show chart
+        expect(find.text('Play games over a longer period'), findsNothing);
+      },
+    );
   });
 }

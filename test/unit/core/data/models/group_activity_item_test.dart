@@ -13,7 +13,10 @@ void main() {
     late GameModel testGame;
     late TrainingSessionModel testTraining;
 
-    const testLocation = GameLocation(name: 'Beach Court', address: '123 Beach Rd');
+    const testLocation = GameLocation(
+      name: 'Beach Court',
+      address: '123 Beach Rd',
+    );
 
     setUp(() {
       now = DateTime.now();
@@ -238,7 +241,8 @@ void main() {
 
         final result = item.map(
           game: (gameItem) => 'GameItem: ${gameItem.game.id}',
-          training: (trainingItem) => 'TrainingItem: ${trainingItem.session.id}',
+          training: (trainingItem) =>
+              'TrainingItem: ${trainingItem.session.id}',
         );
 
         expect(result, equals('GameItem: game-123'));
@@ -249,7 +253,8 @@ void main() {
 
         final result = item.map(
           game: (gameItem) => 'GameItem: ${gameItem.game.id}',
-          training: (trainingItem) => 'TrainingItem: ${trainingItem.session.id}',
+          training: (trainingItem) =>
+              'TrainingItem: ${trainingItem.session.id}',
         );
 
         expect(result, equals('TrainingItem: training-789'));

@@ -43,7 +43,9 @@ class ProfilePage extends StatelessWidget {
             // Show a brief snackbar in case there's a delay.
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(AppLocalizations.of(context)!.deleteAccountSuccess),
+                content: Text(
+                  AppLocalizations.of(context)!.deleteAccountSuccess,
+                ),
               ),
             );
           } else if (state is AccountDeletionFailure) {
@@ -51,7 +53,9 @@ class ProfilePage extends StatelessWidget {
               ..hideCurrentSnackBar()
               ..showSnackBar(
                 SnackBar(
-                  content: Text(AppLocalizations.of(context)!.deleteAccountError),
+                  content: Text(
+                    AppLocalizations.of(context)!.deleteAccountError,
+                  ),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -64,9 +68,7 @@ class ProfilePage extends StatelessWidget {
             }
 
             if (state is AuthenticationUnknown) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
 
             // Unauthenticated state - should not happen on profile page
@@ -114,16 +116,10 @@ class _ProfileContent extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (newContext) => MultiRepositoryProvider(
                     providers: [
-                      RepositoryProvider.value(
-                        value: authRepository,
-                      ),
+                      RepositoryProvider.value(value: authRepository),
                     ],
                     child: MultiBlocProvider(
-                      providers: [
-                        BlocProvider.value(
-                          value: authBloc,
-                        ),
-                      ],
+                      providers: [BlocProvider.value(value: authBloc)],
                       child: ProfileEditPage(user: state.user),
                     ),
                   ),
@@ -155,9 +151,9 @@ class _ProfileContent extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (newContext) => BlocProvider(
-          create: (context) => EmailVerificationBloc(
-            authRepository: authRepository,
-          )..add(const EmailVerificationEvent.checkStatus()),
+          create: (context) =>
+              EmailVerificationBloc(authRepository: authRepository)
+                ..add(const EmailVerificationEvent.checkStatus()),
           child: const EmailVerificationPage(),
         ),
       ),
@@ -176,15 +172,15 @@ class _ProfileContent extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.secondary,
-            ),
+            style: TextButton.styleFrom(foregroundColor: AppColors.secondary),
             child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
               Navigator.of(dialogContext).pop();
-              accountDeletionBloc.add(const AccountDeletionEvent.deleteRequested());
+              accountDeletionBloc.add(
+                const AccountDeletionEvent.deleteRequested(),
+              );
             },
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
@@ -207,22 +203,18 @@ class _ProfileContent extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.secondary,
-            ),
+            style: TextButton.styleFrom(foregroundColor: AppColors.secondary),
             child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
               // Trigger logout through AuthenticationBloc
-              context
-                  .read<AuthenticationBloc>()
-                  .add(const AuthenticationLogoutRequested());
+              context.read<AuthenticationBloc>().add(
+                const AuthenticationLogoutRequested(),
+              );
               Navigator.of(dialogContext).pop();
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.secondary,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.secondary),
             child: Text(l10n.signOut),
           ),
         ],

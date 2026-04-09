@@ -22,9 +22,11 @@ import 'package:play_with_me/core/services/service_locator.dart';
 
 // Mock classes
 class MockGameRepository extends Mock implements GameRepository {}
+
 class MockUserRepository extends Mock implements UserRepository {}
 
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
@@ -85,23 +87,33 @@ void main() {
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
     sl.registerSingleton<AuthenticationBloc>(mockAuthBloc);
     sl.registerSingleton<GameRepository>(mockGameRepository);
     sl.registerSingleton<UserRepository>(mockUserRepository);
-    when(() => mockUserRepository.getUsersByIds(any()))
-        .thenAnswer((_) async => []);
+    when(
+      () => mockUserRepository.getUsersByIds(any()),
+    ).thenAnswer((_) async => []);
 
-    when(() => mockGameRepository.getGameById(any()))
-        .thenAnswer((_) async => testGame);
-    when(() => mockGameRepository.saveGameResult(
-          gameId: any(named: 'gameId'),
-          userId: any(named: 'userId'),
-          teams: any(named: 'teams'),
-          result: any(named: 'result'),
-        )).thenAnswer((_) async {});
-    when(() => mockAuthBloc.state).thenReturn(const AuthenticationAuthenticated(testUser));
-    when(() => mockAuthBloc.stream).thenAnswer((_) => Stream.value(const AuthenticationAuthenticated(testUser)));
+    when(
+      () => mockGameRepository.getGameById(any()),
+    ).thenAnswer((_) async => testGame);
+    when(
+      () => mockGameRepository.saveGameResult(
+        gameId: any(named: 'gameId'),
+        userId: any(named: 'userId'),
+        teams: any(named: 'teams'),
+        result: any(named: 'result'),
+      ),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockAuthBloc.state,
+    ).thenReturn(const AuthenticationAuthenticated(testUser));
+    when(() => mockAuthBloc.stream).thenAnswer(
+      (_) => Stream.value(const AuthenticationAuthenticated(testUser)),
+    );
   });
 
   tearDown(() {
@@ -115,16 +127,14 @@ void main() {
         BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
       ],
       child: MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-        home: ScoreEntryPage(
-          gameId: gameId,
-        ),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
+        home: ScoreEntryPage(gameId: gameId),
       ),
     );
   }
@@ -133,25 +143,25 @@ void main() {
     testWidgets('can save scores when teams are tied', (tester) async {
       final mockObserver = MockNavigatorObserver();
 
-      await tester.pumpWidget(MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
-          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
           ],
-          supportedLocales: const [Locale('en')],
-          home: ScoreEntryPage(
-            gameId: testGameId,
+          child: MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: ScoreEntryPage(gameId: testGameId),
+            navigatorObservers: [mockObserver],
           ),
-          navigatorObservers: [mockObserver],
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Select 2 games
@@ -191,7 +201,10 @@ void main() {
       expect(find.text('Result: Tie'), findsOneWidget);
 
       // Verify the Save Scores button is enabled
-      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Scores');
+      final saveButtonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Save Scores',
+      );
       expect(saveButtonFinder, findsOneWidget);
 
       // Tap save
@@ -224,25 +237,25 @@ void main() {
     testWidgets('can save scores when all games are complete', (tester) async {
       final mockObserver = MockNavigatorObserver();
 
-      await tester.pumpWidget(MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
-          BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationBloc>.value(value: mockAuthBloc),
+            BlocProvider<InvitationBloc>.value(value: mockInvitationBloc),
           ],
-          supportedLocales: const [Locale('en')],
-          home: ScoreEntryPage(
-            gameId: testGameId,
+          child: MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: ScoreEntryPage(gameId: testGameId),
+            navigatorObservers: [mockObserver],
           ),
-          navigatorObservers: [mockObserver],
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Select 1 game
@@ -251,10 +264,12 @@ void main() {
 
       // Select teams for Game 1 (scoped to picker to exclude SegmentedButton InkWells)
       await tester.tap(
-        find.descendant(
-          of: find.byType(GameTeamPickerWidget),
-          matching: find.byType(InkWell),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(GameTeamPickerWidget),
+              matching: find.byType(InkWell),
+            )
+            .first,
       );
       await tester.pumpAndSettle();
 
@@ -265,7 +280,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find the button and tap it
-      final saveButtonFinder = find.widgetWithText(ElevatedButton, 'Save Scores');
+      final saveButtonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Save Scores',
+      );
       expect(saveButtonFinder, findsOneWidget);
       await tester.ensureVisible(saveButtonFinder);
       await tester.tap(saveButtonFinder);

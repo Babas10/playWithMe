@@ -46,9 +46,7 @@ void main() {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en')],
-      routes: {
-        '/login': (_) => const Scaffold(body: Text('Login Page')),
-      },
+      routes: {'/login': (_) => const Scaffold(body: Text('Login Page'))},
       home: InviteRegistrationPage(
         token: token,
         groupName: groupName,
@@ -69,8 +67,9 @@ void main() {
 
   group('InviteRegistrationPage', () {
     group('renders correctly', () {
-      testWidgets('shows group context banner with group name and inviter',
-          (tester) async {
+      testWidgets('shows group context banner with group name and inviter', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         expect(find.text('Create your account to join:'), findsOneWidget);
@@ -112,10 +111,10 @@ void main() {
       testWidgets('shows already have account link', (tester) async {
         await tester.pumpWidget(createTestWidget());
         await tester.ensureVisible(
-            find.text('Already have an account? Log in'));
+          find.text('Already have an account? Log in'),
+        );
 
-        expect(
-            find.text('Already have an account? Log in'), findsOneWidget);
+        expect(find.text('Already have an account? Log in'), findsOneWidget);
       });
 
       testWidgets('shows app bar with Create Account title', (tester) async {
@@ -138,18 +137,24 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'J');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'J',
+        );
         await scrollAndTapSubmit(tester);
 
-        expect(find.text('First name must be at least 2 characters'),
-            findsOneWidget);
+        expect(
+          find.text('First name must be at least 2 characters'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('validates last name is required', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await scrollAndTapSubmit(tester);
 
         expect(find.text('Last name is required'), findsOneWidget);
@@ -159,9 +164,13 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await scrollAndTapSubmit(tester);
 
         expect(find.text('Display name is required'), findsOneWidget);
@@ -171,26 +180,40 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JD');
+          find.widgetWithText(TextFormField, 'Display Name'),
+          'JD',
+        );
         await scrollAndTapSubmit(tester);
 
-        expect(find.text('Display name must be at least 3 characters'),
-            findsOneWidget);
+        expect(
+          find.text('Display name must be at least 3 characters'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('validates email is required', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JohnD');
+          find.widgetWithText(TextFormField, 'Display Name'),
+          'JohnD',
+        );
         await scrollAndTapSubmit(tester);
 
         expect(find.text('Email is required'), findsOneWidget);
@@ -200,13 +223,21 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JohnD');
+          find.widgetWithText(TextFormField, 'Display Name'),
+          'JohnD',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Email'), 'john@example.com');
+          find.widgetWithText(TextFormField, 'Email'),
+          'john@example.com',
+        );
         await scrollAndTapSubmit(tester);
 
         expect(find.text('Password is required'), findsOneWidget);
@@ -216,43 +247,69 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JohnD');
+          find.widgetWithText(TextFormField, 'Display Name'),
+          'JohnD',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Email'), 'john@example.com');
+          find.widgetWithText(TextFormField, 'Email'),
+          'john@example.com',
+        );
         await tester.ensureVisible(
-            find.widgetWithText(TextFormField, 'Password'));
+          find.widgetWithText(TextFormField, 'Password'),
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Password'), 'Pass1');
+          find.widgetWithText(TextFormField, 'Password'),
+          'Pass1',
+        );
         await scrollAndTapSubmit(tester);
 
-        expect(find.text('Password must be at least 8 characters'),
-            findsOneWidget);
+        expect(
+          find.text('Password must be at least 8 characters'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('validates confirm password matches', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JohnD');
+          find.widgetWithText(TextFormField, 'Display Name'),
+          'JohnD',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Email'), 'john@example.com');
+          find.widgetWithText(TextFormField, 'Email'),
+          'john@example.com',
+        );
         await tester.ensureVisible(
-            find.widgetWithText(TextFormField, 'Password'));
+          find.widgetWithText(TextFormField, 'Password'),
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Password'), 'Password1');
+          find.widgetWithText(TextFormField, 'Password'),
+          'Password1',
+        );
         await tester.ensureVisible(
-            find.widgetWithText(TextFormField, 'Confirm Password'));
+          find.widgetWithText(TextFormField, 'Confirm Password'),
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Confirm Password'),
-            'Password2');
+          find.widgetWithText(TextFormField, 'Confirm Password'),
+          'Password2',
+        );
         await scrollAndTapSubmit(tester);
 
         expect(find.text('Passwords do not match'), findsOneWidget);
@@ -260,20 +317,22 @@ void main() {
     });
 
     group('state-driven behavior', () {
-      testWidgets('shows loading indicator when creating account',
-          (tester) async {
-        when(() => mockBloc.state)
-            .thenReturn(const InviteRegistrationCreatingAccount());
+      testWidgets('shows loading indicator when creating account', (
+        tester,
+      ) async {
+        when(
+          () => mockBloc.state,
+        ).thenReturn(const InviteRegistrationCreatingAccount());
 
         await tester.pumpWidget(createTestWidget());
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
 
-      testWidgets('shows loading indicator when joining group',
-          (tester) async {
-        when(() => mockBloc.state)
-            .thenReturn(const InviteRegistrationJoiningGroup());
+      testWidgets('shows loading indicator when joining group', (tester) async {
+        when(
+          () => mockBloc.state,
+        ).thenReturn(const InviteRegistrationJoiningGroup());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -291,9 +350,11 @@ void main() {
 
         await tester.pumpWidget(createTestWidget());
 
-        controller.add(const InviteRegistrationFailure(
-          message: 'An account with this email already exists.',
-        ));
+        controller.add(
+          const InviteRegistrationFailure(
+            message: 'An account with this email already exists.',
+          ),
+        );
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
 
@@ -305,8 +366,9 @@ void main() {
         controller.close();
       });
 
-      testWidgets('shows token expired snackbar and navigates to login',
-          (tester) async {
+      testWidgets('shows token expired snackbar and navigates to login', (
+        tester,
+      ) async {
         final controller =
             StreamController<InviteRegistrationState>.broadcast();
         whenListen(
@@ -323,7 +385,8 @@ void main() {
 
         expect(
           find.text(
-              'The invite link has expired, but your account was created successfully.'),
+            'The invite link has expired, but your account was created successfully.',
+          ),
           findsOneWidget,
         );
 
@@ -335,8 +398,9 @@ void main() {
     });
 
     group('navigation', () {
-      testWidgets('already have account link navigates to login',
-          (tester) async {
+      testWidgets('already have account link navigates to login', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         final link = find.text('Already have an account? Log in');
@@ -350,31 +414,47 @@ void main() {
     });
 
     group('form submission', () {
-      testWidgets('dispatches event when form is valid and submitted',
-          (tester) async {
+      testWidgets('dispatches event when form is valid and submitted', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'First Name'), 'John');
+          find.widgetWithText(TextFormField, 'First Name'),
+          'John',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Last Name'), 'Doe');
+          find.widgetWithText(TextFormField, 'Last Name'),
+          'Doe',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Display Name'), 'JohnD');
+          find.widgetWithText(TextFormField, 'Display Name'),
+          'JohnD',
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Email'), 'john@example.com');
+          find.widgetWithText(TextFormField, 'Email'),
+          'john@example.com',
+        );
         await tester.ensureVisible(
-            find.widgetWithText(TextFormField, 'Password'));
+          find.widgetWithText(TextFormField, 'Password'),
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Password'), 'Password1');
+          find.widgetWithText(TextFormField, 'Password'),
+          'Password1',
+        );
         await tester.ensureVisible(
-            find.widgetWithText(TextFormField, 'Confirm Password'));
+          find.widgetWithText(TextFormField, 'Confirm Password'),
+        );
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'Confirm Password'),
-            'Password1');
+          find.widgetWithText(TextFormField, 'Confirm Password'),
+          'Password1',
+        );
 
         await scrollAndTapSubmit(tester);
 
-        verify(() => mockBloc.add(const InviteRegistrationSubmitted(
+        verify(
+          () => mockBloc.add(
+            const InviteRegistrationSubmitted(
               firstName: 'John',
               lastName: 'Doe',
               displayName: 'JohnD',
@@ -382,11 +462,14 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
-            ))).called(1);
+            ),
+          ),
+        ).called(1);
       });
 
-      testWidgets('does not dispatch event when form is invalid',
-          (tester) async {
+      testWidgets('does not dispatch event when form is invalid', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         await scrollAndTapSubmit(tester);

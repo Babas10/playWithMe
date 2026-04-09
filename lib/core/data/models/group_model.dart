@@ -13,9 +13,14 @@ class GroupModel with _$GroupModel {
     String? photoUrl,
     required String createdBy,
     // ignore: invalid_annotation_target
-    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required DateTime createdAt,
+    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
+    required DateTime createdAt,
     // ignore: invalid_annotation_target
-    @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? updatedAt,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    DateTime? updatedAt,
     @Default([]) List<String> memberIds,
     @Default([]) List<String> adminIds,
     @Default([]) List<String> gameIds,
@@ -30,7 +35,11 @@ class GroupModel with _$GroupModel {
     // Group stats
     @Default(0) int totalGamesPlayed,
     // ignore: invalid_annotation_target
-    @JsonKey(fromJson: _timestampFromJsonNullable, toJson: _timestampToJsonNullable) DateTime? lastActivity,
+    @JsonKey(
+      fromJson: _timestampFromJsonNullable,
+      toJson: _timestampToJsonNullable,
+    )
+    DateTime? lastActivity,
   }) = _GroupModel;
 
   const GroupModel._();
@@ -41,10 +50,7 @@ class GroupModel with _$GroupModel {
   /// Factory constructor for creating from Firestore DocumentSnapshot
   factory GroupModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return GroupModel.fromJson({
-      ...data,
-      'id': doc.id,
-    });
+    return GroupModel.fromJson({...data, 'id': doc.id});
   }
 
   /// Convert to Firestore-compatible map (excludes id since it's the document ID)
@@ -80,7 +86,9 @@ class GroupModel with _$GroupModel {
   /// Check if group is active (has recent activity)
   bool get isActive {
     if (lastActivity == null) return false;
-    final daysSinceLastActivity = DateTime.now().difference(lastActivity!).inDays;
+    final daysSinceLastActivity = DateTime.now()
+        .difference(lastActivity!)
+        .inDays;
     return daysSinceLastActivity <= 30; // Active if activity within 30 days
   }
 
@@ -124,9 +132,12 @@ class GroupModel with _$GroupModel {
       privacy: privacy ?? this.privacy,
       requiresApproval: requiresApproval ?? this.requiresApproval,
       maxMembers: maxMembers ?? this.maxMembers,
-      allowMembersToCreateGames: allowMembersToCreateGames ?? this.allowMembersToCreateGames,
-      allowMembersToInviteOthers: allowMembersToInviteOthers ?? this.allowMembersToInviteOthers,
-      notifyMembersOfNewGames: notifyMembersOfNewGames ?? this.notifyMembersOfNewGames,
+      allowMembersToCreateGames:
+          allowMembersToCreateGames ?? this.allowMembersToCreateGames,
+      allowMembersToInviteOthers:
+          allowMembersToInviteOthers ?? this.allowMembersToInviteOthers,
+      notifyMembersOfNewGames:
+          notifyMembersOfNewGames ?? this.notifyMembersOfNewGames,
       updatedAt: DateTime.now(),
       lastActivity: DateTime.now(),
     );
@@ -146,7 +157,9 @@ class GroupModel with _$GroupModel {
   GroupModel removeMember(String userId) {
     return copyWith(
       memberIds: memberIds.where((id) => id != userId).toList(),
-      adminIds: adminIds.where((id) => id != userId).toList(), // Remove from admins too
+      adminIds: adminIds
+          .where((id) => id != userId)
+          .toList(), // Remove from admins too
       updatedAt: DateTime.now(),
       lastActivity: DateTime.now(),
     );
@@ -164,7 +177,9 @@ class GroupModel with _$GroupModel {
 
   /// Demote an admin to regular member
   GroupModel demoteFromAdmin(String userId) {
-    if (!adminIds.contains(userId) || userId == createdBy) return this; // Can't demote creator
+    if (!adminIds.contains(userId) || userId == createdBy) {
+      return this; // Can't demote creator
+    }
     return copyWith(
       adminIds: adminIds.where((id) => id != userId).toList(),
       updatedAt: DateTime.now(),
@@ -194,9 +209,7 @@ class GroupModel with _$GroupModel {
 
   /// Update last activity timestamp
   GroupModel updateActivity() {
-    return copyWith(
-      lastActivity: DateTime.now(),
-    );
+    return copyWith(lastActivity: DateTime.now());
   }
 
   /// Get members excluding a specific user (useful for invitations)

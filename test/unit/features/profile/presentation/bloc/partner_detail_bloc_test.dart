@@ -47,17 +47,21 @@ void main() {
           isAnonymous: false,
         );
 
-        when(() => mockUserRepository.getTeammateStats('user-123', 'partner-123'))
-            .thenAnswer((_) async => testStats);
-        when(() => mockUserRepository.getUserById('partner-123'))
-            .thenAnswer((_) async => testPartner);
+        when(
+          () => mockUserRepository.getTeammateStats('user-123', 'partner-123'),
+        ).thenAnswer((_) async => testStats);
+        when(
+          () => mockUserRepository.getUserById('partner-123'),
+        ).thenAnswer((_) async => testPartner);
 
         return PartnerDetailBloc(userRepository: mockUserRepository);
       },
-      act: (bloc) => bloc.add(const PartnerDetailEvent.loadPartnerDetails(
-        userId: 'user-123',
-        partnerId: 'partner-123',
-      )),
+      act: (bloc) => bloc.add(
+        const PartnerDetailEvent.loadPartnerDetails(
+          userId: 'user-123',
+          partnerId: 'partner-123',
+        ),
+      ),
       expect: () => [
         const PartnerDetailState.loading(),
         isA<PartnerDetailLoaded>()
@@ -70,22 +74,26 @@ void main() {
     blocTest<PartnerDetailBloc, PartnerDetailState>(
       'emits [loading, error] when stats are not found',
       build: () {
-        when(() => mockUserRepository.getTeammateStats('user-123', 'partner-123'))
-            .thenAnswer((_) async => null);
-        when(() => mockUserRepository.getUserById('partner-123'))
-            .thenAnswer((_) async => UserModel(
-                  uid: 'partner-123',
-                  email: 'partner@example.com',
-                  isEmailVerified: true,
-                  isAnonymous: false,
-                ));
+        when(
+          () => mockUserRepository.getTeammateStats('user-123', 'partner-123'),
+        ).thenAnswer((_) async => null);
+        when(() => mockUserRepository.getUserById('partner-123')).thenAnswer(
+          (_) async => UserModel(
+            uid: 'partner-123',
+            email: 'partner@example.com',
+            isEmailVerified: true,
+            isAnonymous: false,
+          ),
+        );
 
         return PartnerDetailBloc(userRepository: mockUserRepository);
       },
-      act: (bloc) => bloc.add(const PartnerDetailEvent.loadPartnerDetails(
-        userId: 'user-123',
-        partnerId: 'partner-123',
-      )),
+      act: (bloc) => bloc.add(
+        const PartnerDetailEvent.loadPartnerDetails(
+          userId: 'user-123',
+          partnerId: 'partner-123',
+        ),
+      ),
       expect: () => [
         const PartnerDetailState.loading(),
         const PartnerDetailState.error(
@@ -97,46 +105,56 @@ void main() {
     blocTest<PartnerDetailBloc, PartnerDetailState>(
       'emits [loading, error] when partner profile is not found',
       build: () {
-        when(() => mockUserRepository.getTeammateStats('user-123', 'partner-123'))
-            .thenAnswer((_) async => TeammateStats(
-                  userId: 'partner-123',
-                  gamesPlayed: 10,
-                  gamesWon: 7,
-                  gamesLost: 3,
-                ));
-        when(() => mockUserRepository.getUserById('partner-123'))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockUserRepository.getTeammateStats('user-123', 'partner-123'),
+        ).thenAnswer(
+          (_) async => TeammateStats(
+            userId: 'partner-123',
+            gamesPlayed: 10,
+            gamesWon: 7,
+            gamesLost: 3,
+          ),
+        );
+        when(
+          () => mockUserRepository.getUserById('partner-123'),
+        ).thenAnswer((_) async => null);
 
         return PartnerDetailBloc(userRepository: mockUserRepository);
       },
-      act: (bloc) => bloc.add(const PartnerDetailEvent.loadPartnerDetails(
-        userId: 'user-123',
-        partnerId: 'partner-123',
-      )),
+      act: (bloc) => bloc.add(
+        const PartnerDetailEvent.loadPartnerDetails(
+          userId: 'user-123',
+          partnerId: 'partner-123',
+        ),
+      ),
       expect: () => [
         const PartnerDetailState.loading(),
-        const PartnerDetailState.error(
-          message: 'Partner profile not found',
-        ),
+        const PartnerDetailState.error(message: 'Partner profile not found'),
       ],
     );
 
     blocTest<PartnerDetailBloc, PartnerDetailState>(
       'emits [loading, error] when repository throws exception',
       build: () {
-        when(() => mockUserRepository.getTeammateStats('user-123', 'partner-123'))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockUserRepository.getTeammateStats('user-123', 'partner-123'),
+        ).thenThrow(Exception('Network error'));
 
         return PartnerDetailBloc(userRepository: mockUserRepository);
       },
-      act: (bloc) => bloc.add(const PartnerDetailEvent.loadPartnerDetails(
-        userId: 'user-123',
-        partnerId: 'partner-123',
-      )),
+      act: (bloc) => bloc.add(
+        const PartnerDetailEvent.loadPartnerDetails(
+          userId: 'user-123',
+          partnerId: 'partner-123',
+        ),
+      ),
       expect: () => [
         const PartnerDetailState.loading(),
-        isA<PartnerDetailError>()
-            .having((s) => s.message, 'error message', contains('Failed to load partner details')),
+        isA<PartnerDetailError>().having(
+          (s) => s.message,
+          'error message',
+          contains('Failed to load partner details'),
+        ),
       ],
     );
   });

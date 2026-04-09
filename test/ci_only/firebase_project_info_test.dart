@@ -139,7 +139,7 @@ void main() {
               'expectedProjectId': 'gatherli-dev',
               'status': 'created',
               'matchesExpected': true,
-            }
+            },
           ],
         };
 
@@ -179,10 +179,7 @@ void main() {
   group('Gatherli Requirements', () {
     test('should support all required project environments', () {
       const requiredEnvironments = ['dev', 'prod'];
-      const expectedProjectIds = [
-        'gatherli-dev',
-        'gatherli-prod',
-      ];
+      const expectedProjectIds = ['gatherli-dev', 'gatherli-prod'];
 
       final projects = List.generate(2, (index) {
         return FirebaseProjectInfo(
@@ -194,7 +191,10 @@ void main() {
 
       expect(projects.length, 2);
       expect(projects.map((p) => p.environment).toList(), requiredEnvironments);
-      expect(projects.map((p) => p.expectedProjectId).toList(), expectedProjectIds);
+      expect(
+        projects.map((p) => p.expectedProjectId).toList(),
+        expectedProjectIds,
+      );
     });
 
     test('should validate completion criteria', () {
@@ -216,7 +216,9 @@ void main() {
       ];
 
       // All projects created
-      final allComplete = allCreated.every((p) => p.status == FirebaseProjectStatus.created);
+      final allComplete = allCreated.every(
+        (p) => p.status == FirebaseProjectStatus.created,
+      );
       expect(allComplete, true);
 
       // All project IDs match expected

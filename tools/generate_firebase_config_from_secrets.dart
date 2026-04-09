@@ -8,7 +8,9 @@ import 'dart:io';
 /// set by GitHub Secrets, ensuring no sensitive data is committed to the repository.
 void main(List<String> arguments) {
   if (arguments.isEmpty) {
-    print('Usage: dart tools/generate_firebase_config_from_secrets.dart <environment>');
+    print(
+      'Usage: dart tools/generate_firebase_config_from_secrets.dart <environment>',
+    );
     print('Example: dart tools/generate_firebase_config_from_secrets.dart dev');
     print('Available environments: dev, prod');
     exit(1);
@@ -21,12 +23,16 @@ void main(List<String> arguments) {
     exit(1);
   }
 
-  print('🔥 Generating Firebase configuration for $environment environment from secrets...');
+  print(
+    '🔥 Generating Firebase configuration for $environment environment from secrets...',
+  );
 
   try {
     final config = _generateFirebaseConfig(environment);
     _writeConfigFile(environment, config);
-    print('✅ Successfully generated lib/core/config/firebase_config_$environment.dart');
+    print(
+      '✅ Successfully generated lib/core/config/firebase_config_$environment.dart',
+    );
   } catch (e) {
     print('❌ Error generating Firebase configuration: $e');
     exit(1);
@@ -84,30 +90,51 @@ Map<String, String> _getProjectDataFromEnv(String environment) {
 
   // Try to get values from environment variables
   final projectId = Platform.environment['FIREBASE_${envPrefix}_PROJECT_ID'];
-  final storageBucket = Platform.environment['FIREBASE_${envPrefix}_STORAGE_BUCKET'];
-  final androidAppId = Platform.environment['FIREBASE_${envPrefix}_ANDROID_APP_ID'];
+  final storageBucket =
+      Platform.environment['FIREBASE_${envPrefix}_STORAGE_BUCKET'];
+  final androidAppId =
+      Platform.environment['FIREBASE_${envPrefix}_ANDROID_APP_ID'];
   final iosAppId = Platform.environment['FIREBASE_${envPrefix}_IOS_APP_ID'];
   final apiKey = Platform.environment['FIREBASE_${envPrefix}_API_KEY'];
-  final messagingSenderId = Platform.environment['FIREBASE_${envPrefix}_MESSAGING_SENDER_ID'];
-  final androidPackageName = Platform.environment['FIREBASE_${envPrefix}_ANDROID_PACKAGE_NAME'];
-  final iosBundleId = Platform.environment['FIREBASE_${envPrefix}_IOS_BUNDLE_ID'];
+  final messagingSenderId =
+      Platform.environment['FIREBASE_${envPrefix}_MESSAGING_SENDER_ID'];
+  final androidPackageName =
+      Platform.environment['FIREBASE_${envPrefix}_ANDROID_PACKAGE_NAME'];
+  final iosBundleId =
+      Platform.environment['FIREBASE_${envPrefix}_IOS_BUNDLE_ID'];
 
   // Validate that all required environment variables are present
   final missingVars = <String>[];
-  if (projectId == null || projectId.isEmpty) missingVars.add('FIREBASE_${envPrefix}_PROJECT_ID');
-  if (storageBucket == null || storageBucket.isEmpty) missingVars.add('FIREBASE_${envPrefix}_STORAGE_BUCKET');
-  if (androidAppId == null || androidAppId.isEmpty) missingVars.add('FIREBASE_${envPrefix}_ANDROID_APP_ID');
-  if (iosAppId == null || iosAppId.isEmpty) missingVars.add('FIREBASE_${envPrefix}_IOS_APP_ID');
-  if (apiKey == null || apiKey.isEmpty) missingVars.add('FIREBASE_${envPrefix}_API_KEY');
-  if (messagingSenderId == null || messagingSenderId.isEmpty) missingVars.add('FIREBASE_${envPrefix}_MESSAGING_SENDER_ID');
-  if (androidPackageName == null || androidPackageName.isEmpty) missingVars.add('FIREBASE_${envPrefix}_ANDROID_PACKAGE_NAME');
-  if (iosBundleId == null || iosBundleId.isEmpty) missingVars.add('FIREBASE_${envPrefix}_IOS_BUNDLE_ID');
+  if (projectId == null || projectId.isEmpty) {
+    missingVars.add('FIREBASE_${envPrefix}_PROJECT_ID');
+  }
+  if (storageBucket == null || storageBucket.isEmpty) {
+    missingVars.add('FIREBASE_${envPrefix}_STORAGE_BUCKET');
+  }
+  if (androidAppId == null || androidAppId.isEmpty) {
+    missingVars.add('FIREBASE_${envPrefix}_ANDROID_APP_ID');
+  }
+  if (iosAppId == null || iosAppId.isEmpty) {
+    missingVars.add('FIREBASE_${envPrefix}_IOS_APP_ID');
+  }
+  if (apiKey == null || apiKey.isEmpty) {
+    missingVars.add('FIREBASE_${envPrefix}_API_KEY');
+  }
+  if (messagingSenderId == null || messagingSenderId.isEmpty) {
+    missingVars.add('FIREBASE_${envPrefix}_MESSAGING_SENDER_ID');
+  }
+  if (androidPackageName == null || androidPackageName.isEmpty) {
+    missingVars.add('FIREBASE_${envPrefix}_ANDROID_PACKAGE_NAME');
+  }
+  if (iosBundleId == null || iosBundleId.isEmpty) {
+    missingVars.add('FIREBASE_${envPrefix}_IOS_BUNDLE_ID');
+  }
 
   if (missingVars.isNotEmpty) {
     throw Exception(
       'Missing required environment variables for $environment environment:\n'
       '${missingVars.map((v) => '  - $v').join('\n')}\n\n'
-      'Please ensure these GitHub Secrets are configured in your repository.'
+      'Please ensure these GitHub Secrets are configured in your repository.',
     );
   }
 

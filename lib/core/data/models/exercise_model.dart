@@ -13,6 +13,7 @@ class ExerciseModel with _$ExerciseModel {
     required String id,
     required String name,
     String? description,
+
     /// Duration in minutes (optional)
     int? durationMinutes,
     @TimestampConverter() required DateTime createdAt,
@@ -32,18 +33,17 @@ class ExerciseModel with _$ExerciseModel {
     final jsonData = Map<String, dynamic>.from(data);
 
     if (data['createdAt'] is Timestamp) {
-      jsonData['createdAt'] =
-          (data['createdAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['createdAt'] = (data['createdAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
     if (data['updatedAt'] is Timestamp) {
-      jsonData['updatedAt'] =
-          (data['updatedAt'] as Timestamp).toDate().toIso8601String();
+      jsonData['updatedAt'] = (data['updatedAt'] as Timestamp)
+          .toDate()
+          .toIso8601String();
     }
 
-    return ExerciseModel.fromJson({
-      ...jsonData,
-      'id': doc.id,
-    });
+    return ExerciseModel.fromJson({...jsonData, 'id': doc.id});
   }
 
   /// Convert to Firestore-compatible map (excludes id since it's the document ID)

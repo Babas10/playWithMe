@@ -17,7 +17,8 @@ abstract class GroupRepository {
   Future<String> createGroup(GroupModel group);
 
   /// Update group information
-  Future<void> updateGroupInfo(String groupId, {
+  Future<void> updateGroupInfo(
+    String groupId, {
     String? name,
     String? description,
     String? photoUrl,
@@ -25,7 +26,8 @@ abstract class GroupRepository {
   });
 
   /// Update group settings
-  Future<void> updateGroupSettings(String groupId, {
+  Future<void> updateGroupSettings(
+    String groupId, {
     GroupPrivacy? privacy,
     bool? requiresApproval,
     int? maxMembers,

@@ -17,9 +17,13 @@ import 'package:play_with_me/features/groups/presentation/pages/invite_member_pa
 import 'package:play_with_me/core/data/models/group_model.dart';
 
 class MockFriendRepository extends Mock implements FriendRepository {}
+
 class MockGroupRepository extends Mock implements GroupRepository {}
+
 class MockInvitationRepository extends Mock implements InvitationRepository {}
+
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 void main() {
@@ -36,7 +40,9 @@ void main() {
     mockAuthenticationBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
 
     // Default group data setup
     when(() => mockGroupRepository.getGroupById(any())).thenAnswer(
@@ -59,9 +65,9 @@ void main() {
       isAnonymous: false,
     );
 
-    when(() => mockAuthenticationBloc.state).thenReturn(
-      const AuthenticationAuthenticated(testUser),
-    );
+    when(
+      () => mockAuthenticationBloc.state,
+    ).thenReturn(const AuthenticationAuthenticated(testUser));
 
     when(() => mockAuthenticationBloc.stream).thenAnswer(
       (_) => Stream.value(const AuthenticationAuthenticated(testUser)),
@@ -94,9 +100,9 @@ void main() {
   group('InviteMemberPage', () {
     testWidgets('displays title and instructions', (tester) async {
       // Arrange
-      when(() => mockFriendRepository.getFriends('test-user')).thenAnswer(
-        (_) async => [],
-      );
+      when(
+        () => mockFriendRepository.getFriends('test-user'),
+      ).thenAnswer((_) async => []);
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -122,9 +128,9 @@ void main() {
         ),
       ];
 
-      when(() => mockFriendRepository.getFriends('test-user')).thenAnswer(
-        (_) async => friends,
-      );
+      when(
+        () => mockFriendRepository.getFriends('test-user'),
+      ).thenAnswer((_) async => friends);
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -137,9 +143,9 @@ void main() {
 
     testWidgets('shows disabled send button when no selection', (tester) async {
       // Arrange
-      when(() => mockFriendRepository.getFriends('test-user')).thenAnswer(
-        (_) async => [],
-      );
+      when(
+        () => mockFriendRepository.getFriends('test-user'),
+      ).thenAnswer((_) async => []);
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());

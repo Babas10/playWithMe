@@ -86,9 +86,7 @@ void main() {
           body: BlocBuilder<GamesListBloc, GamesListState>(
             builder: (context, state) {
               if (state is GamesListLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const Center(child: CircularProgressIndicator());
               }
               if (state is GamesListError) {
                 return Center(
@@ -103,9 +101,9 @@ void main() {
                       const SizedBox(height: 24),
                       ElevatedButton.icon(
                         onPressed: () {
-                          context
-                              .read<GamesListBloc>()
-                              .add(const RefreshGamesList());
+                          context.read<GamesListBloc>().add(
+                            const RefreshGamesList(),
+                          );
                         },
                         icon: const Icon(Icons.refresh),
                         label: const Text('Retry'),
@@ -137,9 +135,7 @@ void main() {
               if (state is GamesListLoaded) {
                 return RefreshIndicator(
                   onRefresh: () async {
-                    context
-                        .read<GamesListBloc>()
-                        .add(const RefreshGamesList());
+                    context.read<GamesListBloc>().add(const RefreshGamesList());
                   },
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -162,9 +158,8 @@ void main() {
                                 isPast: false,
                                 onTap: () {},
                               ),
-                              training: (session) => ListTile(
-                                title: Text(session.title),
-                              ),
+                              training: (session) =>
+                                  ListTile(title: Text(session.title)),
                             );
                           }),
                         ],
@@ -184,9 +179,8 @@ void main() {
                                 isPast: true,
                                 onTap: () {},
                               ),
-                              training: (session) => ListTile(
-                                title: Text(session.title),
-                              ),
+                              training: (session) =>
+                                  ListTile(title: Text(session.title)),
                             );
                           }),
                         ],
@@ -227,8 +221,9 @@ void main() {
 
     group('Loading State', () {
       testWidgets('shows loading indicator when loading', (tester) async {
-        when(() => mockGamesListBloc.state)
-            .thenReturn(const GamesListLoading());
+        when(
+          () => mockGamesListBloc.state,
+        ).thenReturn(const GamesListLoading());
 
         await tester.pumpWidget(createTestWidget());
 
@@ -238,8 +233,9 @@ void main() {
 
     group('Empty State', () {
       testWidgets('shows empty state when no games', (tester) async {
-        when(() => mockGamesListBloc.state)
-            .thenReturn(const GamesListEmpty(userId: testUserId));
+        when(
+          () => mockGamesListBloc.state,
+        ).thenReturn(const GamesListEmpty(userId: testUserId));
 
         await tester.pumpWidget(createTestWidget());
 
@@ -249,8 +245,9 @@ void main() {
       });
 
       testWidgets('empty state shows create game button', (tester) async {
-        when(() => mockGamesListBloc.state)
-            .thenReturn(const GamesListEmpty(userId: testUserId));
+        when(
+          () => mockGamesListBloc.state,
+        ).thenReturn(const GamesListEmpty(userId: testUserId));
 
         await tester.pumpWidget(createTestWidget());
 
@@ -262,8 +259,9 @@ void main() {
 
     group('Error State', () {
       testWidgets('shows error state with message', (tester) async {
-        when(() => mockGamesListBloc.state)
-            .thenReturn(const GamesListError(message: 'Failed to load games'));
+        when(
+          () => mockGamesListBloc.state,
+        ).thenReturn(const GamesListError(message: 'Failed to load games'));
 
         await tester.pumpWidget(createTestWidget());
 
@@ -273,8 +271,9 @@ void main() {
       });
 
       testWidgets('shows retry button in error state', (tester) async {
-        when(() => mockGamesListBloc.state)
-            .thenReturn(const GamesListError(message: 'Error message'));
+        when(
+          () => mockGamesListBloc.state,
+        ).thenReturn(const GamesListError(message: 'Error message'));
 
         await tester.pumpWidget(createTestWidget());
 
@@ -283,8 +282,9 @@ void main() {
       });
 
       testWidgets('retry button triggers RefreshGamesList', (tester) async {
-        when(() => mockGamesListBloc.state)
-            .thenReturn(const GamesListError(message: 'Error'));
+        when(
+          () => mockGamesListBloc.state,
+        ).thenReturn(const GamesListError(message: 'Error'));
 
         await tester.pumpWidget(createTestWidget());
 
@@ -485,8 +485,9 @@ void main() {
 
     group('FAB Interaction', () {
       testWidgets('FAB shows create game icon and label', (tester) async {
-        when(() => mockGamesListBloc.state)
-            .thenReturn(const GamesListEmpty(userId: testUserId));
+        when(
+          () => mockGamesListBloc.state,
+        ).thenReturn(const GamesListEmpty(userId: testUserId));
 
         await tester.pumpWidget(createTestWidget());
 

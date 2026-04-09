@@ -35,16 +35,18 @@ void main() {
     // NOTE: Loading state timing test moved to integration tests
     // See: https://github.com/Babas10/playWithMe/issues/442
 
-    testWidgets('displays empty state when user has no friends', (tester) async {
+    testWidgets('displays empty state when user has no friends', (
+      tester,
+    ) async {
       // Arrange
-      when(() => mockFriendRepository.getFriends('user1')).thenAnswer(
-        (_) async => [],
-      );
+      when(
+        () => mockFriendRepository.getFriends('user1'),
+      ).thenAnswer((_) async => []);
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (_) {},
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(onSelectionChanged: (_) {}),
+      );
       await tester.pumpAndSettle();
 
       // Assert
@@ -53,16 +55,18 @@ void main() {
       expect(find.byIcon(Icons.people_outline), findsOneWidget);
     });
 
-    testWidgets('displays error state when friend loading fails', (tester) async {
+    testWidgets('displays error state when friend loading fails', (
+      tester,
+    ) async {
       // Arrange
-      when(() => mockFriendRepository.getFriends('user1')).thenThrow(
-        FriendshipException('Failed to load friends'),
-      );
+      when(
+        () => mockFriendRepository.getFriends('user1'),
+      ).thenThrow(FriendshipException('Failed to load friends'));
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (_) {},
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(onSelectionChanged: (_) {}),
+      );
       await tester.pumpAndSettle();
 
       // Assert
@@ -91,14 +95,14 @@ void main() {
         ),
       ];
 
-      when(() => mockFriendRepository.getFriends('user1')).thenAnswer(
-        (_) async => friends,
-      );
+      when(
+        () => mockFriendRepository.getFriends('user1'),
+      ).thenAnswer((_) async => friends);
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (_) {},
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(onSelectionChanged: (_) {}),
+      );
       await tester.pumpAndSettle();
 
       // Assert
@@ -121,14 +125,14 @@ void main() {
         ),
       ];
 
-      when(() => mockFriendRepository.getFriends('user1')).thenAnswer(
-        (_) async => friends,
-      );
+      when(
+        () => mockFriendRepository.getFriends('user1'),
+      ).thenAnswer((_) async => friends);
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (_) {},
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(onSelectionChanged: (_) {}),
+      );
       await tester.pumpAndSettle();
 
       // Assert
@@ -147,18 +151,20 @@ void main() {
         ),
       ];
 
-      when(() => mockFriendRepository.getFriends('user1')).thenAnswer(
-        (_) async => friends,
-      );
+      when(
+        () => mockFriendRepository.getFriends('user1'),
+      ).thenAnswer((_) async => friends);
 
       Set<String> selectedIds = {};
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (ids) {
-          selectedIds = ids;
-        },
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          onSelectionChanged: (ids) {
+            selectedIds = ids;
+          },
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Tap the checkbox
@@ -196,18 +202,20 @@ void main() {
         ),
       ];
 
-      when(() => mockFriendRepository.getFriends('user1')).thenAnswer(
-        (_) async => friends,
-      );
+      when(
+        () => mockFriendRepository.getFriends('user1'),
+      ).thenAnswer((_) async => friends);
 
       Set<String> selectedIds = {};
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (ids) {
-          selectedIds = ids;
-        },
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          onSelectionChanged: (ids) {
+            selectedIds = ids;
+          },
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Tap Select All button
@@ -238,18 +246,20 @@ void main() {
         ),
       ];
 
-      when(() => mockFriendRepository.getFriends('user1')).thenAnswer(
-        (_) async => friends,
-      );
+      when(
+        () => mockFriendRepository.getFriends('user1'),
+      ).thenAnswer((_) async => friends);
 
       Set<String> selectedIds = {};
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (ids) {
-          selectedIds = ids;
-        },
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          onSelectionChanged: (ids) {
+            selectedIds = ids;
+          },
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Select all first
@@ -267,10 +277,14 @@ void main() {
       expect(find.text('0 selected'), findsOneWidget);
     });
 
-    testWidgets('retries loading friends when Retry button is tapped', (tester) async {
+    testWidgets('retries loading friends when Retry button is tapped', (
+      tester,
+    ) async {
       // Arrange
       var callCount = 0;
-      when(() => mockFriendRepository.getFriends('user1')).thenAnswer((_) async {
+      when(() => mockFriendRepository.getFriends('user1')).thenAnswer((
+        _,
+      ) async {
         callCount++;
         if (callCount == 1) {
           throw FriendshipException('Failed to load friends');
@@ -287,9 +301,9 @@ void main() {
       });
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (_) {},
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(onSelectionChanged: (_) {}),
+      );
       await tester.pumpAndSettle();
 
       // Verify error state
@@ -323,15 +337,17 @@ void main() {
         ),
       ];
 
-      when(() => mockFriendRepository.getFriends('user1')).thenAnswer(
-        (_) async => friends,
-      );
+      when(
+        () => mockFriendRepository.getFriends('user1'),
+      ).thenAnswer((_) async => friends);
 
       // Act
-      await tester.pumpWidget(createWidgetUnderTest(
-        onSelectionChanged: (_) {},
-        initialSelection: {'friend1'},
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          onSelectionChanged: (_) {},
+          initialSelection: {'friend1'},
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Assert

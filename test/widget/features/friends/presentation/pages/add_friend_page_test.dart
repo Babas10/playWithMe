@@ -26,8 +26,7 @@ class MockAuthenticationBloc
     extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
-class MockInvitationBloc
-    extends MockBloc<InvitationEvent, InvitationState>
+class MockInvitationBloc extends MockBloc<InvitationEvent, InvitationState>
     implements InvitationBloc {}
 
 class FakeFriendEvent extends Fake implements FriendEvent {}
@@ -73,8 +72,9 @@ void main() {
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
 
     when(() => mockFriendBloc.state).thenReturn(const FriendState.initial());
-    when(() => mockAuthBloc.state)
-        .thenReturn(AuthenticationAuthenticated(testUser));
+    when(
+      () => mockAuthBloc.state,
+    ).thenReturn(AuthenticationAuthenticated(testUser));
   });
 
   tearDown(() {
@@ -142,15 +142,17 @@ void main() {
         expect(find.byIcon(Icons.person_search), findsOneWidget);
       });
 
-      testWidgets('search button is disabled when input is empty',
-          (tester) async {
+      testWidgets('search button is disabled when input is empty', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
         // The button is disabled when input is empty
         // Find button by using byWidgetPredicate to find exactly _FilledButtonWithIcon
-        final buttonFinder = find.byWidgetPredicate((widget) =>
-            widget.runtimeType.toString() == '_FilledButtonWithIcon');
+        final buttonFinder = find.byWidgetPredicate(
+          (widget) => widget.runtimeType.toString() == '_FilledButtonWithIcon',
+        );
         expect(buttonFinder, findsOneWidget);
 
         // Check button is disabled by tapping it and verifying no event is dispatched
@@ -162,8 +164,9 @@ void main() {
 
     group('Unauthenticated State', () {
       testWidgets('shows login prompt when not authenticated', (tester) async {
-        when(() => mockAuthBloc.state)
-            .thenReturn(const AuthenticationUnauthenticated());
+        when(
+          () => mockAuthBloc.state,
+        ).thenReturn(const AuthenticationUnauthenticated());
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -184,8 +187,9 @@ void main() {
         expect(find.text('friend@example.com'), findsOneWidget);
       });
 
-      testWidgets('search button becomes enabled when text is entered',
-          (tester) async {
+      testWidgets('search button becomes enabled when text is entered', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -218,8 +222,9 @@ void main() {
         expect(find.byIcon(Icons.clear), findsOneWidget);
       });
 
-      testWidgets('clears text and dispatches event when clear button tapped',
-          (tester) async {
+      testWidgets('clears text and dispatches event when clear button tapped', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -230,14 +235,16 @@ void main() {
         await tester.tap(find.byIcon(Icons.clear));
         await tester.pump();
 
-        verify(() => mockFriendBloc.add(const FriendEvent.searchCleared()))
-            .called(1);
+        verify(
+          () => mockFriendBloc.add(const FriendEvent.searchCleared()),
+        ).called(1);
       });
     });
 
     group('Search Action', () {
-      testWidgets('dispatches search event when search button tapped',
-          (tester) async {
+      testWidgets('dispatches search event when search button tapped', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -256,8 +263,9 @@ void main() {
         ).called(1);
       });
 
-      testWidgets('dispatches search event when submitting via keyboard',
-          (tester) async {
+      testWidgets('dispatches search event when submitting via keyboard', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -275,8 +283,9 @@ void main() {
         ).called(1);
       });
 
-      testWidgets('does not dispatch search event when input is empty',
-          (tester) async {
+      testWidgets('does not dispatch search event when input is empty', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
@@ -289,8 +298,9 @@ void main() {
 
     group('Loading State', () {
       testWidgets('shows loading indicator during search', (tester) async {
-        when(() => mockFriendBloc.state)
-            .thenReturn(const FriendState.searchLoading());
+        when(
+          () => mockFriendBloc.state,
+        ).thenReturn(const FriendState.searchLoading());
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -299,8 +309,9 @@ void main() {
       });
 
       testWidgets('disables search input during loading', (tester) async {
-        when(() => mockFriendBloc.state)
-            .thenReturn(const FriendState.searchLoading());
+        when(
+          () => mockFriendBloc.state,
+        ).thenReturn(const FriendState.searchLoading());
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
@@ -309,18 +320,21 @@ void main() {
         expect(textField.enabled, isFalse);
       });
 
-      testWidgets('search button shows loading indicator when searching',
-          (tester) async {
-        when(() => mockFriendBloc.state)
-            .thenReturn(const FriendState.searchLoading());
+      testWidgets('search button shows loading indicator when searching', (
+        tester,
+      ) async {
+        when(
+          () => mockFriendBloc.state,
+        ).thenReturn(const FriendState.searchLoading());
 
         await tester.pumpWidget(createTestWidget());
         await tester.pump();
 
         // The button should have a CircularProgressIndicator inside it when loading
         // Find button using predicate since FilledButton.icon creates _FilledButtonWithIcon
-        final buttonFinder = find.byWidgetPredicate((widget) =>
-            widget.runtimeType.toString() == '_FilledButtonWithIcon');
+        final buttonFinder = find.byWidgetPredicate(
+          (widget) => widget.runtimeType.toString() == '_FilledButtonWithIcon',
+        );
         expect(buttonFinder, findsOneWidget);
 
         // There should be loading indicator in the button
@@ -384,8 +398,9 @@ void main() {
         expect(find.byType(ListView), findsOneWidget);
       });
 
-      testWidgets('displays result for pending request received',
-          (tester) async {
+      testWidgets('displays result for pending request received', (
+        tester,
+      ) async {
         when(() => mockFriendBloc.state).thenReturn(
           FriendState.searchResult(
             user: searchedUser,
@@ -402,8 +417,9 @@ void main() {
         expect(find.byType(ListView), findsOneWidget);
       });
 
-      testWidgets('displays user-not-found message when user not found',
-          (tester) async {
+      testWidgets('displays user-not-found message when user not found', (
+        tester,
+      ) async {
         when(() => mockFriendBloc.state).thenReturn(
           const FriendState.searchResult(
             user: null,
@@ -422,25 +438,30 @@ void main() {
         expect(find.textContaining('notfound@example.com'), findsOneWidget);
       });
 
-      testWidgets('displays cannot-add-yourself message when searching own email',
-          (tester) async {
-        when(() => mockFriendBloc.state).thenReturn(
-          const FriendState.searchResult(
-            user: null,
-            isFriend: false,
-            hasPendingRequest: false,
-            searchedEmail: 'test@example.com',
-            isSelfSearch: true,
-          ),
-        );
+      testWidgets(
+        'displays cannot-add-yourself message when searching own email',
+        (tester) async {
+          when(() => mockFriendBloc.state).thenReturn(
+            const FriendState.searchResult(
+              user: null,
+              isFriend: false,
+              hasPendingRequest: false,
+              searchedEmail: 'test@example.com',
+              isSelfSearch: true,
+            ),
+          );
 
-        await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+          await tester.pumpWidget(createTestWidget());
+          await tester.pump();
 
-        expect(find.byType(ListView), findsOneWidget);
-        expect(find.byIcon(Icons.info_outline), findsOneWidget);
-        expect(find.text('You cannot add yourself as a friend'), findsOneWidget);
-      });
+          expect(find.byType(ListView), findsOneWidget);
+          expect(find.byIcon(Icons.info_outline), findsOneWidget);
+          expect(
+            find.text('You cannot add yourself as a friend'),
+            findsOneWidget,
+          );
+        },
+      );
     });
 
     group('Error Handling', () {
@@ -480,8 +501,9 @@ void main() {
     });
 
     group('Success Handling', () {
-      testWidgets('shows green tick icon after friend request sent',
-          (tester) async {
+      testWidgets('shows green tick icon after friend request sent', (
+        tester,
+      ) async {
         // Start with searchResult so _lastSearchSnapshot is captured on initial build
         final searchResultState = FriendState.searchResult(
           user: searchedUser,
@@ -493,7 +515,8 @@ void main() {
           mockFriendBloc,
           Stream.fromIterable([
             const FriendState.actionSuccess(
-                message: 'Friend request sent successfully'),
+              message: 'Friend request sent successfully',
+            ),
           ]),
           initialState: searchResultState,
         );
@@ -522,8 +545,9 @@ void main() {
         expect(find.byType(SnackBar), findsNothing);
       });
 
-      testWidgets('does not auto-clear search after successful action',
-          (tester) async {
+      testWidgets('does not auto-clear search after successful action', (
+        tester,
+      ) async {
         whenListen(
           mockFriendBloc,
           Stream.fromIterable([
@@ -537,7 +561,8 @@ void main() {
         await tester.pumpAndSettle();
 
         verifyNever(
-            () => mockFriendBloc.add(const FriendEvent.searchCleared()));
+          () => mockFriendBloc.add(const FriendEvent.searchCleared()),
+        );
       });
     });
   });

@@ -79,17 +79,13 @@ class InviteOnboardingPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Spacer(),
-        const Icon(
-          Icons.sports_volleyball,
-          size: 64,
-          color: AppColors.primary,
-        ),
+        const Icon(Icons.sports_volleyball, size: 64, color: AppColors.primary),
         const SizedBox(height: 24),
         Text(
           l10n.inviteOnboardingTitle,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
@@ -113,9 +109,7 @@ class InviteOnboardingPage extends StatelessWidget {
               ),
             );
           },
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
           child: Text(l10n.createAccount),
         ),
         const SizedBox(height: 12),
@@ -148,23 +142,23 @@ class InviteOnboardingPage extends StatelessWidget {
           children: [
             Text(
               state.groupName,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               l10n.invitedBy(state.inviterName),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
             ),
             const SizedBox(height: 4),
             Text(
               l10n.membersCount(state.memberCount),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
             ),
           ],
         ),
@@ -181,11 +175,7 @@ class InviteOnboardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline,
-            size: 64,
-            color: AppColors.danger,
-          ),
+          const Icon(Icons.error_outline, size: 64, color: AppColors.danger),
           const SizedBox(height: 24),
           Text(
             message,

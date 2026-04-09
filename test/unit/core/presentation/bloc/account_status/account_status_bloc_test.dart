@@ -16,18 +16,16 @@ void main() {
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
-    when(() => mockAuthRepository.authStateChanges)
-        .thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockAuthRepository.authStateChanges,
+    ).thenAnswer((_) => const Stream.empty());
   });
 
   AccountStatusBloc buildBloc() {
     return AccountStatusBloc(authRepository: mockAuthRepository);
   }
 
-  UserEntity createUser({
-    bool isEmailVerified = false,
-    DateTime? createdAt,
-  }) {
+  UserEntity createUser({bool isEmailVerified = false, DateTime? createdAt}) {
     return UserEntity(
       uid: 'test-uid',
       email: 'test@example.com',
@@ -59,9 +57,9 @@ void main() {
       blocTest<AccountStatusBloc, AccountStatusState>(
         'emits [AccountStatusActive] when email is verified',
         setUp: () {
-          when(() => mockAuthRepository.currentUser).thenReturn(
-            createUser(isEmailVerified: true),
-          );
+          when(
+            () => mockAuthRepository.currentUser,
+          ).thenReturn(createUser(isEmailVerified: true));
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const CheckAccountStatus()),
@@ -91,35 +89,35 @@ void main() {
         'emits [AccountStatusPending] with 7 days for new account',
         setUp: () {
           when(() => mockAuthRepository.currentUser).thenReturn(
-            createUser(
-              isEmailVerified: false,
-              createdAt: DateTime.now(),
-            ),
+            createUser(isEmailVerified: false, createdAt: DateTime.now()),
           );
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const CheckAccountStatus()),
         expect: () => [
-          isA<AccountStatusPending>()
-              .having((s) => s.daysRemaining, 'daysRemaining', gracePeriodDays),
+          isA<AccountStatusPending>().having(
+            (s) => s.daysRemaining,
+            'daysRemaining',
+            gracePeriodDays,
+          ),
         ],
       );
 
       blocTest<AccountStatusBloc, AccountStatusState>(
         'emits [AccountStatusPending] when createdAt is null',
         setUp: () {
-          when(() => mockAuthRepository.currentUser).thenReturn(
-            createUser(
-              isEmailVerified: false,
-              createdAt: null,
-            ),
-          );
+          when(
+            () => mockAuthRepository.currentUser,
+          ).thenReturn(createUser(isEmailVerified: false, createdAt: null));
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const CheckAccountStatus()),
         expect: () => [
-          isA<AccountStatusPending>()
-              .having((s) => s.daysRemaining, 'daysRemaining', gracePeriodDays),
+          isA<AccountStatusPending>().having(
+            (s) => s.daysRemaining,
+            'daysRemaining',
+            gracePeriodDays,
+          ),
         ],
       );
 
@@ -136,8 +134,11 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(const CheckAccountStatus()),
         expect: () => [
-          isA<AccountStatusRestricted>()
-              .having((s) => s.daysUntilDeletion, 'daysUntilDeletion', 15),
+          isA<AccountStatusRestricted>().having(
+            (s) => s.daysUntilDeletion,
+            'daysUntilDeletion',
+            15,
+          ),
         ],
       );
 
@@ -153,9 +154,7 @@ void main() {
         },
         build: buildBloc,
         act: (bloc) => bloc.add(const CheckAccountStatus()),
-        expect: () => [
-          const AccountStatusRestricted(daysUntilDeletion: 0),
-        ],
+        expect: () => [const AccountStatusRestricted(daysUntilDeletion: 0)],
       );
     });
 
@@ -180,16 +179,11 @@ void main() {
           );
         },
         build: buildBloc,
-        seed: () => const AccountStatusPending(
-          daysRemaining: 5,
-          isDismissed: false,
-        ),
+        seed: () =>
+            const AccountStatusPending(daysRemaining: 5, isDismissed: false),
         act: (bloc) => bloc.add(const DismissAccountWarning()),
         expect: () => [
-          const AccountStatusPending(
-            daysRemaining: 5,
-            isDismissed: true,
-          ),
+          const AccountStatusPending(daysRemaining: 5, isDismissed: true),
         ],
       );
 
@@ -213,11 +207,9 @@ void main() {
       blocTest<AccountStatusBloc, AccountStatusState>(
         'emits [AccountStatusActive] when auth stream reports verified user',
         setUp: () {
-          when(() => mockAuthRepository.authStateChanges).thenAnswer(
-            (_) => Stream.value(
-              createUser(isEmailVerified: true),
-            ),
-          );
+          when(
+            () => mockAuthRepository.authStateChanges,
+          ).thenAnswer((_) => Stream.value(createUser(isEmailVerified: true)));
         },
         build: buildBloc,
         expect: () => [const AccountStatusActive()],
@@ -248,15 +240,22 @@ void main() {
         );
       });
 
-      test('AccountStatusPending instances with different props are not equal',
-          () {
-        expect(
-          const AccountStatusPending(daysRemaining: 5, isDismissed: false),
-          isNot(equals(
-            const AccountStatusPending(daysRemaining: 3, isDismissed: false),
-          )),
-        );
-      });
+      test(
+        'AccountStatusPending instances with different props are not equal',
+        () {
+          expect(
+            const AccountStatusPending(daysRemaining: 5, isDismissed: false),
+            isNot(
+              equals(
+                const AccountStatusPending(
+                  daysRemaining: 3,
+                  isDismissed: false,
+                ),
+              ),
+            ),
+          );
+        },
+      );
 
       test('AccountStatusRestricted instances with same props are equal', () {
         expect(
@@ -268,10 +267,7 @@ void main() {
 
     group('AccountStatusEvent equatable', () {
       test('CheckAccountStatus instances are equal', () {
-        expect(
-          const CheckAccountStatus(),
-          equals(const CheckAccountStatus()),
-        );
+        expect(const CheckAccountStatus(), equals(const CheckAccountStatus()));
       });
 
       test('AccountEmailVerified instances are equal', () {

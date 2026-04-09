@@ -17,9 +17,9 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
   RecordResultsBloc({
     required GameRepository gameRepository,
     required UserRepository userRepository,
-  })  : _gameRepository = gameRepository,
-        _userRepository = userRepository,
-        super(const RecordResultsInitial()) {
+  }) : _gameRepository = gameRepository,
+       _userRepository = userRepository,
+       super(const RecordResultsInitial()) {
     on<LoadGameForResults>(_onLoadGameForResults);
     on<AssignPlayerToTeamA>(_onAssignPlayerToTeamA);
     on<AssignPlayerToTeamB>(_onAssignPlayerToTeamB);
@@ -42,7 +42,11 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
       }
 
       if (game.status == GameStatus.cancelled) {
-        emit(const RecordResultsError(message: 'Cannot record results for a cancelled game'));
+        emit(
+          const RecordResultsError(
+            message: 'Cannot record results for a cancelled game',
+          ),
+        );
         return;
       }
 
@@ -68,13 +72,15 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
         }
       }
 
-      emit(RecordResultsLoaded(
-        game: game,
-        teamAPlayerIds: teamAPlayerIds,
-        teamBPlayerIds: teamBPlayerIds,
-        unassignedPlayerIds: unassignedPlayerIds,
-        players: players,
-      ));
+      emit(
+        RecordResultsLoaded(
+          game: game,
+          teamAPlayerIds: teamAPlayerIds,
+          teamBPlayerIds: teamBPlayerIds,
+          unassignedPlayerIds: unassignedPlayerIds,
+          players: players,
+        ),
+      );
     } catch (e) {
       emit(RecordResultsError(message: 'Failed to load game: ${e.toString()}'));
     }
@@ -99,15 +105,18 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
         .toList();
 
     // Add to teamA if not already there
-    final newTeamAPlayerIds = currentState.teamAPlayerIds.contains(event.playerId)
+    final newTeamAPlayerIds =
+        currentState.teamAPlayerIds.contains(event.playerId)
         ? currentState.teamAPlayerIds
         : [...currentState.teamAPlayerIds, event.playerId];
 
-    emit(currentState.copyWith(
-      teamAPlayerIds: newTeamAPlayerIds,
-      teamBPlayerIds: newTeamBPlayerIds,
-      unassignedPlayerIds: newUnassignedPlayerIds,
-    ));
+    emit(
+      currentState.copyWith(
+        teamAPlayerIds: newTeamAPlayerIds,
+        teamBPlayerIds: newTeamBPlayerIds,
+        unassignedPlayerIds: newUnassignedPlayerIds,
+      ),
+    );
   }
 
   Future<void> _onAssignPlayerToTeamB(
@@ -129,15 +138,18 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
         .toList();
 
     // Add to teamB if not already there
-    final newTeamBPlayerIds = currentState.teamBPlayerIds.contains(event.playerId)
+    final newTeamBPlayerIds =
+        currentState.teamBPlayerIds.contains(event.playerId)
         ? currentState.teamBPlayerIds
         : [...currentState.teamBPlayerIds, event.playerId];
 
-    emit(currentState.copyWith(
-      teamAPlayerIds: newTeamAPlayerIds,
-      teamBPlayerIds: newTeamBPlayerIds,
-      unassignedPlayerIds: newUnassignedPlayerIds,
-    ));
+    emit(
+      currentState.copyWith(
+        teamAPlayerIds: newTeamAPlayerIds,
+        teamBPlayerIds: newTeamBPlayerIds,
+        unassignedPlayerIds: newUnassignedPlayerIds,
+      ),
+    );
   }
 
   Future<void> _onRemovePlayerFromTeam(
@@ -157,15 +169,18 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
         .toList();
 
     // Add to unassigned if not already there
-    final newUnassignedPlayerIds = currentState.unassignedPlayerIds.contains(event.playerId)
+    final newUnassignedPlayerIds =
+        currentState.unassignedPlayerIds.contains(event.playerId)
         ? currentState.unassignedPlayerIds
         : [...currentState.unassignedPlayerIds, event.playerId];
 
-    emit(currentState.copyWith(
-      teamAPlayerIds: newTeamAPlayerIds,
-      teamBPlayerIds: newTeamBPlayerIds,
-      unassignedPlayerIds: newUnassignedPlayerIds,
-    ));
+    emit(
+      currentState.copyWith(
+        teamAPlayerIds: newTeamAPlayerIds,
+        teamBPlayerIds: newTeamBPlayerIds,
+        unassignedPlayerIds: newUnassignedPlayerIds,
+      ),
+    );
   }
 
   Future<void> _onSaveTeams(
@@ -177,16 +192,22 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
     final currentState = state as RecordResultsLoaded;
 
     if (!currentState.canSave) {
-      emit(const RecordResultsError(message: 'All players must be assigned to a team'));
+      emit(
+        const RecordResultsError(
+          message: 'All players must be assigned to a team',
+        ),
+      );
       emit(currentState);
       return;
     }
 
-    emit(RecordResultsSaving(
-      game: currentState.game,
-      teamAPlayerIds: currentState.teamAPlayerIds,
-      teamBPlayerIds: currentState.teamBPlayerIds,
-    ));
+    emit(
+      RecordResultsSaving(
+        game: currentState.game,
+        teamAPlayerIds: currentState.teamAPlayerIds,
+        teamBPlayerIds: currentState.teamBPlayerIds,
+      ),
+    );
 
     try {
       final teams = GameTeams(
@@ -201,7 +222,9 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
       );
 
       // Fetch updated game
-      final updatedGame = await _gameRepository.getGameById(currentState.game.id);
+      final updatedGame = await _gameRepository.getGameById(
+        currentState.game.id,
+      );
 
       if (updatedGame != null) {
         emit(RecordResultsSaved(game: updatedGame));
@@ -209,7 +232,9 @@ class RecordResultsBloc extends Bloc<RecordResultsEvent, RecordResultsState> {
         emit(currentState);
       }
     } catch (e) {
-      emit(RecordResultsError(message: 'Failed to save teams: ${e.toString()}'));
+      emit(
+        RecordResultsError(message: 'Failed to save teams: ${e.toString()}'),
+      );
       emit(currentState);
     }
   }

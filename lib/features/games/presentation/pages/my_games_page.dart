@@ -56,14 +56,16 @@ class _MyGamesViewState extends State<_MyGamesView> {
 
     // Group games stream — subscribe separately so we can setState on emission
     // without nesting a second StreamBuilder.
-    _groupGamesSub = repo.getGroupGamesForUser(_userId).listen(
-      (games) {
-        if (mounted) setState(() => _lastGroupGames = games);
-      },
-      onError: (Object e) {
-        debugPrint('[MyGamesPage] group games stream error: $e');
-      },
-    );
+    _groupGamesSub = repo
+        .getGroupGamesForUser(_userId)
+        .listen(
+          (games) {
+            if (mounted) setState(() => _lastGroupGames = games);
+          },
+          onError: (Object e) {
+            debugPrint('[MyGamesPage] group games stream error: $e');
+          },
+        );
 
     context.read<GameInvitationsBloc>().add(const LoadGameInvitations());
   }
@@ -101,16 +103,21 @@ class _MyGamesViewState extends State<_MyGamesView> {
                 _joinedStreamHasEmitted = true;
               }
               if (snapshot.hasError) {
-                debugPrint('[MyGamesPage] joined stream error: ${snapshot.error}');
+                debugPrint(
+                  '[MyGamesPage] joined stream error: ${snapshot.error}',
+                );
               }
               // Keep spinner until joined games and invitations have settled.
-              if (!_joinedStreamHasEmitted || invState is GameInvitationsLoading) {
+              if (!_joinedStreamHasEmitted ||
+                  invState is GameInvitationsLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) _lastJoinedGames = snapshot.data!;
 
               // Joined games (user is in playerIds)
-              final joinedItems = _lastJoinedGames.map(MyGameItem.fromGame).toList();
+              final joinedItems = _lastJoinedGames
+                  .map(MyGameItem.fromGame)
+                  .toList();
               final joinedGameIds = _lastJoinedGames.map((g) => g.id).toSet();
 
               // Cross-group invitations — exclude games already joined
@@ -122,10 +129,12 @@ class _MyGamesViewState extends State<_MyGamesView> {
 
               // Un-joined group games — exclude already joined and already invited
               final groupGameItems = _lastGroupGames
-                  .where((g) =>
-                      !joinedGameIds.contains(g.id) &&
-                      !invitedGameIds.contains(g.id) &&
-                      g.status != GameStatus.cancelled)
+                  .where(
+                    (g) =>
+                        !joinedGameIds.contains(g.id) &&
+                        !invitedGameIds.contains(g.id) &&
+                        g.status != GameStatus.cancelled,
+                  )
                   .map((g) => MyGameItem.fromGroupGame(g, groupName: ''))
                   .toList();
 
@@ -137,9 +146,7 @@ class _MyGamesViewState extends State<_MyGamesView> {
               ]..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
 
               // Past: joined completed/verification/overdue games, most recent first
-              final past = joinedItems
-                  .where((g) => g.isPast)
-                  .toList()
+              final past = joinedItems.where((g) => g.isPast).toList()
                 ..sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
 
               if (upcoming.isEmpty && past.isEmpty) {
@@ -147,26 +154,30 @@ class _MyGamesViewState extends State<_MyGamesView> {
               }
 
               return RefreshIndicator(
-                onRefresh: () async => context
-                    .read<GameInvitationsBloc>()
-                    .add(const LoadGameInvitations()),
+                onRefresh: () async => context.read<GameInvitationsBloc>().add(
+                  const LoadGameInvitations(),
+                ),
                 child: ListView(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   children: [
                     if (upcoming.isNotEmpty) ...[
                       _SectionHeader(title: l10n.upcoming),
-                      ...upcoming.map((item) => MyGameTile(
-                            item: item,
-                            onTap: () => _navigateToGame(context, item),
-                          )),
+                      ...upcoming.map(
+                        (item) => MyGameTile(
+                          item: item,
+                          onTap: () => _navigateToGame(context, item),
+                        ),
+                      ),
                     ],
                     if (past.isNotEmpty) ...[
                       if (upcoming.isNotEmpty) const SizedBox(height: 8),
                       _SectionHeader(title: l10n.pastGames),
-                      ...past.map((item) => MyGameTile(
-                            item: item,
-                            onTap: () => _navigateToGame(context, item),
-                          )),
+                      ...past.map(
+                        (item) => MyGameTile(
+                          item: item,
+                          onTap: () => _navigateToGame(context, item),
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -211,15 +222,17 @@ class _MyGamesViewState extends State<_MyGamesView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.sports_volleyball_outlined,
-              size: 64, color: AppColors.textMuted),
+          Icon(
+            Icons.sports_volleyball_outlined,
+            size: 64,
+            color: AppColors.textMuted,
+          ),
           const SizedBox(height: 16),
           Text(
             l10n.noMyGamesYet,
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: AppColors.textMuted),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(color: AppColors.textMuted),
             textAlign: TextAlign.center,
           ),
         ],

@@ -26,8 +26,7 @@ class InviteRegistrationPage extends StatefulWidget {
   });
 
   @override
-  State<InviteRegistrationPage> createState() =>
-      _InviteRegistrationPageState();
+  State<InviteRegistrationPage> createState() => _InviteRegistrationPageState();
 }
 
 class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
@@ -61,9 +60,7 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
           widget.blocOverride ?? GetIt.instance<InviteRegistrationBloc>(),
       child: Builder(
         builder: (blocContext) => Scaffold(
-          appBar: AppBar(
-            title: Text(l10n.createAccount),
-          ),
+          appBar: AppBar(title: Text(l10n.createAccount)),
           body: BlocListener<InviteRegistrationBloc, InviteRegistrationState>(
             listener: _onStateChange,
             child: SingleChildScrollView(
@@ -89,10 +86,8 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
                       padding: const EdgeInsets.only(left: 12),
                       child: Text(
                         l10n.passwordRequirementsHint,
-                        style:
-                            Theme.of(blocContext).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textMuted,
-                                ),
+                        style: Theme.of(blocContext).textTheme.bodySmall
+                            ?.copyWith(color: AppColors.textMuted),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -130,16 +125,16 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
               children: [
                 Text(
                   widget.groupName,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   l10n.invitedBy(widget.inviterName),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -233,9 +228,7 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
       textInputAction: TextInputAction.next,
       prefixIcon: Icons.lock,
       suffixIcon: IconButton(
-        icon: Icon(
-          _obscurePassword ? Icons.visibility : Icons.visibility_off,
-        ),
+        icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
         onPressed: () {
           setState(() {
             _obscurePassword = !_obscurePassword;
@@ -292,13 +285,14 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
   Widget _buildSubmitButton(BuildContext blocContext, AppLocalizations l10n) {
     return BlocBuilder<InviteRegistrationBloc, InviteRegistrationState>(
       builder: (context, state) {
-        final isLoading = state is InviteRegistrationCreatingAccount ||
+        final isLoading =
+            state is InviteRegistrationCreatingAccount ||
             state is InviteRegistrationJoiningGroup;
         final buttonText = state is InviteRegistrationJoiningGroup
             ? l10n.accountCreatedJoiningGroup
             : state is InviteRegistrationCreatingAccount
-                ? l10n.creatingAccount
-                : l10n.createAccountAndJoin;
+            ? l10n.creatingAccount
+            : l10n.createAccountAndJoin;
 
         return AuthButton(
           text: buttonText,
@@ -323,16 +317,16 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
   void _submitRegistration(BuildContext blocContext) {
     if (_formKey.currentState!.validate()) {
       blocContext.read<InviteRegistrationBloc>().add(
-            InviteRegistrationSubmitted(
-              firstName: _firstNameController.text.trim(),
-              lastName: _lastNameController.text.trim(),
-              displayName: _displayNameController.text.trim(),
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-              confirmPassword: _confirmPasswordController.text,
-              token: widget.token,
-            ),
-          );
+        InviteRegistrationSubmitted(
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          displayName: _displayNameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          confirmPassword: _confirmPasswordController.text,
+          token: widget.token,
+        ),
+      );
     }
   }
 
@@ -343,10 +337,7 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          SnackBar(
-            content: Text(state.message),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(state.message), backgroundColor: Colors.red),
         );
     } else if (state is InviteRegistrationSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -368,10 +359,7 @@ class _InviteRegistrationPageState extends State<InviteRegistrationPage> {
           backgroundColor: Colors.orange,
         ),
       );
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        '/login',
-        (route) => false,
-      );
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
     }
   }
 }

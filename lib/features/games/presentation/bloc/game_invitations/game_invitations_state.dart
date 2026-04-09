@@ -31,7 +31,10 @@ class GameInvitationsError extends GameInvitationsState {
 class GameInvitationActionInFlight extends GameInvitationsState {
   final List<GameInvitationDetails> invitations;
   final String processingInvitationId;
-  const GameInvitationActionInFlight(this.invitations, this.processingInvitationId);
+  const GameInvitationActionInFlight(
+    this.invitations,
+    this.processingInvitationId,
+  );
 }
 
 /// An accept/decline call succeeded; [invitationId] has been removed from [invitations].
@@ -55,5 +58,9 @@ class GameInvitationActionError extends GameInvitationsState {
   final List<GameInvitationDetails> invitations;
   final String message;
   final String? errorCode;
-  const GameInvitationActionError(this.invitations, this.message, {this.errorCode});
+  const GameInvitationActionError(
+    this.invitations,
+    this.message, {
+    this.errorCode,
+  });
 }

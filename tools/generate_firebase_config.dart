@@ -27,7 +27,9 @@ void main(List<String> arguments) {
   try {
     final config = _generateFirebaseConfig(environment);
     _writeConfigFile(environment, config);
-    print('✅ Successfully generated lib/core/config/firebase_config_$environment.dart');
+    print(
+      '✅ Successfully generated lib/core/config/firebase_config_$environment.dart',
+    );
   } catch (e) {
     print('❌ Error generating Firebase configuration: $e');
     exit(1);
@@ -87,7 +89,7 @@ Map<String, dynamic> _readAndroidConfig(String environment) {
   if (!file.existsSync()) {
     throw Exception(
       'Android Firebase config file not found: ${file.path}\n'
-      'Please download google-services.json from Firebase Console and place it at this location.'
+      'Please download google-services.json from Firebase Console and place it at this location.',
     );
   }
 
@@ -101,12 +103,14 @@ Map<String, dynamic> _readAndroidConfig(String environment) {
 
 /// Reads and parses iOS GoogleService-Info.plist file
 Map<String, dynamic> _readIosConfig(String environment) {
-  final file = File('ios/Runner/Firebase/$environment/GoogleService-Info.plist');
+  final file = File(
+    'ios/Runner/Firebase/$environment/GoogleService-Info.plist',
+  );
 
   if (!file.existsSync()) {
     throw Exception(
       'iOS Firebase config file not found: ${file.path}\n'
-      'Please download GoogleService-Info.plist from Firebase Console and place it at this location.'
+      'Please download GoogleService-Info.plist from Firebase Console and place it at this location.',
     );
   }
 

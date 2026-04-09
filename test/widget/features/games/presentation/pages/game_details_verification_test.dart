@@ -21,7 +21,8 @@ import 'package:play_with_me/features/games/presentation/pages/game_details_page
 import '../../../../../unit/core/data/repositories/mock_game_repository.dart';
 import '../../../../../unit/core/data/repositories/mock_user_repository.dart';
 
-class MockAuthenticationBloc extends MockBloc<AuthenticationEvent, AuthenticationState>
+class MockAuthenticationBloc
+    extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
 class MockInvitationBloc extends MockBloc<InvitationEvent, InvitationState>
@@ -39,7 +40,7 @@ void main() {
 
   const submitterId = 'user-1';
   const verifierId = 'user-2';
-  
+
   final verificationGame = TestGameData.testGame.copyWith(
     id: 'verify-game-1',
     status: GameStatus.verification,
@@ -57,10 +58,12 @@ void main() {
     mockAuthBloc = MockAuthenticationBloc();
     mockInvitationBloc = MockInvitationBloc();
     mockAnalytics = MockFirebaseAnalytics();
-    when(() => mockAnalytics.logEvent(
-          name: any(named: 'name'),
-          parameters: any(named: 'parameters'),
-        )).thenAnswer((_) async {});
+    when(
+      () => mockAnalytics.logEvent(
+        name: any(named: 'name'),
+        parameters: any(named: 'parameters'),
+      ),
+    ).thenAnswer((_) async {});
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
 
     if (sl.isRegistered<GameRepository>()) {
@@ -101,10 +104,19 @@ void main() {
     );
   }
 
-  testWidgets('GameDetailsPage shows "Result Submitted" for submitter', (tester) async {
+  testWidgets('GameDetailsPage shows "Result Submitted" for submitter', (
+    tester,
+  ) async {
     mockGameRepository.addGame(verificationGame);
     when(() => mockAuthBloc.state).thenReturn(
-      AuthenticationAuthenticated(UserEntity(uid: submitterId, email: '', isEmailVerified: true, isAnonymous: false)),
+      AuthenticationAuthenticated(
+        UserEntity(
+          uid: submitterId,
+          email: '',
+          isEmailVerified: true,
+          isAnonymous: false,
+        ),
+      ),
     );
 
     await tester.pumpWidget(createWidgetUnderTest());
@@ -115,35 +127,55 @@ void main() {
     expect(find.text('Edit / Dispute'), findsOneWidget);
   });
 
-  testWidgets('GameDetailsPage shows "Verification Pending" and Confirm button for verifier', (tester) async {
-    mockGameRepository.addGame(verificationGame);
-    when(() => mockAuthBloc.state).thenReturn(
-      AuthenticationAuthenticated(UserEntity(uid: verifierId, email: '', isEmailVerified: true, isAnonymous: false)),
-    );
+  testWidgets(
+    'GameDetailsPage shows "Verification Pending" and Confirm button for verifier',
+    (tester) async {
+      mockGameRepository.addGame(verificationGame);
+      when(() => mockAuthBloc.state).thenReturn(
+        AuthenticationAuthenticated(
+          UserEntity(
+            uid: verifierId,
+            email: '',
+            isEmailVerified: true,
+            isAnonymous: false,
+          ),
+        ),
+      );
 
-    await tester.pumpWidget(createWidgetUnderTest());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
-    expect(find.text('Result Verification Pending'), findsOneWidget);
-    expect(find.text('Confirm'), findsOneWidget);
-    expect(find.text('Edit / Dispute'), findsOneWidget);
-  });
+      expect(find.text('Result Verification Pending'), findsOneWidget);
+      expect(find.text('Confirm'), findsOneWidget);
+      expect(find.text('Edit / Dispute'), findsOneWidget);
+    },
+  );
 
-  testWidgets('GameDetailsPage shows "Confirmed" for user who already confirmed', (tester) async {
-    final confirmedGame = verificationGame.copyWith(
-      confirmedBy: [verifierId],
-    );
-    mockGameRepository.addGame(confirmedGame);
-    
-    when(() => mockAuthBloc.state).thenReturn(
-      AuthenticationAuthenticated(UserEntity(uid: verifierId, email: '', isEmailVerified: true, isAnonymous: false)),
-    );
+  testWidgets(
+    'GameDetailsPage shows "Confirmed" for user who already confirmed',
+    (tester) async {
+      final confirmedGame = verificationGame.copyWith(
+        confirmedBy: [verifierId],
+      );
+      mockGameRepository.addGame(confirmedGame);
 
-    await tester.pumpWidget(createWidgetUnderTest());
-    await tester.pumpAndSettle();
+      when(() => mockAuthBloc.state).thenReturn(
+        AuthenticationAuthenticated(
+          UserEntity(
+            uid: verifierId,
+            email: '',
+            isEmailVerified: true,
+            isAnonymous: false,
+          ),
+        ),
+      );
 
-    expect(find.text('Confirmed'), findsOneWidget);
-    expect(find.text('Confirm'), findsNothing);
-    expect(find.text('Edit / Dispute'), findsOneWidget);
-  });
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Confirmed'), findsOneWidget);
+      expect(find.text('Confirm'), findsNothing);
+      expect(find.text('Edit / Dispute'), findsOneWidget);
+    },
+  );
 }

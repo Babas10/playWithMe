@@ -13,10 +13,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 class RivalsCard extends StatelessWidget {
   final UserModel user;
 
-  const RivalsCard({
-    super.key,
-    required this.user,
-  });
+  const RivalsCard({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -44,14 +41,14 @@ class RivalsCard extends StatelessWidget {
             child: InkWell(
               onTap: nemesis != null
                   ? () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HeadToHeadPage(
-                            userId: user.uid,
-                            opponentId: nemesis.opponentId,
-                          ),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HeadToHeadPage(
+                          userId: user.uid,
+                          opponentId: nemesis.opponentId,
                         ),
-                      )
+                      ),
+                    )
                   : null,
               borderRadius: BorderRadius.circular(16),
               child: Padding(
@@ -97,8 +94,11 @@ class RivalsCard extends StatelessWidget {
         // Record
         Row(
           children: [
-            Icon(Icons.sports_score, size: 16,
-                color: AppColors.textMuted.withValues(alpha: 0.7)),
+            Icon(
+              Icons.sports_score,
+              size: 16,
+              color: AppColors.textMuted.withValues(alpha: 0.7),
+            ),
             const SizedBox(width: 8),
             Text(
               nemesis.recordString,
@@ -121,12 +121,16 @@ class RivalsCard extends StatelessWidget {
         // Win rate
         Row(
           children: [
-            Icon(Icons.percent, size: 16,
-                color: AppColors.textMuted.withValues(alpha: 0.7)),
+            Icon(
+              Icons.percent,
+              size: 16,
+              color: AppColors.textMuted.withValues(alpha: 0.7),
+            ),
             const SizedBox(width: 8),
             Text(
-              AppLocalizations.of(context)!
-                  .winRateLabel(nemesis.winRate.toStringAsFixed(1)),
+              AppLocalizations.of(
+                context,
+              )!.winRateLabel(nemesis.winRate.toStringAsFixed(1)),
               style: TextStyle(
                 fontSize: 13,
                 color: nemesis.winRate < 50.0

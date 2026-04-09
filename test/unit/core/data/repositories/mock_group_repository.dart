@@ -7,7 +7,8 @@ import 'package:rxdart/rxdart.dart';
 
 class MockGroupRepository implements GroupRepository {
   // Use BehaviorSubject for synchronous, deterministic emissions
-  final BehaviorSubject<List<GroupModel>> _groupsController = BehaviorSubject<List<GroupModel>>.seeded([]);
+  final BehaviorSubject<List<GroupModel>> _groupsController =
+      BehaviorSubject<List<GroupModel>>.seeded([]);
   final Map<String, GroupModel> _groups = {};
   String _lastCreatedGroupId = '';
 
@@ -72,7 +73,8 @@ class MockGroupRepository implements GroupRepository {
 
     // Then continue listening for future updates
     yield* _groupsController.stream.map(
-      (groups) => groups.where((group) => group.memberIds.contains(userId)).toList(),
+      (groups) =>
+          groups.where((group) => group.memberIds.contains(userId)).toList(),
     );
   }
 
@@ -89,7 +91,8 @@ class MockGroupRepository implements GroupRepository {
   String get lastCreatedGroupId => _lastCreatedGroupId;
 
   @override
-  Future<void> updateGroupInfo(String groupId, {
+  Future<void> updateGroupInfo(
+    String groupId, {
     String? name,
     String? description,
     String? photoUrl,
@@ -110,7 +113,8 @@ class MockGroupRepository implements GroupRepository {
   }
 
   @override
-  Future<void> updateGroupSettings(String groupId, {
+  Future<void> updateGroupSettings(
+    String groupId, {
     GroupPrivacy? privacy,
     bool? requiresApproval,
     int? maxMembers,
@@ -158,7 +162,9 @@ class MockGroupRepository implements GroupRepository {
   Future<void> leaveGroup(String groupId) async {
     // In mock, leaveGroup doesn't need userId since it's implied
     // This is just a stub for testing - real implementation uses Cloud Function
-    throw UnimplementedError('leaveGroup should be mocked in tests that use it');
+    throw UnimplementedError(
+      'leaveGroup should be mocked in tests that use it',
+    );
   }
 
   @override
@@ -212,12 +218,17 @@ class MockGroupRepository implements GroupRepository {
   }
 
   @override
-  Future<List<GroupModel>> searchPublicGroups(String query, {int limit = 20}) async {
+  Future<List<GroupModel>> searchPublicGroups(
+    String query, {
+    int limit = 20,
+  }) async {
     final queryLower = query.toLowerCase();
     return _groups.values
-        .where((group) =>
-            group.privacy == GroupPrivacy.public &&
-            group.name.toLowerCase().contains(queryLower))
+        .where(
+          (group) =>
+              group.privacy == GroupPrivacy.public &&
+              group.name.toLowerCase().contains(queryLower),
+        )
         .take(limit)
         .toList();
   }
@@ -240,8 +251,8 @@ class MockGroupRepository implements GroupRepository {
     if (group == null) return false;
 
     return !group.isMember(userId) &&
-           !group.isAtCapacity &&
-           group.privacy != GroupPrivacy.private;
+        !group.isAtCapacity &&
+        group.privacy != GroupPrivacy.private;
   }
 
   @override

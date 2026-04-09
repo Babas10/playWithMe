@@ -35,10 +35,7 @@ class GroupCreated extends GroupState implements SuccessState {
   final String groupId;
   final GroupModel group;
 
-  const GroupCreated({
-    required this.groupId,
-    required this.group,
-  });
+  const GroupCreated({required this.groupId, required this.group});
 
   @override
   List<Object?> get props => [groupId, group];
@@ -48,10 +45,7 @@ class GroupUpdated extends GroupState implements SuccessState {
   final GroupModel group;
   final String message;
 
-  const GroupUpdated({
-    required this.group,
-    required this.message,
-  });
+  const GroupUpdated({required this.group, required this.message});
 
   @override
   List<Object?> get props => [group, message];

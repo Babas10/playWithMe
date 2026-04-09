@@ -26,8 +26,7 @@ class MockAuthenticationBloc
     extends MockBloc<AuthenticationEvent, AuthenticationState>
     implements AuthenticationBloc {}
 
-class MockInvitationBloc
-    extends MockBloc<InvitationEvent, InvitationState>
+class MockInvitationBloc extends MockBloc<InvitationEvent, InvitationState>
     implements InvitationBloc {}
 
 class FakeGroupEvent extends Fake implements GroupEvent {}
@@ -135,7 +134,8 @@ void main() {
 
         expect(
           find.text(
-              'You will automatically become the group admin and first member'),
+            'You will automatically become the group admin and first member',
+          ),
           findsOneWidget,
         );
         expect(find.byIcon(Icons.info_outline), findsOneWidget);
@@ -201,14 +201,18 @@ void main() {
         await tester.pump();
 
         // Tap create group button
-        final createButton = find.byWidgetPredicate((widget) => widget is FilledButton);
+        final createButton = find.byWidgetPredicate(
+          (widget) => widget is FilledButton,
+        );
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
         await tester.pumpAndSettle();
 
         expect(
-            find.text('Group name must be at least 3 characters'), findsOneWidget);
+          find.text('Group name must be at least 3 characters'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('shows character counter for max length', (tester) async {
@@ -223,8 +227,10 @@ void main() {
       testWidgets('can enter description', (tester) async {
         await tester.pumpWidget(createTestWidget());
 
-        final descField =
-            find.widgetWithText(TextFormField, 'Description (Optional)');
+        final descField = find.widgetWithText(
+          TextFormField,
+          'Description (Optional)',
+        );
         await tester.enterText(descField, 'Weekly beach volleyball games');
         await tester.pump();
 
@@ -240,7 +246,9 @@ void main() {
         await tester.pump();
 
         // Tap create group button
-        final createButton = find.byWidgetPredicate((widget) => widget is FilledButton);
+        final createButton = find.byWidgetPredicate(
+          (widget) => widget is FilledButton,
+        );
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
@@ -261,8 +269,9 @@ void main() {
     });
 
     group('Create Button', () {
-      testWidgets('triggers CreateGroup event on tap with valid data',
-          (tester) async {
+      testWidgets('triggers CreateGroup event on tap with valid data', (
+        tester,
+      ) async {
         await tester.pumpWidget(createTestWidget());
 
         // Enter valid group name
@@ -271,13 +280,17 @@ void main() {
         await tester.pump();
 
         // Enter optional description
-        final descField =
-            find.widgetWithText(TextFormField, 'Description (Optional)');
+        final descField = find.widgetWithText(
+          TextFormField,
+          'Description (Optional)',
+        );
         await tester.enterText(descField, 'Weekly games at the beach');
         await tester.pump();
 
         // Tap create group button
-        final createButton = find.byWidgetPredicate((widget) => widget is FilledButton);
+        final createButton = find.byWidgetPredicate(
+          (widget) => widget is FilledButton,
+        );
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
@@ -292,15 +305,15 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         // Tap create group button without entering data
-        final createButton = find.byWidgetPredicate((widget) => widget is FilledButton);
+        final createButton = find.byWidgetPredicate(
+          (widget) => widget is FilledButton,
+        );
         await tester.ensureVisible(createButton);
         await tester.pumpAndSettle();
         await tester.tap(createButton);
         await tester.pump();
 
-        verifyNever(
-          () => mockGroupBloc.add(any(that: isA<CreateGroup>())),
-        );
+        verifyNever(() => mockGroupBloc.add(any(that: isA<CreateGroup>())));
       });
     });
 
@@ -320,7 +333,9 @@ void main() {
         await tester.pumpWidget(createTestWidget());
 
         // Scroll to button
-        final createButton = find.byWidgetPredicate((widget) => widget is FilledButton).first;
+        final createButton = find
+            .byWidgetPredicate((widget) => widget is FilledButton)
+            .first;
         await tester.ensureVisible(createButton);
         await tester.pump();
 
@@ -341,8 +356,9 @@ void main() {
     });
 
     group('Success Handling', () {
-      testWidgets('navigates back on group creation without snackbar',
-          (tester) async {
+      testWidgets('navigates back on group creation without snackbar', (
+        tester,
+      ) async {
         final createdGroup = GroupModel(
           id: 'new-group-id',
           name: 'Beach Volleyball Crew',
@@ -374,8 +390,9 @@ void main() {
         await tester.pump(const Duration(milliseconds: 600));
       });
 
-      testWidgets('does not show success snackbar on group creation',
-          (tester) async {
+      testWidgets('does not show success snackbar on group creation', (
+        tester,
+      ) async {
         final createdGroup = GroupModel(
           id: 'new-group-id',
           name: 'Beach Volleyball Crew',
@@ -422,8 +439,7 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
 
-        expect(
-            find.textContaining('Failed to create group'), findsOneWidget);
+        expect(find.textContaining('Failed to create group'), findsOneWidget);
         expect(find.byType(SnackBar), findsOneWidget);
       });
 
@@ -467,9 +483,11 @@ void main() {
                           providers: [
                             BlocProvider<GroupBloc>.value(value: mockGroupBloc),
                             BlocProvider<AuthenticationBloc>.value(
-                                value: mockAuthBloc),
+                              value: mockAuthBloc,
+                            ),
                             BlocProvider<InvitationBloc>.value(
-                                value: mockInvitationBloc),
+                              value: mockInvitationBloc,
+                            ),
                           ],
                           child: const GroupCreationPage(),
                         ),
@@ -510,13 +528,16 @@ void main() {
 
     group('Unauthenticated State', () {
       testWidgets('shows login message when not authenticated', (tester) async {
-        when(() => mockAuthBloc.state)
-            .thenReturn(const AuthenticationUnauthenticated());
+        when(
+          () => mockAuthBloc.state,
+        ).thenReturn(const AuthenticationUnauthenticated());
 
         await tester.pumpWidget(createTestWidget());
 
         expect(
-            find.text('You must be logged in to create a group'), findsOneWidget);
+          find.text('You must be logged in to create a group'),
+          findsOneWidget,
+        );
       });
     });
   });

@@ -12,10 +12,7 @@ import 'package:play_with_me/features/groups/presentation/bloc/group_invite_link
 class InviteLinkSection extends StatelessWidget {
   final String groupId;
 
-  const InviteLinkSection({
-    super.key,
-    required this.groupId,
-  });
+  const InviteLinkSection({super.key, required this.groupId});
 
   @override
   Widget build(BuildContext context) {
@@ -50,16 +47,16 @@ class InviteLinkSection extends StatelessWidget {
               Text(
                 l10n.inviteLinkSectionTitle,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.secondary,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 l10n.inviteLinkDescription,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
               ),
               const SizedBox(height: 16),
               _buildContent(context, state, l10n),
@@ -94,8 +91,8 @@ class InviteLinkSection extends StatelessWidget {
       child: FilledButton.icon(
         onPressed: () {
           context.read<GroupInviteLinkBloc>().add(
-                GenerateInvite(groupId: groupId),
-              );
+            GenerateInvite(groupId: groupId),
+          );
         },
         icon: const Icon(Icons.link),
         label: Text(l10n.generateInviteLink),
@@ -128,9 +125,9 @@ class InviteLinkSection extends StatelessWidget {
           child: SelectableText(
             state.deepLinkUrl,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.secondary,
-                  fontFamily: 'monospace',
-                ),
+              color: AppColors.secondary,
+              fontFamily: 'monospace',
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -139,7 +136,8 @@ class InviteLinkSection extends StatelessWidget {
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => _copyToClipboard(context, state.deepLinkUrl, l10n),
+                onPressed: () =>
+                    _copyToClipboard(context, state.deepLinkUrl, l10n),
                 icon: const Icon(Icons.copy, size: 18),
                 label: Text(l10n.copyLink),
                 style: OutlinedButton.styleFrom(
@@ -169,17 +167,12 @@ class InviteLinkSection extends StatelessWidget {
           child: TextButton.icon(
             onPressed: () {
               context.read<GroupInviteLinkBloc>().add(
-                    RevokeInvite(
-                      groupId: groupId,
-                      inviteId: state.inviteId,
-                    ),
-                  );
+                RevokeInvite(groupId: groupId, inviteId: state.inviteId),
+              );
             },
             icon: const Icon(Icons.link_off, size: 18),
             label: Text(l10n.revokeInvite),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.danger,
-            ),
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
           ),
         ),
       ],
@@ -205,11 +198,7 @@ class InviteLinkSection extends StatelessWidget {
     );
   }
 
-  void _shareLink(
-    BuildContext context,
-    String url,
-    AppLocalizations l10n,
-  ) {
+  void _shareLink(BuildContext context, String url, AppLocalizations l10n) {
     Share.share(l10n.inviteLinkShareMessage(url));
   }
 }

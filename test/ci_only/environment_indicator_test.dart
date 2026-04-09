@@ -16,18 +16,16 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EnvironmentIndicator(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EnvironmentIndicator())),
       );
 
       // Assert
       expect(find.byType(EnvironmentIndicator), findsOneWidget);
       expect(find.text('Production Environment'), findsNothing);
       // Should render as SizedBox.shrink() in production
-      final widget = tester.widget<EnvironmentIndicator>(find.byType(EnvironmentIndicator));
+      final widget = tester.widget<EnvironmentIndicator>(
+        find.byType(EnvironmentIndicator),
+      );
       expect(widget, isNotNull);
     });
 
@@ -37,11 +35,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EnvironmentIndicator(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EnvironmentIndicator())),
       );
 
       // Assert
@@ -51,16 +45,16 @@ void main() {
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
     });
 
-    testWidgets('renders detailed view when showDetails is true', (tester) async {
+    testWidgets('renders detailed view when showDetails is true', (
+      tester,
+    ) async {
       // Arrange
       EnvironmentConfig.setEnvironment(Environment.dev);
 
       // Act
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: EnvironmentIndicator(showDetails: true),
-          ),
+          home: Scaffold(body: EnvironmentIndicator(showDetails: true)),
         ),
       );
 
@@ -71,15 +65,13 @@ void main() {
       expect(find.text('Disconnected'), findsOneWidget);
     });
 
-    testWidgets('shows correct colors for different environments', (tester) async {
+    testWidgets('shows correct colors for different environments', (
+      tester,
+    ) async {
       // Test development environment color
       EnvironmentConfig.setEnvironment(Environment.dev);
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EnvironmentIndicator(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EnvironmentIndicator())),
       );
 
       // Find the container with the environment color
@@ -91,7 +83,6 @@ void main() {
       );
       final devDecoration = devContainer.decoration as BoxDecoration;
       expect(devDecoration.color, equals(Colors.red.shade600));
-
     });
   });
 
@@ -101,14 +92,14 @@ void main() {
       EnvironmentConfig.setEnvironment(Environment.prod);
     });
 
-    testWidgets('does not render in non-development environments', (tester) async {
+    testWidgets('does not render in non-development environments', (
+      tester,
+    ) async {
       // Test production
       EnvironmentConfig.setEnvironment(Environment.prod);
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: Stack(children: [FirebaseDebugPanel()]),
-          ),
+          home: Scaffold(body: Stack(children: [FirebaseDebugPanel()])),
         ),
       );
       expect(find.text('Debug'), findsNothing);
@@ -121,9 +112,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: Stack(children: [FirebaseDebugPanel()]),
-          ),
+          home: Scaffold(body: Stack(children: [FirebaseDebugPanel()])),
         ),
       );
 
@@ -139,9 +128,7 @@ void main() {
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: Stack(children: [FirebaseDebugPanel()]),
-          ),
+          home: Scaffold(body: Stack(children: [FirebaseDebugPanel()])),
         ),
       );
 
@@ -164,9 +151,7 @@ void main() {
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: Stack(children: [FirebaseDebugPanel()]),
-          ),
+          home: Scaffold(body: Stack(children: [FirebaseDebugPanel()])),
         ),
       );
 
@@ -187,15 +172,15 @@ void main() {
       expect(find.text('Debug'), findsOneWidget);
     });
 
-    testWidgets('shows correct environment information in debug panel', (tester) async {
+    testWidgets('shows correct environment information in debug panel', (
+      tester,
+    ) async {
       // Arrange
       EnvironmentConfig.setEnvironment(Environment.dev);
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: Stack(children: [FirebaseDebugPanel()]),
-          ),
+          home: Scaffold(body: Stack(children: [FirebaseDebugPanel()])),
         ),
       );
 
@@ -208,7 +193,10 @@ void main() {
       // Assert
       expect(find.text('Development'), findsOneWidget);
       expect(find.text('gatherli-dev'), findsOneWidget);
-      expect(find.text('false'), findsOneWidget); // isInitialized should be false in tests
+      expect(
+        find.text('false'),
+        findsOneWidget,
+      ); // isInitialized should be false in tests
     });
   });
 }

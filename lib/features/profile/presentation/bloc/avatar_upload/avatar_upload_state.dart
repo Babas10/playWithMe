@@ -12,19 +12,16 @@ class AvatarUploadState with _$AvatarUploadState {
   const factory AvatarUploadState.picking() = AvatarUploadPicking;
 
   /// State when an image has been picked and is ready to upload
-  const factory AvatarUploadState.picked({
-    required File imageFile,
-  }) = AvatarUploadPicked;
+  const factory AvatarUploadState.picked({required File imageFile}) =
+      AvatarUploadPicked;
 
   /// State when validating the picked image
-  const factory AvatarUploadState.validating({
-    required File imageFile,
-  }) = AvatarUploadValidating;
+  const factory AvatarUploadState.validating({required File imageFile}) =
+      AvatarUploadValidating;
 
   /// State when validation fails
-  const factory AvatarUploadState.validationError({
-    required String message,
-  }) = AvatarUploadValidationError;
+  const factory AvatarUploadState.validationError({required String message}) =
+      AvatarUploadValidationError;
 
   /// State when uploading the image
   const factory AvatarUploadState.uploading({
@@ -33,9 +30,8 @@ class AvatarUploadState with _$AvatarUploadState {
   }) = AvatarUploadUploading;
 
   /// State when upload is successful
-  const factory AvatarUploadState.uploadSuccess({
-    required String downloadUrl,
-  }) = AvatarUploadUploadSuccess;
+  const factory AvatarUploadState.uploadSuccess({required String downloadUrl}) =
+      AvatarUploadUploadSuccess;
 
   /// State when upload fails
   const factory AvatarUploadState.uploadError({
@@ -50,7 +46,6 @@ class AvatarUploadState with _$AvatarUploadState {
   const factory AvatarUploadState.deleteSuccess() = AvatarUploadDeleteSuccess;
 
   /// State when deletion fails
-  const factory AvatarUploadState.deleteError({
-    required String message,
-  }) = AvatarUploadDeleteError;
+  const factory AvatarUploadState.deleteError({required String message}) =
+      AvatarUploadDeleteError;
 }

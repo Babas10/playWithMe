@@ -25,10 +25,12 @@ void main() {
       mockGroupRepository = MockGroupRepository();
       mockInvitationRepository = MockInvitationRepository();
       mockAnalytics = MockFirebaseAnalytics();
-      when(() => mockAnalytics.logEvent(
-            name: any(named: 'name'),
-            parameters: any(named: 'parameters'),
-          )).thenAnswer((_) async {});
+      when(
+        () => mockAnalytics.logEvent(
+          name: any(named: 'name'),
+          parameters: any(named: 'parameters'),
+        ),
+      ).thenAnswer((_) async {});
       groupBloc = GroupBloc(
         groupRepository: mockGroupRepository,
         invitationRepository: mockInvitationRepository,
@@ -51,7 +53,9 @@ void main() {
         act: (bloc) => bloc.add(const GroupCreationStarted()),
         expect: () => [],
         verify: (_) {
-          verify(() => mockAnalytics.logEvent(name: 'create_group_started')).called(1);
+          verify(
+            () => mockAnalytics.logEvent(name: 'create_group_started'),
+          ).called(1);
         },
       );
     });
@@ -71,10 +75,7 @@ void main() {
           return groupBloc;
         },
         act: (bloc) => bloc.add(const LoadGroupById(groupId: 'group-1')),
-        expect: () => [
-          const GroupLoading(),
-          GroupLoaded(group: testGroup),
-        ],
+        expect: () => [const GroupLoading(), GroupLoaded(group: testGroup)],
       );
 
       blocTest<GroupBloc, GroupState>(
@@ -106,10 +107,7 @@ void main() {
           return groupBloc;
         },
         act: (bloc) => bloc.add(CreateGroup(group: newGroup)),
-        expect: () => [
-          const GroupLoading(),
-          isA<GroupCreated>(),
-        ],
+        expect: () => [const GroupLoading(), isA<GroupCreated>()],
       );
 
       blocTest<GroupBloc, GroupState>(
@@ -119,21 +117,22 @@ void main() {
           mockInvitationRepository.clearInvitations();
           return groupBloc;
         },
-        act: (bloc) => bloc.add(CreateGroup(
-          group: newGroup,
-          friendIdsToInvite: {'friend-1', 'friend-2'},
-        )),
-        expect: () => [
-          const GroupLoading(),
-          isA<GroupCreated>(),
-        ],
+        act: (bloc) => bloc.add(
+          CreateGroup(
+            group: newGroup,
+            friendIdsToInvite: {'friend-1', 'friend-2'},
+          ),
+        ),
+        expect: () => [const GroupLoading(), isA<GroupCreated>()],
         verify: (_) async {
           // Verify that invitations were sent to both friends
-          final sentInvitations =
-              await mockInvitationRepository.getInvitationsSentByUser('user-1');
+          final sentInvitations = await mockInvitationRepository
+              .getInvitationsSentByUser('user-1');
           expect(sentInvitations.length, 2);
-          expect(sentInvitations.map((i) => i.invitedUserId).toSet(),
-              {'friend-1', 'friend-2'});
+          expect(sentInvitations.map((i) => i.invitedUserId).toSet(), {
+            'friend-1',
+            'friend-2',
+          });
         },
       );
     });
@@ -152,14 +151,10 @@ void main() {
           mockGroupRepository.addGroup(updatedGroup);
           return groupBloc;
         },
-        act: (bloc) => bloc.add(const UpdateGroupInfo(
-          groupId: 'group-1',
-          name: 'Updated Group',
-        )),
-        expect: () => [
-          const GroupLoading(),
-          isA<GroupUpdated>(),
-        ],
+        act: (bloc) => bloc.add(
+          const UpdateGroupInfo(groupId: 'group-1', name: 'Updated Group'),
+        ),
+        expect: () => [const GroupLoading(), isA<GroupUpdated>()],
       );
     });
   });

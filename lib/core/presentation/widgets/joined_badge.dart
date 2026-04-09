@@ -13,9 +13,7 @@ class JoinedBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.secondary,
-        ),
+        border: Border.all(color: Theme.of(context).colorScheme.secondary),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

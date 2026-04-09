@@ -15,8 +15,9 @@ class ConnectivityStatusWidget extends StatelessWidget {
       initialData: const [ConnectivityResult.wifi], // Assume online initially
       builder: (context, snapshot) {
         final results = snapshot.data ?? [];
-        final isOffline = results.isEmpty ||
-                         results.every((result) => result == ConnectivityResult.none);
+        final isOffline =
+            results.isEmpty ||
+            results.every((result) => result == ConnectivityResult.none);
 
         return isOffline ? const OfflineBanner() : const SizedBox.shrink();
       },

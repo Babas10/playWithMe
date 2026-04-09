@@ -107,15 +107,21 @@ Future<void> initializeDependencies() async {
   }
 
   if (!sl.isRegistered<FirebaseMessaging>()) {
-    sl.registerLazySingleton<FirebaseMessaging>(() => FirebaseMessaging.instance);
+    sl.registerLazySingleton<FirebaseMessaging>(
+      () => FirebaseMessaging.instance,
+    );
   }
 
   if (!sl.isRegistered<FirebaseFunctions>()) {
-    sl.registerLazySingleton<FirebaseFunctions>(() => FirebaseFunctions.instanceFor(region: 'europe-west6'));
+    sl.registerLazySingleton<FirebaseFunctions>(
+      () => FirebaseFunctions.instanceFor(region: 'europe-west6'),
+    );
   }
 
   if (!sl.isRegistered<FirebaseAnalytics>()) {
-    sl.registerLazySingleton<FirebaseAnalytics>(() => FirebaseAnalytics.instance);
+    sl.registerLazySingleton<FirebaseAnalytics>(
+      () => FirebaseAnalytics.instance,
+    );
   }
 
   if (!sl.isRegistered<FlutterLocalNotificationsPlugin>()) {
@@ -126,43 +132,31 @@ Future<void> initializeDependencies() async {
 
   // Register repositories only if not already registered
   if (!sl.isRegistered<AuthRepository>()) {
-    sl.registerLazySingleton<AuthRepository>(
-      () => FirebaseAuthRepository(),
-    );
+    sl.registerLazySingleton<AuthRepository>(() => FirebaseAuthRepository());
   }
 
   // Register core data repositories
   if (!sl.isRegistered<UserRepository>()) {
-    sl.registerLazySingleton<UserRepository>(
-      () => FirestoreUserRepository(),
-    );
+    sl.registerLazySingleton<UserRepository>(() => FirestoreUserRepository());
   }
 
   if (!sl.isRegistered<GroupRepository>()) {
-    sl.registerLazySingleton<GroupRepository>(
-      () => FirestoreGroupRepository(),
-    );
+    sl.registerLazySingleton<GroupRepository>(() => FirestoreGroupRepository());
   }
 
   if (!sl.isRegistered<GameRepository>()) {
-    sl.registerLazySingleton<GameRepository>(
-      () => FirestoreGameRepository(),
-    );
+    sl.registerLazySingleton<GameRepository>(() => FirestoreGameRepository());
   }
 
   if (!sl.isRegistered<TrainingSessionRepository>()) {
     sl.registerLazySingleton<TrainingSessionRepository>(
-      () => FirestoreTrainingSessionRepository(
-        groupRepository: sl(),
-      ),
+      () => FirestoreTrainingSessionRepository(groupRepository: sl()),
     );
   }
 
   if (!sl.isRegistered<ExerciseRepository>()) {
     sl.registerLazySingleton<ExerciseRepository>(
-      () => FirestoreExerciseRepository(
-        trainingSessionRepository: sl(),
-      ),
+      () => FirestoreExerciseRepository(trainingSessionRepository: sl()),
     );
   }
 
@@ -189,18 +183,13 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<InvitationRepository>()) {
     sl.registerLazySingleton<InvitationRepository>(
-      () => FirestoreInvitationRepository(
-        groupRepository: sl(),
-      ),
+      () => FirestoreInvitationRepository(groupRepository: sl()),
     );
   }
 
   if (!sl.isRegistered<NotificationRepository>()) {
     sl.registerLazySingleton<NotificationRepository>(
-      () => FirestoreNotificationRepository(
-        firestore: sl(),
-        auth: sl(),
-      ),
+      () => FirestoreNotificationRepository(firestore: sl(), auth: sl()),
     );
   }
 
@@ -216,9 +205,7 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<GroupInviteLinkRepository>()) {
     sl.registerLazySingleton<GroupInviteLinkRepository>(
-      () => FirestoreGroupInviteLinkRepository(
-        functions: sl(),
-      ),
+      () => FirestoreGroupInviteLinkRepository(functions: sl()),
     );
   }
 
@@ -230,9 +217,7 @@ Future<void> initializeDependencies() async {
 
   // Register services
   if (!sl.isRegistered<ImagePickerService>()) {
-    sl.registerLazySingleton<ImagePickerService>(
-      () => ImagePickerService(),
-    );
+    sl.registerLazySingleton<ImagePickerService>(() => ImagePickerService());
   }
 
   if (!sl.isRegistered<NotificationService>()) {
@@ -253,9 +238,7 @@ Future<void> initializeDependencies() async {
   }
 
   if (!sl.isRegistered<DeepLinkService>()) {
-    sl.registerLazySingleton<DeepLinkService>(
-      () => AppLinksDeepLinkService(),
-    );
+    sl.registerLazySingleton<DeepLinkService>(() => AppLinksDeepLinkService());
   }
 
   // Deferred deep link service — platform-specific.
@@ -297,17 +280,12 @@ Future<void> initializeDependencies() async {
   }
 
   if (!sl.isRegistered<LoginBloc>()) {
-    sl.registerFactory<LoginBloc>(
-      () => LoginBloc(authRepository: sl()),
-    );
+    sl.registerFactory<LoginBloc>(() => LoginBloc(authRepository: sl()));
   }
 
   if (!sl.isRegistered<RegistrationBloc>()) {
     sl.registerFactory<RegistrationBloc>(
-      () => RegistrationBloc(
-        authRepository: sl(),
-        analytics: sl(),
-      ),
+      () => RegistrationBloc(authRepository: sl(), analytics: sl()),
     );
   }
 
@@ -319,9 +297,7 @@ Future<void> initializeDependencies() async {
 
   // Register core BLoCs only if not already registered
   if (!sl.isRegistered<UserBloc>()) {
-    sl.registerFactory<UserBloc>(
-      () => UserBloc(userRepository: sl()),
-    );
+    sl.registerFactory<UserBloc>(() => UserBloc(userRepository: sl()));
   }
 
   if (!sl.isRegistered<GroupBloc>()) {
@@ -335,9 +311,7 @@ Future<void> initializeDependencies() async {
   }
 
   if (!sl.isRegistered<GameBloc>()) {
-    sl.registerFactory<GameBloc>(
-      () => GameBloc(gameRepository: sl()),
-    );
+    sl.registerFactory<GameBloc>(() => GameBloc(gameRepository: sl()));
   }
 
   if (!sl.isRegistered<InvitationBloc>()) {
@@ -354,18 +328,13 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<FriendBloc>()) {
     sl.registerFactory<FriendBloc>(
-      () => FriendBloc(
-        friendRepository: sl(),
-        authRepository: sl(),
-      ),
+      () => FriendBloc(friendRepository: sl(), authRepository: sl()),
     );
   }
 
   if (!sl.isRegistered<FriendRequestCountBloc>()) {
     sl.registerFactory<FriendRequestCountBloc>(
-      () => FriendRequestCountBloc(
-        friendRepository: sl(),
-      ),
+      () => FriendRequestCountBloc(friendRepository: sl()),
     );
   }
 
@@ -393,42 +362,32 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<GamesListBloc>()) {
     sl.registerFactory<GamesListBloc>(
-      () => GamesListBloc(
-        gameRepository: sl(),
-        trainingSessionRepository: sl(),
-      ),
+      () =>
+          GamesListBloc(gameRepository: sl(), trainingSessionRepository: sl()),
     );
   }
 
   if (!sl.isRegistered<TrainingSessionCreationBloc>()) {
     sl.registerFactory<TrainingSessionCreationBloc>(
-      () => TrainingSessionCreationBloc(
-        trainingSessionRepository: sl(),
-      ),
+      () => TrainingSessionCreationBloc(trainingSessionRepository: sl()),
     );
   }
 
   if (!sl.isRegistered<ExerciseBloc>()) {
     sl.registerFactory<ExerciseBloc>(
-      () => ExerciseBloc(
-        exerciseRepository: sl(),
-      ),
+      () => ExerciseBloc(exerciseRepository: sl()),
     );
   }
 
   if (!sl.isRegistered<TrainingFeedbackBloc>()) {
     sl.registerFactory<TrainingFeedbackBloc>(
-      () => TrainingFeedbackBloc(
-        feedbackRepository: sl(),
-      ),
+      () => TrainingFeedbackBloc(feedbackRepository: sl()),
     );
   }
 
   if (!sl.isRegistered<TrainingSessionParticipationBloc>()) {
     sl.registerFactory<TrainingSessionParticipationBloc>(
-      () => TrainingSessionParticipationBloc(
-        trainingSessionRepository: sl(),
-      ),
+      () => TrainingSessionParticipationBloc(trainingSessionRepository: sl()),
     );
   }
 
@@ -450,10 +409,7 @@ Future<void> initializeDependencies() async {
 
   if (!sl.isRegistered<InviteJoinBloc>()) {
     sl.registerFactory<InviteJoinBloc>(
-      () => InviteJoinBloc(
-        repository: sl(),
-        pendingInviteStorage: sl(),
-      ),
+      () => InviteJoinBloc(repository: sl(), pendingInviteStorage: sl()),
     );
   }
 
@@ -484,5 +440,4 @@ Future<void> initializeDependencies() async {
       ),
     );
   }
-
 }

@@ -51,10 +51,9 @@ void main() {
   setUpAll(() {
     registerFallbackValue(FakeInitializationSettings());
     registerFallbackValue(FakeRemoteMessage());
-    registerFallbackValue(const AndroidNotificationChannel(
-      'test_channel',
-      'Test Channel',
-    ));
+    registerFallbackValue(
+      const AndroidNotificationChannel('test_channel', 'Test Channel'),
+    );
   });
 
   setUp(() {
@@ -107,54 +106,62 @@ void main() {
   });
 
   group('NotificationService - deleteToken', () {
-    test('deletes FCM token and removes from Firestore when user is authenticated',
-        () async {
-      // Arrange
-      when(() => mockFcm.deleteToken()).thenAnswer((_) async {});
-      when(() => mockFcm.getToken()).thenAnswer((_) async => 'old-token');
-      when(() => mockDocument.update(any())).thenAnswer((_) async {});
+    test(
+      'deletes FCM token and removes from Firestore when user is authenticated',
+      () async {
+        // Arrange
+        when(() => mockFcm.deleteToken()).thenAnswer((_) async {});
+        when(() => mockFcm.getToken()).thenAnswer((_) async => 'old-token');
+        when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
-      // Act
-      await notificationService.deleteToken();
+        // Act
+        await notificationService.deleteToken();
 
-      // Assert
-      verify(() => mockFcm.deleteToken()).called(1);
-      verify(() => mockFcm.getToken()).called(1);
-      verify(() => mockDocument.update({
+        // Assert
+        verify(() => mockFcm.deleteToken()).called(1);
+        verify(() => mockFcm.getToken()).called(1);
+        verify(
+          () => mockDocument.update({
             'fcmTokens': FieldValue.arrayRemove(['old-token']),
-          })).called(1);
-    });
+          }),
+        ).called(1);
+      },
+    );
 
-    test('deletes FCM token but does not update Firestore when no token exists',
-        () async {
-      // Arrange
-      when(() => mockFcm.deleteToken()).thenAnswer((_) async {});
-      when(() => mockFcm.getToken()).thenAnswer((_) async => null);
+    test(
+      'deletes FCM token but does not update Firestore when no token exists',
+      () async {
+        // Arrange
+        when(() => mockFcm.deleteToken()).thenAnswer((_) async {});
+        when(() => mockFcm.getToken()).thenAnswer((_) async => null);
 
-      // Act
-      await notificationService.deleteToken();
+        // Act
+        await notificationService.deleteToken();
 
-      // Assert
-      verify(() => mockFcm.deleteToken()).called(1);
-      verify(() => mockFcm.getToken()).called(1);
-      verifyNever(() => mockDocument.update(any()));
-    });
+        // Assert
+        verify(() => mockFcm.deleteToken()).called(1);
+        verify(() => mockFcm.getToken()).called(1);
+        verifyNever(() => mockDocument.update(any()));
+      },
+    );
 
-    test('deletes FCM token but does not update Firestore when user is not authenticated',
-        () async {
-      // Arrange
-      when(() => mockAuth.currentUser).thenReturn(null);
-      when(() => mockFcm.deleteToken()).thenAnswer((_) async {});
+    test(
+      'deletes FCM token but does not update Firestore when user is not authenticated',
+      () async {
+        // Arrange
+        when(() => mockAuth.currentUser).thenReturn(null);
+        when(() => mockFcm.deleteToken()).thenAnswer((_) async {});
 
-      // Act
-      await notificationService.deleteToken();
+        // Act
+        await notificationService.deleteToken();
 
-      // Assert
-      verify(() => mockFcm.deleteToken()).called(1);
-      // getToken is NOT called when user is not authenticated (early return)
-      verifyNever(() => mockFcm.getToken());
-      verifyNever(() => mockDocument.update(any()));
-    });
+        // Assert
+        verify(() => mockFcm.deleteToken()).called(1);
+        // getToken is NOT called when user is not authenticated (early return)
+        verifyNever(() => mockFcm.getToken());
+        verifyNever(() => mockDocument.update(any()));
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
@@ -171,8 +178,9 @@ void main() {
       () async {
         // Arrange
         final mockSettings = MockNotificationSettings();
-        when(() => mockSettings.authorizationStatus)
-            .thenReturn(AuthorizationStatus.denied);
+        when(
+          () => mockSettings.authorizationStatus,
+        ).thenReturn(AuthorizationStatus.denied);
         when(
           () => mockFcm.requestPermission(
             alert: any(named: 'alert'),
@@ -199,8 +207,9 @@ void main() {
       () async {
         // Arrange
         final mockSettings = MockNotificationSettings();
-        when(() => mockSettings.authorizationStatus)
-            .thenReturn(AuthorizationStatus.denied);
+        when(
+          () => mockSettings.authorizationStatus,
+        ).thenReturn(AuthorizationStatus.denied);
         when(
           () => mockFcm.requestPermission(
             alert: any(named: 'alert'),
@@ -238,25 +247,22 @@ void main() {
   // directly without a full Firebase environment.
   // ---------------------------------------------------------------------------
   group('NotificationService - saveTokenToFirestoreForTest', () {
-    test(
-      'saves token to Firestore with arrayUnion and lastTokenUpdate '
-      'when user is authenticated',
-      () async {
-        // Arrange
-        when(() => mockDocument.update(any())).thenAnswer((_) async {});
+    test('saves token to Firestore with arrayUnion and lastTokenUpdate '
+        'when user is authenticated', () async {
+      // Arrange
+      when(() => mockDocument.update(any())).thenAnswer((_) async {});
 
-        // Act
-        await notificationService.saveTokenToFirestoreForTest('new-fcm-token');
+      // Act
+      await notificationService.saveTokenToFirestoreForTest('new-fcm-token');
 
-        // Assert
-        verify(
-          () => mockDocument.update({
-            'fcmTokens': FieldValue.arrayUnion(['new-fcm-token']),
-            'lastTokenUpdate': FieldValue.serverTimestamp(),
-          }),
-        ).called(1);
-      },
-    );
+      // Assert
+      verify(
+        () => mockDocument.update({
+          'fcmTokens': FieldValue.arrayUnion(['new-fcm-token']),
+          'lastTokenUpdate': FieldValue.serverTimestamp(),
+        }),
+      ).called(1);
+    });
 
     test(
       'does not write to Firestore when user is not authenticated',

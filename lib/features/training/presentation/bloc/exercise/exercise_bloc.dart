@@ -17,10 +17,9 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
   bool _canModify = true;
   bool _isOrganiser = false;
 
-  ExerciseBloc({
-    required ExerciseRepository exerciseRepository,
-  })  : _exerciseRepository = exerciseRepository,
-        super(const ExerciseInitial()) {
+  ExerciseBloc({required ExerciseRepository exerciseRepository})
+    : _exerciseRepository = exerciseRepository,
+      super(const ExerciseInitial()) {
     on<LoadExercises>(_onLoadExercises);
     on<AddExercise>(_onAddExercise);
     on<UpdateExercise>(_onUpdateExercise);
@@ -47,7 +46,9 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
       _canModify = _isOrganiser && canModifyByTime;
 
       await emit.forEach<List<ExerciseModel>>(
-        _exerciseRepository.getExercisesForTrainingSession(event.trainingSessionId),
+        _exerciseRepository.getExercisesForTrainingSession(
+          event.trainingSessionId,
+        ),
         onData: (exercises) {
           _currentExercises = exercises;
           return ExercisesLoaded(
@@ -68,9 +69,11 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     } on ExerciseException catch (e) {
       emit(ExerciseError(message: e.message));
     } catch (e) {
-      emit(ExerciseError(
-        message: ErrorMessages.getErrorMessage(e as Exception).$1,
-      ));
+      emit(
+        ExerciseError(
+          message: ErrorMessages.getErrorMessage(e as Exception).$1,
+        ),
+      );
     }
   }
 
@@ -82,11 +85,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
       // Organiser check — must be before any write attempt
       if (!_isOrganiser) {
         emit(const ExercisePermissionDenied());
-        emit(ExercisesLoaded(
-          exercises: _currentExercises,
-          canModify: false,
-          isOrganiser: false,
-        ));
+        emit(
+          ExercisesLoaded(
+            exercises: _currentExercises,
+            canModify: false,
+            isOrganiser: false,
+          ),
+        );
         return;
       }
 
@@ -97,11 +102,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       if (!canModifyByTime) {
         emit(const ExercisesLocked());
-        emit(ExercisesLoaded(
-          exercises: _currentExercises,
-          canModify: false,
-          isOrganiser: _isOrganiser,
-        ));
+        emit(
+          ExercisesLoaded(
+            exercises: _currentExercises,
+            canModify: false,
+            isOrganiser: _isOrganiser,
+          ),
+        );
         return;
       }
 
@@ -122,27 +129,35 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       emit(ExerciseAdded(exerciseId: exerciseId));
 
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     } on ExerciseException catch (e) {
       emit(ExerciseError(message: e.message));
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     } catch (e) {
-      emit(ExerciseError(
-        message: ErrorMessages.getErrorMessage(e as Exception).$1,
-      ));
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExerciseError(
+          message: ErrorMessages.getErrorMessage(e as Exception).$1,
+        ),
+      );
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     }
   }
 
@@ -153,11 +168,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     try {
       if (!_isOrganiser) {
         emit(const ExercisePermissionDenied());
-        emit(ExercisesLoaded(
-          exercises: _currentExercises,
-          canModify: false,
-          isOrganiser: false,
-        ));
+        emit(
+          ExercisesLoaded(
+            exercises: _currentExercises,
+            canModify: false,
+            isOrganiser: false,
+          ),
+        );
         return;
       }
 
@@ -167,11 +184,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       if (!canModifyByTime) {
         emit(const ExercisesLocked());
-        emit(ExercisesLoaded(
-          exercises: _currentExercises,
-          canModify: false,
-          isOrganiser: _isOrganiser,
-        ));
+        emit(
+          ExercisesLoaded(
+            exercises: _currentExercises,
+            canModify: false,
+            isOrganiser: _isOrganiser,
+          ),
+        );
         return;
       }
 
@@ -187,27 +206,35 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       emit(const ExerciseUpdated());
 
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     } on ExerciseException catch (e) {
       emit(ExerciseError(message: e.message));
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     } catch (e) {
-      emit(ExerciseError(
-        message: ErrorMessages.getErrorMessage(e as Exception).$1,
-      ));
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExerciseError(
+          message: ErrorMessages.getErrorMessage(e as Exception).$1,
+        ),
+      );
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     }
   }
 
@@ -218,11 +245,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     try {
       if (!_isOrganiser) {
         emit(const ExercisePermissionDenied());
-        emit(ExercisesLoaded(
-          exercises: _currentExercises,
-          canModify: false,
-          isOrganiser: false,
-        ));
+        emit(
+          ExercisesLoaded(
+            exercises: _currentExercises,
+            canModify: false,
+            isOrganiser: false,
+          ),
+        );
         return;
       }
 
@@ -232,11 +261,13 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       if (!canModifyByTime) {
         emit(const ExercisesLocked());
-        emit(ExercisesLoaded(
-          exercises: _currentExercises,
-          canModify: false,
-          isOrganiser: _isOrganiser,
-        ));
+        emit(
+          ExercisesLoaded(
+            exercises: _currentExercises,
+            canModify: false,
+            isOrganiser: _isOrganiser,
+          ),
+        );
         return;
       }
 
@@ -249,27 +280,35 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
 
       emit(const ExerciseDeleted());
 
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     } on ExerciseException catch (e) {
       emit(ExerciseError(message: e.message));
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     } catch (e) {
-      emit(ExerciseError(
-        message: ErrorMessages.getErrorMessage(e as Exception).$1,
-      ));
-      emit(ExercisesLoaded(
-        exercises: _currentExercises,
-        canModify: _canModify,
-        isOrganiser: _isOrganiser,
-      ));
+      emit(
+        ExerciseError(
+          message: ErrorMessages.getErrorMessage(e as Exception).$1,
+        ),
+      );
+      emit(
+        ExercisesLoaded(
+          exercises: _currentExercises,
+          canModify: _canModify,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     }
   }
 
@@ -278,10 +317,12 @@ class ExerciseBloc extends Bloc<ExerciseEvent, ExerciseState> {
     Emitter<ExerciseState> emit,
   ) async {
     if (_currentSessionId != null) {
-      add(LoadExercises(
-        trainingSessionId: _currentSessionId!,
-        isOrganiser: _isOrganiser,
-      ));
+      add(
+        LoadExercises(
+          trainingSessionId: _currentSessionId!,
+          isOrganiser: _isOrganiser,
+        ),
+      );
     }
   }
 }

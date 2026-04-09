@@ -46,24 +46,32 @@ class FirebaseConfigValidator {
       final projectId = config['project_info']?['project_id'] as String?;
       final expectedProjectId = expectedProjectIds[environment];
       if (projectId != expectedProjectId) {
-        errors.add('Project ID mismatch: expected "$expectedProjectId", found "$projectId"');
+        errors.add(
+          'Project ID mismatch: expected "$expectedProjectId", found "$projectId"',
+        );
       }
 
       // Validate bundle ID
       final clients = config['client'] as List<dynamic>?;
       if (clients?.isNotEmpty == true) {
         final firstClient = clients!.first as Map<String, dynamic>;
-        final bundleId = firstClient['client_info']?['android_client_info']?['package_name'] as String?;
+        final bundleId =
+            firstClient['client_info']?['android_client_info']?['package_name']
+                as String?;
         final expectedBundleId = expectedAndroidBundleIds[environment];
 
         if (bundleId != expectedBundleId) {
-          errors.add('Bundle ID mismatch: expected "$expectedBundleId", found "$bundleId"');
+          errors.add(
+            'Bundle ID mismatch: expected "$expectedBundleId", found "$bundleId"',
+          );
         }
 
         // Check for placeholder API keys
         final apiKeys = firstClient['api_key'] as List<dynamic>?;
         if (apiKeys?.isNotEmpty == true) {
-          final apiKey = (apiKeys!.first as Map<String, dynamic>)['current_key'] as String?;
+          final apiKey =
+              (apiKeys!.first as Map<String, dynamic>)['current_key']
+                  as String?;
           if (apiKey?.contains('placeholder') == true ||
               apiKey?.contains('DEV') == true ||
               apiKey?.contains('STG') == true ||
@@ -80,7 +88,6 @@ class FirebaseConfigValidator {
         errors: errors,
         warnings: warnings,
       );
-
     } catch (e) {
       return ConfigValidationResult(
         isValid: false,
@@ -109,22 +116,32 @@ class FirebaseConfigValidator {
       final warnings = <String>[];
 
       // Simple plist parsing using RegExp
-      final projectIdMatch = RegExp(r'<key>PROJECT_ID</key>\s*<string>([^<]+)</string>').firstMatch(content);
-      final bundleIdMatch = RegExp(r'<key>BUNDLE_ID</key>\s*<string>([^<]+)</string>').firstMatch(content);
-      final apiKeyMatch = RegExp(r'<key>API_KEY</key>\s*<string>([^<]+)</string>').firstMatch(content);
+      final projectIdMatch = RegExp(
+        r'<key>PROJECT_ID</key>\s*<string>([^<]+)</string>',
+      ).firstMatch(content);
+      final bundleIdMatch = RegExp(
+        r'<key>BUNDLE_ID</key>\s*<string>([^<]+)</string>',
+      ).firstMatch(content);
+      final apiKeyMatch = RegExp(
+        r'<key>API_KEY</key>\s*<string>([^<]+)</string>',
+      ).firstMatch(content);
 
       // Validate project ID
       final projectId = projectIdMatch?.group(1);
       final expectedProjectId = expectedProjectIds[environment];
       if (projectId != expectedProjectId) {
-        errors.add('Project ID mismatch: expected "$expectedProjectId", found "$projectId"');
+        errors.add(
+          'Project ID mismatch: expected "$expectedProjectId", found "$projectId"',
+        );
       }
 
       // Validate bundle ID
       final bundleId = bundleIdMatch?.group(1);
       final expectedBundleId = expectediOSBundleIds[environment];
       if (bundleId != expectedBundleId) {
-        errors.add('Bundle ID mismatch: expected "$expectedBundleId", found "$bundleId"');
+        errors.add(
+          'Bundle ID mismatch: expected "$expectedBundleId", found "$bundleId"',
+        );
       }
 
       // Check for placeholder API keys
@@ -141,7 +158,6 @@ class FirebaseConfigValidator {
         errors: errors,
         warnings: warnings,
       );
-
     } catch (e) {
       return ConfigValidationResult(
         isValid: false,
@@ -151,7 +167,8 @@ class FirebaseConfigValidator {
   }
 
   /// Validates all Firebase configurations for all environments
-  static Future<Map<String, ConfigValidationResult>> validateAllConfigs() async {
+  static Future<Map<String, ConfigValidationResult>>
+  validateAllConfigs() async {
     final results = <String, ConfigValidationResult>{};
     const environments = ['dev', 'prod'];
 

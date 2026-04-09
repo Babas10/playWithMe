@@ -17,7 +17,9 @@ void main(List<String> args) async {
     return;
   }
 
-  print('This script will help you replace placeholder Firebase configuration files');
+  print(
+    'This script will help you replace placeholder Firebase configuration files',
+  );
   print('with real ones downloaded from Firebase Console.\n');
 
   // Check prerequisites
@@ -31,7 +33,9 @@ void main(List<String> args) async {
   await guideReplacementProcess();
 
   print('\n✅ Replacement process complete!');
-  print('Run "dart run tools/validate_firebase_config.dart" to validate your configurations.');
+  print(
+    'Run "dart run tools/validate_firebase_config.dart" to validate your configurations.',
+  );
 }
 
 void printUsage() {
@@ -89,10 +93,7 @@ Future<void> guideReplacementProcess() async {
 
 Future<void> replaceAndroidConfigs() async {
   const environments = ['dev', 'prod'];
-  const projectNames = {
-    'dev': 'gatherli-dev',
-    'prod': 'gatherli-prod',
-  };
+  const projectNames = {'dev': 'gatherli-dev', 'prod': 'gatherli-prod'};
 
   for (final env in environments) {
     final targetPath = 'android/app/src/$env/google-services.json';
@@ -120,10 +121,7 @@ Future<void> replaceAndroidConfigs() async {
 
 Future<void> replaceiOSConfigs() async {
   const environments = ['dev', 'prod'];
-  const projectNames = {
-    'dev': 'gatherli-dev',
-    'prod': 'gatherli-prod',
-  };
+  const projectNames = {'dev': 'gatherli-dev', 'prod': 'gatherli-prod'};
 
   for (final env in environments) {
     final targetPath = 'ios/Runner/Firebase/$env/GoogleService-Info.plist';

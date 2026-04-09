@@ -33,11 +33,12 @@ class GroupListPage extends StatelessWidget {
               showUserActions: true,
             ),
             body: Center(
-              child: Text(AppLocalizations.of(context)!.pleaseLogInToViewGroups),
+              child: Text(
+                AppLocalizations.of(context)!.pleaseLogInToViewGroups,
+              ),
             ),
           );
         }
-
 
         // BLoC is now provided by HomePage, just use it
         if (blocOverride != null) {
@@ -49,92 +50,93 @@ class GroupListPage extends StatelessWidget {
 
         // Use Builder to get a new context that includes the GroupBloc from HomePage
         return Builder(
-          builder: (builderContext) => _buildScaffold(builderContext, authState),
+          builder: (builderContext) =>
+              _buildScaffold(builderContext, authState),
         );
       },
     );
   }
 
-  Widget _buildScaffold(BuildContext context, AuthenticationAuthenticated authState) {
+  Widget _buildScaffold(
+    BuildContext context,
+    AuthenticationAuthenticated authState,
+  ) {
     return Scaffold(
       body: BlocBuilder<GroupBloc, GroupState>(
-              builder: (context, groupState) {
-                if (groupState is GroupLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+        builder: (context, groupState) {
+          if (groupState is GroupLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                if (groupState is GroupError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          AppLocalizations.of(context)!.errorLoadingGroups,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
-                          child: Text(
-                            groupState.message,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        FilledButton.icon(
-                          onPressed: () {
-                            context.read<GroupBloc>().add(
-                              LoadGroupsForUser(userId: authState.user.uid),
-                            );
-                          },
-                          icon: const Icon(Icons.refresh),
-                          label: Text(AppLocalizations.of(context)!.retry),
-                        ),
-                      ],
+          if (groupState is GroupError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)!.errorLoadingGroups,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Text(
+                      groupState.message,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
                     ),
-                  );
-                }
-
-                if (groupState is GroupsLoaded) {
-                  for (var i = 0; i < groupState.groups.length; i++) {
-                  }
-                  if (groupState.groups.isEmpty) {
-                    return const EmptyGroupList();
-                  }
-
-                  return RefreshIndicator(
-                    onRefresh: () async {
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () {
                       context.read<GroupBloc>().add(
                         LoadGroupsForUser(userId: authState.user.uid),
                       );
                     },
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: groupState.groups.length,
-                      itemBuilder: (context, index) {
-                        final group = groupState.groups[index];
-                        return GroupListItem(
-                          group: group,
-                          onTap: () => _navigateToGroupDetails(context, group),
-                        );
-                      },
-                    ),
-                  );
-                }
+                    icon: const Icon(Icons.refresh),
+                    label: Text(AppLocalizations.of(context)!.retry),
+                  ),
+                ],
+              ),
+            );
+          }
 
-                // Initial state or other states
-                return const EmptyGroupList();
+          if (groupState is GroupsLoaded) {
+            for (var i = 0; i < groupState.groups.length; i++) {}
+            if (groupState.groups.isEmpty) {
+              return const EmptyGroupList();
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<GroupBloc>().add(
+                  LoadGroupsForUser(userId: authState.user.uid),
+                );
               },
-            ),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: groupState.groups.length,
+                itemBuilder: (context, index) {
+                  final group = groupState.groups[index];
+                  return GroupListItem(
+                    group: group,
+                    onTap: () => _navigateToGroupDetails(context, group),
+                  );
+                },
+              ),
+            );
+          }
+
+          // Initial state or other states
+          return const EmptyGroupList();
+        },
+      ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
         foregroundColor: const Color(0xFF004E64),
@@ -169,9 +171,7 @@ class GroupListPage extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => BlocProvider(
           create: (context) => sl<GroupBloc>(),
-          child: GroupCreationPage(
-            friendRepository: friendRepository,
-          ),
+          child: GroupCreationPage(friendRepository: friendRepository),
         ),
       ),
     );

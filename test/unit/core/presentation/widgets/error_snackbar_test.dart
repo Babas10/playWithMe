@@ -14,10 +14,7 @@ void main() {
                 builder: (context) {
                   return ElevatedButton(
                     onPressed: () {
-                      ErrorSnackbar.show(
-                        context,
-                        'Test error message',
-                      );
+                      ErrorSnackbar.show(context, 'Test error message');
                     },
                     child: const Text('Show Error'),
                   );
@@ -57,7 +54,9 @@ void main() {
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
       });
 
-      testWidgets('shows retry button when isRetryable is true', (tester) async {
+      testWidgets('shows retry button when isRetryable is true', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -86,7 +85,9 @@ void main() {
         expect(find.text('Retry'), findsOneWidget);
       });
 
-      testWidgets('does not show retry button when isRetryable is false', (tester) async {
+      testWidgets('does not show retry button when isRetryable is false', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -94,11 +95,7 @@ void main() {
                 builder: (context) {
                   return ElevatedButton(
                     onPressed: () {
-                      ErrorSnackbar.show(
-                        context,
-                        'Error',
-                        isRetryable: false,
-                      );
+                      ErrorSnackbar.show(context, 'Error', isRetryable: false);
                     },
                     child: const Text('Show'),
                   );
@@ -159,10 +156,7 @@ void main() {
                 builder: (context) {
                   return ElevatedButton(
                     onPressed: () {
-                      ErrorSnackbar.showSuccess(
-                        context,
-                        'Success message',
-                      );
+                      ErrorSnackbar.showSuccess(context, 'Success message');
                     },
                     child: const Text('Show'),
                   );
@@ -212,10 +206,7 @@ void main() {
                 builder: (context) {
                   return ElevatedButton(
                     onPressed: () {
-                      ErrorSnackbar.showInfo(
-                        context,
-                        'Info message',
-                      );
+                      ErrorSnackbar.showInfo(context, 'Info message');
                     },
                     child: const Text('Show'),
                   );

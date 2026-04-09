@@ -37,10 +37,7 @@ Widget _build(MyGameItem item, {VoidCallback? onTap}) {
     ],
     supportedLocales: const [Locale('en')],
     home: Scaffold(
-      body: MyGameTile(
-        item: item,
-        onTap: onTap ?? () {},
-      ),
+      body: MyGameTile(item: item, onTap: onTap ?? () {}),
     ),
   );
 }
@@ -63,16 +60,18 @@ void main() {
     });
 
     testWidgets('shows Completed badge for completed game', (tester) async {
-      await tester.pumpWidget(
-          _build(_makeItem(status: GameStatus.completed)));
+      await tester.pumpWidget(_build(_makeItem(status: GameStatus.completed)));
       await tester.pump();
 
       expect(find.text('Completed'), findsOneWidget);
     });
 
-    testWidgets('shows Verification badge for verification game', (tester) async {
+    testWidgets('shows Verification badge for verification game', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-          _build(_makeItem(status: GameStatus.verification)));
+        _build(_makeItem(status: GameStatus.verification)),
+      );
       await tester.pump();
 
       expect(find.text('Verification'), findsOneWidget);

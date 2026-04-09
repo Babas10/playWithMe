@@ -94,9 +94,7 @@ Future<bool> showRemoveMemberConfirmationDialog(
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
               child: Text(l10n.remove),
             ),
           ],
@@ -115,9 +113,7 @@ Future<bool> showLeaveGroupConfirmationDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text(l10n.leaveGroup),
-          content: Text(
-            l10n.leaveGroupConfirmMessage(groupName),
-          ),
+          content: Text(l10n.leaveGroupConfirmMessage(groupName)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -125,9 +121,7 @@ Future<bool> showLeaveGroupConfirmationDialog(
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
               child: Text(l10n.leave),
             ),
           ],

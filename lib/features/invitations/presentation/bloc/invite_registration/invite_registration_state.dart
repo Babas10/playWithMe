@@ -42,10 +42,7 @@ class InviteRegistrationFailure extends InviteRegistrationState {
   final String message;
   final String? errorCode;
 
-  const InviteRegistrationFailure({
-    required this.message,
-    this.errorCode,
-  });
+  const InviteRegistrationFailure({required this.message, this.errorCode});
 
   @override
   List<Object?> get props => [message, errorCode];

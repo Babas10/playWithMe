@@ -13,10 +13,7 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 class RoleBasedPerformanceCard extends StatelessWidget {
   final UserModel user;
 
-  const RoleBasedPerformanceCard({
-    super.key,
-    required this.user,
-  });
+  const RoleBasedPerformanceCard({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +84,9 @@ class RoleBasedPerformanceCard extends StatelessWidget {
             icon: Icons.people,
             color: AppColors.secondary,
             stats: stats.weakLink,
-            description: AppLocalizations.of(context)!.whenMoreExperiencedTeammates,
+            description: AppLocalizations.of(
+              context,
+            )!.whenMoreExperiencedTeammates,
           ),
           const SizedBox(height: 16),
         ],
@@ -98,7 +97,9 @@ class RoleBasedPerformanceCard extends StatelessWidget {
             icon: Icons.balance,
             color: AppColors.primary,
             stats: stats.balanced,
-            description: AppLocalizations.of(context)!.whenSimilarlyRatedTeammates,
+            description: AppLocalizations.of(
+              context,
+            )!.whenSimilarlyRatedTeammates,
           ),
           const SizedBox(height: 16),
         ],

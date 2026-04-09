@@ -59,9 +59,9 @@ class FriendRequestsList extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               l10n.receivedRequests,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
           ...receivedRequests.map(
@@ -72,16 +72,15 @@ class FriendRequestsList extends StatelessWidget {
             ),
           ),
         ],
-        if (hasReceivedRequests && hasSentRequests)
-          const Divider(height: 32),
+        if (hasReceivedRequests && hasSentRequests) const Divider(height: 32),
         if (hasSentRequests) ...[
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
               l10n.sentRequests,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
           ...sentRequests.map(
@@ -97,8 +96,8 @@ class FriendRequestsList extends StatelessWidget {
             child: Text(
               'No pending requests to respond to',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
           ),

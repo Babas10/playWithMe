@@ -78,8 +78,7 @@ class _FakeStorage implements PendingInviteStorage {
 class _FakePrefs implements SharedPreferences {
   final Map<String, Object> _data;
 
-  _FakePrefs([Map<String, Object>? initial])
-      : _data = Map.of(initial ?? {});
+  _FakePrefs([Map<String, Object>? initial]) : _data = Map.of(initial ?? {});
 
   @override
   bool? getBool(String key) => _data[key] as bool?;
@@ -121,19 +120,27 @@ void main() {
   group('DeferredDeepLinkOrchestrator.checkOnce', () {
     group('first launch — with token', () {
       test('returns the recovered token', () async {
-        final result = await _build(service: _TokenService('abc123')).checkOnce();
+        final result = await _build(
+          service: _TokenService('abc123'),
+        ).checkOnce();
         expect(result, 'abc123');
       });
 
       test('stores the token in PendingInviteStorage', () async {
         final storage = _FakeStorage();
-        await _build(service: _TokenService('abc123'), storage: storage).checkOnce();
+        await _build(
+          service: _TokenService('abc123'),
+          storage: storage,
+        ).checkOnce();
         expect(storage.lastStored, 'abc123');
       });
 
       test('sets the checked flag in SharedPreferences', () async {
         final prefs = _FakePrefs();
-        await _build(service: _TokenService('abc123'), prefs: prefs).checkOnce();
+        await _build(
+          service: _TokenService('abc123'),
+          prefs: prefs,
+        ).checkOnce();
         expect(prefs.getBool(DeferredDeepLinkOrchestrator.checkedKey), true);
       });
 
@@ -167,14 +174,16 @@ void main() {
       late _FakePrefs prefsWithFlag;
 
       setUp(() {
-        prefsWithFlag =
-            _FakePrefs({DeferredDeepLinkOrchestrator.checkedKey: true});
+        prefsWithFlag = _FakePrefs({
+          DeferredDeepLinkOrchestrator.checkedKey: true,
+        });
       });
 
       test('returns null immediately', () async {
-        final result =
-            await _build(service: _TokenService('abc123'), prefs: prefsWithFlag)
-                .checkOnce();
+        final result = await _build(
+          service: _TokenService('abc123'),
+          prefs: prefsWithFlag,
+        ).checkOnce();
         expect(result, isNull);
       });
 
@@ -197,8 +206,10 @@ void main() {
       test('never writes the flag again', () async {
         // Flag is already true — calling checkOnce should not modify prefs.
         final before = prefsWithFlag._data.length;
-        await _build(service: _TokenService('abc123'), prefs: prefsWithFlag)
-            .checkOnce();
+        await _build(
+          service: _TokenService('abc123'),
+          prefs: prefsWithFlag,
+        ).checkOnce();
         expect(prefsWithFlag._data.length, before);
       });
     });

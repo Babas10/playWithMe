@@ -69,32 +69,33 @@ void main() {
 
   group('GameTeamPickerWidget', () {
     testWidgets('shows 3 combination rows for 4 players', (tester) async {
-      await tester.pumpWidget(_buildWidget(
-        playerIds: ['p1', 'p2', 'p3', 'p4'],
-      ));
+      await tester.pumpWidget(
+        _buildWidget(playerIds: ['p1', 'p2', 'p3', 'p4']),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(InkWell), findsNWidgets(3));
     });
 
     testWidgets('shows select prompt when no teams selected', (tester) async {
-      await tester.pumpWidget(_buildWidget(
-        playerIds: ['p1', 'p2', 'p3', 'p4'],
-        selectedTeams: null,
-      ));
+      await tester.pumpWidget(
+        _buildWidget(playerIds: ['p1', 'p2', 'p3', 'p4'], selectedTeams: null),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Who played this game?'), findsOneWidget);
     });
 
     testWidgets('shows teams label when teams are selected', (tester) async {
-      await tester.pumpWidget(_buildWidget(
-        playerIds: ['p1', 'p2', 'p3', 'p4'],
-        selectedTeams: const GameTeams(
-          teamAPlayerIds: ['p1', 'p2'],
-          teamBPlayerIds: ['p3', 'p4'],
+      await tester.pumpWidget(
+        _buildWidget(
+          playerIds: ['p1', 'p2', 'p3', 'p4'],
+          selectedTeams: const GameTeams(
+            teamAPlayerIds: ['p1', 'p2'],
+            teamBPlayerIds: ['p3', 'p4'],
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Teams'), findsOneWidget);
@@ -141,12 +142,16 @@ void main() {
       expect(find.byKey(const Key('team_combo_selected_icon')), findsOneWidget);
     });
 
-    testWidgets('calls onTeamsSelected when a combination is tapped', (tester) async {
+    testWidgets('calls onTeamsSelected when a combination is tapped', (
+      tester,
+    ) async {
       GameTeams? selected;
-      await tester.pumpWidget(_buildWidget(
-        playerIds: ['p1', 'p2', 'p3', 'p4'],
-        onTeamsSelected: (t) => selected = t,
-      ));
+      await tester.pumpWidget(
+        _buildWidget(
+          playerIds: ['p1', 'p2', 'p3', 'p4'],
+          onTeamsSelected: (t) => selected = t,
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(InkWell).first);
@@ -158,9 +163,9 @@ void main() {
     });
 
     testWidgets('shows vs label between team names', (tester) async {
-      await tester.pumpWidget(_buildWidget(
-        playerIds: ['p1', 'p2', 'p3', 'p4'],
-      ));
+      await tester.pumpWidget(
+        _buildWidget(playerIds: ['p1', 'p2', 'p3', 'p4']),
+      );
       await tester.pumpAndSettle();
 
       expect(find.textContaining('vs'), findsWidgets);

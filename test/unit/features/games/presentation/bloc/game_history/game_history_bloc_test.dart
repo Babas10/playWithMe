@@ -28,7 +28,11 @@ void main() {
       createdBy: 'user1',
       createdAt: DateTime(2024, 1, 1),
       scheduledAt: DateTime(2024, 1, 5),
-      location: const GameLocation(name: 'Test Location', latitude: 0, longitude: 0),
+      location: const GameLocation(
+        name: 'Test Location',
+        latitude: 0,
+        longitude: 0,
+      ),
       status: GameStatus.completed,
       completedAt: DateTime(2024, 1, 5, 14, 0),
       playerIds: ['user1', 'user2'],
@@ -41,7 +45,11 @@ void main() {
       createdBy: 'user1',
       createdAt: DateTime(2024, 1, 2),
       scheduledAt: DateTime(2024, 1, 6),
-      location: const GameLocation(name: 'Test Location 2', latitude: 0, longitude: 0),
+      location: const GameLocation(
+        name: 'Test Location 2',
+        latitude: 0,
+        longitude: 0,
+      ),
       status: GameStatus.completed,
       completedAt: DateTime(2024, 1, 6, 14, 0),
       playerIds: ['user2', 'user3'],
@@ -54,10 +62,9 @@ void main() {
         mockRepository.addGame(testGame2);
         return GameHistoryBloc(gameRepository: mockRepository);
       },
-      act: (bloc) => bloc.add(const GameHistoryEvent.load(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const GameHistoryEvent.load(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GameHistoryState.loading(),
         isA<GameHistoryLoaded>()
@@ -73,11 +80,13 @@ void main() {
         mockRepository.addGame(testGame2);
         return GameHistoryBloc(gameRepository: mockRepository);
       },
-      act: (bloc) => bloc.add(const GameHistoryEvent.load(
-        groupId: 'group1',
-        userId: 'user1',
-        filter: GameHistoryFilter.myGames,
-      )),
+      act: (bloc) => bloc.add(
+        const GameHistoryEvent.load(
+          groupId: 'group1',
+          userId: 'user1',
+          filter: GameHistoryFilter.myGames,
+        ),
+      ),
       expect: () => [
         const GameHistoryState.loading(),
         isA<GameHistoryLoaded>()
@@ -89,10 +98,9 @@ void main() {
     blocTest<GameHistoryBloc, GameHistoryState>(
       'emits empty list when no completed games exist',
       build: () => GameHistoryBloc(gameRepository: mockRepository),
-      act: (bloc) => bloc.add(const GameHistoryEvent.load(
-        groupId: 'group1',
-        userId: 'user1',
-      )),
+      act: (bloc) => bloc.add(
+        const GameHistoryEvent.load(groupId: 'group1', userId: 'user1'),
+      ),
       expect: () => [
         const GameHistoryState.loading(),
         isA<GameHistoryLoaded>().having((s) => s.games, 'games', isEmpty),
@@ -107,21 +115,26 @@ void main() {
         return GameHistoryBloc(gameRepository: mockRepository);
       },
       act: (bloc) async {
-        bloc.add(const GameHistoryEvent.load(
-          groupId: 'group1',
-          userId: 'user1',
-        ));
+        bloc.add(
+          const GameHistoryEvent.load(groupId: 'group1', userId: 'user1'),
+        );
         await Future.delayed(const Duration(milliseconds: 100));
-        bloc.add(const GameHistoryEvent.filterChanged(
-          filter: GameHistoryFilter.myGames,
-        ));
+        bloc.add(
+          const GameHistoryEvent.filterChanged(
+            filter: GameHistoryFilter.myGames,
+          ),
+        );
       },
       skip: 2, // Skip initial loading and loaded states
       expect: () => [
         const GameHistoryState.loading(),
         isA<GameHistoryLoaded>()
             .having((s) => s.games.length, 'games length', 1)
-            .having((s) => s.currentFilter, 'filter', GameHistoryFilter.myGames),
+            .having(
+              (s) => s.currentFilter,
+              'filter',
+              GameHistoryFilter.myGames,
+            ),
       ],
     );
 
@@ -132,10 +145,9 @@ void main() {
         return GameHistoryBloc(gameRepository: mockRepository);
       },
       act: (bloc) async {
-        bloc.add(const GameHistoryEvent.load(
-          groupId: 'group1',
-          userId: 'user1',
-        ));
+        bloc.add(
+          const GameHistoryEvent.load(groupId: 'group1', userId: 'user1'),
+        );
         await Future.delayed(const Duration(milliseconds: 100));
         // Add another game
         mockRepository.addGame(testGame2);
@@ -144,7 +156,11 @@ void main() {
       skip: 2,
       expect: () => [
         const GameHistoryState.loading(),
-        isA<GameHistoryLoaded>().having((s) => s.games.length, 'games length', 2),
+        isA<GameHistoryLoaded>().having(
+          (s) => s.games.length,
+          'games length',
+          2,
+        ),
       ],
     );
   });

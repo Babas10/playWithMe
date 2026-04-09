@@ -45,7 +45,9 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
     });
 
     try {
-      final friends = await widget.friendRepository.getFriends(widget.currentUserId);
+      final friends = await widget.friendRepository.getFriends(
+        widget.currentUserId,
+      );
       if (mounted) {
         setState(() {
           _friends = friends;
@@ -107,16 +109,16 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
           children: [
             Text(
               'Select Friends to Invite',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             if (_friends != null && _friends!.isNotEmpty)
               Text(
                 '${_selectedFriendIds.length} selected',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
               ),
           ],
         ),
@@ -125,9 +127,9 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
         // Description
         Text(
           'Choose friends from your community to invite to this group',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
         ),
         const SizedBox(height: 16),
 
@@ -136,10 +138,10 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
           child: _isLoading
               ? _buildLoadingState()
               : _errorMessage != null
-                  ? _buildErrorState()
-                  : (_friends == null || _friends!.isEmpty)
-                      ? _buildEmptyState()
-                      : _buildFriendList(),
+              ? _buildErrorState()
+              : (_friends == null || _friends!.isEmpty)
+              ? _buildEmptyState()
+              : _buildFriendList(),
         ),
       ],
     );
@@ -219,8 +221,14 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton.icon(
-                onPressed: _selectedFriendIds.length == _friends!.length ? null : _selectAll,
-                icon: Icon(Icons.check_box, size: 18, color: AppColors.secondary),
+                onPressed: _selectedFriendIds.length == _friends!.length
+                    ? null
+                    : _selectAll,
+                icon: Icon(
+                  Icons.check_box,
+                  size: 18,
+                  color: AppColors.secondary,
+                ),
                 label: Text(
                   'Select All',
                   style: TextStyle(color: AppColors.secondary),
@@ -241,22 +249,86 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
         // Friend list — fills all remaining vertical space
         Expanded(
           child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: ListView.separated(
-            itemCount: _friends!.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final friend = _friends![index];
-              final isSelected = _selectedFriendIds.contains(friend.uid);
-              final isInvited = widget.invitedUserIds.contains(friend.uid);
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListView.separated(
+              itemCount: _friends!.length,
+              separatorBuilder: (context, index) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final friend = _friends![index];
+                final isSelected = _selectedFriendIds.contains(friend.uid);
+                final isInvited = widget.invitedUserIds.contains(friend.uid);
 
-              if (isInvited) {
-                // Show green tick — already invited, not selectable
-                return ListTile(
-                  leading: CircleAvatar(
+                if (isInvited) {
+                  // Show green tick — already invited, not selectable
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.25,
+                      ),
+                      backgroundImage: friend.photoUrl != null
+                          ? NetworkImage(friend.photoUrl!)
+                          : null,
+                      child: friend.photoUrl == null
+                          ? Text(
+                              friend.displayNameOrEmail[0].toUpperCase(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.secondary,
+                              ),
+                            )
+                          : null,
+                    ),
+                    title: Text(
+                      friend.displayNameOrEmail,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    subtitle: friend.displayName != null
+                        ? Text(
+                            friend.email,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[400],
+                            ),
+                          )
+                        : null,
+                    trailing: const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 28,
+                    ),
+                  );
+                }
+
+                return CheckboxListTile(
+                  value: isSelected,
+                  onChanged: (_) => _toggleSelection(friend.uid),
+                  activeColor: AppColors.secondary,
+                  checkColor: Colors.white,
+                  title: Text(
+                    friend.displayNameOrEmail,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: isSelected ? AppColors.secondary : null,
+                    ),
+                  ),
+                  subtitle: friend.displayName != null
+                      ? Text(
+                          friend.email,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isSelected
+                                ? AppColors.secondary.withValues(alpha: 0.7)
+                                : Colors.grey[600],
+                          ),
+                        )
+                      : null,
+                  secondary: CircleAvatar(
                     backgroundColor: AppColors.primary.withValues(alpha: 0.25),
                     backgroundImage: friend.photoUrl != null
                         ? NetworkImage(friend.photoUrl!)
@@ -271,64 +343,11 @@ class _FriendSelectorWidgetState extends State<FriendSelectorWidget> {
                           )
                         : null,
                   ),
-                  title: Text(
-                    friend.displayNameOrEmail,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                  subtitle: friend.displayName != null
-                      ? Text(
-                          friend.email,
-                          style: TextStyle(fontSize: 12, color: Colors.grey[400]),
-                        )
-                      : null,
-                  trailing: const Icon(Icons.check_circle, color: Colors.green, size: 28),
+                  controlAffinity: ListTileControlAffinity.trailing,
                 );
-              }
-
-              return CheckboxListTile(
-                value: isSelected,
-                onChanged: (_) => _toggleSelection(friend.uid),
-                activeColor: AppColors.secondary,
-                checkColor: Colors.white,
-                title: Text(
-                  friend.displayNameOrEmail,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: isSelected ? AppColors.secondary : null,
-                  ),
-                ),
-                subtitle: friend.displayName != null
-                    ? Text(
-                        friend.email,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isSelected ? AppColors.secondary.withValues(alpha: 0.7) : Colors.grey[600],
-                        ),
-                      )
-                    : null,
-                secondary: CircleAvatar(
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.25),
-                  backgroundImage: friend.photoUrl != null
-                      ? NetworkImage(friend.photoUrl!)
-                      : null,
-                  child: friend.photoUrl == null
-                      ? Text(
-                          friend.displayNameOrEmail[0].toUpperCase(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.secondary,
-                          ),
-                        )
-                      : null,
-                ),
-                controlAffinity: ListTileControlAffinity.trailing,
-              );
-            },
+              },
+            ),
           ),
-        ),
         ),
       ],
     );

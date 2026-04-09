@@ -9,9 +9,7 @@ import 'package:play_with_me/core/presentation/bloc/account_status/account_statu
 import 'package:play_with_me/core/presentation/widgets/restricted_action_guard.dart';
 import 'package:play_with_me/l10n/app_localizations.dart';
 
-class MockAccountStatusBloc
-    extends Mock
-    implements AccountStatusBloc {
+class MockAccountStatusBloc extends Mock implements AccountStatusBloc {
   final AccountStatusState _state;
 
   MockAccountStatusBloc(this._state);
@@ -97,11 +95,13 @@ void main() {
     testWidgets('calls onAllowed when account is active', (tester) async {
       bool allowedCalled = false;
 
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusActive(),
-        onAllowed: () => allowedCalled = true,
-        onVerifyEmail: () {},
-      ));
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusActive(),
+          onAllowed: () => allowedCalled = true,
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -113,11 +113,13 @@ void main() {
     testWidgets('calls onAllowed when account is pending', (tester) async {
       bool allowedCalled = false;
 
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusPending(daysRemaining: 5),
-        onAllowed: () => allowedCalled = true,
-        onVerifyEmail: () {},
-      ));
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusPending(daysRemaining: 5),
+          onAllowed: () => allowedCalled = true,
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -126,15 +128,18 @@ void main() {
       expect(allowedCalled, isTrue);
     });
 
-    testWidgets('shows restriction dialog when account is restricted',
-        (tester) async {
+    testWidgets('shows restriction dialog when account is restricted', (
+      tester,
+    ) async {
       bool allowedCalled = false;
 
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
-        onAllowed: () => allowedCalled = true,
-        onVerifyEmail: () {},
-      ));
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
+          onAllowed: () => allowedCalled = true,
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -142,19 +147,24 @@ void main() {
 
       expect(allowedCalled, isFalse);
       expect(find.text('Feature Restricted'), findsOneWidget);
-      expect(find.text('This feature requires email verification.'),
-          findsOneWidget);
-      expect(find.text('Verify your email to use this feature.'),
-          findsOneWidget);
+      expect(
+        find.text('This feature requires email verification.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Verify your email to use this feature.'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('restriction dialog shows days until deletion',
-        (tester) async {
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
-        onAllowed: () {},
-        onVerifyEmail: () {},
-      ));
+    testWidgets('restriction dialog shows days until deletion', (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
+          onAllowed: () {},
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -164,11 +174,13 @@ void main() {
     });
 
     testWidgets('restriction dialog has Dismiss button', (tester) async {
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
-        onAllowed: () {},
-        onVerifyEmail: () {},
-      ));
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
+          onAllowed: () {},
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -178,11 +190,13 @@ void main() {
     });
 
     testWidgets('restriction dialog has Verify Email button', (tester) async {
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
-        onAllowed: () {},
-        onVerifyEmail: () {},
-      ));
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
+          onAllowed: () {},
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -192,11 +206,13 @@ void main() {
     });
 
     testWidgets('dismiss closes dialog', (tester) async {
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
-        onAllowed: () {},
-        onVerifyEmail: () {},
-      ));
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
+          onAllowed: () {},
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -208,15 +224,18 @@ void main() {
       expect(find.text('Feature Restricted'), findsNothing);
     });
 
-    testWidgets('verify email button calls onVerifyEmail and closes dialog',
-        (tester) async {
+    testWidgets('verify email button calls onVerifyEmail and closes dialog', (
+      tester,
+    ) async {
       bool verifyCalled = false;
 
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
-        onAllowed: () {},
-        onVerifyEmail: () => verifyCalled = true,
-      ));
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
+          onAllowed: () {},
+          onVerifyEmail: () => verifyCalled = true,
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -229,13 +248,16 @@ void main() {
       expect(find.text('Feature Restricted'), findsNothing);
     });
 
-    testWidgets('does not show deletion warning when daysUntilDeletion is 0',
-        (tester) async {
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusRestricted(daysUntilDeletion: 0),
-        onAllowed: () {},
-        onVerifyEmail: () {},
-      ));
+    testWidgets('does not show deletion warning when daysUntilDeletion is 0', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusRestricted(daysUntilDeletion: 0),
+          onAllowed: () {},
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));
@@ -246,11 +268,13 @@ void main() {
     });
 
     testWidgets('dialog shows block icon', (tester) async {
-      await tester.pumpWidget(buildTestApp(
-        accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
-        onAllowed: () {},
-        onVerifyEmail: () {},
-      ));
+      await tester.pumpWidget(
+        buildTestApp(
+          accountState: const AccountStatusRestricted(daysUntilDeletion: 15),
+          onAllowed: () {},
+          onVerifyEmail: () {},
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Test Action'));

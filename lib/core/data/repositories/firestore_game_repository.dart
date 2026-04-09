@@ -15,9 +15,8 @@ class FirestoreGameRepository implements GameRepository {
 
   static const String _collection = 'games';
 
-  FirestoreGameRepository({
-    FirebaseFirestore? firestore,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance;
+  FirestoreGameRepository({FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   Future<GameModel?> getGameById(String gameId) async {
@@ -38,16 +37,22 @@ class FirestoreGameRepository implements GameRepository {
           .collection(_collection)
           .doc(gameId)
           .snapshots()
-          .map((snapshot) =>
-              snapshot.exists ? GameModel.fromFirestore(snapshot) : null)
+          .map(
+            (snapshot) =>
+                snapshot.exists ? GameModel.fromFirestore(snapshot) : null,
+          )
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw GameException('Failed to stream game: ${error.message}',
-              code: error.code);
-        }
-        throw GameException('Failed to stream game: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw GameException(
+                'Failed to stream game: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw GameException(
+              'Failed to stream game: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
       throw GameException('Failed to stream game: $e', code: 'stream-error');
     }
@@ -93,24 +98,30 @@ class FirestoreGameRepository implements GameRepository {
           .where('playerIds', arrayContains: userId)
           .snapshots()
           .map((snapshot) {
-        final games = snapshot.docs
-            .where((doc) => doc.exists)
-            .map((doc) => GameModel.fromFirestore(doc))
-            .where((game) => game.status != GameStatus.cancelled)
-            .toList();
-        games.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
-        return games;
-      })
+            final games = snapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GameModel.fromFirestore(doc))
+                .where((game) => game.status != GameStatus.cancelled)
+                .toList();
+            games.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
+            return games;
+          })
           .handleError((error) {
-        if (error is FirebaseException) {
-          debugPrint('[getMyGames] FirebaseException: code=${error.code} message=${error.message}');
-          throw GameException('Failed to get my games: ${error.message}',
-              code: error.code);
-        }
-        debugPrint('[getMyGames] Unexpected error: $error');
-        throw GameException('Failed to get my games: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              debugPrint(
+                '[getMyGames] FirebaseException: code=${error.code} message=${error.message}',
+              );
+              throw GameException(
+                'Failed to get my games: ${error.message}',
+                code: error.code,
+              );
+            }
+            debugPrint('[getMyGames] Unexpected error: $error');
+            throw GameException(
+              'Failed to get my games: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
       throw GameException('Failed to get my games: $e', code: 'stream-error');
     }
@@ -124,22 +135,29 @@ class FirestoreGameRepository implements GameRepository {
           .where('playerIds', arrayContains: userId)
           .orderBy('scheduledAt', descending: false)
           .snapshots()
-          .map((snapshot) => snapshot.docs
-              .where((doc) => doc.exists)
-              .map((doc) => GameModel.fromFirestore(doc))
-              .toList())
+          .map(
+            (snapshot) => snapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GameModel.fromFirestore(doc))
+                .toList(),
+          )
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw GameException(
-              'Failed to get games for user: ${error.message}',
-              code: error.code);
-        }
-        throw GameException('Failed to get games for user: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw GameException(
+                'Failed to get games for user: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw GameException(
+              'Failed to get games for user: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
-      throw GameException('Failed to get games for user: $e',
-          code: 'stream-error');
+      throw GameException(
+        'Failed to get games for user: $e',
+        code: 'stream-error',
+      );
     }
   }
 
@@ -151,22 +169,29 @@ class FirestoreGameRepository implements GameRepository {
           .where('groupId', isEqualTo: groupId)
           .orderBy('scheduledAt', descending: false)
           .snapshots()
-          .map((snapshot) => snapshot.docs
-              .where((doc) => doc.exists)
-              .map((doc) => GameModel.fromFirestore(doc))
-              .toList())
+          .map(
+            (snapshot) => snapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GameModel.fromFirestore(doc))
+                .toList(),
+          )
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw GameException(
-              'Failed to get games for group: ${error.message}',
-              code: error.code);
-        }
-        throw GameException('Failed to get games for group: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw GameException(
+                'Failed to get games for group: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw GameException(
+              'Failed to get games for group: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
-      throw GameException('Failed to get games for group: $e',
-          code: 'stream-error');
+      throw GameException(
+        'Failed to get games for group: $e',
+        code: 'stream-error',
+      );
     }
   }
 
@@ -177,29 +202,37 @@ class FirestoreGameRepository implements GameRepository {
   }) {
     try {
       final cutoff = Timestamp.fromDate(
-          DateTime.now().subtract(Duration(days: pastDays)));
+        DateTime.now().subtract(Duration(days: pastDays)),
+      );
       return _firestore
           .collection(_collection)
           .where('groupId', isEqualTo: groupId)
           .where('scheduledAt', isGreaterThan: cutoff)
           .orderBy('scheduledAt', descending: false)
           .snapshots()
-          .map((snapshot) => snapshot.docs
-              .where((doc) => doc.exists)
-              .map((doc) => GameModel.fromFirestore(doc))
-              .toList())
+          .map(
+            (snapshot) => snapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GameModel.fromFirestore(doc))
+                .toList(),
+          )
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw GameException(
-              'Failed to get recent games for group: ${error.message}',
-              code: error.code);
-        }
-        throw GameException('Failed to get recent games for group: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw GameException(
+                'Failed to get recent games for group: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw GameException(
+              'Failed to get recent games for group: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
-      throw GameException('Failed to get recent games for group: $e',
-          code: 'stream-error');
+      throw GameException(
+        'Failed to get recent games for group: $e',
+        code: 'stream-error',
+      );
     }
   }
 
@@ -210,7 +243,8 @@ class FirestoreGameRepository implements GameRepository {
   }) async {
     try {
       final cutoff = Timestamp.fromDate(
-          DateTime.now().subtract(Duration(days: pastDays)));
+        DateTime.now().subtract(Duration(days: pastDays)),
+      );
       final query = await _firestore
           .collection(_collection)
           .where('groupId', isEqualTo: groupId)
@@ -226,11 +260,15 @@ class FirestoreGameRepository implements GameRepository {
       games.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
       return games;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to get older games for group: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to get older games for group: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
-      throw GameException('Failed to get older games for group: $e',
-          code: 'unknown');
+      throw GameException(
+        'Failed to get older games for group: $e',
+        code: 'unknown',
+      );
     }
   }
 
@@ -246,17 +284,22 @@ class FirestoreGameRepository implements GameRepository {
           .snapshots()
           .map((snapshot) => snapshot.docs.length)
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw GameException(
-              'Failed to get upcoming games count: ${error.message}',
-              code: error.code);
-        }
-        throw GameException('Failed to get upcoming games count: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw GameException(
+                'Failed to get upcoming games count: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw GameException(
+              'Failed to get upcoming games count: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
-      throw GameException('Failed to get upcoming games count: $e',
-          code: 'stream-error');
+      throw GameException(
+        'Failed to get upcoming games count: $e',
+        code: 'stream-error',
+      );
     }
   }
 
@@ -271,55 +314,67 @@ class FirestoreGameRepository implements GameRepository {
         .where('memberIds', arrayContains: userId)
         .snapshots()
         .listen(
-      (groupsSnapshot) {
-        gamesSub?.cancel();
-        final groupIds = groupsSnapshot.docs.map((d) => d.id).toList();
-        if (groupIds.isEmpty) {
-          controller.add([]);
-          return;
-        }
+          (groupsSnapshot) {
+            gamesSub?.cancel();
+            final groupIds = groupsSnapshot.docs.map((d) => d.id).toList();
+            if (groupIds.isEmpty) {
+              controller.add([]);
+              return;
+            }
 
-        // Firestore 'whereIn' is limited to 30 values
-        gamesSub = _firestore
-            .collection(_collection)
-            .where('groupId', whereIn: groupIds.take(30).toList())
-            .where('status', whereIn: ['scheduled', 'inProgress'])
-            .where('scheduledAt', isGreaterThan: Timestamp.now())
-            .orderBy('scheduledAt')
-            .snapshots()
-            .listen(
-          (gamesSnapshot) {
-            final games = gamesSnapshot.docs
-                .where((doc) => doc.exists)
-                .map((doc) => GameModel.fromFirestore(doc))
-                .toList();
-            controller.add(games);
+            // Firestore 'whereIn' is limited to 30 values
+            gamesSub = _firestore
+                .collection(_collection)
+                .where('groupId', whereIn: groupIds.take(30).toList())
+                .where('status', whereIn: ['scheduled', 'inProgress'])
+                .where('scheduledAt', isGreaterThan: Timestamp.now())
+                .orderBy('scheduledAt')
+                .snapshots()
+                .listen(
+                  (gamesSnapshot) {
+                    final games = gamesSnapshot.docs
+                        .where((doc) => doc.exists)
+                        .map((doc) => GameModel.fromFirestore(doc))
+                        .toList();
+                    controller.add(games);
+                  },
+                  onError: (Object error) {
+                    if (error is FirebaseException) {
+                      controller.addError(
+                        GameException(
+                          'Failed to get group games: ${error.message}',
+                          code: error.code,
+                        ),
+                      );
+                    } else {
+                      controller.addError(
+                        GameException(
+                          'Failed to get group games: $error',
+                          code: 'stream-error',
+                        ),
+                      );
+                    }
+                  },
+                );
           },
           onError: (Object error) {
             if (error is FirebaseException) {
-              controller.addError(GameException(
+              controller.addError(
+                GameException(
                   'Failed to get group games: ${error.message}',
-                  code: error.code));
+                  code: error.code,
+                ),
+              );
             } else {
-              controller.addError(GameException(
+              controller.addError(
+                GameException(
                   'Failed to get group games: $error',
-                  code: 'stream-error'));
+                  code: 'stream-error',
+                ),
+              );
             }
           },
         );
-      },
-      onError: (Object error) {
-        if (error is FirebaseException) {
-          controller.addError(GameException(
-              'Failed to get group games: ${error.message}',
-              code: error.code));
-        } else {
-          controller.addError(GameException(
-              'Failed to get group games: $error',
-              code: 'stream-error'));
-        }
-      },
-    );
 
     controller.onCancel = () {
       groupsSub?.cancel();
@@ -339,22 +394,29 @@ class FirestoreGameRepository implements GameRepository {
           .where('scheduledAt', isGreaterThan: now)
           .orderBy('scheduledAt', descending: false)
           .snapshots()
-          .map((snapshot) => snapshot.docs
-              .where((doc) => doc.exists)
-              .map((doc) => GameModel.fromFirestore(doc))
-              .toList())
+          .map(
+            (snapshot) => snapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GameModel.fromFirestore(doc))
+                .toList(),
+          )
           .handleError((error) {
-        if (error is FirebaseException) {
-          throw GameException(
-              'Failed to get upcoming games for user: ${error.message}',
-              code: error.code);
-        }
-        throw GameException('Failed to get upcoming games for user: $error',
-            code: 'stream-error');
-      });
+            if (error is FirebaseException) {
+              throw GameException(
+                'Failed to get upcoming games for user: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw GameException(
+              'Failed to get upcoming games for user: $error',
+              code: 'stream-error',
+            );
+          });
     } catch (e) {
-      throw GameException('Failed to get upcoming games for user: $e',
-          code: 'stream-error');
+      throw GameException(
+        'Failed to get upcoming games for user: $e',
+        code: 'stream-error',
+      );
     }
   }
 
@@ -385,56 +447,68 @@ class FirestoreGameRepository implements GameRepository {
         .where('memberIds', arrayContains: userId)
         .snapshots()
         .listen(
-      (groupsSnapshot) {
-        groupGamesSub?.cancel();
-        final groupIds = groupsSnapshot.docs.map((d) => d.id).toList();
-        if (groupIds.isEmpty) {
-          latestGroupGames = [];
-          emitBest();
-          return;
-        }
+          (groupsSnapshot) {
+            groupGamesSub?.cancel();
+            final groupIds = groupsSnapshot.docs.map((d) => d.id).toList();
+            if (groupIds.isEmpty) {
+              latestGroupGames = [];
+              emitBest();
+              return;
+            }
 
-        // Firestore 'whereIn' is limited to 30 values
-        groupGamesSub = _firestore
-            .collection(_collection)
-            .where('groupId', whereIn: groupIds.take(30).toList())
-            .where('status', isEqualTo: 'scheduled')
-            .where('scheduledAt', isGreaterThan: Timestamp.now())
-            .orderBy('scheduledAt')
-            .snapshots()
-            .listen(
-          (gamesSnapshot) {
-            latestGroupGames = gamesSnapshot.docs
-                .where((doc) => doc.exists)
-                .map((doc) => GameModel.fromFirestore(doc))
-                .toList();
-            emitBest();
+            // Firestore 'whereIn' is limited to 30 values
+            groupGamesSub = _firestore
+                .collection(_collection)
+                .where('groupId', whereIn: groupIds.take(30).toList())
+                .where('status', isEqualTo: 'scheduled')
+                .where('scheduledAt', isGreaterThan: Timestamp.now())
+                .orderBy('scheduledAt')
+                .snapshots()
+                .listen(
+                  (gamesSnapshot) {
+                    latestGroupGames = gamesSnapshot.docs
+                        .where((doc) => doc.exists)
+                        .map((doc) => GameModel.fromFirestore(doc))
+                        .toList();
+                    emitBest();
+                  },
+                  onError: (Object error) {
+                    if (error is FirebaseException) {
+                      controller.addError(
+                        GameException(
+                          'Failed to get next game: ${error.message}',
+                          code: error.code,
+                        ),
+                      );
+                    } else {
+                      controller.addError(
+                        GameException(
+                          'Failed to get next game: $error',
+                          code: 'stream-error',
+                        ),
+                      );
+                    }
+                  },
+                );
           },
           onError: (Object error) {
             if (error is FirebaseException) {
-              controller.addError(GameException(
+              controller.addError(
+                GameException(
                   'Failed to get next game: ${error.message}',
-                  code: error.code));
+                  code: error.code,
+                ),
+              );
             } else {
-              controller.addError(GameException(
+              controller.addError(
+                GameException(
                   'Failed to get next game: $error',
-                  code: 'stream-error'));
+                  code: 'stream-error',
+                ),
+              );
             }
           },
         );
-      },
-      onError: (Object error) {
-        if (error is FirebaseException) {
-          controller.addError(GameException(
-              'Failed to get next game: ${error.message}',
-              code: error.code));
-        } else {
-          controller.addError(GameException(
-              'Failed to get next game: $error',
-              code: 'stream-error'));
-        }
-      },
-    );
 
     // Stream 2: games where the user is explicitly in playerIds (catches
     // accepted cross-group guest invitations).
@@ -447,22 +521,23 @@ class FirestoreGameRepository implements GameRepository {
         .orderBy('scheduledAt')
         .snapshots()
         .listen(
-      (gamesSnapshot) {
-        latestPlayerGames = gamesSnapshot.docs
-            .where((doc) => doc.exists)
-            .map((doc) => GameModel.fromFirestore(doc))
-            .where((g) => g.status == GameStatus.scheduled)
-            .toList();
-        emitBest();
-      },
-      onError: (Object error) {
-        // Non-fatal: group-based stream still provides results.
-        if (error is FirebaseException) {
-          debugPrint(
-              '[getNextGameForUser] playerIds stream error: ${error.message}');
-        }
-      },
-    );
+          (gamesSnapshot) {
+            latestPlayerGames = gamesSnapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => GameModel.fromFirestore(doc))
+                .where((g) => g.status == GameStatus.scheduled)
+                .toList();
+            emitBest();
+          },
+          onError: (Object error) {
+            // Non-fatal: group-based stream still provides results.
+            if (error is FirebaseException) {
+              debugPrint(
+                '[getNextGameForUser] playerIds stream error: ${error.message}',
+              );
+            }
+          },
+        );
 
     controller.onCancel = () {
       groupsSub?.cancel();
@@ -474,8 +549,10 @@ class FirestoreGameRepository implements GameRepository {
   }
 
   @override
-  Future<List<GameModel>> getPastGamesForUser(String userId,
-      {int limit = 20}) async {
+  Future<List<GameModel>> getPastGamesForUser(
+    String userId, {
+    int limit = 20,
+  }) async {
     try {
       final now = Timestamp.now();
       final query = await _firestore
@@ -491,19 +568,24 @@ class FirestoreGameRepository implements GameRepository {
           .map((doc) => GameModel.fromFirestore(doc))
           .toList();
     } on FirebaseException catch (e) {
-      throw GameException('Failed to get past games for user: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to get past games for user: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
-      throw GameException('Failed to get past games for user: $e',
-          code: 'unknown');
+      throw GameException(
+        'Failed to get past games for user: $e',
+        code: 'unknown',
+      );
     }
   }
 
   @override
   Future<String> createGame(GameModel game) async {
     try {
-      final docRef =
-          await _firestore.collection(_collection).add(game.toFirestore());
+      final docRef = await _firestore
+          .collection(_collection)
+          .add(game.toFirestore());
       return docRef.id;
     } on FirebaseException catch (e) {
       throw GameException('Failed to create game: ${e.message}', code: e.code);
@@ -546,8 +628,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to update game info: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to update game info: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to update game info: $e', code: 'unknown');
     }
@@ -591,11 +675,15 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to update game settings: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to update game settings: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
-      throw GameException('Failed to update game settings: $e',
-          code: 'unknown');
+      throw GameException(
+        'Failed to update game settings: $e',
+        code: 'unknown',
+      );
     }
   }
 
@@ -639,8 +727,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to remove player: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to remove player: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to remove player: $e', code: 'unknown');
     }
@@ -733,19 +823,24 @@ class FirestoreGameRepository implements GameRepository {
       // Check if user has permission (creator only for now)
       if (!currentGame.isCreator(userId)) {
         throw GameException(
-            'Only the game creator can mark the game as completed',
-            code: 'permission-denied');
+          'Only the game creator can mark the game as completed',
+          code: 'permission-denied',
+        );
       }
 
       // Check if game can be marked as completed
       if (currentGame.status == GameStatus.completed) {
-        throw GameException('Game is already completed',
-            code: 'already-completed');
+        throw GameException(
+          'Game is already completed',
+          code: 'already-completed',
+        );
       }
 
       if (currentGame.status == GameStatus.cancelled) {
-        throw GameException('Cannot complete a cancelled game',
-            code: 'invalid-state');
+        throw GameException(
+          'Cannot complete a cancelled game',
+          code: 'invalid-state',
+        );
       }
 
       // Update game status to completed
@@ -762,17 +857,24 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to mark game as completed: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to mark game as completed: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
-      throw GameException('Failed to mark game as completed: $e',
-          code: 'unknown');
+      throw GameException(
+        'Failed to mark game as completed: $e',
+        code: 'unknown',
+      );
     }
   }
 
   @override
   Future<void> updateGameTeams(
-      String gameId, String userId, GameTeams teams) async {
+    String gameId,
+    String userId,
+    GameTeams teams,
+  ) async {
     try {
       final currentGame = await getGameById(gameId);
       if (currentGame == null) {
@@ -781,27 +883,34 @@ class FirestoreGameRepository implements GameRepository {
 
       // Check if user has permission (participant or creator)
       if (!currentGame.isPlayer(userId) && !currentGame.isCreator(userId)) {
-        throw GameException('Only participants can update teams',
-            code: 'permission-denied');
+        throw GameException(
+          'Only participants can update teams',
+          code: 'permission-denied',
+        );
       }
 
       // Check if game is active
       if (currentGame.status == GameStatus.cancelled) {
-        throw GameException('Cannot update teams for a cancelled game',
-            code: 'invalid-state');
+        throw GameException(
+          'Cannot update teams for a cancelled game',
+          code: 'invalid-state',
+        );
       }
 
       // Validate teams
       if (teams.hasPlayerOnBothTeams()) {
-        throw GameException('A player cannot be on both teams',
-            code: 'invalid-argument');
+        throw GameException(
+          'A player cannot be on both teams',
+          code: 'invalid-argument',
+        );
       }
 
       if (!teams.areAllPlayersAssigned(currentGame.playerIds)) {
         final unassigned = teams.getUnassignedPlayers(currentGame.playerIds);
         throw GameException(
-            'All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}',
-            code: 'invalid-argument');
+          'All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}',
+          code: 'invalid-argument',
+        );
       }
 
       // Update game with teams
@@ -817,8 +926,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to update game teams: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to update game teams: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to update game teams: $e', code: 'unknown');
     }
@@ -826,7 +937,10 @@ class FirestoreGameRepository implements GameRepository {
 
   @override
   Future<void> updateGameResult(
-      String gameId, String userId, GameResult result) async {
+    String gameId,
+    String userId,
+    GameResult result,
+  ) async {
     try {
       final currentGame = await getGameById(gameId);
       if (currentGame == null) {
@@ -835,27 +949,34 @@ class FirestoreGameRepository implements GameRepository {
 
       // Check if user has permission (participant or creator)
       if (!currentGame.isPlayer(userId) && !currentGame.isCreator(userId)) {
-        throw GameException('Only participants can update game result',
-            code: 'permission-denied');
+        throw GameException(
+          'Only participants can update game result',
+          code: 'permission-denied',
+        );
       }
 
       // Check if game is active
       if (currentGame.status == GameStatus.cancelled) {
-        throw GameException('Cannot update result of a cancelled game',
-            code: 'invalid-state');
+        throw GameException(
+          'Cannot update result of a cancelled game',
+          code: 'invalid-state',
+        );
       }
 
       // Check if teams are assigned
       if (currentGame.teams == null) {
-        throw GameException('Teams must be assigned before entering scores',
-            code: 'failed-precondition');
+        throw GameException(
+          'Teams must be assigned before entering scores',
+          code: 'failed-precondition',
+        );
       }
 
       // Validate result
       if (!result.isValid()) {
         throw GameException(
-            'Invalid game result. Check that all sets are valid and winner is correct.',
-            code: 'invalid-argument');
+          'Invalid game result. Check that all sets are valid and winner is correct.',
+          code: 'invalid-argument',
+        );
       }
 
       // Determine winner team and update winnerId
@@ -885,8 +1006,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to update game result: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to update game result: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to update game result: $e', code: 'unknown');
     }
@@ -913,14 +1036,18 @@ class FirestoreGameRepository implements GameRepository {
 
         // Check if user has permission (participant or creator)
         if (!currentGame.isPlayer(userId) && !currentGame.isCreator(userId)) {
-          throw GameException('Only participants can save game result',
-              code: 'permission-denied');
+          throw GameException(
+            'Only participants can save game result',
+            code: 'permission-denied',
+          );
         }
 
         // Check if game is active
         if (currentGame.status == GameStatus.cancelled) {
-          throw GameException('Cannot save result to a cancelled game',
-              code: 'invalid-state');
+          throw GameException(
+            'Cannot save result to a cancelled game',
+            code: 'invalid-state',
+          );
         }
 
         // Check if game has passed its scheduled time
@@ -928,35 +1055,41 @@ class FirestoreGameRepository implements GameRepository {
             currentGame.status != GameStatus.completed &&
             currentGame.status != GameStatus.inProgress) {
           throw GameException(
-              'Cannot save result before the scheduled game time',
-              code: 'failed-precondition');
+            'Cannot save result before the scheduled game time',
+            code: 'failed-precondition',
+          );
         }
 
         // Check if game has minimum required players
         if (!currentGame.hasMinimumPlayers) {
           throw GameException(
-              'Cannot save result without the minimum number of players (${currentGame.minPlayers} required, ${currentGame.currentPlayerCount} joined)',
-              code: 'failed-precondition');
+            'Cannot save result without the minimum number of players (${currentGame.minPlayers} required, ${currentGame.currentPlayerCount} joined)',
+            code: 'failed-precondition',
+          );
         }
 
         // Validate teams
         if (teams.hasPlayerOnBothTeams()) {
-          throw GameException('A player cannot be on both teams',
-              code: 'invalid-argument');
+          throw GameException(
+            'A player cannot be on both teams',
+            code: 'invalid-argument',
+          );
         }
 
         if (!teams.areAllPlayersAssigned(currentGame.playerIds)) {
           final unassigned = teams.getUnassignedPlayers(currentGame.playerIds);
           throw GameException(
-              'All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}',
-              code: 'invalid-argument');
+            'All players must be assigned to a team. Unassigned: ${unassigned.join(", ")}',
+            code: 'invalid-argument',
+          );
         }
 
         // Validate result
         if (!result.isValid()) {
           throw GameException(
-              'Invalid game result. Check that all sets are valid and winner is correct.',
-              code: 'invalid-argument');
+            'Invalid game result. Check that all sets are valid and winner is correct.',
+            code: 'invalid-argument',
+          );
         }
 
         // Determine winner team
@@ -989,8 +1122,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to save game result: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to save game result: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to save game result: $e', code: 'unknown');
     }
@@ -1010,18 +1145,24 @@ class FirestoreGameRepository implements GameRepository {
         final currentGame = GameModel.fromFirestore(snapshot);
 
         if (currentGame.status != GameStatus.verification) {
-          throw GameException('Game is not in verification state',
-              code: 'invalid-state');
+          throw GameException(
+            'Game is not in verification state',
+            code: 'invalid-state',
+          );
         }
 
         if (currentGame.resultSubmittedBy == userId) {
-          throw GameException('You cannot confirm your own result',
-              code: 'permission-denied');
+          throw GameException(
+            'You cannot confirm your own result',
+            code: 'permission-denied',
+          );
         }
 
         if (currentGame.confirmedBy.contains(userId)) {
-          throw GameException('You have already confirmed this result',
-              code: 'already-exists');
+          throw GameException(
+            'You have already confirmed this result',
+            code: 'already-exists',
+          );
         }
 
         final updatedConfirmedBy = [...currentGame.confirmedBy, userId];
@@ -1044,8 +1185,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to confirm game result: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to confirm game result: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to confirm game result: $e', code: 'unknown');
     }
@@ -1068,8 +1211,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to update scores: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to update scores: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to update scores: $e', code: 'unknown');
     }
@@ -1107,30 +1252,35 @@ class FirestoreGameRepository implements GameRepository {
           .where((doc) => doc.exists)
           .map((doc) => GameModel.fromFirestore(doc))
           .where((game) {
-        if (game.location.latitude == null ||
-            game.location.longitude == null) {
-          return false;
-        }
-        final gameLon = game.location.longitude!;
-        if (gameLon < minLon || gameLon > maxLon) return false;
+            if (game.location.latitude == null ||
+                game.location.longitude == null) {
+              return false;
+            }
+            final gameLon = game.location.longitude!;
+            if (gameLon < minLon || gameLon > maxLon) return false;
 
-        // Calculate actual distance
-        final distance = _calculateDistance(
-          latitude,
-          longitude,
-          game.location.latitude!,
-          game.location.longitude!,
-        );
-        return distance <= radiusKm;
-      }).toList();
+            // Calculate actual distance
+            final distance = _calculateDistance(
+              latitude,
+              longitude,
+              game.location.latitude!,
+              game.location.longitude!,
+            );
+            return distance <= radiusKm;
+          })
+          .toList();
 
       return games;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to get games by location: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to get games by location: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
-      throw GameException('Failed to get games by location: $e',
-          code: 'unknown');
+      throw GameException(
+        'Failed to get games by location: $e',
+        code: 'unknown',
+      );
     }
   }
 
@@ -1152,8 +1302,10 @@ class FirestoreGameRepository implements GameRepository {
           .map((doc) => GameModel.fromFirestore(doc))
           .toList();
     } on FirebaseException catch (e) {
-      throw GameException('Failed to get games by status: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to get games by status: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to get games by status: $e', code: 'unknown');
     }
@@ -1168,8 +1320,10 @@ class FirestoreGameRepository implements GameRepository {
 
       final query = await _firestore
           .collection(_collection)
-          .where('scheduledAt',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+          .where(
+            'scheduledAt',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+          )
           .where('scheduledAt', isLessThan: Timestamp.fromDate(endOfDay))
           .orderBy('scheduledAt', descending: false)
           .get();
@@ -1179,8 +1333,10 @@ class FirestoreGameRepository implements GameRepository {
           .map((doc) => GameModel.fromFirestore(doc))
           .toList();
     } on FirebaseException catch (e) {
-      throw GameException('Failed to get games today: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to get games today: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to get games today: $e', code: 'unknown');
     }
@@ -1195,8 +1351,10 @@ class FirestoreGameRepository implements GameRepository {
 
       final query = await _firestore
           .collection(_collection)
-          .where('scheduledAt',
-              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfWeek))
+          .where(
+            'scheduledAt',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfWeek),
+          )
           .where('scheduledAt', isLessThan: Timestamp.fromDate(endOfWeek))
           .orderBy('scheduledAt', descending: false)
           .get();
@@ -1206,8 +1364,10 @@ class FirestoreGameRepository implements GameRepository {
           .map((doc) => GameModel.fromFirestore(doc))
           .toList();
     } on FirebaseException catch (e) {
-      throw GameException('Failed to get games this week: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to get games this week: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to get games this week: $e', code: 'unknown');
     }
@@ -1247,8 +1407,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } catch (e) {
-      throw GameException('Failed to get game participants: $e',
-          code: 'unknown');
+      throw GameException(
+        'Failed to get game participants: $e',
+        code: 'unknown',
+      );
     }
   }
 
@@ -1274,8 +1436,10 @@ class FirestoreGameRepository implements GameRepository {
     } on GameException {
       rethrow;
     } catch (e) {
-      throw GameException('Failed to check if user can join game: $e',
-          code: 'unknown');
+      throw GameException(
+        'Failed to check if user can join game: $e',
+        code: 'unknown',
+      );
     }
   }
 
@@ -1296,11 +1460,15 @@ class FirestoreGameRepository implements GameRepository {
       final doc = await _firestore.collection(_collection).doc(gameId).get();
       return doc.exists;
     } on FirebaseException catch (e) {
-      throw GameException('Failed to check if game exists: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to check if game exists: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
-      throw GameException('Failed to check if game exists: $e',
-          code: 'unknown');
+      throw GameException(
+        'Failed to check if game exists: $e',
+        code: 'unknown',
+      );
     }
   }
 
@@ -1336,13 +1504,18 @@ class FirestoreGameRepository implements GameRepository {
 
   /// Calculate distance between two points using Haversine formula
   double _calculateDistance(
-      double lat1, double lon1, double lat2, double lon2) {
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
     const double earthRadiusKm = 6371.0;
 
     final double dLat = (lat2 - lat1) * pi / 180;
     final double dLon = (lon2 - lon1) * pi / 180;
 
-    final double a = sin(dLat / 2) * sin(dLat / 2) +
+    final double a =
+        sin(dLat / 2) * sin(dLat / 2) +
         cos(lat1 * pi / 180) *
             cos(lat2 * pi / 180) *
             sin(dLon / 2) *
@@ -1364,8 +1537,9 @@ class FirestoreGameRepository implements GameRepository {
   }) async* {
     try {
       // Call Cloud Function to fetch completed games
-      final callable =
-          FirebaseFunctions.instanceFor(region: 'europe-west6').httpsCallable('getCompletedGames');
+      final callable = FirebaseFunctions.instanceFor(
+        region: 'europe-west6',
+      ).httpsCallable('getCompletedGames');
 
       final result = await callable.call({
         if (groupId != null) 'groupId': groupId,
@@ -1383,32 +1557,41 @@ class FirestoreGameRepository implements GameRepository {
 
       final games = gamesData.map<GameModel>((gameData) {
         // Convert Cloud Function response to GameModel
-        final Map<String, dynamic> gameMap =
-            Map<String, dynamic>.from(gameData);
+        final Map<String, dynamic> gameMap = Map<String, dynamic>.from(
+          gameData,
+        );
 
         // Convert Firestore Timestamps to ISO strings for fromJson
         if (gameMap['createdAt'] is Map) {
           final ts = gameMap['createdAt'] as Map;
-          final timestamp =
-              Timestamp(ts['_seconds'] as int, ts['_nanoseconds'] as int);
+          final timestamp = Timestamp(
+            ts['_seconds'] as int,
+            ts['_nanoseconds'] as int,
+          );
           gameMap['createdAt'] = timestamp.toDate().toIso8601String();
         }
         if (gameMap['updatedAt'] is Map) {
           final ts = gameMap['updatedAt'] as Map;
-          final timestamp =
-              Timestamp(ts['_seconds'] as int, ts['_nanoseconds'] as int);
+          final timestamp = Timestamp(
+            ts['_seconds'] as int,
+            ts['_nanoseconds'] as int,
+          );
           gameMap['updatedAt'] = timestamp.toDate().toIso8601String();
         }
         if (gameMap['scheduledAt'] is Map) {
           final ts = gameMap['scheduledAt'] as Map;
-          final timestamp =
-              Timestamp(ts['_seconds'] as int, ts['_nanoseconds'] as int);
+          final timestamp = Timestamp(
+            ts['_seconds'] as int,
+            ts['_nanoseconds'] as int,
+          );
           gameMap['scheduledAt'] = timestamp.toDate().toIso8601String();
         }
         if (gameMap['completedAt'] != null && gameMap['completedAt'] is Map) {
           final ts = gameMap['completedAt'] as Map;
-          final timestamp =
-              Timestamp(ts['_seconds'] as int, ts['_nanoseconds'] as int);
+          final timestamp = Timestamp(
+            ts['_seconds'] as int,
+            ts['_nanoseconds'] as int,
+          );
           gameMap['completedAt'] = timestamp.toDate().toIso8601String();
         }
 
@@ -1421,8 +1604,10 @@ class FirestoreGameRepository implements GameRepository {
         hasMore: hasMore,
       );
     } on FirebaseFunctionsException catch (e) {
-      throw GameException('Failed to get completed games: ${e.message}',
-          code: e.code);
+      throw GameException(
+        'Failed to get completed games: ${e.message}',
+        code: e.code,
+      );
     } catch (e) {
       throw GameException('Failed to get completed games: $e', code: 'unknown');
     }

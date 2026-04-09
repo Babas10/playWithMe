@@ -13,7 +13,8 @@ import 'package:play_with_me/l10n/app_localizations.dart';
 import 'helpers/test_helpers.dart';
 
 // Fake for mocktail matchers
-class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntity {}
+class FakeLocalePreferencesEntity extends Fake
+    implements LocalePreferencesEntity {}
 
 void main() {
   setUpAll(() {
@@ -29,40 +30,49 @@ void main() {
     cleanupTestDependencies();
   });
 
-  testWidgets('Gatherli app login page shows correct authentication UI elements', (WidgetTester tester) async {
-    // Create a test app with the real LoginPage and proper BLoC setup
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('en')],
-        home: BlocProvider<LoginBloc>(
-          create: (context) => sl<LoginBloc>(),
-          child: const LoginPage(),
+  testWidgets(
+    'Gatherli app login page shows correct authentication UI elements',
+    (WidgetTester tester) async {
+      // Create a test app with the real LoginPage and proper BLoC setup
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: BlocProvider<LoginBloc>(
+            create: (context) => sl<LoginBloc>(),
+            child: const LoginPage(),
+          ),
         ),
-      ),
-    );
+      );
 
-    // Wait for the page to render
-    await tester.pump();
+      // Wait for the page to render
+      await tester.pump();
 
-    // Verify authentication UI elements are present (not old static content)
-    expect(find.text('Welcome Back!'), findsOneWidget);
-    expect(find.text('Sign in to continue organizing your volleyball games'), findsOneWidget);
+      // Verify authentication UI elements are present (not old static content)
+      expect(find.text('Welcome Back!'), findsOneWidget);
+      expect(
+        find.text('Sign in to continue organizing your volleyball games'),
+        findsOneWidget,
+      );
 
-    // Verify login form fields are present
-    expect(find.byType(TextFormField), findsNWidgets(2)); // Email and password fields
+      // Verify login form fields are present
+      expect(
+        find.byType(TextFormField),
+        findsNWidgets(2),
+      ); // Email and password fields
 
-    // Verify authentication-specific buttons
-    expect(find.byType(AuthButton), findsOneWidget); // Login button only
-    expect(find.text('Sign Up'), findsOneWidget);
-    expect(find.text('Forgot Password?'), findsOneWidget);
+      // Verify authentication-specific buttons
+      expect(find.byType(AuthButton), findsOneWidget); // Login button only
+      expect(find.text('Sign Up'), findsOneWidget);
+      expect(find.text('Forgot Password?'), findsOneWidget);
 
-    // Verify volleyball icons are present (app branding - one in content, one in AppBar)
-    expect(find.byIcon(Icons.sports_volleyball), findsNWidgets(2));
-  });
+      // Verify volleyball icons are present (app branding - one in content, one in AppBar)
+      expect(find.byIcon(Icons.sports_volleyball), findsNWidgets(2));
+    },
+  );
 }

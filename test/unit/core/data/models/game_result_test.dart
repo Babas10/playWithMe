@@ -66,9 +66,7 @@ void main() {
       test('isValid returns true for valid single set game', () {
         final game = IndividualGame(
           gameNumber: 1,
-          sets: [
-            SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1),
-          ],
+          sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
           winner: 'teamA',
         );
 
@@ -78,9 +76,7 @@ void main() {
       test('isValid returns false when winner does not match', () {
         final game = IndividualGame(
           gameNumber: 1,
-          sets: [
-            SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1),
-          ],
+          sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
           winner: 'teamB', // Wrong winner
         );
 
@@ -138,9 +134,7 @@ void main() {
     test('toJson and fromJson work correctly', () {
       final game = IndividualGame(
         gameNumber: 1,
-        sets: [
-          SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1),
-        ],
+        sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
         winner: 'teamA',
       );
 
@@ -316,25 +310,32 @@ void main() {
         expect(result.scoreDescription, '2-2');
       });
 
-      test('isValid returns false for tied result with non-null overallWinner', () {
-        final result = GameResult(
-          games: [
-            IndividualGame(
-              gameNumber: 1,
-              sets: [SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1)],
-              winner: 'teamA',
-            ),
-            IndividualGame(
-              gameNumber: 2,
-              sets: [SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1)],
-              winner: 'teamB',
-            ),
-          ],
-          overallWinner: 'teamA',
-        );
+      test(
+        'isValid returns false for tied result with non-null overallWinner',
+        () {
+          final result = GameResult(
+            games: [
+              IndividualGame(
+                gameNumber: 1,
+                sets: [
+                  SetScore(teamAPoints: 21, teamBPoints: 19, setNumber: 1),
+                ],
+                winner: 'teamA',
+              ),
+              IndividualGame(
+                gameNumber: 2,
+                sets: [
+                  SetScore(teamAPoints: 19, teamBPoints: 21, setNumber: 1),
+                ],
+                winner: 'teamB',
+              ),
+            ],
+            overallWinner: 'teamA',
+          );
 
-        expect(result.isValid(), false);
-      });
+          expect(result.isValid(), false);
+        },
+      );
 
       test('toJson and fromJson work correctly for tied session', () {
         final result = GameResult(
@@ -365,10 +366,7 @@ void main() {
 
     group('Invalid Session Results', () {
       test('isValid returns false for empty games list', () {
-        final result = GameResult(
-          games: [],
-          overallWinner: 'teamA',
-        );
+        final result = GameResult(games: [], overallWinner: 'teamA');
 
         expect(result.isValid(), false);
       });
@@ -398,7 +396,9 @@ void main() {
           games: [
             IndividualGame(
               gameNumber: 1,
-              sets: [SetScore(teamAPoints: 20, teamBPoints: 18, setNumber: 1)], // Invalid
+              sets: [
+                SetScore(teamAPoints: 20, teamBPoints: 18, setNumber: 1),
+              ], // Invalid
               winner: 'teamA',
             ),
           ],

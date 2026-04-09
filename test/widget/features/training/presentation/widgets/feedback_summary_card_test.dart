@@ -14,9 +14,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
-          ),
+          home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
         ),
       );
 
@@ -48,14 +46,14 @@ void main() {
         ),
       ];
 
-      final aggregation =
-          FeedbackAggregation.fromFeedbackList('session-123', feedback);
+      final aggregation = FeedbackAggregation.fromFeedbackList(
+        'session-123',
+        feedback,
+      );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
-          ),
+          home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
         ),
       );
 
@@ -81,14 +79,14 @@ void main() {
         ),
       ];
 
-      final aggregation =
-          FeedbackAggregation.fromFeedbackList('session-123', feedback);
+      final aggregation = FeedbackAggregation.fromFeedbackList(
+        'session-123',
+        feedback,
+      );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
-          ),
+          home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
         ),
       );
 
@@ -122,14 +120,14 @@ void main() {
         ),
       ];
 
-      final aggregation =
-          FeedbackAggregation.fromFeedbackList('session-123', feedback);
+      final aggregation = FeedbackAggregation.fromFeedbackList(
+        'session-123',
+        feedback,
+      );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
-          ),
+          home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
         ),
       );
 
@@ -153,14 +151,14 @@ void main() {
         ),
       ];
 
-      final aggregation =
-          FeedbackAggregation.fromFeedbackList('session-123', feedback);
+      final aggregation = FeedbackAggregation.fromFeedbackList(
+        'session-123',
+        feedback,
+      );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
-          ),
+          home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
         ),
       );
 
@@ -191,14 +189,14 @@ void main() {
         ),
       ];
 
-      final aggregation =
-          FeedbackAggregation.fromFeedbackList('session-123', feedback);
+      final aggregation = FeedbackAggregation.fromFeedbackList(
+        'session-123',
+        feedback,
+      );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
-          ),
+          home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
         ),
       );
 
@@ -229,89 +227,97 @@ void main() {
         ),
       ];
 
-      final aggregation =
-          FeedbackAggregation.fromFeedbackList('session-123', feedback);
+      final aggregation = FeedbackAggregation.fromFeedbackList(
+        'session-123',
+        feedback,
+      );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
-          ),
+          home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
         ),
       );
 
       expect(find.text('Based on 2 ratings'), findsOneWidget);
     });
 
-    testWidgets('rating bars use brand blue (AppColors.secondary) for high ratings',
-        (tester) async {
-      final feedback = [
-        TrainingFeedbackModel(
-          id: '1',
-          trainingSessionId: 'session-123',
-          exercisesQuality: 5,
-          trainingIntensity: 5,
-          coachingClarity: 5,
-          comment: null,
-          participantHash: 'hash1',
-          submittedAt: DateTime.now(),
-        ),
-      ];
-
-      final aggregation =
-          FeedbackAggregation.fromFeedbackList('session-123', feedback);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
+    testWidgets(
+      'rating bars use brand blue (AppColors.secondary) for high ratings',
+      (tester) async {
+        final feedback = [
+          TrainingFeedbackModel(
+            id: '1',
+            trainingSessionId: 'session-123',
+            exercisesQuality: 5,
+            trainingIntensity: 5,
+            coachingClarity: 5,
+            comment: null,
+            participantHash: 'hash1',
+            submittedAt: DateTime.now(),
           ),
-        ),
-      );
+        ];
 
-      // Find the LinearProgressIndicator widgets and check their color
-      final indicators =
-          tester.widgetList<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+        final aggregation = FeedbackAggregation.fromFeedbackList(
+          'session-123',
+          feedback,
+        );
 
-      for (final indicator in indicators) {
-        final valueColor = indicator.valueColor as AlwaysStoppedAnimation<Color>;
-        expect(valueColor.value, AppColors.secondary);
-      }
-    });
-
-    testWidgets('rating bars use brand blue (AppColors.secondary) for medium ratings',
-        (tester) async {
-      final feedback = [
-        TrainingFeedbackModel(
-          id: '1',
-          trainingSessionId: 'session-123',
-          exercisesQuality: 3,
-          trainingIntensity: 3,
-          coachingClarity: 3,
-          comment: null,
-          participantHash: 'hash1',
-          submittedAt: DateTime.now(),
-        ),
-      ];
-
-      final aggregation =
-          FeedbackAggregation.fromFeedbackList('session-123', feedback);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: FeedbackSummaryCard(aggregation: aggregation),
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
           ),
-        ),
-      );
+        );
 
-      final indicators =
-          tester.widgetList<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+        // Find the LinearProgressIndicator widgets and check their color
+        final indicators = tester.widgetList<LinearProgressIndicator>(
+          find.byType(LinearProgressIndicator),
+        );
 
-      for (final indicator in indicators) {
-        final valueColor = indicator.valueColor as AlwaysStoppedAnimation<Color>;
-        expect(valueColor.value, AppColors.secondary);
-      }
-    });
+        for (final indicator in indicators) {
+          final valueColor =
+              indicator.valueColor as AlwaysStoppedAnimation<Color>;
+          expect(valueColor.value, AppColors.secondary);
+        }
+      },
+    );
+
+    testWidgets(
+      'rating bars use brand blue (AppColors.secondary) for medium ratings',
+      (tester) async {
+        final feedback = [
+          TrainingFeedbackModel(
+            id: '1',
+            trainingSessionId: 'session-123',
+            exercisesQuality: 3,
+            trainingIntensity: 3,
+            coachingClarity: 3,
+            comment: null,
+            participantHash: 'hash1',
+            submittedAt: DateTime.now(),
+          ),
+        ];
+
+        final aggregation = FeedbackAggregation.fromFeedbackList(
+          'session-123',
+          feedback,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(body: FeedbackSummaryCard(aggregation: aggregation)),
+          ),
+        );
+
+        final indicators = tester.widgetList<LinearProgressIndicator>(
+          find.byType(LinearProgressIndicator),
+        );
+
+        for (final indicator in indicators) {
+          final valueColor =
+              indicator.valueColor as AlwaysStoppedAnimation<Color>;
+          expect(valueColor.value, AppColors.secondary);
+        }
+      },
+    );
   });
 }

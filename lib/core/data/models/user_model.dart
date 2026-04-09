@@ -20,8 +20,7 @@ class UserModel with _$UserModel {
     required bool isAnonymous,
     // Account status fields (Story 17.8.2)
     @TimestampConverter() DateTime? emailVerifiedAt,
-    @Default(AccountStatus.pendingVerification)
-    AccountStatus accountStatus,
+    @Default(AccountStatus.pendingVerification) AccountStatus accountStatus,
     @TimestampConverter() DateTime? gracePeriodExpiresAt,
     @TimestampConverter() DateTime? deletionScheduledAt,
     // Extended fields for full user profile
@@ -80,10 +79,7 @@ class UserModel with _$UserModel {
   /// Factory constructor for creating from Firestore DocumentSnapshot
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return UserModel.fromJson({
-      ...data,
-      'uid': doc.id,
-    });
+    return UserModel.fromJson({...data, 'uid': doc.id});
   }
 
   /// Factory constructor for creating from Firebase Auth User (Story 302.7)
@@ -105,7 +101,9 @@ class UserModel with _$UserModel {
       accountStatus: isVerified
           ? AccountStatus.active
           : AccountStatus.pendingVerification,
-      gracePeriodExpiresAt: creationTime?.add(const Duration(days: gracePeriodDays)),
+      gracePeriodExpiresAt: creationTime?.add(
+        const Duration(days: gracePeriodDays),
+      ),
       deletionScheduledAt: null,
     );
   }
@@ -267,7 +265,9 @@ class UserModel with _$UserModel {
 
   /// Add game participation
   UserModel addGame(String gameId, {bool won = false, int score = 0}) {
-    final newGameIds = gameIds.contains(gameId) ? gameIds : [...gameIds, gameId];
+    final newGameIds = gameIds.contains(gameId)
+        ? gameIds
+        : [...gameIds, gameId];
     return copyWith(
       gameIds: newGameIds,
       gamesPlayed: gamesPlayed + 1,
@@ -306,8 +306,9 @@ class UserModel with _$UserModel {
   /// Cache is considered stale after 24 hours
   bool get needsFriendCacheRefresh {
     if (friendsLastUpdated == null) return true;
-    final hoursSinceUpdate =
-        DateTime.now().difference(friendsLastUpdated!).inHours;
+    final hoursSinceUpdate = DateTime.now()
+        .difference(friendsLastUpdated!)
+        .inHours;
     return hoursSinceUpdate > 24;
   }
 }
@@ -432,7 +433,8 @@ class BestWinRecord with _$BestWinRecord {
 
     /// Date when this win occurred
     // ignore: invalid_annotation_target
-    @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson) required DateTime date,
+    @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
+    required DateTime date,
 
     /// Game title or description for display
     required String gameTitle,
@@ -521,8 +523,7 @@ class PointStats with _$PointStats {
   }
 
   /// Get subtitle text showing set record
-  String get statsSubtitle =>
-      '$winningSetsCount won, $losingSetsCount lost';
+  String get statsSubtitle => '$winningSetsCount won, $losingSetsCount lost';
 
   /// Total sets played
   int get totalSets => winningSetsCount + losingSetsCount;
@@ -612,9 +613,7 @@ class RoleBasedStats with _$RoleBasedStats {
 
     if (roles.isEmpty) return 'none';
 
-    return roles.entries
-        .reduce((a, b) => a.value > b.value ? a : b)
-        .key;
+    return roles.entries.reduce((a, b) => a.value > b.value ? a : b).key;
   }
 
   /// Generate personalized insight based on role performance
@@ -634,7 +633,8 @@ class RoleBasedStats with _$RoleBasedStats {
     }
 
     // Check if balanced is the dominant category
-    if (balanced.games > carry.games + weakLink.games && balanced.hasEnoughData) {
+    if (balanced.games > carry.games + weakLink.games &&
+        balanced.hasEnoughData) {
       return '⚖️ You play best in balanced matchups.';
     }
 

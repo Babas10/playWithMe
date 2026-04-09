@@ -75,7 +75,10 @@ class StatisticsService {
     );
 
     // Calculate expected scores using logistic curve
-    final teamAExpectedScore = _calculateExpectedScore(teamARating, teamBRating);
+    final teamAExpectedScore = _calculateExpectedScore(
+      teamARating,
+      teamBRating,
+    );
     final teamBExpectedScore = 1.0 - teamAExpectedScore;
 
     // Calculate actual scores (1 for win, 0 for loss)
@@ -200,7 +203,9 @@ class StatisticsService {
     int? limit,
   }) {
     // Filter teammates with minimum games
-    final qualified = teammates.where((t) => t.gamesPlayed >= minGames).toList();
+    final qualified = teammates
+        .where((t) => t.gamesPlayed >= minGames)
+        .toList();
 
     // Sort by win rate (descending), then by games played (descending)
     qualified.sort((a, b) {

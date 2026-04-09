@@ -112,10 +112,7 @@ class ParticipationError extends TrainingSessionParticipationState {
   final String message;
   final String? errorCode;
 
-  const ParticipationError({
-    required this.message,
-    this.errorCode,
-  });
+  const ParticipationError({required this.message, this.errorCode});
 
   @override
   List<Object?> get props => [message, errorCode];

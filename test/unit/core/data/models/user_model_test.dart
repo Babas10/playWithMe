@@ -230,10 +230,13 @@ void main() {
         expect(testUser.fullDisplayName, 'Test User');
       });
 
-      test('fullDisplayName returns displayName when first/last name unavailable', () {
-        final user = testUser.copyWith(firstName: null, lastName: null);
-        expect(user.fullDisplayName, 'Test User');
-      });
+      test(
+        'fullDisplayName returns displayName when first/last name unavailable',
+        () {
+          final user = testUser.copyWith(firstName: null, lastName: null);
+          expect(user.fullDisplayName, 'Test User');
+        },
+      );
 
       test('fullDisplayName returns email when no names available', () {
         final user = testUser.copyWith(
@@ -253,22 +256,28 @@ void main() {
         expect(user.displayNameOrEmail, 'test@example.com');
       });
 
-      test('canBeContacted returns true when email is shown and not private', () {
-        final user = testUser.copyWith(
-          showEmail: true,
-          privacyLevel: UserPrivacyLevel.public,
-        );
-        expect(user.canBeContacted, true);
-      });
+      test(
+        'canBeContacted returns true when email is shown and not private',
+        () {
+          final user = testUser.copyWith(
+            showEmail: true,
+            privacyLevel: UserPrivacyLevel.public,
+          );
+          expect(user.canBeContacted, true);
+        },
+      );
 
-      test('canBeContacted returns true when phone is shown and not private', () {
-        final user = testUser.copyWith(
-          showEmail: false,
-          showPhoneNumber: true,
-          privacyLevel: UserPrivacyLevel.public,
-        );
-        expect(user.canBeContacted, true);
-      });
+      test(
+        'canBeContacted returns true when phone is shown and not private',
+        () {
+          final user = testUser.copyWith(
+            showEmail: false,
+            showPhoneNumber: true,
+            privacyLevel: UserPrivacyLevel.public,
+          );
+          expect(user.canBeContacted, true);
+        },
+      );
 
       test('canBeContacted returns false when private', () {
         final user = testUser.copyWith(
@@ -536,10 +545,7 @@ void main() {
       });
 
       test('addFriend does not add duplicate friend', () {
-        final user = testUser.copyWith(
-          friendIds: ['friend1'],
-          friendCount: 1,
-        );
+        final user = testUser.copyWith(friendIds: ['friend1'], friendCount: 1);
         final updatedUser = user.addFriend('friend1');
 
         expect(updatedUser.friendIds, ['friend1']);
@@ -563,23 +569,23 @@ void main() {
         );
       });
 
-      test('removeFriend removes friend from friendIds and decrements count', () {
-        final user = testUser.copyWith(
-          friendIds: ['friend1', 'friend2'],
-          friendCount: 2,
-        );
-        final updatedUser = user.removeFriend('friend1');
+      test(
+        'removeFriend removes friend from friendIds and decrements count',
+        () {
+          final user = testUser.copyWith(
+            friendIds: ['friend1', 'friend2'],
+            friendCount: 2,
+          );
+          final updatedUser = user.removeFriend('friend1');
 
-        expect(updatedUser.friendIds, ['friend2']);
-        expect(updatedUser.friendCount, 1);
-        expect(updatedUser.friendsLastUpdated, isNotNull);
-      });
+          expect(updatedUser.friendIds, ['friend2']);
+          expect(updatedUser.friendCount, 1);
+          expect(updatedUser.friendsLastUpdated, isNotNull);
+        },
+      );
 
       test('removeFriend does nothing when friend not in list', () {
-        final user = testUser.copyWith(
-          friendIds: ['friend1'],
-          friendCount: 1,
-        );
+        final user = testUser.copyWith(friendIds: ['friend1'], friendCount: 1);
         final updatedUser = user.removeFriend('friend2');
 
         expect(updatedUser.friendIds, ['friend1']);
@@ -625,19 +631,20 @@ void main() {
       });
 
       test('isFriend returns false when userId is not in friendIds', () {
-        final user = testUser.copyWith(
-          friendIds: ['friend1', 'friend2'],
-        );
+        final user = testUser.copyWith(friendIds: ['friend1', 'friend2']);
 
         expect(user.isFriend('friend3'), false);
         expect(user.isFriend('nonexistent'), false);
       });
 
-      test('needsFriendCacheRefresh returns true when friendsLastUpdated is null', () {
-        final user = testUser.copyWith(friendsLastUpdated: null);
+      test(
+        'needsFriendCacheRefresh returns true when friendsLastUpdated is null',
+        () {
+          final user = testUser.copyWith(friendsLastUpdated: null);
 
-        expect(user.needsFriendCacheRefresh, true);
-      });
+          expect(user.needsFriendCacheRefresh, true);
+        },
+      );
 
       test('needsFriendCacheRefresh returns false when cache is fresh', () {
         final user = testUser.copyWith(
@@ -647,22 +654,32 @@ void main() {
         expect(user.needsFriendCacheRefresh, false);
       });
 
-      test('needsFriendCacheRefresh returns true when cache is stale (>24 hours)', () {
-        final user = testUser.copyWith(
-          friendsLastUpdated: DateTime.now().subtract(const Duration(hours: 25)),
-        );
+      test(
+        'needsFriendCacheRefresh returns true when cache is stale (>24 hours)',
+        () {
+          final user = testUser.copyWith(
+            friendsLastUpdated: DateTime.now().subtract(
+              const Duration(hours: 25),
+            ),
+          );
 
-        expect(user.needsFriendCacheRefresh, true);
-      });
+          expect(user.needsFriendCacheRefresh, true);
+        },
+      );
 
-      test('needsFriendCacheRefresh returns false when exactly 24 hours old', () {
-        final user = testUser.copyWith(
-          friendsLastUpdated: DateTime.now().subtract(const Duration(hours: 24)),
-        );
+      test(
+        'needsFriendCacheRefresh returns false when exactly 24 hours old',
+        () {
+          final user = testUser.copyWith(
+            friendsLastUpdated: DateTime.now().subtract(
+              const Duration(hours: 24),
+            ),
+          );
 
-        // Should be false because we check for > 24 hours
-        expect(user.needsFriendCacheRefresh, false);
-      });
+          // Should be false because we check for > 24 hours
+          expect(user.needsFriendCacheRefresh, false);
+        },
+      );
     });
 
     // Story 14.5.3: Tests for ELO rating fields
@@ -809,10 +826,7 @@ void main() {
       });
 
       test('handles decimal ELO ratings', () {
-        final user = testUser.copyWith(
-          eloRating: 1632.567,
-          eloPeak: 1700.123,
-        );
+        final user = testUser.copyWith(eloRating: 1632.567, eloPeak: 1700.123);
 
         expect(user.eloRating, 1632.567);
         expect(user.eloPeak, 1700.123);
@@ -882,7 +896,7 @@ void main() {
           lastGameDate: lastGame,
           teammateStats: {
             'player1': {'gamesPlayed': 10, 'gamesWon': 7},
-            'player2': {'gamesPlayed': 5, 'gamesWon': 3}
+            'player2': {'gamesPlayed': 5, 'gamesWon': 3},
           },
         );
 
@@ -894,7 +908,7 @@ void main() {
         expect(json['lastGameDate'], isA<Timestamp>());
         expect(json['teammateStats'], {
           'player1': {'gamesPlayed': 10, 'gamesWon': 7},
-          'player2': {'gamesPlayed': 5, 'gamesWon': 3}
+          'player2': {'gamesPlayed': 5, 'gamesWon': 3},
         });
       });
 
@@ -910,7 +924,7 @@ void main() {
           'recentGameIds': ['game5', 'game4', 'game3'],
           'lastGameDate': Timestamp.fromDate(lastGame),
           'teammateStats': {
-            'teammate1': {'gamesPlayed': 8, 'gamesWon': 6}
+            'teammate1': {'gamesPlayed': 8, 'gamesWon': 6},
           },
         };
 
@@ -921,31 +935,34 @@ void main() {
         expect(user.recentGameIds, ['game5', 'game4', 'game3']);
         expect(user.lastGameDate, lastGame);
         expect(user.teammateStats, {
-          'teammate1': {'gamesPlayed': 8, 'gamesWon': 6}
+          'teammate1': {'gamesPlayed': 8, 'gamesWon': 6},
         });
       });
 
-      test('backward compatibility - missing new stats fields default correctly', () {
-        final json = {
-          'uid': 'legacy-user',
-          'email': 'legacy@test.com',
-          'isEmailVerified': true,
-          'isAnonymous': false,
-          'gamesPlayed': 5,
-          'gamesWon': 3,
-          // No new stats fields
-        };
+      test(
+        'backward compatibility - missing new stats fields default correctly',
+        () {
+          final json = {
+            'uid': 'legacy-user',
+            'email': 'legacy@test.com',
+            'isEmailVerified': true,
+            'isAnonymous': false,
+            'gamesPlayed': 5,
+            'gamesWon': 3,
+            // No new stats fields
+          };
 
-        final user = UserModel.fromJson(json);
+          final user = UserModel.fromJson(json);
 
-        expect(user.gamesPlayed, 5);
-        expect(user.gamesWon, 3);
-        expect(user.gamesLost, 0);
-        expect(user.currentStreak, 0);
-        expect(user.recentGameIds, []);
-        expect(user.lastGameDate, null);
-        expect(user.teammateStats, {});
-      });
+          expect(user.gamesPlayed, 5);
+          expect(user.gamesWon, 3);
+          expect(user.gamesLost, 0);
+          expect(user.currentStreak, 0);
+          expect(user.recentGameIds, []);
+          expect(user.lastGameDate, null);
+          expect(user.teammateStats, {});
+        },
+      );
 
       test('toFirestore includes new stats fields', () {
         final lastGame = DateTime(2024, 12, 8, 10, 0, 0);
@@ -954,7 +971,9 @@ void main() {
           currentStreak: 3,
           recentGameIds: ['g1', 'g2'],
           lastGameDate: lastGame,
-          teammateStats: {'p1': {'gamesPlayed': 2, 'gamesWon': 1}},
+          teammateStats: {
+            'p1': {'gamesPlayed': 2, 'gamesWon': 1},
+          },
         );
 
         final firestoreData = user.toFirestore();
@@ -963,7 +982,9 @@ void main() {
         expect(firestoreData['currentStreak'], 3);
         expect(firestoreData['recentGameIds'], ['g1', 'g2']);
         expect(firestoreData['lastGameDate'], isA<Timestamp>());
-        expect(firestoreData['teammateStats'], {'p1': {'gamesPlayed': 2, 'gamesWon': 1}});
+        expect(firestoreData['teammateStats'], {
+          'p1': {'gamesPlayed': 2, 'gamesWon': 1},
+        });
         expect(firestoreData.containsKey('uid'), false);
       });
 
@@ -980,7 +1001,7 @@ void main() {
           'lastGameDate': Timestamp.fromDate(lastGame),
           'teammateStats': {
             'mate1': {'gamesPlayed': 15, 'gamesWon': 10},
-            'mate2': {'gamesPlayed': 8, 'gamesWon': 8}
+            'mate2': {'gamesPlayed': 8, 'gamesWon': 8},
           },
         };
 
@@ -994,7 +1015,7 @@ void main() {
         expect(user.lastGameDate, lastGame);
         expect(user.teammateStats, {
           'mate1': {'gamesPlayed': 15, 'gamesWon': 10},
-          'mate2': {'gamesPlayed': 8, 'gamesWon': 8}
+          'mate2': {'gamesPlayed': 8, 'gamesWon': 8},
         });
       });
 
@@ -1005,14 +1026,18 @@ void main() {
           currentStreak: 7,
           recentGameIds: ['new-g1', 'new-g2'],
           lastGameDate: newDate,
-          teammateStats: {'new-mate': {'gamesPlayed': 1, 'gamesWon': 1}},
+          teammateStats: {
+            'new-mate': {'gamesPlayed': 1, 'gamesWon': 1},
+          },
         );
 
         expect(updatedUser.gamesLost, 5);
         expect(updatedUser.currentStreak, 7);
         expect(updatedUser.recentGameIds, ['new-g1', 'new-g2']);
         expect(updatedUser.lastGameDate, newDate);
-        expect(updatedUser.teammateStats, {'new-mate': {'gamesPlayed': 1, 'gamesWon': 1}});
+        expect(updatedUser.teammateStats, {
+          'new-mate': {'gamesPlayed': 1, 'gamesWon': 1},
+        });
         // Other fields unchanged
         expect(updatedUser.uid, testUser.uid);
         expect(updatedUser.email, testUser.email);
@@ -1032,7 +1057,7 @@ void main() {
         final stats = {
           'player-1': {'gamesPlayed': 20, 'gamesWon': 15},
           'player-2': {'gamesPlayed': 10, 'gamesWon': 8},
-          'player-3': {'gamesPlayed': 5, 'gamesWon': 2}
+          'player-3': {'gamesPlayed': 5, 'gamesWon': 2},
         };
 
         final user = testUser.copyWith(teammateStats: stats);
@@ -1117,21 +1142,24 @@ void main() {
         }
       });
 
-      test('backward compatibility - missing account status fields default correctly', () {
-        final json = {
-          'uid': 'legacy-user',
-          'email': 'legacy@test.com',
-          'isEmailVerified': true,
-          'isAnonymous': false,
-        };
+      test(
+        'backward compatibility - missing account status fields default correctly',
+        () {
+          final json = {
+            'uid': 'legacy-user',
+            'email': 'legacy@test.com',
+            'isEmailVerified': true,
+            'isAnonymous': false,
+          };
 
-        final user = UserModel.fromJson(json);
+          final user = UserModel.fromJson(json);
 
-        expect(user.accountStatus, AccountStatus.pendingVerification);
-        expect(user.emailVerifiedAt, null);
-        expect(user.gracePeriodExpiresAt, null);
-        expect(user.deletionScheduledAt, null);
-      });
+          expect(user.accountStatus, AccountStatus.pendingVerification);
+          expect(user.emailVerifiedAt, null);
+          expect(user.gracePeriodExpiresAt, null);
+          expect(user.deletionScheduledAt, null);
+        },
+      );
 
       test('toFirestore includes account status fields', () {
         final graceExpires = DateTime(2024, 6, 8, 10, 0, 0);
@@ -1419,7 +1447,6 @@ void main() {
         expect(updated.gender, UserGender.male);
       });
     });
-
   });
 }
 

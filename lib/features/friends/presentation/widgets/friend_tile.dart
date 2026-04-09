@@ -19,8 +19,9 @@ class FriendTile extends StatelessWidget {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: const Color(0xFFEACE6A).withValues(alpha: 0.25),
-        backgroundImage:
-            friend.photoUrl != null ? NetworkImage(friend.photoUrl!) : null,
+        backgroundImage: friend.photoUrl != null
+            ? NetworkImage(friend.photoUrl!)
+            : null,
         child: friend.photoUrl == null
             ? Text(
                 _getInitials(friend.displayNameOrEmail),

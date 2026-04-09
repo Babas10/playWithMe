@@ -13,10 +13,7 @@ class LoadGamesForGroup extends GamesListEvent {
   final String groupId;
   final String userId;
 
-  const LoadGamesForGroup({
-    required this.groupId,
-    required this.userId,
-  });
+  const LoadGamesForGroup({required this.groupId, required this.userId});
 
   @override
   List<Object?> get props => [groupId, userId];

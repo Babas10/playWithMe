@@ -12,6 +12,7 @@ import 'package:play_with_me/features/profile/presentation/bloc/profile_edit/pro
 
 // Mocktail mocks
 class MockAuthRepository extends Mock implements AuthRepository {}
+
 class MockUserRepository extends Mock implements UserRepository {}
 
 // Fake for testing
@@ -102,10 +103,12 @@ void main() {
         ),
         act: (bloc) {
           // Initialize with original values
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           // Change display name
           bloc.add(const ProfileEditEvent.displayNameChanged('Jane Smith'));
         },
@@ -131,10 +134,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jo'));
         },
         expect: () => [
@@ -160,10 +165,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged(''));
         },
         expect: () => [
@@ -189,10 +196,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(ProfileEditEvent.displayNameChanged('A' * 51));
         },
         expect: () => [
@@ -218,10 +227,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('John@Doe!'));
         },
         expect: () => [
@@ -249,13 +260,17 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
-          bloc.add(const ProfileEditEvent.photoUrlChanged(
-            'https://example.com/photo.jpg',
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
+          bloc.add(
+            const ProfileEditEvent.photoUrlChanged(
+              'https://example.com/photo.jpg',
+            ),
+          );
         },
         expect: () => [
           const ProfileEditState.loading(),
@@ -279,10 +294,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: 'https://example.com/old.jpg',
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: 'https://example.com/old.jpg',
+            ),
+          );
           bloc.add(const ProfileEditEvent.photoUrlChanged(''));
         },
         expect: () => [
@@ -307,10 +324,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.photoUrlChanged('not-a-url'));
         },
         expect: () => [
@@ -336,13 +355,15 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
-          bloc.add(const ProfileEditEvent.photoUrlChanged(
-            'https://example.com/photo',
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
+          bloc.add(
+            const ProfileEditEvent.photoUrlChanged('https://example.com/photo'),
+          );
         },
         expect: () => [
           const ProfileEditState.loading(),
@@ -368,14 +389,18 @@ void main() {
           when(() => mockAuthRepository.currentUser).thenReturn(
             FakeUserEntity(uid: 'user123', email: 'test@example.com'),
           );
-          when(() => mockUserRepository.updateUserProfile(
-                any(),
-                displayName: any(named: 'displayName'),
-              )).thenAnswer((_) async {});
-          when(() => mockAuthRepository.updateUserProfile(
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              )).thenAnswer((_) async {});
+          when(
+            () => mockUserRepository.updateUserProfile(
+              any(),
+              displayName: any(named: 'displayName'),
+            ),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
         },
         build: () => ProfileEditBloc(
@@ -383,10 +408,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jane Smith'));
           bloc.add(const ProfileEditEvent.saveRequested());
         },
@@ -409,15 +436,19 @@ void main() {
           const ProfileEditState.success(),
         ],
         verify: (_) {
-          verify(() => mockUserRepository.updateUserProfile(
-                'user123',
-                displayName: 'Jane Smith',
-                photoUrl: null,
-              )).called(1);
-          verify(() => mockAuthRepository.updateUserProfile(
-                displayName: 'Jane Smith',
-                photoUrl: null,
-              )).called(1);
+          verify(
+            () => mockUserRepository.updateUserProfile(
+              'user123',
+              displayName: 'Jane Smith',
+              photoUrl: null,
+            ),
+          ).called(1);
+          verify(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: 'Jane Smith',
+              photoUrl: null,
+            ),
+          ).called(1);
           verify(() => mockAuthRepository.reloadUser()).called(1);
         },
       );
@@ -428,15 +459,19 @@ void main() {
           when(() => mockAuthRepository.currentUser).thenReturn(
             FakeUserEntity(uid: 'user123', email: 'test@example.com'),
           );
-          when(() => mockUserRepository.updateUserProfile(
-                any(),
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              )).thenAnswer((_) async {});
-          when(() => mockAuthRepository.updateUserProfile(
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              )).thenAnswer((_) async {});
+          when(
+            () => mockUserRepository.updateUserProfile(
+              any(),
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          ).thenAnswer((_) async {});
+          when(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          ).thenAnswer((_) async {});
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
         },
         build: () => ProfileEditBloc(
@@ -444,12 +479,18 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jane Smith'));
-          bloc.add(const ProfileEditEvent.photoUrlChanged('https://example.com/photo.jpg'));
+          bloc.add(
+            const ProfileEditEvent.photoUrlChanged(
+              'https://example.com/photo.jpg',
+            ),
+          );
           bloc.add(const ProfileEditEvent.saveRequested());
         },
         expect: () => [
@@ -476,15 +517,19 @@ void main() {
           const ProfileEditState.success(),
         ],
         verify: (_) {
-          verify(() => mockUserRepository.updateUserProfile(
-                'user123',
-                displayName: 'Jane Smith',
-                photoUrl: 'https://example.com/photo.jpg',
-              )).called(1);
-          verify(() => mockAuthRepository.updateUserProfile(
-                displayName: 'Jane Smith',
-                photoUrl: 'https://example.com/photo.jpg',
-              )).called(1);
+          verify(
+            () => mockUserRepository.updateUserProfile(
+              'user123',
+              displayName: 'Jane Smith',
+              photoUrl: 'https://example.com/photo.jpg',
+            ),
+          ).called(1);
+          verify(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: 'Jane Smith',
+              photoUrl: 'https://example.com/photo.jpg',
+            ),
+          ).called(1);
           verify(() => mockAuthRepository.reloadUser()).called(1);
         },
       );
@@ -496,10 +541,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.saveRequested());
         },
         expect: () => [
@@ -512,10 +559,12 @@ void main() {
           const ProfileEditState.success(),
         ],
         verify: (_) {
-          verifyNever(() => mockAuthRepository.updateUserProfile(
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              ));
+          verifyNever(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          );
         },
       );
 
@@ -526,10 +575,12 @@ void main() {
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jo'));
           bloc.add(const ProfileEditEvent.saveRequested());
         },
@@ -551,10 +602,12 @@ void main() {
           // (BLoC deduplicates). The important thing is that updateUserProfile is never called.
         ],
         verify: (_) {
-          verifyNever(() => mockAuthRepository.updateUserProfile(
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              ));
+          verifyNever(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          );
         },
       );
 
@@ -564,20 +617,24 @@ void main() {
           when(() => mockAuthRepository.currentUser).thenReturn(
             FakeUserEntity(uid: 'user123', email: 'test@example.com'),
           );
-          when(() => mockUserRepository.updateUserProfile(
-                any(),
-                displayName: any(named: 'displayName'),
-              )).thenThrow(Exception('Network error'));
+          when(
+            () => mockUserRepository.updateUserProfile(
+              any(),
+              displayName: any(named: 'displayName'),
+            ),
+          ).thenThrow(Exception('Network error'));
         },
         build: () => ProfileEditBloc(
           authRepository: mockAuthRepository,
           userRepository: mockUserRepository,
         ),
         act: (bloc) {
-          bloc.add(const ProfileEditEvent.started(
-            currentDisplayName: 'John Doe',
-            currentPhotoUrl: null,
-          ));
+          bloc.add(
+            const ProfileEditEvent.started(
+              currentDisplayName: 'John Doe',
+              currentPhotoUrl: null,
+            ),
+          );
           bloc.add(const ProfileEditEvent.displayNameChanged('Jane Smith'));
           bloc.add(const ProfileEditEvent.saveRequested());
         },
@@ -604,15 +661,19 @@ void main() {
           ),
         ],
         verify: (_) {
-          verify(() => mockUserRepository.updateUserProfile(
-                'user123',
-                displayName: 'Jane Smith',
-              )).called(1);
+          verify(
+            () => mockUserRepository.updateUserProfile(
+              'user123',
+              displayName: 'Jane Smith',
+            ),
+          ).called(1);
           // authRepository.updateUserProfile should never be called since userRepository fails first
-          verifyNever(() => mockAuthRepository.updateUserProfile(
-                displayName: any(named: 'displayName'),
-                photoUrl: any(named: 'photoUrl'),
-              ));
+          verifyNever(
+            () => mockAuthRepository.updateUserProfile(
+              displayName: any(named: 'displayName'),
+              photoUrl: any(named: 'photoUrl'),
+            ),
+          );
         },
       );
     });
@@ -630,9 +691,7 @@ void main() {
           hasUnsavedChanges: true,
         ),
         act: (bloc) => bloc.add(const ProfileEditEvent.cancelled()),
-        expect: () => [
-          const ProfileEditState.success(),
-        ],
+        expect: () => [const ProfileEditState.success()],
       );
     });
   });

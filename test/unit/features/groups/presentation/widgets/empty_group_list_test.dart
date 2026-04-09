@@ -15,9 +15,7 @@ void main() {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [Locale('en')],
-      home: Scaffold(
-        body: EmptyGroupList(),
-      ),
+      home: Scaffold(body: EmptyGroupList()),
     );
   }
 
@@ -41,7 +39,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Create or join groups to start organizing beach volleyball games with your friends!'),
+        find.text(
+          'Create or join groups to start organizing beach volleyball games with your friends!',
+        ),
         findsOneWidget,
       );
     });
@@ -50,7 +50,10 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      expect(find.text('Use the Create Group button below to get started.'), findsOneWidget);
+      expect(
+        find.text('Use the Create Group button below to get started.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('is centered on screen', (tester) async {
@@ -79,14 +82,19 @@ void main() {
       expect(icon.size, 96);
     });
 
-    testWidgets('all content is visible without scrolling on standard device', (tester) async {
+    testWidgets('all content is visible without scrolling on standard device', (
+      tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
       // Verify all key elements are rendered
       expect(find.byIcon(Icons.groups_outlined), findsOneWidget);
       expect(find.text("You're not part of any group yet"), findsOneWidget);
-      expect(find.text('Use the Create Group button below to get started.'), findsOneWidget);
+      expect(
+        find.text('Use the Create Group button below to get started.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('uses padding around content', (tester) async {
@@ -94,10 +102,9 @@ void main() {
       await tester.pumpAndSettle();
 
       final padding = tester.widget<Padding>(
-        find.descendant(
-          of: find.byType(Center),
-          matching: find.byType(Padding),
-        ).first,
+        find
+            .descendant(of: find.byType(Center), matching: find.byType(Padding))
+            .first,
       );
       expect(padding.padding, const EdgeInsets.all(32.0));
     });

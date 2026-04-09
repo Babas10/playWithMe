@@ -27,10 +27,7 @@ void main() {
       ],
       supportedLocales: const [Locale('en')],
       home: Scaffold(
-        body: GroupListItem(
-          group: group,
-          onTap: onTap ?? () {},
-        ),
+        body: GroupListItem(group: group, onTap: onTap ?? () {}),
       ),
     );
   }
@@ -144,7 +141,9 @@ void main() {
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
     });
 
-    testWidgets('does not display privacy label for private groups', (tester) async {
+    testWidgets('does not display privacy label for private groups', (
+      tester,
+    ) async {
       final group = GroupModel(
         id: 'group-1',
         name: 'Beach Volleyball Crew',
@@ -211,7 +210,9 @@ void main() {
       expect(find.text('BV'), findsOneWidget);
     });
 
-    testWidgets('displays single letter initial for one-word group name', (tester) async {
+    testWidgets('displays single letter initial for one-word group name', (
+      tester,
+    ) async {
       final group = GroupModel(
         id: 'group-1',
         name: 'Volleyball',
@@ -236,10 +237,9 @@ void main() {
         createdAt: DateTime(2024, 1, 1),
       );
 
-      await tester.pumpWidget(createWidgetUnderTest(
-        group: group,
-        onTap: () => tapped = true,
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(group: group, onTap: () => tapped = true),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(InkWell));
@@ -265,7 +265,8 @@ void main() {
     testWidgets('truncates long group names with ellipsis', (tester) async {
       final group = GroupModel(
         id: 'group-1',
-        name: 'This is a very long group name that should be truncated with ellipsis when displayed in the UI',
+        name:
+            'This is a very long group name that should be truncated with ellipsis when displayed in the UI',
         createdBy: 'user-123',
         createdAt: DateTime(2024, 1, 1),
       );
@@ -284,7 +285,8 @@ void main() {
       final group = GroupModel(
         id: 'group-1',
         name: 'Beach Volleyball',
-        description: 'This is a very long description that should be truncated with ellipsis after two lines when displayed in the UI to prevent overflow',
+        description:
+            'This is a very long description that should be truncated with ellipsis after two lines when displayed in the UI to prevent overflow',
         createdBy: 'user-123',
         createdAt: DateTime(2024, 1, 1),
       );

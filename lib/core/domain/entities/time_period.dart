@@ -1,11 +1,6 @@
 /// Time period options for filtering ELO rating history (Story 302.1).
 /// Used to display rating progress over different time ranges.
-enum TimePeriod {
-  thirtyDays,
-  ninetyDays,
-  oneYear,
-  allTime,
-}
+enum TimePeriod { thirtyDays, ninetyDays, oneYear, allTime }
 
 /// Extension methods for TimePeriod enum
 extension TimePeriodExtension on TimePeriod {

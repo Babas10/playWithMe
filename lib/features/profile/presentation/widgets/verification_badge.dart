@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 
 /// A widget that displays an email verification status badge
 class VerificationBadge extends StatelessWidget {
-  const VerificationBadge({
-    super.key,
-    required this.isVerified,
-  });
+  const VerificationBadge({super.key, required this.isVerified});
 
   final bool isVerified;
 
@@ -23,11 +20,7 @@ class VerificationBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.verified,
-              size: 16,
-              color: theme.colorScheme.primary,
-            ),
+            Icon(Icons.verified, size: 16, color: theme.colorScheme.primary),
             const SizedBox(width: 4),
             Text(
               'Verified',

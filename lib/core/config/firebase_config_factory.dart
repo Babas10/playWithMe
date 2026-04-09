@@ -24,7 +24,7 @@ class FirebaseConfigFactory {
         'Development Firebase configuration not found!\n'
         'Please run: dart tools/generate_firebase_config.dart dev\n'
         'Make sure you have placed google-services.json and GoogleService-Info.plist files in the correct locations.\n'
-        'Error: $e'
+        'Error: $e',
       );
     }
   }
@@ -39,7 +39,7 @@ class FirebaseConfigFactory {
         'Production Firebase configuration not found!\n'
         'Please run: dart tools/generate_firebase_config.dart prod\n'
         'Make sure you have placed google-services.json and GoogleService-Info.plist files in the correct locations.\n'
-        'Error: $e'
+        'Error: $e',
       );
     }
   }
@@ -48,6 +48,8 @@ class FirebaseConfigFactory {
   static FirebaseConfigBase _loadGeneratedConfig(String environment) {
     // This will be dynamically imported based on generated files
     // The actual implementation will depend on the generated config classes
-    throw Exception('Generated config for $environment not found. Run the config generation tool first.');
+    throw Exception(
+      'Generated config for $environment not found. Run the config generation tool first.',
+    );
   }
 }

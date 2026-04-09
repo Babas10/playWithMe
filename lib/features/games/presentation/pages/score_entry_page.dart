@@ -20,21 +20,18 @@ class ScoreEntryPage extends StatelessWidget {
   final String gameId;
   final ScoreEntryBloc? scoreEntryBloc;
 
-  const ScoreEntryPage({
-    super.key,
-    required this.gameId,
-    this.scoreEntryBloc,
-  });
+  const ScoreEntryPage({super.key, required this.gameId, this.scoreEntryBloc});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
           scoreEntryBloc ??
-          ScoreEntryBloc(
-            gameRepository: sl<GameRepository>(),
-            userRepository: sl<UserRepository>(),
-          )..add(LoadGameForScoreEntry(gameId: gameId)),
+                ScoreEntryBloc(
+                  gameRepository: sl<GameRepository>(),
+                  userRepository: sl<UserRepository>(),
+                )
+            ..add(LoadGameForScoreEntry(gameId: gameId)),
       child: const _ScoreEntryView(),
     );
   }
@@ -47,10 +44,7 @@ class _ScoreEntryView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: PlayWithMeAppBar.build(
-        context: context,
-        title: l10n.enterScores,
-      ),
+      appBar: PlayWithMeAppBar.build(context: context, title: l10n.enterScores),
       body: BlocConsumer<ScoreEntryBloc, ScoreEntryState>(
         listener: (context, state) {
           if (state is ScoreEntrySaved) {
@@ -76,7 +70,11 @@ class _ScoreEntryView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       state.message,
@@ -93,7 +91,9 @@ class _ScoreEntryView extends StatelessWidget {
             if (state.gameCount == null) {
               return _GameCountSelector(
                 onGameCountSelected: (count) {
-                  context.read<ScoreEntryBloc>().add(SetGameCount(count: count));
+                  context.read<ScoreEntryBloc>().add(
+                    SetGameCount(count: count),
+                  );
                 },
               );
             }
@@ -159,7 +159,10 @@ class _GameCountSelector extends StatelessWidget {
                   ),
                   child: Text(
                     '$count',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               );
@@ -205,8 +208,8 @@ class _ScoreEntryForm extends StatelessWidget {
             final authState = context.read<AuthenticationBloc>().state;
             if (authState is AuthenticationAuthenticated) {
               context.read<ScoreEntryBloc>().add(
-                    SaveScores(userId: authState.user.uid),
-                  );
+                SaveScores(userId: authState.user.uid),
+              );
             }
           },
         ),
@@ -245,9 +248,9 @@ class _GameCard extends StatelessWidget {
                 Text(
                   'Game ${gameIndex + 1}',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
                 ),
                 if (gameData.isComplete)
                   Container(
@@ -274,11 +277,8 @@ class _GameCard extends StatelessWidget {
                 selectedTeams: gameData.teams,
                 onTeamsSelected: (teams) {
                   context.read<ScoreEntryBloc>().add(
-                        SelectGameTeams(
-                          gameIndex: gameIndex,
-                          teams: teams,
-                        ),
-                      );
+                    SelectGameTeams(gameIndex: gameIndex, teams: teams),
+                  );
                 },
               ),
             const SizedBox(height: 12),
@@ -317,10 +317,7 @@ class _GameFormatSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(
-          'Format:',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text('Format:', style: Theme.of(context).textTheme.bodyMedium),
         const SizedBox(width: 12),
         Expanded(
           child: SegmentedButton<int>(
@@ -332,11 +329,11 @@ class _GameFormatSelector extends StatelessWidget {
             selected: {currentFormat},
             onSelectionChanged: (selected) {
               context.read<ScoreEntryBloc>().add(
-                    SetGameFormat(
-                      gameIndex: gameIndex,
-                      numberOfSets: selected.first,
-                    ),
-                  );
+                SetGameFormat(
+                  gameIndex: gameIndex,
+                  numberOfSets: selected.first,
+                ),
+              );
             },
           ),
         ),
@@ -442,55 +439,80 @@ class _SetScoreInputState extends State<_SetScoreInput> {
               children: [
                 Expanded(
                   child: TextField(
-                    key: Key('team_a_score_${widget.gameIndex}_${widget.setIndex}'),
+                    key: Key(
+                      'team_a_score_${widget.gameIndex}_${widget.setIndex}',
+                    ),
                     focusNode: _teamAFocusNode,
                     decoration: InputDecoration(
                       labelText: 'Team A',
                       floatingLabelStyle: TextStyle(
-                        color: _teamAFocused ? AppColors.secondary : Colors.grey,
+                        color: _teamAFocused
+                            ? AppColors.secondary
+                            : Colors.grey,
                       ),
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.primary, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.primary,
+                          width: 2,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     controller: _teamAController,
                     onChanged: (value) {
-                      final teamAPoints = value.isEmpty ? null : int.tryParse(value);
+                      final teamAPoints = value.isEmpty
+                          ? null
+                          : int.tryParse(value);
                       final teamBPoints = _teamBController.text.isEmpty
                           ? null
                           : int.tryParse(_teamBController.text);
                       context.read<ScoreEntryBloc>().add(
-                            UpdateSetScore(
-                              gameIndex: widget.gameIndex,
-                              setIndex: widget.setIndex,
-                              teamAPoints: teamAPoints,
-                              teamBPoints: teamBPoints,
-                            ),
-                          );
+                        UpdateSetScore(
+                          gameIndex: widget.gameIndex,
+                          setIndex: widget.setIndex,
+                          teamAPoints: teamAPoints,
+                          teamBPoints: teamBPoints,
+                        ),
+                      );
                     },
                   ),
                 ),
                 const SizedBox(width: 4),
-                const Text('-', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text(
+                  '-',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: TextField(
-                    key: Key('team_b_score_${widget.gameIndex}_${widget.setIndex}'),
+                    key: Key(
+                      'team_b_score_${widget.gameIndex}_${widget.setIndex}',
+                    ),
                     focusNode: _teamBFocusNode,
                     decoration: InputDecoration(
                       labelText: 'Team B',
                       floatingLabelStyle: TextStyle(
-                        color: _teamBFocused ? AppColors.secondary : Colors.grey,
+                        color: _teamBFocused
+                            ? AppColors.secondary
+                            : Colors.grey,
                       ),
                       border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.primary, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.primary,
+                          width: 2,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -499,15 +521,17 @@ class _SetScoreInputState extends State<_SetScoreInput> {
                       final teamAPoints = _teamAController.text.isEmpty
                           ? null
                           : int.tryParse(_teamAController.text);
-                      final teamBPoints = value.isEmpty ? null : int.tryParse(value);
+                      final teamBPoints = value.isEmpty
+                          ? null
+                          : int.tryParse(value);
                       context.read<ScoreEntryBloc>().add(
-                            UpdateSetScore(
-                              gameIndex: widget.gameIndex,
-                              setIndex: widget.setIndex,
-                              teamAPoints: teamAPoints,
-                              teamBPoints: teamBPoints,
-                            ),
-                          );
+                        UpdateSetScore(
+                          gameIndex: widget.gameIndex,
+                          setIndex: widget.setIndex,
+                          teamAPoints: teamAPoints,
+                          teamBPoints: teamBPoints,
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -532,12 +556,12 @@ class _SetScoreInputState extends State<_SetScoreInput> {
                     ),
                   )
                 : widget.setData.isComplete
-                    ? Tooltip(
-                        message: widget.setData.validationError ?? 'Invalid score',
-                        triggerMode: TooltipTriggerMode.tap,
-                        child: const Icon(Icons.error, color: Colors.red, size: 20),
-                      )
-                    : null,
+                ? Tooltip(
+                    message: widget.setData.validationError ?? 'Invalid score',
+                    triggerMode: TooltipTriggerMode.tap,
+                    child: const Icon(Icons.error, color: Colors.red, size: 20),
+                  )
+                : null,
           ),
         ],
       ),
@@ -588,12 +612,12 @@ class _SaveButton extends StatelessWidget {
                   isTied
                       ? l10n.resultTie
                       : overallWinner == 'teamA'
-                          ? l10n.overallWinnerTeamA
-                          : l10n.overallWinnerTeamB,
+                      ? l10n.overallWinnerTeamA
+                      : l10n.overallWinnerTeamB,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
                 ),
               ),
             SizedBox(
@@ -610,7 +634,10 @@ class _SaveButton extends StatelessWidget {
                   canSave
                       ? l10n.saveScores
                       : l10n.completeGamesToContinue(gamesWon, totalGames),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

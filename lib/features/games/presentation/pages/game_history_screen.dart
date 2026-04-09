@@ -16,11 +16,7 @@ class GameHistoryScreen extends StatefulWidget {
   final String? groupId;
   final String userId;
 
-  const GameHistoryScreen({
-    super.key,
-    this.groupId,
-    required this.userId,
-  });
+  const GameHistoryScreen({super.key, this.groupId, required this.userId});
 
   @override
   State<GameHistoryScreen> createState() => _GameHistoryScreenState();
@@ -110,8 +106,8 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
 
   void _applyFilter(GameHistoryFilter filter) {
     context.read<GameHistoryBloc>().add(
-          GameHistoryEvent.filterChanged(filter: filter),
-        );
+      GameHistoryEvent.filterChanged(filter: filter),
+    );
   }
 
   Future<void> _showDateRangePicker() async {
@@ -146,11 +142,8 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
       _endDate = null;
     });
     context.read<GameHistoryBloc>().add(
-          const GameHistoryEvent.dateRangeChanged(
-            startDate: null,
-            endDate: null,
-          ),
-        );
+      const GameHistoryEvent.dateRangeChanged(startDate: null, endDate: null),
+    );
   }
 
   @override
@@ -174,60 +167,60 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
         ],
       ),
       body: BlocProvider(
-        create: (context) => GameHistoryBloc(
-          gameRepository: context.read<GameRepository>(),
-        )..add(GameHistoryEvent.load(
-            groupId: widget.groupId,
-            userId: widget.userId,
-          )),
+        create: (context) =>
+            GameHistoryBloc(gameRepository: context.read<GameRepository>())
+              ..add(
+                GameHistoryEvent.load(
+                  groupId: widget.groupId,
+                  userId: widget.userId,
+                ),
+              ),
         child: BlocBuilder<GameHistoryBloc, GameHistoryState>(
           builder: (context, state) {
             return state.when(
-              initial: () => Center(
-                child: Text(l10n.selectFiltersToView),
-              ),
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              loaded: (games, hasMore, filter, startDate, endDate,
-                  isLoadingMore) {
-                return Column(
-                  children: [
-                    // Active filters display
-                    if (startDate != null || filter != GameHistoryFilter.all)
-                      _buildActiveFiltersBar(filter, startDate, endDate),
+              initial: () => Center(child: Text(l10n.selectFiltersToView)),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              loaded:
+                  (games, hasMore, filter, startDate, endDate, isLoadingMore) {
+                    return Column(
+                      children: [
+                        // Active filters display
+                        if (startDate != null ||
+                            filter != GameHistoryFilter.all)
+                          _buildActiveFiltersBar(filter, startDate, endDate),
 
-                    // Games list
-                    Expanded(
-                      child: games.isEmpty
-                          ? _buildEmptyState()
-                          : RefreshIndicator(
-                              onRefresh: _onRefresh,
-                              child: ListView.builder(
-                                controller: _scrollController,
-                                itemCount: games.length + (hasMore ? 1 : 0),
-                                itemBuilder: (context, index) {
-                                  if (index >= games.length) {
-                                    return const Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(16),
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
-                                  }
+                        // Games list
+                        Expanded(
+                          child: games.isEmpty
+                              ? _buildEmptyState()
+                              : RefreshIndicator(
+                                  onRefresh: _onRefresh,
+                                  child: ListView.builder(
+                                    controller: _scrollController,
+                                    itemCount: games.length + (hasMore ? 1 : 0),
+                                    itemBuilder: (context, index) {
+                                      if (index >= games.length) {
+                                        return const Center(
+                                          child: Padding(
+                                            padding: EdgeInsets.all(16),
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                      }
 
-                                  final game = games[index];
-                                  return GameHistoryCard(
-                                    game: game,
-                                    onTap: () => _navigateToGameDetail(game.id),
-                                  );
-                                },
-                              ),
-                            ),
-                    ),
-                  ],
-                );
-              },
+                                      final game = games[index];
+                                      return GameHistoryCard(
+                                        game: game,
+                                        onTap: () =>
+                                            _navigateToGameDetail(game.id),
+                                      );
+                                    },
+                                  ),
+                                ),
+                        ),
+                      ],
+                    );
+                  },
               error: (message, lastFilter) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -239,13 +232,12 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
                     ElevatedButton(
                       onPressed: () {
                         context.read<GameHistoryBloc>().add(
-                              GameHistoryEvent.load(
-                                groupId: widget.groupId,
-                                userId: widget.userId,
-                                filter:
-                                    lastFilter ?? GameHistoryFilter.all,
-                              ),
-                            );
+                          GameHistoryEvent.load(
+                            groupId: widget.groupId,
+                            userId: widget.userId,
+                            filter: lastFilter ?? GameHistoryFilter.all,
+                          ),
+                        );
                       },
                       child: Text(l10n.retry),
                     ),
@@ -311,8 +303,8 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
           Text(
             l10n.gamesWillAppearAfterCompleted,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -322,11 +314,7 @@ class _GameHistoryScreenState extends State<GameHistoryScreen> {
   void _navigateToGameDetail(String gameId) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => GameDetailsPage(
-          gameId: gameId,
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => GameDetailsPage(gameId: gameId)),
     );
   }
 }

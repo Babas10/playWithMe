@@ -59,8 +59,8 @@ void main() {
             .collection('groups')
             .doc(groupId)
             .update({
-          'memberIds': FieldValue.arrayUnion([userB.uid]),
-        });
+              'memberIds': FieldValue.arrayUnion([userB.uid]),
+            });
 
         // 3. Create a game
         final gameRef = FirebaseEmulatorHelper.firestore
@@ -169,9 +169,7 @@ void main() {
           'scheduledAt': Timestamp.fromDate(
             DateTime.now().add(const Duration(hours: 1)),
           ),
-          'location': {
-            'name': 'Test Location',
-          },
+          'location': {'name': 'Test Location'},
           'status': 'scheduled',
           'maxPlayers': 4,
           'minPlayers': 2,
@@ -257,11 +255,8 @@ void main() {
             .collection('groups')
             .doc(groupId)
             .update({
-          'memberIds': FieldValue.arrayUnion([
-            users[1].uid,
-            users[2].uid,
-          ]),
-        });
+              'memberIds': FieldValue.arrayUnion([users[1].uid, users[2].uid]),
+            });
 
         // 3. Create game
         final gameRef = FirebaseEmulatorHelper.firestore
@@ -314,8 +309,7 @@ void main() {
 
         // 6. Verify all stream listeners received the update
         for (var i = 0; i < 3; i++) {
-          final latestSnapshot = await streamControllers[i]
-              .stream
+          final latestSnapshot = await streamControllers[i].stream
               .firstWhere((snapshot) {
                 final data = snapshot.data() as Map<String, dynamic>;
                 return (data['playerIds'] as List).length == 3;
@@ -378,8 +372,8 @@ void main() {
             .collection('groups')
             .doc(groupId)
             .update({
-          'memberIds': FieldValue.arrayUnion([player.uid, waitlister.uid]),
-        });
+              'memberIds': FieldValue.arrayUnion([player.uid, waitlister.uid]),
+            });
 
         // 3. Create game with max 2 players
         final gameRef = FirebaseEmulatorHelper.firestore

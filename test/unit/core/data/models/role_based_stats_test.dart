@@ -119,16 +119,19 @@ void main() {
       );
     });
 
-    test('getInsight returns adaptability message for good weak-link performance', () {
-      const stats = RoleBasedStats(
-        weakLink: RoleStats(games: 10, wins: 7, winRate: 0.7),
-        carry: RoleStats(games: 5, wins: 2, winRate: 0.4),
-      );
-      expect(
-        stats.getInsight(),
-        '🌟 Great adaptability! You thrive with experienced partners.',
-      );
-    });
+    test(
+      'getInsight returns adaptability message for good weak-link performance',
+      () {
+        const stats = RoleBasedStats(
+          weakLink: RoleStats(games: 10, wins: 7, winRate: 0.7),
+          carry: RoleStats(games: 5, wins: 2, winRate: 0.4),
+        );
+        expect(
+          stats.getInsight(),
+          '🌟 Great adaptability! You thrive with experienced partners.',
+        );
+      },
+    );
 
     test('getInsight returns balanced message when balanced is dominant', () {
       const stats = RoleBasedStats(
@@ -136,23 +139,23 @@ void main() {
         carry: RoleStats(games: 2, wins: 1, winRate: 0.5),
         balanced: RoleStats(games: 15, wins: 10, winRate: 0.667),
       );
-      expect(
-        stats.getInsight(),
-        '⚖️ You play best in balanced matchups.',
-      );
+      expect(stats.getInsight(), '⚖️ You play best in balanced matchups.');
     });
 
-    test('getInsight returns default encouragement when no specific pattern', () {
-      const stats = RoleBasedStats(
-        weakLink: RoleStats(games: 5, wins: 2, winRate: 0.4),
-        carry: RoleStats(games: 5, wins: 2, winRate: 0.4),
-        balanced: RoleStats(games: 5, wins: 2, winRate: 0.4),
-      );
-      expect(
-        stats.getInsight(),
-        '📊 Keep playing to refine your role-based performance!',
-      );
-    });
+    test(
+      'getInsight returns default encouragement when no specific pattern',
+      () {
+        const stats = RoleBasedStats(
+          weakLink: RoleStats(games: 5, wins: 2, winRate: 0.4),
+          carry: RoleStats(games: 5, wins: 2, winRate: 0.4),
+          balanced: RoleStats(games: 5, wins: 2, winRate: 0.4),
+        );
+        expect(
+          stats.getInsight(),
+          '📊 Keep playing to refine your role-based performance!',
+        );
+      },
+    );
 
     test('fromJson creates instance correctly', () {
       final json = {
@@ -170,7 +173,6 @@ void main() {
       expect(stats.balanced.games, 3);
       expect(stats.balanced.wins, 2);
     });
-
   });
 
   group('RoleBasedStats edge cases', () {

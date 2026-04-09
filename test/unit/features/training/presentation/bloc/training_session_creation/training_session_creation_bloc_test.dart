@@ -45,10 +45,12 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'emits form state with group selected and no error',
         build: () => bloc,
-        act: (bloc) => bloc.add(const SelectTrainingGroup(
-          groupId: 'group-1',
-          groupName: 'Test Group',
-        )),
+        act: (bloc) => bloc.add(
+          const SelectTrainingGroup(
+            groupId: 'group-1',
+            groupName: 'Test Group',
+          ),
+        ),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
               .having((s) => s.groupId, 'groupId', 'group-1')
@@ -83,8 +85,11 @@ void main() {
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.startTimeError, 'startTimeError',
-                  'Start time must be in the future')
+              .having(
+                (s) => s.startTimeError,
+                'startTimeError',
+                'Start time must be in the future',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -96,8 +101,11 @@ void main() {
           SetStartTime(startTime: DateTime.now().add(const Duration(hours: 2))),
         ),
         expect: () => [
-          isA<TrainingSessionCreationFormState>()
-              .having((s) => s.startTimeError, 'startTimeError', null),
+          isA<TrainingSessionCreationFormState>().having(
+            (s) => s.startTimeError,
+            'startTimeError',
+            null,
+          ),
         ],
       );
 
@@ -109,9 +117,11 @@ void main() {
         ),
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
-          isA<TrainingSessionCreationFormState>()
-              .having((s) => s.startTimeError, 'startTimeError',
-                  'Start time must be in the future'),
+          isA<TrainingSessionCreationFormState>().having(
+            (s) => s.startTimeError,
+            'startTimeError',
+            'Start time must be in the future',
+          ),
         ],
       );
 
@@ -126,8 +136,11 @@ void main() {
           ),
         ),
         expect: () => [
-          isA<TrainingSessionCreationFormState>()
-              .having((s) => s.startTimeError, 'startTimeError', null),
+          isA<TrainingSessionCreationFormState>().having(
+            (s) => s.startTimeError,
+            'startTimeError',
+            null,
+          ),
         ],
       );
     });
@@ -158,8 +171,11 @@ void main() {
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.endTimeError, 'endTimeError',
-                  'End time must be after start time')
+              .having(
+                (s) => s.endTimeError,
+                'endTimeError',
+                'End time must be after start time',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -174,8 +190,11 @@ void main() {
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.endTimeError, 'endTimeError',
-                  'Training session must be at least 30 minutes long')
+              .having(
+                (s) => s.endTimeError,
+                'endTimeError',
+                'Training session must be at least 30 minutes long',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -185,10 +204,12 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'emits form state with location set',
         build: () => bloc,
-        act: (bloc) => bloc.add(const SetTrainingLocation(
-          locationName: 'Beach Court 1',
-          address: '123 Beach St',
-        )),
+        act: (bloc) => bloc.add(
+          const SetTrainingLocation(
+            locationName: 'Beach Court 1',
+            address: '123 Beach St',
+          ),
+        ),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
               .having((s) => s.locationName, 'locationName', 'Beach Court 1')
@@ -201,14 +222,15 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'validates location is not empty',
         build: () => bloc,
-        seed: () => const TrainingSessionCreationFormState(
-          locationName: '',
-        ),
+        seed: () => const TrainingSessionCreationFormState(locationName: ''),
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.locationError, 'locationError',
-                  'Please enter a location')
+              .having(
+                (s) => s.locationError,
+                'locationError',
+                'Please enter a location',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -218,12 +240,12 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'emits form state with title set',
         build: () => bloc,
-        act: (bloc) => bloc.add(const SetTrainingTitle(
-            title: 'Advanced Serving Practice')),
+        act: (bloc) => bloc.add(
+          const SetTrainingTitle(title: 'Advanced Serving Practice'),
+        ),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having(
-                  (s) => s.title, 'title', 'Advanced Serving Practice')
+              .having((s) => s.title, 'title', 'Advanced Serving Practice')
               .having((s) => s.titleError, 'titleError', null)
               .having((s) => s.isValid, 'isValid', false),
         ],
@@ -236,8 +258,11 @@ void main() {
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.titleError, 'titleError',
-                  'Please enter a session title')
+              .having(
+                (s) => s.titleError,
+                'titleError',
+                'Please enter a session title',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -249,8 +274,11 @@ void main() {
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.titleError, 'titleError',
-                  'Title must be at least 3 characters')
+              .having(
+                (s) => s.titleError,
+                'titleError',
+                'Title must be at least 3 characters',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -258,13 +286,15 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'validates title maximum length (100 characters)',
         build: () => bloc,
-        seed: () => TrainingSessionCreationFormState(
-            title: 'A' * 101),
+        seed: () => TrainingSessionCreationFormState(title: 'A' * 101),
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.titleError, 'titleError',
-                  'Title must be less than 100 characters')
+              .having(
+                (s) => s.titleError,
+                'titleError',
+                'Title must be less than 100 characters',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -274,12 +304,18 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'emits form state with description set (no validation)',
         build: () => bloc,
-        act: (bloc) => bloc.add(const SetTrainingDescription(
-            description: 'Focus on serves and blocks')),
+        act: (bloc) => bloc.add(
+          const SetTrainingDescription(
+            description: 'Focus on serves and blocks',
+          ),
+        ),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.description, 'description',
-                  'Focus on serves and blocks')
+              .having(
+                (s) => s.description,
+                'description',
+                'Focus on serves and blocks',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -301,14 +337,15 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'validates maxParticipants cannot exceed 30',
         build: () => bloc,
-        seed: () => const TrainingSessionCreationFormState(
-          maxParticipants: 35,
-        ),
+        seed: () => const TrainingSessionCreationFormState(maxParticipants: 35),
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.participantsError, 'participantsError',
-                  'Maximum participants cannot exceed 30')
+              .having(
+                (s) => s.participantsError,
+                'participantsError',
+                'Maximum participants cannot exceed 30',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -330,14 +367,15 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'validates minParticipants is at least 2',
         build: () => bloc,
-        seed: () => const TrainingSessionCreationFormState(
-          minParticipants: 1,
-        ),
+        seed: () => const TrainingSessionCreationFormState(minParticipants: 1),
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.participantsError, 'participantsError',
-                  'Minimum participants must be at least 2')
+              .having(
+                (s) => s.participantsError,
+                'participantsError',
+                'Minimum participants must be at least 2',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -352,8 +390,11 @@ void main() {
         act: (bloc) => bloc.add(const ValidateTrainingForm()),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
-              .having((s) => s.participantsError, 'participantsError',
-                  'Maximum participants must be greater than or equal to minimum participants')
+              .having(
+                (s) => s.participantsError,
+                'participantsError',
+                'Maximum participants must be greater than or equal to minimum participants',
+              )
               .having((s) => s.isValid, 'isValid', false),
         ],
       );
@@ -363,8 +404,8 @@ void main() {
       blocTest<TrainingSessionCreationBloc, TrainingSessionCreationState>(
         'emits form state with notes set (no validation)',
         build: () => bloc,
-        act: (bloc) => bloc.add(const SetSessionNotes(
-            notes: 'Bring water and sunscreen')),
+        act: (bloc) =>
+            bloc.add(const SetSessionNotes(notes: 'Bring water and sunscreen')),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
               .having((s) => s.notes, 'notes', 'Bring water and sunscreen')
@@ -381,9 +422,8 @@ void main() {
         'emits validation errors when form is invalid',
         build: () => bloc,
         seed: () => const TrainingSessionCreationFormState(),
-        act: (bloc) => bloc.add(const SubmitTrainingSession(
-          createdBy: 'user-1',
-        )),
+        act: (bloc) =>
+            bloc.add(const SubmitTrainingSession(createdBy: 'user-1')),
         expect: () => [
           isA<TrainingSessionCreationFormState>()
               .having((s) => s.isValid, 'isValid', false)
@@ -402,8 +442,9 @@ void main() {
         'successfully creates training session with valid form',
         build: () => bloc,
         setUp: () {
-          when(() => mockRepository.createTrainingSession(any()))
-              .thenAnswer((_) async => 'session-123');
+          when(
+            () => mockRepository.createTrainingSession(any()),
+          ).thenAnswer((_) async => 'session-123');
         },
         seed: () => TrainingSessionCreationFormState(
           groupId: 'group-1',
@@ -418,22 +459,30 @@ void main() {
           minParticipants: 4,
           notes: 'Bring equipment',
         ),
-        act: (bloc) => bloc.add(const SubmitTrainingSession(
-          createdBy: 'user-1',
-        )),
+        act: (bloc) =>
+            bloc.add(const SubmitTrainingSession(createdBy: 'user-1')),
         expect: () => [
           isA<TrainingSessionCreationSubmitting>(),
           isA<TrainingSessionCreationSuccess>()
               .having((s) => s.sessionId, 'sessionId', 'session-123')
               .having((s) => s.session.id, 'session.id', 'session-123')
               .having((s) => s.session.groupId, 'session.groupId', 'group-1')
-              .having((s) => s.session.title, 'session.title',
-                  'Advanced Training')
+              .having(
+                (s) => s.session.title,
+                'session.title',
+                'Advanced Training',
+              )
               .having((s) => s.session.createdBy, 'session.createdBy', 'user-1')
-              .having((s) => s.session.minParticipants,
-                  'session.minParticipants', 4)
-              .having((s) => s.session.maxParticipants,
-                  'session.maxParticipants', 12),
+              .having(
+                (s) => s.session.minParticipants,
+                'session.minParticipants',
+                4,
+              )
+              .having(
+                (s) => s.session.maxParticipants,
+                'session.maxParticipants',
+                12,
+              ),
         ],
         verify: (_) {
           verify(() => mockRepository.createTrainingSession(any())).called(1);
@@ -445,9 +494,11 @@ void main() {
         build: () => bloc,
         setUp: () {
           when(() => mockRepository.createTrainingSession(any())).thenThrow(
-              TrainingSessionException(
-                  'You must be a member of the group to create a training session',
-                  code: 'NOT_A_MEMBER'));
+            TrainingSessionException(
+              'You must be a member of the group to create a training session',
+              code: 'NOT_A_MEMBER',
+            ),
+          );
         },
         seed: () => TrainingSessionCreationFormState(
           groupId: 'group-1',
@@ -457,14 +508,16 @@ void main() {
           locationName: 'Beach Court 1',
           title: 'Advanced Training',
         ),
-        act: (bloc) => bloc.add(const SubmitTrainingSession(
-          createdBy: 'user-1',
-        )),
+        act: (bloc) =>
+            bloc.add(const SubmitTrainingSession(createdBy: 'user-1')),
         expect: () => [
           isA<TrainingSessionCreationSubmitting>(),
           isA<TrainingSessionCreationError>()
-              .having((s) => s.message, 'message',
-                  'You must be a member of the group to create a training session')
+              .having(
+                (s) => s.message,
+                'message',
+                'You must be a member of the group to create a training session',
+              )
               .having((s) => s.errorCode, 'errorCode', 'NOT_A_MEMBER')
               .having((s) => s.isRetryable, 'isRetryable', true),
         ],
@@ -475,8 +528,11 @@ void main() {
         build: () => bloc,
         setUp: () {
           when(() => mockRepository.createTrainingSession(any())).thenThrow(
-              TrainingSessionException('The selected group no longer exists',
-                  code: 'not-found'));
+            TrainingSessionException(
+              'The selected group no longer exists',
+              code: 'not-found',
+            ),
+          );
         },
         seed: () => TrainingSessionCreationFormState(
           groupId: 'group-1',
@@ -486,14 +542,16 @@ void main() {
           locationName: 'Beach Court 1',
           title: 'Advanced Training',
         ),
-        act: (bloc) => bloc.add(const SubmitTrainingSession(
-          createdBy: 'user-1',
-        )),
+        act: (bloc) =>
+            bloc.add(const SubmitTrainingSession(createdBy: 'user-1')),
         expect: () => [
           isA<TrainingSessionCreationSubmitting>(),
           isA<TrainingSessionCreationError>()
-              .having((s) => s.message, 'message',
-                  'The selected group no longer exists')
+              .having(
+                (s) => s.message,
+                'message',
+                'The selected group no longer exists',
+              )
               .having((s) => s.errorCode, 'errorCode', 'not-found')
               .having((s) => s.isRetryable, 'isRetryable', true),
         ],
@@ -503,8 +561,9 @@ void main() {
         'emits generic error for other exceptions',
         build: () => bloc,
         setUp: () {
-          when(() => mockRepository.createTrainingSession(any()))
-              .thenThrow(Exception('Network error'));
+          when(
+            () => mockRepository.createTrainingSession(any()),
+          ).thenThrow(Exception('Network error'));
         },
         seed: () => TrainingSessionCreationFormState(
           groupId: 'group-1',
@@ -514,14 +573,16 @@ void main() {
           locationName: 'Beach Court 1',
           title: 'Advanced Training',
         ),
-        act: (bloc) => bloc.add(const SubmitTrainingSession(
-          createdBy: 'user-1',
-        )),
+        act: (bloc) =>
+            bloc.add(const SubmitTrainingSession(createdBy: 'user-1')),
         expect: () => [
           isA<TrainingSessionCreationSubmitting>(),
           isA<TrainingSessionCreationError>()
-              .having((s) => s.message, 'message',
-                  contains('Failed to create training session'))
+              .having(
+                (s) => s.message,
+                'message',
+                contains('Failed to create training session'),
+              )
               .having((s) => s.errorCode, 'errorCode', 'CREATE_SESSION_ERROR')
               .having((s) => s.isRetryable, 'isRetryable', true),
         ],
@@ -539,9 +600,7 @@ void main() {
           startTime: DateTime.now().add(const Duration(days: 1)),
         ),
         act: (bloc) => bloc.add(const ResetTrainingForm()),
-        expect: () => [
-          const TrainingSessionCreationFormState(),
-        ],
+        expect: () => [const TrainingSessionCreationFormState()],
       );
     });
 

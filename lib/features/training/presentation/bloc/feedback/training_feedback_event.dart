@@ -26,7 +26,13 @@ class SubmitFeedback extends TrainingFeedbackEvent {
   });
 
   @override
-  List<Object?> get props => [trainingSessionId, exercisesQuality, trainingIntensity, coachingClarity, comment];
+  List<Object?> get props => [
+    trainingSessionId,
+    exercisesQuality,
+    trainingIntensity,
+    coachingClarity,
+    comment,
+  ];
 }
 
 /// Event to load aggregated feedback for a training session

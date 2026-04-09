@@ -44,10 +44,7 @@ class RatingHistoryEntry with _$RatingHistoryEntry {
   /// Factory constructor for creating from Firestore DocumentSnapshot
   factory RatingHistoryEntry.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return RatingHistoryEntry.fromJson({
-      ...data,
-      'entryId': doc.id,
-    });
+    return RatingHistoryEntry.fromJson({...data, 'entryId': doc.id});
   }
 
   /// Convert to Firestore-compatible map (excludes entryId since it's the document ID)

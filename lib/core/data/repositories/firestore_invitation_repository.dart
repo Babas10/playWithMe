@@ -19,8 +19,9 @@ class FirestoreInvitationRepository implements InvitationRepository {
     FirebaseFirestore? firestore,
     FirebaseFunctions? functions,
     GroupRepository? groupRepository,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _functions =
+           functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
 
   @override
   Future<String> sendInvitation({
@@ -56,7 +57,9 @@ class FirestoreInvitationRepository implements InvitationRepository {
           message = e.message ?? 'User or group not found';
           break;
         case 'already-exists':
-          message = e.message ?? 'Invitation already exists or user is already a member';
+          message =
+              e.message ??
+              'Invitation already exists or user is already a member';
           break;
         case 'invalid-argument':
           message = e.message ?? 'Invalid invitation parameters';
@@ -81,11 +84,11 @@ class FirestoreInvitationRepository implements InvitationRepository {
           .orderBy('createdAt', descending: true)
           .snapshots()
           .map((snapshot) {
-        return snapshot.docs
-            .where((doc) => doc.exists)
-            .map((doc) => InvitationModel.fromFirestore(doc))
-            .toList();
-      });
+            return snapshot.docs
+                .where((doc) => doc.exists)
+                .map((doc) => InvitationModel.fromFirestore(doc))
+                .toList();
+          });
     } catch (e) {
       throw InvitationException('Failed to get pending invitations: $e');
     }
@@ -138,11 +141,11 @@ class FirestoreInvitationRepository implements InvitationRepository {
       // Use Cloud Function for secure invitation acceptance
       // This bypasses Firestore security rules and ensures atomic operation
       final callable = _functions.httpsCallable('acceptInvitation');
-      await callable.call({
-        'invitationId': invitationId,
-      });
+      await callable.call({'invitationId': invitationId});
     } on FirebaseFunctionsException catch (e) {
-      throw InvitationException('Failed to accept invitation: ${e.message ?? e.code}');
+      throw InvitationException(
+        'Failed to accept invitation: ${e.message ?? e.code}',
+      );
     } catch (e) {
       throw InvitationException('Failed to accept invitation: $e');
     }
@@ -156,11 +159,11 @@ class FirestoreInvitationRepository implements InvitationRepository {
     try {
       // Use Cloud Function for secure invitation decline
       final callable = _functions.httpsCallable('declineInvitation');
-      await callable.call({
-        'invitationId': invitationId,
-      });
+      await callable.call({'invitationId': invitationId});
     } on FirebaseFunctionsException catch (e) {
-      throw InvitationException('Failed to decline invitation: ${e.message ?? e.code}');
+      throw InvitationException(
+        'Failed to decline invitation: ${e.message ?? e.code}',
+      );
     } catch (e) {
       throw InvitationException('Failed to decline invitation: $e');
     }
@@ -212,7 +215,8 @@ class FirestoreInvitationRepository implements InvitationRepository {
       // Note: This is inefficient and should use a separate collection in production
       // This is a simplified implementation
       throw UnimplementedError(
-          'Getting invitations sent by user requires different schema');
+        'Getting invitations sent by user requires different schema',
+      );
     } catch (e) {
       throw InvitationException('Failed to get invitations sent by user: $e');
     }
@@ -225,10 +229,7 @@ class FirestoreInvitationRepository implements InvitationRepository {
   }) async {
     try {
       // For now, canceling is the same as deleting
-      await deleteInvitation(
-        userId: userId,
-        invitationId: invitationId,
-      );
+      await deleteInvitation(userId: userId, invitationId: invitationId);
     } catch (e) {
       throw InvitationException('Failed to cancel invitation: $e');
     }

@@ -129,10 +129,7 @@ class SearchResultTile extends StatelessWidget {
     // Already friends
     if (isFriend) {
       return Chip(
-        label: Text(
-          l10n.friends,
-          style: const TextStyle(fontSize: 12),
-        ),
+        label: Text(l10n.friends, style: const TextStyle(fontSize: 12)),
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         labelStyle: TextStyle(
           color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -144,10 +141,7 @@ class SearchResultTile extends StatelessWidget {
     // Pending request sent
     if (hasPendingRequest && requestDirection == 'sent') {
       return Chip(
-        label: Text(
-          l10n.requestPending,
-          style: const TextStyle(fontSize: 12),
-        ),
+        label: Text(l10n.requestPending, style: const TextStyle(fontSize: 12)),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         labelStyle: TextStyle(
           color: Theme.of(context).colorScheme.onSecondaryContainer,

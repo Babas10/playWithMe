@@ -20,6 +20,7 @@ import '../../../../../unit/core/data/repositories/mock_group_repository.dart';
 
 // Mock classes
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+
 class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
 
 void main() {
@@ -34,10 +35,12 @@ void main() {
     mockGroupRepository = MockGroupRepository();
     mockAuthBloc = MockAuthenticationBloc();
     mockAnalytics = MockFirebaseAnalytics();
-    when(() => mockAnalytics.logEvent(
-          name: any(named: 'name'),
-          parameters: any(named: 'parameters'),
-        )).thenAnswer((_) async {});
+    when(
+      () => mockAnalytics.logEvent(
+        name: any(named: 'name'),
+        parameters: any(named: 'parameters'),
+      ),
+    ).thenAnswer((_) async {});
 
     when(() => mockAuthBloc.state).thenReturn(
       AuthenticationAuthenticated(
@@ -134,30 +137,36 @@ void main() {
 
     testWidgets('displays multiple groups correctly', (tester) async {
       // Arrange
-      mockGroupRepository.addGroup(GroupModel(
-        id: 'group-1',
-        name: 'Group A',
-        createdBy: testUserId,
-        createdAt: DateTime(2024, 1, 1),
-        memberIds: [testUserId],
-        adminIds: [testUserId],
-      ));
-      mockGroupRepository.addGroup(GroupModel(
-        id: 'group-2',
-        name: 'Group B',
-        createdBy: testUserId,
-        createdAt: DateTime(2024, 1, 2),
-        memberIds: [testUserId],
-        adminIds: [testUserId],
-      ));
-      mockGroupRepository.addGroup(GroupModel(
-        id: 'group-3',
-        name: 'Group C',
-        createdBy: testUserId,
-        createdAt: DateTime(2024, 1, 3),
-        memberIds: [testUserId],
-        adminIds: [testUserId],
-      ));
+      mockGroupRepository.addGroup(
+        GroupModel(
+          id: 'group-1',
+          name: 'Group A',
+          createdBy: testUserId,
+          createdAt: DateTime(2024, 1, 1),
+          memberIds: [testUserId],
+          adminIds: [testUserId],
+        ),
+      );
+      mockGroupRepository.addGroup(
+        GroupModel(
+          id: 'group-2',
+          name: 'Group B',
+          createdBy: testUserId,
+          createdAt: DateTime(2024, 1, 2),
+          memberIds: [testUserId],
+          adminIds: [testUserId],
+        ),
+      );
+      mockGroupRepository.addGroup(
+        GroupModel(
+          id: 'group-3',
+          name: 'Group C',
+          createdBy: testUserId,
+          createdAt: DateTime(2024, 1, 3),
+          memberIds: [testUserId],
+          adminIds: [testUserId],
+        ),
+      );
 
       // Act
       await tester.pumpWidget(createApp());
@@ -174,24 +183,30 @@ void main() {
       expect(find.text('Group C'), findsOneWidget);
     });
 
-    testWidgets('does not display groups where user is not a member', (tester) async {
+    testWidgets('does not display groups where user is not a member', (
+      tester,
+    ) async {
       // Arrange
-      mockGroupRepository.addGroup(GroupModel(
-        id: 'group-1',
-        name: 'My Group',
-        createdBy: testUserId,
-        createdAt: DateTime(2024, 1, 1),
-        memberIds: [testUserId],
-        adminIds: [testUserId],
-      ));
-      mockGroupRepository.addGroup(GroupModel(
-        id: 'group-2',
-        name: 'Other Group',
-        createdBy: 'other-user',
-        createdAt: DateTime(2024, 1, 2),
-        memberIds: ['other-user'],
-        adminIds: ['other-user'],
-      ));
+      mockGroupRepository.addGroup(
+        GroupModel(
+          id: 'group-1',
+          name: 'My Group',
+          createdBy: testUserId,
+          createdAt: DateTime(2024, 1, 1),
+          memberIds: [testUserId],
+          adminIds: [testUserId],
+        ),
+      );
+      mockGroupRepository.addGroup(
+        GroupModel(
+          id: 'group-2',
+          name: 'Other Group',
+          createdBy: 'other-user',
+          createdAt: DateTime(2024, 1, 2),
+          memberIds: ['other-user'],
+          adminIds: ['other-user'],
+        ),
+      );
 
       // Act
       await tester.pumpWidget(createApp());

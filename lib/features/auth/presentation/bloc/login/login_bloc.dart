@@ -7,11 +7,12 @@ import 'package:play_with_me/features/auth/presentation/bloc/login/login_state.d
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthRepository _authRepository;
 
-  LoginBloc({
-    required AuthRepository authRepository,
-  })  : _authRepository = authRepository,
-        super(const LoginInitial()) {
-    on<LoginWithEmailAndPasswordSubmitted>(_onLoginWithEmailAndPasswordSubmitted);
+  LoginBloc({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(const LoginInitial()) {
+    on<LoginWithEmailAndPasswordSubmitted>(
+      _onLoginWithEmailAndPasswordSubmitted,
+    );
     on<LoginAnonymouslySubmitted>(_onLoginAnonymouslySubmitted);
     on<LoginFormReset>(_onLoginFormReset);
   }
@@ -91,10 +92,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  void _onLoginFormReset(
-    LoginFormReset event,
-    Emitter<LoginState> emit,
-  ) {
+  void _onLoginFormReset(LoginFormReset event, Emitter<LoginState> emit) {
     debugPrint('🔐 LoginBloc: Form reset');
     emit(const LoginInitial());
   }

@@ -52,7 +52,9 @@ void printUsage() {
   print('  --verify    Verify all required projects are documented');
   print('  --help      Show this help message');
   print('');
-  print('This tool helps track the Firebase projects required for Story 0.2.1:');
+  print(
+    'This tool helps track the Firebase projects required for Story 0.2.1:',
+  );
   print('  - gatherli-dev (Development)');
   print('  - gatherli-prod (Production)');
 }
@@ -68,10 +70,7 @@ Future<void> recordProjects() async {
   };
 
   const environments = ['dev', 'prod'];
-  const environmentNames = {
-    'dev': 'Development',
-    'prod': 'Production',
-  };
+  const environmentNames = {'dev': 'Development', 'prod': 'Production'};
 
   for (final env in environments) {
     print('🏗️  ${environmentNames[env]} Environment');
@@ -149,10 +148,7 @@ Future<void> showSummary(Map<String, dynamic> data) async {
   print('========================');
 
   const environments = ['dev', 'prod'];
-  const environmentNames = {
-    'dev': 'Development',
-    'prod': 'Production',
-  };
+  const environmentNames = {'dev': 'Development', 'prod': 'Production'};
 
   for (final env in environments) {
     final project = projects[env] as Map<String, dynamic>?;
@@ -231,7 +227,9 @@ Future<void> verifyProjects() async {
 
       if (!matchesExpected) {
         print('   ⚠️  Project ID differs from expected (gatherli-$env)');
-        print('   ℹ️  You\'ll need to update Flutter configuration accordingly');
+        print(
+          '   ℹ️  You\'ll need to update Flutter configuration accordingly',
+        );
       }
     }
 
@@ -248,7 +246,6 @@ Future<void> verifyProjects() async {
       print('   Complete project creation before proceeding.');
       exit(1);
     }
-
   } catch (e) {
     print('❌ Error during verification: $e');
     exit(1);

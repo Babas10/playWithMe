@@ -10,14 +10,13 @@ class FirestoreGameInvitationsRepository implements GameInvitationsRepository {
   final FirebaseFunctions _functions;
 
   FirestoreGameInvitationsRepository({FirebaseFunctions? functions})
-      : _functions =
-            functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
+    : _functions =
+          functions ?? FirebaseFunctions.instanceFor(region: 'europe-west6');
 
   @override
   Future<List<GameInvitationDetails>> getGameInvitations() async {
     try {
-      final callable =
-          _functions.httpsCallable('getGameInvitationsForUser');
+      final callable = _functions.httpsCallable('getGameInvitationsForUser');
       final result = await callable.call<Map<String, dynamic>>();
       final data = Map<String, dynamic>.from(result.data as Map);
       final raw = data['invitations'] as List<dynamic>;
@@ -38,8 +37,7 @@ class FirestoreGameInvitationsRepository implements GameInvitationsRepository {
   @override
   Future<void> acceptGameInvitation(String invitationId) async {
     try {
-      final callable =
-          _functions.httpsCallable('acceptGameGuestInvitation');
+      final callable = _functions.httpsCallable('acceptGameGuestInvitation');
       await callable.call<Map<String, dynamic>>({'invitationId': invitationId});
     } on FirebaseFunctionsException catch (e) {
       throw GameInvitationException(
@@ -54,8 +52,7 @@ class FirestoreGameInvitationsRepository implements GameInvitationsRepository {
   @override
   Future<void> declineGameInvitation(String invitationId) async {
     try {
-      final callable =
-          _functions.httpsCallable('declineGameGuestInvitation');
+      final callable = _functions.httpsCallable('declineGameGuestInvitation');
       await callable.call<Map<String, dynamic>>({'invitationId': invitationId});
     } on FirebaseFunctionsException catch (e) {
       throw GameInvitationException(

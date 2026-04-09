@@ -60,20 +60,18 @@ Future<void> initializeTestDependencies({
   }
 
   // Register mock repositories
-  sl.registerLazySingleton<AuthRepository>(
-    () => _globalMockRepo!,
-  );
+  sl.registerLazySingleton<AuthRepository>(() => _globalMockRepo!);
 
-  sl.registerLazySingleton<UserRepository>(
-    () => _globalMockUserRepo!,
-  );
+  sl.registerLazySingleton<UserRepository>(() => _globalMockUserRepo!);
 
   // Register mock FirebaseAnalytics
   final mockAnalytics = MockFirebaseAnalytics();
-  when(() => mockAnalytics.logEvent(
-        name: any(named: 'name'),
-        parameters: any(named: 'parameters'),
-      )).thenAnswer((_) async {});
+  when(
+    () => mockAnalytics.logEvent(
+      name: any(named: 'name'),
+      parameters: any(named: 'parameters'),
+    ),
+  ).thenAnswer((_) async {});
   sl.registerLazySingleton<FirebaseAnalytics>(() => mockAnalytics);
 
   // Register BLoCs with mock repository
@@ -105,25 +103,28 @@ Future<void> initializeTestDependencies({
 
   // Register LocalePreferencesRepository mock
   final mockLocalePreferencesRepo = MockLocalePreferencesRepository();
-  when(() => mockLocalePreferencesRepo.loadPreferences()).thenAnswer(
-    (_) async => LocalePreferencesEntity.defaultPreferences(),
-  );
+  when(
+    () => mockLocalePreferencesRepo.loadPreferences(),
+  ).thenAnswer((_) async => LocalePreferencesEntity.defaultPreferences());
   sl.registerLazySingleton<LocalePreferencesRepository>(
-      () => mockLocalePreferencesRepo);
+    () => mockLocalePreferencesRepo,
+  );
 
   // Register deep link services and bloc
   final mockDeepLinkService = MockDeepLinkService();
   final mockPendingInviteStorage = MockPendingInviteStorage();
-  when(() => mockDeepLinkService.inviteTokenStream)
-      .thenAnswer((_) => const Stream.empty());
-  when(() => mockDeepLinkService.getInitialInviteToken())
-      .thenAnswer((_) async => null);
-  when(() => mockPendingInviteStorage.retrieve())
-      .thenAnswer((_) async => null);
+  when(
+    () => mockDeepLinkService.inviteTokenStream,
+  ).thenAnswer((_) => const Stream.empty());
+  when(
+    () => mockDeepLinkService.getInitialInviteToken(),
+  ).thenAnswer((_) async => null);
+  when(() => mockPendingInviteStorage.retrieve()).thenAnswer((_) async => null);
 
   sl.registerLazySingleton<DeepLinkService>(() => mockDeepLinkService);
   sl.registerLazySingleton<PendingInviteStorage>(
-      () => mockPendingInviteStorage);
+    () => mockPendingInviteStorage,
+  );
   sl.registerFactory<DeepLinkBloc>(
     () => DeepLinkBloc(
       deepLinkService: sl<DeepLinkService>(),
@@ -135,7 +136,8 @@ Future<void> initializeTestDependencies({
   // Register InviteJoinBloc with mock repository
   final mockGroupInviteLinkRepo = MockGroupInviteLinkRepository();
   sl.registerLazySingleton<GroupInviteLinkRepository>(
-      () => mockGroupInviteLinkRepo);
+    () => mockGroupInviteLinkRepo,
+  );
   sl.registerFactory<InviteJoinBloc>(
     () => InviteJoinBloc(
       repository: sl<GroupInviteLinkRepository>(),

@@ -52,7 +52,8 @@ void main() {
         blocTest<PasswordResetBloc, PasswordResetState>(
           'emits [PasswordResetLoading, PasswordResetFailure] when email is invalid format',
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: 'invalid-email')),
+          act: (bloc) =>
+              bloc.add(const PasswordResetRequested(email: 'invalid-email')),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetFailure('Please enter a valid email address'),
@@ -72,7 +73,8 @@ void main() {
         blocTest<PasswordResetBloc, PasswordResetState>(
           'emits [PasswordResetLoading, PasswordResetFailure] when email has no username',
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: '@example.com')),
+          act: (bloc) =>
+              bloc.add(const PasswordResetRequested(email: '@example.com')),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetFailure('Please enter a valid email address'),
@@ -89,7 +91,8 @@ void main() {
             );
           },
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: validEmail)),
+          act: (bloc) =>
+              bloc.add(const PasswordResetRequested(email: validEmail)),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetSuccess(validEmail),
@@ -99,7 +102,9 @@ void main() {
         blocTest<PasswordResetBloc, PasswordResetState>(
           'fails validation when email has leading/trailing whitespace',
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: '  test@example.com  ')),
+          act: (bloc) => bloc.add(
+            const PasswordResetRequested(email: '  test@example.com  '),
+          ),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetFailure('Please enter a valid email address'),
@@ -114,7 +119,9 @@ void main() {
             );
           },
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: 'test+tag@example.com')),
+          act: (bloc) => bloc.add(
+            const PasswordResetRequested(email: 'test+tag@example.com'),
+          ),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetSuccess('test+tag@example.com'),
@@ -129,7 +136,9 @@ void main() {
             );
           },
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: 'test.user@example.com')),
+          act: (bloc) => bloc.add(
+            const PasswordResetRequested(email: 'test.user@example.com'),
+          ),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetSuccess('test.user@example.com'),
@@ -144,7 +153,9 @@ void main() {
             );
           },
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: 'test-user@example.com')),
+          act: (bloc) => bloc.add(
+            const PasswordResetRequested(email: 'test-user@example.com'),
+          ),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetSuccess('test-user@example.com'),
@@ -157,11 +168,13 @@ void main() {
           'emits [PasswordResetLoading, PasswordResetFailure] when repository throws',
           setUp: () {
             mockAuthRepository.setSendPasswordResetEmailBehavior(
-              ({required String email}) async => throw Exception('User not found'),
+              ({required String email}) async =>
+                  throw Exception('User not found'),
             );
           },
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: validEmail)),
+          act: (bloc) =>
+              bloc.add(const PasswordResetRequested(email: validEmail)),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetFailure('User not found'),
@@ -172,11 +185,13 @@ void main() {
           'strips Exception prefix from error message',
           setUp: () {
             mockAuthRepository.setSendPasswordResetEmailBehavior(
-              ({required String email}) async => throw Exception('Network error'),
+              ({required String email}) async =>
+                  throw Exception('Network error'),
             );
           },
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: validEmail)),
+          act: (bloc) =>
+              bloc.add(const PasswordResetRequested(email: validEmail)),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetFailure('Network error'),
@@ -187,11 +202,13 @@ void main() {
           'handles generic error message',
           setUp: () {
             mockAuthRepository.setSendPasswordResetEmailBehavior(
-              ({required String email}) async => throw Exception('Something went wrong'),
+              ({required String email}) async =>
+                  throw Exception('Something went wrong'),
             );
           },
           build: () => passwordResetBloc,
-          act: (bloc) => bloc.add(const PasswordResetRequested(email: validEmail)),
+          act: (bloc) =>
+              bloc.add(const PasswordResetRequested(email: validEmail)),
           expect: () => [
             const PasswordResetLoading(),
             const PasswordResetFailure('Something went wrong'),
@@ -205,9 +222,7 @@ void main() {
         'emits [PasswordResetInitial] when form is reset',
         build: () => passwordResetBloc,
         act: (bloc) => bloc.add(const PasswordResetFormReset()),
-        expect: () => [
-          const PasswordResetInitial(),
-        ],
+        expect: () => [const PasswordResetInitial()],
       );
 
       blocTest<PasswordResetBloc, PasswordResetState>(
@@ -215,9 +230,7 @@ void main() {
         build: () => passwordResetBloc,
         seed: () => const PasswordResetFailure('Some error'),
         act: (bloc) => bloc.add(const PasswordResetFormReset()),
-        expect: () => [
-          const PasswordResetInitial(),
-        ],
+        expect: () => [const PasswordResetInitial()],
       );
 
       blocTest<PasswordResetBloc, PasswordResetState>(
@@ -225,9 +238,7 @@ void main() {
         build: () => passwordResetBloc,
         seed: () => const PasswordResetSuccess('test@example.com'),
         act: (bloc) => bloc.add(const PasswordResetFormReset()),
-        expect: () => [
-          const PasswordResetInitial(),
-        ],
+        expect: () => [const PasswordResetInitial()],
       );
 
       blocTest<PasswordResetBloc, PasswordResetState>(
@@ -235,9 +246,7 @@ void main() {
         build: () => passwordResetBloc,
         seed: () => const PasswordResetLoading(),
         act: (bloc) => bloc.add(const PasswordResetFormReset()),
-        expect: () => [
-          const PasswordResetInitial(),
-        ],
+        expect: () => [const PasswordResetInitial()],
       );
     });
 
@@ -291,12 +300,15 @@ void main() {
         );
       });
 
-      test('PasswordResetSuccess instances with different emails are not equal', () {
-        expect(
-          const PasswordResetSuccess('test1@example.com'),
-          isNot(const PasswordResetSuccess('test2@example.com')),
-        );
-      });
+      test(
+        'PasswordResetSuccess instances with different emails are not equal',
+        () {
+          expect(
+            const PasswordResetSuccess('test1@example.com'),
+            isNot(const PasswordResetSuccess('test2@example.com')),
+          );
+        },
+      );
 
       test('PasswordResetFailure instances with same message are equal', () {
         expect(
@@ -305,12 +317,15 @@ void main() {
         );
       });
 
-      test('PasswordResetFailure instances with different messages are not equal', () {
-        expect(
-          const PasswordResetFailure('Error 1'),
-          isNot(const PasswordResetFailure('Error 2')),
-        );
-      });
+      test(
+        'PasswordResetFailure instances with different messages are not equal',
+        () {
+          expect(
+            const PasswordResetFailure('Error 1'),
+            isNot(const PasswordResetFailure('Error 2')),
+          );
+        },
+      );
     });
 
     group('Event equality', () {
@@ -321,12 +336,15 @@ void main() {
         );
       });
 
-      test('PasswordResetRequested instances with different emails are not equal', () {
-        expect(
-          const PasswordResetRequested(email: 'test1@example.com'),
-          isNot(const PasswordResetRequested(email: 'test2@example.com')),
-        );
-      });
+      test(
+        'PasswordResetRequested instances with different emails are not equal',
+        () {
+          expect(
+            const PasswordResetRequested(email: 'test1@example.com'),
+            isNot(const PasswordResetRequested(email: 'test2@example.com')),
+          );
+        },
+      );
 
       test('PasswordResetFormReset instances are equal', () {
         expect(const PasswordResetFormReset(), const PasswordResetFormReset());

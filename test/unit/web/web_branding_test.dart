@@ -34,8 +34,11 @@ void main() {
 
     test('does not contain play_with_me references', () {
       final raw = File('$projectRoot/web/manifest.json').readAsStringSync();
-      expect(raw.contains('play_with_me'), isFalse,
-          reason: 'manifest.json should not contain legacy play_with_me branding');
+      expect(
+        raw.contains('play_with_me'),
+        isFalse,
+        reason: 'manifest.json should not contain legacy play_with_me branding',
+      );
     });
   });
 
@@ -58,14 +61,23 @@ void main() {
       );
     });
 
-    test('meta description is meaningful (not default Flutter placeholder)', () {
-      expect(html, isNot(contains('content="A new Flutter project."')));
-      expect(html, contains('content="Organize and join games with your group."'));
-    });
+    test(
+      'meta description is meaningful (not default Flutter placeholder)',
+      () {
+        expect(html, isNot(contains('content="A new Flutter project."')));
+        expect(
+          html,
+          contains('content="Organize and join games with your group."'),
+        );
+      },
+    );
 
     test('does not contain play_with_me references', () {
-      expect(html.contains('play_with_me'), isFalse,
-          reason: 'index.html should not contain legacy play_with_me branding');
+      expect(
+        html.contains('play_with_me'),
+        isFalse,
+        reason: 'index.html should not contain legacy play_with_me branding',
+      );
     });
   });
 }

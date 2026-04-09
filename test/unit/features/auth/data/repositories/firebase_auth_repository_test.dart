@@ -52,7 +52,9 @@ void main() {
 
     // Setup default user metadata
     when(() => mockUserMetadata.creationTime).thenReturn(DateTime(2024, 1, 1));
-    when(() => mockUserMetadata.lastSignInTime).thenReturn(DateTime(2024, 1, 15));
+    when(
+      () => mockUserMetadata.lastSignInTime,
+    ).thenReturn(DateTime(2024, 1, 15));
 
     // Setup default user properties
     when(() => mockUser.uid).thenReturn('test-uid-123');
@@ -107,8 +109,9 @@ void main() {
 
     group('authStateChanges', () {
       test('emits null when no user is signed in', () async {
-        when(() => mockFirebaseAuth.authStateChanges())
-            .thenAnswer((_) => Stream.value(null));
+        when(
+          () => mockFirebaseAuth.authStateChanges(),
+        ).thenAnswer((_) => Stream.value(null));
 
         final stream = repository.authStateChanges;
 
@@ -116,8 +119,9 @@ void main() {
       });
 
       test('emits UserEntity when user signs in', () async {
-        when(() => mockFirebaseAuth.authStateChanges())
-            .thenAnswer((_) => Stream.value(mockUser));
+        when(
+          () => mockFirebaseAuth.authStateChanges(),
+        ).thenAnswer((_) => Stream.value(mockUser));
 
         final stream = repository.authStateChanges;
 
@@ -129,8 +133,9 @@ void main() {
 
       test('emits sequence of auth state changes', () async {
         final controller = StreamController<User?>();
-        when(() => mockFirebaseAuth.authStateChanges())
-            .thenAnswer((_) => controller.stream);
+        when(
+          () => mockFirebaseAuth.authStateChanges(),
+        ).thenAnswer((_) => controller.stream);
 
         final stream = repository.authStateChanges;
         final emissions = <UserEntity?>[];
@@ -156,10 +161,12 @@ void main() {
       const testPassword = 'password123';
 
       test('returns UserEntity on successful sign in', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenAnswer((_) async => mockUserCredential);
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenAnswer((_) async => mockUserCredential);
 
         final result = await repository.signInWithEmailAndPassword(
           email: testEmail,
@@ -169,124 +176,150 @@ void main() {
         expect(result, isA<UserEntity>());
         expect(result.uid, 'test-uid-123');
         expect(result.email, 'test@example.com');
-        verify(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).called(1);
+        verify(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).called(1);
       });
 
       test('throws exception when credential.user is null', () async {
         when(() => mockUserCredential.user).thenReturn(null);
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenAnswer((_) async => mockUserCredential);
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenAnswer((_) async => mockUserCredential);
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Sign in failed: User is null'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Sign in failed: User is null'),
+            ),
+          ),
         );
       });
 
       test('maps user-not-found FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('user-not-found'));
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('user-not-found'));
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('No user found with this email address'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('No user found with this email address'),
+            ),
+          ),
         );
       });
 
       test('maps wrong-password FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('wrong-password'));
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('wrong-password'));
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Wrong password provided'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Wrong password provided'),
+            ),
+          ),
         );
       });
 
       test('maps invalid-email FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('invalid-email'));
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('invalid-email'));
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('email address is not valid'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('email address is not valid'),
+            ),
+          ),
         );
       });
 
       test('maps user-disabled FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('user-disabled'));
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('user-disabled'));
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('user account has been disabled'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('user account has been disabled'),
+            ),
+          ),
         );
       });
 
       test('wraps generic exceptions', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(Exception('Network error'));
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(Exception('Network error'));
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Sign in failed'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Sign in failed'),
+            ),
+          ),
         );
       });
     });
@@ -296,12 +329,15 @@ void main() {
       const testPassword = 'newpassword123';
 
       test('returns UserEntity on successful registration', () async {
-        when(() => mockFirebaseAuth.createUserWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenAnswer((_) async => mockUserCredential);
-        when(() => mockUser.getIdToken(true))
-            .thenAnswer((_) async => 'mock-id-token');
+        when(
+          () => mockFirebaseAuth.createUserWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenAnswer((_) async => mockUserCredential);
+        when(
+          () => mockUser.getIdToken(true),
+        ).thenAnswer((_) async => 'mock-id-token');
 
         final result = await repository.createUserWithEmailAndPassword(
           email: testEmail,
@@ -310,86 +346,104 @@ void main() {
 
         expect(result, isA<UserEntity>());
         expect(result.uid, 'test-uid-123');
-        verify(() => mockFirebaseAuth.createUserWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).called(1);
+        verify(
+          () => mockFirebaseAuth.createUserWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).called(1);
       });
 
       test('throws exception when credential.user is null', () async {
         when(() => mockUserCredential.user).thenReturn(null);
-        when(() => mockFirebaseAuth.createUserWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenAnswer((_) async => mockUserCredential);
+        when(
+          () => mockFirebaseAuth.createUserWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenAnswer((_) async => mockUserCredential);
 
         expect(
           () => repository.createUserWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('User creation failed: User is null'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('User creation failed: User is null'),
+            ),
+          ),
         );
       });
 
       test('maps email-already-in-use FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.createUserWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('email-already-in-use'));
+        when(
+          () => mockFirebaseAuth.createUserWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('email-already-in-use'));
 
         expect(
           () => repository.createUserWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('account already exists with this email'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('account already exists with this email'),
+            ),
+          ),
         );
       });
 
       test('maps weak-password FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.createUserWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('weak-password'));
+        when(
+          () => mockFirebaseAuth.createUserWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('weak-password'));
 
         expect(
           () => repository.createUserWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('password provided is too weak'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('password provided is too weak'),
+            ),
+          ),
         );
       });
 
       test('wraps generic exceptions', () async {
-        when(() => mockFirebaseAuth.createUserWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(Exception('Network error'));
+        when(
+          () => mockFirebaseAuth.createUserWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(Exception('Network error'));
 
         expect(
           () => repository.createUserWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('User creation failed'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('User creation failed'),
+            ),
+          ),
         );
       });
     });
@@ -398,8 +452,9 @@ void main() {
       test('returns UserEntity on successful anonymous sign in', () async {
         when(() => mockUser.isAnonymous).thenReturn(true);
         when(() => mockUser.email).thenReturn(null);
-        when(() => mockFirebaseAuth.signInAnonymously())
-            .thenAnswer((_) async => mockUserCredential);
+        when(
+          () => mockFirebaseAuth.signInAnonymously(),
+        ).thenAnswer((_) async => mockUserCredential);
 
         final result = await repository.signInAnonymously();
 
@@ -411,44 +466,53 @@ void main() {
 
       test('throws exception when credential.user is null', () async {
         when(() => mockUserCredential.user).thenReturn(null);
-        when(() => mockFirebaseAuth.signInAnonymously())
-            .thenAnswer((_) async => mockUserCredential);
+        when(
+          () => mockFirebaseAuth.signInAnonymously(),
+        ).thenAnswer((_) async => mockUserCredential);
 
         expect(
           () => repository.signInAnonymously(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Anonymous sign in failed: User is null'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Anonymous sign in failed: User is null'),
+            ),
+          ),
         );
       });
 
       test('maps operation-not-allowed FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.signInAnonymously())
-            .thenThrow(createAuthException('operation-not-allowed'));
+        when(
+          () => mockFirebaseAuth.signInAnonymously(),
+        ).thenThrow(createAuthException('operation-not-allowed'));
 
         expect(
           () => repository.signInAnonymously(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('sign-in method is not allowed'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('sign-in method is not allowed'),
+            ),
+          ),
         );
       });
 
       test('wraps generic exceptions', () async {
-        when(() => mockFirebaseAuth.signInAnonymously())
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockFirebaseAuth.signInAnonymously(),
+        ).thenThrow(Exception('Network error'));
 
         expect(
           () => repository.signInAnonymously(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Anonymous sign in failed'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Anonymous sign in failed'),
+            ),
+          ),
         );
       });
     });
@@ -457,71 +521,85 @@ void main() {
       const testEmail = 'test@example.com';
 
       test('completes successfully when email is sent', () async {
-        when(() => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail))
-            .thenAnswer((_) async {});
+        when(
+          () => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail),
+        ).thenAnswer((_) async {});
 
         await expectLater(
           repository.sendPasswordResetEmail(email: testEmail),
           completes,
         );
 
-        verify(() => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail))
-            .called(1);
+        verify(
+          () => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail),
+        ).called(1);
       });
 
       test('maps invalid-email FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail))
-            .thenThrow(createAuthException('invalid-email'));
+        when(
+          () => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail),
+        ).thenThrow(createAuthException('invalid-email'));
 
         expect(
           () => repository.sendPasswordResetEmail(email: testEmail),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('email address is not valid'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('email address is not valid'),
+            ),
+          ),
         );
       });
 
       test('maps user-not-found FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail))
-            .thenThrow(createAuthException('user-not-found'));
+        when(
+          () => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail),
+        ).thenThrow(createAuthException('user-not-found'));
 
         expect(
           () => repository.sendPasswordResetEmail(email: testEmail),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('No user found with this email address'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('No user found with this email address'),
+            ),
+          ),
         );
       });
 
       test('maps too-many-requests FirebaseAuthException', () async {
-        when(() => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail))
-            .thenThrow(createAuthException('too-many-requests'));
+        when(
+          () => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail),
+        ).thenThrow(createAuthException('too-many-requests'));
 
         expect(
           () => repository.sendPasswordResetEmail(email: testEmail),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Too many requests'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Too many requests'),
+            ),
+          ),
         );
       });
 
       test('wraps generic exceptions', () async {
-        when(() => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockFirebaseAuth.sendPasswordResetEmail(email: testEmail),
+        ).thenThrow(Exception('Network error'));
 
         expect(
           () => repository.sendPasswordResetEmail(email: testEmail),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Failed to send password reset email'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Failed to send password reset email'),
+            ),
+          ),
         );
       });
     });
@@ -529,12 +607,11 @@ void main() {
     group('sendEmailVerification', () {
       test('completes successfully when verification email is sent', () async {
         when(() => mockFirebaseAuth.currentUser).thenReturn(mockUser);
-        when(() => mockUser.sendEmailVerification(any())).thenAnswer((_) async {});
+        when(
+          () => mockUser.sendEmailVerification(any()),
+        ).thenAnswer((_) async {});
 
-        await expectLater(
-          repository.sendEmailVerification(),
-          completes,
-        );
+        await expectLater(repository.sendEmailVerification(), completes);
 
         verify(() => mockUser.sendEmailVerification(any())).called(1);
       });
@@ -544,41 +621,49 @@ void main() {
 
         expect(
           () => repository.sendEmailVerification(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('No user is currently signed in'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('No user is currently signed in'),
+            ),
+          ),
         );
       });
 
       test('maps too-many-requests FirebaseAuthException', () async {
         when(() => mockFirebaseAuth.currentUser).thenReturn(mockUser);
-        when(() => mockUser.sendEmailVerification(any()))
-            .thenThrow(createAuthException('too-many-requests'));
+        when(
+          () => mockUser.sendEmailVerification(any()),
+        ).thenThrow(createAuthException('too-many-requests'));
 
         expect(
           () => repository.sendEmailVerification(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Too many requests'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Too many requests'),
+            ),
+          ),
         );
       });
 
       test('wraps generic exceptions', () async {
         when(() => mockFirebaseAuth.currentUser).thenReturn(mockUser);
-        when(() => mockUser.sendEmailVerification(any()))
-            .thenThrow(Exception('Network error'));
+        when(
+          () => mockUser.sendEmailVerification(any()),
+        ).thenThrow(Exception('Network error'));
 
         expect(
           () => repository.sendEmailVerification(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Failed to send email verification'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Failed to send email verification'),
+            ),
+          ),
         );
       });
     });
@@ -588,10 +673,7 @@ void main() {
         when(() => mockFirebaseAuth.currentUser).thenReturn(mockUser);
         when(() => mockUser.reload()).thenAnswer((_) async {});
 
-        await expectLater(
-          repository.reloadUser(),
-          completes,
-        );
+        await expectLater(repository.reloadUser(), completes);
 
         verify(() => mockUser.reload()).called(1);
       });
@@ -601,11 +683,13 @@ void main() {
 
         expect(
           () => repository.reloadUser(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('No user is currently signed in'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('No user is currently signed in'),
+            ),
+          ),
         );
       });
 
@@ -615,11 +699,13 @@ void main() {
 
         expect(
           () => repository.reloadUser(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Failed to reload user data'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Failed to reload user data'),
+            ),
+          ),
         );
       });
     });
@@ -628,25 +714,25 @@ void main() {
       test('completes successfully when user signs out', () async {
         when(() => mockFirebaseAuth.signOut()).thenAnswer((_) async {});
 
-        await expectLater(
-          repository.signOut(),
-          completes,
-        );
+        await expectLater(repository.signOut(), completes);
 
         verify(() => mockFirebaseAuth.signOut()).called(1);
       });
 
       test('wraps exceptions during sign out', () async {
-        when(() => mockFirebaseAuth.signOut())
-            .thenThrow(Exception('Sign out error'));
+        when(
+          () => mockFirebaseAuth.signOut(),
+        ).thenThrow(Exception('Sign out error'));
 
         expect(
           () => repository.signOut(),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Sign out failed'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Sign out failed'),
+            ),
+          ),
         );
       });
     });
@@ -681,8 +767,9 @@ void main() {
         );
 
         verify(() => mockUser.updateDisplayName('New Name')).called(1);
-        verify(() => mockUser.updatePhotoURL('https://example.com/new-photo.jpg'))
-            .called(1);
+        verify(
+          () => mockUser.updatePhotoURL('https://example.com/new-photo.jpg'),
+        ).called(1);
         verify(() => mockUser.reload()).called(1);
       });
 
@@ -703,26 +790,31 @@ void main() {
 
         expect(
           () => repository.updateUserProfile(displayName: 'New Name'),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('No user is currently signed in'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('No user is currently signed in'),
+            ),
+          ),
         );
       });
 
       test('wraps exceptions during profile update', () async {
         when(() => mockFirebaseAuth.currentUser).thenReturn(mockUser);
-        when(() => mockUser.updateDisplayName(any()))
-            .thenThrow(Exception('Update error'));
+        when(
+          () => mockUser.updateDisplayName(any()),
+        ).thenThrow(Exception('Update error'));
 
         expect(
           () => repository.updateUserProfile(displayName: 'New Name'),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Failed to update user profile'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Failed to update user profile'),
+            ),
+          ),
         );
       });
     });
@@ -732,59 +824,71 @@ void main() {
       const testPassword = 'password123';
 
       test('maps invalid-credential to appropriate message', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('invalid-credential'));
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('invalid-credential'));
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('credentials are invalid'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('credentials are invalid'),
+            ),
+          ),
         );
       });
 
       test('maps network-request-failed to appropriate message', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('network-request-failed'));
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('network-request-failed'));
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Network error'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Network error'),
+            ),
+          ),
         );
       });
 
       test('maps unknown error code to generic message', () async {
-        when(() => mockFirebaseAuth.signInWithEmailAndPassword(
-              email: testEmail,
-              password: testPassword,
-            )).thenThrow(createAuthException('unknown-error-code'));
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: testEmail,
+            password: testPassword,
+          ),
+        ).thenThrow(createAuthException('unknown-error-code'));
 
         expect(
           () => repository.signInWithEmailAndPassword(
             email: testEmail,
             password: testPassword,
           ),
-          throwsA(isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Authentication failed'),
-          )),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Authentication failed'),
+            ),
+          ),
         );
       });
     });

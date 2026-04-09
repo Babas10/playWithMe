@@ -19,10 +19,9 @@ class EmailVerificationBloc
   /// Subscription to auth state changes
   StreamSubscription<dynamic>? _authStateSubscription;
 
-  EmailVerificationBloc({
-    required AuthRepository authRepository,
-  })  : _authRepository = authRepository,
-        super(const EmailVerificationState.initial()) {
+  EmailVerificationBloc({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(const EmailVerificationState.initial()) {
     on<EmailVerificationCheckStatus>(_onCheckStatus);
     on<EmailVerificationSendEmail>(_onSendEmail);
     on<EmailVerificationRefreshStatus>(_onRefreshStatus);
@@ -32,10 +31,12 @@ class EmailVerificationBloc
     // Listen to auth state changes for real-time verification updates
     _authStateSubscription = _authRepository.authStateChanges.listen((user) {
       if (user != null && user.isEmailVerified) {
-        add(EmailVerificationEvent.authStateChanged(
-          isVerified: true,
-          verifiedAt: user.lastSignInAt,
-        ));
+        add(
+          EmailVerificationEvent.authStateChanged(
+            isVerified: true,
+            verifiedAt: user.lastSignInAt,
+          ),
+        );
       }
     });
   }
@@ -51,9 +52,11 @@ class EmailVerificationBloc
       final user = _authRepository.currentUser;
 
       if (user == null) {
-        emit(const EmailVerificationState.error(
-          message: 'No user is currently signed in',
-        ));
+        emit(
+          const EmailVerificationState.error(
+            message: 'No user is currently signed in',
+          ),
+        );
         return;
       }
 
@@ -62,17 +65,21 @@ class EmailVerificationBloc
         emit(EmailVerificationState.verified(verifiedAt: user.lastSignInAt));
       } else {
         final cooldown = _calculateCooldown();
-        emit(EmailVerificationState.pending(
-          email: user.email,
-          emailSent: _lastSentAt != null,
-          lastSentAt: _lastSentAt,
-          resendCooldownSeconds: cooldown,
-        ));
+        emit(
+          EmailVerificationState.pending(
+            email: user.email,
+            emailSent: _lastSentAt != null,
+            lastSentAt: _lastSentAt,
+            resendCooldownSeconds: cooldown,
+          ),
+        );
       }
     } catch (e) {
-      emit(EmailVerificationState.error(
-        message: 'Failed to check verification status: ${e.toString()}',
-      ));
+      emit(
+        EmailVerificationState.error(
+          message: 'Failed to check verification status: ${e.toString()}',
+        ),
+      );
     }
   }
 
@@ -84,10 +91,12 @@ class EmailVerificationBloc
       // Check cooldown
       final cooldown = _calculateCooldown();
       if (cooldown > 0) {
-        emit(EmailVerificationState.error(
-          message: 'Please wait $cooldown seconds before resending',
-          email: _authRepository.currentUser?.email,
-        ));
+        emit(
+          EmailVerificationState.error(
+            message: 'Please wait $cooldown seconds before resending',
+            email: _authRepository.currentUser?.email,
+          ),
+        );
         return;
       }
 
@@ -96,9 +105,11 @@ class EmailVerificationBloc
       // Get current user
       final user = _authRepository.currentUser;
       if (user == null) {
-        emit(const EmailVerificationState.error(
-          message: 'No user is currently signed in',
-        ));
+        emit(
+          const EmailVerificationState.error(
+            message: 'No user is currently signed in',
+          ),
+        );
         return;
       }
 
@@ -115,25 +126,31 @@ class EmailVerificationBloc
       _lastSentAt = DateTime.now();
 
       // Emit success state
-      emit(EmailVerificationState.emailSent(
-        email: user.email,
-        sentAt: _lastSentAt!,
-        resendCooldownSeconds: resendCooldownSeconds,
-      ));
+      emit(
+        EmailVerificationState.emailSent(
+          email: user.email,
+          sentAt: _lastSentAt!,
+          resendCooldownSeconds: resendCooldownSeconds,
+        ),
+      );
 
       // After a brief delay, transition to pending state
       await Future.delayed(const Duration(seconds: 2));
-      emit(EmailVerificationState.pending(
-        email: user.email,
-        emailSent: true,
-        lastSentAt: _lastSentAt,
-        resendCooldownSeconds: resendCooldownSeconds,
-      ));
+      emit(
+        EmailVerificationState.pending(
+          email: user.email,
+          emailSent: true,
+          lastSentAt: _lastSentAt,
+          resendCooldownSeconds: resendCooldownSeconds,
+        ),
+      );
     } catch (e) {
-      emit(EmailVerificationState.error(
-        message: 'Failed to send verification email: ${e.toString()}',
-        email: _authRepository.currentUser?.email,
-      ));
+      emit(
+        EmailVerificationState.error(
+          message: 'Failed to send verification email: ${e.toString()}',
+          email: _authRepository.currentUser?.email,
+        ),
+      );
     }
   }
 
@@ -151,9 +168,11 @@ class EmailVerificationBloc
       final user = _authRepository.currentUser;
 
       if (user == null) {
-        emit(const EmailVerificationState.error(
-          message: 'No user is currently signed in',
-        ));
+        emit(
+          const EmailVerificationState.error(
+            message: 'No user is currently signed in',
+          ),
+        );
         return;
       }
 
@@ -162,18 +181,22 @@ class EmailVerificationBloc
         emit(EmailVerificationState.verified(verifiedAt: user.lastSignInAt));
       } else {
         final cooldown = _calculateCooldown();
-        emit(EmailVerificationState.pending(
-          email: user.email,
-          emailSent: _lastSentAt != null,
-          lastSentAt: _lastSentAt,
-          resendCooldownSeconds: cooldown,
-        ));
+        emit(
+          EmailVerificationState.pending(
+            email: user.email,
+            emailSent: _lastSentAt != null,
+            lastSentAt: _lastSentAt,
+            resendCooldownSeconds: cooldown,
+          ),
+        );
       }
     } catch (e) {
-      emit(EmailVerificationState.error(
-        message: 'Failed to refresh verification status: ${e.toString()}',
-        email: _authRepository.currentUser?.email,
-      ));
+      emit(
+        EmailVerificationState.error(
+          message: 'Failed to refresh verification status: ${e.toString()}',
+          email: _authRepository.currentUser?.email,
+        ),
+      );
     }
   }
 
@@ -192,12 +215,14 @@ class EmailVerificationBloc
       emit(EmailVerificationState.verified(verifiedAt: user.lastSignInAt));
     } else {
       final cooldown = _calculateCooldown();
-      emit(EmailVerificationState.pending(
-        email: user.email,
-        emailSent: _lastSentAt != null,
-        lastSentAt: _lastSentAt,
-        resendCooldownSeconds: cooldown,
-      ));
+      emit(
+        EmailVerificationState.pending(
+          email: user.email,
+          emailSent: _lastSentAt != null,
+          lastSentAt: _lastSentAt,
+          resendCooldownSeconds: cooldown,
+        ),
+      );
     }
   }
 

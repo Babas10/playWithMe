@@ -44,7 +44,6 @@ class FakeAuthenticationEvent extends Fake implements AuthenticationEvent {}
 
 class FakeAuthenticationState extends Fake implements AuthenticationState {}
 
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 GameInvitationDetails _makeInvitation({String id = 'inv-1'}) =>
@@ -141,8 +140,9 @@ void main() {
   // ── Loaded with data ────────────────────────────────────────────────────────
 
   testWidgets('renders invitation card with game details', (tester) async {
-    when(() => mockBloc.state)
-        .thenReturn(GameInvitationsLoaded([_makeInvitation()]));
+    when(
+      () => mockBloc.state,
+    ).thenReturn(GameInvitationsLoaded([_makeInvitation()]));
 
     await tester.pumpWidget(buildPage());
     await tester.pump();
@@ -157,10 +157,12 @@ void main() {
 
   // ── Accept / Decline ────────────────────────────────────────────────────────
 
-  testWidgets('tapping Accept dispatches AcceptGameInvitation event',
-      (tester) async {
-    when(() => mockBloc.state)
-        .thenReturn(GameInvitationsLoaded([_makeInvitation()]));
+  testWidgets('tapping Accept dispatches AcceptGameInvitation event', (
+    tester,
+  ) async {
+    when(
+      () => mockBloc.state,
+    ).thenReturn(GameInvitationsLoaded([_makeInvitation()]));
 
     await tester.pumpWidget(buildPage());
     await tester.pump();
@@ -168,13 +170,17 @@ void main() {
     await tester.tap(find.text('Accept'));
     await tester.pump();
 
-    verify(() => mockBloc.add(any(that: isA<AcceptGameInvitation>()))).called(1);
+    verify(
+      () => mockBloc.add(any(that: isA<AcceptGameInvitation>())),
+    ).called(1);
   });
 
-  testWidgets('tapping Decline dispatches DeclineGameInvitation event',
-      (tester) async {
-    when(() => mockBloc.state)
-        .thenReturn(GameInvitationsLoaded([_makeInvitation()]));
+  testWidgets('tapping Decline dispatches DeclineGameInvitation event', (
+    tester,
+  ) async {
+    when(
+      () => mockBloc.state,
+    ).thenReturn(GameInvitationsLoaded([_makeInvitation()]));
 
     await tester.pumpWidget(buildPage());
     await tester.pump();
@@ -182,11 +188,14 @@ void main() {
     await tester.tap(find.text('Decline'));
     await tester.pump();
 
-    verify(() => mockBloc.add(any(that: isA<DeclineGameInvitation>()))).called(1);
+    verify(
+      () => mockBloc.add(any(that: isA<DeclineGameInvitation>())),
+    ).called(1);
   });
 
-  testWidgets('shows accepted snackbar on ActionSuccess(accepted)',
-      (tester) async {
+  testWidgets('shows accepted snackbar on ActionSuccess(accepted)', (
+    tester,
+  ) async {
     whenListen(
       mockBloc,
       Stream.fromIterable([
@@ -203,8 +212,9 @@ void main() {
     expect(find.text('Invitation accepted'), findsOneWidget);
   });
 
-  testWidgets('shows declined snackbar on ActionSuccess(declined)',
-      (tester) async {
+  testWidgets('shows declined snackbar on ActionSuccess(declined)', (
+    tester,
+  ) async {
     whenListen(
       mockBloc,
       Stream.fromIterable([
@@ -240,26 +250,33 @@ void main() {
 
   // ── Card tap navigation (Story 28.10) ───────────────────────────────────────
 
-  testWidgets('invitation card has tap handler wired to game navigation',
-      (tester) async {
-    when(() => mockBloc.state)
-        .thenReturn(GameInvitationsLoaded([_makeInvitation()]));
+  testWidgets('invitation card has tap handler wired to game navigation', (
+    tester,
+  ) async {
+    when(
+      () => mockBloc.state,
+    ).thenReturn(GameInvitationsLoaded([_makeInvitation()]));
 
     await tester.pumpWidget(buildPage());
     await tester.pump();
 
     // Verify the card is wrapped in an InkWell with a non-null onTap.
     final inkWells = tester.widgetList<InkWell>(find.byType(InkWell));
-    expect(inkWells.any((w) => w.onTap != null), isTrue,
-        reason: 'At least one InkWell on the card must have onTap set');
+    expect(
+      inkWells.any((w) => w.onTap != null),
+      isTrue,
+      reason: 'At least one InkWell on the card must have onTap set',
+    );
   });
 
   // ── Error state ─────────────────────────────────────────────────────────────
 
-  testWidgets('shows error page with retry button on error state',
-      (tester) async {
-    when(() => mockBloc.state)
-        .thenReturn(const GameInvitationsError('Network error'));
+  testWidgets('shows error page with retry button on error state', (
+    tester,
+  ) async {
+    when(
+      () => mockBloc.state,
+    ).thenReturn(const GameInvitationsError('Network error'));
 
     await tester.pumpWidget(buildPage());
     await tester.pump();
@@ -272,8 +289,9 @@ void main() {
 
   testWidgets('disables buttons while action in-flight', (tester) async {
     final inv = _makeInvitation();
-    when(() => mockBloc.state)
-        .thenReturn(GameInvitationActionInFlight([inv], 'inv-1'));
+    when(
+      () => mockBloc.state,
+    ).thenReturn(GameInvitationActionInFlight([inv], 'inv-1'));
 
     await tester.pumpWidget(buildPage());
     await tester.pump();

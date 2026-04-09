@@ -128,7 +128,9 @@ void main() {
       expect(find.byIcon(Icons.info_outline), findsOneWidget);
     });
 
-    testWidgets('displays both progress and message when provided', (tester) async {
+    testWidgets('displays both progress and message when provided', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -145,7 +147,10 @@ void main() {
       expect(find.text('Monthly Progress Chart'), findsOneWidget);
       expect(find.text('Play at least 3 games'), findsOneWidget);
       expect(find.text('1/3 games'), findsOneWidget);
-      expect(find.text('Start playing to track your progress!'), findsOneWidget);
+      expect(
+        find.text('Start playing to track your progress!'),
+        findsOneWidget,
+      );
     });
   });
 }

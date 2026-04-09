@@ -18,11 +18,15 @@ class FirebaseService {
     }
 
     try {
-      debugPrint('🔥 Initializing Firebase for ${EnvironmentConfig.environmentName}...');
+      debugPrint(
+        '🔥 Initializing Firebase for ${EnvironmentConfig.environmentName}...',
+      );
 
       // Validate configuration before initialization
       if (!FirebaseOptionsProvider.validateConfiguration()) {
-        debugPrint('⚠️  Proceeding with placeholder configuration for development');
+        debugPrint(
+          '⚠️  Proceeding with placeholder configuration for development',
+        );
       }
 
       // Initialize Firebase with environment-specific configuration
@@ -30,9 +34,13 @@ class FirebaseService {
 
       // Handle Firebase initialization with comprehensive duplicate app handling
       // Check all available Firebase apps first
-      debugPrint('🔍 Checking Firebase apps: ${Firebase.apps.length} apps available');
+      debugPrint(
+        '🔍 Checking Firebase apps: ${Firebase.apps.length} apps available',
+      );
       for (final app in Firebase.apps) {
-        debugPrint('📱 Found Firebase app: ${app.name} (${app.options.projectId})');
+        debugPrint(
+          '📱 Found Firebase app: ${app.name} (${app.options.projectId})',
+        );
       }
 
       // Try to get the default app first (handles both auto-initialization and manual initialization)
@@ -45,13 +53,19 @@ class FirebaseService {
         final currentProjectId = _app!.options.projectId;
         final expectedProjectId = EnvironmentConfig.firebaseProjectId;
         if (currentProjectId != expectedProjectId) {
-          debugPrint('⚠️  Warning: Existing Firebase app project ID ($currentProjectId) differs from expected ($expectedProjectId)');
-          debugPrint('🔧 This may indicate auto-initialization with default config instead of environment-specific config');
+          debugPrint(
+            '⚠️  Warning: Existing Firebase app project ID ($currentProjectId) differs from expected ($expectedProjectId)',
+          );
+          debugPrint(
+            '🔧 This may indicate auto-initialization with default config instead of environment-specific config',
+          );
         }
       } catch (e) {
         // If no default app exists, check if there are any other apps we can use
         if (Firebase.apps.isNotEmpty) {
-          debugPrint('🔧 No default app found, but ${Firebase.apps.length} other apps exist');
+          debugPrint(
+            '🔧 No default app found, but ${Firebase.apps.length} other apps exist',
+          );
           _app = Firebase.apps.first;
           debugPrint('🔥 Using first available Firebase app: ${_app!.name}');
         } else {
@@ -65,7 +79,9 @@ class FirebaseService {
           } catch (duplicateError) {
             if (duplicateError.toString().contains('duplicate-app')) {
               // Firebase was initialized between our checks (race condition)
-              debugPrint('🔧 Firebase was initialized during our attempt, using existing app');
+              debugPrint(
+                '🔧 Firebase was initialized during our attempt, using existing app',
+              );
               _app = Firebase.app();
               debugPrint('🔥 Using existing Firebase app: ${_app!.name}');
             } else {
@@ -78,7 +94,9 @@ class FirebaseService {
 
       // Verify we have a valid app
       if (_app == null) {
-        throw FirebaseInitializationException('Failed to obtain Firebase app instance');
+        throw FirebaseInitializationException(
+          'Failed to obtain Firebase app instance',
+        );
       }
 
       // Configure Firestore settings
@@ -90,8 +108,9 @@ class FirebaseService {
       _isInitialized = true;
 
       debugPrint('✅ Firebase initialized successfully');
-      debugPrint('🔗 Connected to project: ${EnvironmentConfig.firebaseProjectId}');
-
+      debugPrint(
+        '🔗 Connected to project: ${EnvironmentConfig.firebaseProjectId}',
+      );
     } catch (e, stackTrace) {
       debugPrint('❌ Firebase initialization failed: $e');
       debugPrint('Stack trace: $stackTrace');
@@ -101,7 +120,6 @@ class FirebaseService {
       );
     }
   }
-
 
   /// Configure Firestore settings for optimal performance
   static Future<void> _configureFirestore() async {
@@ -126,14 +144,19 @@ class FirebaseService {
       FirebaseFirestore.setLoggingEnabled(true);
     }
 
-    debugPrint('🗄️ Firestore configured for ${EnvironmentConfig.environmentName}');
+    debugPrint(
+      '🗄️ Firestore configured for ${EnvironmentConfig.environmentName}',
+    );
   }
 
   /// Configure Cloud Functions (use emulator in development if enabled)
   static void _configureCloudFunctions() {
     try {
       // Only use emulator if explicitly enabled via environment variable or compile-time constant
-      const bool useEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR', defaultValue: false);
+      const bool useEmulator = bool.fromEnvironment(
+        'USE_FIREBASE_EMULATOR',
+        defaultValue: false,
+      );
 
       if (useEmulator && EnvironmentConfig.isDevelopment) {
         // Use localhost emulator for dev environment
@@ -141,20 +164,25 @@ class FirebaseService {
         // For mobile platforms, you may need to use platform-specific host
         if (kIsWeb) {
           FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
-          debugPrint('⚡ Cloud Functions (Web) configured to use emulator on localhost:5001');
+          debugPrint(
+            '⚡ Cloud Functions (Web) configured to use emulator on localhost:5001',
+          );
         } else {
           // For mobile emulators/simulators, use 10.0.2.2 (Android) or localhost (iOS)
           FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
-          debugPrint('⚡ Cloud Functions (Mobile) configured to use emulator on localhost:5001');
+          debugPrint(
+            '⚡ Cloud Functions (Mobile) configured to use emulator on localhost:5001',
+          );
         }
       } else {
-        debugPrint('⚡ Cloud Functions configured for ${EnvironmentConfig.environmentName} (live)');
+        debugPrint(
+          '⚡ Cloud Functions configured for ${EnvironmentConfig.environmentName} (live)',
+        );
       }
     } catch (e) {
       debugPrint('⚠️ Warning: Failed to configure Cloud Functions: $e');
     }
   }
-
 
   /// Get the current Firebase app instance
   static FirebaseApp? get app => _app;
@@ -165,7 +193,9 @@ class FirebaseService {
   /// Get Firestore instance
   static FirebaseFirestore get firestore {
     if (!_isInitialized) {
-      throw StateError('Firebase not initialized. Call FirebaseService.initialize() first.');
+      throw StateError(
+        'Firebase not initialized. Call FirebaseService.initialize() first.',
+      );
     }
     return FirebaseFirestore.instance;
   }
@@ -173,7 +203,9 @@ class FirebaseService {
   /// Get Firebase Auth instance
   static FirebaseAuth get auth {
     if (!_isInitialized) {
-      throw StateError('Firebase not initialized. Call FirebaseService.initialize() first.');
+      throw StateError(
+        'Firebase not initialized. Call FirebaseService.initialize() first.',
+      );
     }
     return FirebaseAuth.instance;
   }
@@ -225,10 +257,7 @@ class FirebaseInitializationException implements Exception {
   final String message;
   final dynamic originalException;
 
-  const FirebaseInitializationException(
-    this.message, {
-    this.originalException,
-  });
+  const FirebaseInitializationException(this.message, {this.originalException});
 
   @override
   String toString() {

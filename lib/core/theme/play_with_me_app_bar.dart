@@ -42,20 +42,16 @@ class PlayWithMeAppBar {
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.sports_volleyball,
-            color: AppColors.secondary,
-            size: 22,
-          ),
+          Icon(Icons.sports_volleyball, color: AppColors.secondary, size: 22),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
               title,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.secondary,
-                    letterSpacing: -0.5,
-                  ),
+                fontWeight: FontWeight.w600,
+                color: AppColors.secondary,
+                letterSpacing: -0.5,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -63,16 +59,14 @@ class PlayWithMeAppBar {
       ),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(
-          color: AppColors.divider,
-          height: 1,
-        ),
+        child: Container(color: AppColors.divider, height: 1),
       ),
       actions: [
-        if (showUserActions) ..._buildUserActions(
-          context: context,
-          showProfileAction: showProfileAction,
-        ),
+        if (showUserActions)
+          ..._buildUserActions(
+            context: context,
+            showProfileAction: showProfileAction,
+          ),
         if (extraActions != null) ...extraActions,
       ],
     );
@@ -163,8 +157,10 @@ class PlayWithMeAppBar {
               return Stack(
                 children: [
                   IconButton(
-                    icon:
-                        const Icon(Icons.sports_volleyball_outlined, size: 22),
+                    icon: const Icon(
+                      Icons.sports_volleyball_outlined,
+                      size: 22,
+                    ),
                     visualDensity: VisualDensity.compact,
                     tooltip: l10n.gameInvitations,
                     onPressed: () async {
@@ -258,21 +254,17 @@ class PlayWithMeAppBar {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.secondary,
-            ),
+            style: TextButton.styleFrom(foregroundColor: AppColors.secondary),
             child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
-              context
-                  .read<AuthenticationBloc>()
-                  .add(const AuthenticationLogoutRequested());
+              context.read<AuthenticationBloc>().add(
+                const AuthenticationLogoutRequested(),
+              );
               Navigator.of(dialogContext).pop();
             },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.secondary,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.secondary),
             child: Text(l10n.signOut),
           ),
         ],

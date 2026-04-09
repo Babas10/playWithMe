@@ -10,9 +10,8 @@ import 'partner_detail_state.dart';
 class PartnerDetailBloc extends Bloc<PartnerDetailEvent, PartnerDetailState> {
   final UserRepository userRepository;
 
-  PartnerDetailBloc({
-    required this.userRepository,
-  }) : super(const PartnerDetailState.initial()) {
+  PartnerDetailBloc({required this.userRepository})
+    : super(const PartnerDetailState.initial()) {
     on<LoadPartnerDetails>(_onLoadPartnerDetails);
   }
 
@@ -33,27 +32,30 @@ class PartnerDetailBloc extends Bloc<PartnerDetailEvent, PartnerDetailState> {
       final partnerProfile = results[1] as UserModel?;
 
       if (stats == null) {
-        emit(const PartnerDetailState.error(
-          message: 'No statistics found for this partner',
-        ));
+        emit(
+          const PartnerDetailState.error(
+            message: 'No statistics found for this partner',
+          ),
+        );
         return;
       }
 
       if (partnerProfile == null) {
-        emit(const PartnerDetailState.error(
-          message: 'Partner profile not found',
-        ));
+        emit(
+          const PartnerDetailState.error(message: 'Partner profile not found'),
+        );
         return;
       }
 
-      emit(PartnerDetailState.loaded(
-        stats: stats,
-        partnerProfile: partnerProfile,
-      ));
+      emit(
+        PartnerDetailState.loaded(stats: stats, partnerProfile: partnerProfile),
+      );
     } catch (e) {
-      emit(PartnerDetailState.error(
-        message: 'Failed to load partner details: ${e.toString()}',
-      ));
+      emit(
+        PartnerDetailState.error(
+          message: 'Failed to load partner details: ${e.toString()}',
+        ),
+      );
     }
   }
 }

@@ -18,9 +18,7 @@ class JoinGroupConfirmationPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.joinGroupConfirmation),
-      ),
+      appBar: AppBar(title: Text(l10n.joinGroupConfirmation)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -30,9 +28,9 @@ class JoinGroupConfirmationPage extends StatelessWidget {
                 final message = state.alreadyMember
                     ? l10n.alreadyAMember
                     : l10n.groupJoinedSuccess(state.groupName);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(message)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(message)));
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                     builder: (_) => GroupDetailsPage(groupId: state.groupId),
@@ -97,9 +95,9 @@ class JoinGroupConfirmationPage extends StatelessWidget {
               children: [
                 Text(
                   state.groupName,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 if (state.groupDescription != null) ...[
                   const SizedBox(height: 8),
@@ -111,16 +109,16 @@ class JoinGroupConfirmationPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   l10n.invitedBy(state.inviterName),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   l10n.membersCount(state.memberCount),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -129,13 +127,9 @@ class JoinGroupConfirmationPage extends StatelessWidget {
         const Spacer(),
         FilledButton(
           onPressed: () {
-            context
-                .read<InviteJoinBloc>()
-                .add(JoinGroupViaInvite(state.token));
+            context.read<InviteJoinBloc>().add(JoinGroupViaInvite(state.token));
           },
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
           child: Text(l10n.joinGroup),
         ),
         const SizedBox(height: 12),
@@ -160,11 +154,7 @@ class JoinGroupConfirmationPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline,
-            size: 64,
-            color: AppColors.danger,
-          ),
+          const Icon(Icons.error_outline, size: 64, color: AppColors.danger),
           const SizedBox(height: 24),
           Text(
             message,

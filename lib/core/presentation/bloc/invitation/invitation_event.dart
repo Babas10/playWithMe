@@ -21,12 +21,12 @@ class SendInvitation extends InvitationEvent {
 
   @override
   List<Object?> get props => [
-        groupId,
-        groupName,
-        invitedUserId,
-        invitedBy,
-        inviterName,
-      ];
+    groupId,
+    groupName,
+    invitedUserId,
+    invitedBy,
+    inviterName,
+  ];
 }
 
 class LoadPendingInvitations extends InvitationEvent {
@@ -51,10 +51,7 @@ class AcceptInvitation extends InvitationEvent {
   final String userId;
   final String invitationId;
 
-  const AcceptInvitation({
-    required this.userId,
-    required this.invitationId,
-  });
+  const AcceptInvitation({required this.userId, required this.invitationId});
 
   @override
   List<Object?> get props => [userId, invitationId];
@@ -64,10 +61,7 @@ class DeclineInvitation extends InvitationEvent {
   final String userId;
   final String invitationId;
 
-  const DeclineInvitation({
-    required this.userId,
-    required this.invitationId,
-  });
+  const DeclineInvitation({required this.userId, required this.invitationId});
 
   @override
   List<Object?> get props => [userId, invitationId];
@@ -77,10 +71,7 @@ class DeleteInvitation extends InvitationEvent {
   final String userId;
   final String invitationId;
 
-  const DeleteInvitation({
-    required this.userId,
-    required this.invitationId,
-  });
+  const DeleteInvitation({required this.userId, required this.invitationId});
 
   @override
   List<Object?> get props => [userId, invitationId];

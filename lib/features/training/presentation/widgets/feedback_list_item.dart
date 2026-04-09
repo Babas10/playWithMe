@@ -9,10 +9,7 @@ import '../../../../core/data/models/training_feedback_model.dart';
 class FeedbackListItem extends StatelessWidget {
   final TrainingFeedbackModel feedback;
 
-  const FeedbackListItem({
-    super.key,
-    required this.feedback,
-  });
+  const FeedbackListItem({super.key, required this.feedback});
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +86,10 @@ class FeedbackListItem extends StatelessWidget {
 
                 // Rating pill — top right
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
@@ -97,7 +97,11 @@ class FeedbackListItem extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star, size: 14, color: AppColors.primary),
+                      const Icon(
+                        Icons.star,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         feedback.averageRating.toStringAsFixed(1),
@@ -117,11 +121,23 @@ class FeedbackListItem extends StatelessWidget {
             // Flat inline sub-ratings (no border boxes)
             Row(
               children: [
-                _buildInlineRating(Icons.fitness_center, 'Exercises', feedback.exercisesQuality),
+                _buildInlineRating(
+                  Icons.fitness_center,
+                  'Exercises',
+                  feedback.exercisesQuality,
+                ),
                 const SizedBox(width: 20),
-                _buildInlineRating(Icons.local_fire_department, 'Intensity', feedback.trainingIntensity),
+                _buildInlineRating(
+                  Icons.local_fire_department,
+                  'Intensity',
+                  feedback.trainingIntensity,
+                ),
                 const SizedBox(width: 20),
-                _buildInlineRating(Icons.school, 'Coaching', feedback.coachingClarity),
+                _buildInlineRating(
+                  Icons.school,
+                  'Coaching',
+                  feedback.coachingClarity,
+                ),
               ],
             ),
 
@@ -177,18 +193,12 @@ class FeedbackListItem extends StatelessWidget {
         const SizedBox(width: 3),
         const Text(
           '★',
-          style: TextStyle(
-            fontSize: 11,
-            color: AppColors.primary,
-          ),
+          style: TextStyle(fontSize: 11, color: AppColors.primary),
         ),
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textMuted,
-          ),
+          style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
         ),
       ],
     );

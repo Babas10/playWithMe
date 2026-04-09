@@ -24,11 +24,11 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     required UserRepository userRepository,
     required FirebaseAnalytics analytics,
     GameInvitationsRepository? invitationsRepository,
-  })  : _gameRepository = gameRepository,
-        _userRepository = userRepository,
-        _invitationsRepository = invitationsRepository,
-        _analytics = analytics,
-        super(const GameDetailsInitial()) {
+  }) : _gameRepository = gameRepository,
+       _userRepository = userRepository,
+       _invitationsRepository = invitationsRepository,
+       _analytics = analytics,
+       super(const GameDetailsInitial()) {
     on<LoadGameDetails>(_onLoadGameDetails);
     on<GameDetailsUpdated>(_onGameDetailsUpdated);
     on<JoinGameDetails>(_onJoinGameDetails);
@@ -46,24 +46,30 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       emit(const GameDetailsLoading());
 
       await _gameSubscription?.cancel();
-      _gameSubscription = _gameRepository.getGameStream(event.gameId).listen(
-        (game) {
-          add(GameDetailsUpdated(game: game));
-        },
-        onError: (error) {
-          add(GameDetailsUpdated(game: null));
-        },
-      );
+      _gameSubscription = _gameRepository
+          .getGameStream(event.gameId)
+          .listen(
+            (game) {
+              add(GameDetailsUpdated(game: game));
+            },
+            onError: (error) {
+              add(GameDetailsUpdated(game: null));
+            },
+          );
     } on GameException catch (e) {
-      emit(GameDetailsError(
-        message: e.message,
-        errorCode: e.code ?? 'LOAD_GAME_DETAILS_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: e.message,
+          errorCode: e.code ?? 'LOAD_GAME_DETAILS_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(GameDetailsError(
-        message: 'Failed to load game details: ${e.toString()}',
-        errorCode: 'LOAD_GAME_DETAILS_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: 'Failed to load game details: ${e.toString()}',
+          errorCode: 'LOAD_GAME_DETAILS_ERROR',
+        ),
+      );
     }
   }
 
@@ -72,7 +78,8 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     Emitter<GameDetailsState> emit,
   ) async {
     // Log when the RSVP screen first renders (state transitions from loading).
-    final isFirstLoad = state is GameDetailsLoading || state is GameDetailsInitial;
+    final isFirstLoad =
+        state is GameDetailsLoading || state is GameDetailsInitial;
 
     if (event.game != null) {
       final game = event.game!;
@@ -106,9 +113,12 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
                 final eloUpdate = game.eloUpdates[playerId];
                 if (eloUpdate != null && eloUpdate is Map) {
                   // Convert the eloUpdates map to RatingHistoryEntry for UI display
-                  final previousRating = (eloUpdate['previousRating'] as num?)?.toDouble() ?? 0.0;
-                  final newRating = (eloUpdate['newRating'] as num?)?.toDouble() ?? 0.0;
-                  final change = (eloUpdate['change'] as num?)?.toDouble() ?? 0.0;
+                  final previousRating =
+                      (eloUpdate['previousRating'] as num?)?.toDouble() ?? 0.0;
+                  final newRating =
+                      (eloUpdate['newRating'] as num?)?.toDouble() ?? 0.0;
+                  final change =
+                      (eloUpdate['change'] as num?)?.toDouble() ?? 0.0;
 
                   playerEloUpdates[playerId] = RatingHistoryEntry(
                     entryId: '', // Not needed for display purposes
@@ -122,7 +132,9 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
                   );
                 }
               } catch (e) {
-                debugPrint('Failed to parse ELO update for player $playerId: $e');
+                debugPrint(
+                  'Failed to parse ELO update for player $playerId: $e',
+                );
               }
             }
           }
@@ -133,15 +145,19 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
         }
       }
 
-      emit(GameDetailsLoaded(
-        game: game, 
-        players: players,
-        playerEloUpdates: playerEloUpdates,
-      ));
+      emit(
+        GameDetailsLoaded(
+          game: game,
+          players: players,
+          playerEloUpdates: playerEloUpdates,
+        ),
+      );
     } else {
-      emit(const GameDetailsNotFound(
-        message: 'Game not found or has been deleted',
-      ));
+      emit(
+        const GameDetailsNotFound(
+          message: 'Game not found or has been deleted',
+        ),
+      );
     }
   }
 
@@ -153,27 +169,33 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       // Keep showing current game while operation is in progress
       if (state is GameDetailsLoaded) {
         final currentState = state as GameDetailsLoaded;
-        emit(GameDetailsOperationInProgress(
-          game: currentState.game,
-          operation: 'join',
-          players: currentState.players,
-          playerEloUpdates: currentState.playerEloUpdates,
-        ));
+        emit(
+          GameDetailsOperationInProgress(
+            game: currentState.game,
+            operation: 'join',
+            players: currentState.players,
+            playerEloUpdates: currentState.playerEloUpdates,
+          ),
+        );
       }
 
       await _gameRepository.addPlayer(event.gameId, event.userId);
 
       // The stream will automatically update with the new state
     } on GameException catch (e) {
-      emit(GameDetailsError(
-        message: e.message,
-        errorCode: e.code ?? 'JOIN_GAME_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: e.message,
+          errorCode: e.code ?? 'JOIN_GAME_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(GameDetailsError(
-        message: 'Failed to join game: ${e.toString()}',
-        errorCode: 'JOIN_GAME_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: 'Failed to join game: ${e.toString()}',
+          errorCode: 'JOIN_GAME_ERROR',
+        ),
+      );
     }
   }
 
@@ -185,27 +207,33 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       // Keep showing current game while operation is in progress
       if (state is GameDetailsLoaded) {
         final currentState = state as GameDetailsLoaded;
-        emit(GameDetailsOperationInProgress(
-          game: currentState.game,
-          operation: 'leave',
-          players: currentState.players,
-          playerEloUpdates: currentState.playerEloUpdates,
-        ));
+        emit(
+          GameDetailsOperationInProgress(
+            game: currentState.game,
+            operation: 'leave',
+            players: currentState.players,
+            playerEloUpdates: currentState.playerEloUpdates,
+          ),
+        );
       }
 
       await _gameRepository.removePlayer(event.gameId, event.userId);
 
       // The stream will automatically update with the new state
     } on GameException catch (e) {
-      emit(GameDetailsError(
-        message: e.message,
-        errorCode: e.code ?? 'LEAVE_GAME_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: e.message,
+          errorCode: e.code ?? 'LEAVE_GAME_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(GameDetailsError(
-        message: 'Failed to leave game: ${e.toString()}',
-        errorCode: 'LEAVE_GAME_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: 'Failed to leave game: ${e.toString()}',
+          errorCode: 'LEAVE_GAME_ERROR',
+        ),
+      );
     }
   }
 
@@ -217,12 +245,14 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
       // Keep showing current game while operation is in progress
       if (state is GameDetailsLoaded) {
         final currentState = state as GameDetailsLoaded;
-        emit(GameDetailsOperationInProgress(
-          game: currentState.game,
-          operation: 'mark_completed',
-          players: currentState.players,
-          playerEloUpdates: currentState.playerEloUpdates,
-        ));
+        emit(
+          GameDetailsOperationInProgress(
+            game: currentState.game,
+            operation: 'mark_completed',
+            players: currentState.players,
+            playerEloUpdates: currentState.playerEloUpdates,
+          ),
+        );
       }
 
       await _gameRepository.markGameAsCompleted(event.gameId, event.userId);
@@ -235,15 +265,19 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
 
       // The stream will automatically update with the new state
     } on GameException catch (e) {
-      emit(GameDetailsError(
-        message: e.message,
-        errorCode: e.code ?? 'MARK_COMPLETED_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: e.message,
+          errorCode: e.code ?? 'MARK_COMPLETED_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(GameDetailsError(
-        message: 'Failed to mark game as completed: ${e.toString()}',
-        errorCode: 'MARK_COMPLETED_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: 'Failed to mark game as completed: ${e.toString()}',
+          errorCode: 'MARK_COMPLETED_ERROR',
+        ),
+      );
     }
   }
 
@@ -254,26 +288,32 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     try {
       if (state is GameDetailsLoaded) {
         final currentState = state as GameDetailsLoaded;
-        emit(GameDetailsOperationInProgress(
-          game: currentState.game,
-          operation: 'confirm_result',
-          players: currentState.players,
-          playerEloUpdates: currentState.playerEloUpdates,
-        ));
+        emit(
+          GameDetailsOperationInProgress(
+            game: currentState.game,
+            operation: 'confirm_result',
+            players: currentState.players,
+            playerEloUpdates: currentState.playerEloUpdates,
+          ),
+        );
       }
 
       await _gameRepository.confirmGameResult(event.gameId, event.userId);
       // Stream updates state
     } on GameException catch (e) {
-      emit(GameDetailsError(
-        message: e.message,
-        errorCode: e.code ?? 'CONFIRM_RESULT_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: e.message,
+          errorCode: e.code ?? 'CONFIRM_RESULT_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(GameDetailsError(
-        message: 'Failed to confirm result: ${e.toString()}',
-        errorCode: 'CONFIRM_RESULT_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: 'Failed to confirm result: ${e.toString()}',
+          errorCode: 'CONFIRM_RESULT_ERROR',
+        ),
+      );
     }
   }
 
@@ -284,27 +324,33 @@ class GameDetailsBloc extends Bloc<GameDetailsEvent, GameDetailsState> {
     try {
       if (state is GameDetailsLoaded) {
         final currentState = state as GameDetailsLoaded;
-        emit(GameDetailsOperationInProgress(
-          game: currentState.game,
-          operation: 'join',
-          players: currentState.players,
-          playerEloUpdates: currentState.playerEloUpdates,
-        ));
+        emit(
+          GameDetailsOperationInProgress(
+            game: currentState.game,
+            operation: 'join',
+            players: currentState.players,
+            playerEloUpdates: currentState.playerEloUpdates,
+          ),
+        );
       }
 
       await _invitationsRepository?.acceptGameInvitation(event.invitationId);
 
       // Stream will automatically update state once Firestore reflects the change
     } on GameException catch (e) {
-      emit(GameDetailsError(
-        message: e.message,
-        errorCode: e.code ?? 'JOIN_AS_GUEST_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: e.message,
+          errorCode: e.code ?? 'JOIN_AS_GUEST_ERROR',
+        ),
+      );
     } catch (e) {
-      emit(GameDetailsError(
-        message: 'Failed to join game: ${e.toString()}',
-        errorCode: 'JOIN_AS_GUEST_ERROR',
-      ));
+      emit(
+        GameDetailsError(
+          message: 'Failed to join game: ${e.toString()}',
+          errorCode: 'JOIN_AS_GUEST_ERROR',
+        ),
+      );
     }
   }
 

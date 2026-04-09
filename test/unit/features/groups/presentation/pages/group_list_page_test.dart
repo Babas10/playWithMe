@@ -22,13 +22,18 @@ import '../../../../helpers/test_helpers.dart';
 
 // Mock classes
 class MockAuthenticationBloc extends Mock implements AuthenticationBloc {}
+
 class MockGroupBloc extends Mock implements GroupBloc {}
+
 class MockInvitationBloc extends Mock implements InvitationBloc {}
 
 // Fakes for mocktail
 class FakeGroupEvent extends Fake implements GroupEvent {}
+
 class FakeGroupState extends Fake implements GroupState {}
-class FakeLocalePreferencesEntity extends Fake implements LocalePreferencesEntity {}
+
+class FakeLocalePreferencesEntity extends Fake
+    implements LocalePreferencesEntity {}
 
 void main() {
   late MockAuthenticationBloc mockAuthBloc;
@@ -49,7 +54,9 @@ void main() {
     mockGroupBloc = MockGroupBloc();
     mockInvitationBloc = MockInvitationBloc();
     when(() => mockInvitationBloc.state).thenReturn(const InvitationInitial());
-    when(() => mockInvitationBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(
+      () => mockInvitationBloc.stream,
+    ).thenAnswer((_) => const Stream.empty());
 
     // Default auth bloc state
     when(() => mockAuthBloc.state).thenReturn(
@@ -102,8 +109,12 @@ void main() {
   }
 
   group('GroupListPage', () {
-    testWidgets('displays login message when user is not authenticated', (tester) async {
-      when(() => mockAuthBloc.state).thenReturn(const AuthenticationUnauthenticated());
+    testWidgets('displays login message when user is not authenticated', (
+      tester,
+    ) async {
+      when(
+        () => mockAuthBloc.state,
+      ).thenReturn(const AuthenticationUnauthenticated());
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -111,8 +122,12 @@ void main() {
       expect(find.text('Please log in to view your groups'), findsOneWidget);
     });
 
-    testWidgets('displays loading indicator when GroupLoading state', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest(groupState: const GroupLoading()));
+    testWidgets('displays loading indicator when GroupLoading state', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createWidgetUnderTest(groupState: const GroupLoading()),
+      );
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -120,12 +135,14 @@ void main() {
 
     testWidgets('displays error message when GroupError state', (tester) async {
       const errorMessage = 'Failed to load groups';
-      await tester.pumpWidget(createWidgetUnderTest(
-        groupState: const GroupError(
-          message: errorMessage,
-          errorCode: 'LOAD_ERROR',
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          groupState: const GroupError(
+            message: errorMessage,
+            errorCode: 'LOAD_ERROR',
+          ),
         ),
-      ));
+      );
       await tester.pump(); // Initial build
       await tester.pump(); // BLoC event processing
       await tester.pump(); // State emission and rebuild
@@ -136,32 +153,42 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
     });
 
-    testWidgets('retry button triggers LoadGroupsForUser event', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest(
-        groupState: const GroupError(
-          message: 'Failed to load groups',
-          errorCode: 'LOAD_ERROR',
+    testWidgets('retry button triggers LoadGroupsForUser event', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          groupState: const GroupError(
+            message: 'Failed to load groups',
+            errorCode: 'LOAD_ERROR',
+          ),
         ),
-      ));
+      );
       await tester.pump();
 
       await tester.tap(find.text('Retry'));
       await tester.pump();
 
-      verify(() => mockGroupBloc.add(any(that: isA<LoadGroupsForUser>()))).called(greaterThanOrEqualTo(1));
+      verify(
+        () => mockGroupBloc.add(any(that: isA<LoadGroupsForUser>())),
+      ).called(greaterThanOrEqualTo(1));
     });
 
-    testWidgets('displays empty state when GroupsLoaded with empty list', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest(
-        groupState: const GroupsLoaded(groups: []),
-      ));
+    testWidgets('displays empty state when GroupsLoaded with empty list', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createWidgetUnderTest(groupState: const GroupsLoaded(groups: [])),
+      );
       await tester.pump();
 
       expect(find.byType(EmptyGroupList), findsOneWidget);
       expect(find.text("You're not part of any group yet"), findsOneWidget);
     });
 
-    testWidgets('displays list of groups when GroupsLoaded with groups', (tester) async {
+    testWidgets('displays list of groups when GroupsLoaded with groups', (
+      tester,
+    ) async {
       final groups = [
         GroupModel(
           id: 'group-1',
@@ -183,9 +210,9 @@ void main() {
         ),
       ];
 
-      await tester.pumpWidget(createWidgetUnderTest(
-        groupState: GroupsLoaded(groups: groups),
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(groupState: GroupsLoaded(groups: groups)),
+      );
       await tester.pump();
 
       expect(find.byType(GroupListItem), findsNWidgets(2));
@@ -193,7 +220,9 @@ void main() {
       expect(find.text('Sunday Players'), findsOneWidget);
     });
 
-    testWidgets('displays RefreshIndicator for pull-to-refresh', (tester) async {
+    testWidgets('displays RefreshIndicator for pull-to-refresh', (
+      tester,
+    ) async {
       final groups = [
         GroupModel(
           id: 'group-1',
@@ -205,9 +234,9 @@ void main() {
         ),
       ];
 
-      await tester.pumpWidget(createWidgetUnderTest(
-        groupState: GroupsLoaded(groups: groups),
-      ));
+      await tester.pumpWidget(
+        createWidgetUnderTest(groupState: GroupsLoaded(groups: groups)),
+      );
       await tester.pump();
 
       expect(find.byType(RefreshIndicator), findsOneWidget);
@@ -219,17 +248,22 @@ void main() {
 
       expect(find.byType(FloatingActionButton), findsOneWidget);
       expect(find.text('Create Group'), findsOneWidget);
-      expect(find.descendant(
-        of: find.byType(FloatingActionButton),
-        matching: find.byIcon(Icons.add),
-      ), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(FloatingActionButton),
+          matching: find.byIcon(Icons.add),
+        ),
+        findsOneWidget,
+      );
     });
 
     // NOTE: Navigation to GroupDetailsPage test removed - navigation requires real repositories
     // which cannot be properly mocked in widget tests. Navigation is covered in integration tests.
     // See: integration_test/group_navigation_integration_test.dart
 
-    testWidgets('tapping Create Group FAB navigates to GroupCreationPage', (tester) async {
+    testWidgets('tapping Create Group FAB navigates to GroupCreationPage', (
+      tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
 
@@ -241,13 +275,17 @@ void main() {
     });
 
     testWidgets('initial state shows empty state', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest(groupState: const GroupInitial()));
+      await tester.pumpWidget(
+        createWidgetUnderTest(groupState: const GroupInitial()),
+      );
       await tester.pump();
 
       expect(find.byType(EmptyGroupList), findsOneWidget);
     });
 
-    testWidgets('loads groups on initialization for authenticated user', (tester) async {
+    testWidgets('loads groups on initialization for authenticated user', (
+      tester,
+    ) async {
       // When blocOverride is provided, the widget doesn't trigger LoadGroupsForUser automatically
       // This test verifies the UI shows the empty state when no groups are loaded
       await tester.pumpWidget(createWidgetUnderTest());

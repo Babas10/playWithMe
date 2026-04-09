@@ -50,10 +50,7 @@ void main() {
           return userBloc;
         },
         act: (bloc) => bloc.add(const LoadUserById(uid: 'test-uid')),
-        expect: () => [
-          const UserLoading(),
-          UserLoaded(user: testUser),
-        ],
+        expect: () => [const UserLoading(), UserLoaded(user: testUser)],
       );
 
       blocTest<UserBloc, UserState>(
@@ -88,15 +85,14 @@ void main() {
           mockUserRepository.addUser(originalUser);
           return userBloc;
         },
-        act: (bloc) => bloc.add(const UpdateUserProfile(
-          uid: 'test-uid',
-          firstName: 'Jane',
-          lastName: 'Doe',
-        )),
-        expect: () => [
-          const UserLoading(),
-          isA<UserUpdated>(),
-        ],
+        act: (bloc) => bloc.add(
+          const UpdateUserProfile(
+            uid: 'test-uid',
+            firstName: 'Jane',
+            lastName: 'Doe',
+          ),
+        ),
+        expect: () => [const UserLoading(), isA<UserUpdated>()],
       );
 
       // Skipping error test as mock doesn't support throwing exceptions
@@ -118,14 +114,13 @@ void main() {
           mockUserRepository.addUser(updatedUser);
           return userBloc;
         },
-        act: (bloc) => bloc.add(const UpdateUserPreferences(
-          uid: 'test-uid',
-          notificationsEnabled: false,
-        )),
-        expect: () => [
-          const UserLoading(),
-          isA<UserUpdated>(),
-        ],
+        act: (bloc) => bloc.add(
+          const UpdateUserPreferences(
+            uid: 'test-uid',
+            notificationsEnabled: false,
+          ),
+        ),
+        expect: () => [const UserLoading(), isA<UserUpdated>()],
       );
     });
 
@@ -144,14 +139,9 @@ void main() {
           mockUserRepository.addUser(updatedUser);
           return userBloc;
         },
-        act: (bloc) => bloc.add(const JoinGroup(
-          uid: 'test-uid',
-          groupId: 'group-1',
-        )),
-        expect: () => [
-          const UserLoading(),
-          isA<UserUpdated>(),
-        ],
+        act: (bloc) =>
+            bloc.add(const JoinGroup(uid: 'test-uid', groupId: 'group-1')),
+        expect: () => [const UserLoading(), isA<UserUpdated>()],
       );
     });
 
@@ -182,10 +172,7 @@ void main() {
           return userBloc;
         },
         act: (bloc) => bloc.add(const SearchUsers(query: 'query')),
-        expect: () => [
-          const UserLoading(),
-          isA<UsersLoaded>(),
-        ],
+        expect: () => [const UserLoading(), isA<UsersLoaded>()],
       );
 
       // Skipping error test as mock doesn't support throwing exceptions

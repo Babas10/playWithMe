@@ -15,17 +15,14 @@ import 'package:intl/intl.dart';
 class FullEloHistoryPage extends StatelessWidget {
   final String userId;
 
-  const FullEloHistoryPage({
-    super.key,
-    required this.userId,
-  });
+  const FullEloHistoryPage({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => EloHistoryBloc(
-        userRepository: sl<UserRepository>(),
-      )..add(EloHistoryEvent.loadHistory(userId: userId, limit: 100)),
+      create: (context) =>
+          EloHistoryBloc(userRepository: sl<UserRepository>())
+            ..add(EloHistoryEvent.loadHistory(userId: userId, limit: 100)),
       child: Scaffold(
         appBar: PlayWithMeAppBar.build(
           context: context,
@@ -41,8 +38,8 @@ class FullEloHistoryPage extends StatelessWidget {
                     tooltip: 'Clear filter',
                     onPressed: () {
                       context.read<EloHistoryBloc>().add(
-                            const EloHistoryEvent.clearFilter(),
-                          );
+                        const EloHistoryEvent.clearFilter(),
+                      );
                     },
                   );
                 }
@@ -61,15 +58,29 @@ class FullEloHistoryPage extends StatelessWidget {
             return state.when(
               initial: () => const SizedBox.shrink(),
               loading: () => const Center(child: CircularProgressIndicator()),
-              loaded: (history, filteredHistory, startDate, endDate,
-                      selectedPeriod, bestEloInPeriod) =>
-                  _buildLoadedView(
-                      context, filteredHistory, startDate, endDate),
+              loaded:
+                  (
+                    history,
+                    filteredHistory,
+                    startDate,
+                    endDate,
+                    selectedPeriod,
+                    bestEloInPeriod,
+                  ) => _buildLoadedView(
+                    context,
+                    filteredHistory,
+                    startDate,
+                    endDate,
+                  ),
               error: (message) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     Text(message, textAlign: TextAlign.center),
                   ],
@@ -96,16 +107,22 @@ class FullEloHistoryPage extends StatelessWidget {
       context: context,
       firstDate: firstGameDate,
       lastDate: now,
-      initialDateRange: state.filterStartDate != null && state.filterEndDate != null
-          ? DateTimeRange(start: state.filterStartDate!, end: state.filterEndDate!)
+      initialDateRange:
+          state.filterStartDate != null && state.filterEndDate != null
+          ? DateTimeRange(
+              start: state.filterStartDate!,
+              end: state.filterEndDate!,
+            )
           : null,
     );
 
     if (picked != null && context.mounted) {
-      bloc.add(EloHistoryEvent.filterByDateRange(
-        startDate: picked.start,
-        endDate: picked.end,
-      ));
+      bloc.add(
+        EloHistoryEvent.filterByDateRange(
+          startDate: picked.start,
+          endDate: picked.end,
+        ),
+      );
     }
   }
 
@@ -128,10 +145,7 @@ class FullEloHistoryPage extends StatelessWidget {
               color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
-            Text(
-              'No ELO history yet',
-              style: theme.textTheme.titleLarge,
-            ),
+            Text('No ELO history yet', style: theme.textTheme.titleLarge),
             const SizedBox(height: 8),
             Text(
               'Play some games to see your rating history',
@@ -157,7 +171,9 @@ class FullEloHistoryPage extends StatelessWidget {
         // Stats summary
         Container(
           padding: const EdgeInsets.all(16.0),
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.3,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -167,12 +183,7 @@ class FullEloHistoryPage extends StatelessWidget {
                 history.length.toString(),
                 Colors.blue,
               ),
-              _buildStatChip(
-                context,
-                'W-L',
-                '$wins-$losses',
-                Colors.orange,
-              ),
+              _buildStatChip(context, 'W-L', '$wins-$losses', Colors.orange),
               _buildStatChip(
                 context,
                 'Total',
@@ -204,8 +215,8 @@ class FullEloHistoryPage extends StatelessWidget {
                 selectedPeriod: state.selectedPeriod,
                 onPeriodChanged: (period) {
                   context.read<EloHistoryBloc>().add(
-                        EloHistoryEvent.filterByPeriod(period),
-                      );
+                    EloHistoryEvent.filterByPeriod(period),
+                  );
                 },
               ),
             );
@@ -370,7 +381,9 @@ class FullEloHistoryPage extends StatelessWidget {
                     Text(
                       DateFormat('MMM d, y').format(entry.timestamp),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                     ),
                   ],

@@ -323,9 +323,7 @@ void main() {
       });
 
       test('demoteFromAdmin demotes admin successfully', () {
-        final group = testGroup.copyWith(
-          adminIds: ['user-123', 'user-456'],
-        );
+        final group = testGroup.copyWith(adminIds: ['user-123', 'user-456']);
 
         final updated = group.demoteFromAdmin('user-456');
 

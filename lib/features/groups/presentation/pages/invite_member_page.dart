@@ -45,7 +45,8 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
   void initState() {
     super.initState();
     _groupRepository = widget.groupRepositoryOverride ?? sl<GroupRepository>();
-    _invitationRepository = widget.invitationRepositoryOverride ?? sl<InvitationRepository>();
+    _invitationRepository =
+        widget.invitationRepositoryOverride ?? sl<InvitationRepository>();
     _friendRepository = widget.friendRepository;
     _loadGroupData();
   }
@@ -63,7 +64,11 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
     }
   }
 
-  Future<void> _sendInvitations(BuildContext context, String inviterUid, String inviterName) async {
+  Future<void> _sendInvitations(
+    BuildContext context,
+    String inviterUid,
+    String inviterName,
+  ) async {
     if (_selectedFriendIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -143,9 +148,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
               title: 'Invite Members',
               showUserActions: true,
             ),
-            body: const Center(
-              child: Text('Please log in to invite members'),
-            ),
+            body: const Center(child: Text('Please log in to invite members')),
           );
         }
 
@@ -157,9 +160,7 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
               title: 'Invite Members',
               showUserActions: true,
             ),
-            body: const Center(
-              child: Text('Friend list not available'),
-            ),
+            body: const Center(child: Text('Friend list not available')),
           );
         }
 
@@ -218,13 +219,15 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     FilledButton.icon(
-                      onPressed: _isSendingInvitations || _selectedFriendIds.isEmpty
+                      onPressed:
+                          _isSendingInvitations || _selectedFriendIds.isEmpty
                           ? null
                           : () => _sendInvitations(
-                                context,
-                                authState.user.uid,
-                                authState.user.displayName ?? authState.user.email,
-                              ),
+                              context,
+                              authState.user.uid,
+                              authState.user.displayName ??
+                                  authState.user.email,
+                            ),
                       icon: _isSendingInvitations
                           ? const SizedBox(
                               width: 20,
@@ -239,10 +242,10 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
                         _isSendingInvitations
                             ? 'Sending...'
                             : _selectedFriendIds.isEmpty
-                                ? 'Select friends to invite'
-                                : _selectedFriendIds.length == 1
-                                    ? 'Send Invitation'
-                                    : 'Send ${_selectedFriendIds.length} Invitations',
+                            ? 'Select friends to invite'
+                            : _selectedFriendIds.length == 1
+                            ? 'Send Invitation'
+                            : 'Send ${_selectedFriendIds.length} Invitations',
                       ),
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -257,5 +260,4 @@ class _InviteMemberPageState extends State<InviteMemberPage> {
       },
     );
   }
-
 }

@@ -45,7 +45,9 @@ class PendingInvitationsPage extends StatelessWidget {
   }
 
   Widget _buildScaffold(
-      BuildContext context, AuthenticationAuthenticated authState) {
+    BuildContext context,
+    AuthenticationAuthenticated authState,
+  ) {
     return Scaffold(
       appBar: PlayWithMeAppBar.build(
         context: context,
@@ -62,8 +64,8 @@ class PendingInvitationsPage extends StatelessWidget {
             );
             // Reload invitations after accepting
             context.read<InvitationBloc>().add(
-                  LoadPendingInvitations(userId: authState.user.uid),
-                );
+              LoadPendingInvitations(userId: authState.user.uid),
+            );
           } else if (state is InvitationDeclined) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -73,8 +75,8 @@ class PendingInvitationsPage extends StatelessWidget {
             );
             // Reload invitations after declining
             context.read<InvitationBloc>().add(
-                  LoadPendingInvitations(userId: authState.user.uid),
-                );
+              LoadPendingInvitations(userId: authState.user.uid),
+            );
           } else if (state is InvitationError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -84,16 +86,14 @@ class PendingInvitationsPage extends StatelessWidget {
             );
             // Reload invitations after error
             context.read<InvitationBloc>().add(
-                  LoadPendingInvitations(userId: authState.user.uid),
-                );
+              LoadPendingInvitations(userId: authState.user.uid),
+            );
           }
         },
         builder: (context, state) {
           // Show loading when explicitly loading (not from stream updates)
           if (state is InvitationLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           // Show invitations list
@@ -110,19 +110,19 @@ class PendingInvitationsPage extends StatelessWidget {
                   invitation: invitation,
                   onAccept: () {
                     context.read<InvitationBloc>().add(
-                          AcceptInvitation(
-                            userId: authState.user.uid,
-                            invitationId: invitation.id,
-                          ),
-                        );
+                      AcceptInvitation(
+                        userId: authState.user.uid,
+                        invitationId: invitation.id,
+                      ),
+                    );
                   },
                   onDecline: () {
                     context.read<InvitationBloc>().add(
-                          DeclineInvitation(
-                            userId: authState.user.uid,
-                            invitationId: invitation.id,
-                          ),
-                        );
+                      DeclineInvitation(
+                        userId: authState.user.uid,
+                        invitationId: invitation.id,
+                      ),
+                    );
                   },
                 );
               },
@@ -157,8 +157,8 @@ class PendingInvitationsPage extends StatelessWidget {
             child: Text(
               'You don\'t have any pending group invitations at the moment.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
           ),

@@ -10,14 +10,14 @@ void main() {
       // Set up mock method channel for SharedPreferences
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('plugins.flutter.io/shared_preferences'),
-        (MethodCall methodCall) async {
-          if (methodCall.method == 'getAll') {
-            return <String, dynamic>{};
-          }
-          return null;
-        },
-      );
+            const MethodChannel('plugins.flutter.io/shared_preferences'),
+            (MethodCall methodCall) async {
+              if (methodCall.method == 'getAll') {
+                return <String, dynamic>{};
+              }
+              return null;
+            },
+          );
     });
 
     tearDown(() {
@@ -28,9 +28,12 @@ void main() {
       await expectLater(initializeDependencies(), completes);
     });
 
-    test('should be able to call initializeDependencies multiple times', () async {
-      await initializeDependencies();
-      await expectLater(initializeDependencies(), completes);
-    });
+    test(
+      'should be able to call initializeDependencies multiple times',
+      () async {
+        await initializeDependencies();
+        await expectLater(initializeDependencies(), completes);
+      },
+    );
   });
 }

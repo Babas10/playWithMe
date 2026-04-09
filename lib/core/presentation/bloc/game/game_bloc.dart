@@ -10,8 +10,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   StreamSubscription<dynamic>? _upcomingGamesSubscription;
 
   GameBloc({required GameRepository gameRepository})
-      : _gameRepository = gameRepository,
-        super(const GameInitial()) {
+    : _gameRepository = gameRepository,
+      super(const GameInitial()) {
     on<LoadGameById>(_onLoadGameById);
     on<LoadGamesForUser>(_onLoadGamesForUser);
     on<LoadGamesForGroup>(_onLoadGamesForGroup);
@@ -50,10 +50,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         emit(const GameNotFound(message: 'Game not found'));
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load game: ${e.toString()}',
-        errorCode: 'LOAD_GAME_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load game: ${e.toString()}',
+          errorCode: 'LOAD_GAME_ERROR',
+        ),
+      );
     }
   }
 
@@ -65,22 +67,28 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       emit(const GameLoading());
 
       await _gamesSubscription?.cancel();
-      _gamesSubscription = _gameRepository.getGamesForUser(event.userId).listen(
-        (games) {
-          emit(GamesLoaded(games: games));
-        },
-        onError: (error) {
-          emit(GameError(
-            message: 'Failed to load user games: ${error.toString()}',
-            errorCode: 'LOAD_USER_GAMES_ERROR',
-          ));
-        },
-      );
+      _gamesSubscription = _gameRepository
+          .getGamesForUser(event.userId)
+          .listen(
+            (games) {
+              emit(GamesLoaded(games: games));
+            },
+            onError: (error) {
+              emit(
+                GameError(
+                  message: 'Failed to load user games: ${error.toString()}',
+                  errorCode: 'LOAD_USER_GAMES_ERROR',
+                ),
+              );
+            },
+          );
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load user games: ${e.toString()}',
-        errorCode: 'LOAD_USER_GAMES_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load user games: ${e.toString()}',
+          errorCode: 'LOAD_USER_GAMES_ERROR',
+        ),
+      );
     }
   }
 
@@ -92,22 +100,28 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       emit(const GameLoading());
 
       await _gamesSubscription?.cancel();
-      _gamesSubscription = _gameRepository.getGamesForGroup(event.groupId).listen(
-        (games) {
-          emit(GamesLoaded(games: games));
-        },
-        onError: (error) {
-          emit(GameError(
-            message: 'Failed to load group games: ${error.toString()}',
-            errorCode: 'LOAD_GROUP_GAMES_ERROR',
-          ));
-        },
-      );
+      _gamesSubscription = _gameRepository
+          .getGamesForGroup(event.groupId)
+          .listen(
+            (games) {
+              emit(GamesLoaded(games: games));
+            },
+            onError: (error) {
+              emit(
+                GameError(
+                  message: 'Failed to load group games: ${error.toString()}',
+                  errorCode: 'LOAD_GROUP_GAMES_ERROR',
+                ),
+              );
+            },
+          );
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load group games: ${e.toString()}',
-        errorCode: 'LOAD_GROUP_GAMES_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load group games: ${e.toString()}',
+          errorCode: 'LOAD_GROUP_GAMES_ERROR',
+        ),
+      );
     }
   }
 
@@ -119,22 +133,28 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       emit(const GameLoading());
 
       await _upcomingGamesSubscription?.cancel();
-      _upcomingGamesSubscription = _gameRepository.getUpcomingGamesForUser(event.userId).listen(
-        (games) {
-          emit(GamesLoaded(games: games));
-        },
-        onError: (error) {
-          emit(GameError(
-            message: 'Failed to load upcoming games: ${error.toString()}',
-            errorCode: 'LOAD_UPCOMING_GAMES_ERROR',
-          ));
-        },
-      );
+      _upcomingGamesSubscription = _gameRepository
+          .getUpcomingGamesForUser(event.userId)
+          .listen(
+            (games) {
+              emit(GamesLoaded(games: games));
+            },
+            onError: (error) {
+              emit(
+                GameError(
+                  message: 'Failed to load upcoming games: ${error.toString()}',
+                  errorCode: 'LOAD_UPCOMING_GAMES_ERROR',
+                ),
+              );
+            },
+          );
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load upcoming games: ${e.toString()}',
-        errorCode: 'LOAD_UPCOMING_GAMES_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load upcoming games: ${e.toString()}',
+          errorCode: 'LOAD_UPCOMING_GAMES_ERROR',
+        ),
+      );
     }
   }
 
@@ -152,32 +172,30 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       emit(GamesLoaded(games: games));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load past games: ${e.toString()}',
-        errorCode: 'LOAD_PAST_GAMES_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load past games: ${e.toString()}',
+          errorCode: 'LOAD_PAST_GAMES_ERROR',
+        ),
+      );
     }
   }
 
-  Future<void> _onCreateGame(
-    CreateGame event,
-    Emitter<GameState> emit,
-  ) async {
+  Future<void> _onCreateGame(CreateGame event, Emitter<GameState> emit) async {
     try {
       emit(const GameLoading());
 
       final gameId = await _gameRepository.createGame(event.game);
       final createdGame = event.game.copyWith(id: gameId);
 
-      emit(GameCreated(
-        gameId: gameId,
-        game: createdGame,
-      ));
+      emit(GameCreated(gameId: gameId, game: createdGame));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to create game: ${e.toString()}',
-        errorCode: 'CREATE_GAME_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to create game: ${e.toString()}',
+          errorCode: 'CREATE_GAME_ERROR',
+        ),
+      );
     }
   }
 
@@ -201,20 +219,26 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Game information updated successfully',
-        ));
+        emit(
+          GameUpdated(
+            game: updatedGame,
+            message: 'Game information updated successfully',
+          ),
+        );
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Game information updated successfully',
-        ));
+        emit(
+          const GameOperationSuccess(
+            message: 'Game information updated successfully',
+          ),
+        );
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to update game info: ${e.toString()}',
-        errorCode: 'UPDATE_GAME_INFO_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to update game info: ${e.toString()}',
+          errorCode: 'UPDATE_GAME_INFO_ERROR',
+        ),
+      );
     }
   }
 
@@ -240,27 +264,30 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Game settings updated successfully',
-        ));
+        emit(
+          GameUpdated(
+            game: updatedGame,
+            message: 'Game settings updated successfully',
+          ),
+        );
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Game settings updated successfully',
-        ));
+        emit(
+          const GameOperationSuccess(
+            message: 'Game settings updated successfully',
+          ),
+        );
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to update game settings: ${e.toString()}',
-        errorCode: 'UPDATE_GAME_SETTINGS_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to update game settings: ${e.toString()}',
+          errorCode: 'UPDATE_GAME_SETTINGS_ERROR',
+        ),
+      );
     }
   }
 
-  Future<void> _onJoinGame(
-    JoinGame event,
-    Emitter<GameState> emit,
-  ) async {
+  Future<void> _onJoinGame(JoinGame event, Emitter<GameState> emit) async {
     try {
       emit(const GameLoading());
 
@@ -268,27 +295,23 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Successfully joined game',
-        ));
+        emit(
+          GameUpdated(game: updatedGame, message: 'Successfully joined game'),
+        );
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Successfully joined game',
-        ));
+        emit(const GameOperationSuccess(message: 'Successfully joined game'));
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to join game: ${e.toString()}',
-        errorCode: 'JOIN_GAME_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to join game: ${e.toString()}',
+          errorCode: 'JOIN_GAME_ERROR',
+        ),
+      );
     }
   }
 
-  Future<void> _onLeaveGame(
-    LeaveGame event,
-    Emitter<GameState> emit,
-  ) async {
+  Future<void> _onLeaveGame(LeaveGame event, Emitter<GameState> emit) async {
     try {
       emit(const GameLoading());
 
@@ -296,27 +319,21 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Successfully left game',
-        ));
+        emit(GameUpdated(game: updatedGame, message: 'Successfully left game'));
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Successfully left game',
-        ));
+        emit(const GameOperationSuccess(message: 'Successfully left game'));
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to leave game: ${e.toString()}',
-        errorCode: 'LEAVE_GAME_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to leave game: ${e.toString()}',
+          errorCode: 'LEAVE_GAME_ERROR',
+        ),
+      );
     }
   }
 
-  Future<void> _onStartGame(
-    StartGame event,
-    Emitter<GameState> emit,
-  ) async {
+  Future<void> _onStartGame(StartGame event, Emitter<GameState> emit) async {
     try {
       emit(const GameLoading());
 
@@ -324,27 +341,23 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Game started successfully',
-        ));
+        emit(
+          GameUpdated(game: updatedGame, message: 'Game started successfully'),
+        );
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Game started successfully',
-        ));
+        emit(const GameOperationSuccess(message: 'Game started successfully'));
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to start game: ${e.toString()}',
-        errorCode: 'START_GAME_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to start game: ${e.toString()}',
+          errorCode: 'START_GAME_ERROR',
+        ),
+      );
     }
   }
 
-  Future<void> _onEndGame(
-    EndGame event,
-    Emitter<GameState> emit,
-  ) async {
+  Future<void> _onEndGame(EndGame event, Emitter<GameState> emit) async {
     try {
       emit(const GameLoading());
 
@@ -356,27 +369,23 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Game ended successfully',
-        ));
+        emit(
+          GameUpdated(game: updatedGame, message: 'Game ended successfully'),
+        );
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Game ended successfully',
-        ));
+        emit(const GameOperationSuccess(message: 'Game ended successfully'));
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to end game: ${e.toString()}',
-        errorCode: 'END_GAME_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to end game: ${e.toString()}',
+          errorCode: 'END_GAME_ERROR',
+        ),
+      );
     }
   }
 
-  Future<void> _onCancelGame(
-    CancelGame event,
-    Emitter<GameState> emit,
-  ) async {
+  Future<void> _onCancelGame(CancelGame event, Emitter<GameState> emit) async {
     try {
       emit(const GameLoading());
 
@@ -384,20 +393,24 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Game cancelled successfully',
-        ));
+        emit(
+          GameUpdated(
+            game: updatedGame,
+            message: 'Game cancelled successfully',
+          ),
+        );
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Game cancelled successfully',
-        ));
+        emit(
+          const GameOperationSuccess(message: 'Game cancelled successfully'),
+        );
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to cancel game: ${e.toString()}',
-        errorCode: 'CANCEL_GAME_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to cancel game: ${e.toString()}',
+          errorCode: 'CANCEL_GAME_ERROR',
+        ),
+      );
     }
   }
 
@@ -412,20 +425,24 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Scores updated successfully',
-        ));
+        emit(
+          GameUpdated(
+            game: updatedGame,
+            message: 'Scores updated successfully',
+          ),
+        );
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Scores updated successfully',
-        ));
+        emit(
+          const GameOperationSuccess(message: 'Scores updated successfully'),
+        );
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to update scores: ${e.toString()}',
-        errorCode: 'UPDATE_SCORES_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to update scores: ${e.toString()}',
+          errorCode: 'UPDATE_SCORES_ERROR',
+        ),
+      );
     }
   }
 
@@ -445,10 +462,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       emit(GamesLoaded(games: games));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load games by location: ${e.toString()}',
-        errorCode: 'LOAD_GAMES_BY_LOCATION_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load games by location: ${e.toString()}',
+          errorCode: 'LOAD_GAMES_BY_LOCATION_ERROR',
+        ),
+      );
     }
   }
 
@@ -466,10 +485,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       emit(GamesLoaded(games: games));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load games by status: ${e.toString()}',
-        errorCode: 'LOAD_GAMES_BY_STATUS_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load games by status: ${e.toString()}',
+          errorCode: 'LOAD_GAMES_BY_STATUS_ERROR',
+        ),
+      );
     }
   }
 
@@ -483,10 +504,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       final games = await _gameRepository.getGamesToday();
       emit(GamesLoaded(games: games));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load today\'s games: ${e.toString()}',
-        errorCode: 'LOAD_GAMES_TODAY_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load today\'s games: ${e.toString()}',
+          errorCode: 'LOAD_GAMES_TODAY_ERROR',
+        ),
+      );
     }
   }
 
@@ -500,10 +523,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       final games = await _gameRepository.getGamesThisWeek();
       emit(GamesLoaded(games: games));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load this week\'s games: ${e.toString()}',
-        errorCode: 'LOAD_GAMES_THIS_WEEK_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load this week\'s games: ${e.toString()}',
+          errorCode: 'LOAD_GAMES_THIS_WEEK_ERROR',
+        ),
+      );
     }
   }
 
@@ -521,10 +546,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       emit(GamesLoaded(games: games));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to search games: ${e.toString()}',
-        errorCode: 'SEARCH_GAMES_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to search games: ${e.toString()}',
+          errorCode: 'SEARCH_GAMES_ERROR',
+        ),
+      );
     }
   }
 
@@ -538,30 +565,29 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       final stats = await _gameRepository.getGameStats(event.gameId);
       emit(GameStatsLoaded(stats: stats));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to load game stats: ${e.toString()}',
-        errorCode: 'LOAD_GAME_STATS_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to load game stats: ${e.toString()}',
+          errorCode: 'LOAD_GAME_STATS_ERROR',
+        ),
+      );
     }
   }
 
-  Future<void> _onDeleteGame(
-    DeleteGame event,
-    Emitter<GameState> emit,
-  ) async {
+  Future<void> _onDeleteGame(DeleteGame event, Emitter<GameState> emit) async {
     try {
       emit(const GameLoading());
 
       await _gameRepository.deleteGame(event.gameId);
 
-      emit(const GameOperationSuccess(
-        message: 'Game deleted successfully',
-      ));
+      emit(const GameOperationSuccess(message: 'Game deleted successfully'));
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to delete game: ${e.toString()}',
-        errorCode: 'DELETE_GAME_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to delete game: ${e.toString()}',
+          errorCode: 'DELETE_GAME_ERROR',
+        ),
+      );
     }
   }
 
@@ -581,20 +607,24 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       final updatedGame = await _gameRepository.getGameById(event.gameId);
       if (updatedGame != null) {
-        emit(GameUpdated(
-          game: updatedGame,
-          message: 'Game result saved successfully',
-        ));
+        emit(
+          GameUpdated(
+            game: updatedGame,
+            message: 'Game result saved successfully',
+          ),
+        );
       } else {
-        emit(const GameOperationSuccess(
-          message: 'Game result saved successfully',
-        ));
+        emit(
+          const GameOperationSuccess(message: 'Game result saved successfully'),
+        );
       }
     } catch (e) {
-      emit(GameError(
-        message: 'Failed to save game result: ${e.toString()}',
-        errorCode: 'SAVE_GAME_RESULT_ERROR',
-      ));
+      emit(
+        GameError(
+          message: 'Failed to save game result: ${e.toString()}',
+          errorCode: 'SAVE_GAME_RESULT_ERROR',
+        ),
+      );
     }
   }
 
