@@ -293,7 +293,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _selectedIndex = 0;
 
   // Pages for bottom navigation: Home, Stats, Groups, Community
@@ -307,6 +307,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     final authState = context.read<AuthenticationBloc>().state;
     _groupBloc = sl<GroupBloc>();
@@ -402,7 +403,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _accountStatusBloc.add(const RefreshVerificationStatus());
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     HomePage.onNavigateToTab = null;
     _groupBloc.close();
     _friendRequestCountBloc.close();

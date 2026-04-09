@@ -265,6 +265,75 @@ void main() {
       });
     });
 
+    group('RefreshVerificationStatus', () {
+      blocTest<AccountStatusBloc, AccountStatusState>(
+        'emits [AccountStatusActive] when reload finds email is now verified',
+        setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
+          when(
+            () => mockAuthRepository.currentUser,
+          ).thenReturn(createUser(isEmailVerified: true));
+        },
+        build: buildBloc,
+        seed: () => const AccountStatusPending(daysRemaining: 5),
+        act: (bloc) => bloc.add(const RefreshVerificationStatus()),
+        expect: () => [const AccountStatusActive()],
+      );
+
+      blocTest<AccountStatusBloc, AccountStatusState>(
+        'emits nothing when reload finds email still unverified',
+        setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
+          when(
+            () => mockAuthRepository.currentUser,
+          ).thenReturn(createUser(isEmailVerified: false));
+        },
+        build: buildBloc,
+        seed: () => const AccountStatusPending(daysRemaining: 5),
+        act: (bloc) => bloc.add(const RefreshVerificationStatus()),
+        expect: () => <AccountStatusState>[],
+      );
+
+      blocTest<AccountStatusBloc, AccountStatusState>(
+        'emits [AccountStatusActive] from restricted state when email verified',
+        setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
+          when(
+            () => mockAuthRepository.currentUser,
+          ).thenReturn(createUser(isEmailVerified: true));
+        },
+        build: buildBloc,
+        seed: () => const AccountStatusRestricted(daysUntilDeletion: 10),
+        act: (bloc) => bloc.add(const RefreshVerificationStatus()),
+        expect: () => [const AccountStatusActive()],
+      );
+
+      blocTest<AccountStatusBloc, AccountStatusState>(
+        'emits nothing when state is already active',
+        setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
+        },
+        build: buildBloc,
+        seed: () => const AccountStatusActive(),
+        act: (bloc) => bloc.add(const RefreshVerificationStatus()),
+        expect: () => <AccountStatusState>[],
+        verify: (_) => verifyNever(() => mockAuthRepository.reloadUser()),
+      );
+
+      blocTest<AccountStatusBloc, AccountStatusState>(
+        'silently ignores reloadUser errors',
+        setUp: () {
+          when(
+            () => mockAuthRepository.reloadUser(),
+          ).thenThrow(Exception('network error'));
+        },
+        build: buildBloc,
+        seed: () => const AccountStatusPending(daysRemaining: 5),
+        act: (bloc) => bloc.add(const RefreshVerificationStatus()),
+        expect: () => <AccountStatusState>[],
+      );
+    });
+
     group('AccountStatusEvent equatable', () {
       test('CheckAccountStatus instances are equal', () {
         expect(const CheckAccountStatus(), equals(const CheckAccountStatus()));
@@ -281,6 +350,13 @@ void main() {
         expect(
           const DismissAccountWarning(),
           equals(const DismissAccountWarning()),
+        );
+      });
+
+      test('RefreshVerificationStatus instances are equal', () {
+        expect(
+          const RefreshVerificationStatus(),
+          equals(const RefreshVerificationStatus()),
         );
       });
     });

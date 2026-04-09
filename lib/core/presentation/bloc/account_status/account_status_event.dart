@@ -22,3 +22,10 @@ class AccountEmailVerified extends AccountStatusEvent {
 class DismissAccountWarning extends AccountStatusEvent {
   const DismissAccountWarning();
 }
+
+/// Reload user data from Firebase and re-check email verification status.
+/// Dispatched when the app resumes from background so the banner disappears
+/// automatically after the user taps the verification link in their email.
+class RefreshVerificationStatus extends AccountStatusEvent {
+  const RefreshVerificationStatus();
+}

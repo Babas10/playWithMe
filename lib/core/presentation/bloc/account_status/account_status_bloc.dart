@@ -17,6 +17,7 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
     on<CheckAccountStatus>(_onCheckStatus);
     on<AccountEmailVerified>(_onEmailVerified);
     on<DismissAccountWarning>(_onDismissWarning);
+    on<RefreshVerificationStatus>(_onRefreshVerificationStatus);
 
     _authStateSubscription = _authRepository.authStateChanges.listen((user) {
       if (user != null && user.isEmailVerified) {
@@ -81,6 +82,25 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
     final currentState = state;
     if (currentState is AccountStatusPending) {
       emit(currentState.copyWith(isDismissed: true));
+    }
+  }
+
+  Future<void> _onRefreshVerificationStatus(
+    RefreshVerificationStatus event,
+    Emitter<AccountStatusState> emit,
+  ) async {
+    // Only worth reloading when we know the email is still unverified.
+    if (state is! AccountStatusPending && state is! AccountStatusRestricted) {
+      return;
+    }
+    try {
+      await _authRepository.reloadUser();
+      final user = _authRepository.currentUser;
+      if (user != null && user.isEmailVerified) {
+        emit(const AccountStatusActive());
+      }
+    } catch (_) {
+      // Silently ignore — the next natural refresh will pick it up.
     }
   }
 
