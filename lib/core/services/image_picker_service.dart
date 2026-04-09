@@ -51,20 +51,10 @@ class ImagePickerService {
           'Camera access denied. Please enable camera access in your device settings.',
         );
       }
-      if (e.code == 'photo_access_denied') {
-        throw Exception(
-          'Photo library access denied. Please enable photo access in your device settings.',
-        );
-      }
       throw Exception('Failed to pick image: ${e.message}');
     } catch (e) {
       throw Exception('Failed to pick image: $e');
     }
-  }
-
-  /// Pick image from gallery
-  Future<File?> pickFromGallery({bool cropSquare = true}) async {
-    return pickImage(source: ImageSource.gallery, cropSquare: cropSquare);
   }
 
   /// Pick image from camera

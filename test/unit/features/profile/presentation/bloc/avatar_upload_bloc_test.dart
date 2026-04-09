@@ -35,7 +35,7 @@ void main() {
 
     // Register fallback values
     registerFallbackValue(File(''));
-    registerFallbackValue(ImageSource.gallery);
+    registerFallbackValue(ImageSource.camera);
   });
 
   AvatarUploadBloc createBloc() {
@@ -95,7 +95,7 @@ void main() {
         build: createBloc,
         act: (bloc) => bloc.add(
           const AvatarUploadEvent.imageSourceSelected(
-            source: ImageSource.gallery,
+            source: ImageSource.camera,
           ),
         ),
         expect: () => [
@@ -140,7 +140,7 @@ void main() {
         build: createBloc,
         act: (bloc) => bloc.add(
           const AvatarUploadEvent.imageSourceSelected(
-            source: ImageSource.gallery,
+            source: ImageSource.camera,
           ),
         ),
         expect: () => [

@@ -332,7 +332,7 @@ void main() {
         expect(cameraIcon, findsOneWidget);
       });
 
-      testWidgets('camera button opens image source selection dialog', (
+      testWidgets('camera button directly opens camera without bottom sheet', (
         tester,
       ) async {
         await tester.pumpWidget(createWidgetUnderTest(testUser));
@@ -343,11 +343,9 @@ void main() {
         await tester.tap(cameraButton);
         await tester.pumpAndSettle();
 
-        // Verify bottom sheet appears with options
-        expect(find.text('Take Photo'), findsOneWidget);
-        expect(find.text('Choose from Gallery'), findsOneWidget);
-        // Note: "Cancel" text appears in both AppBar and bottom sheet, so we check for at least one
-        expect(find.text('Cancel'), findsWidgets);
+        // Verify no source-selection bottom sheet appears
+        expect(find.text('Take Photo'), findsNothing);
+        expect(find.text('Choose from Gallery'), findsNothing);
       });
 
       testWidgets('shows delete button when user has current photo', (
@@ -432,12 +430,12 @@ void main() {
         final cameraButton = find.widgetWithIcon(IconButton, Icons.camera_alt);
         expect(cameraButton, findsOneWidget);
 
-        // Try tapping - should work without errors
+        // Try tapping - should work without errors and not show a bottom sheet
         await tester.tap(cameraButton);
         await tester.pumpAndSettle();
 
-        // Bottom sheet should appear
-        expect(find.text('Take Photo'), findsOneWidget);
+        // Camera opens directly — no source-selection bottom sheet
+        expect(find.text('Take Photo'), findsNothing);
       });
     });
 
