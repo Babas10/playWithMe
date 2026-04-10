@@ -387,10 +387,11 @@ class _PlayersCard extends StatelessWidget {
             : <String, dynamic>{};
         final isOperationInProgress = state is GameDetailsOperationInProgress;
 
-        final isCreator = currentUserId != null &&
-            currentUserId == game.createdBy;
-        final canInviteGuests =
-            isCreator && game.status == GameStatus.scheduled;
+        final isCreator =
+            currentUserId != null &&
+            currentUserId == game.createdBy &&
+            game.status == GameStatus.scheduled &&
+            !game.isFull;
 
         return Card(
           child: Padding(
@@ -408,17 +409,30 @@ class _PlayersCard extends StatelessWidget {
                         color: AppColors.secondary,
                       ),
                     ),
-                    Chip(
-                      label: Text(
-                        '${game.currentPlayerCount}/${game.maxPlayers}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isCreator)
+                          IconButton(
+                            onPressed: () =>
+                                showInviteGuestPlayersSheet(context, game.id),
+                            icon: const Icon(Icons.person_add_outlined),
+                            tooltip: l10n.inviteGuestPlayers,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        Chip(
+                          label: Text(
+                            '${game.currentPlayerCount}/${game.maxPlayers}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.secondary,
+                            ),
+                          ),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.25,
+                          ),
                         ),
-                      ),
-                      backgroundColor: AppColors.primary.withValues(
-                        alpha: 0.25,
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -470,9 +484,6 @@ class _PlayersCard extends StatelessWidget {
                           displayName,
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
-                        subtitle: player != null && player.displayName != null
-                            ? Text(player.email)
-                            : null,
                         trailing: _buildPlayerTrailing(
                           context,
                           l10n,
@@ -512,9 +523,6 @@ class _PlayersCard extends StatelessWidget {
                         child: Text('${entry.key + 1}'),
                       ),
                       title: Text(displayName),
-                      subtitle: player != null && player.displayName != null
-                          ? Text(player.email)
-                          : null,
                       trailing:
                           isCurrentUser && game.status == GameStatus.scheduled
                           ? PopupMenuButton<String>(
@@ -558,28 +566,6 @@ class _PlayersCard extends StatelessWidget {
                           : null,
                     );
                   }),
-                ],
-                if (canInviteGuests) ...[
-                  const SizedBox(height: 16),
-                  const Divider(),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n.inviteGuestPlayers,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () =>
-                          showInviteGuestPlayersSheet(context, game.id),
-                      icon: const Icon(Icons.person_add_outlined),
-                      label: Text(l10n.inviteGuest),
-                    ),
-                  ),
                 ],
               ],
             ),

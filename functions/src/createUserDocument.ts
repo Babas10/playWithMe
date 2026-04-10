@@ -27,14 +27,24 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
       isAnonymous: user.providerData.length === 0,
     });
 
-    // Idempotency check: Verify document doesn't already exist
-    // This handles cases where client-side code created the document first
+    // Check if document already exists (race with updateUserNames callable).
+    // If it does exist but is missing email (updateUserNames won the race and
+    // doesn't include email), patch it in. Otherwise skip full creation.
     const existingDoc = await userRef.get();
     if (existingDoc.exists) {
-      functions.logger.info(`User document already exists for ${user.uid}, skipping creation`, {
-        uid: user.uid,
-        email: user.email,
-      });
+      const existingEmail = existingDoc.data()?.email;
+      if (!existingEmail && user.email) {
+        await userRef.update({ email: user.email });
+        functions.logger.info(`Patched missing email on existing user document`, {
+          uid: user.uid,
+          email: user.email,
+        });
+      } else {
+        functions.logger.info(`User document already exists for ${user.uid}, skipping creation`, {
+          uid: user.uid,
+          email: user.email,
+        });
+      }
       return;
     }
 

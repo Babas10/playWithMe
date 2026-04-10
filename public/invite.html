@@ -150,7 +150,7 @@
 <script>
 (function () {
   // ── Constants ──────────────────────────────────────────────────────────────
-  var APP_STORE_URL  = 'https://apps.apple.com/app/id6760428234';
+  var APP_STORE_URL  = 'https://apps.apple.com/us/app/gatherli/id6760428234';
   var PLAY_STORE_ID  = 'org.gatherli.app';
   var CUSTOM_SCHEME  = 'gatherli://invite/';
 
@@ -176,27 +176,15 @@
     showFallback();
   }
 
-  // ── Android: try deep-link into app first, fall back to Play Store ────────
+  // ── Android: auto-redirect with Play Install Referrer ─────────────────────
   function redirectAndroid() {
-    var playStoreUrl = 'https://play.google.com/store/apps/details?id=' + PLAY_STORE_ID;
-
-    if (token) {
-      // Intent URL: Chrome for Android attempts to open the app via the custom
-      // scheme. If the app is installed it opens directly on the invite page.
-      // If not installed, Chrome follows S.browser_fallback_url to Play Store.
-      var referrer = encodeURIComponent('invite_token=' + token);
-      var fallback  = encodeURIComponent(playStoreUrl + '&referrer=' + referrer);
-      var intentUrl = 'intent://invite/' + token
-        + '#Intent'
-        + ';scheme=gatherli'
-        + ';package=' + PLAY_STORE_ID
-        + ';S.browser_fallback_url=' + fallback
-        + ';end';
-      window.location.href = intentUrl;
-    } else {
-      // No token — just send to Play Store
-      window.location.replace(playStoreUrl);
-    }
+    var referrer = token
+      ? encodeURIComponent('invite_token=' + token)
+      : '';
+    var url = 'https://play.google.com/store/apps/details?id=' + PLAY_STORE_ID;
+    if (referrer) url += '&referrer=' + referrer;
+    // replace() so the redirect page is not in browser history
+    window.location.replace(url);
   }
 
   // ── iOS: clipboard write on user tap, then App Store redirect ─────────────

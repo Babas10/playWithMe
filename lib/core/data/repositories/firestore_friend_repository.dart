@@ -194,7 +194,7 @@ class FirestoreFriendRepository implements FriendRepository {
 
           return UserEntity(
             uid: friendData['uid'] as String,
-            email: friendData['email'] as String,
+            email: friendData['email'] as String? ?? '',
             displayName: friendData['displayName'] as String?,
             photoUrl: friendData['photoUrl'] as String?,
             isEmailVerified: friendData['isEmailVerified'] as bool? ?? false,
@@ -382,7 +382,7 @@ class FirestoreFriendRepository implements FriendRepository {
 
           user = UserEntity(
             uid: userData['uid'] as String,
-            email: userData['email'] as String,
+            email: userData['email'] as String? ?? '',
             displayName: userData['displayName'] as String?,
             photoUrl: userData['photoUrl'] as String?,
             isEmailVerified: userData['isEmailVerified'] as bool? ?? false,
