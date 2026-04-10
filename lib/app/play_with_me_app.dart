@@ -518,8 +518,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 }
 
 // Home tab content with player statistics
-class _HomeTab extends StatelessWidget {
+class _HomeTab extends StatefulWidget {
   const _HomeTab();
+
+  @override
+  State<_HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends State<_HomeTab> {
+  Future<void> _onRefresh() async {
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) return;
+
+    final statsBloc = context.read<PlayerStatsBloc>();
+    final invitationsBloc = context.read<GameInvitationsBloc>();
+
+    statsBloc.add(LoadPlayerStats(authState.user.uid));
+    invitationsBloc.add(const LoadGameInvitations());
+
+    // Wait for stats to finish loading before hiding the indicator.
+    await statsBloc.stream.firstWhere((s) => s is! PlayerStatsLoading);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -541,20 +560,28 @@ class _HomeTab extends StatelessWidget {
             }
 
             if (statsState is PlayerStatsError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              return RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: ListView(
                   children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error loading stats: ${statsState.message}',
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            size: 48,
+                            color: Colors.red,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Error loading stats: ${statsState.message}',
+                            style: const TextStyle(color: Colors.red),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -562,8 +589,11 @@ class _HomeTab extends StatelessWidget {
             }
 
             if (statsState is PlayerStatsLoaded) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 30, bottom: 20.0),
+              return RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.only(top: 30, bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -694,7 +724,8 @@ class _HomeTab extends StatelessWidget {
                     ),
                   ],
                 ),
-              );
+              ),
+            );
             }
 
             // Initial state
