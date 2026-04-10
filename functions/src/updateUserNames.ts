@@ -82,6 +82,9 @@ export const updateUserNames = functions.region('europe-west6').https.onCall(asy
       firstName: trimmedFirstName,
       lastName: trimmedLastName,
       displayName: `${trimmedFirstName} ${trimmedLastName}`,
+      // Include email so the doc is complete even if this callable wins the race
+      // against the createUserDocument Auth onCreate trigger.
+      email: context.auth.token.email || "",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
