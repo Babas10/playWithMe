@@ -97,7 +97,6 @@ class MemberListItemWithFriendship extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (user.fullDisplayName != user.email) Text(user.email),
           if (!isCurrentUser) _buildFriendshipStatus(context),
         ],
       ),

@@ -470,9 +470,6 @@ class _PlayersCard extends StatelessWidget {
                           displayName,
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
-                        subtitle: player != null && player.displayName != null
-                            ? Text(player.email)
-                            : null,
                         trailing: _buildPlayerTrailing(
                           context,
                           l10n,
@@ -512,9 +509,6 @@ class _PlayersCard extends StatelessWidget {
                         child: Text('${entry.key + 1}'),
                       ),
                       title: Text(displayName),
-                      subtitle: player != null && player.displayName != null
-                          ? Text(player.email)
-                          : null,
                       trailing:
                           isCurrentUser && game.status == GameStatus.scheduled
                           ? PopupMenuButton<String>(

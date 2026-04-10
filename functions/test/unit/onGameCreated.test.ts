@@ -121,6 +121,10 @@ describe("onGameCreated Cloud Function", () => {
 
     // Setup mock Firestore
     mockDb = {
+      batch: jest.fn(() => ({
+        set: jest.fn(),
+        commit: jest.fn().mockResolvedValue({}),
+      })),
       collection: jest.fn((collectionName: string) => {
         if (collectionName === "groups") {
           return {

@@ -30,7 +30,7 @@ class MemberListItem extends StatelessWidget {
         user.displayName ?? user.email,
         style: const TextStyle(fontWeight: FontWeight.w500),
       ),
-      subtitle: user.displayName != null ? Text(user.email) : null,
+      subtitle: null,
       trailing: isAdmin
           ? Chip(
               label: const Text('Admin', style: TextStyle(fontSize: 12)),
