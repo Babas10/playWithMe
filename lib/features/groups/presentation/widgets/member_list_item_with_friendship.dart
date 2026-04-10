@@ -167,41 +167,44 @@ class MemberListItemWithFriendship extends StatelessWidget {
   }
 
   Widget? _buildTrailingWidget(BuildContext context) {
-    // Admin action menu takes priority when viewer is an admin
-    if (isCurrentUserAdmin && onMemberAction != null) {
-      return MemberActionMenu(
-        isCurrentUserAdmin: isCurrentUserAdmin,
-        isTargetUserAdmin: isAdmin,
-        isTargetUserCreator: isCreator,
-        canDemote: canDemote,
-        onActionSelected: onMemberAction!,
+    final adminMenu = isCurrentUserAdmin && onMemberAction != null
+        ? MemberActionMenu(
+            isCurrentUserAdmin: isCurrentUserAdmin,
+            isTargetUserAdmin: isAdmin,
+            isTargetUserCreator: isCreator,
+            canDemote: canDemote,
+            onActionSelected: onMemberAction!,
+          )
+        : null;
+
+    Widget? friendWidget;
+    if (!isFriend) {
+      if (requestStatus == FriendRequestStatus.none) {
+        friendWidget = IconButton(
+          icon: const Icon(Icons.person_add_outlined),
+          onPressed: () => _sendFriendRequest(context),
+          tooltip: 'Add to Community',
+          color: Theme.of(context).colorScheme.primary,
+          iconSize: 24,
+        );
+      } else if (requestStatus == FriendRequestStatus.sentByMe) {
+        friendWidget = Chip(
+          label: const Text('Pending'),
+          backgroundColor: Colors.orange.shade100,
+          labelStyle: TextStyle(color: Colors.orange[900], fontSize: 11),
+        );
+      }
+      // receivedFromThem: no trailing widget needed (status shown in subtitle)
+    }
+
+    if (adminMenu != null && friendWidget != null) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [friendWidget, adminMenu],
       );
     }
 
-    if (isFriend) {
-      return null; // Already friends, no action needed
-    }
-
-    if (requestStatus == FriendRequestStatus.sentByMe) {
-      return Chip(
-        label: const Text('Pending'),
-        backgroundColor: Colors.orange.shade100,
-        labelStyle: TextStyle(color: Colors.orange[900], fontSize: 11),
-      );
-    }
-
-    if (requestStatus == FriendRequestStatus.receivedFromThem) {
-      return const SizedBox.shrink();
-    }
-
-    // Not in community - show add button
-    return IconButton(
-      icon: const Icon(Icons.person_add_outlined),
-      onPressed: () => _sendFriendRequest(context),
-      tooltip: 'Add to Community',
-      color: Theme.of(context).colorScheme.primary,
-      iconSize: 24,
-    );
+    return adminMenu ?? friendWidget;
   }
 
   void _sendFriendRequest(BuildContext context) {
