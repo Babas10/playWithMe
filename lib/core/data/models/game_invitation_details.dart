@@ -16,6 +16,9 @@ class GameInvitationDetails {
   final String groupName;
   final String inviterDisplayName;
 
+  /// Invitation type: `"guest"` (cross-group) or `"group_game"` (same-group).
+  final String type;
+
   const GameInvitationDetails({
     required this.invitationId,
     required this.gameId,
@@ -29,6 +32,7 @@ class GameInvitationDetails {
     required this.gameLocationName,
     required this.groupName,
     required this.inviterDisplayName,
+    this.type = 'guest',
   });
 
   factory GameInvitationDetails.fromMap(Map<String, dynamic> map) {
@@ -51,6 +55,7 @@ class GameInvitationDetails {
       gameLocationName: map['gameLocationName'] as String? ?? '',
       groupName: map['groupName'] as String? ?? '',
       inviterDisplayName: map['inviterDisplayName'] as String? ?? '',
+      type: map['type'] as String? ?? 'guest',
     );
   }
 }

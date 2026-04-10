@@ -350,6 +350,37 @@ export const onGameCreated = functions.region('europe-west6').firestore
         memberCount: members.length,
       });
 
+      // ── Write gameInvitations for badge notifications ──────────────────────
+      // One document per group member (except creator) drives the ball-icon
+      // badge count so same-group game creation appears in the notification dot.
+      const eligibleMembers = members.filter((id: string) => id !== game.createdBy);
+      if (eligibleMembers.length > 0) {
+        const invBatch = admin.firestore().batch();
+        for (const memberId of eligibleMembers) {
+          // Deterministic doc ID ensures idempotency if the trigger re-fires.
+          const invRef = admin
+            .firestore()
+            .collection("gameInvitations")
+            .doc(`${gameId}_group_${memberId}`);
+          invBatch.set(invRef, {
+            gameId,
+            groupId,
+            inviteeId: memberId,
+            inviterId: game.createdBy,
+            status: "pending",
+            type: "group_game",
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            expiresAt: game.scheduledAt ?? null,
+          });
+        }
+        await invBatch.commit();
+        functions.logger.info("[onGameCreated] wrote group_game invitations", {
+          groupId,
+          gameId,
+          count: eligibleMembers.length,
+        });
+      }
+
       // Get creator details for notification message
       const creatorDoc = await admin
         .firestore()

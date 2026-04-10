@@ -15,6 +15,7 @@ interface EnrichedInvitation {
   groupId: string;
   inviterId: string;
   status: string;
+  type: string; // "guest" | "group_game"
   createdAt: string;
   expiresAt: string | null;
   gameTitle: string;
@@ -51,7 +52,16 @@ export const getGameInvitationsForUserHandler = async (
       return { invitations: [] };
     }
 
-    const invDocs = invitationsSnap.docs;
+    // ── Filter out expired invitations ──────────────────────────────────────
+    const now = new Date();
+    const invDocs = invitationsSnap.docs.filter((doc) => {
+      const expiresAt = doc.data().expiresAt as admin.firestore.Timestamp | undefined;
+      return !expiresAt || expiresAt.toDate() > now;
+    });
+
+    if (invDocs.length === 0) {
+      return { invitations: [] };
+    }
 
     // ── Collect unique IDs for batch fetching ───────────────────────────────
     const gameIds = [...new Set(invDocs.map((d) => d.data().gameId as string))];
@@ -71,11 +81,15 @@ export const getGameInvitationsForUserHandler = async (
     const inviterMap = new Map(inviterDocs.map((d) => [d.id, d.data()]));
 
     // ── Enrich and return ───────────────────────────────────────────────────
-    const invitations: EnrichedInvitation[] = invDocs.map((doc) => {
+    const enriched = invDocs.map((doc) => {
       const inv = doc.data();
       const game = gameMap.get(inv.gameId) ?? {};
       const group = groupMap.get(inv.groupId) ?? {};
       const inviter = inviterMap.get(inv.inviterId) ?? {};
+
+      // Skip if the user has already joined this game (badge should disappear).
+      const playerIds: string[] = (game.playerIds as string[]) ?? [];
+      if (playerIds.includes(uid)) return null;
 
       const scheduledAt: admin.firestore.Timestamp | undefined = game.scheduledAt;
       const createdAt: admin.firestore.Timestamp | undefined = inv.createdAt;
@@ -87,6 +101,7 @@ export const getGameInvitationsForUserHandler = async (
         groupId: inv.groupId,
         inviterId: inv.inviterId,
         status: inv.status,
+        type: (inv.type as string) ?? "guest",
         createdAt: createdAt?.toDate().toISOString() ?? new Date().toISOString(),
         expiresAt: expiresAt ? expiresAt.toDate().toISOString() : null,
         gameTitle: (game.title as string) ?? "Game",
@@ -94,8 +109,10 @@ export const getGameInvitationsForUserHandler = async (
         gameLocationName: (game.location as { name?: string })?.name ?? "",
         groupName: (group.name as string) ?? "",
         inviterDisplayName: (inviter.displayName as string) ?? (inviter.email as string) ?? "",
-      };
+      } satisfies EnrichedInvitation;
     });
+
+    const invitations = enriched.filter((inv): inv is EnrichedInvitation => inv !== null);
 
     functions.logger.info("[getGameInvitationsForUser] success", {
       uid,
