@@ -58,30 +58,38 @@ export async function onGameStatusChangedExpireInvitationsHandler(
   const expiredAt = admin.firestore.FieldValue.serverTimestamp();
   const totalDocs = pendingSnapshot.docs.length;
 
-  // Collect invitee IDs to clear from pendingInviteeIds on the game
-  const inviteeIds = pendingSnapshot.docs.map((doc) => doc.data().inviteeId as string);
-
-  // ── 3. Batch-update in chunks of 500 (Firestore limit) ───────────────────
+  // ── 3. Expire invitations atomically in chunks ────────────────────────────
+  // Use a transaction per chunk so we re-read each invitation before writing.
+  // This closes a race with acceptGameGuestInvitation: without the re-read, an
+  // invitation accepted between our query (step 2) and this write would have
+  // its status silently overwritten from "accepted" back to "expired".
   let expiredCount = 0;
 
   for (let i = 0; i < pendingSnapshot.docs.length; i += BATCH_SIZE) {
     const chunk = pendingSnapshot.docs.slice(i, i + BATCH_SIZE);
-    const batch = db.batch();
 
-    for (const doc of chunk) {
-      batch.update(doc.ref, {
-        status: "expired",
-        updatedAt: expiredAt,
-      });
-    }
+    await db.runTransaction(async (t) => {
+      const freshDocs = await Promise.all(chunk.map((doc) => t.get(doc.ref)));
 
-    await batch.commit();
-    expiredCount += chunk.length;
+      for (const freshDoc of freshDocs) {
+        // Skip any invitation no longer pending (e.g. accepted between the
+        // outer query and this transaction read).
+        if (!freshDoc.exists || freshDoc.data()?.status !== "pending") continue;
+
+        t.update(freshDoc.ref, {
+          status: "expired",
+          updatedAt: expiredAt,
+        });
+        expiredCount++;
+      }
+    });
   }
 
   // ── 4. Clear pendingInviteeIds on the game document ──────────────────────
+  // The game is in a terminal state — unconditionally set to [] rather than
+  // computing which IDs to remove, so this is a single idempotent write.
   await db.collection("games").doc(gameId).update({
-    pendingInviteeIds: admin.firestore.FieldValue.arrayRemove(...inviteeIds),
+    pendingInviteeIds: [],
     updatedAt: expiredAt,
   });
 
