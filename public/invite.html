@@ -176,15 +176,27 @@
     showFallback();
   }
 
-  // ── Android: auto-redirect with Play Install Referrer ─────────────────────
+  // ── Android: try deep-link into app first, fall back to Play Store ────────
   function redirectAndroid() {
-    var referrer = token
-      ? encodeURIComponent('invite_token=' + token)
-      : '';
-    var url = 'https://play.google.com/store/apps/details?id=' + PLAY_STORE_ID;
-    if (referrer) url += '&referrer=' + referrer;
-    // replace() so the redirect page is not in browser history
-    window.location.replace(url);
+    var playStoreUrl = 'https://play.google.com/store/apps/details?id=' + PLAY_STORE_ID;
+
+    if (token) {
+      // Intent URL: Chrome for Android attempts to open the app via the custom
+      // scheme. If the app is installed it opens directly on the invite page.
+      // If not installed, Chrome follows S.browser_fallback_url to Play Store.
+      var referrer = encodeURIComponent('invite_token=' + token);
+      var fallback  = encodeURIComponent(playStoreUrl + '&referrer=' + referrer);
+      var intentUrl = 'intent://invite/' + token
+        + '#Intent'
+        + ';scheme=gatherli'
+        + ';package=' + PLAY_STORE_ID
+        + ';S.browser_fallback_url=' + fallback
+        + ';end';
+      window.location.href = intentUrl;
+    } else {
+      // No token — just send to Play Store
+      window.location.replace(playStoreUrl);
+    }
   }
 
   // ── iOS: clipboard write on user tap, then App Store redirect ─────────────
