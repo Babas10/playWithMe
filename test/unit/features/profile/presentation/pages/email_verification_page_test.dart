@@ -409,7 +409,7 @@ void main() {
       );
 
       testWidgets(
-        'card #3 is not tappable before the verification email is sent',
+        'card #3 is always tappable even before the verification email is sent',
         (tester) async {
           when(() => mockBloc.state).thenReturn(
             const EmailVerificationState.pending(
@@ -423,13 +423,13 @@ void main() {
 
           await tester.pumpWidget(createWidgetUnderTest());
 
-          // Non-tappable description shown
+          // Tappable description always shown
           expect(
-            find.text('Return here and refresh to confirm verification.'),
+            find.text('Tap here to check if your email has been verified.'),
             findsOneWidget,
           );
-          // No chevron
-          expect(find.byIcon(Icons.chevron_right), findsNothing);
+          // Chevron visible (card is tappable)
+          expect(find.byIcon(Icons.chevron_right), findsOneWidget);
         },
       );
     });
