@@ -27,23 +27,18 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
       isAnonymous: user.providerData.length === 0,
     });
 
-    // Check if document already exists (race with updateUserNames callable).
-    // If it does exist but is missing email (updateUserNames won the race and
-    // doesn't include email), patch it in. Otherwise skip full creation.
+    // Idempotency check: Verify document doesn't already exist.
+    // When the doc already exists it was created by a concurrent updateUserNames call
+    // (which fires before this trigger). In that case we only patch the email field if
+    // it is missing — a defence against any remaining ordering edge cases.
     const existingDoc = await userRef.get();
     if (existingDoc.exists) {
       const existingEmail = existingDoc.data()?.email;
       if (!existingEmail && user.email) {
-        await userRef.update({ email: user.email });
-        functions.logger.info(`Patched missing email on existing user document`, {
-          uid: user.uid,
-          email: user.email,
-        });
+        await userRef.update({ email: user.email, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+        functions.logger.info(`Patched missing email on existing user document`, { uid: user.uid, email: user.email });
       } else {
-        functions.logger.info(`User document already exists for ${user.uid}, skipping creation`, {
-          uid: user.uid,
-          email: user.email,
-        });
+        functions.logger.info(`User document already exists for ${user.uid}, skipping creation`, { uid: user.uid, email: user.email });
       }
       return;
     }
@@ -59,10 +54,14 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
     const isVerified = user.emailVerified || false;
 
     // Create user document with complete profile structure
-    const userData = {
+    // Note: displayName is intentionally omitted when null so that a concurrent
+    // updateUserNames call (which sets displayName from firstName+lastName) is not
+    // silently overwritten back to null by this trigger. For OAuth providers
+    // (Google, Apple) displayName is available from Auth and is written normally.
+    const userData: Record<string, unknown> = {
       // Core identity
       email: user.email || "",
-      displayName: user.displayName || null,
+      ...(user.displayName ? { displayName: user.displayName } : {}),
       photoUrl: user.photoURL || null,
 
       // Auth metadata
