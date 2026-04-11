@@ -166,8 +166,33 @@ class MemberListItemWithFriendship extends StatelessWidget {
   }
 
   Widget? _buildTrailingWidget(BuildContext context) {
-    // Admin action menu takes priority when viewer is an admin
+    // Admin action menu takes priority when viewer is an admin.
+    // For non-community members, show both the add-friend button and the
+    // admin menu so admins can take either action.
     if (isCurrentUserAdmin && onMemberAction != null) {
+      if (!isFriend &&
+          requestStatus == FriendRequestStatus.none &&
+          onSendFriendRequest != null) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.person_add_outlined),
+              onPressed: () => _sendFriendRequest(context),
+              tooltip: 'Add to Community',
+              color: Theme.of(context).colorScheme.primary,
+              iconSize: 20,
+            ),
+            MemberActionMenu(
+              isCurrentUserAdmin: isCurrentUserAdmin,
+              isTargetUserAdmin: isAdmin,
+              isTargetUserCreator: isCreator,
+              canDemote: canDemote,
+              onActionSelected: onMemberAction!,
+            ),
+          ],
+        );
+      }
       return MemberActionMenu(
         isCurrentUserAdmin: isCurrentUserAdmin,
         isTargetUserAdmin: isAdmin,

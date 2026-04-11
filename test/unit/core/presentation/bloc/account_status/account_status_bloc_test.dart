@@ -67,8 +67,25 @@ void main() {
       );
 
       blocTest<AccountStatusBloc, AccountStatusState>(
+        'emits [AccountStatusActive] when reloadUser finds email is now verified',
+        setUp: () {
+          // First call returns unverified, reload updates it to verified
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
+          var callCount = 0;
+          when(() => mockAuthRepository.currentUser).thenAnswer((_) {
+            callCount++;
+            return createUser(isEmailVerified: callCount > 1);
+          });
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(const CheckAccountStatus()),
+        expect: () => [const AccountStatusActive()],
+      );
+
+      blocTest<AccountStatusBloc, AccountStatusState>(
         'emits [AccountStatusPending] when unverified and within grace period',
         setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
           when(() => mockAuthRepository.currentUser).thenReturn(
             createUser(
               isEmailVerified: false,
@@ -88,6 +105,7 @@ void main() {
       blocTest<AccountStatusBloc, AccountStatusState>(
         'emits [AccountStatusPending] with 7 days for new account',
         setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
           when(() => mockAuthRepository.currentUser).thenReturn(
             createUser(isEmailVerified: false, createdAt: DateTime.now()),
           );
@@ -106,6 +124,7 @@ void main() {
       blocTest<AccountStatusBloc, AccountStatusState>(
         'emits [AccountStatusPending] when createdAt is null',
         setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
           when(
             () => mockAuthRepository.currentUser,
           ).thenReturn(createUser(isEmailVerified: false, createdAt: null));
@@ -124,6 +143,7 @@ void main() {
       blocTest<AccountStatusBloc, AccountStatusState>(
         'emits [AccountStatusRestricted] when past grace period',
         setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
           when(() => mockAuthRepository.currentUser).thenReturn(
             createUser(
               isEmailVerified: false,
@@ -145,6 +165,7 @@ void main() {
       blocTest<AccountStatusBloc, AccountStatusState>(
         'emits [AccountStatusRestricted] with 0 days when past deletion period',
         setUp: () {
+          when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
           when(() => mockAuthRepository.currentUser).thenReturn(
             createUser(
               isEmailVerified: false,
@@ -155,6 +176,30 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(const CheckAccountStatus()),
         expect: () => [const AccountStatusRestricted(daysUntilDeletion: 0)],
+      );
+
+      blocTest<AccountStatusBloc, AccountStatusState>(
+        'silently ignores reloadUser errors during CheckAccountStatus',
+        setUp: () {
+          when(
+            () => mockAuthRepository.reloadUser(),
+          ).thenThrow(Exception('network error'));
+          when(() => mockAuthRepository.currentUser).thenReturn(
+            createUser(
+              isEmailVerified: false,
+              createdAt: DateTime.now(),
+            ),
+          );
+        },
+        build: buildBloc,
+        act: (bloc) => bloc.add(const CheckAccountStatus()),
+        expect: () => [
+          isA<AccountStatusPending>().having(
+            (s) => s.daysRemaining,
+            'daysRemaining',
+            gracePeriodDays,
+          ),
+        ],
       );
     });
 

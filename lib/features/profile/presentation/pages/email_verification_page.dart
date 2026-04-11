@@ -226,14 +226,10 @@ class EmailVerificationPage extends StatelessWidget {
             context,
             icon: Icons.looks_3,
             title: 'Refresh Status',
-            description: emailSent
-                ? 'Tap here to check if your email has been verified.'
-                : 'Return here and refresh to confirm verification.',
-            onTap: emailSent
-                ? () => context.read<EmailVerificationBloc>().add(
-                      const EmailVerificationEvent.refreshStatus(),
-                    )
-                : null,
+            description: 'Tap here to check if your email has been verified.',
+            onTap: () => context.read<EmailVerificationBloc>().add(
+              const EmailVerificationEvent.refreshStatus(),
+            ),
           ),
           const SizedBox(height: 32),
 
