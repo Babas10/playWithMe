@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "org.gatherli.app",
+      "sha256_cert_fingerprints": [
+        "E1:4B:57:EE:BE:70:F0:CB:B4:02:AA:A6:E6:61:CB:A6:7F:F1:35:08:1F:87:AC:00:50:BB:39:4B:8C:52:85:9A"
+      ]
+    }
+  }
+]
