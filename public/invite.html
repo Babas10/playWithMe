@@ -122,10 +122,10 @@
     </button>
   </div>
 
-  <!-- Android: shown briefly while auto-redirecting -->
+  <!-- Android: shown briefly while opening app or redirecting -->
   <div id="android-view" style="display:none">
-    <h1>Opening the Play Store…</h1>
-    <p class="redirecting-text">Redirecting you to Google Play to install Gatherli.</p>
+    <h1>Opening Gatherli…</h1>
+    <p class="redirecting-text">Opening the app. If it doesn't open, you'll be taken to Google Play.</p>
     <div class="redirecting-wrap">
       <span class="spinner"></span>
       <img class="badge-img" src="/badge-google-play.png" alt="Get it on Google Play" style="opacity:.45">
@@ -176,15 +176,27 @@
     showFallback();
   }
 
-  // ── Android: auto-redirect with Play Install Referrer ─────────────────────
+  // ── Android: intent URL opens app if installed, Play Store if not ──────────
   function redirectAndroid() {
     var referrer = token
       ? encodeURIComponent('invite_token=' + token)
       : '';
-    var url = 'https://play.google.com/store/apps/details?id=' + PLAY_STORE_ID;
-    if (referrer) url += '&referrer=' + referrer;
-    // replace() so the redirect page is not in browser history
-    window.location.replace(url);
+    var playStoreUrl = 'https://play.google.com/store/apps/details?id=' + PLAY_STORE_ID;
+    if (referrer) playStoreUrl += '&referrer=' + referrer;
+
+    if (token) {
+      // Intent URL: Chrome on Android opens the app directly if installed.
+      // S.browser_fallback_url is the Play Store URL with the referrer token
+      // so deferred deep linking still works when the app is not yet installed.
+      var intentUrl = 'intent://invite/' + token
+        + '#Intent;scheme=gatherli'
+        + ';package=' + PLAY_STORE_ID
+        + ';S.browser_fallback_url=' + encodeURIComponent(playStoreUrl)
+        + ';end';
+      window.location.replace(intentUrl);
+    } else {
+      window.location.replace(playStoreUrl);
+    }
   }
 
   // ── iOS: clipboard write on user tap, then App Store redirect ─────────────
