@@ -42,8 +42,22 @@ class AccountStatusBloc extends Bloc<AccountStatusEvent, AccountStatusState> {
       return;
     }
 
+    // Reload to get the freshest email-verification status from Firebase.
+    // This handles the case where the user verified their email before the
+    // app cold-started (cached token still has isEmailVerified = false).
+    try {
+      await _authRepository.reloadUser();
+      final freshUser = _authRepository.currentUser;
+      if (freshUser != null && freshUser.isEmailVerified) {
+        emit(const AccountStatusActive());
+        return;
+      }
+    } catch (_) {
+      // Ignore reload failures; proceed with cached status.
+    }
+
     final status = computeAccountStatus(
-      isEmailVerified: user.isEmailVerified,
+      isEmailVerified: false,
       accountCreatedAt: user.createdAt,
     );
 

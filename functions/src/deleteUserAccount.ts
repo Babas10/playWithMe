@@ -98,16 +98,24 @@ export const deleteUserAccount = functions
     }
 
     // ── 3. Delete group invite links created by this user ─────────────────
-    // Uses collectionGroup to query across all groups' "invites" subcollections.
-    // For each invite, also delete the corresponding invite_tokens lookup doc.
-    const inviteLinksSnap = await db
-      .collectionGroup("invites")
-      .where("createdBy", "==", uid)
-      .get();
+    // Query each group's invites subcollection directly rather than using
+    // collectionGroup, which requires a COLLECTION_GROUP-scoped index.
+    // This is safe since invite links can only be created within groups the
+    // user belongs to.
+    const allInviteDocs: FirebaseFirestore.QueryDocumentSnapshot[] = [];
+    for (const groupDoc of groupsSnap.docs) {
+      const invitesSnap = await db
+        .collection("groups")
+        .doc(groupDoc.id)
+        .collection("invites")
+        .where("createdBy", "==", uid)
+        .get();
+      allInviteDocs.push(...invitesSnap.docs);
+    }
 
-    if (!inviteLinksSnap.empty) {
+    if (allInviteDocs.length > 0) {
       const inviteBatch = db.batch();
-      for (const inviteDoc of inviteLinksSnap.docs) {
+      for (const inviteDoc of allInviteDocs) {
         const token: string | undefined = inviteDoc.data().token;
         inviteBatch.delete(inviteDoc.ref);
         if (token) {
@@ -116,7 +124,7 @@ export const deleteUserAccount = functions
       }
       await inviteBatch.commit();
       functions.logger.info(
-        `[deleteUserAccount] Deleted ${inviteLinksSnap.size} group invite link(s)`
+        `[deleteUserAccount] Deleted ${allInviteDocs.length} group invite link(s)`
       );
     }
 
@@ -182,8 +190,8 @@ export const deleteUserAccount = functions
 
     // ── 6. Delete all friendship documents ────────────────────────────────
     const [sentFriendships, receivedFriendships] = await Promise.all([
-      db.collection("friendships").where("requesterId", "==", uid).get(),
-      db.collection("friendships").where("receiverId", "==", uid).get(),
+      db.collection("friendships").where("initiatorId", "==", uid).get(),
+      db.collection("friendships").where("recipientId", "==", uid).get(),
     ]);
 
     const allFriendshipDocs = [...sentFriendships.docs, ...receivedFriendships.docs];
