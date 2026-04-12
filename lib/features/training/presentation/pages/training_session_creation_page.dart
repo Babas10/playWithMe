@@ -134,7 +134,11 @@ class _TrainingSessionCreationPageState
 
     final isToday =
         date.year == now.year && date.month == now.month && date.day == now.day;
-    final minPickerTime = isToday ? now : null;
+    // Truncate to minute precision: sub-minute values in minimumDate cause
+    // CupertinoDatePicker to behave inconsistently on some Android devices.
+    final minPickerTime = isToday
+        ? DateTime(now.year, now.month, now.day, now.hour, now.minute)
+        : null;
     DateTime pickerTime = isToday
         ? DateTime(
             date.year,
@@ -150,6 +154,7 @@ class _TrainingSessionCreationPageState
     // ignore: use_build_context_synchronously
     await showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
         return Dialog(
           backgroundColor: Colors.white,
@@ -265,6 +270,7 @@ class _TrainingSessionCreationPageState
 
     await showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
         return Dialog(
           backgroundColor: Colors.white,
