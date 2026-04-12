@@ -26,34 +26,6 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
       providers: user.providerData.map(p => p.providerId),
     });
 
-    // Idempotency check: Verify document doesn't already exist.
-    // When the doc already exists it was created by a concurrent updateUserNames call
-    // (which fires before this trigger). In that case we only patch the email field if
-    // it is missing — a defence against any remaining ordering edge cases.
-    const existingDoc = await userRef.get();
-    if (existingDoc.exists) {
-      // Patch any required bool fields that may be missing when updateUserNames
-      // won the race and created the document before this trigger fired.
-      const existingData = existingDoc.data() ?? {};
-      const patch: Record<string, unknown> = {};
-
-      if (!existingData.email && user.email) {
-        patch.email = user.email;
-      }
-      if (existingData.isEmailVerified === undefined || existingData.isEmailVerified === null) {
-        patch.isEmailVerified = user.emailVerified || false;
-      }
-
-      if (Object.keys(patch).length > 0) {
-        patch.updatedAt = admin.firestore.FieldValue.serverTimestamp();
-        await userRef.update(patch);
-        functions.logger.info(`Patched missing fields on existing user document`, { uid: user.uid, patch: Object.keys(patch) });
-      } else {
-        functions.logger.info(`User document already exists for ${user.uid}, skipping creation`, { uid: user.uid });
-      }
-      return;
-    }
-
     // Determine signup method for logging
     const signupMethod = user.providerData.map(p => p.providerId).join(", ") || "email";
 
@@ -62,12 +34,16 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
     const gracePeriodExpiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     const isVerified = user.emailVerified || false;
 
-    // Create user document with complete profile structure
-    // Note: displayName is intentionally omitted when null so that a concurrent
+    // Build the complete canonical document once.
+    //
+    // Note: displayName is intentionally omitted when null/empty so that a concurrent
     // updateUserNames call (which sets displayName from firstName+lastName) is not
     // silently overwritten back to null by this trigger. For OAuth providers
     // (Google, Apple) displayName is available from Auth and is written normally.
-    const userData: Record<string, unknown> = {
+    //
+    // This single source of truth is reused for both the new-doc path (set with
+    // merge:true) and the race-condition patch path (fill in any missing/null fields).
+    const canonicalData: Record<string, unknown> = {
       // Core identity
       email: user.email || "",
       ...(user.displayName ? { displayName: user.displayName } : {}),
@@ -89,20 +65,60 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
 
       // Social graph (initialized empty)
-      // Note: These arrays are managed by Cloud Functions for friends/groups features
       friendIds: [],
       groupIds: [],
 
       // Stats
       eloRating: 1200,
       gamesPlayed: 0,
-      wins: 0,
-      losses: 0,
+      gamesWon: 0,
+      gamesLost: 0,
+      eloGamesPlayed: 0,
+      eloPeak: 1200,
     };
 
-    // Use merge: true so that if updateUserNames already wrote firstName/lastName/gender
-    // before this trigger fired, those fields are preserved rather than overwritten.
-    await userRef.set(userData, {merge: true});
+    // Idempotency / race-condition guard: the doc may already exist when
+    // updateUserNames (called during onboarding) wins the race against this trigger.
+    // In that case the doc is typically incomplete (missing eloRating, accountStatus,
+    // createdAt, groupIds, etc.). We backfill every canonical field that is absent
+    // or null rather than returning early, so the schema is always complete.
+    const existingDoc = await userRef.get();
+    if (existingDoc.exists) {
+      const existing = existingDoc.data() ?? {};
+      const patch: Record<string, unknown> = {};
+
+      // A field is considered "missing" when it is absent, null, or an empty string.
+      // An empty string is used as the sentinel for a missing email address, so we
+      // treat it the same as null/undefined to ensure the real email is backfilled.
+      const isMissing = (v: unknown) => v === undefined || v === null || v === "";
+
+      for (const [key, value] of Object.entries(canonicalData)) {
+        // Patch only when the field is missing in the existing doc AND the canonical
+        // default is meaningful (non-null/non-empty). This avoids null→null no-op
+        // updates for fields like deletionScheduledAt or emailVerifiedAt that are
+        // intentionally null for unverified users.
+        if (isMissing(existing[key]) && value !== null && value !== "") {
+          patch[key] = value;
+        }
+      }
+
+      if (Object.keys(patch).length > 0) {
+        patch.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+        await userRef.update(patch);
+        functions.logger.info(`Backfilled missing fields on existing user document`, {
+          uid: user.uid,
+          fields: Object.keys(patch),
+        });
+      } else {
+        functions.logger.info(`User document already complete for ${user.uid}, no patch needed`, { uid: user.uid });
+      }
+      return;
+    }
+
+    // New user: write the full canonical document.
+    // merge:true preserves any fields already written by updateUserNames
+    // (firstName, lastName, gender, displayName) if it somehow ran first.
+    await userRef.set(canonicalData, {merge: true});
 
     functions.logger.info(`Successfully created Firestore user document`, {
       uid: user.uid,

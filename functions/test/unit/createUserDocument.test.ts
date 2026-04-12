@@ -1,6 +1,7 @@
 // Unit tests for createUserDocument Auth onCreate trigger.
-// Validates correct document creation and the displayName omission fix for
-// the race condition against updateUserNames (issue #724).
+// Validates correct document creation, the displayName omission fix for
+// the race condition against updateUserNames (issue #724), and the robust
+// canonical-field backfill that prevents incomplete docs from the race (issue #728).
 
 import * as admin from "firebase-admin";
 import { createUserDocument } from "../../src/createUserDocument";
@@ -68,6 +69,42 @@ function makeUser(overrides: Partial<{
   } as any;
 }
 
+/** Builds a mock db where the doc already exists with the given fields. */
+function buildDbWithExistingDoc(existingFields: Record<string, unknown>) {
+  const docUpdate = jest.fn().mockResolvedValue(undefined);
+  const docGet = jest.fn().mockResolvedValue({
+    exists: true,
+    data: () => existingFields,
+  });
+  const db = {
+    collection: jest.fn(() => ({
+      doc: jest.fn(() => ({ get: docGet, set: mockSet, update: docUpdate })),
+    })),
+  };
+  return { db, docUpdate };
+}
+
+/** A fully populated existing doc — contains all canonical non-null fields. */
+const COMPLETE_EXISTING_DOC = {
+  email: "existing@example.com",
+  photoUrl: null,
+  isEmailVerified: true,
+  emailVerifiedAt: "MOCK_TIMESTAMP",
+  accountStatus: "active",
+  gracePeriodExpiresAt: { _seconds: 9999 },
+  deletionScheduledAt: null,
+  createdAt: "MOCK_TIMESTAMP",
+  updatedAt: "MOCK_TIMESTAMP",
+  friendIds: [],
+  groupIds: [],
+  eloRating: 1200,
+  gamesPlayed: 0,
+  gamesWon: 0,
+  gamesLost: 0,
+  eloGamesPlayed: 0,
+  eloPeak: 1200,
+};
+
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 describe("createUserDocument", () => {
@@ -124,9 +161,23 @@ describe("createUserDocument", () => {
       expect(data.email).toBe("hello@example.com");
       expect(data.eloRating).toBe(1200);
       expect(data.gamesPlayed).toBe(0);
+      expect(data.gamesWon).toBe(0);
+      expect(data.gamesLost).toBe(0);
+      expect(data.eloGamesPlayed).toBe(0);
+      expect(data.eloPeak).toBe(1200);
       expect(data.friendIds).toEqual([]);
       expect(data.groupIds).toEqual([]);
       expect(data.accountStatus).toBe("pendingVerification");
+    });
+
+    it("does NOT write legacy wins/losses fields", async () => {
+      const user = makeUser();
+
+      await (createUserDocument as any)(user);
+
+      const writtenData = mockSet.mock.calls[0][0];
+      expect(writtenData).not.toHaveProperty("wins");
+      expect(writtenData).not.toHaveProperty("losses");
     });
 
     it("sets accountStatus to active for already-verified users (e.g. OAuth)", async () => {
@@ -150,22 +201,53 @@ describe("createUserDocument", () => {
   // ── Existing document handling ────────────────────────────────────────────
 
   describe("existing document", () => {
-    function buildDbWithExistingDoc(existingEmail: string, extraFields: Record<string, unknown> = {}) {
-      const docUpdate = jest.fn().mockResolvedValue(undefined);
-      const docGet = jest.fn().mockResolvedValue({
-        exists: true,
-        data: () => ({ email: existingEmail, ...extraFields }),
+    it("backfills all missing canonical fields when doc was created by updateUserNames race", async () => {
+      // Simulate what updateUserNames writes: only name fields, nothing else
+      const { db, docUpdate } = buildDbWithExistingDoc({
+        firstName: "Alice",
+        lastName: "Smith",
+        displayName: "Alice Smith",
+        gender: "female",
+        updatedAt: "MOCK_TIMESTAMP",
       });
-      const db = {
-        collection: jest.fn(() => ({
-          doc: jest.fn(() => ({ get: docGet, set: mockSet, update: docUpdate })),
-        })),
-      };
-      return { db, docUpdate };
-    }
+      (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
+      const user = makeUser({ email: "alice@example.com" });
+
+      await (createUserDocument as any)(user);
+
+      expect(mockSet).not.toHaveBeenCalled();
+      const patch = docUpdate.mock.calls[0][0];
+      // All canonical fields that were absent should be backfilled
+      expect(patch).toMatchObject({
+        email: "alice@example.com",
+        isEmailVerified: false,
+        accountStatus: "pendingVerification",
+        eloRating: 1200,
+        gamesPlayed: 0,
+        gamesWon: 0,
+        gamesLost: 0,
+        eloGamesPlayed: 0,
+        eloPeak: 1200,
+        friendIds: [],
+        groupIds: [],
+      });
+      expect(patch).toHaveProperty("gracePeriodExpiresAt");
+      expect(patch).toHaveProperty("createdAt");
+    });
+
+    it("skips update when doc is already complete", async () => {
+      const { db, docUpdate } = buildDbWithExistingDoc(COMPLETE_EXISTING_DOC);
+      (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
+      const user = makeUser({ email: "existing@example.com", emailVerified: true });
+
+      await (createUserDocument as any)(user);
+
+      expect(mockSet).not.toHaveBeenCalled();
+      expect(docUpdate).not.toHaveBeenCalled();
+    });
 
     it("patches email when doc exists but email is missing", async () => {
-      const { db, docUpdate } = buildDbWithExistingDoc("");
+      const { db, docUpdate } = buildDbWithExistingDoc({ ...COMPLETE_EXISTING_DOC, email: "" });
       (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
       const user = makeUser({ email: "real@example.com" });
 
@@ -175,19 +257,11 @@ describe("createUserDocument", () => {
       expect(docUpdate).toHaveBeenCalledWith(expect.objectContaining({ email: "real@example.com" }));
     });
 
-    it("skips entirely when doc exists with email and isEmailVerified already set", async () => {
-      const { db, docUpdate } = buildDbWithExistingDoc("existing@example.com", { isEmailVerified: true });
-      (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
-      const user = makeUser({ email: "existing@example.com" });
-
-      await (createUserDocument as any)(user);
-
-      expect(mockSet).not.toHaveBeenCalled();
-      expect(docUpdate).not.toHaveBeenCalled();
-    });
-
-    it("patches isEmailVerified when doc exists with email but missing isEmailVerified", async () => {
-      const { db, docUpdate } = buildDbWithExistingDoc("existing@example.com");
+    it("patches isEmailVerified when doc exists but isEmailVerified is null", async () => {
+      const { db, docUpdate } = buildDbWithExistingDoc({
+        ...COMPLETE_EXISTING_DOC,
+        isEmailVerified: null,
+      });
       (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
       const user = makeUser({ email: "existing@example.com", emailVerified: true });
 
@@ -195,6 +269,20 @@ describe("createUserDocument", () => {
 
       expect(mockSet).not.toHaveBeenCalled();
       expect(docUpdate).toHaveBeenCalledWith(expect.objectContaining({ isEmailVerified: true }));
+    });
+
+    it("does NOT overwrite existing non-null values (e.g. custom eloRating)", async () => {
+      const { db, docUpdate } = buildDbWithExistingDoc({
+        ...COMPLETE_EXISTING_DOC,
+        eloRating: 1350,
+      });
+      (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
+      const user = makeUser({ email: "existing@example.com", emailVerified: true });
+
+      await (createUserDocument as any)(user);
+
+      // The doc is complete, nothing should be patched
+      expect(docUpdate).not.toHaveBeenCalled();
     });
   });
 });
