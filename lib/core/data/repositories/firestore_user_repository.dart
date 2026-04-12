@@ -677,6 +677,26 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
+  @override
+  Future<void> markEmailVerified() async {
+    final user = _auth.currentUser;
+    if (user == null) throw UserException('No user is currently signed in');
+    try {
+      await _firestore.collection(_collection).doc(user.uid).update({
+        'isEmailVerified': true,
+        'accountStatus': 'active',
+        'emailVerifiedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException catch (e) {
+      throw UserException(
+        'Failed to sync email verification: ${e.message}',
+        code: e.code,
+      );
+    }
+  }
+
+  @override
   Future<UserRanking> getUserRanking(String userId) {
     return PerformanceTracer.trace('repo_calculate_user_ranking', () async {
       try {

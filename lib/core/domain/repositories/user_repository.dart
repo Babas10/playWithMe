@@ -115,4 +115,9 @@ abstract class UserRepository {
   /// Get user's ranking (global, percentile, friends) via Cloud Function (Story 302.2)
   /// Calls calculateUserRanking Cloud Function which performs cross-user queries
   Future<UserRanking> getUserRanking(String userId);
+
+  /// Sync email verification status from Firebase Auth to Firestore.
+  /// Called when the app detects the current user has verified their email.
+  /// Updates isEmailVerified, accountStatus, and emailVerifiedAt in Firestore.
+  Future<void> markEmailVerified();
 }
