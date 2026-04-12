@@ -85,7 +85,6 @@ void main() {
           'pushNotifications': true,
           // Other defaults
           'isEmailVerified': false,
-          'isAnonymous': false,
         });
 
         // 3. Verify default settings
@@ -415,7 +414,6 @@ void main() {
         'showEmail': true,
         'showPhoneNumber': true,
         'isEmailVerified': false,
-        'isAnonymous': false,
         'createdAt': FieldValue.serverTimestamp(),
         'groupIds': <String>[],
         'gameIds': <String>[],
@@ -450,7 +448,6 @@ void main() {
         'showEmail': true,
         'showPhoneNumber': true,
         'isEmailVerified': false,
-        'isAnonymous': false,
         'createdAt': FieldValue.serverTimestamp(),
         'groupIds': <String>[],
         'gameIds': <String>[],
@@ -494,7 +491,6 @@ void main() {
         'showPhoneNumber': true,
         'phoneNumber': '+1234567890',
         'isEmailVerified': false,
-        'isAnonymous': false,
         'createdAt': FieldValue.serverTimestamp(),
         'groupIds': <String>[],
         'gameIds': <String>[],
@@ -532,7 +528,6 @@ void main() {
         'emailNotifications': true,
         'pushNotifications': true,
         'isEmailVerified': false,
-        'isAnonymous': false,
         'createdAt': FieldValue.serverTimestamp(),
         'groupIds': <String>[],
         'gameIds': <String>[],
@@ -575,7 +570,6 @@ void main() {
         'emailNotifications': false,
         'pushNotifications': false,
         'isEmailVerified': false,
-        'isAnonymous': false,
         'createdAt': FieldValue.serverTimestamp(),
         'groupIds': <String>[],
         'gameIds': <String>[],
@@ -897,7 +891,6 @@ void main() {
         email: 'model-test@test.com',
         displayName: 'Model Test User',
         isEmailVerified: false,
-        isAnonymous: false,
         photoUrl: 'https://example.com/photo.jpg',
         firstName: 'Model',
         lastName: 'Test',

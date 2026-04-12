@@ -28,7 +28,6 @@ mixin _$UserModel {
   bool get isEmailVerified => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get lastSignInAt => throw _privateConstructorUsedError;
-  bool get isAnonymous => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,7 +52,6 @@ abstract class $UserModelCopyWith<$Res> {
     bool isEmailVerified,
     DateTime? createdAt,
     DateTime? lastSignInAt,
-    bool isAnonymous,
   });
 }
 
@@ -79,7 +77,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? isEmailVerified = null,
     Object? createdAt = freezed,
     Object? lastSignInAt = freezed,
-    Object? isAnonymous = null,
   }) {
     return _then(
       _value.copyWith(
@@ -111,10 +108,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.lastSignInAt
                 : lastSignInAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
-            isAnonymous: null == isAnonymous
-                ? _value.isAnonymous
-                : isAnonymous // ignore: cast_nullable_to_non_nullable
-                      as bool,
           )
           as $Val,
     );
@@ -138,7 +131,6 @@ abstract class _$$UserModelImplCopyWith<$Res>
     bool isEmailVerified,
     DateTime? createdAt,
     DateTime? lastSignInAt,
-    bool isAnonymous,
   });
 }
 
@@ -163,7 +155,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? isEmailVerified = null,
     Object? createdAt = freezed,
     Object? lastSignInAt = freezed,
-    Object? isAnonymous = null,
   }) {
     return _then(
       _$UserModelImpl(
@@ -195,10 +186,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.lastSignInAt
             : lastSignInAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
-        isAnonymous: null == isAnonymous
-            ? _value.isAnonymous
-            : isAnonymous // ignore: cast_nullable_to_non_nullable
-                  as bool,
       ),
     );
   }
@@ -215,7 +202,6 @@ class _$UserModelImpl extends _UserModel {
     required this.isEmailVerified,
     this.createdAt,
     this.lastSignInAt,
-    required this.isAnonymous,
   }) : super._();
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -235,12 +221,10 @@ class _$UserModelImpl extends _UserModel {
   final DateTime? createdAt;
   @override
   final DateTime? lastSignInAt;
-  @override
-  final bool isAnonymous;
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, isAnonymous: $isAnonymous)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt)';
   }
 
   @override
@@ -259,9 +243,7 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.lastSignInAt, lastSignInAt) ||
-                other.lastSignInAt == lastSignInAt) &&
-            (identical(other.isAnonymous, isAnonymous) ||
-                other.isAnonymous == isAnonymous));
+                other.lastSignInAt == lastSignInAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -275,7 +257,6 @@ class _$UserModelImpl extends _UserModel {
     isEmailVerified,
     createdAt,
     lastSignInAt,
-    isAnonymous,
   );
 
   /// Create a copy of UserModel
@@ -301,7 +282,6 @@ abstract class _UserModel extends UserModel {
     required final bool isEmailVerified,
     final DateTime? createdAt,
     final DateTime? lastSignInAt,
-    required final bool isAnonymous,
   }) = _$UserModelImpl;
   const _UserModel._() : super._();
 
@@ -322,8 +302,6 @@ abstract class _UserModel extends UserModel {
   DateTime? get createdAt;
   @override
   DateTime? get lastSignInAt;
-  @override
-  bool get isAnonymous;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

@@ -114,7 +114,6 @@ void main() {
           uid: submitterId,
           email: '',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ),
     );
@@ -137,7 +136,6 @@ void main() {
             uid: verifierId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );
@@ -165,7 +163,6 @@ void main() {
             uid: verifierId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );

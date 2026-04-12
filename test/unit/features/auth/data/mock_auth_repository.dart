@@ -83,8 +83,6 @@ class MockAuthRepository implements AuthRepository {
       ({required String email, required String password}) async =>
           TestUserData.testUser;
 
-  Future<UserEntity> Function() _signInAnonymouslyBehavior = () async =>
-      TestUserData.anonymousUser;
 
   Future<void> Function({required String email})
   _sendPasswordResetEmailBehavior = ({required String email}) async {};
@@ -134,9 +132,6 @@ class MockAuthRepository implements AuthRepository {
     _createUserWithEmailAndPasswordBehavior = behavior;
   }
 
-  void setSignInAnonymouslyBehavior(Future<UserEntity> Function() behavior) {
-    _signInAnonymouslyBehavior = behavior;
-  }
 
   void setSendPasswordResetEmailBehavior(
     Future<void> Function({required String email}) behavior,
@@ -199,10 +194,6 @@ class MockAuthRepository implements AuthRepository {
     );
   }
 
-  @override
-  Future<UserEntity> signInAnonymously() {
-    return _signInAnonymouslyBehavior();
-  }
 
   @override
   Future<void> sendPasswordResetEmail({required String email}) {
@@ -262,19 +253,8 @@ class TestUserData {
     isEmailVerified: true,
     createdAt: null,
     lastSignInAt: null,
-    isAnonymous: false,
   );
 
-  static const anonymousUser = UserEntity(
-    uid: 'anon-uid-456',
-    email: '',
-    displayName: null,
-    photoUrl: null,
-    isEmailVerified: false,
-    createdAt: null,
-    lastSignInAt: null,
-    isAnonymous: true,
-  );
 
   static const unverifiedUser = UserEntity(
     uid: 'unverified-uid-789',
@@ -284,6 +264,5 @@ class TestUserData {
     isEmailVerified: false,
     createdAt: null,
     lastSignInAt: null,
-    isAnonymous: false,
   );
 }

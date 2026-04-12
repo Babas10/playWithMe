@@ -328,19 +328,8 @@ void main() {
         expect(user.displayName, equals('Test User'));
         expect(user.photoUrl, isNull);
         expect(user.isEmailVerified, isTrue);
-        expect(user.isAnonymous, isFalse);
       });
 
-      test('TestUserData.anonymousUser should have correct properties', () {
-        const user = TestUserData.anonymousUser;
-
-        expect(user.uid, equals('anon-uid-456'));
-        expect(user.email, equals(''));
-        expect(user.displayName, isNull);
-        expect(user.photoUrl, isNull);
-        expect(user.isEmailVerified, isFalse);
-        expect(user.isAnonymous, isTrue);
-      });
 
       test('TestUserData.unverifiedUser should have correct properties', () {
         const user = TestUserData.unverifiedUser;
@@ -350,7 +339,6 @@ void main() {
         expect(user.displayName, equals('Unverified User'));
         expect(user.photoUrl, isNull);
         expect(user.isEmailVerified, isFalse);
-        expect(user.isAnonymous, isFalse);
       });
     });
 
@@ -367,8 +355,6 @@ void main() {
           ) {
             if (user == null) {
               receivedStates.add('Unauthenticated');
-            } else if (user.isAnonymous) {
-              receivedStates.add('AuthenticatedAnonymous');
             } else {
               receivedStates.add('AuthenticatedUser');
             }
@@ -378,9 +364,6 @@ void main() {
           await Future.delayed(const Duration(milliseconds: 10));
 
           // Act - Simulate authentication flow
-          mockAuthRepository.setCurrentUser(TestUserData.anonymousUser);
-          await Future.delayed(const Duration(milliseconds: 10));
-
           mockAuthRepository.setCurrentUser(TestUserData.testUser);
           await Future.delayed(const Duration(milliseconds: 10));
 
@@ -392,7 +375,6 @@ void main() {
             receivedStates,
             equals([
               'Unauthenticated',
-              'AuthenticatedAnonymous',
               'AuthenticatedUser',
               'Unauthenticated',
             ]),

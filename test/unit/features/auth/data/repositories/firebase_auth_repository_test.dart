@@ -62,7 +62,6 @@ void main() {
     when(() => mockUser.displayName).thenReturn('Test User');
     when(() => mockUser.photoURL).thenReturn('https://example.com/photo.jpg');
     when(() => mockUser.emailVerified).thenReturn(true);
-    when(() => mockUser.isAnonymous).thenReturn(false);
     when(() => mockUser.metadata).thenReturn(mockUserMetadata);
 
     // Setup default credential
@@ -92,7 +91,6 @@ void main() {
         expect(result.displayName, 'Test User');
         expect(result.photoUrl, 'https://example.com/photo.jpg');
         expect(result.isEmailVerified, true);
-        expect(result.isAnonymous, false);
         verify(() => mockFirebaseAuth.currentUser).called(1);
       });
 
@@ -448,74 +446,7 @@ void main() {
       });
     });
 
-    group('signInAnonymously', () {
-      test('returns UserEntity on successful anonymous sign in', () async {
-        when(() => mockUser.isAnonymous).thenReturn(true);
-        when(() => mockUser.email).thenReturn(null);
-        when(
-          () => mockFirebaseAuth.signInAnonymously(),
-        ).thenAnswer((_) async => mockUserCredential);
 
-        final result = await repository.signInAnonymously();
-
-        expect(result, isA<UserEntity>());
-        expect(result.uid, 'test-uid-123');
-        expect(result.isAnonymous, true);
-        verify(() => mockFirebaseAuth.signInAnonymously()).called(1);
-      });
-
-      test('throws exception when credential.user is null', () async {
-        when(() => mockUserCredential.user).thenReturn(null);
-        when(
-          () => mockFirebaseAuth.signInAnonymously(),
-        ).thenAnswer((_) async => mockUserCredential);
-
-        expect(
-          () => repository.signInAnonymously(),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Anonymous sign in failed: User is null'),
-            ),
-          ),
-        );
-      });
-
-      test('maps operation-not-allowed FirebaseAuthException', () async {
-        when(
-          () => mockFirebaseAuth.signInAnonymously(),
-        ).thenThrow(createAuthException('operation-not-allowed'));
-
-        expect(
-          () => repository.signInAnonymously(),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('sign-in method is not allowed'),
-            ),
-          ),
-        );
-      });
-
-      test('wraps generic exceptions', () async {
-        when(
-          () => mockFirebaseAuth.signInAnonymously(),
-        ).thenThrow(Exception('Network error'));
-
-        expect(
-          () => repository.signInAnonymously(),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Anonymous sign in failed'),
-            ),
-          ),
-        );
-      });
-    });
 
     group('sendPasswordResetEmail', () {
       const testEmail = 'test@example.com';

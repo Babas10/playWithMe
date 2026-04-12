@@ -32,7 +32,6 @@ void main() {
       displayName: 'Test User',
       isEmailVerified: isEmailVerified,
       createdAt: createdAt,
-      isAnonymous: false,
     );
   }
 

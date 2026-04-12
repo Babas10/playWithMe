@@ -81,7 +81,6 @@ void main() {
           uid: 'test-user',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ),
     );
@@ -93,28 +92,24 @@ void main() {
         email: 'alice@example.com',
         displayName: 'Alice',
         isEmailVerified: true,
-        isAnonymous: false,
       ),
       'user2': const UserModel(
         uid: 'user2',
         email: 'bob@example.com',
         displayName: 'Bob',
         isEmailVerified: true,
-        isAnonymous: false,
       ),
       'user3': const UserModel(
         uid: 'user3',
         email: 'charlie@example.com',
         displayName: null,
         isEmailVerified: true,
-        isAnonymous: false,
       ),
       'user4': const UserModel(
         uid: 'user4',
         email: 'diana@example.com',
         displayName: 'Diana',
         isEmailVerified: true,
-        isAnonymous: false,
       ),
     };
 

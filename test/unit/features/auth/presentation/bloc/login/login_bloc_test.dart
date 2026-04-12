@@ -243,49 +243,6 @@ void main() {
       });
     });
 
-    group('LoginAnonymouslySubmitted', () {
-      blocTest<LoginBloc, LoginState>(
-        'emits [LoginLoading, LoginSuccess] when anonymous login succeeds',
-        setUp: () {
-          mockAuthRepository.setSignInAnonymouslyBehavior(
-            () async => TestUserData.anonymousUser,
-          );
-        },
-        build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginAnonymouslySubmitted()),
-        expect: () => [const LoginLoading(), const LoginSuccess()],
-      );
-
-      blocTest<LoginBloc, LoginState>(
-        'emits [LoginLoading, LoginFailure] when anonymous login fails',
-        setUp: () {
-          mockAuthRepository.setSignInAnonymouslyBehavior(
-            () async => throw Exception('Anonymous login not allowed'),
-          );
-        },
-        build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginAnonymouslySubmitted()),
-        expect: () => [
-          const LoginLoading(),
-          const LoginFailure('Anonymous login not allowed'),
-        ],
-      );
-
-      blocTest<LoginBloc, LoginState>(
-        'handles anonymous login repository errors correctly',
-        setUp: () {
-          mockAuthRepository.setSignInAnonymouslyBehavior(
-            () async => throw Exception('Network connection failed'),
-          );
-        },
-        build: () => loginBloc,
-        act: (bloc) => bloc.add(const LoginAnonymouslySubmitted()),
-        expect: () => [
-          const LoginLoading(),
-          const LoginFailure('Network connection failed'),
-        ],
-      );
-    });
 
     group('LoginFormReset', () {
       blocTest<LoginBloc, LoginState>(
@@ -387,36 +344,6 @@ void main() {
         ],
       );
 
-      blocTest<LoginBloc, LoginState>(
-        'handles mixed login types (email/password and anonymous)',
-        setUp: () {
-          mockAuthRepository.setSignInWithEmailAndPasswordBehavior(
-            ({required String email, required String password}) async =>
-                TestUserData.testUser,
-          );
-          mockAuthRepository.setSignInAnonymouslyBehavior(
-            () async => TestUserData.anonymousUser,
-          );
-        },
-        build: () => loginBloc,
-        act: (bloc) {
-          bloc.add(
-            const LoginWithEmailAndPasswordSubmitted(
-              email: 'test@example.com',
-              password: 'password',
-            ),
-          );
-          bloc.add(const LoginAnonymouslySubmitted());
-          bloc.add(const LoginFormReset());
-        },
-        expect: () => [
-          const LoginLoading(),
-          const LoginSuccess(),
-          const LoginLoading(),
-          const LoginSuccess(),
-          const LoginInitial(),
-        ],
-      );
     });
   });
 }

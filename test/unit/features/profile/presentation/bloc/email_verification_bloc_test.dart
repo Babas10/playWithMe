@@ -24,7 +24,6 @@ void main() {
     isEmailVerified: false,
     createdAt: DateTime(2024, 1, 1),
     lastSignInAt: DateTime(2024, 10, 1),
-    isAnonymous: false,
   );
 
   final verifiedUser = testUser.copyWith(isEmailVerified: true);

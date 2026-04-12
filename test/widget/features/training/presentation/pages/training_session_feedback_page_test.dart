@@ -58,7 +58,6 @@ void main() {
           uid: 'test-user',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ),
     );

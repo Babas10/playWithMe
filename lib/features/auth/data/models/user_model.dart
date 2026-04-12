@@ -15,7 +15,6 @@ class UserModel with _$UserModel {
     required bool isEmailVerified,
     DateTime? createdAt,
     DateTime? lastSignInAt,
-    required bool isAnonymous,
   }) = _UserModel;
 
   const UserModel._();
@@ -33,7 +32,6 @@ class UserModel with _$UserModel {
       isEmailVerified: firebaseUser.emailVerified,
       createdAt: firebaseUser.metadata.creationTime,
       lastSignInAt: firebaseUser.metadata.lastSignInTime,
-      isAnonymous: firebaseUser.isAnonymous,
     );
   }
 
@@ -47,7 +45,6 @@ class UserModel with _$UserModel {
       isEmailVerified: isEmailVerified,
       createdAt: createdAt,
       lastSignInAt: lastSignInAt,
-      isAnonymous: isAnonymous,
     );
   }
 
@@ -61,7 +58,6 @@ class UserModel with _$UserModel {
       isEmailVerified: entity.isEmailVerified,
       createdAt: entity.createdAt,
       lastSignInAt: entity.lastSignInAt,
-      isAnonymous: entity.isAnonymous,
     );
   }
 }

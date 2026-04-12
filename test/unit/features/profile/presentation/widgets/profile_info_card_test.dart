@@ -20,7 +20,6 @@ void main() {
         isEmailVerified: true,
         createdAt: DateTime(2024, 1, 1),
         lastSignInAt: DateTime(2024, 10, 1),
-        isAnonymous: false,
       );
 
       await tester.pumpWidget(
@@ -40,35 +39,6 @@ void main() {
       expect(find.text('Regular'), findsOneWidget);
     });
 
-    testWidgets('displays account type as Anonymous for anonymous users', (
-      tester,
-    ) async {
-      final testUser = UserEntity(
-        uid: 'test-uid-123',
-        email: 'anon@example.com',
-        displayName: null,
-        photoUrl: null,
-        isEmailVerified: false,
-        createdAt: DateTime(2024, 1, 1),
-        lastSignInAt: DateTime(2024, 10, 1),
-        isAnonymous: true,
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('en')],
-          home: Scaffold(body: ProfileInfoCard(user: testUser)),
-        ),
-      );
-
-      expect(find.text('Anonymous'), findsOneWidget);
-    });
 
     testWidgets('displays formatted member since date', (tester) async {
       final testUser = UserEntity(
@@ -79,7 +49,6 @@ void main() {
         isEmailVerified: true,
         createdAt: DateTime(2024, 1, 15),
         lastSignInAt: DateTime(2024, 10, 1),
-        isAnonymous: false,
       );
 
       await tester.pumpWidget(
@@ -108,7 +77,6 @@ void main() {
         isEmailVerified: true,
         createdAt: DateTime(2024, 1, 1),
         lastSignInAt: DateTime(2024, 10, 12),
-        isAnonymous: false,
       );
 
       await tester.pumpWidget(
@@ -137,7 +105,6 @@ void main() {
         isEmailVerified: true,
         createdAt: null,
         lastSignInAt: DateTime(2024, 10, 1),
-        isAnonymous: false,
       );
 
       await tester.pumpWidget(
@@ -165,7 +132,6 @@ void main() {
         isEmailVerified: true,
         createdAt: DateTime(2024, 1, 1),
         lastSignInAt: null,
-        isAnonymous: false,
       );
 
       await tester.pumpWidget(
@@ -193,7 +159,6 @@ void main() {
         isEmailVerified: true,
         createdAt: DateTime(2024, 1, 1),
         lastSignInAt: DateTime(2024, 10, 1),
-        isAnonymous: false,
       );
 
       await tester.pumpWidget(

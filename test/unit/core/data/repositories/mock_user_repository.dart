@@ -310,7 +310,6 @@ class TestUserData {
     createdAt: DateTime.now(),
     lastSignInAt: DateTime.now(),
     updatedAt: DateTime.now(),
-    isAnonymous: false,
     firstName: 'Test',
     lastName: 'User',
     phoneNumber: '+1234567890',
@@ -332,7 +331,6 @@ class TestUserData {
     createdAt: DateTime.now(),
     lastSignInAt: DateTime.now(),
     updatedAt: DateTime.now(),
-    isAnonymous: true,
   );
 
   static final anotherUser = UserModel(
@@ -344,7 +342,6 @@ class TestUserData {
     createdAt: DateTime.now(),
     lastSignInAt: DateTime.now(),
     updatedAt: DateTime.now(),
-    isAnonymous: false,
     firstName: 'Another',
     lastName: 'User',
     groupIds: ['group1'],

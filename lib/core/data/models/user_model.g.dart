@@ -13,11 +13,10 @@ _$UserModelImpl _$$UserModelImplFromJson(
   email: json['email'] as String,
   displayName: json['displayName'] as String?,
   photoUrl: json['photoUrl'] as String?,
-  isEmailVerified: json['isEmailVerified'] as bool,
+  isEmailVerified: json['isEmailVerified'] as bool? ?? false,
   createdAt: const TimestampConverter().fromJson(json['createdAt']),
   lastSignInAt: const TimestampConverter().fromJson(json['lastSignInAt']),
   updatedAt: const TimestampConverter().fromJson(json['updatedAt']),
-  isAnonymous: json['isAnonymous'] as bool,
   emailVerifiedAt: const TimestampConverter().fromJson(json['emailVerifiedAt']),
   accountStatus:
       $enumDecodeNullable(_$AccountStatusEnumMap, json['accountStatus']) ??
@@ -100,7 +99,6 @@ Map<String, dynamic> _$$UserModelImplToJson(
   'createdAt': const TimestampConverter().toJson(instance.createdAt),
   'lastSignInAt': const TimestampConverter().toJson(instance.lastSignInAt),
   'updatedAt': const TimestampConverter().toJson(instance.updatedAt),
-  'isAnonymous': instance.isAnonymous,
   'emailVerifiedAt': const TimestampConverter().toJson(
     instance.emailVerifiedAt,
   ),

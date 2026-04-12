@@ -73,7 +73,6 @@ void main() {
           isEmailVerified: true,
           createdAt: DateTime(2024, 1, 1),
           lastSignInAt: DateTime(2024, 1, 1),
-          isAnonymous: false,
         ),
       ),
     );

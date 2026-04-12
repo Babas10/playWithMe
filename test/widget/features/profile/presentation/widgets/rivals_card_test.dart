@@ -15,7 +15,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: null,
         );
 
@@ -54,7 +53,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
         );
 
         await tester.pumpWidget(
@@ -90,7 +88,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: nemesis,
         );
 
@@ -136,7 +133,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: nemesis,
         );
 
@@ -173,7 +169,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: nemesis,
         );
 
@@ -209,7 +204,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: nemesis,
         );
 
@@ -250,7 +244,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: nemesis,
         );
 
@@ -288,7 +281,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: nemesis,
         );
 
@@ -318,7 +310,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: null,
         );
 
@@ -350,7 +341,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
         );
 
         await tester.pumpWidget(
@@ -384,7 +374,6 @@ void main() {
           uid: 'test-uid',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           nemesis: nemesis,
         );
 

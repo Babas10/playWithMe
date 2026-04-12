@@ -44,7 +44,6 @@ void main() {
           email: 'partner@example.com',
           displayName: 'Partner User',
           isEmailVerified: true,
-          isAnonymous: false,
         );
 
         when(
@@ -82,7 +81,6 @@ void main() {
             uid: 'partner-123',
             email: 'partner@example.com',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         );
 

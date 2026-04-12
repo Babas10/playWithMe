@@ -51,7 +51,6 @@ void main() {
     email: 'test@example.com',
     displayName: 'Test User',
     isEmailVerified: true,
-    isAnonymous: false,
   );
 
   final testGame = GameModel(

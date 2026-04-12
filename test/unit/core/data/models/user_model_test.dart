@@ -20,7 +20,6 @@ void main() {
         createdAt: testDate,
         lastSignInAt: testDate,
         updatedAt: testDate,
-        isAnonymous: false,
         firstName: 'Test',
         lastName: 'User',
         phoneNumber: '+1234567890',
@@ -47,13 +46,11 @@ void main() {
           uid: 'uid',
           email: 'email@test.com',
           isEmailVerified: false,
-          isAnonymous: true,
         );
 
         expect(user.uid, 'uid');
         expect(user.email, 'email@test.com');
         expect(user.isEmailVerified, false);
-        expect(user.isAnonymous, true);
         expect(user.displayName, null);
         expect(user.photoUrl, null);
         expect(user.createdAt, null);
@@ -89,7 +86,6 @@ void main() {
           'email': 'test@example.com',
           'displayName': 'Test User',
           'isEmailVerified': true,
-          'isAnonymous': false,
           'firstName': 'Test',
           'lastName': 'User',
           'gamesPlayed': 5,
@@ -103,7 +99,6 @@ void main() {
         expect(user.email, 'test@example.com');
         expect(user.displayName, 'Test User');
         expect(user.isEmailVerified, true);
-        expect(user.isAnonymous, false);
         expect(user.firstName, 'Test');
         expect(user.lastName, 'User');
         expect(user.gamesPlayed, 5);
@@ -119,7 +114,6 @@ void main() {
         expect(json['displayName'], 'Test User');
         expect(json['photoUrl'], 'https://example.com/photo.jpg');
         expect(json['isEmailVerified'], true);
-        expect(json['isAnonymous'], false);
         expect(json['firstName'], 'Test');
         expect(json['lastName'], 'User');
         expect(json['phoneNumber'], '+1234567890');
@@ -148,7 +142,6 @@ void main() {
           'createdAt': Timestamp.fromDate(testDate),
           'lastSignInAt': Timestamp.fromDate(testDate),
           'updatedAt': Timestamp.fromDate(testDate),
-          'isAnonymous': false,
           'firstName': 'Test',
           'lastName': 'User',
           'phoneNumber': '+1234567890',
@@ -178,7 +171,6 @@ void main() {
         expect(user.createdAt, testDate);
         expect(user.lastSignInAt, testDate);
         expect(user.updatedAt, testDate);
-        expect(user.isAnonymous, false);
         expect(user.firstName, 'Test');
         expect(user.lastName, 'User');
         expect(user.phoneNumber, '+1234567890');
@@ -689,7 +681,6 @@ void main() {
           uid: 'uid',
           email: 'email@test.com',
           isEmailVerified: false,
-          isAnonymous: false,
         );
 
         expect(user.eloRating, 1200.0);
@@ -724,7 +715,6 @@ void main() {
           'uid': 'test-uid',
           'email': 'test@example.com',
           'isEmailVerified': true,
-          'isAnonymous': false,
           'eloRating': 1725.0,
           'eloPeak': 1800.0,
           'eloGamesPlayed': 25,
@@ -747,7 +737,6 @@ void main() {
           'uid': 'legacy-user',
           'email': 'legacy@test.com',
           'isEmailVerified': true,
-          'isAnonymous': false,
           // No ELO fields
         };
 
@@ -786,7 +775,6 @@ void main() {
           'email': 'elo@test.com',
           'displayName': 'ELO Test User',
           'isEmailVerified': true,
-          'isAnonymous': false,
           'eloRating': 1850.0,
           'eloPeak': 1900.0,
           'eloGamesPlayed': 42,
@@ -846,7 +834,6 @@ void main() {
           uid: 'uid',
           email: 'email@test.com',
           isEmailVerified: false,
-          isAnonymous: false,
         );
 
         expect(user.gamesLost, 0);
@@ -918,7 +905,6 @@ void main() {
           'uid': 'test-uid',
           'email': 'test@example.com',
           'isEmailVerified': true,
-          'isAnonymous': false,
           'gamesLost': 2,
           'currentStreak': -2,
           'recentGameIds': ['game5', 'game4', 'game3'],
@@ -946,7 +932,6 @@ void main() {
             'uid': 'legacy-user',
             'email': 'legacy@test.com',
             'isEmailVerified': true,
-            'isAnonymous': false,
             'gamesPlayed': 5,
             'gamesWon': 3,
             // No new stats fields
@@ -994,7 +979,6 @@ void main() {
           'email': 'stats@test.com',
           'displayName': 'Stats Test User',
           'isEmailVerified': true,
-          'isAnonymous': false,
           'gamesLost': 6,
           'currentStreak': -1,
           'recentGameIds': ['game-a', 'game-b', 'game-c'],
@@ -1077,7 +1061,6 @@ void main() {
           uid: 'uid',
           email: 'email@test.com',
           isEmailVerified: false,
-          isAnonymous: false,
         );
 
         expect(user.accountStatus, AccountStatus.pendingVerification);
@@ -1112,7 +1095,6 @@ void main() {
           'uid': 'test-uid',
           'email': 'test@example.com',
           'isEmailVerified': false,
-          'isAnonymous': false,
           'accountStatus': 'restricted',
           'emailVerifiedAt': Timestamp.fromDate(verifiedAt),
           'gracePeriodExpiresAt': Timestamp.fromDate(graceExpires),
@@ -1133,7 +1115,6 @@ void main() {
             'uid': 'test-uid',
             'email': 'test@example.com',
             'isEmailVerified': false,
-            'isAnonymous': false,
             'accountStatus': status.name,
           };
 
@@ -1149,7 +1130,6 @@ void main() {
             'uid': 'legacy-user',
             'email': 'legacy@test.com',
             'isEmailVerified': true,
-            'isAnonymous': false,
           };
 
           final user = UserModel.fromJson(json);
@@ -1182,7 +1162,6 @@ void main() {
           'email': 'status@test.com',
           'displayName': 'Status Test User',
           'isEmailVerified': true,
-          'isAnonymous': false,
           'accountStatus': 'active',
           'emailVerifiedAt': Timestamp.fromDate(verifiedAt),
           'gracePeriodExpiresAt': Timestamp.fromDate(graceExpires),
@@ -1236,7 +1215,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
         );
 
         expect(user.gender, isNull);
@@ -1247,7 +1225,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
         );
 
         expect(user.effectiveGender, UserGender.none);
@@ -1258,7 +1235,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
           gender: UserGender.none,
         );
 
@@ -1270,7 +1246,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
         );
 
         expect(user.isMixOnly, isTrue);
@@ -1281,7 +1256,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
           gender: UserGender.none,
         );
 
@@ -1293,7 +1267,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
           gender: UserGender.male,
         );
 
@@ -1305,7 +1278,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
           gender: UserGender.female,
         );
 
@@ -1317,7 +1289,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
           gender: UserGender.male,
         );
 
@@ -1329,7 +1300,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
           gender: UserGender.female,
         );
 
@@ -1341,7 +1311,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
           gender: UserGender.none,
         );
 
@@ -1353,7 +1322,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
         );
 
         expect(user.toJson()['gender'], isNull);
@@ -1364,7 +1332,6 @@ void main() {
           'uid': 'uid',
           'email': 'a@b.com',
           'isEmailVerified': false,
-          'isAnonymous': false,
           'gender': 'male',
         });
 
@@ -1376,7 +1343,6 @@ void main() {
           'uid': 'uid',
           'email': 'a@b.com',
           'isEmailVerified': false,
-          'isAnonymous': false,
           'gender': 'female',
         });
 
@@ -1388,7 +1354,6 @@ void main() {
           'uid': 'uid',
           'email': 'a@b.com',
           'isEmailVerified': false,
-          'isAnonymous': false,
           'gender': 'none',
         });
 
@@ -1400,7 +1365,6 @@ void main() {
           'uid': 'uid',
           'email': 'a@b.com',
           'isEmailVerified': false,
-          'isAnonymous': false,
         });
 
         expect(user.gender, isNull);
@@ -1412,7 +1376,6 @@ void main() {
             uid: 'uid',
             email: 'a@b.com',
             isEmailVerified: false,
-            isAnonymous: false,
             gender: gender,
           );
           final restored = UserModel.fromJson(user.toJson());
@@ -1425,7 +1388,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
         );
 
         final updated = user.updateProfile(gender: UserGender.female);
@@ -1438,7 +1400,6 @@ void main() {
           uid: 'uid',
           email: 'a@b.com',
           isEmailVerified: false,
-          isAnonymous: false,
           gender: UserGender.male,
         );
 

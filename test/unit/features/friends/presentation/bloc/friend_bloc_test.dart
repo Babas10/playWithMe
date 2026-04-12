@@ -40,7 +40,6 @@ void main() {
       email: 'test@example.com',
       displayName: 'Test User',
       isEmailVerified: true,
-      isAnonymous: false,
     );
 
     final testFriend = UserEntity(
@@ -48,7 +47,6 @@ void main() {
       email: 'friend@example.com',
       displayName: 'Friend User',
       isEmailVerified: true,
-      isAnonymous: false,
     );
 
     final testReceivedRequest = FriendshipEntity(

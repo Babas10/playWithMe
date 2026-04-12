@@ -37,8 +37,7 @@ class ProfileInfoCard extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Email and verification status
-            if (!user.isAnonymous) ...[
-              Row(
+            Row(
                 children: [
                   Icon(
                     Icons.email_outlined,
@@ -88,13 +87,12 @@ class ProfileInfoCard extends StatelessWidget {
                 ],
               ),
               const Divider(height: 24),
-            ],
 
             // Account type
             _InfoRow(
               icon: Icons.person_outline,
               label: l10n.accountType,
-              value: user.isAnonymous ? l10n.anonymous : l10n.regular,
+              value: l10n.regular,
             ),
             const Divider(height: 24),
 

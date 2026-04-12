@@ -17,7 +17,6 @@ void main() {
         email: 'test@example.com',
         displayName: 'Test User',
         isEmailVerified: true,
-        isAnonymous: false,
         teammateStats: {
           'teammate-456': {
             'teammateName': 'John Doe',
@@ -65,7 +64,6 @@ void main() {
         email: 'test@example.com',
         displayName: 'Test User',
         isEmailVerified: true,
-        isAnonymous: false,
         teammateStats: {
           'teammate-789': {
             // Missing 'teammateName' field (legacy data)
@@ -107,7 +105,6 @@ void main() {
         email: 'test@example.com',
         displayName: 'Test User',
         isEmailVerified: true,
-        isAnonymous: false,
         teammateStats: {
           'teammate-111': {
             'teammateName': 'Alice Smith',
@@ -148,7 +145,6 @@ void main() {
         email: 'test@example.com',
         displayName: 'Test User',
         isEmailVerified: true,
-        isAnonymous: false,
         teammateStats: {
           'teammate-low': {
             'teammateName': 'Bob Jones',
@@ -199,7 +195,6 @@ void main() {
         email: 'test@example.com',
         displayName: 'Test User',
         isEmailVerified: true,
-        isAnonymous: false,
         teammateStats: {
           'teammate-long': {
             'teammateName': 'Alexander Maximilian Constantine Rodriguez',

@@ -47,7 +47,6 @@ void main() {
     email: 'test@example.com',
     displayName: 'Test User',
     isEmailVerified: true,
-    isAnonymous: false,
   );
 
   final searchedUser = UserEntity(
@@ -55,7 +54,6 @@ void main() {
     email: 'found@example.com',
     displayName: 'Found User',
     isEmailVerified: true,
-    isAnonymous: false,
   );
 
   setUpAll(() {

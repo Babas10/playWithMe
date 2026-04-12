@@ -42,7 +42,6 @@ void main() {
     email: 'test@example.com',
     displayName: 'Test User',
     isEmailVerified: true,
-    isAnonymous: false,
   );
 
   final testInvitation1 = InvitationModel(

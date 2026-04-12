@@ -31,9 +31,7 @@ mixin _$UserModel {
   @TimestampConverter()
   DateTime? get lastSignInAt => throw _privateConstructorUsedError;
   @TimestampConverter()
-  DateTime? get updatedAt => throw _privateConstructorUsedError;
-  bool get isAnonymous =>
-      throw _privateConstructorUsedError; // Account status fields (Story 17.8.2)
+  DateTime? get updatedAt => throw _privateConstructorUsedError; // Account status fields (Story 17.8.2)
   @TimestampConverter()
   DateTime? get emailVerifiedAt => throw _privateConstructorUsedError;
   AccountStatus get accountStatus => throw _privateConstructorUsedError;
@@ -113,7 +111,6 @@ abstract class $UserModelCopyWith<$Res> {
     @TimestampConverter() DateTime? createdAt,
     @TimestampConverter() DateTime? lastSignInAt,
     @TimestampConverter() DateTime? updatedAt,
-    bool isAnonymous,
     @TimestampConverter() DateTime? emailVerifiedAt,
     AccountStatus accountStatus,
     @TimestampConverter() DateTime? gracePeriodExpiresAt,
@@ -184,7 +181,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? createdAt = freezed,
     Object? lastSignInAt = freezed,
     Object? updatedAt = freezed,
-    Object? isAnonymous = null,
     Object? emailVerifiedAt = freezed,
     Object? accountStatus = null,
     Object? gracePeriodExpiresAt = freezed,
@@ -259,10 +255,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.updatedAt
                 : updatedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
-            isAnonymous: null == isAnonymous
-                ? _value.isAnonymous
-                : isAnonymous // ignore: cast_nullable_to_non_nullable
-                      as bool,
             emailVerifiedAt: freezed == emailVerifiedAt
                 ? _value.emailVerifiedAt
                 : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
@@ -499,7 +491,6 @@ abstract class _$$UserModelImplCopyWith<$Res>
     @TimestampConverter() DateTime? createdAt,
     @TimestampConverter() DateTime? lastSignInAt,
     @TimestampConverter() DateTime? updatedAt,
-    bool isAnonymous,
     @TimestampConverter() DateTime? emailVerifiedAt,
     AccountStatus accountStatus,
     @TimestampConverter() DateTime? gracePeriodExpiresAt,
@@ -573,7 +564,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? createdAt = freezed,
     Object? lastSignInAt = freezed,
     Object? updatedAt = freezed,
-    Object? isAnonymous = null,
     Object? emailVerifiedAt = freezed,
     Object? accountStatus = null,
     Object? gracePeriodExpiresAt = freezed,
@@ -648,10 +638,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.updatedAt
             : updatedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
-        isAnonymous: null == isAnonymous
-            ? _value.isAnonymous
-            : isAnonymous // ignore: cast_nullable_to_non_nullable
-                  as bool,
         emailVerifiedAt: freezed == emailVerifiedAt
             ? _value.emailVerifiedAt
             : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
@@ -821,11 +807,10 @@ class _$UserModelImpl extends _UserModel {
     required this.email,
     this.displayName,
     this.photoUrl,
-    required this.isEmailVerified,
+    this.isEmailVerified = false,
     @TimestampConverter() this.createdAt,
     @TimestampConverter() this.lastSignInAt,
     @TimestampConverter() this.updatedAt,
-    required this.isAnonymous,
     @TimestampConverter() this.emailVerifiedAt,
     this.accountStatus = AccountStatus.pendingVerification,
     @TimestampConverter() this.gracePeriodExpiresAt,
@@ -884,6 +869,7 @@ class _$UserModelImpl extends _UserModel {
   @override
   final String? photoUrl;
   @override
+  @JsonKey()
   final bool isEmailVerified;
   @override
   @TimestampConverter()
@@ -894,8 +880,6 @@ class _$UserModelImpl extends _UserModel {
   @override
   @TimestampConverter()
   final DateTime? updatedAt;
-  @override
-  final bool isAnonymous;
   // Account status fields (Story 17.8.2)
   @override
   @TimestampConverter()
@@ -1048,7 +1032,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, isAnonymous: $isAnonymous, emailVerifiedAt: $emailVerifiedAt, accountStatus: $accountStatus, gracePeriodExpiresAt: $gracePeriodExpiresAt, deletionScheduledAt: $deletionScheduledAt, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, gender: $gender, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats, roleBasedStats: $roleBasedStats)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, updatedAt: $updatedAt, emailVerifiedAt: $emailVerifiedAt, accountStatus: $accountStatus, gracePeriodExpiresAt: $gracePeriodExpiresAt, deletionScheduledAt: $deletionScheduledAt, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, dateOfBirth: $dateOfBirth, location: $location, bio: $bio, groupIds: $groupIds, gameIds: $gameIds, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated, notificationsEnabled: $notificationsEnabled, emailNotifications: $emailNotifications, pushNotifications: $pushNotifications, privacyLevel: $privacyLevel, showEmail: $showEmail, showPhoneNumber: $showPhoneNumber, gamesPlayed: $gamesPlayed, gamesWon: $gamesWon, gamesLost: $gamesLost, totalScore: $totalScore, currentStreak: $currentStreak, recentGameIds: $recentGameIds, lastGameDate: $lastGameDate, teammateStats: $teammateStats, gender: $gender, eloRating: $eloRating, eloLastUpdated: $eloLastUpdated, eloPeak: $eloPeak, eloPeakDate: $eloPeakDate, eloGamesPlayed: $eloGamesPlayed, nemesis: $nemesis, bestWin: $bestWin, pointStats: $pointStats, roleBasedStats: $roleBasedStats)';
   }
 
   @override
@@ -1070,8 +1054,6 @@ class _$UserModelImpl extends _UserModel {
                 other.lastSignInAt == lastSignInAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
-            (identical(other.isAnonymous, isAnonymous) ||
-                other.isAnonymous == isAnonymous) &&
             (identical(other.emailVerifiedAt, emailVerifiedAt) ||
                 other.emailVerifiedAt == emailVerifiedAt) &&
             (identical(other.accountStatus, accountStatus) ||
@@ -1163,7 +1145,6 @@ class _$UserModelImpl extends _UserModel {
     createdAt,
     lastSignInAt,
     updatedAt,
-    isAnonymous,
     emailVerifiedAt,
     accountStatus,
     gracePeriodExpiresAt,
@@ -1225,11 +1206,10 @@ abstract class _UserModel extends UserModel {
     required final String email,
     final String? displayName,
     final String? photoUrl,
-    required final bool isEmailVerified,
+    final bool isEmailVerified,
     @TimestampConverter() final DateTime? createdAt,
     @TimestampConverter() final DateTime? lastSignInAt,
     @TimestampConverter() final DateTime? updatedAt,
-    required final bool isAnonymous,
     @TimestampConverter() final DateTime? emailVerifiedAt,
     final AccountStatus accountStatus,
     @TimestampConverter() final DateTime? gracePeriodExpiresAt,
@@ -1293,9 +1273,7 @@ abstract class _UserModel extends UserModel {
   DateTime? get lastSignInAt;
   @override
   @TimestampConverter()
-  DateTime? get updatedAt;
-  @override
-  bool get isAnonymous; // Account status fields (Story 17.8.2)
+  DateTime? get updatedAt; // Account status fields (Story 17.8.2)
   @override
   @TimestampConverter()
   DateTime? get emailVerifiedAt;

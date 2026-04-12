@@ -15,7 +15,6 @@ void main() {
         displayName: 'Test User',
         photoUrl: 'https://example.com/photo.jpg',
         isEmailVerified: true,
-        isAnonymous: false,
       );
     });
 
@@ -91,7 +90,6 @@ void main() {
           email: 'new@example.com',
           displayName: 'New User',
           isEmailVerified: true,
-          isAnonymous: false,
         );
 
         final copy = result.copyWith(user: newUser);
