@@ -314,7 +314,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _friendRequestCountBloc = sl<FriendRequestCountBloc>();
     _playerStatsBloc = PlayerStatsBloc(userRepository: sl<UserRepository>());
     _accountStatusBloc = sl<AccountStatusBloc>();
-    _emailVerificationBloc = EmailVerificationBloc(authRepository: sl());
+    _emailVerificationBloc = EmailVerificationBloc(
+      authRepository: sl(),
+      userRepository: sl(),
+    );
 
     // Expose tab switching so pushed routes (e.g. GroupDetailsPage) can
     // navigate back to a specific tab without prop-drilling.

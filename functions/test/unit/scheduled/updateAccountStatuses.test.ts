@@ -1,5 +1,6 @@
 // Unit tests for updateAccountStatuses scheduled Cloud Function.
 // Story 17.8.4: Scheduled Cloud Functions for Account Cleanup (#481)
+// Issue #729: Safety-net for isEmailVerified sync gap
 
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
@@ -19,8 +20,10 @@ jest.mock("firebase-admin", () => {
       toMillis: () => date.getTime(),
     })),
   };
+  const authFn = jest.fn();
   return {
     firestore: firestoreFn,
+    auth: authFn,
     initializeApp: jest.fn(),
   };
 });
@@ -54,6 +57,7 @@ const handler = updateAccountStatuses as unknown as () =>
 describe("updateAccountStatuses", () => {
   let mockDb: any;
   let mockBatch: any;
+  let mockAuthInstance: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -70,6 +74,12 @@ describe("updateAccountStatuses", () => {
 
     (admin.firestore as unknown as jest.Mock)
       .mockReturnValue(mockDb);
+
+    // Default: auth lookup returns unverified (existing tests pass unchanged)
+    mockAuthInstance = {
+      getUser: jest.fn().mockResolvedValue({emailVerified: false}),
+    };
+    (admin.auth as unknown as jest.Mock).mockReturnValue(mockAuthInstance);
   });
 
   it("should skip when no accounts need transition", async () => {
@@ -94,7 +104,7 @@ describe("updateAccountStatuses", () => {
     expect(mockBatch.commit).not.toHaveBeenCalled();
   });
 
-  it("should transition expired accounts to restricted",
+  it("should transition expired accounts to restricted when not verified in Auth",
     async () => {
       const createdAt = new Date("2026-01-01T00:00:00Z");
       const mockRef = {id: "user-1", path: "users/user-1"};
@@ -121,6 +131,7 @@ describe("updateAccountStatuses", () => {
         get: jest.fn().mockResolvedValue(mockSnapshot),
       };
       mockDb.collection.mockReturnValue(mockQuery);
+      mockAuthInstance.getUser.mockResolvedValue({emailVerified: false});
 
       await handler();
 
@@ -140,6 +151,132 @@ describe("updateAccountStatuses", () => {
       expect(mockBatch.commit).toHaveBeenCalledTimes(1);
     }
   );
+
+  it("should sync account to active when Auth shows emailVerified=true",
+    async () => {
+      const createdAt = new Date("2026-01-01T00:00:00Z");
+      const mockRef = {id: "user-sync", path: "users/user-sync"};
+      const mockDoc = {
+        id: "user-sync",
+        ref: mockRef,
+        data: () => ({
+          accountStatus: "pendingVerification",
+          emailVerifiedAt: null,
+          createdAt: {toDate: () => createdAt},
+        }),
+      };
+      const mockQuery = {
+        where: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({
+          empty: false,
+          size: 1,
+          docs: [mockDoc],
+        }),
+      };
+      mockDb.collection.mockReturnValue(mockQuery);
+      mockAuthInstance.getUser.mockResolvedValue({emailVerified: true});
+
+      await handler();
+
+      expect(mockBatch.update).toHaveBeenCalledWith(
+        mockRef,
+        expect.objectContaining({
+          isEmailVerified: true,
+          accountStatus: "active",
+          emailVerifiedAt: "MOCK_TIMESTAMP",
+          updatedAt: "MOCK_TIMESTAMP",
+        })
+      );
+      // Must NOT restrict
+      const call = mockBatch.update.mock.calls[0][1];
+      expect(call.accountStatus).toBe("active");
+      expect(call).not.toHaveProperty("deletionScheduledAt");
+      expect(mockBatch.commit).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it("should restrict account when Auth lookup throws (defensive fallback)",
+    async () => {
+      const createdAt = new Date("2026-01-01T00:00:00Z");
+      const mockRef = {id: "user-no-auth", path: "users/user-no-auth"};
+      const mockDoc = {
+        id: "user-no-auth",
+        ref: mockRef,
+        data: () => ({
+          accountStatus: "pendingVerification",
+          emailVerifiedAt: null,
+          createdAt: {toDate: () => createdAt},
+        }),
+      };
+      const mockQuery = {
+        where: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({
+          empty: false,
+          size: 1,
+          docs: [mockDoc],
+        }),
+      };
+      mockDb.collection.mockReturnValue(mockQuery);
+      mockAuthInstance.getUser.mockRejectedValue(new Error("auth/user-not-found"));
+
+      await handler();
+
+      expect(mockBatch.update).toHaveBeenCalledWith(
+        mockRef,
+        expect.objectContaining({accountStatus: "restricted"})
+      );
+      expect(functions.logger.warn).toHaveBeenCalledWith(
+        "[updateAccountStatuses] Could not fetch Auth record, restricting",
+        expect.objectContaining({uid: "user-no-auth"})
+      );
+      expect(mockBatch.commit).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it("should handle mixed batch: some synced, some restricted", async () => {
+    const createdAt = new Date("2026-01-01T00:00:00Z");
+    const mockDocs = [
+      {
+        id: "user-verified",
+        ref: {id: "user-verified"},
+        data: () => ({createdAt: {toDate: () => createdAt}}),
+      },
+      {
+        id: "user-unverified",
+        ref: {id: "user-unverified"},
+        data: () => ({createdAt: {toDate: () => createdAt}}),
+      },
+    ];
+    const mockQuery = {
+      where: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      get: jest.fn().mockResolvedValue({
+        empty: false,
+        size: 2,
+        docs: mockDocs,
+      }),
+    };
+    mockDb.collection.mockReturnValue(mockQuery);
+    mockAuthInstance.getUser
+      .mockResolvedValueOnce({emailVerified: true})   // user-verified
+      .mockResolvedValueOnce({emailVerified: false});  // user-unverified
+
+    await handler();
+
+    expect(mockBatch.update).toHaveBeenCalledTimes(2);
+    const calls = mockBatch.update.mock.calls;
+    const syncedCall = calls.find(
+      (c: any[]) => c[1].accountStatus === "active"
+    );
+    const restrictedCall = calls.find(
+      (c: any[]) => c[1].accountStatus === "restricted"
+    );
+    expect(syncedCall).toBeDefined();
+    expect(restrictedCall).toBeDefined();
+    expect(mockBatch.commit).toHaveBeenCalledTimes(1);
+  });
 
   it("should process multiple accounts in batch", async () => {
     const createdAt = new Date("2026-01-01T00:00:00Z");
@@ -248,7 +385,7 @@ describe("updateAccountStatuses", () => {
     );
   });
 
-  it("should log transition details for each account",
+  it("should log transition details for restricted account",
     async () => {
       const createdAt = new Date("2026-01-01T00:00:00Z");
       const mockDoc = {
@@ -277,6 +414,41 @@ describe("updateAccountStatuses", () => {
           uid: "user-1",
           previousStatus: "pendingVerification",
           newStatus: "restricted",
+        })
+      );
+    }
+  );
+
+  it("should log sync details for gap-fixed account",
+    async () => {
+      const createdAt = new Date("2026-01-01T00:00:00Z");
+      const mockDoc = {
+        id: "user-gap",
+        ref: {id: "user-gap"},
+        data: () => ({
+          createdAt: {toDate: () => createdAt},
+        }),
+      };
+      const mockQuery = {
+        where: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        get: jest.fn().mockResolvedValue({
+          empty: false,
+          size: 1,
+          docs: [mockDoc],
+        }),
+      };
+      mockDb.collection.mockReturnValue(mockQuery);
+      mockAuthInstance.getUser.mockResolvedValue({emailVerified: true});
+
+      await handler();
+
+      expect(functions.logger.info).toHaveBeenCalledWith(
+        "[updateAccountStatuses] Syncing verified account (gap fix)",
+        expect.objectContaining({
+          uid: "user-gap",
+          previousStatus: "pendingVerification",
+          newStatus: "active",
         })
       );
     }

@@ -1,5 +1,7 @@
 // Scheduled function to transition unverified accounts from pendingVerification
 // to restricted after grace period expiration (7 days).
+// Also acts as a safety net: if Firebase Auth shows emailVerified=true but
+// Firestore was never synced, marks the account active instead of restricting.
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
@@ -14,16 +16,19 @@ const BATCH_SIZE = 500;
  *   - gracePeriodExpiresAt < now
  *   - accountStatus == 'pendingVerification'
  *
- * Updates:
- *   - accountStatus -> 'restricted'
- *   - deletionScheduledAt -> 30 days from account creation (createdAt)
+ * For each matching user:
+ *   - Checks Firebase Auth to detect the isEmailVerified sync gap.
+ *   - If Auth shows emailVerified=true  → syncs Firestore to active.
+ *   - If Auth shows emailVerified=false → restricts account and schedules deletion.
  *
  * Story 17.8.4: Scheduled Cloud Functions for Account Cleanup (#481)
+ * Issue #729: Safety-net for isEmailVerified sync gap
  */
 export const updateAccountStatuses = functions.region('europe-west6').pubsub
   .schedule("every 24 hours")
   .onRun(async () => {
     const db = admin.firestore();
+    const auth = admin.auth();
     const now = admin.firestore.Timestamp.now();
 
     functions.logger.info(
@@ -52,36 +57,71 @@ export const updateAccountStatuses = functions.region('europe-west6').pubsub
       );
 
       const batch = db.batch();
-      const transitionedUserIds: string[] = [];
+      const restrictedUserIds: string[] = [];
+      const syncedUserIds: string[] = [];
 
       for (const doc of snapshot.docs) {
         const data = doc.data();
         const createdAt = data.createdAt as admin.firestore.Timestamp;
 
-        // Compute deletionScheduledAt: 30 days from account creation
-        const deletionDate = new Date(
-          createdAt.toDate().getTime() + 30 * 24 * 60 * 60 * 1000
-        );
+        // Safety net (Issue #729): check Firebase Auth before restricting.
+        // A user may have verified their email but the Firestore sync was missed.
+        let authVerified = false;
+        try {
+          const authUser = await auth.getUser(doc.id);
+          authVerified = authUser.emailVerified;
+        } catch (authError) {
+          // Auth record missing or lookup failed — treat as unverified and restrict.
+          functions.logger.warn(
+            "[updateAccountStatuses] Could not fetch Auth record, restricting",
+            {
+              uid: doc.id,
+              error: authError instanceof Error ?
+                authError.message : String(authError),
+            }
+          );
+        }
 
-        batch.update(doc.ref, {
-          accountStatus: "restricted",
-          deletionScheduledAt:
-            admin.firestore.Timestamp.fromDate(deletionDate),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-        transitionedUserIds.push(doc.id);
-
-        functions.logger.info(
-          "[updateAccountStatuses] Transitioning account",
-          {
-            uid: doc.id,
-            previousStatus: "pendingVerification",
-            newStatus: "restricted",
-            createdAt: createdAt.toDate().toISOString(),
-            deletionScheduledAt: deletionDate.toISOString(),
-          }
-        );
+        if (authVerified) {
+          // Sync gap: user verified in Auth but Firestore was never updated.
+          batch.update(doc.ref, {
+            isEmailVerified: true,
+            accountStatus: "active",
+            emailVerifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          syncedUserIds.push(doc.id);
+          functions.logger.info(
+            "[updateAccountStatuses] Syncing verified account (gap fix)",
+            {
+              uid: doc.id,
+              previousStatus: "pendingVerification",
+              newStatus: "active",
+            }
+          );
+        } else {
+          // Truly unverified: restrict and schedule deletion.
+          const deletionDate = new Date(
+            createdAt.toDate().getTime() + 30 * 24 * 60 * 60 * 1000
+          );
+          batch.update(doc.ref, {
+            accountStatus: "restricted",
+            deletionScheduledAt:
+              admin.firestore.Timestamp.fromDate(deletionDate),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          restrictedUserIds.push(doc.id);
+          functions.logger.info(
+            "[updateAccountStatuses] Transitioning account",
+            {
+              uid: doc.id,
+              previousStatus: "pendingVerification",
+              newStatus: "restricted",
+              createdAt: createdAt.toDate().toISOString(),
+              deletionScheduledAt: deletionDate.toISOString(),
+            }
+          );
+        }
       }
 
       await batch.commit();
@@ -89,8 +129,10 @@ export const updateAccountStatuses = functions.region('europe-west6').pubsub
       functions.logger.info(
         "[updateAccountStatuses] Completed successfully",
         {
-          transitioned: transitionedUserIds.length,
-          userIds: transitionedUserIds,
+          restricted: restrictedUserIds.length,
+          syncedToActive: syncedUserIds.length,
+          restrictedIds: restrictedUserIds,
+          syncedIds: syncedUserIds,
         }
       );
     } catch (error: unknown) {

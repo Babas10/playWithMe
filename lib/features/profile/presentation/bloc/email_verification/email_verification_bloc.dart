@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_state.dart';
@@ -9,6 +10,7 @@ import 'package:play_with_me/features/profile/presentation/bloc/email_verificati
 class EmailVerificationBloc
     extends Bloc<EmailVerificationEvent, EmailVerificationState> {
   final AuthRepository _authRepository;
+  final UserRepository _userRepository;
 
   /// Cooldown duration between resend attempts (60 seconds)
   static const int resendCooldownSeconds = 60;
@@ -19,9 +21,12 @@ class EmailVerificationBloc
   /// Subscription to auth state changes
   StreamSubscription<dynamic>? _authStateSubscription;
 
-  EmailVerificationBloc({required AuthRepository authRepository})
-    : _authRepository = authRepository,
-      super(const EmailVerificationState.initial()) {
+  EmailVerificationBloc({
+    required AuthRepository authRepository,
+    required UserRepository userRepository,
+  }) : _authRepository = authRepository,
+       _userRepository = userRepository,
+       super(const EmailVerificationState.initial()) {
     on<EmailVerificationCheckStatus>(_onCheckStatus);
     on<EmailVerificationSendEmail>(_onSendEmail);
     on<EmailVerificationRefreshStatus>(_onRefreshStatus);
@@ -179,6 +184,11 @@ class EmailVerificationBloc
       // Check updated verification status
       if (user.isEmailVerified) {
         emit(EmailVerificationState.verified(verifiedAt: user.lastSignInAt));
+        try {
+          await _userRepository.markEmailVerified();
+        } catch (_) {
+          // Non-fatal: see _onAuthStateChanged comment.
+        }
       } else {
         final cooldown = _calculateCooldown();
         emit(
@@ -232,6 +242,14 @@ class EmailVerificationBloc
   ) async {
     if (event.isVerified) {
       emit(EmailVerificationState.verified(verifiedAt: event.verifiedAt));
+      // Sync verified status to Firestore so accountStatus becomes 'active'
+      // and the email verification banner disappears on next app open.
+      try {
+        await _userRepository.markEmailVerified();
+      } catch (_) {
+        // Non-fatal: the UI is already showing verified, Firestore will be
+        // corrected by the updateAccountStatuses safety-net job if this fails.
+      }
     }
   }
 

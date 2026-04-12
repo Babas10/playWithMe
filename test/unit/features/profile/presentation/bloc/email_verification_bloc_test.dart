@@ -5,15 +5,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:play_with_me/features/auth/domain/entities/user_entity.dart';
 import 'package:play_with_me/features/auth/domain/repositories/auth_repository.dart';
+import 'package:play_with_me/core/domain/repositories/user_repository.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_bloc.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_event.dart';
 import 'package:play_with_me/features/profile/presentation/bloc/email_verification/email_verification_state.dart';
 
 // Mock classes
 class MockAuthRepository extends Mock implements AuthRepository {}
+class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   late MockAuthRepository mockAuthRepository;
+  late MockUserRepository mockUserRepository;
   late EmailVerificationBloc bloc;
 
   final testUser = UserEntity(
@@ -30,9 +33,13 @@ void main() {
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
+    mockUserRepository = MockUserRepository();
     when(
       () => mockAuthRepository.authStateChanges,
     ).thenAnswer((_) => Stream<UserEntity?>.value(testUser));
+    when(
+      () => mockUserRepository.markEmailVerified(),
+    ).thenAnswer((_) async {});
   });
 
   tearDown(() {
@@ -41,7 +48,7 @@ void main() {
 
   group('EmailVerificationBloc', () {
     test('initial state is EmailVerificationInitial', () {
-      bloc = EmailVerificationBloc(authRepository: mockAuthRepository);
+      bloc = EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
       expect(bloc.state, equals(const EmailVerificationState.initial()));
     });
 
@@ -50,7 +57,7 @@ void main() {
         'emits [loading, pending] when user is not verified',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.checkStatus()),
         expect: () => [
@@ -68,7 +75,7 @@ void main() {
         'emits [loading, verified] when user is already verified',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(verifiedUser);
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.checkStatus()),
         expect: () => [
@@ -83,7 +90,7 @@ void main() {
         'emits [loading, error] when user is null',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(null);
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.checkStatus()),
         expect: () => [
@@ -100,7 +107,7 @@ void main() {
           when(
             () => mockAuthRepository.currentUser,
           ).thenThrow(Exception('Connection error'));
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.checkStatus()),
         expect: () => [
@@ -121,7 +128,7 @@ void main() {
           when(
             () => mockAuthRepository.sendEmailVerification(),
           ).thenAnswer((_) async {});
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) =>
             bloc.add(const EmailVerificationEvent.sendVerificationEmail()),
@@ -148,7 +155,7 @@ void main() {
         'emits [loading, verified] when user is already verified',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(verifiedUser);
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) =>
             bloc.add(const EmailVerificationEvent.sendVerificationEmail()),
@@ -167,7 +174,7 @@ void main() {
         'emits [error] when user is null',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(null);
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) =>
             bloc.add(const EmailVerificationEvent.sendVerificationEmail()),
@@ -187,7 +194,7 @@ void main() {
           when(
             () => mockAuthRepository.sendEmailVerification(),
           ).thenThrow(Exception('Failed to send email'));
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) =>
             bloc.add(const EmailVerificationEvent.sendVerificationEmail()),
@@ -208,7 +215,7 @@ void main() {
           when(
             () => mockAuthRepository.sendEmailVerification(),
           ).thenAnswer((_) async {});
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) async {
           // First send
@@ -237,7 +244,7 @@ void main() {
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(verifiedUser);
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.refreshStatus()),
         expect: () => [
@@ -256,7 +263,7 @@ void main() {
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.refreshStatus()),
         expect: () => [
@@ -278,7 +285,7 @@ void main() {
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(null);
           when(() => mockAuthRepository.reloadUser()).thenAnswer((_) async {});
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.refreshStatus()),
         expect: () => [
@@ -296,7 +303,7 @@ void main() {
           when(
             () => mockAuthRepository.reloadUser(),
           ).thenThrow(Exception('Network error'));
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.refreshStatus()),
         expect: () => [
@@ -315,7 +322,7 @@ void main() {
         'emits [pending] when user exists and is not verified',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(testUser);
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.resetError()),
         expect: () => [
@@ -332,7 +339,7 @@ void main() {
         'emits [verified] when user exists and is verified',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(verifiedUser);
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.resetError()),
         expect: () => [
@@ -346,7 +353,7 @@ void main() {
         'emits [initial] when user is null',
         build: () {
           when(() => mockAuthRepository.currentUser).thenReturn(null);
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         act: (bloc) => bloc.add(const EmailVerificationEvent.resetError()),
         expect: () => [const EmailVerificationState.initial()],
@@ -360,7 +367,7 @@ void main() {
           when(
             () => mockAuthRepository.authStateChanges,
           ).thenAnswer((_) => Stream<UserEntity?>.value(verifiedUser));
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         expect: () => [
           EmailVerificationState.verified(
@@ -375,7 +382,7 @@ void main() {
           when(
             () => mockAuthRepository.authStateChanges,
           ).thenAnswer((_) => Stream<UserEntity?>.value(testUser));
-          return EmailVerificationBloc(authRepository: mockAuthRepository);
+          return EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
         },
         expect: () => [],
       );
@@ -388,7 +395,7 @@ void main() {
           () => mockAuthRepository.sendEmailVerification(),
         ).thenAnswer((_) async {});
 
-        bloc = EmailVerificationBloc(authRepository: mockAuthRepository);
+        bloc = EmailVerificationBloc(authRepository: mockAuthRepository, userRepository: mockUserRepository);
 
         // Send email
         bloc.add(const EmailVerificationEvent.sendVerificationEmail());

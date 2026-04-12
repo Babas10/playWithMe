@@ -297,6 +297,15 @@ class MockUserRepository implements UserRepository {
       calculatedAt: DateTime.now(),
     );
   }
+
+  int markEmailVerifiedCallCount = 0;
+  Exception? markEmailVerifiedError;
+
+  @override
+  Future<void> markEmailVerified() async {
+    markEmailVerifiedCallCount++;
+    if (markEmailVerifiedError != null) throw markEmailVerifiedError!;
+  }
 }
 
 // Test data helpers
