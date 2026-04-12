@@ -24,7 +24,6 @@ mixin _$UserEntity {
   bool get isEmailVerified => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get lastSignInAt => throw _privateConstructorUsedError;
-  bool get isAnonymous => throw _privateConstructorUsedError;
   List<String> get fcmTokens =>
       throw _privateConstructorUsedError; // Social graph cache fields (Story 11.6)
   List<String> get friendIds => throw _privateConstructorUsedError;
@@ -53,7 +52,6 @@ abstract class $UserEntityCopyWith<$Res> {
     bool isEmailVerified,
     DateTime? createdAt,
     DateTime? lastSignInAt,
-    bool isAnonymous,
     List<String> fcmTokens,
     List<String> friendIds,
     int friendCount,
@@ -83,7 +81,6 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
     Object? isEmailVerified = null,
     Object? createdAt = freezed,
     Object? lastSignInAt = freezed,
-    Object? isAnonymous = null,
     Object? fcmTokens = null,
     Object? friendIds = null,
     Object? friendCount = null,
@@ -119,10 +116,6 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
                 ? _value.lastSignInAt
                 : lastSignInAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
-            isAnonymous: null == isAnonymous
-                ? _value.isAnonymous
-                : isAnonymous // ignore: cast_nullable_to_non_nullable
-                      as bool,
             fcmTokens: null == fcmTokens
                 ? _value.fcmTokens
                 : fcmTokens // ignore: cast_nullable_to_non_nullable
@@ -162,7 +155,6 @@ abstract class _$$UserEntityImplCopyWith<$Res>
     bool isEmailVerified,
     DateTime? createdAt,
     DateTime? lastSignInAt,
-    bool isAnonymous,
     List<String> fcmTokens,
     List<String> friendIds,
     int friendCount,
@@ -191,7 +183,6 @@ class __$$UserEntityImplCopyWithImpl<$Res>
     Object? isEmailVerified = null,
     Object? createdAt = freezed,
     Object? lastSignInAt = freezed,
-    Object? isAnonymous = null,
     Object? fcmTokens = null,
     Object? friendIds = null,
     Object? friendCount = null,
@@ -227,10 +218,6 @@ class __$$UserEntityImplCopyWithImpl<$Res>
             ? _value.lastSignInAt
             : lastSignInAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
-        isAnonymous: null == isAnonymous
-            ? _value.isAnonymous
-            : isAnonymous // ignore: cast_nullable_to_non_nullable
-                  as bool,
         fcmTokens: null == fcmTokens
             ? _value._fcmTokens
             : fcmTokens // ignore: cast_nullable_to_non_nullable
@@ -263,7 +250,6 @@ class _$UserEntityImpl extends _UserEntity {
     required this.isEmailVerified,
     this.createdAt,
     this.lastSignInAt,
-    required this.isAnonymous,
     final List<String> fcmTokens = const [],
     final List<String> friendIds = const [],
     this.friendCount = 0,
@@ -286,8 +272,6 @@ class _$UserEntityImpl extends _UserEntity {
   final DateTime? createdAt;
   @override
   final DateTime? lastSignInAt;
-  @override
-  final bool isAnonymous;
   final List<String> _fcmTokens;
   @override
   @JsonKey()
@@ -316,7 +300,7 @@ class _$UserEntityImpl extends _UserEntity {
 
   @override
   String toString() {
-    return 'UserEntity(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, isAnonymous: $isAnonymous, fcmTokens: $fcmTokens, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated)';
+    return 'UserEntity(uid: $uid, email: $email, displayName: $displayName, photoUrl: $photoUrl, isEmailVerified: $isEmailVerified, createdAt: $createdAt, lastSignInAt: $lastSignInAt, fcmTokens: $fcmTokens, friendIds: $friendIds, friendCount: $friendCount, friendsLastUpdated: $friendsLastUpdated)';
   }
 
   @override
@@ -336,8 +320,6 @@ class _$UserEntityImpl extends _UserEntity {
                 other.createdAt == createdAt) &&
             (identical(other.lastSignInAt, lastSignInAt) ||
                 other.lastSignInAt == lastSignInAt) &&
-            (identical(other.isAnonymous, isAnonymous) ||
-                other.isAnonymous == isAnonymous) &&
             const DeepCollectionEquality().equals(
               other._fcmTokens,
               _fcmTokens,
@@ -362,7 +344,6 @@ class _$UserEntityImpl extends _UserEntity {
     isEmailVerified,
     createdAt,
     lastSignInAt,
-    isAnonymous,
     const DeepCollectionEquality().hash(_fcmTokens),
     const DeepCollectionEquality().hash(_friendIds),
     friendCount,
@@ -387,7 +368,6 @@ abstract class _UserEntity extends UserEntity {
     required final bool isEmailVerified,
     final DateTime? createdAt,
     final DateTime? lastSignInAt,
-    required final bool isAnonymous,
     final List<String> fcmTokens,
     final List<String> friendIds,
     final int friendCount,
@@ -409,8 +389,6 @@ abstract class _UserEntity extends UserEntity {
   DateTime? get createdAt;
   @override
   DateTime? get lastSignInAt;
-  @override
-  bool get isAnonymous;
   @override
   List<String> get fcmTokens; // Social graph cache fields (Story 11.6)
   @override

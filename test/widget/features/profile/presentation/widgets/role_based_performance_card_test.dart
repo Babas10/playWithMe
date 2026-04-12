@@ -19,7 +19,6 @@ void main() {
         email: 'test@example.com',
         displayName: 'Test User',
         isEmailVerified: true,
-        isAnonymous: false,
         roleBasedStats: null,
       );
 
@@ -28,7 +27,6 @@ void main() {
         email: 'test2@example.com',
         displayName: 'All Roles User',
         isEmailVerified: true,
-        isAnonymous: false,
         roleBasedStats: RoleBasedStats(
           weakLink: RoleStats(games: 5, wins: 2, winRate: 0.4),
           carry: RoleStats(games: 8, wins: 6, winRate: 0.75),
@@ -41,7 +39,6 @@ void main() {
         email: 'test3@example.com',
         displayName: 'Carry User',
         isEmailVerified: true,
-        isAnonymous: false,
         roleBasedStats: RoleBasedStats(
           carry: RoleStats(games: 10, wins: 8, winRate: 0.8),
         ),
@@ -52,7 +49,6 @@ void main() {
         email: 'test4@example.com',
         displayName: 'WeakLink User',
         isEmailVerified: true,
-        isAnonymous: false,
         roleBasedStats: RoleBasedStats(
           weakLink: RoleStats(games: 6, wins: 4, winRate: 0.667),
         ),

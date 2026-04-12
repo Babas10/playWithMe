@@ -13,11 +13,10 @@ class UserModel with _$UserModel {
     required String email,
     String? displayName,
     String? photoUrl,
-    required bool isEmailVerified,
+    @Default(false) bool isEmailVerified,
     @TimestampConverter() DateTime? createdAt,
     @TimestampConverter() DateTime? lastSignInAt,
     @TimestampConverter() DateTime? updatedAt,
-    required bool isAnonymous,
     // Account status fields (Story 17.8.2)
     @TimestampConverter() DateTime? emailVerifiedAt,
     @Default(AccountStatus.pendingVerification) AccountStatus accountStatus,
@@ -95,7 +94,6 @@ class UserModel with _$UserModel {
       isEmailVerified: isVerified,
       createdAt: creationTime,
       lastSignInAt: firebaseUser.metadata.lastSignInTime,
-      isAnonymous: firebaseUser.isAnonymous,
       // Account status fields (Story 17.8.2)
       emailVerifiedAt: isVerified ? creationTime : null,
       accountStatus: isVerified

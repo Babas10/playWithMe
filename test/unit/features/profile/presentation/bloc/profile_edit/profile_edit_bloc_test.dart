@@ -24,7 +24,6 @@ void main() {
     uid: 'test-uid-123',
     email: 'test@example.com',
     isEmailVerified: true,
-    isAnonymous: false,
   );
 
   setUp(() {

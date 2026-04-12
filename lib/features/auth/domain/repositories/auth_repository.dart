@@ -19,9 +19,6 @@ abstract class AuthRepository {
     required String password,
   });
 
-  /// Sign in anonymously
-  Future<UserEntity> signInAnonymously();
-
   /// Send password reset email
   Future<void> sendPasswordResetEmail({required String email});
 

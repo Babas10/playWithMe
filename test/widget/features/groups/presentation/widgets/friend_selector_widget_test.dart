@@ -83,7 +83,6 @@ void main() {
           email: 'friend1@example.com',
           displayName: 'Friend One',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
         const UserEntity(
           uid: 'friend2',
@@ -91,7 +90,6 @@ void main() {
           displayName: 'Friend Two',
           // photoUrl removed to avoid network image loading in tests
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ];
 
@@ -121,7 +119,6 @@ void main() {
           email: 'friend1@example.com',
           displayName: 'Friend One',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ];
 
@@ -147,7 +144,6 @@ void main() {
           email: 'friend1@example.com',
           displayName: 'Friend One',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ];
 
@@ -191,14 +187,12 @@ void main() {
           email: 'friend1@example.com',
           displayName: 'Friend One',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
         const UserEntity(
           uid: 'friend2',
           email: 'friend2@example.com',
           displayName: 'Friend Two',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ];
 
@@ -235,14 +229,12 @@ void main() {
           email: 'friend1@example.com',
           displayName: 'Friend One',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
         const UserEntity(
           uid: 'friend2',
           email: 'friend2@example.com',
           displayName: 'Friend Two',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ];
 
@@ -295,7 +287,6 @@ void main() {
             email: 'friend1@example.com',
             displayName: 'Friend One',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ];
       });
@@ -326,14 +317,12 @@ void main() {
           email: 'friend1@example.com',
           displayName: 'Friend One',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
         const UserEntity(
           uid: 'friend2',
           email: 'friend2@example.com',
           displayName: 'Friend Two',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ];
 

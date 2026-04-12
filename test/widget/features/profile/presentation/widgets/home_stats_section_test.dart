@@ -14,7 +14,6 @@ void main() {
       email: 'test@example.com',
       displayName: 'Test User',
       isEmailVerified: true,
-      isAnonymous: false,
       eloRating: 1600.0,
       gamesPlayed: 50,
       gamesWon: 30,

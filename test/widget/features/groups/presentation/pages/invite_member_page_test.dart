@@ -62,7 +62,6 @@ void main() {
       email: 'test@example.com',
       displayName: 'Test User',
       isEmailVerified: true,
-      isAnonymous: false,
     );
 
     when(
@@ -124,7 +123,6 @@ void main() {
           email: 'friend1@example.com',
           displayName: 'Friend One',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ];
 

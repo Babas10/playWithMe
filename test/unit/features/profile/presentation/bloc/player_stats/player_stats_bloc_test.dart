@@ -22,7 +22,6 @@ void main() {
     uid: userId,
     email: 'test@example.com',
     isEmailVerified: true,
-    isAnonymous: false,
     eloRating: 1650,
     gamesPlayed: 10,
   );

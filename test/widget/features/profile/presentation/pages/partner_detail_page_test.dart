@@ -87,7 +87,6 @@ void main() {
     displayName: 'John Partner',
     photoUrl: null,
     isEmailVerified: true,
-    isAnonymous: false,
   );
 
   final testPartnerWithoutDisplayName = UserModel(
@@ -96,7 +95,6 @@ void main() {
     displayName: null,
     photoUrl: null,
     isEmailVerified: true,
-    isAnonymous: false,
   );
 
   setUp(() {
@@ -113,7 +111,6 @@ void main() {
           uid: 'test-user',
           email: 'test@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ),
     );

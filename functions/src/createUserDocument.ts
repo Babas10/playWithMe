@@ -11,7 +11,7 @@ import * as admin from "firebase-admin";
  *
  * Features:
  * - Idempotent: Checks if document exists before creating
- * - Works with all signup flows: email/password, OAuth (Google, Apple), anonymous
+ * - Works with all signup flows: email/password, OAuth (Google, Apple)
  * - Initializes profile with predictable structure
  * - Comprehensive logging for monitoring and debugging
  */
@@ -24,7 +24,6 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
       email: user.email,
       displayName: user.displayName,
       providers: user.providerData.map(p => p.providerId),
-      isAnonymous: user.providerData.length === 0,
     });
 
     // Idempotency check: Verify document doesn't already exist.
@@ -33,20 +32,30 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
     // it is missing — a defence against any remaining ordering edge cases.
     const existingDoc = await userRef.get();
     if (existingDoc.exists) {
-      const existingEmail = existingDoc.data()?.email;
-      if (!existingEmail && user.email) {
-        await userRef.update({ email: user.email, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
-        functions.logger.info(`Patched missing email on existing user document`, { uid: user.uid, email: user.email });
+      // Patch any required bool fields that may be missing when updateUserNames
+      // won the race and created the document before this trigger fired.
+      const existingData = existingDoc.data() ?? {};
+      const patch: Record<string, unknown> = {};
+
+      if (!existingData.email && user.email) {
+        patch.email = user.email;
+      }
+      if (existingData.isEmailVerified === undefined || existingData.isEmailVerified === null) {
+        patch.isEmailVerified = user.emailVerified || false;
+      }
+
+      if (Object.keys(patch).length > 0) {
+        patch.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+        await userRef.update(patch);
+        functions.logger.info(`Patched missing fields on existing user document`, { uid: user.uid, patch: Object.keys(patch) });
       } else {
-        functions.logger.info(`User document already exists for ${user.uid}, skipping creation`, { uid: user.uid, email: user.email });
+        functions.logger.info(`User document already exists for ${user.uid}, skipping creation`, { uid: user.uid });
       }
       return;
     }
 
     // Determine signup method for logging
-    const signupMethod = user.providerData.length === 0
-      ? "anonymous"
-      : user.providerData.map(p => p.providerId).join(", ");
+    const signupMethod = user.providerData.map(p => p.providerId).join(", ") || "email";
 
     // Compute grace period expiration (7 days from now)
     const now = new Date();
@@ -66,7 +75,6 @@ export const createUserDocument = functions.region('europe-west6').auth.user().o
 
       // Auth metadata
       isEmailVerified: isVerified,
-      isAnonymous: user.providerData.length === 0,
 
       // Account status fields (Story 17.8.2)
       emailVerifiedAt: isVerified

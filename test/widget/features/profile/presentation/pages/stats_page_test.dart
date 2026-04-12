@@ -34,7 +34,6 @@ void main() {
     uid: userId,
     email: 'test@example.com',
     isEmailVerified: true,
-    isAnonymous: false,
     eloRating: 1500,
     gamesPlayed: 5,
     gamesWon: 3,

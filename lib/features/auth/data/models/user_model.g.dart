@@ -19,7 +19,6 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       lastSignInAt: json['lastSignInAt'] == null
           ? null
           : DateTime.parse(json['lastSignInAt'] as String),
-      isAnonymous: json['isAnonymous'] as bool,
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
@@ -31,5 +30,4 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'isEmailVerified': instance.isEmailVerified,
       'createdAt': instance.createdAt?.toIso8601String(),
       'lastSignInAt': instance.lastSignInAt?.toIso8601String(),
-      'isAnonymous': instance.isAnonymous,
     };

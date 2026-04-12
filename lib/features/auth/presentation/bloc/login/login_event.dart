@@ -21,11 +21,6 @@ class LoginWithEmailAndPasswordSubmitted extends LoginEvent {
   List<Object?> get props => [email, password];
 }
 
-/// Event to attempt anonymous login
-class LoginAnonymouslySubmitted extends LoginEvent {
-  const LoginAnonymouslySubmitted();
-}
-
 /// Event to reset the login form state
 class LoginFormReset extends LoginEvent {
   const LoginFormReset();

@@ -13,7 +13,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginWithEmailAndPasswordSubmitted>(
       _onLoginWithEmailAndPasswordSubmitted,
     );
-    on<LoginAnonymouslySubmitted>(_onLoginAnonymouslySubmitted);
     on<LoginFormReset>(_onLoginFormReset);
   }
 
@@ -51,34 +50,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(const LoginSuccess());
     } catch (error) {
       debugPrint('❌ LoginBloc: Login failed: $error');
-      String errorMessage = error.toString();
-      // Remove "Exception: " prefix if present
-      if (errorMessage.startsWith('Exception: ')) {
-        errorMessage = errorMessage.substring(11);
-      }
-      // Also handle nested exceptions like "Exception: Exception: message"
-      if (errorMessage.startsWith('Exception: ')) {
-        errorMessage = errorMessage.substring(11);
-      }
-      emit(LoginFailure(errorMessage));
-    }
-  }
-
-  Future<void> _onLoginAnonymouslySubmitted(
-    LoginAnonymouslySubmitted event,
-    Emitter<LoginState> emit,
-  ) async {
-    emit(const LoginLoading());
-
-    try {
-      debugPrint('🔐 LoginBloc: Attempting anonymous login');
-
-      await _authRepository.signInAnonymously();
-
-      debugPrint('✅ LoginBloc: Anonymous login successful');
-      emit(const LoginSuccess());
-    } catch (error) {
-      debugPrint('❌ LoginBloc: Anonymous login failed: $error');
       String errorMessage = error.toString();
       // Remove "Exception: " prefix if present
       if (errorMessage.startsWith('Exception: ')) {

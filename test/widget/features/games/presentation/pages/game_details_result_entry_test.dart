@@ -123,7 +123,6 @@ void main() {
           uid: participantId,
           email: '',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ),
     );
@@ -148,7 +147,6 @@ void main() {
             uid: participantId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );
@@ -174,7 +172,6 @@ void main() {
             uid: creatorId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );
@@ -202,7 +199,6 @@ void main() {
             uid: participantId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );
@@ -228,7 +224,6 @@ void main() {
             uid: outsiderId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );
@@ -254,7 +249,6 @@ void main() {
           uid: participantId,
           email: '',
           isEmailVerified: true,
-          isAnonymous: false,
         ),
       ),
     );
@@ -284,7 +278,6 @@ void main() {
             uid: participantId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );
@@ -314,7 +307,6 @@ void main() {
             uid: creatorId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );
@@ -344,7 +336,6 @@ void main() {
             uid: participantId,
             email: '',
             isEmailVerified: true,
-            isAnonymous: false,
           ),
         ),
       );

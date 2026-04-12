@@ -12,7 +12,6 @@ class UserEntity with _$UserEntity {
     required bool isEmailVerified,
     DateTime? createdAt,
     DateTime? lastSignInAt,
-    required bool isAnonymous,
     @Default([]) List<String> fcmTokens,
     // Social graph cache fields (Story 11.6)
     @Default([]) List<String> friendIds,

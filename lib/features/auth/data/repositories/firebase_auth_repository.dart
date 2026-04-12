@@ -94,28 +94,6 @@ class FirebaseAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> signInAnonymously() async {
-    try {
-      final credential = await _firebaseAuth.signInAnonymously();
-
-      if (credential.user == null) {
-        throw Exception('Anonymous sign in failed: User is null');
-      }
-
-      debugPrint('✅ Successfully signed in anonymously');
-      return UserModel.fromFirebaseUser(credential.user!).toEntity();
-    } on FirebaseAuthException catch (e) {
-      debugPrint(
-        '❌ Firebase Auth Error during anonymous sign in: ${e.code} - ${e.message}',
-      );
-      throw _mapFirebaseAuthException(e);
-    } catch (e) {
-      debugPrint('❌ Unexpected error during anonymous sign in: $e');
-      throw Exception('Anonymous sign in failed: $e');
-    }
-  }
-
-  @override
   Future<void> sendPasswordResetEmail({required String email}) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);

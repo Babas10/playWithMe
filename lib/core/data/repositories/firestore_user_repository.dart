@@ -85,7 +85,6 @@ class FirestoreUserRepository implements UserRepository {
         firstName: userData['firstName'] as String?,
         lastName: userData['lastName'] as String?,
         isEmailVerified: false, // Not returned by public profile
-        isAnonymous: false, // Not returned by public profile
       );
     } on FirebaseFunctionsException catch (e) {
       throw UserException('Failed to get user: ${e.code} - ${e.message}');
@@ -139,7 +138,6 @@ class FirestoreUserRepository implements UserRepository {
               firstName: userData['firstName'] as String?,
               lastName: userData['lastName'] as String?,
               isEmailVerified: false, // Not returned by Cloud Function
-              isAnonymous: false, // Not returned by Cloud Function
             );
             _userCache[user.uid] = (user: user, fetchedAt: now);
           }
@@ -353,7 +351,6 @@ class FirestoreUserRepository implements UserRepository {
           displayName: userData['displayName'] as String?,
           photoUrl: userData['photoUrl'] as String?,
           isEmailVerified: false, // Not returned by Cloud Function
-          isAnonymous: false, // Not returned by Cloud Function
         );
       }).toList();
     } on FirebaseFunctionsException catch (e) {
@@ -423,7 +420,6 @@ class FirestoreUserRepository implements UserRepository {
           firstName: userData['firstName'] as String?,
           lastName: userData['lastName'] as String?,
           isEmailVerified: false, // Not returned by Cloud Function
-          isAnonymous: false, // Not returned by Cloud Function
         );
       }).toList();
     } on FirebaseFunctionsException catch (e) {

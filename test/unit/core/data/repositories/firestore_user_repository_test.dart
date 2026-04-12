@@ -77,7 +77,6 @@ void main() {
           'email': testEmail,
           'displayName': 'Test User',
           'isEmailVerified': true,
-          'isAnonymous': false,
         });
 
         final result = await repository.getUserById(testUserId);
@@ -179,7 +178,6 @@ void main() {
           email: testEmail,
           displayName: 'New User',
           isEmailVerified: true,
-          isAnonymous: false,
         );
 
         await repository.createOrUpdateUser(user);
@@ -199,7 +197,6 @@ void main() {
           'email': testEmail,
           'displayName': 'Old Name',
           'isEmailVerified': true,
-          'isAnonymous': false,
         });
 
         final updatedUser = UserModel(
@@ -207,7 +204,6 @@ void main() {
           email: testEmail,
           displayName: 'New Name',
           isEmailVerified: true,
-          isAnonymous: false,
         );
 
         await repository.createOrUpdateUser(updatedUser);
@@ -228,7 +224,6 @@ void main() {
           'email': testEmail,
           'displayName': 'Old Name',
           'isEmailVerified': true,
-          'isAnonymous': false,
         });
 
         await repository.updateUserProfile(
@@ -270,7 +265,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
           'notificationsEnabled': true,
           'emailNotifications': true,
           'pushNotifications': true,
@@ -315,7 +309,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
           'privacyLevel': 'public',
           'showEmail': true,
           'showPhoneNumber': true,
@@ -360,7 +353,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
           'groupIds': <String>[],
         });
 
@@ -394,7 +386,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
           'groupIds': ['group-123', 'group-456'],
         });
 
@@ -429,7 +420,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
           'gameIds': <String>[],
           'gamesPlayed': 0,
           'gamesWon': 0,
@@ -913,7 +903,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
         });
 
         await repository.deleteUser(testUserId);
@@ -931,7 +920,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
         });
 
         final result = await repository.userExists(testUserId);
@@ -1331,7 +1319,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
         });
 
         final result = await repository.getTeammateStats(
@@ -1346,7 +1333,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
           'teammateStats': {
             'other-teammate': {'gamesPlayed': 5, 'gamesWon': 3},
           },
@@ -1364,7 +1350,6 @@ void main() {
         await fakeFirestore.collection('users').doc(testUserId).set({
           'email': testEmail,
           'isEmailVerified': true,
-          'isAnonymous': false,
           'teammateStats': {
             'teammate-123': {
               'gamesPlayed': 10,

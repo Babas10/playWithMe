@@ -150,11 +150,11 @@ describe("createUserDocument", () => {
   // ── Existing document handling ────────────────────────────────────────────
 
   describe("existing document", () => {
-    function buildDbWithExistingDoc(existingEmail: string) {
+    function buildDbWithExistingDoc(existingEmail: string, extraFields: Record<string, unknown> = {}) {
       const docUpdate = jest.fn().mockResolvedValue(undefined);
       const docGet = jest.fn().mockResolvedValue({
         exists: true,
-        data: () => ({ email: existingEmail }),
+        data: () => ({ email: existingEmail, ...extraFields }),
       });
       const db = {
         collection: jest.fn(() => ({
@@ -175,8 +175,8 @@ describe("createUserDocument", () => {
       expect(docUpdate).toHaveBeenCalledWith(expect.objectContaining({ email: "real@example.com" }));
     });
 
-    it("skips entirely when doc exists and email is already set", async () => {
-      const { db, docUpdate } = buildDbWithExistingDoc("existing@example.com");
+    it("skips entirely when doc exists with email and isEmailVerified already set", async () => {
+      const { db, docUpdate } = buildDbWithExistingDoc("existing@example.com", { isEmailVerified: true });
       (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
       const user = makeUser({ email: "existing@example.com" });
 
@@ -184,6 +184,17 @@ describe("createUserDocument", () => {
 
       expect(mockSet).not.toHaveBeenCalled();
       expect(docUpdate).not.toHaveBeenCalled();
+    });
+
+    it("patches isEmailVerified when doc exists with email but missing isEmailVerified", async () => {
+      const { db, docUpdate } = buildDbWithExistingDoc("existing@example.com");
+      (admin.firestore as unknown as jest.Mock).mockReturnValue(db);
+      const user = makeUser({ email: "existing@example.com", emailVerified: true });
+
+      await (createUserDocument as any)(user);
+
+      expect(mockSet).not.toHaveBeenCalled();
+      expect(docUpdate).toHaveBeenCalledWith(expect.objectContaining({ isEmailVerified: true }));
     });
   });
 });

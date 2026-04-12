@@ -40,7 +40,6 @@ void main() {
         uid: 'test-uid',
         email: 'test@example.com',
         isEmailVerified: true,
-        isAnonymous: false,
       );
 
       blocTest<UserBloc, UserState>(
@@ -75,7 +74,6 @@ void main() {
         uid: 'test-uid',
         email: 'test@example.com',
         isEmailVerified: true,
-        isAnonymous: false,
         firstName: 'John',
       );
 
@@ -104,7 +102,6 @@ void main() {
         uid: 'test-uid',
         email: 'test@example.com',
         isEmailVerified: true,
-        isAnonymous: false,
         notificationsEnabled: false,
       );
 
@@ -129,7 +126,6 @@ void main() {
         uid: 'test-uid',
         email: 'test@example.com',
         isEmailVerified: true,
-        isAnonymous: false,
         groupIds: ['group-1'],
       );
 
@@ -151,14 +147,12 @@ void main() {
           uid: 'user-1',
           email: 'user1@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           displayName: 'User One',
         ),
         UserModel(
           uid: 'user-2',
           email: 'user2@example.com',
           isEmailVerified: true,
-          isAnonymous: false,
           displayName: 'User Two',
         ),
       ];
@@ -184,7 +178,6 @@ void main() {
         uid: 'test-uid',
         email: 'test@example.com',
         isEmailVerified: true,
-        isAnonymous: false,
       );
 
       blocTest<UserBloc, UserState>(

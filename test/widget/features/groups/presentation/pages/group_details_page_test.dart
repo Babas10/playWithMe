@@ -96,7 +96,6 @@ void main() {
       displayName: 'Group Owner',
       createdAt: DateTime(2024, 1, 1),
       isEmailVerified: true,
-      isAnonymous: false,
     ),
     UserModel(
       uid: 'member-2',
@@ -104,7 +103,6 @@ void main() {
       displayName: 'Member Two',
       createdAt: DateTime(2024, 1, 1),
       isEmailVerified: true,
-      isAnonymous: false,
     ),
     UserModel(
       uid: 'member-3',
@@ -112,7 +110,6 @@ void main() {
       displayName: 'Member Three',
       createdAt: DateTime(2024, 1, 1),
       isEmailVerified: true,
-      isAnonymous: false,
     ),
   ];
 
@@ -152,7 +149,6 @@ void main() {
           isEmailVerified: true,
           createdAt: DateTime(2024, 1, 1),
           lastSignInAt: DateTime(2024, 1, 1),
-          isAnonymous: false,
         ),
       ),
     );

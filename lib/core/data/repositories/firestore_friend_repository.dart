@@ -204,7 +204,6 @@ class FirestoreFriendRepository implements FriendRepository {
             lastSignInAt: friendData['lastSignInAt'] != null
                 ? DateTime.parse(friendData['lastSignInAt'] as String)
                 : null,
-            isAnonymous: friendData['isAnonymous'] as bool? ?? false,
           );
         }).toList();
       } on FirebaseFunctionsException catch (e) {
@@ -392,7 +391,6 @@ class FirestoreFriendRepository implements FriendRepository {
             lastSignInAt: userData['lastSignInAt'] != null
                 ? DateTime.parse(userData['lastSignInAt'] as String)
                 : null,
-            isAnonymous: userData['isAnonymous'] as bool? ?? false,
           );
         }
 
