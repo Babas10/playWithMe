@@ -62,15 +62,20 @@ class InviteRegistrationBloc
         );
       }
 
-      // Step 3: Persist firstName and lastName to Firestore
+      // Step 3: Persist firstName, lastName and gender to Firestore
       try {
         await _authRepository.updateUserNames(
           firstName: event.firstName.trim(),
           lastName: event.lastName.trim(),
+          gender: event.gender,
         );
-        debugPrint('✅ InviteRegistrationBloc: First/last name persisted');
+        debugPrint(
+          '✅ InviteRegistrationBloc: First/last name and gender persisted',
+        );
       } catch (e) {
-        debugPrint('⚠️ InviteRegistrationBloc: Failed to persist names: $e');
+        debugPrint(
+          '⚠️ InviteRegistrationBloc: Failed to persist names/gender: $e',
+        );
       }
 
       // Step 4: Send email verification (non-blocking)
@@ -181,6 +186,9 @@ class InviteRegistrationBloc
     }
     if (event.password != event.confirmPassword) {
       return 'Passwords do not match';
+    }
+    if (!['male', 'female', 'none'].contains(event.gender)) {
+      return 'Please select a gender';
     }
     return null;
   }

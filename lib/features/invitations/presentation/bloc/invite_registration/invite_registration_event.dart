@@ -17,6 +17,7 @@ class InviteRegistrationSubmitted extends InviteRegistrationEvent {
   final String password;
   final String confirmPassword;
   final String token;
+  final String gender;
 
   const InviteRegistrationSubmitted({
     required this.firstName,
@@ -26,6 +27,7 @@ class InviteRegistrationSubmitted extends InviteRegistrationEvent {
     required this.password,
     required this.confirmPassword,
     required this.token,
+    required this.gender,
   });
 
   @override
@@ -37,6 +39,7 @@ class InviteRegistrationSubmitted extends InviteRegistrationEvent {
     password,
     confirmPassword,
     token,
+    gender,
   ];
 }
 

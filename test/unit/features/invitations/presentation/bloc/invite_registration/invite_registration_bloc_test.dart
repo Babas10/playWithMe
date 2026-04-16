@@ -53,6 +53,7 @@ void main() {
     password: 'Password1',
     confirmPassword: 'Password1',
     token: 'test-token',
+    gender: 'male',
   );
 
   const joinResult = (
@@ -77,6 +78,7 @@ void main() {
       () => mockAuthRepo.updateUserNames(
         firstName: any(named: 'firstName'),
         lastName: any(named: 'lastName'),
+        gender: any(named: 'gender'),
       ),
     ).thenAnswer((_) async {});
     when(() => mockAuthRepo.sendEmailVerification()).thenAnswer((_) async {});
@@ -122,6 +124,7 @@ void main() {
               () => mockAuthRepo.updateUserNames(
                 firstName: 'John',
                 lastName: 'Doe',
+                gender: 'male',
               ),
             ).called(1);
             verify(() => mockAuthRepo.sendEmailVerification()).called(1);
@@ -269,6 +272,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -289,6 +293,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -311,6 +316,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -331,6 +337,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -353,6 +360,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -375,6 +383,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -397,6 +406,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -419,6 +429,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -439,6 +450,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -461,6 +473,7 @@ void main() {
               password: 'Pass1',
               confirmPassword: 'Pass1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -483,6 +496,7 @@ void main() {
               password: 'password1',
               confirmPassword: 'password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -505,6 +519,7 @@ void main() {
               password: 'Password',
               confirmPassword: 'Password',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
@@ -527,11 +542,33 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password2',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
           expect: () => [
             const InviteRegistrationCreatingAccount(),
             const InviteRegistrationFailure(message: 'Passwords do not match'),
+          ],
+        );
+
+        blocTest<InviteRegistrationBloc, InviteRegistrationState>(
+          'emits failure when gender is invalid',
+          build: buildBloc,
+          act: (bloc) => bloc.add(
+            const InviteRegistrationSubmitted(
+              firstName: 'John',
+              lastName: 'Doe',
+              displayName: 'JohnD',
+              email: 'john@example.com',
+              password: 'Password1',
+              confirmPassword: 'Password1',
+              token: 'test-token',
+              gender: '',
+            ),
+          ),
+          expect: () => [
+            const InviteRegistrationCreatingAccount(),
+            const InviteRegistrationFailure(message: 'Please select a gender'),
           ],
         );
       });
