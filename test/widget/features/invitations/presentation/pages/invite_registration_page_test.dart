@@ -58,6 +58,12 @@ void main() {
 
   /// Helper to scroll the submit button into view and tap it.
   Future<void> scrollAndTapSubmit(WidgetTester tester) async {
+    // Expand the test viewport so the full form fits without scrolling issues.
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpAndSettle();
+
     final submitButton = find.text('Create Account & Join');
     await tester.ensureVisible(submitButton);
     await tester.pumpAndSettle();
@@ -450,6 +456,11 @@ void main() {
           'Password1',
         );
 
+        // Select gender
+        await tester.ensureVisible(find.text('Male'));
+        await tester.tap(find.text('Male'));
+        await tester.pumpAndSettle();
+
         await scrollAndTapSubmit(tester);
 
         verify(
@@ -462,6 +473,7 @@ void main() {
               password: 'Password1',
               confirmPassword: 'Password1',
               token: 'test-token',
+              gender: 'male',
             ),
           ),
         ).called(1);
