@@ -223,7 +223,7 @@
   "setQuietHours": "Establecer Horas de Silencio",
   "error": "Error: {message}",
   "pleaseLogInToAddFriends": "Inicia sesión para agregar amigos",
-  "welcomeBack": "¡Bienvenido de Nuevo!",
+  "welcomeBack": "¡Bienvenido!",
   "signInToContinue": "Inicia sesión para continuar organizando tus partidos de voleibol",
   "emailRequired": "El correo electrónico es requerido",
   "validEmailRequired": "Por favor ingresa un correo válido",

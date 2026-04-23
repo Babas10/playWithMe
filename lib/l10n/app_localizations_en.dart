@@ -715,7 +715,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseLogInToAddFriends => 'Please log in to add friends';
 
   @override
-  String get welcomeBack => 'Welcome Back!';
+  String get welcomeBack => 'Welcome!';
 
   @override
   String get signInToContinue =>

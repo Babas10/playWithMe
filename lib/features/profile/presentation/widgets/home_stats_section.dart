@@ -53,22 +53,28 @@ class HomeStatsSection extends StatelessWidget {
               ),
             ),
           ),
-          // Row 1: ELO + Win Rate side-by-side
-          Row(
-            children: [
-              Expanded(child: _buildEloCard(context, l10n, trendData)),
-              const SizedBox(width: 15),
-              Expanded(child: _buildWinRateCard(context, l10n)),
-            ],
+          // Row 1: ELO + Win Rate side-by-side — IntrinsicHeight ensures equal height
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: _buildEloCard(context, l10n, trendData)),
+                const SizedBox(width: 15),
+                Expanded(child: _buildWinRateCard(context, l10n)),
+              ],
+            ),
           ),
           const SizedBox(height: 15),
-          // Row 2: Streak + Games Played side-by-side
-          Row(
-            children: [
-              Expanded(child: _buildStreakCard(context, l10n, hasStreak)),
-              const SizedBox(width: 15),
-              Expanded(child: _buildGamesPlayedCard(context, l10n)),
-            ],
+          // Row 2: Streak + Games Played side-by-side — IntrinsicHeight ensures equal height
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: _buildStreakCard(context, l10n, hasStreak)),
+                const SizedBox(width: 15),
+                Expanded(child: _buildGamesPlayedCard(context, l10n)),
+              ],
+            ),
           ),
         ],
       ),

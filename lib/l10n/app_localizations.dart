@@ -1445,7 +1445,7 @@ abstract class AppLocalizations {
   /// Welcome back heading on login page
   ///
   /// In en, this message translates to:
-  /// **'Welcome Back!'**
+  /// **'Welcome!'**
   String get welcomeBack;
 
   /// Subtitle on login page
