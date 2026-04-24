@@ -8,7 +8,7 @@ import 'package:play_with_me/features/profile/presentation/widgets/ranking_stats
 
 void main() {
   group('RankingStatsCards', () {
-    testWidgets('shows empty state when ranking is null', (tester) async {
+    testWidgets('shows dash for all ranking cards when ranking is null', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: const [
@@ -22,8 +22,11 @@ void main() {
         ),
       );
 
-      expect(find.byIcon(Icons.lock_outline), findsOneWidget);
-      expect(find.text('Play games to unlock rankings'), findsOneWidget);
+      // All three ranking cards (global rank, percentile, friends rank) show '-'
+      // Streak card also shows '-' when currentStreak is 0 (default)
+      expect(find.text('-'), findsNWidgets(4));
+      expect(find.byIcon(Icons.lock_outline), findsNothing);
+      expect(find.text('Play games to unlock rankings'), findsNothing);
     });
 
     testWidgets('displays global rank correctly', (tester) async {

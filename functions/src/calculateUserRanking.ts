@@ -63,6 +63,17 @@ export async function calculateUserRankingHandler(
       eloGamesPlayed,
     });
 
+    // User has not played any ELO-eligible games yet — no ranking available.
+    // Returning a rank when the user is excluded from totalUsers would produce
+    // a nonsensical result such as "16 of 15".
+    if (eloGamesPlayed === 0) {
+      functions.logger.info("User has no ELO games played, skipping ranking", {userId});
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "No ELO games played yet."
+      );
+    }
+
     // 3 & 4. Run both count queries in parallel — they only depend on userElo
     const [higherEloCount, totalUsersSnapshot] = await Promise.all([
       db.collection("users")

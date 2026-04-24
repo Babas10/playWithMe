@@ -1303,6 +1303,23 @@ void main() {
           ),
         );
       });
+
+      test('returns null when user has no ELO games played (failed-precondition)', () async {
+        final mockCallable = MockHttpsCallable();
+
+        when(
+          () => mockFunctions.httpsCallable('calculateUserRanking'),
+        ).thenReturn(mockCallable);
+        when(() => mockCallable.call<Map<String, dynamic>>()).thenThrow(
+          FirebaseFunctionsException(
+            code: 'failed-precondition',
+            message: 'No ELO games played yet.',
+          ),
+        );
+
+        final result = await repository.getUserRanking(testUserId);
+        expect(result, isNull);
+      });
     });
 
     group('getTeammateStats', () {

@@ -21,20 +21,16 @@ class RankingStatsCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (ranking == null) {
-      return _buildEmptyState(context);
-    }
-
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 280) {
           return Column(
             children: [
-              _GlobalRankCard(ranking: ranking!),
+              _GlobalRankCard(ranking: ranking),
               const SizedBox(height: 8),
-              _PercentileCard(ranking: ranking!),
+              _PercentileCard(ranking: ranking),
               const SizedBox(height: 8),
-              _FriendsRankCard(ranking: ranking!),
+              _FriendsRankCard(ranking: ranking),
               const SizedBox(height: 8),
               _StreakCard(currentStreak: currentStreak),
             ],
@@ -43,11 +39,11 @@ class RankingStatsCards extends StatelessWidget {
 
         return Row(
           children: [
-            Expanded(child: _GlobalRankCard(ranking: ranking!)),
+            Expanded(child: _GlobalRankCard(ranking: ranking)),
             const SizedBox(width: 6),
-            Expanded(child: _PercentileCard(ranking: ranking!)),
+            Expanded(child: _PercentileCard(ranking: ranking)),
             const SizedBox(width: 6),
-            Expanded(child: _FriendsRankCard(ranking: ranking!)),
+            Expanded(child: _FriendsRankCard(ranking: ranking)),
             const SizedBox(width: 6),
             Expanded(child: _StreakCard(currentStreak: currentStreak)),
           ],
@@ -55,39 +51,11 @@ class RankingStatsCards extends StatelessWidget {
       },
     );
   }
-
-  Widget _buildEmptyState(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.lock_outline,
-            size: 20,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            AppLocalizations.of(context)!.playGamesToUnlockRankings,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 /// Global ranking card
 class _GlobalRankCard extends StatelessWidget {
-  final UserRanking ranking;
+  final UserRanking? ranking;
 
   const _GlobalRankCard({required this.ranking});
 
@@ -97,14 +65,14 @@ class _GlobalRankCard extends StatelessWidget {
       icon: Icons.public,
       iconColor: AppColors.secondary,
       label: AppLocalizations.of(context)!.globalRank,
-      value: ranking.globalRankDisplay,
+      value: ranking?.globalRankDisplay ?? '-',
     );
   }
 }
 
 /// Percentile card — uses a gaussian curve painter instead of a Material icon.
 class _PercentileCard extends StatelessWidget {
-  final UserRanking ranking;
+  final UserRanking? ranking;
 
   const _PercentileCard({required this.ranking});
 
@@ -119,14 +87,14 @@ class _PercentileCard extends StatelessWidget {
         ),
       ),
       label: AppLocalizations.of(context)!.percentile,
-      value: ranking.percentileDisplay,
+      value: ranking?.percentileDisplay ?? '-',
     );
   }
 }
 
 /// Friends ranking card
 class _FriendsRankCard extends StatelessWidget {
-  final UserRanking ranking;
+  final UserRanking? ranking;
 
   const _FriendsRankCard({required this.ranking});
 
@@ -136,9 +104,7 @@ class _FriendsRankCard extends StatelessWidget {
       icon: Icons.people,
       iconColor: AppColors.secondary,
       label: AppLocalizations.of(context)!.friendsRank,
-      value: ranking.friendsRank != null && ranking.totalFriends != null
-          ? ranking.friendsRankDisplay!
-          : '-',
+      value: ranking?.friendsRankDisplay ?? '-',
     );
   }
 }
