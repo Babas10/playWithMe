@@ -24,6 +24,7 @@ import '../bloc/game_details/game_details_bloc.dart';
 import '../bloc/game_details/game_details_event.dart';
 import '../bloc/game_details/game_details_state.dart';
 import '../bloc/game_guest_invitation/game_guest_invitation_bloc.dart';
+import '../widgets/game_chat_section.dart';
 import '../widgets/invite_guest_players_sheet.dart';
 import 'score_entry_page.dart';
 import 'game_result_view_page.dart';
@@ -226,6 +227,8 @@ class _GameDetailsView extends StatelessWidget {
                     const SizedBox(height: 16),
                   ],
                   _PlayersCard(game: game),
+                  const SizedBox(height: 16),
+                  _ChatSectionWrapper(game: game),
                 ],
               ),
             ),
@@ -240,6 +243,26 @@ class _GameDetailsView extends StatelessWidget {
     }
 
     return const SizedBox.shrink();
+  }
+}
+
+class _ChatSectionWrapper extends StatelessWidget {
+  final GameModel game;
+  const _ChatSectionWrapper({required this.game});
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = context.read<AuthenticationBloc>().state;
+    if (authState is! AuthenticationAuthenticated) return const SizedBox.shrink();
+    final currentUserId = authState.user.uid;
+    final currentUserDisplayName = authState.user.displayNameOrEmail;
+    final isPlayer = game.isPlayer(currentUserId);
+    return GameChatSection(
+      gameId: game.id,
+      currentUserId: currentUserId,
+      currentUserDisplayName: currentUserDisplayName,
+      isPlayer: isPlayer,
+    );
   }
 }
 

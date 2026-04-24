@@ -706,5 +706,14 @@
   "vsLabel": "vs",
   "@vsLabel": {
     "description": "Label between two teams in a matchup, e.g. Alice & Bob vs Carol & Dave"
-  }
+  },
+
+  "chatSectionTitle": "Chat",
+  "@chatSectionTitle": {},
+  "chatInputHint": "Nachricht eingeben...",
+  "@chatInputHint": {},
+  "chatEmpty": "Noch keine Nachrichten. Sei der Erste!",
+  "@chatEmpty": {},
+  "chatPlayersOnly": "Nur Spieler können Nachrichten senden",
+  "@chatPlayersOnly": {}
 }
