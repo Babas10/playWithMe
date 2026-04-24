@@ -93,6 +93,7 @@ class FirebaseEmulatorHelper {
       'exercises',
       'feedback',
       'participants',
+      'messages',
     ];
 
     for (final subcollection in subcollections) {
@@ -318,6 +319,46 @@ class FirebaseEmulatorHelper {
     });
 
     return exerciseRef.id;
+  }
+
+  /// Create a test game in Firestore
+  ///
+  /// Helper method to create a game for testing.
+  static Future<String> createTestGame({
+    required String groupId,
+    required String createdBy,
+    required String title,
+    List<String>? playerIds,
+    DateTime? scheduledAt,
+  }) async {
+    final gameRef = FirebaseFirestore.instance.collection('games').doc();
+
+    final now = DateTime.now();
+    final gameScheduledAt = scheduledAt ?? now.add(const Duration(days: 1));
+
+    await gameRef.set({
+      'groupId': groupId,
+      'createdBy': createdBy,
+      'title': title,
+      'description': null,
+      'scheduledAt': Timestamp.fromDate(gameScheduledAt),
+      'createdAt': FieldValue.serverTimestamp(),
+      'status': 'scheduled',
+      'playerIds': playerIds ?? [createdBy],
+      'waitlistIds': [],
+      'maxPlayers': 4,
+      'minPlayers': 2,
+      'allowWaitlist': true,
+      'allowPlayerInvites': true,
+      'visibility': 'group',
+      'scores': [],
+      'eloCalculated': false,
+      'weatherDependent': true,
+      'confirmedBy': [],
+      'location': {'name': 'Test Court'},
+    });
+
+    return gameRef.id;
   }
 
   /// Create a test feedback for a training session
