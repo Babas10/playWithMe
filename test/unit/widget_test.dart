@@ -54,7 +54,7 @@ void main() {
       await tester.pump();
 
       // Verify authentication UI elements are present (not old static content)
-      expect(find.text('Welcome Back!'), findsOneWidget);
+      expect(find.text('Welcome!'), findsOneWidget);
       expect(
         find.text('Sign in to continue organizing your volleyball games'),
         findsOneWidget,

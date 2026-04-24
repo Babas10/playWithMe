@@ -51,7 +51,7 @@ void main() {
       await tester.pump(); // Rebuild with new state
 
       // Should show login screen for unauthenticated users
-      expect(find.text('Welcome Back!'), findsOneWidget);
+      expect(find.text('Welcome!'), findsOneWidget);
       expect(
         find.text('Sign in to continue organizing your volleyball games'),
         findsOneWidget,
@@ -75,7 +75,7 @@ void main() {
       await tester.pump(); // Rebuild with new state
 
       // App shows authentication screen regardless of environment
-      expect(find.text('Welcome Back!'), findsOneWidget);
+      expect(find.text('Welcome!'), findsOneWidget);
       expect(
         find.text('Sign in to continue organizing your volleyball games'),
         findsOneWidget,
@@ -160,7 +160,7 @@ void main() {
         await tester.pump(); // Rebuild with new unauthenticated state
 
         // Should transition to login screen (Unauthenticated state)
-        expect(find.text('Welcome Back!'), findsOneWidget);
+        expect(find.text('Welcome!'), findsOneWidget);
         expect(
           find.text('Sign in to continue organizing your volleyball games'),
           findsOneWidget,
@@ -188,7 +188,7 @@ void main() {
         expect(find.byType(BottomNavigationBar), findsOneWidget);
 
         // Should no longer show login screen elements
-        expect(find.text('Welcome Back!'), findsNothing);
+        expect(find.text('Welcome!'), findsNothing);
         expect(
           find.text('Sign in to continue organizing your volleyball games'),
           findsNothing,

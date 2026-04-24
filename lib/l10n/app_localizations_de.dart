@@ -725,7 +725,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte melden Sie sich an, um Freunde hinzuzufügen';
 
   @override
-  String get welcomeBack => 'Willkommen Zurück!';
+  String get welcomeBack => 'Willkommen!';
 
   @override
   String get signInToContinue =>

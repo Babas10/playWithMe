@@ -1142,7 +1142,7 @@
     "description": "Message when user needs to log in to add friends"
   },
 
-  "welcomeBack": "Welcome Back!",
+  "welcomeBack": "Welcome!",
   "@welcomeBack": {
     "description": "Welcome back heading on login page"
   },

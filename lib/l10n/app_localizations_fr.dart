@@ -729,7 +729,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Veuillez vous connecter pour ajouter des amis';
 
   @override
-  String get welcomeBack => 'Bon Retour !';
+  String get welcomeBack => 'Bienvenue !';
 
   @override
   String get signInToContinue =>
