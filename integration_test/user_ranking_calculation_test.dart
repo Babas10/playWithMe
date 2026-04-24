@@ -59,7 +59,7 @@ void main() {
         functions: FirebaseFunctions.instance,
       );
 
-      final ranking = await repository.getUserRanking(users[3]);
+      final ranking = (await repository.getUserRanking(users[3]))!;
 
       // 4. Verify global ranking
       expect(ranking.globalRank, equals(4)); // 3 users have higher ELO
@@ -101,7 +101,7 @@ void main() {
         functions: FirebaseFunctions.instance,
       );
 
-      final ranking = await repository.getUserRanking(users[4]);
+      final ranking = (await repository.getUserRanking(users[4]))!;
 
       // 4. Verify #1 rank
       expect(ranking.globalRank, equals(1));
@@ -160,7 +160,7 @@ void main() {
         functions: FirebaseFunctions.instance,
       );
 
-      final ranking = await repository.getUserRanking(mainUser.uid);
+      final ranking = (await repository.getUserRanking(mainUser.uid))!;
 
       // 6. Verify friends ranking
       // Main user (1700) should be #3 of 5 friends
@@ -211,7 +211,7 @@ void main() {
         functions: FirebaseFunctions.instance,
       );
 
-      final ranking = await repository.getUserRanking(user.uid);
+      final ranking = (await repository.getUserRanking(user.uid))!;
 
       // 4. Verify no friends ranking
       expect(ranking.friendsRank, isNull);
@@ -279,7 +279,7 @@ void main() {
         functions: FirebaseFunctions.instance,
       );
 
-      final ranking = await repository.getUserRanking(userWithGames2.uid);
+      final ranking = (await repository.getUserRanking(userWithGames2.uid))!;
 
       // 4. Verify only users with games are counted
       expect(ranking.totalUsers, equals(2)); // Only 2 users with games
@@ -359,7 +359,7 @@ void main() {
         functions: FirebaseFunctions.instance,
       );
 
-      final ranking = await repository.getUserRanking(mainUser.uid);
+      final ranking = (await repository.getUserRanking(mainUser.uid))!;
 
       // 5. Verify only friends with games are counted
       expect(ranking.totalFriends, equals(2)); // friend1 and friend3 only
@@ -406,7 +406,7 @@ void main() {
         functions: FirebaseFunctions.instance,
       );
 
-      final ranking = await repository.getUserRanking(user.uid);
+      final ranking = (await repository.getUserRanking(user.uid))!;
 
       // 3. Verify ranking for single user
       expect(ranking.globalRank, equals(1));
@@ -446,7 +446,7 @@ void main() {
         functions: FirebaseFunctions.instance,
       );
 
-      final ranking = await repository.getUserRanking(users[49]);
+      final ranking = (await repository.getUserRanking(users[49]))!;
 
       // 4. Verify percentile
       expect(ranking.globalRank, equals(50)); // 49 users have higher ELO

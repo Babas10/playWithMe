@@ -697,7 +697,7 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<UserRanking> getUserRanking(String userId) {
+  Future<UserRanking?> getUserRanking(String userId) {
     return PerformanceTracer.trace('repo_calculate_user_ranking', () async {
       try {
         final callable = _functions.httpsCallable('calculateUserRanking');
@@ -706,6 +706,9 @@ class FirestoreUserRepository implements UserRepository {
         return UserRanking.fromJson(result.data);
       } on FirebaseFunctionsException catch (e) {
         switch (e.code) {
+          case 'failed-precondition':
+            // User has not played any ELO-eligible games yet — no ranking available.
+            return null;
           case 'unauthenticated':
             throw UserException(
               'You must be logged in to view rankings',

@@ -174,7 +174,7 @@ describe("calculateUserRankingHandler", () => {
     expect(result.totalUsers).toBe(5);
   });
 
-  it("handles user with default ELO (no eloRating field)", async () => {
+  it("throws failed-precondition when user has no ELO games played", async () => {
     mockDb.doc.mockReturnValue({
       get: jest.fn().mockResolvedValue({
         exists: true,
@@ -182,21 +182,11 @@ describe("calculateUserRankingHandler", () => {
       }),
     });
 
-    mockDb.collection.mockImplementation(() => {
-      const get = jest.fn().mockResolvedValue({data: () => ({count: 0})});
-      const countFn = jest.fn().mockReturnValue({get});
-      const where2 = jest.fn().mockReturnValue({count: countFn});
-      const where1 = jest.fn().mockReturnValue({where: where2, count: countFn});
-      return {where: where1};
+    await expect(
+      calculateUserRankingHandler({}, {auth: {uid: "user-123"}} as any)
+    ).rejects.toMatchObject({
+      code: "failed-precondition",
+      message: "No ELO games played yet.",
     });
-
-    const result = await calculateUserRankingHandler(
-      {},
-      {auth: {uid: "user-123"}} as any
-    );
-
-    // Default ELO is 1600, 0 users above → rank 1
-    expect(result.globalRank).toBe(1);
-    expect(typeof result.calculatedAt).toBe("number");
   });
 });
