@@ -233,6 +233,26 @@ service cloud.firestore {
       // Only creator can delete games
       allow delete: if isAuthenticated() &&
                        request.auth.uid == resource.data.createdBy;
+
+      // ============================================
+      // In-Game Chat Messages (Story 14.14)
+      // ============================================
+      // Sub-collection: games/{gameId}/messages
+      // Only players listed in games/{gameId}.playerIds can read or create messages.
+      // No editing or deleting of individual messages by users.
+      match /messages/{messageId} {
+        // Read access: players only
+        allow get, list: if isAuthenticated() &&
+                            request.auth.uid in get(/databases/$(database)/documents/games/$(gameId)).data.playerIds;
+
+        // Create access: players only, and sender must be the authenticated user
+        allow create: if isAuthenticated() &&
+                         request.auth.uid in get(/databases/$(database)/documents/games/$(gameId)).data.playerIds &&
+                         request.resource.data.senderId == request.auth.uid;
+
+        // No editing or deleting of messages by users
+        allow update, delete: if false;
+      }
     }
 
     // ============================================
