@@ -2014,4 +2014,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vsLabel => 'vs';
+
+  @override
+  String get chatSectionTitle => 'Chat';
+
+  @override
+  String get chatInputHint => 'Type a message...';
+
+  @override
+  String get chatEmpty => 'No messages yet. Be the first to say something!';
+
+  @override
+  String get chatPlayersOnly => 'Only players can send messages';
 }

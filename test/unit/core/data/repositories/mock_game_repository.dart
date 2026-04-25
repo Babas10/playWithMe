@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart' as cloud_firestore;
+import 'package:play_with_me/core/data/models/chat_message_model.dart';
 import 'package:play_with_me/core/data/models/game_model.dart';
 import 'package:play_with_me/core/domain/repositories/game_repository.dart';
 
@@ -748,6 +749,19 @@ class MockGameRepository implements GameRepository {
 
     return controller.stream;
   }
+
+  @override
+  Stream<List<ChatMessageModel>> getMessages(String gameId) {
+    return Stream.value([]);
+  }
+
+  @override
+  Future<void> sendMessage({
+    required String gameId,
+    required String senderId,
+    required String senderDisplayName,
+    required String text,
+  }) async {}
 }
 
 // Test data helpers

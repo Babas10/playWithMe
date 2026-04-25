@@ -2941,5 +2941,22 @@
   "vsLabel": "vs",
   "@vsLabel": {
     "description": "Label between two teams in a matchup, e.g. Alice & Bob vs Carol & Dave"
+  },
+
+  "chatSectionTitle": "Chat",
+  "@chatSectionTitle": {
+    "description": "Title of the in-game chat section on the game details page"
+  },
+  "chatInputHint": "Type a message...",
+  "@chatInputHint": {
+    "description": "Hint text in the chat message input field"
+  },
+  "chatEmpty": "No messages yet. Be the first to say something!",
+  "@chatEmpty": {
+    "description": "Placeholder shown when game chat has no messages"
+  },
+  "chatPlayersOnly": "Only players can send messages",
+  "@chatPlayersOnly": {
+    "description": "Message shown to non-players instead of the chat input"
   }
 }

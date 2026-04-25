@@ -8,6 +8,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 import '../../domain/exceptions/repository_exceptions.dart';
 import '../../domain/repositories/game_repository.dart';
+import '../models/chat_message_model.dart';
 import '../models/game_model.dart';
 
 class FirestoreGameRepository implements GameRepository {
@@ -1610,6 +1611,70 @@ class FirestoreGameRepository implements GameRepository {
       );
     } catch (e) {
       throw GameException('Failed to get completed games: $e', code: 'unknown');
+    }
+  }
+
+  @override
+  Stream<List<ChatMessageModel>> getMessages(String gameId) {
+    try {
+      return _firestore
+          .collection(_collection)
+          .doc(gameId)
+          .collection('messages')
+          .orderBy('sentAt', descending: false)
+          .snapshots()
+          .map(
+            (snapshot) => snapshot.docs
+                .map((doc) => ChatMessageModel.fromFirestore(doc))
+                .toList(),
+          )
+          .handleError((error) {
+            if (error is FirebaseException) {
+              throw GameException(
+                'Failed to stream messages: ${error.message}',
+                code: error.code,
+              );
+            }
+            throw GameException(
+              'Failed to stream messages: $error',
+              code: 'stream-error',
+            );
+          });
+    } catch (e) {
+      throw GameException(
+        'Failed to stream messages: $e',
+        code: 'stream-error',
+      );
+    }
+  }
+
+  @override
+  Future<void> sendMessage({
+    required String gameId,
+    required String senderId,
+    required String senderDisplayName,
+    required String text,
+  }) async {
+    try {
+      final message = ChatMessageModel(
+        id: '',
+        senderId: senderId,
+        senderDisplayName: senderDisplayName,
+        text: text,
+        sentAt: DateTime.now(),
+      );
+      await _firestore
+          .collection(_collection)
+          .doc(gameId)
+          .collection('messages')
+          .add(message.toFirestore());
+    } on FirebaseException catch (e) {
+      throw GameException(
+        'Failed to send message: ${e.message}',
+        code: e.code,
+      );
+    } catch (e) {
+      throw GameException('Failed to send message: $e');
     }
   }
 }

@@ -2034,4 +2034,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get vsLabel => 'vs';
+
+  @override
+  String get chatSectionTitle => 'Chat';
+
+  @override
+  String get chatInputHint => 'Scrivi un messaggio...';
+
+  @override
+  String get chatEmpty =>
+      'Nessun messaggio ancora. Sii il primo a dire qualcosa!';
+
+  @override
+  String get chatPlayersOnly => 'Solo i giocatori possono inviare messaggi';
 }

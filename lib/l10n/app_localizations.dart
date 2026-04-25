@@ -3745,6 +3745,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'vs'**
   String get vsLabel;
+
+  /// Title of the in-game chat section on the game details page
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chatSectionTitle;
+
+  /// Hint text in the chat message input field
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message...'**
+  String get chatInputHint;
+
+  /// Placeholder shown when game chat has no messages
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet. Be the first to say something!'**
+  String get chatEmpty;
+
+  /// Message shown to non-players instead of the chat input
+  ///
+  /// In en, this message translates to:
+  /// **'Only players can send messages'**
+  String get chatPlayersOnly;
 }
 
 class _AppLocalizationsDelegate
