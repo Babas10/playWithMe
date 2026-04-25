@@ -132,3 +132,6 @@ export {declineGameGuestInvitation} from "./declineGameGuestInvitation"; // Stor
 export {onGameStatusChangedExpireInvitations} from "./onGameStatusChangedExpireInvitations"; // Story 28.5
 export {getGameInvitationsForUser} from "./getGameInvitationsForUser"; // Story 28.7
 
+// Story 14.16: Delete chat messages when game is completed
+export {onGameCompletedDeleteChatMessages} from "./deleteChatMessages";
+
