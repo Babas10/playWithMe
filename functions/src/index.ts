@@ -79,6 +79,7 @@ export {
   onWaitlistPromoted,
   onGameResultSubmitted, // Story 14.15
   onGameCancelled,
+  onChatMessageCreated, // Story 14.16 (chat message notification)
 } from "./notifications";
 
 // Export game update triggers

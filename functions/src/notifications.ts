@@ -2686,3 +2686,181 @@ export const onGameCancelled = functions.region('europe-west6').firestore
       return null;
     }
   });
+
+/**
+ * Send notification to all players in a game when a new chat message is created.
+ * Skips the sender. Respects notification preferences and quiet hours.
+ */
+export const onChatMessageCreated = functions
+  .region("europe-west6")
+  .firestore.document("games/{gameId}/messages/{messageId}")
+  .onCreate(async (snapshot, context) => {
+    const messageData = snapshot.data();
+    const gameId = context.params.gameId;
+
+    if (!messageData) {
+      functions.logger.warn("[onChatMessageCreated] Message data missing", { gameId });
+      return null;
+    }
+
+    const senderId: string = messageData.senderId;
+    const senderDisplayName: string = messageData.senderDisplayName || "Someone";
+    const text: string = messageData.text || "";
+
+    // Truncate message body for the notification (max 100 chars)
+    const bodyText = text.length > 100 ? `${text.substring(0, 97)}...` : text;
+
+    functions.logger.info("[onChatMessageCreated] New chat message, processing notifications", {
+      gameId,
+      senderId,
+    });
+
+    try {
+      // Fetch the parent game to get playerIds and groupId
+      const gameDoc = await admin.firestore().collection("games").doc(gameId).get();
+      if (!gameDoc.exists) {
+        functions.logger.warn("[onChatMessageCreated] Game not found", { gameId });
+        return null;
+      }
+
+      const gameData = gameDoc.data()!;
+      const playerIds: string[] = gameData.playerIds || [];
+      const groupId: string = gameData.groupId || "";
+
+      if (playerIds.length === 0) {
+        functions.logger.info("[onChatMessageCreated] No players to notify", { gameId });
+        return null;
+      }
+
+      // Track tokens per user for later invalid-token cleanup
+      const userTokenMap = new Map<string, string[]>();
+      const allTokens: string[] = [];
+
+      for (const playerId of playerIds) {
+        // Don't notify the sender
+        if (playerId === senderId) continue;
+
+        const playerDoc = await admin.firestore().collection("users").doc(playerId).get();
+        const playerData = playerDoc.data();
+        if (!playerData) continue;
+
+        const fcmTokens: string[] = playerData.fcmTokens || [];
+        if (fcmTokens.length === 0) continue;
+
+        const prefs = playerData.notificationPreferences || {};
+        const groupPrefs = prefs.groupSpecific?.[groupId];
+        const shouldNotify =
+          groupPrefs?.chatMessage !== false && prefs.chatMessage !== false;
+
+        if (!shouldNotify) {
+          functions.logger.debug("[onChatMessageCreated] Player disabled chat notifications", {
+            playerId,
+            gameId,
+          });
+          continue;
+        }
+
+        if (isQuietHours(prefs.quietHours)) {
+          functions.logger.debug("[onChatMessageCreated] Player in quiet hours", {
+            playerId,
+            gameId,
+          });
+          continue;
+        }
+
+        userTokenMap.set(playerId, fcmTokens);
+        allTokens.push(...fcmTokens);
+      }
+
+      if (allTokens.length === 0) {
+        functions.logger.info("[onChatMessageCreated] No tokens to notify", { gameId });
+        return null;
+      }
+
+      const message: admin.messaging.MulticastMessage = {
+        tokens: allTokens,
+        notification: {
+          title: `${senderDisplayName} in ${gameData.title || "your game"}`,
+          body: bodyText,
+        },
+        data: {
+          type: "chat_message",
+          gameId,
+          groupId,
+          senderId,
+          senderDisplayName,
+        },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "high_importance_channel",
+            clickAction: "FLUTTER_NOTIFICATION_CLICK",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              badge: 1,
+              sound: "default",
+            },
+          },
+        },
+      };
+
+      const response = await admin.messaging().sendEachForMulticast(message);
+
+      functions.logger.info("[onChatMessageCreated] Notification sent", {
+        gameId,
+        senderId,
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+      });
+
+      // Remove invalid tokens
+      if (response.failureCount > 0) {
+        const invalidTokensByUser = new Map<string, string[]>();
+
+        response.responses.forEach((resp, idx) => {
+          if (
+            !resp.success &&
+            (resp.error?.code === "messaging/invalid-registration-token" ||
+              resp.error?.code === "messaging/registration-token-not-registered")
+          ) {
+            const invalidToken = allTokens[idx];
+            for (const [userId, tokens] of userTokenMap.entries()) {
+              if (tokens.includes(invalidToken)) {
+                if (!invalidTokensByUser.has(userId)) {
+                  invalidTokensByUser.set(userId, []);
+                }
+                invalidTokensByUser.get(userId)!.push(invalidToken);
+                break;
+              }
+            }
+          }
+        });
+
+        for (const [userId, tokensToRemove] of invalidTokensByUser.entries()) {
+          await admin
+            .firestore()
+            .collection("users")
+            .doc(userId)
+            .update({
+              fcmTokens: admin.firestore.FieldValue.arrayRemove(...tokensToRemove),
+            });
+          functions.logger.info("[onChatMessageCreated] Removed invalid FCM tokens", {
+            userId,
+            gameId,
+            removedCount: tokensToRemove.length,
+          });
+        }
+      }
+
+      return null;
+    } catch (error) {
+      functions.logger.error("[onChatMessageCreated] Error sending chat notification", {
+        gameId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
+  });
